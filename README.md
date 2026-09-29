@@ -10,9 +10,13 @@ So far it covers: widgets for Spotify (bring back the desktop media player), soc
 
 ## Status
 
-Exploration. The only artefact so far is a web prototype (its casings still carry the earlier placeholder name "relay"):
+Exploration. The only artefact so far is a web prototype:
 
-- [`prototypes/relay-capsule-study.html`](prototypes/relay-capsule-study.html) — capsule assembly study: draggable capsules (Jarvis, GitDiscuss), socket joining with end-cap retraction, a release grip, an independent Checks widget that docks into a drawer bay, and paged digital screens. Open it directly in a browser; no build step.
+- [`prototypes/capsule-study.html`](prototypes/capsule-study.html) — capsule assembly study: draggable capsules (Jarvis, GitDiscuss), socket joining with end-cap retraction, a release grip, an independent Checks widget that docks into a drawer bay, and paged digital screens. Open it directly in a browser; no build step.
+
+## Prior art
+
+[`docs/prior-art.md`](docs/prior-art.md): Konfabulator, Dashboard, Windows Gadgets, Rainmeter, Winamp/Webamp, Sonique, Plasma, Übersicht, WidgetKit, Zebar and more. What worked, what killed them, and where this project is new.
 
 ## Direction
 
