@@ -28,10 +28,16 @@ Exploration. The only artefact so far is a web prototype:
 - **Skins at two levels.** A generic widget design that any skin can style, plus widget authors packaging their own skins. A skin is one shareable file or folder.
 - **User-defined placement regions.** Users define their own dynamic regions (the Mac example: either side of the Dock). Regions track the host OS's layout: Dock, taskbar and menu bar position, auto-hide, and display and resolution changes. Widgets inside a region adjust to it.
 
+- **Actors all the way down.** Each widget is an actor (Zapt) with its own memory and state. That is its sandbox and also how widgets connect. Apps can start actors when they run, so which widgets exist depends on what's running.
+- **One system across machines.** Widgets and actors on the laptop, the NUC and the VPSs all appear as one system. Parts can be disconnected at any time; a disconnected part is offline, not broken.
+- **Functional, not decorative.** Widgets do things. Any single widget can die, but the framework stays useful. Data sources are separate actors, so a dead web service means swapping one source, not rewriting the widget.
+- **Shape-aware surfaces.** A display's content knows its real shape (circle, polygon, ring), not only its width and height.
+
 ## Open questions
 
 - Renderer and toolkit: native rendering in a single host process (e.g. Rust with a 2D renderer) versus a trimmed webview. See the footprint goal.
 - Window model: one OS window per docked group, or per widget?
 - Isolation: how to keep one widget from reading another's data or the user's files, when many widgets share one process.
 - Widget contract: what a widget declares (screens, controls, sockets and their angle ranges, sizes, required permissions) and where its data comes from.
+- HTML/CSS surfaces within the footprint budget: a lightweight HTML/CSS engine (Sciter, litehtml, Blitz) or the OS webview only for surfaces that need it. How to hand the surface its shape (CSS custom properties, `env()`-style safe areas, an SVG path).
 - Messaging between widgets: Zapt as the shared language, plus a language-neutral protocol for widgets written in other languages.
