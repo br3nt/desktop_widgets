@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Relay · Capsule assembly study</title>
+<style>
+:root{color-scheme:dark;--ink:#07100e;--lime:#bddd55;--cyan:#45eddf;--muted:#829d92}
+*{box-sizing:border-box}body{margin:0;background:#141a19;color:#d8e2d7;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;cursor:pointer}button:disabled{opacity:.4;cursor:default}button:focus-visible,a:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid #d0f075;outline-offset:3px}a{color:#b8d899;text-underline-offset:3px}
+header{padding:22px 30px 18px;display:flex;gap:24px;justify-content:space-between;align-items:center;border-bottom:1px solid #d7e5cf16}h1{font-size:23px;letter-spacing:-.8px;margin:0;font-weight:560}h1 span{font-weight:400;color:#8b9d8f}header p{margin:4px 0 0;font-size:13px;color:#91a496}.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tools button,.aux{border:1px solid #5c6d5c;background:linear-gradient(#354338,#26332b);color:#dce8d4;border-radius:5px;padding:8px 13px}.tools button:hover:not(:disabled),.aux:hover{background:#455944}.tools button[aria-pressed=true]{border-color:#c5e67c;color:#e5f5bd}.tools .primary{border-color:#bacd85;color:#e8f5c8;background:linear-gradient(#566c41,#354a2c)}
+#viewport{overflow:auto;background:radial-gradient(ellipse at 42% 30%,#5c736151,transparent 65%),linear-gradient(140deg,#24332e,#101b20)}
+#stage{position:relative;width:1200px;height:695px;margin:auto;isolation:isolate;overflow:hidden;touch-action:none;background:repeating-linear-gradient(115deg,transparent 0 240px,#d1fbd803 241px 480px)}
+.topline{position:absolute;top:25px;left:35px;right:35px;display:flex;justify-content:space-between;gap:30px;z-index:10;pointer-events:none}.topline p{margin:0;color:#b5c9b8;font-size:13px;max-width:730px}#phase{font:11px/1.5 "Courier New",monospace;color:#b8d478;white-space:nowrap}
+#hardware{position:absolute;inset:0;width:1200px;height:695px;pointer-events:none;filter:drop-shadow(0 14px 12px #0007)}
+.module{position:absolute;width:390px;height:130px;user-select:none;touch-action:none;isolation:isolate}
+.module-hardware{position:absolute;inset:0;width:390px;height:130px;overflow:visible;pointer-events:none;z-index:-1;filter:drop-shadow(0 14px 12px #0007)}
+.grip{position:absolute;top:5px;left:44px;width:275px;height:21px;cursor:grab;background:none;border:0;color:#d2dac7;display:flex;justify-content:space-between;align-items:center;padding:0 12px;text-shadow:0 1px #000;font-size:10px;letter-spacing:.4px}
+.grip b{font:bold italic 20px/1 Arial,sans-serif;letter-spacing:-1.2px}.grip:active{cursor:grabbing}
+.screen{position:absolute;left:45px;top:32px;width:294px;height:64px;border:2px solid #020c08;border-radius:5px;background:linear-gradient(#05332d,#002027 45%,#001217);box-shadow:0 0 0 1px #72816a,inset 0 2px 9px #000;overflow:hidden;color:#42f1df}
+.screen:after,.mini-screen:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,#00130622 0 1px,transparent 1px 3px);pointer-events:none}
+.pages{height:100%;width:300%;display:flex;transition:transform 280ms cubic-bezier(.2,.7,.2,1)}.page{width:33.33333%;flex:none;padding:7px 11px;position:relative;overflow:hidden}.page .tiny{font:10px/1.4 "Courier New",monospace;color:#a0c5af}.page strong{font:bold 20px/1.05 "Courier New",monospace;letter-spacing:-.6px;display:block}.page strong em{font-style:normal;color:#c4ed57}.page small{font:11px/1.6 "Courier New",monospace}.page .bar{position:absolute;right:11px;top:10px;display:flex;align-items:end;gap:3px;height:25px}.bar i{width:4px;background:#b9dc46;box-shadow:0 0 3px #b9dc4622}.tabline{position:absolute;left:49px;top:103px;display:flex;gap:8px;align-items:center}.digital-tab{padding:0;background:none;border:0;color:#97ab90;font:10px/1.2 "Courier New",monospace}.digital-tab[aria-selected=true]{color:#d0f673}.physical{position:absolute;top:100px;border-radius:50%;width:20px;height:20px;padding:0;border:2px solid #0a180e;box-shadow:0 0 0 1px #849174,inset 0 1px 2px #ffffbbaa,0 2px 2px #000a;background:radial-gradient(circle at 35% 25%,#fff8af,#d59c27 43%,#58340a 88%);color:#25290b;font:bold 10px/1 Arial}.physical:hover{filter:brightness(1.25)}.run-button{left:289px}.next-button{left:319px;background:radial-gradient(circle at 35% 25%,#acf5ef,#248dab 43%,#0c3643 88%)}.drawer-button{position:absolute;left:189px;top:99px;width:84px;height:21px;border:1px solid #182c1d;clip-path:polygon(7% 0,100% 0,94% 100%,0 100%);color:#162018;background:linear-gradient(#d5decd,#7d9080 45%,#374b3c 50%,#9baa95 58%,#4f6855);font:bold 9px Arial;text-shadow:0 1px #cfdec444;box-shadow:inset 0 1px #fff}
+#tray{position:absolute;width:324px;height:216px;overflow:hidden;pointer-events:none;z-index:0}
+#trayBody{position:absolute;left:0;top:0;width:324px;height:202px;transform:translateY(-190px);transition:transform 450ms cubic-bezier(.2,.75,.2,1);background:linear-gradient(100deg,#717e6c,#344635 5%,#1b2d21 48%,#536853 94%,#132616);border:2px solid #72826a;border-radius:3px 3px 24px 24px;box-shadow:inset 0 0 0 4px #142719,inset 0 0 0 5px #657760,0 9px 13px #0008;pointer-events:auto}
+#tray.open #trayBody{transform:translateY(0)}.rail{position:absolute;top:0;bottom:0;width:9px;background:linear-gradient(90deg,#15291a,#9dab92,#344632);box-shadow:inset 0 0 0 1px #18281b}.rail.l{left:8px}.rail.r{right:8px}
+.trayhead{position:absolute;top:11px;left:27px;right:27px;display:flex;justify-content:space-between;align-items:center;color:#d3ddc5;text-shadow:0 1px #000;font-size:11px}.trayhead button{border:1px solid #607251;border-radius:3px;color:#e1ebc4;background:#1f3323;font-size:10px;padding:2px 8px}
+#bay{position:absolute;left:22px;top:43px;width:276px;height:79px;border:1px solid #527048;background:#06190e;border-radius:7px;box-shadow:inset 0 5px 10px #000a;display:flex;align-items:center;justify-content:center;color:#789a70;font-size:11px;transition:background .15s}
+#bay.hot{background:#1b4428;border-color:#d1f87c;box-shadow:inset 0 0 18px #afdb3a44}
+#emptyBay{display:flex;flex-direction:column;align-items:center;gap:4px}#emptyBay button{font-size:10px;padding:2px 7px;color:#d5edbc;background:#243e26;border:1px solid #627850;border-radius:3px}
+.trayfooter{position:absolute;left:29px;right:29px;top:132px;font:10px/1.6 "Courier New",monospace;color:#abd197}.trayfooter strong{color:#d8e896}.knob-wrap{position:absolute;right:31px;bottom:16px;display:flex;align-items:center;gap:8px;font-size:9px;color:#adc19a}
+#budget{appearance:none;width:32px;height:32px;background:radial-gradient(circle at 30% 25%,#e0e9cf,#94a58c 38%,#4a634a 70%,#132517);border-radius:50%;border:3px solid #142a1b;box-shadow:0 0 0 1px #8d9e7f;position:relative;cursor:ns-resize}
+#budget:after{content:"";position:absolute;left:13px;top:3px;width:3px;height:8px;border-radius:1px;background:#17391c;transform-origin:1px 11px;transform:rotate(var(--angle,0deg))}
+#meter{position:absolute;width:276px;height:78px;touch-action:none;user-select:none;z-index:8;filter:drop-shadow(0 8px 7px #0008)}
+#meter .meter-case{position:absolute;inset:0;border:1px solid #899781;border-radius:20px 10px 18px 10px;background:linear-gradient(170deg,#b5c1a9,#596f55 8%,#2b402f 48%,#546d50 84%,#102e1a);box-shadow:inset 0 2px #d1dbbc77,inset 0 -2px #07190a}
+.meter-grip{position:absolute;left:15px;top:1px;width:211px;height:18px;background:none;border:0;color:#d5e1bf;text-align:left;font:bold 9px Arial;letter-spacing:.4px;cursor:grab}
+.mini-screen{position:absolute;left:13px;right:38px;top:24px;height:40px;border:2px solid #06160c;border-radius:3px;background:linear-gradient(#083531,#002621);box-shadow:0 0 0 1px #728963;overflow:hidden;padding:4px 9px;color:#4eedcc;font:10px "Courier New",monospace}.mini-screen strong{font-size:16px;color:#c9ed71}.meter-lens{position:absolute;right:13px;top:33px;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#e9ffc2,#96ba3c 45%,#294512);border:2px solid #17391c;box-shadow:0 0 0 1px #7c955e}
+#eject{position:absolute;right:14px;top:7px;width:15px;height:13px;border:0;background:none;color:#d8ecc0;padding:0;font-size:10px}
+#callout{max-width:850px;margin:0 0 16px;color:#a9bdac;font-size:13px}
+#callout strong{color:#e2ead7;font-weight:550}#callout p{margin:4px 0}
+#designLegend{display:none;gap:20px;align-items:center;color:#cae6ac;font-size:12px;padding:12px 30px;border-block:1px solid #8aac5e55;background:#152c1ce6}
+#stage.design #designLegend{display:flex}#designLegend label{display:flex;align-items:center;gap:8px;white-space:nowrap}#designLegend input{accent-color:#c5e680}.legendnote{color:#8ca67f;font-size:11px}
+#portOverlay{position:absolute;inset:0;pointer-events:none}#portOverlay .port{position:absolute;width:20px;height:20px;border:2px solid #c0ec6b;border-radius:50%;box-shadow:0 0 10px #b7db6033;display:none}.port:before{content:"";position:absolute;inset:4px;border:1px solid #a8d858;border-radius:50%}.port:after{position:absolute;top:-30px;left:-38px;white-space:nowrap;color:#d2eea5;font:10px "Courier New",monospace;content:attr(data-label)}
+#stage.design .port{display:block}#stage.design #bay{outline:1px dashed #c3e779;outline-offset:5px}#stage.design .screen{outline:1px dashed #55cfce;outline-offset:4px}
+footer{padding:17px 30px 23px;border-top:1px solid #d5e3cf18;color:#879c8e;font-size:12px}footer p{margin:0 0 8px;max-width:1000px}.hint{color:#b4c4b3}
+@media(max-width:850px){header{align-items:flex-start;flex-direction:column;gap:15px;padding:18px}footer{padding:18px}}
+@media(prefers-reduced-motion:reduce){.pages,#trayBody{transition:none}}
+
+
+/* Small recessed release detail, with a larger transparent pointer target. */
+.release-grip{position:absolute;width:22px;height:36px;z-index:12;border:0;background:none;color:#d2e0bd;cursor:ew-resize;touch-action:none;padding:0}
+.release-grip[hidden]{display:none}
+#stage.joined .module{pointer-events:none}
+#stage.joined .module button,#stage.joined .module .screen{pointer-events:auto}
+.release-grip:before{content:"";position:absolute;width:6px;height:24px;left:8px;top:6px;border-radius:3px;background:linear-gradient(90deg,#263b29,#91a184 30%,#c0cdae 50%,#91a184 70%,#263b29);border:1px solid #293c28;box-shadow:0 1px 2px #0008}
+.release-grip svg{display:none}
+.release-grip:hover:before,.release-grip:focus-visible:before{border-color:#bed2a4}
+.release-grip:hover svg{opacity:1}
+.release-grip:after{content:"";position:absolute;bottom:8px;right:7px;width:1px;height:calc(20px * var(--tension,0));background:#e2b75b}
+#stage[data-feel="captured"] #phase,#stage[data-feel="bayCaptured"] #phase{color:#e4fca7}
+#bay{--dock-glow:0}
+#bay:after{content:"";position:absolute;inset:-4px;border:2px solid #dcffa2;border-radius:10px;pointer-events:none;opacity:var(--dock-glow);box-shadow:inset 0 0 22px #bded6866,0 0 22px #b7f34acc,0 0 7px #e4ffad}
+#tray[data-dock-state="near"] #bayStatus{color:#bbd995}
+#tray[data-dock-state="ready"] #bayStatus{color:#e3f7ad}
+#trayBody{transition:transform 330ms cubic-bezier(.17,.75,.28,1)}
+#tray:not(.open) #trayBody{transition-duration:240ms}
+#tray.open #trayBody{transform:translateY(0)}
+@media(prefers-reduced-motion:reduce){#trayBody{transition:none}}
+/* Scoped design record; no changes to the live instrument. */
+.tools .notes-link{padding:8px 4px;font-size:12px}
+.design-notes{max-width:1100px;margin:auto;padding:64px 32px 80px;font-size:16px;line-height:1.75;color:#b9c9be}
+.design-notes .eyebrow{font:11px/1.5 "Courier New",monospace;letter-spacing:1.6px;text-transform:uppercase;color:#bdd77c}
+.design-notes h2{margin:12px 0 16px;font-size:clamp(30px,4vw,44px);line-height:1.12;letter-spacing:-1.4px;color:#e5ebdf;font-weight:550}
+.design-notes .intro{font-size:19px;max-width:750px;color:#d0dace}
+.design-notes nav{display:flex;flex-wrap:wrap;gap:8px 22px;margin:28px 0 36px;padding:18px 0;border-block:1px solid #98b08c33;font-size:13px}
+.design-notes section{scroll-margin-top:24px;padding:24px 0;border-bottom:1px solid #98b08c22}
+.design-notes h3{margin:0 0 16px;color:#dce6d5;font-size:23px;line-height:1.3;font-weight:550;letter-spacing:-.4px}
+.design-notes h4{margin:24px 0 6px;color:#d5e3c9;font-size:16px}
+.design-notes p{margin:10px 0 16px;max-width:850px}
+.design-notes strong{color:#e0e9d9;font-weight:600}
+.design-notes ul{padding-left:23px;max-width:850px}.design-notes li{margin:8px 0}
+.design-notes .layers{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.design-notes .layers>div{border-left:2px solid #86a057;padding-left:20px}
+.design-notes .layers>div+div{border-color:#3aaea6}.design-notes .layers h4{margin-top:0}
+.design-notes .table-scroll{overflow-x:auto;margin:20px 0}
+.design-notes table{width:100%;border-collapse:collapse;text-align:left;font-size:14px;line-height:1.6;min-width:570px}
+.design-notes th{color:#cfddbd;border-bottom:1px solid #80906a;padding:10px 18px 10px 0}
+.design-notes td{vertical-align:top;padding:14px 18px 14px 0;border-bottom:1px solid #71836933}
+.design-notes td:first-child{color:#dbe5d2;width:23%}
+.design-notes .decision{padding:16px 20px;border-left:3px solid #bfdc71;background:#a9c98008;color:#d5e0c9}
+.design-notes details{margin:24px 0;border-block:1px solid #98b08c33;padding:16px 0;font-size:14px}
+.design-notes summary{cursor:pointer;color:#cbdcb5}.design-notes summary:focus-visible{outline:2px solid #d0f075;outline-offset:5px}
+.design-notes code{font-size:.9em;color:#d6e8b7}
+.design-notes .record-end{font-size:13px;color:#94aa98;margin-top:28px}
+@media(max-width:700px){.design-notes{padding:40px 20px 56px}.design-notes .layers{grid-template-columns:1fr;gap:18px}}
+</style></head><body>
+<header><div><h1>Relay <span>/ joining study</span></h1><p>Two instruments. One casing. Independent displays.</p></div><nav class="tools" aria-label="Experiment controls">
+<button id="join" class="primary">Join capsules</button><button id="separate" disabled>Separate</button><button id="design" aria-pressed="false">Design mode</button><button id="reset">Reset</button>
+<a class="notes-link" href="#design-notes">Design &amp; decisions ↓</a></nav></header>
+<div id="viewport"><main id="stage" aria-label="Capsule assembly experiment">
+<div class="topline"><p id="status" role="status" aria-live="polite">Drag the capsules together, or press Join capsules to watch the connection.</p><span id="phase">Separate / two housings</span></div>
+<svg id="hardware" viewBox="0 0 1200 695" aria-hidden="true"><defs>
+<linearGradient id="case" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#d5daca"/><stop offset=".065" stop-color="#909b89"/><stop offset=".14" stop-color="#445141"/><stop offset=".44" stop-color="#253428"/><stop offset=".63" stop-color="#4f614a"/><stop offset=".8" stop-color="#374b35"/><stop offset=".94" stop-color="#0b1a0e"/><stop offset="1" stop-color="#71846b"/></linearGradient>
+<linearGradient id="bevel" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#e5e8d7"/><stop offset=".25" stop-color="#919c83"/><stop offset=".5" stop-color="#172b1a"/><stop offset=".76" stop-color="#768b6e"/><stop offset="1" stop-color="#122c19"/></linearGradient>
+<linearGradient id="cap" x2="1" y2=".2"><stop stop-color="#1a2b1e"/><stop offset=".3" stop-color="#b0bba0"/><stop offset=".43" stop-color="#46583c"/><stop offset=".7" stop-color="#70835f"/><stop offset="1" stop-color="#172c19"/></linearGradient>
+<linearGradient id="cyan" x2="1"><stop stop-color="#0c505b"/><stop offset=".5" stop-color="#6aeee3"/><stop offset="1" stop-color="#12443e"/></linearGradient>
+<linearGradient id="green" x2="1"><stop stop-color="#284919"/><stop offset=".5" stop-color="#b4e441"/><stop offset="1" stop-color="#4f7025"/></linearGradient>
+<pattern id="brush" width="70" height="11" patternUnits="userSpaceOnUse"><path d="M0 1H50M22 4H70M0 8H32" stroke="#c5d8b0" stroke-opacity=".045"/><path d="M10 3H55M0 6H40M26 10H70" stroke="#001003" stroke-opacity=".07"/></pattern>
+<filter id="joinGlow" x="-100%" y="-30%" width="300%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+</defs><g id="shells"></g><g id="socketLights"></g></svg>
+<div id="tray" aria-label="Activity drawer"><div id="trayBody" inert><i class="rail l"></i><i class="rail r"></i>
+<div class="trayhead"><span id="bayStatus">Activity cartridge bay</span><button id="closeDrawer" aria-label="Close drawer">▴ close</button></div>
+<div id="bay" aria-label="Checks widget bay"><div id="emptyBay"><span>Drop the Checks widget here</span><button id="insert">Insert Checks widget</button></div></div>
+<div class="trayfooter"><strong id="activityState">Activity running</strong><br>Drawer belongs to Jarvis.<br>Its contents stay with it.</div>
+<div class="knob-wrap"><span>Concurrency <b id="budgetValue">3</b></span><button id="budget" aria-label="Cycle concurrency limit"></button></div>
+</div></div>
+<section class="module" id="a" aria-label="Jarvis capsule"><svg class="module-hardware" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+<button class="grip" data-drag="a" aria-label="Move Jarvis capsule"><b>relay</b><span>Jarvis / agent control</span><span>⋮⋮</span></button>
+<div class="screen" aria-label="Jarvis digital display"><div class="pages">
+<div class="page"><div class="tiny">Jarvis / active workflow</div><strong id="runText">03 <em>agents running</em></strong><small>Reviewing the capsule renderer</small><div class="bar"><i style="height:9px"></i><i style="height:22px"></i><i style="height:15px"></i><i style="height:25px"></i><i style="height:17px"></i></div></div>
+<div class="page"><div class="tiny">Jarvis / current task</div><strong style="font-size:17px">Verify shell assembly</strong><small>12 checks passed · 2 queued</small></div>
+<div class="page"><div class="tiny">Jarvis / event log</div><small>10:42  joined display state retained<br>10:43  waiting for your next action</small></div>
+</div></div>
+<div class="tabline" role="tablist" aria-label="Jarvis screens"><button class="digital-tab" role="tab" aria-selected="true" data-page="0">Status</button><button class="digital-tab" role="tab" aria-selected="false" data-page="1">Task</button><button class="digital-tab" role="tab" aria-selected="false" data-page="2">Log</button></div>
+<button class="drawer-button" aria-label="Open activity drawer" aria-expanded="false">▾ activity bay</button><button class="physical run-button" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button><button class="physical next-button" aria-label="Next Jarvis screen" title="Next screen">›</button>
+</section>
+<section class="module" id="b" aria-label="GitDiscuss capsule"><svg class="module-hardware" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+<button class="grip" data-drag="b" aria-label="Move GitDiscuss capsule"><b>relay</b><span>GitDiscuss / review queue</span><span>⋮⋮</span></button>
+<div class="screen" aria-label="GitDiscuss digital display"><div class="pages">
+<div class="page"><div class="tiny">GitDiscuss / incoming</div><strong>02 <em>need a decision</em></strong><small>Capsule joining · design feedback</small></div>
+<div class="page"><div class="tiny">GitDiscuss / selected discussion</div><strong style="font-size:17px">Shared casing geometry</strong><small>Brent · 4 comments · ready to review</small></div>
+<div class="page"><div class="tiny">GitDiscuss / event log</div><small>10:41  feedback collected<br>10:43  no workflow links created</small></div>
+</div></div>
+<div class="tabline" role="tablist" aria-label="GitDiscuss screens"><button class="digital-tab" role="tab" aria-selected="true" data-page="0">Queue</button><button class="digital-tab" role="tab" aria-selected="false" data-page="1">Thread</button><button class="digital-tab" role="tab" aria-selected="false" data-page="2">Log</button></div>
+<button class="drawer-button" aria-label="Open selected discussion">▸ view thread</button><button class="physical run-button" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button><button class="physical next-button" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+</section>
+<section id="meter" aria-label="Checks widget"><div class="meter-case"></div><button class="meter-grip" data-drag="meter" aria-label="Move Checks widget">Checks / independent widget ⋮⋮</button><div class="mini-screen"><strong>12 / 14</strong> checks passed<br>2 waiting for approval</div><span class="meter-lens"></span><button id="eject" aria-label="Eject Checks widget" title="Eject from drawer" hidden>↗</button></section>
+<button id="releaseGrip" class="release-grip" data-drag="release" aria-label="Release GitDiscuss: pull right, or press Enter" title="Pull right to release GitDiscuss · Enter to separate" hidden><svg viewBox="0 0 14 6" aria-hidden="true"><path d="M1 1v4M4 1v4M7 1v4M10 1l2 2-2 2" fill="none" stroke="currentColor" stroke-width="1"/></svg></button>
+<div id="portOverlay" aria-hidden="true"><div class="port" id="portA" data-label="End socket · A"></div><div class="port" id="portB" data-label="End socket · B"></div></div>
+</main></div>
+<div id="designLegend"><label><input type="checkbox" id="allowJoin" checked> Capsule end sockets enabled</label><span class="legendnote">Green = connection socket / bay · Cyan = digital display boundary<br>Checks has no joining sockets. It fits the drawer’s containment bay.</span></div>
+<footer><div id="callout"><strong>Chrome moves like an object. Displays behave like software.</strong><p>Drag the engraved nameplates slowly toward each other to feel the magnetic guidance. Hold to explore the pull; release to latch. The slim vertical bar between the displays pulls right to undock. Glow eases in at 120px, grows as you approach, then settles at full brightness within 40px. Both connector types use the same distances.</p><p class="hint">Nameplates move the whole assembly. The drawer guides Checks into its bay; a deliberate pull frees it again. Escape cancels a drag. Join, Separate, Insert and Eject also work with the keyboard.</p></div><p><span class="hint">Working study:</span> magnetic guidance, capture resistance, breakaway latches, casing fusion, group dragging, independent displays, and a guided drawer bay. Agent activity is simulated. Native macOS windows are a later step.</p>
+<p>Only the authored capsule ends can fuse. This experiment uses a fixed connection rule, not procedural synthesis. <a href="relay-sonique-study.html" id="earlier">Earlier form-factor study</a></p></footer>
+<article class="design-notes" id="design-notes" aria-labelledby="record-title">
+<div class="eyebrow">Design record · 29 September 2026 · Relay working title</div>
+<h2 id="record-title">A little machine for<br>working with agents.</h2>
+<p class="intro">A Sonique-inspired, skinnable workspace: independent instruments that can come together as one tangible object, while keeping their own digital lives.</p>
+<p class="decision"><strong>Docking study accepted.</strong> The current magnetic interaction and connection feedback are the approved baseline. Fine tuning of distances and easing is deferred. These notes describe that baseline; they do not change it.</p>
+<nav aria-label="Design record sections"><a href="#design-intent">Intent</a><a href="#design-layers">Two UI layers</a><a href="#design-connections">Composition</a><a href="#design-feedback">Docking contract</a><a href="#design-decisions">Decisions</a><a href="#design-next">Scope &amp; next steps</a></nav>
+<section id="design-intent"><h3>01 / The instrument, not the music player</h3>
+<p>An interaction study for agentic workflows, potentially spanning Command Center, Jarvis, GitDiscuss and a prototyping tool. This is <strong>not a music player or desktop pet</strong>. The names and activity are illustrative; no services are connected.</p>
+<p>Sonique is the reference for sculpted silhouettes and physical machinery: smoky green-grey metal, curved shoulders, inset cyan displays, lime indicators, lens-like buttons and distinctive blue/green end details. Ornament should frame useful controls, not consume their space.</p>
+<p>The intended family has small, medium and large forms. This experiment isolates a narrower question: can two compact instruments fuse convincingly, separate cleanly and hold another widget in a working drawer? A complete size-morphing system is not yet implemented.</p></section>
+<section id="design-layers"><h3>02 / Two layers, two kinds of behaviour</h3>
+<div class="layers"><div><h4>Physical housing &amp; controls</h4><p>The “chrome”: casing, bevels, buttons, knobs, rails, drawers and connectors. Something you could plausibly fabricate and hold. Motion communicates weight, alignment, resistance and attachment.</p></div><div><h4>Digital display surfaces</h4><p>The programmable screens inside the object: task views, conversations, navigation, readouts and on-screen controls. Their content changes without requiring the surrounding device to change shape.</p></div></div>
+<p>Both layers are interactive. This means <strong>physical versus digital</strong>, not decoration versus functionality. A physical button can change a digital page; a workflow event might eventually expose a physical drawer.</p></section>
+<section id="design-connections"><h3>03 / Authored connections, not universal stretching</h3>
+<p>A skin author chooses which connections exist and what they permit. Some silhouettes should remain standalone. Proximity does not make arbitrary edges compatible.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Behaviour</th><th scope="col">Design rule</th><th scope="col">Current coverage</th></tr></thead><tbody>
+<tr><td>Shared housing</td><td>Inner decorative caps retract. Useful displays come together; ornament remains outside one continuous shell.</td><td>Implemented for the capsule ends.</td></tr>
+<tr><td>Containment</td><td>A widget fits an authored bay. Its container can close around it.</td><td>Checks fits the Jarvis drawer.</td></tr>
+<tr><td>Bolt-on attachment</td><td>A designed connector preserves each distinctive silhouette.</td><td>Agreed direction; not implemented.</td></tr>
+<tr><td>No joining sockets</td><td>A skin may opt out of fusion. Containment is a separate capability.</td><td>Checks has no fusion sockets. Design mode can disable capsule sockets.</td></tr>
+</tbody></table></div>
+<p>Either joined nameplate moves the assembly. Display pages and running/paused states survive joining and separation. The drawer belongs to Jarvis; its loaded widget stays with it when the capsules separate or the drawer closes.</p>
+<p class="decision"><strong>Physical attachment is not workflow wiring.</strong> Joining housings does not share agent context, grant permissions, trigger work or establish a data connection.</p>
+<p>Design mode reveals sockets, display boundaries and the bay. It is an authoring aid, not yet a skin editor. Multiple groups, arbitrary module counts and saved layouts remain future work.</p></section>
+<section id="design-feedback"><h3>04 / A connection should keep its promise</h3>
+<p>Capsules and drawer bays use the same boundaries. Feedback depends on <strong>current proximity</strong>, not approach history. Move away and approach again: the same feedback must return.</p>
+<div class="table-scroll"><table><thead><tr><th scope="col">Distance to aligned pose</th><th scope="col">Light</th><th scope="col">Release outcome</th></tr></thead><tbody>
+<tr><td>Outside 120 px</td><td>No proximity glow. Leaving the boundary eases the light out.</td><td>No connection.</td></tr>
+<tr><td>120 px → above 40 px</td><td>A dim glow eases on, then grows toward medium brightness with closeness. Moving away dims it.</td><td>Nearby, but not ready to connect.</td></tr>
+<tr><td>40 px or less</td><td>Eases to steady full brightness, independent of distance inside this boundary.</td><td>Ready: releasing completes the connection.</td></tr>
+</tbody></table></div>
+<p>These are stage-space distances between the pointer-driven widget pose and its aligned docking pose, <em>before</em> magnetic attraction offsets the visible widget—not the apparent gap between curved edges.</p>
+<p>Transitions are quick but perceptible in both directions. Readiness updates immediately; easing affects only the light. Status text distinguishes nearby from ready while the glow catches up. Attraction, guidance and latch resistance remain separate from visual feedback.</p>
+<h4>Release is intentional</h4><p>Nameplates move the joined group. Pull the small vertical grip right to separate capsules. Checks can be deliberately pulled out or ejected. Breakaway gestures have their own thresholds; these are not different docking radii.</p>
+<p>Escape cancels dragging. Join, Separate, Insert and Eject provide keyboard-operable alternatives. Reduced-motion mode removes timed movement and glow interpolation. Perceived force is simulated through movement; there is no physical haptic feedback.</p>
+<details><summary>Implementation values — recorded, not new tuning targets</summary><ul>
+<li>Shared proximity/capture radii: <code>120 / 40 px</code>.</li>
+<li>Approach glow: <code>0.18 + 0.44 × ((120 − distance) / 80)^0.8</code>. Capture target: <code>1</code>.</li>
+<li>Glow uses a <code>40 ms</code> exponential time constant, not a 40 ms total transition. It settles over several time constants.</li>
+<li>Spring stiffness <code>400</code>, damping <code>40</code>; captured pull <code>0.88</code>. Attraction and glow are independent.</li>
+<li>Capsule <code>390 × 130 px</code>; joined offset <code>316 px</code>; gap between useful displays <code>22 px</code>.</li>
+<li>Visible release bar <code>6 × 24 px</code>, transparent pointer target <code>22 × 36 px</code>.</li>
+<li>Deliberate release thresholds: shell <code>72 px</code> outward; cartridge <code>46 px</code> movement.</li>
+</ul></details></section>
+<section id="design-decisions"><h3>05 / What the experiments taught us</h3><ul>
+<li><strong>Preserve useful centres; relocate ornament.</strong> Fusion is not two complete cases stuck together. Inner end details retract into shared casing.</li>
+<li><strong>Do not turn the release control into another empty module.</strong> The bulky separator became a narrow, centred vertical grip with a larger invisible grab area.</li>
+<li><strong>Glow is a promise, not just atmosphere.</strong> Dim-to-medium means proximity; full means release will capture. Both connection types follow the same rule.</li>
+<li><strong>No hidden penalty for changing direction.</strong> Post-escape suppression was removed so a second approach behaves like the first.</li>
+<li><strong>Preserve the tactile baseline when tuning visuals.</strong> Changing an indicator should not silently change magnetic behaviour.</li>
+<li><strong>Draw each detached object as one coherent stack.</strong> Shell, caps and display must occlude together. Painting all shells before all caps caused overlap artefacts.</li>
+<li><strong>Joining must not steal adjacent controls.</strong> Transparent module bounds must not block neighbouring displays or buttons.</li>
+</ul></section>
+<section id="design-next"><h3>06 / Boundaries &amp; next steps</h3>
+<h4>Working now</h4><p>Capsule fusion and separation, group movement, magnetic guidance, shared proximity feedback, independent display pages, simulated run/pause controls, a sliding drawer, cartridge insertion/ejection and socket visibility in design mode.</p>
+<h4>Still a browser study</h4><p>Counts, tasks and logs are simulated; no external actions occur. Layout does not persist across reloads. Small labels and compact targets need an accessibility pass before production. The desktop-oriented stage scrolls horizontally on narrow screens.</p>
+<h4>Native macOS is a separate proof</h4><p>Borderless floating windows, desktop click-through, focus, Spaces, multiple monitors and Dock-aware placement are not implemented. Transparency in this page does not demonstrate native click-through behaviour.</p>
+<p>The intended permission strategy is <strong>progressive enhancement</strong>: useful manual anchors without extra permissions, with optional enhanced Dock awareness for people who enable the required access. The native mechanism and permissions still need validation. Dynamic positions beside the real Mac Dock remain an intended feature.</p>
+<h4>Proposed next: make the displays earn their space</h4><p>Keep the accepted housing interaction stable and prototype one simulated workflow: <strong>review a proposed change → agent needs a decision → respond in the drawer → inspect the result → return to a compact view</strong>. Use it to decide when a digital page change is enough and when the housing should expose more space. This is a recommendation, not an implemented or approved workflow specification.</p>
+<h4>Procedural composition can wait</h4><p>Paul Merrell’s graph-grammar work is a possible future direction for assembling authored pieces. This prototype uses fixed rules, not wave-function collapse or a graph-grammar engine. Any future system also needs constraints for readable content, accessible controls and understandable navigation—not only compatible geometry.</p></section>
+<section><h3>Reference trail</h3><p>The reference is the original Sonique, not a generic neon dashboard. The earlier form-factor study is linked immediately above this record.</p><ul>
+<li><a href="https://web.archive.org/web/20000229081810/http://www.sonique.com/over.phtml">Archived Sonique overview</a> · <a href="https://web.archive.org/web/20000125193921im_/http://images.sonique.com:80/screenshots/100399sml.jpg">Small-mode screenshot</a> · <a href="https://web.archive.org/web/19991128020835im_/http://images.sonique.com:80/screenshots/100399mid.jpg">Medium-mode screenshot</a></li>
+<li><a href="https://paulmerrell.org/grammar/">Paul Merrell: graph grammars</a> · <a href="https://paulmerrell.org/model-synthesis/">Model synthesis</a></li></ul></section>
+<p class="record-end">Implemented behaviour, agreed principles and future possibilities are deliberately distinguished. <a href="#stage">Back to the experiment ↑</a></p>
+</article>
+<script>
+const $=s=>document.querySelector(s), stage=$('#stage'), W=390,H=130,JOIN_DISTANCE=316;
+const model={a:{x:142,y:215,page:0,running:true},b:{x:684,y:215,page:0,running:true},meter:{x:805,y:505},joined:false,busy:false,drawer:false,docked:false,design:false,allowJoin:true,blend:0,cap:0,light:0,limit:3,feel:'free',tension:0,front:'b'};
+const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
+let drag=null,animationToken=0,dragFrame=0,glowFrame=0,glowTime=0;
+const DOCKING={near:120,capture:40};
+const connectionGlow={socket:{value:0,target:0},bay:{value:0,target:0}};
+const say=text=>$('#status').textContent=text;
+function capsulePath(x,y,width){
+return 'M'+(x+57)+' '+(y+4)+'H'+(x+width-57)+'C'+(x+width-24)+' '+(y+4)+' '+(x+width-5)+' '+(y+23)+' '+(x+width-6)+' '+(y+62)+'C'+(x+width-6)+' '+(y+107)+' '+(x+width-27)+' '+(y+125)+' '+(x+width-57)+' '+(y+126)+'H'+(x+57)+'C'+(x+22)+' '+(y+126)+' '+(x+6)+' '+(y+104)+' '+(x+6)+' '+(y+64)+'C'+(x+6)+' '+(y+27)+' '+(x+23)+' '+(y+4)+' '+(x+57)+' '+(y+4)+'Z';
+}
+function casing(x,y,width,opacity=1){
+const d=capsulePath(x,y,width);
+return '<g opacity="'+opacity+'"><path d="'+d+'" fill="url(#case)" stroke="#0a160c" stroke-width="3"/><path d="'+d+'" fill="url(#brush)"/><path d="M'+(x+27)+' '+(y+35)+'Q'+(x+30)+' '+(y+9)+' '+(x+59)+' '+(y+9)+'H'+(x+width-58)+'Q'+(x+width-29)+' '+(y+9)+' '+(x+width-24)+' '+(y+32)+'" fill="none" stroke="#e5e8d2" stroke-opacity=".7" stroke-width="1.5"/><path d="M'+(x+47)+' '+(y+121)+'H'+(x+width-48)+'" stroke="#91a181" stroke-opacity=".5"/></g>';
+}
+function cap(x,y,right,retract=0){
+ const width=31*(1-retract),dir=right?-1:1,start=right?x+W-14:x+14;
+ if(width<.05)return '';
+ return '<g transform="translate('+start+' '+(y+64)+') scale('+dir*(1-retract)+' 1)"><path d="M0-39Q-12 0 0 39L25 44Q12 0 25-44Z" fill="url(#cap)" stroke="#132a17"/><path d="M7-32Q-1 0 7 32L14 34Q7 0 14-34Z" fill="url(#'+(right?'green':'cyan')+')" stroke="#072516"/><path d="M16-37Q8 0 16 37" stroke="#cced9866" stroke-width="1"/></g>';
+}
+
+// Paint each detached instrument as a single stack: shell, caps and display.
+function socketLight(x,y,state,amount){
+ if(!amount)return '';
+ const intensity=amount;
+ return '<g opacity="'+intensity+'"><rect x="'+(x-6)+'" y="'+(y+28)+'" width="12" height="70" rx="6" fill="#b7f665" filter="url(#joinGlow)"/><rect x="'+(x-2)+'" y="'+(y+32)+'" width="4" height="63" rx="2" fill="#d9ff92"/></g>';
+}
+function renderHardware(){
+ const a=model.a,b=model.b,p=model.blend,state=connectionState('socket'),glow=model.busy?model.light:connectionGlow.socket.value;
+ let shared='';
+ if(p>0)shared=casing(a.x,a.y,b.x+W-a.x,p)+'<g opacity="'+p+'">'+cap(a.x,a.y,false)+cap(b.x,b.y,true)+'</g>';
+ if(model.joined&&model.design)shared+='<path d="M'+(a.x+W-22)+' '+(a.y+23)+'V'+(a.y+112)+'" stroke="#d2ed82" stroke-dasharray="3 4" opacity=".7"/>';
+ $('#shells').innerHTML=shared;
+ for(const id of ['a','b']){
+  const inner= id==='a',individual=casing(0,0,W)+cap(0,0,false,inner?0:model.cap)+cap(0,0,true,inner?model.cap:0);
+  $('#shell-'+id).innerHTML='<g opacity="'+(1-p)+'">'+individual+socketLight(inner?W-22:22,0,state,glow)+'</g>';
+ }
+ $('#socketLights').dataset.dockState=state;
+ $('#socketLights').innerHTML=p>0?'<g opacity="'+p+'">'+socketLight(a.x+W-22,a.y,state,glow)+socketLight(b.x+22,b.y,state,glow)+'</g>':'';
+}
+function render(){
+ updateGlowTargets();renderHardware();paintGlowValues();
+ ['a','b'].forEach(id=>{const m=model[id],el=$('#'+id);el.style.left=m.x+'px';el.style.top=m.y+'px';el.style.zIndex=model.front===id?'3':'2';el.querySelector('.pages').style.transform='translateX(-'+m.page*(100/3)+'%)';el.querySelectorAll('[data-page]').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));const btn=el.querySelector('.run-button');btn.textContent=m.running?'Ⅱ':'▶';btn.setAttribute('aria-label',(m.running?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'));});
+ $('#runText').innerHTML=model.a.running?'03 <em>agents running</em>':'03 <em>agents paused</em>';
+ $('#activityState').textContent=model.a.running?'Activity running':'Activity paused';
+ const bayState=connectionState('bay');$('#bay').dataset.dockState=bayState;$('#tray').dataset.dockState=bayState;
+ const bayLabel=bayState==='ready'?'Release to dock':bayState==='near'?'Nearby · move closer':'Activity cartridge bay';if($('#bayStatus').textContent!==bayLabel)$('#bayStatus').textContent=bayLabel;
+ const tray=$('#tray');tray.style.left=(model.a.x+36)+'px';tray.style.top=(model.a.y+121)+'px';tray.classList.toggle('open',model.drawer);$('#trayBody').inert=!model.drawer;
+ $('#a .drawer-button').setAttribute('aria-expanded',String(model.drawer));$('#a .drawer-button').setAttribute('aria-label',model.drawer?'Close activity drawer':'Open activity drawer');$('#a .drawer-button').textContent=model.drawer?'▴ activity bay':'▾ activity bay';
+ const meter=$('#meter');
+ if(model.docked){if(meter.parentElement!==$('#bay'))$('#bay').append(meter);meter.style.left='0px';meter.style.top='0px';meter.style.transform='translate('+(drag?.kind==='meterLatch'?drag.deflect.x:0)+'px,'+(drag?.kind==='meterLatch'?drag.deflect.y:0)+'px) scale(.98)';meter.style.transformOrigin='top left';meter.inert=!model.drawer}
+ else{if(meter.parentElement!==stage)stage.append(meter);meter.style.left=model.meter.x+'px';meter.style.top=model.meter.y+'px';meter.style.transform='';meter.inert=false}
+ $('#emptyBay').hidden=model.docked;$('#emptyBay').style.display=model.docked?'none':'flex';$('#eject').hidden=!model.docked;
+ stage.classList.toggle('design',model.design);$('#design').setAttribute('aria-pressed',String(model.design));$('#designLegend').style.display=model.design?'flex':'none';
+ $('#portB').hidden=model.joined;$('#portB').style.display=model.design&&!model.joined?'block':'none';$('#portA').dataset.label=model.joined?'Joined sockets':'End socket · A';
+ $('#portA').style.left=(model.a.x+W-30)+'px';$('#portA').style.top=(model.a.y+54)+'px';$('#portB').style.left=(model.b.x+12)+'px';$('#portB').style.top=(model.b.y+54)+'px';
+ $('#portA').style.opacity=$('#portB').style.opacity=model.allowJoin?'1':'.2';
+ $('#join').disabled=model.joined||model.busy||!model.allowJoin;$('#separate').disabled=!model.joined||model.busy;
+ $('#budgetValue').textContent=model.limit;$('#budget').style.setProperty('--angle',(model.limit-1)*36-90+'deg');
+
+ const latch=$('#releaseGrip');latch.hidden=!model.joined||model.busy;latch.style.left=(model.a.x+339)+'px';latch.style.top=(model.a.y+46)+'px';latch.style.setProperty('--tension',model.tension);
+ stage.dataset.feel=model.feel;
+ stage.classList.toggle('joined',model.joined);
+ const labels={approach:'Socket nearby · move closer',captured:'Ready · release to join',escape:'Magnetic hold released',pull:'Latch tension · pull right',bayApproach:'Bay nearby · move closer',bayCaptured:'Ready · release to dock',bayPull:'Cartridge latch · pull to free'};
+ if(!model.busy)$('#phase').textContent=labels[model.feel]||(model.joined?'Joined / one casing':'Separate / two housings');
+
+}
+function tween(duration,fn,token){
+ return new Promise(resolve=>{if(motion.matches){if(token===animationToken)fn(1);resolve(token===animationToken);return}let start=performance.now();function step(now){if(token!==animationToken){resolve(false);return}let t=Math.min(1,(now-start)/duration),e=t*t*(3-2*t);fn(e);if(t<1)requestAnimationFrame(step);else resolve(true)}requestAnimationFrame(step)});
+}
+async function join(fromDrag=false){
+ if(model.busy||model.joined||!model.allowJoin)return;model.busy=true;stopDrag();model.feel='free';const token=++animationToken;render();say('Compatible sockets found. Inner end caps retract; the display contents stay put.');
+ $('#phase').textContent='Sockets illuminated';
+ const initialLight=model.light;
+ if(!await tween(fromDrag===true?90:260,t=>{model.light=initialLight+(1-initialLight)*t;renderHardware()},token))return;
+ $('#phase').textContent='Caps retracting';
+ if(!await tween(fromDrag===true?160:340,t=>{model.cap=t;renderHardware()},token))return;
+ const startA={...model.a},startB={...model.b};const targetX=Math.max(30,Math.min(1200-(JOIN_DISTANCE+W)-30,model.a.x));const targetY=Math.max(110,Math.min(model.drawer?305:385,model.a.y));
+ $('#phase').textContent='Closing the shared casing';
+ if(!await tween(fromDrag===true?310:750,t=>{model.a.x=startA.x+(targetX-startA.x)*t;model.a.y=startA.y+(targetY-startA.y)*t;model.b.x=startB.x+(targetX+JOIN_DISTANCE-startB.x)*t;model.b.y=startB.y+(targetY-startB.y)*t;model.blend=Math.max(0,(t-.68)/.32);model.light=1-t;render()},token))return;
+ model.joined=true;model.busy=false;model.blend=1;model.cap=1;model.light=0;render();say('One shared housing. Drag either nameplate. Each display keeps its own screen and state.');
+}
+async function separate(){
+ if(model.busy||!model.joined)return;model.busy=true;stopDrag();model.feel='free';model.tension=0;const token=++animationToken;render();say('Releasing the shared casing. Both capsules keep their current screens; the drawer stays with Jarvis.');
+ const startA={...model.a},startB={...model.b};const targetA=Math.max(30,Math.min(260,model.a.x));const targetB=Math.min(780,targetA+W+130);
+ $('#phase').textContent='Separating housings';
+ if(!await tween(720,t=>{model.a.x=startA.x+(targetA-startA.x)*t;model.b.x=startB.x+(targetB-startB.x)*t;model.blend=1-Math.min(1,t*3);model.cap=1-Math.max(0,(t-.45)/.55);render()},token))return;
+ model.joined=false;model.busy=false;model.blend=0;model.cap=0;render();say('Separated. Your displays and the drawer contents were preserved.');
+}
+function drawer(open=!model.drawer){if(drag)cancelDrag();model.drawer=open;if(open&&model.a.y>310){const dy=model.a.y-310;model.a.y=310;if(model.joined)model.b.y-=dy}render();say(open?'Activity bay open. Drag Checks into its recess, or use Insert Checks widget.':'Drawer closed. The contained widget remains loaded.')}
+async function insert(){
+ if(model.busy||model.docked)return;if(!model.drawer)drawer(true);stopDrag();model.busy=true;model.feel='free';model.light=0;const token=++animationToken,start={...model.meter},target=bayTarget();render();
+ const distance=Math.hypot(start.x-target.x,start.y-target.y);
+ if(!await tween(distance<75?170:350,t=>{model.meter.x=start.x+(target.x-start.x)*t;model.meter.y=start.y+(target.y-start.y)*t;render()},token))return;
+ model.docked=true;model.busy=false;$('#bay').classList.remove('hot');render();say('Checks seated and latched. Pull its nameplate deliberately to free it, or use Eject.');
+}
+function eject(){if(model.busy)return;stopDrag();model.feel='free';model.docked=false;model.meter.x=Math.min(900,model.a.x+430);model.meter.y=Math.min(505,model.a.y+190);render();say('Checks ejected. Its own casing is restored.')}
+function setPage(id,p){model[id].page=p;render();}
+['a','b'].forEach(id=>{
+ $('#'+id).querySelectorAll('[data-page]').forEach(btn=>btn.onclick=()=>setPage(id,+btn.dataset.page));
+ $('#'+id+' .next-button').onclick=()=>setPage(id,(model[id].page+1)%3);
+ $('#'+id+' .run-button').onclick=()=>{model[id].running=!model[id].running;render();say((id==='a'?'Jarvis':'GitDiscuss')+' simulated activity '+(model[id].running?'resumed.':'paused.'))};
+});
+$('#a .drawer-button').onclick=()=>drawer();$('#b .drawer-button').onclick=()=>setPage('b',1);
+$('#closeDrawer').onclick=()=>drawer(false);$('#insert').onclick=insert;$('#eject').onclick=eject;$('#budget').onclick=()=>{model.limit=model.limit%6+1;render();say('Simulated concurrency limit: '+model.limit+'.')};
+$('#join').onclick=join;$('#separate').onclick=separate;$('#design').onclick=()=>{model.design=!model.design;render();say(model.design?'Design mode: authored capsule sockets and the drawer bay are shown.':'Design mode off. The connection rules remain in effect.')};
+$('#allowJoin').onchange=e=>{model.allowJoin=e.target.checked;render();say(model.allowJoin?'Capsule sockets enabled.':'Capsule sockets disabled. New joins are blocked; existing assembly is retained.')};
+function reset(){
+ ++animationToken;stopDrag();resetGlow();Object.assign(model,{joined:false,busy:false,drawer:false,docked:false,design:false,allowJoin:true,blend:0,cap:0,light:0,limit:3,feel:'free',tension:0,front:'b'});
+ Object.assign(model.a,{x:142,y:215,page:0,running:true});Object.assign(model.b,{x:684,y:215,page:0,running:true});Object.assign(model.meter,{x:805,y:505});$('#allowJoin').checked=true;$('#bay').classList.remove('hot');render();say('Drag the capsules together, or press Join capsules to watch the connection.');
+}
+$('#reset').onclick=reset;
+function local(e){const r=stage.getBoundingClientRect();const scale=r.width/1200;return{x:(e.clientX-r.left)/scale,y:(e.clientY-r.top)/scale}}
+
+const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
+function bayTarget(){return{x:model.a.x+59,y:model.a.y+165}}
+function stopDrag(){cancelAnimationFrame(dragFrame);dragFrame=0;drag=null}
+function snapshot(){return{a:{...model.a},b:{...model.b},meter:{...model.meter},joined:model.joined,docked:model.docked,cap:model.cap,blend:model.blend,front:model.front}}
+function restore(saved){for(const id of ['a','b','meter'])Object.assign(model[id],saved[id]);for(const key of ['joined','docked','cap','blend','front'])model[key]=saved[key]}
+function feedback(feel,text){if(model.feel!==feel&&text)say(text);model.feel=feel}
+function cancelDrag(){
+ if(!drag)return;const saved=drag.saved;stopDrag();restore(saved);model.feel='free';model.tension=0;model.light=0;$('#bay').classList.remove('hot');render();say('Move cancelled. The original assembly and contents are restored.');
+}
+function targetFor(id){
+ if(id==='meter')return model.drawer&&!model.docked?bayTarget():null;
+ if(!model.allowJoin||model.joined)return null;
+ return id==='a'?{x:model.b.x-W-12,y:model.b.y}:{x:model.a.x+W+12,y:model.a.y};
+}
+
+// One spatial rule for every connector. No cooldown, escape gate or capture history.
+function proximity(raw,target){
+ if(!raw||!target)return{state:'idle',distance:Infinity,brightness:0};
+ const distance=Math.hypot(raw.x-target.x,raw.y-target.y);
+ if(distance>DOCKING.near)return{state:'idle',distance,brightness:0};
+ if(distance<=DOCKING.capture)return{state:'ready',distance,brightness:1};
+ const approach=(DOCKING.near-distance)/(DOCKING.near-DOCKING.capture);
+ return{state:'near',distance,brightness:.18+.44*Math.pow(approach,.8)};
+}
+function activeProximity(kind){
+ if(!drag||drag.kind!=='move'||model.busy||!drag.moved||(kind==='bay')!==(drag.id==='meter'))return proximity(null,null);
+ return proximity(drag.raw,targetFor(drag.id));
+}
+function connectionState(kind){return activeProximity(kind).state}
+function paintGlowValues(){
+ $('#bay').style.setProperty('--dock-glow',connectionGlow.bay.value);
+ $('#bay').dataset.glow=connectionGlow.bay.value;
+ $('#socketLights').dataset.glow=connectionGlow.socket.value;
+}
+function glowTick(now){
+ glowFrame=0;const dt=Math.min(64,now-(glowTime||now-16));glowTime=now;let pending=false;
+ for(const g of Object.values(connectionGlow)){
+  g.value+=(g.target-g.value)*(1-Math.exp(-dt/40));
+  if(Math.abs(g.target-g.value)<.002)g.value=g.target;else pending=true;
+ }
+ renderHardware();paintGlowValues();
+ if(pending)glowFrame=requestAnimationFrame(glowTick);else glowTime=0;
+}
+function updateGlowTargets(){
+ for(const kind of ['socket','bay']){const g=connectionGlow[kind];g.target=activeProximity(kind).brightness;if(motion.matches)g.value=g.target}
+ if(!motion.matches&&!glowFrame&&Object.values(connectionGlow).some(g=>g.value!==g.target)){glowTime=performance.now();glowFrame=requestAnimationFrame(glowTick)}
+}
+function resetGlow(){cancelAnimationFrame(glowFrame);glowFrame=0;glowTime=0;for(const g of Object.values(connectionGlow))g.value=g.target=0}
+function magneticGoal(raw,target,id){
+ const p=proximity(raw,target);drag.captured=p.state==='ready';
+ const strength=drag.captured?.88:p.state==='near'?Math.pow(1-p.distance/DOCKING.near,.8)*.85:0;
+ model.light=id==='meter'?0:p.brightness;
+ feedback(drag.captured?(id==='meter'?'bayCaptured':'captured'):strength?(id==='meter'?'bayApproach':'approach'):'free',
+ drag.captured?'Captured. Release to latch; pull away to escape.':strength?'Magnetic guidance. Move closer to engage the latch.':undefined);
+ return target?{x:raw.x+(target.x-raw.x)*strength,y:raw.y+(target.y-raw.y)*strength}:raw;
+}
+function runDragFrame(now){
+ if(!drag)return;
+ const d=drag,dt=Math.min(.032,(now-(d.time||now-16))/1000);d.time=now;
+ if(d.goal&&d.kind==='move'){
+  const m=model[d.id];
+  if(motion.matches){m.x=d.goal.x;m.y=d.goal.y;d.vx=d.vy=0}
+  else{
+   // Critically damped guidance: settle toward the socket without a rubber bounce.
+   const step=dt/3;
+   for(let i=0;i<3;i++){d.vx+=((d.goal.x-m.x)*400-d.vx*40)*step;d.vy+=((d.goal.y-m.y)*400-d.vy*40)*step;m.x+=d.vx*step;m.y+=d.vy*step}
+   if(Math.abs(d.goal.x-m.x)<.03&&Math.abs(d.vx)<.1){m.x=d.goal.x;d.vx=0}
+   if(Math.abs(d.goal.y-m.y)<.03&&Math.abs(d.vy)<.1){m.y=d.goal.y;d.vy=0}
+  }
+  if(d.breakaway){model.cap=clamp(1-(now-d.breakaway)/180,0,1);model.blend=0}
+ }
+ render();dragFrame=requestAnimationFrame(runDragFrame);
+}
+stage.addEventListener('pointerdown',e=>{
+ const target=e.target.closest('[data-drag]');if(!target||e.button!==0||model.busy)return;
+ e.preventDefault();const id=target.dataset.drag,saved=snapshot(),p=local(e);
+ const kind=id==='release'?'shellLatch':id==='meter'&&model.docked?'meterLatch':model.joined&&id!=='meter'?'group':'move';
+ if(id==='release'&&!model.joined)return;
+ if((id==='a'||id==='b')&&!model.joined)model.front=id;
+ const actual=id==='release'?'b':id;
+ drag={id:actual,kind,start:p,saved,origin:kind==='meterLatch'?bayTarget():{...model[actual]},captured:false,raw:null,moved:false,vx:0,vy:0,deflect:{x:0,y:0},goal:null};
+ stage.setPointerCapture(e.pointerId);dragFrame=requestAnimationFrame(runDragFrame);
+});
+stage.addEventListener('pointermove',e=>{
+ if(!drag)return;const d=drag,p=local(e),dx=p.x-d.start.x,dy=p.y-d.start.y;
+ if(Math.abs(dx)+Math.abs(dy)>3)d.moved=true;
+ if(d.kind==='shellLatch'){
+  model.tension=clamp(dx/72,0,1);model.b.x=d.saved.b.x+clamp(dx*.14,0,10);
+  feedback('pull','Pull the slim vertical release bar right. Release early to reseat.');
+  if(dx<72){render();return}
+  model.joined=false;model.blend=0;model.cap=1;model.tension=0;model.front='b';
+  d.kind='move';d.breakaway=performance.now();
+  // Re-extending the inner caps shifts the detached alignment, without a hidden lockout.
+  d.origin.x=d.saved.a.x+W+12;
+  feedback('escape','Latch released. Keep dragging GitDiscuss away; Escape restores the assembly.');
+ }
+ if(d.kind==='meterLatch'){
+  const distance=Math.hypot(dx,dy);d.deflect={x:clamp(dx*.13,-5,5),y:clamp(dy*.13,-5,5)};
+  feedback('bayPull','The cartridge is latched. Pull deliberately to free it.');
+  if(distance<46){render();return}
+  model.docked=false;Object.assign(model.meter,d.origin);d.kind='move';feedback('escape','Cartridge released. Keep dragging, or press Escape to put it back.');
+ }
+ if(d.kind==='group'){
+  const x=clamp(d.saved.a.x+dx,20,1200-JOIN_DISTANCE-W-20),y=clamp(d.saved.a.y+dy,110,model.drawer?310:440);
+  Object.assign(model.a,{x,y});Object.assign(model.b,{x:x+JOIN_DISTANCE,y});render();return;
+ }
+ const raw={x:clamp(d.origin.x+dx,d.id==='meter'?12:20,d.id==='meter'?912:790),y:clamp(d.origin.y+dy,110,d.id==='meter'?560:d.id==='a'&&model.drawer?310:440)};
+ d.raw=raw;
+ const goal=magneticGoal(raw,targetFor(d.id),d.id);
+ d.goal={x:clamp(goal.x,12,d.id==='meter'?912:790),y:clamp(goal.y,110,d.id==='meter'?560:d.id==='a'&&model.drawer?310:440)};
+ // Away from a field, a normal drag remains one-to-one with the pointer.
+ if(model.feel==='free'&&!d.breakaway){Object.assign(model[d.id],d.goal);d.vx=d.vy=0}
+ render();
+});
+async function reseat(d){
+ stopDrag();model.busy=true;const token=++animationToken,start=model.b.x,delta={...d.deflect};
+ if(!await tween(140,t=>{if(d.kind==='shellLatch')model.b.x=start+(d.saved.b.x-start)*t;else $('#meter').style.transform='translate('+delta.x*(1-t)+'px,'+delta.y*(1-t)+'px) scale(.98)';model.tension*=1-t;renderHardware()},token))return;
+ model.busy=false;model.feel='free';model.tension=0;render();say('Latch reseated. Pull farther to release, or use the keyboard controls.');
+}
+function release(){
+ if(!drag)return;const d=drag;
+ if(d.kind==='shellLatch'||d.kind==='meterLatch'){reseat(d);return}
+ const ready=connectionState(d.id==='meter'?'bay':'socket')==='ready';
+ stopDrag();$('#bay').classList.remove('hot');
+ if(ready){if(d.id==='meter')insert();else join(true);return}
+ model.light=0;model.feel='free';model.tension=0;if(!model.joined){model.cap=0;model.blend=0}render();
+}
+stage.addEventListener('pointerup',release);
+stage.addEventListener('pointercancel',cancelDrag);
+stage.addEventListener('lostpointercapture',()=>{if(drag)cancelDrag()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cancelDrag()});
+$('#releaseGrip').onclick=e=>{if(e.detail===0)separate();else if(model.joined)say('Pull this grip to the right to release GitDiscuss. Nameplates move the whole assembly.')};
+document.querySelectorAll('[data-drag]').forEach(btn=>btn.addEventListener('keydown',e=>{
+ if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||model.busy)return;e.preventDefault();
+ const id=btn.dataset.drag;if(id==='release'){if(e.key==='ArrowRight')separate();return}if(id==='meter'&&model.docked)return;
+ const dx=e.key==='ArrowLeft'?-10:e.key==='ArrowRight'?10:0,dy=e.key==='ArrowUp'?-10:e.key==='ArrowDown'?10:0;
+ if(model.joined&&id!=='meter'){const nx=clamp(model.a.x+dx,20,1200-JOIN_DISTANCE-W-20),ny=clamp(model.a.y+dy,110,model.drawer?310:440);model.b.x=nx+JOIN_DISTANCE;model.a.x=nx;model.a.y=model.b.y=ny}
+ else{const m=model[id];m.x=clamp(m.x+dx,20,id==='meter'?912:790);m.y=clamp(m.y+dy,110,id==='meter'?560:id==='a'&&model.drawer?310:440)}
+ render();
+}));
+function fit(){const width=$('#viewport').clientWidth;if(width<900){stage.style.margin='0';stage.style.transform='none';$('#viewport').style.height='695px';$('#viewport').style.overflow='auto'}else{const scale=Math.min(1,width/1200);stage.style.margin=width>=1200?'auto':'0';stage.style.transform='scale('+scale+')';stage.style.transformOrigin='top left';$('#viewport').style.height=695*scale+'px';$('#viewport').style.overflow='hidden'}}
+$('#earlier').href=location.protocol==='file:'?'relay-sonique-study.html':'/files/relay-study-v2.html'+location.search;
+window.addEventListener('resize',fit);render();fit();
+window.relayStudy={model,join,separate,drawer,insert,eject,reset,render};
+</script></body></html>
