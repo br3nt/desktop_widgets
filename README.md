@@ -20,13 +20,18 @@ Exploration. The only artefact so far is a web prototype:
 
 ## Direction
 
-- **Desktop app on every platform** (macOS, Windows, Linux). The web prototype is the design study, not the target.
-- **Form factors** (not built yet): capsules expand, collapse, and morph between sizes and shapes, as Sonique did.
-- **Skinnable**: casing geometry and screens are data, not hard-coded.
-- **macOS dock regions**: dockable zones either side of the Dock that capsules can attach to, adjusting as the Dock and screen change.
+- **Lightest possible footprint.** People may run tens to hundreds of widgets, so no Electron and no browser engine per widget. Target: one small host process, a few MB per widget.
+- **Every major OS from day one.** The framework runs on macOS, Windows and Linux. Individual widgets may be OS-specific.
+- **Snapping and shade mode first.** Widgets snap together like Winamp's main window, equaliser and playlist, and collapse to a thin strip like Winamp's shade mode. Test with many different skins and shapes.
+- **Angled connections.** A socket accepts a range of angles, and the user can set and change the angle of a joint.
+- **Form factors** (not built yet): widgets expand, collapse and morph between sizes and shapes, as Sonique did.
+- **Skins at two levels.** A generic widget design that any skin can style, plus widget authors packaging their own skins. A skin is one shareable file or folder.
+- **User-defined placement regions.** Users define their own dynamic regions (the Mac example: either side of the Dock). Regions track the host OS's layout: Dock, taskbar and menu bar position, auto-hide, and display and resolution changes. Widgets inside a region adjust to it.
 
 ## Open questions
 
-- Shell: Tauri, Electron, or native per platform?
-- Window model: one transparent always-on-top surface, or one OS window per capsule?
-- Widget contract: what a capsule declares (screens, controls, sockets, sizes) and where its data comes from.
+- Renderer and toolkit: native rendering in a single host process (e.g. Rust with a 2D renderer) versus a trimmed webview. See the footprint goal.
+- Window model: one OS window per docked group, or per widget?
+- Isolation: how to keep one widget from reading another's data or the user's files, when many widgets share one process.
+- Widget contract: what a widget declares (screens, controls, sockets and their angle ranges, sizes, required permissions) and where its data comes from.
+- Messaging between widgets: Zapt as the shared language, plus a language-neutral protocol for widgets written in other languages.

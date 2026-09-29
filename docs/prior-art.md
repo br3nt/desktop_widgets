@@ -48,6 +48,20 @@ Researched 2026-09-30. Rows marked *(background)* come from general knowledge ra
 - **Money.** Stardock's paid theming shrank, and almost nobody made widget stores pay.
 - **Platform lockdown.** Apple's WidgetKit is sandboxed with no custom casings; Microsoft curates Windows 11 widgets.
 
+## Why they really failed
+
+The list above covers what ended each product. These are the underlying reasons, which apply to this project:
+
+1. **Too heavy.** Each Konfabulator/Yahoo widget ran its own JavaScript engine, often 10–30 MB each. Vista's Sidebar ran gadgets on Internet Explorer's engine and was a notorious memory and CPU hog. Five widgets were fine; twenty made the machine noticeably slower, so people stopped at a handful.
+2. **Buried under windows.** Desktop widgets vanish when you maximise an app. Dashboard moved them to a separate screen you had to summon. Either way you stopped looking. Only always-on-top strips (Winamp shade mode, taskbar-style bars) survive regular use.
+3. **Nothing to do but look.** Most widgets showed weather, stocks or CPU load. Phones and notifications took over that job. Widgets that let you act (control music, reply, approve) kept their users; Winamp was an app you used, not a display you glanced at.
+4. **Islands.** No widget could use another's data or controls. Every weather widget re-implemented weather. There were no connections for anything bigger to grow from.
+5. **Rot.** Widgets scraped or called free web APIs that changed or shut down, and the authors had moved on. Galleries filled with broken widgets, and people concluded widgets were broken.
+6. **Nobody made money.** No widget store paid authors, and the platform owners got no revenue. When budgets tightened, widgets were the first thing cut.
+7. **Unrestricted code.** Any gadget could do anything the user could. One security bug was enough for Microsoft to kill the whole platform.
+
+Winamp survived all of this because it was a tool you used every day, it was light (a few MB), it snapped into a compact always-visible strip, and skins made people care about it.
+
 ## Where this project is new
 
 1. **Widgets that physically join into one shape.** Nothing since Winamp and Webamp does this, and they are media players, not general widget frameworks.
