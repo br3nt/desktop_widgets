@@ -18,7 +18,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Gothic: Lancet Portcullis Guillotine shade — Heavy forged-iron portcullis with barbed spike shoes drops with gravity physics into compact 44px stone lintel with glowing gold runes (Built in prototypes/skins/agy/gothic.html with animated guillotine drop, suspension chains, iron impact sparks, and Option 2 switcher)
 - [x] Felt: Accordion Bellows Pleat shade — Heavy wool felt pleats fold flat into a padded ribbon (Built in prototypes/skins/agy/felt.html with scored 3mm carded wool pleats, lateral concertina gussets, cushioned squash-and-stretch folding animation, duffle toggle fastening strap, and glanceable status strip)
 - [x] Elven: Lotus Petal Nocturne shade — Curved filigree petals close over screen leaving crowned diadem bar (Built in prototypes/skins/agy/elven.html with Art Nouveau water-lily petal plates, nephrite jade lotus brooch lock, starlight caustic shimmer, and Option 2 switcher)
-- [ ] Wire: Abacus Bead-Strand Compression shade — Parallel copper rods compress gemstone beads into jeweled rod
+- [x] Wire: Abacus Bead-Strand Compression shade — Parallel copper rods compress gemstone beads into jeweled rod (Built in prototypes/skins/agy/wire.html with vertical 16-gauge copper guide rods, gemstone bead tiers, sliding bottom rail, stacking compression physics, and glanceable status strip)
 - [ ] Hollow: Elytra Wing-Case Shield shade — Bone-white beetle wing-cases glide down over screen to slim crest
 
 ### Cycle 3: Secondary Joins
