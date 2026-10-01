@@ -120,21 +120,48 @@ header {
 }
 
 #viewport {
-  overflow: auto;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: visible;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   background: radial-gradient(ellipse at 45% 25%, #25332c 0%, #0d1210 70%);
   position: relative;
-  min-height: 720px;
+  min-height: 0;
 }
 #stage {
   position: relative;
   width: 1200px;
   height: 720px;
-  margin: auto;
+  transform-origin: top center;
+  transform: scale(var(--stage-scale, 1));
   overflow: hidden;
   touch-action: none;
   background:
     radial-gradient(circle at 600px 100px, rgba(230, 180, 71, 0.05) 0%, transparent 60%),
     repeating-linear-gradient(120deg, transparent 0 200px, rgba(255, 255, 255, 0.015) 201px 400px);
+}
+
+@media (max-width: 820px) {
+  header {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .header-titles h1 { font-size: 17px; }
+  .controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+  .control-group { flex-wrap: wrap; }
+  .controls-bar button, .controls-bar select {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
 }
 
 .topline {
@@ -325,7 +352,7 @@ header {
   box-shadow: 0 0 5px rgba(230, 180, 71, 0.5);
 }
 
-/* Shade Mode Strip Display */
+/* Shade Mode Strip Display - High-contrast readable carved stone lintel plaque */
 .shade-strip {
   position: absolute;
   left: 48px;
@@ -336,13 +363,14 @@ header {
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
-  font: bold 11px/1 "Courier New", monospace;
+  font: 700 11px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.5px;
   color: var(--parchment);
-  z-index: 5;
-  background: linear-gradient(180deg, #242d28 0%, #151b18 50%, #0d120f 100%);
-  border: 1.5px solid #4a5c50;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 255, 255, 0.2);
-  text-shadow: 0 0 6px rgba(230, 180, 71, 0.7), 0 1px 2px #000;
+  z-index: 12;
+  background: #0f1512;
+  border: 1.5px solid #5a7062;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.95), inset 0 1px 2px rgba(230, 180, 71, 0.35);
+  text-shadow: 0 1px 2px #000;
   cursor: grab;
   border-radius: 4px;
 }
@@ -357,6 +385,13 @@ header {
   display: flex;
   align-items: center;
   gap: 6px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.shade-strip .shade-tag em {
+  font-style: normal;
+  color: #ffffff;
+  font-weight: 600;
 }
 .shade-strip .shade-votives {
   display: flex;
@@ -364,14 +399,14 @@ header {
 }
 .shade-votives i {
   display: inline-block;
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: var(--ruby);
-  box-shadow: 0 0 4px var(--ruby);
+  box-shadow: 0 0 5px var(--ruby);
 }
-.shade-votives i.gold { background: var(--gold-glow); box-shadow: 0 0 4px var(--gold-glow); }
-.shade-votives i.emerald { background: var(--emerald); box-shadow: 0 0 4px var(--emerald); }
+.shade-votives i.gold { background: var(--gold-glow); box-shadow: 0 0 5px var(--gold-glow); }
+.shade-votives i.emerald { background: var(--emerald); box-shadow: 0 0 5px var(--emerald); }
 
 /* Navigation and Gothic Buttons */
 .tab-row {
@@ -950,9 +985,9 @@ footer .note-highlight {
         </div>
       </div>
 
-      <!-- Shade Strip Display (Illuminated Gold Runes Behind Portcullis Bars) -->
+      <!-- Shade Strip Display (Illuminated Gold Runes on Stone Lintel) -->
       <div class="shade-strip" data-drag="a" title="Drag Jarvis lintel">
-        <span class="shade-tag"><span>✠</span> JARVIS · 03 AGENTS</span>
+        <span class="shade-tag"><span>✠</span> JARVIS · <em>03 AGENTS</em></span>
         <div class="shade-votives">
           <i class="gold"></i><i class="emerald"></i><i class="gold"></i>
         </div>
@@ -999,9 +1034,9 @@ footer .note-highlight {
         </div>
       </div>
 
-      <!-- Shade Strip Display (Illuminated Gold Runes Behind Portcullis Bars) -->
+      <!-- Shade Strip Display (Illuminated Gold Runes on Stone Lintel) -->
       <div class="shade-strip" data-drag="b" title="Drag GitDiscuss lintel">
-        <span class="shade-tag"><span>✠</span> GITDISCUSS · 02 DECISIONS</span>
+        <span class="shade-tag"><span>✠</span> GITDISCUSS · <em>02 DECISIONS</em></span>
         <div class="shade-votives">
           <i class="ruby"></i><i class="gold"></i>
         </div>
@@ -2185,22 +2220,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') cancelDrag()
 $('#keystoneRelease').onclick = e => { if (e.detail === 0) separate(); };
 
 function fit() {
-  const width = $('#viewport').clientWidth;
-  if (width < 900) {
-    stage.style.margin = '0';
-    stage.style.transform = 'none';
-    $('#viewport').style.height = '720px';
-    $('#viewport').style.overflow = 'auto';
-  } else {
-    const scale = Math.min(1, width / 1200);
-    stage.style.margin = width >= 1200 ? 'auto' : '0';
-    stage.style.transform = `scale(${scale})`;
-    stage.style.transformOrigin = 'top left';
-    $('#viewport').style.height = (720 * scale) + 'px';
-    $('#viewport').style.overflow = 'hidden';
-  }
+  const availableWidth = window.innerWidth;
+  const scale = Math.min(1, Math.max(0.28, availableWidth / 1200));
+  stage.style.margin = '0 auto';
+  stage.style.transform = `scale(${scale})`;
+  stage.style.transformOrigin = 'top center';
+  document.documentElement.style.setProperty('--stage-scale', scale);
+  $('#viewport').style.height = (720 * scale) + 'px';
+  $('#viewport').style.overflow = 'hidden';
 }
 window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', fit);
 render();
 fit();
 </script>

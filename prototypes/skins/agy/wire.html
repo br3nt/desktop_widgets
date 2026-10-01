@@ -133,23 +133,53 @@ header {
 
 /* Stage Viewport */
 #viewport {
-  overflow: auto;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: visible;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
   background:
     radial-gradient(ellipse at 50% 28%, #241610 0%, #0d0908 75%),
     radial-gradient(circle at 82% 82%, rgba(223, 122, 71, 0.08) 0%, transparent 50%);
   position: relative;
-  min-height: 720px;
+  min-height: 0;
 }
 #stage {
   position: relative;
   width: 1200px;
   height: 720px;
-  margin: auto;
+  transform-origin: top center;
+  transform: scale(var(--stage-scale, 1));
   overflow: hidden;
   touch-action: none;
   background:
     radial-gradient(circle at 600px 140px, rgba(249, 169, 121, 0.04) 0%, transparent 60%),
     repeating-linear-gradient(45deg, transparent 0 160px, rgba(223, 122, 71, 0.015) 161px 320px);
+}
+
+@media (max-width: 820px) {
+  header {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .header-titles h1 { font-size: 17px; }
+  .controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    width: 100%;
+  }
+  .control-group { flex-wrap: wrap; }
+  .controls-bar button, .controls-bar select {
+    padding: 6px 9px;
+    font-size: 11px;
+  }
+  footer {
+    padding: 16px 14px 24px;
+  }
 }
 
 .topline {
@@ -2317,9 +2347,10 @@ function onPointerDown(e) {
 
 function onPointerMove(e) {
   if (!drag || e.pointerId !== drag.pointerId) return;
+  const scale = stage.getBoundingClientRect().width / 1200;
 
   if (drag.kind === 'module') {
-    const dx = e.clientX - drag.originX, dy = e.clientY - drag.originY;
+    const dx = (e.clientX - drag.originX) / scale, dy = (e.clientY - drag.originY) / scale;
     let nx = Math.max(10, Math.min(1200 - W - 10, drag.startX + dx));
     let ny = Math.max(40, Math.min(580, drag.startY + dy));
 
@@ -2344,7 +2375,7 @@ function onPointerMove(e) {
     render();
 
   } else if (drag.kind === 'joined') {
-    const dx = e.clientX - drag.startX, dy = e.clientY - drag.startY;
+    const dx = (e.clientX - drag.startX) / scale, dy = (e.clientY - drag.startY) / scale;
     model.a.x = Math.max(10, Math.min(1200 - (JOIN_DISTANCE + W) - 10, drag.startAX + dx));
     model.a.y = Math.max(40, Math.min(580, drag.startAY + dy));
     model.b.x = model.a.x + JOIN_DISTANCE;
@@ -2352,7 +2383,7 @@ function onPointerMove(e) {
     render();
 
   } else if (drag.kind === 'meter') {
-    const dx = e.clientX - drag.originX, dy = e.clientY - drag.originY;
+    const dx = (e.clientX - drag.originX) / scale, dy = (e.clientY - drag.originY) / scale;
     let nx = Math.max(10, Math.min(1200 - 280, drag.startX + dx));
     let ny = Math.max(40, Math.min(620, drag.startY + dy));
 
@@ -2374,7 +2405,7 @@ function onPointerMove(e) {
     render();
 
   } else if (drag.kind === 'meterLatch') {
-    const dx = e.clientX - drag.originX, dy = e.clientY - drag.originY;
+    const dx = (e.clientX - drag.originX) / scale, dy = (e.clientY - drag.originY) / scale;
     const dist = Math.hypot(dx, dy);
     if (dist > 35) {
       // Breakaway from cradle
@@ -2391,7 +2422,7 @@ function onPointerMove(e) {
     }
 
   } else if (drag.kind === 'release') {
-    const dx = Math.max(0, e.clientX - drag.originX);
+    const dx = Math.max(0, (e.clientX - drag.originX) / scale);
     model.tension = Math.min(1, dx / 35);
     render();
     if (dx > 35) {
@@ -2462,8 +2493,23 @@ function loop(now) {
 }
 requestAnimationFrame(loop);
 
-// Initial State Application
+// Viewport Scaling for Phone & Mobile Widths (390px)
+function fit() {
+  const availableWidth = window.innerWidth;
+  const scale = Math.min(1, Math.max(0.28, availableWidth / 1200));
+  stage.style.margin = '0 auto';
+  stage.style.transform = `scale(${scale})`;
+  stage.style.transformOrigin = 'top center';
+  document.documentElement.style.setProperty('--stage-scale', scale);
+  $('#viewport').style.height = (720 * scale) + 'px';
+  $('#viewport').style.overflow = 'hidden';
+}
+window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', fit);
+
+// Initial State Application & Fit
 applyState('separate');
+fit();
 </script>
 </body>
 </html>
