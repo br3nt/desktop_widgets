@@ -81,6 +81,13 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#33211a"/><stop offset=".5" stop-color="#1d130e"/><stop offset="1" stop-color="#140c08"/></linearGradient>
  <pattern id="hammer" width="17" height="13" patternUnits="userSpaceOnUse"><ellipse cx="4" cy="4" rx="3.4" ry="2.4" fill="#ffd7b0" fill-opacity=".035"/><ellipse cx="12.5" cy="9.5" rx="3.6" ry="2.6" fill="#ffd7b0" fill-opacity=".03"/><ellipse cx="13" cy="2.5" rx="2.2" ry="1.6" fill="#000" fill-opacity=".14"/><ellipse cx="4" cy="11" rx="2" ry="1.4" fill="#000" fill-opacity=".12"/></pattern>
  <filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter>
+ <radialGradient id="st-amber" cx=".38" cy=".32" r=".75"><stop stop-color="#fff1c4"/><stop offset=".35" stop-color="#f0ac4e"/><stop offset=".8" stop-color="#9a520f"/><stop offset="1" stop-color="#5e2e06"/></radialGradient>
+ <radialGradient id="st-carn" cx=".38" cy=".32" r=".75"><stop stop-color="#ffd0b4"/><stop offset=".35" stop-color="#e2582c"/><stop offset=".8" stop-color="#8e2109"/><stop offset="1" stop-color="#4f1004"/></radialGradient>
+ <radialGradient id="st-lab" cx=".38" cy=".32" r=".75"><stop stop-color="#c9d4dc"/><stop offset=".3" stop-color="#5d6b78"/><stop offset=".8" stop-color="#26303a"/><stop offset="1" stop-color="#141a21"/></radialGradient>
+ <radialGradient id="st-mal" cx=".38" cy=".32" r=".75"><stop stop-color="#dcffe6"/><stop offset=".35" stop-color="#3fae6a"/><stop offset=".8" stop-color="#145a33"/><stop offset="1" stop-color="#0a321c"/></radialGradient>
+ <linearGradient id="st-flash" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5fe0ff" stop-opacity="0"/><stop offset=".5" stop-color="#5fe0ff" stop-opacity=".7"/><stop offset=".75" stop-color="#9dff9a" stop-opacity=".35"/><stop offset="1" stop-color="#9dff9a" stop-opacity="0"/></linearGradient>
+ <linearGradient id="st-gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff2b8"/><stop offset=".45" stop-color="#d4a640"/><stop offset="1" stop-color="#5c3f0c"/></linearGradient>
+ <linearGradient id="st-slab" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#1b343b"/><stop offset=".55" stop-color="#0c1a1e"/><stop offset="1" stop-color="#060d10"/></linearGradient>
 </defs><path id="probe" fill="none"/></svg>
 <header><div><h1>Wire, beads &amp; stones <span>/ Claude skin study</span></h1><p>Oxidised copper frames, coil-bound cabochon displays, bead buttons. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -154,13 +161,13 @@ function spiral(cx,cy,r,turns,dir=1,start=0){let d='';const n=48;for(let i=0;i<=
 
 /* Casing: hammered backplate, double wire frame bound by coil bands, scroll curls, coiled stone bezel. */
 const casingCache={};
-function casing(w,h,small){
- const key=w+'x'+Math.round(h);if(casingCache[key])return casingCache[key];
+function casing(w,h,small,noFrame){
+ const key=w+'x'+Math.round(h)+(noFrame?'n':'');if(casingCache[key])return casingCache[key];
  const full=small?CH:H,flat=small?CHS:HS,k=clamp((full-h)/(full-flat));
  const r=Math.min(small?20:26,(h-10)/2),outer=rrect(5,5,w-10,h-10,r),inner=rrect(10.5,10.5,w-21,h-21,Math.max(2,r-5.5));
  let s=`<path d="${outer}" fill="url(#plate)"/><path d="${outer}" fill="url(#hammer)"/><path d="${rrect(8,8,w-16,h-16,r-3)}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="3"/>`;
  s+=wire(inner,'copper',1.7,clamp(1-k*1.6));
- s+=wire(outer,'copper',3.1);
+ if(!noFrame)s+=wire(outer,'copper',3.1);
  const sc=small?.75:1,sy=small?13:16;
  s+=wire(spiral(small?17:22,sy,6.5*sc,1.6,1,Math.PI*.9),'copper',1.9)+wire(spiral(w-(small?17:22),sy,6.5*sc,1.6,-1,Math.PI*.1),'copper',1.9);
  const n=Math.max(2,Math.min(7,Math.floor((h-26)/2.6)));
@@ -214,8 +221,83 @@ const JOINS={
 };
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
-  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar) are built and added here.'}
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar) are built and added here.'},
+ strand:{label:'Bead strand',kind:'Distil',ms:1150,ownStrip:true,
+  about:'The pendant comes apart into a necklace. The plate and stone fade, the copper frame squeezes flat into a single strung wire, and the beads slide in along it from both clasps, centre beads first, each clicking into place. A flat slab bead carries the name and a cabochon carries the one key value. The round stones between them are the statuses: <b>amber</b> running, <b>labradorite</b> idle or paused, <b>carnelian</b> needs you, <b>malachite</b> passed. Jarvis strings one amber per running agent, GitDiscuss one carnelian per decision, Checks a seed bead per check. Pause a widget and its stones turn to labradorite. The eye loops stay on the ends, so shaded pendants still link by jump ring into one longer strand.',
+  sayOn:'Shaded: the frame flattens into a wire and the beads slide on, one stone per status.',
+  hk:st=>ease(seg(st,0,.5)),
+  draw(id,w,h,small,st){
+   const hk=ease(seg(st,0,.5)),cy=h/2;
+   let s=`<g opacity="${f(1-seg(hk,.15,.85))}">${casing(w,h,small,true)}</g>`;
+   // The frame squeezes flat into the strand wire.
+   const fh=Math.max(0,(h-10)*(1-seg(hk,.35,1))),r=Math.min(small?20:26,fh/2);
+   s+=wire(rrect(5,cy-fh/2,w-10,fh,r),'copper',fh<2?2:3.1-1.1*seg(hk,.35,1));
+   const bt=seg(st,.42,1);if(bt<=0)return s;
+   s+=wire(band(13,cy,false,3,7,2.2)+band(w-13,cy,false,3,7,2.2),'brass',1.1,seg(bt,0,.25));
+   const items=strandLayout(id,w,small),n=items.length,mid=w/2;
+   const order=items.map((it,i)=>i).sort((p,q)=>Math.abs(items[p].x-mid)-Math.abs(items[q].x-mid));
+   order.forEach((i,rank)=>{
+    const it=items[i],st0=rank/n*.55,p=seg(bt,st0,st0+.45);if(p<=0)return;
+    const from=it.x<mid?18:w-18,x=lerp(from,it.x,backOut(p));
+    s+=`<g opacity="${f(clamp(p*4))}">${strandItem(it,x,cy,small)}</g>`;
+   });
+   return s;
+  }}
 };
+
+/* ---------- Bead strand pieces ---------- */
+const measure=(()=>{const c=document.createElement('canvas').getContext('2d');return(t,font)=>{c.font=font;return c.measureText(t).width}})();
+const backOut=t=>{const c=1.9;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)};
+const NAME_F='italic 14px Georgia,serif',NUM_F='15px Georgia,serif',WORD_F='11px -apple-system,BlinkMacSystemFont,sans-serif';
+function strandData(id){
+ const m=model[id];
+ if(id==='a')return{name:'Jarvis',beads:Array(3).fill(m.run?'amber':'lab'),num:'03',word:m.run?'running':'paused',tip:true};
+ if(id==='b')return{name:'GitDiscuss',beads:Array(2).fill(m.run?'carn':'lab'),num:'02',word:'to decide',tip:true};
+ return{name:'Checks',beads:[...Array(12).fill('mal'),'carn','carn'],num:'12/14',word:'',seed:true};
+}
+// Lays the strand out left to right, then centres it: tip seeds, name slab, status stones, value cabochon, tip seeds.
+function strandLayout(id,w,small){
+ const d=strandData(id),list=[],push=(k,wd,o={})=>list.push({k,wd,...o});
+ const tips=small?[]:[2.4,3,3.6];
+ tips.forEach(r=>push('seed',2*r+2,{r,stone:'gold'}));
+ if(!small)push('sp',5);
+ push('tag',Math.ceil(measure(d.name,NAME_F))+(small?16:20),{text:d.name});
+ push('sp',small?5:6);
+ const r=d.seed?3.3:6.4;
+ d.beads.forEach((st,i)=>{if(i&&!d.seed)push('sp',4.5);push('bead',2*r+(d.seed?1.2:1),{r,stone:st})});
+ push('sp',small?5:6);
+ const vw=Math.ceil(measure(d.num,NUM_F)+(d.word?measure(d.word,WORD_F)+5:0))+(small?18:22);
+ push('val',vw,{num:d.num,word:d.word});
+ if(!small)push('sp',5);
+ [...tips].reverse().forEach(r=>push('seed',2*r+2,{r,stone:'gold'}));
+ const total=list.reduce((a,b)=>a+b.wd,0);let x=(w-total)/2;
+ for(const it of list){it.x=x+it.wd/2;x+=it.wd}
+ return list;
+}
+const coilCache={};
+function strandItem(it,x,cy,small){
+ if(it.k==='sp')return `<ellipse cx="${f(x)}" cy="${f(cy)}" rx="1.5" ry="${small?3.6:4.6}" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".6"/>`;
+ if(it.k==='seed'||it.k==='bead'){
+  const r=it.r,fill=it.stone==='gold'?'url(#st-gold)':`url(#st-${it.stone})`;
+  let s=`<circle cx="${f(x)}" cy="${f(cy)}" r="${r}" fill="${fill}" stroke="#1a0d05" stroke-width=".7"/>`;
+  if(it.stone==='lab')s+=`<ellipse cx="${f(x+r*.1)}" cy="${f(cy+r*.15)}" rx="${f(r*.75)}" ry="${f(r*.35)}" transform="rotate(-35 ${f(x)} ${f(cy)})" fill="url(#st-flash)"/>`;
+  if(r>3)s+=`<ellipse cx="${f(x-r*.36)}" cy="${f(cy-r*.42)}" rx="${f(r*.3)}" ry="${f(r*.2)}" fill="#fff" opacity=".6"/>`;
+  return s;
+ }
+ const th=small?21:24,tw=it.wd-(small?4:6),x0=x-tw/2,y0=cy-th/2;
+ if(it.k==='tag'){
+  // Flat slab bead with brass end caps where the wire enters.
+  return `<rect x="${f(x0)}" y="${f(y0)}" width="${f(tw)}" height="${th}" rx="4" fill="url(#st-slab)"/><rect x="${f(x0+1)}" y="${f(y0+1)}" width="${f(tw-2)}" height="${f(th*.42)}" rx="3" fill="#bfe8ec" opacity=".05"/>`+
+   wire(rrect(x0,y0,tw,th,4),'copper',1.2)+wire(band(x0-1.5,cy,false,2,th*.55,2.2)+band(x0+tw+1.5,cy,false,2,th*.55,2.2),'brass',1.1)+
+   `<text x="${f(x)}" y="${f(cy+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="14" fill="#f6d2ac">${it.text}</text>`;
+ }
+ // Value cabochon: an oval stone in a coiled bezel, like the full displays.
+ const key=f(tw)+'x'+th;
+ if(!coilCache[key])coilCache[key]=coilsAlong(rrect(0,0,tw,th,th/2),2.35,1.9);
+ return `<rect x="${f(x0)}" y="${f(y0)}" width="${f(tw)}" height="${th}" rx="${th/2}" fill="url(#st-slab)" stroke="#120906" stroke-width="2.5"/><ellipse cx="${f(x0+tw*.78)}" cy="${f(y0+th*.28)}" rx="${f(tw*.16)}" ry="${f(th*.16)}" fill="#bfe8ec" opacity=".07"/>`+
+  `<g transform="translate(${f(x0)} ${f(y0)})">${wire(coilCache[key],'copper',1.05)}</g>`+
+  `<text x="${f(x)}" y="${f(cy+.5)}" text-anchor="middle" dominant-baseline="central"><tspan font-family="Georgia,serif" font-size="15" fill="#f2b866">${it.num}</tspan>${it.word?`<tspan dx="5" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#d9e4df">${it.word}</tspan>`:''}</text>`;
+}
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
@@ -266,24 +348,25 @@ function holdJoining(){
 function toggleShade(){
  const to=model.st>.5?0:1;const start=model.st;const token=++shadeAnim;
  // Shade runs on its own clock so it can overlap a join.
- const t0=performance.now(),ms=reduce.matches?0:520*Math.abs(to-start);
+ const t0=performance.now(),ms=reduce.matches?0:(SHADES[model.shade].ms||520)*Math.abs(to-start);
  (function step(now){if(token!==shadeAnim)return;const t=ms?clamp((now-t0)/ms):1;model.st=lerp(start,to,t);render();if(t<1)requestAnimationFrame(step)})(t0);
- say(to?'Shaded: frames close down to a strip with the name and one value.':'Unshaded.');
+ say(to?(SHADES[model.shade].sayOn||'Shaded: frames close down to a strip with the name and one value.'):'Unshaded.');
 }
 
 /* ---------- Rendering ---------- */
-function ctx(){const h=lerp(H,HS,ease(model.st));return{a:model.a,b:model.b,h,jt:model.jt,ghost:model.ghost}}
+const shadeK=()=>{const o=SHADES[model.shade];return o.hk?o.hk(model.st):ease(model.st)};
+function ctx(){const h=lerp(H,HS,shadeK());return{a:model.a,b:model.b,h,jt:model.jt,ghost:model.ghost}}
 function render(){
- const c=ctx(),j=J(),ch=lerp(CH,CHS,ease(model.st));
+ const c=ctx(),j=J(),sh=SHADES[model.shade],hk=shadeK(),ch=lerp(CH,CHS,hk);
  const lit=Math.max(model.glow,model.jt>0&&model.jt<1?seg(model.jt,.04,.25)*(1-seg(model.jt,.86,1)):0);
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=f(h)+'px';
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
-  let s=casing(w,h,small);
+  let s=sh.draw?sh.draw(id,w,h,small,model.st):casing(w,h,small);
   if(id==='a')s+=j.end(1,lit,h);if(id==='b')s+=j.end(-1,lit,h);
   svg.innerHTML=s;
-  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  const k=hk,show=1-clamp(k*2.2),strip=sh.ownStrip?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.bead,.mini,.lens').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
