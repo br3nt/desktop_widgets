@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wire, beads and stones · Claude skin study</title>
+<style>
+:root{color-scheme:dark;--copper:#d9a077;--muted:#a3907f}
+*{box-sizing:border-box}
+body{margin:0;background:#120d10;color:#e8ddd0;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #f0c08f;outline-offset:3px}
+a{color:var(--copper);text-underline-offset:3px}
+header{padding:18px 28px 14px;display:flex;gap:20px 40px;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;border-bottom:1px solid #f0c9a01a}
+h1{margin:0;font:400 23px/1.2 Georgia,"Times New Roman",serif}h1 span{color:var(--muted);font-size:17px}
+header p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.controls{display:flex;flex-direction:column;gap:7px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.row>span{font-size:10px;color:#9c8573;text-transform:uppercase;letter-spacing:1.4px;width:58px}
+.row button{border:1px solid #6b4a36;background:linear-gradient(#3a2a21,#241914);color:#ecd9c6;border-radius:999px;padding:4px 12px;font-size:12px}
+.row button:hover{border-color:#a67550}
+.row button[aria-pressed=true]{border-color:#e7b07c;background:linear-gradient(#6a4429,#3b2617);color:#fff2e0;box-shadow:0 0 8px #e7a76a3a}
+.row button kbd{font:10px "Courier New",monospace;color:#c49a76;margin-right:5px}
+.row input[type=range]{width:180px;accent-color:#d9a077}
+.row output{font:11px "Courier New",monospace;color:#d9b89a;width:38px}
+#viewport{overflow:hidden}
+#stage{position:relative;width:1200px;height:600px;margin:auto;overflow:hidden;touch-action:none;
+ background:radial-gradient(ellipse 70% 60% at 48% 42%,#33243a,#1b1320 62%,#110b13),#110b13}
+#stage:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+ background:repeating-linear-gradient(97deg,#ffffff03 0 1px,transparent 1px 3px),repeating-linear-gradient(7deg,#00000012 0 1px,transparent 1px 4px)}
+.topline{position:absolute;top:18px;left:28px;right:28px;display:flex;justify-content:space-between;gap:30px;z-index:20;pointer-events:none}
+.topline p{margin:0;color:#c9b7a7;font-size:13px;max-width:760px}
+#phase{font:11px/1.5 "Courier New",monospace;color:#e7b07c;white-space:nowrap}
+.layer{position:absolute;inset:0;width:1200px;height:600px;overflow:visible;pointer-events:none}
+#under{z-index:1}#over{z-index:6}
+.w{position:absolute;width:390px;height:130px;user-select:none;touch-action:none;z-index:2;filter:drop-shadow(0 10px 9px #0009)}
+.w.small{width:276px;height:78px}
+.casing{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.grip{position:absolute;top:5px;left:40px;right:40px;height:22px;border:0;background:none;color:#e6b78e;cursor:grab;display:flex;justify-content:space-between;align-items:center;padding:0 6px;text-shadow:0 1px #000;font-size:10px;letter-spacing:.6px}
+.grip b{font:italic 400 15px/1 Georgia,serif;letter-spacing:.2px;color:#f3c9a3;margin-right:7px}
+.grip:active{cursor:grabbing}
+.grip .dots{color:#a06e4c;letter-spacing:1px}
+.small .grip{left:26px;right:26px;top:2px;height:20px}
+.screen{position:absolute;left:45px;top:31px;width:300px;height:64px;border-radius:8px;overflow:hidden;color:#e9efe9;
+ background:radial-gradient(110px 46px at 100% 0%,#4fa5ae38,transparent 70%),radial-gradient(90px 36px at 0% 100%,#6d52a62a,transparent 70%),linear-gradient(165deg,#14272d,#0b171b 55%,#071013);
+ box-shadow:inset 0 2px 7px #000d,inset 0 -1px 0 #ffffff12}
+.pages{height:100%;width:300%;display:flex;transition:transform 280ms cubic-bezier(.2,.7,.2,1)}
+.page{width:33.3333%;flex:none;padding:6px 12px;position:relative;overflow:hidden}
+.page .tiny{font-size:10px;line-height:1.4;color:#9fbcb8;letter-spacing:.2px}
+.page strong{font:400 21px/1.08 Georgia,serif;display:block;color:#f2f5ef}
+.page strong em{font-style:normal;color:#f2b866}
+.page small{font-size:11px;line-height:1.6;color:#c9d6d1}
+.beads{position:absolute;right:12px;top:9px;display:flex;gap:3px;align-items:flex-end;height:26px}
+.beads i{display:flex;flex-direction:column-reverse;gap:1px}
+.beads i b{width:5px;height:4px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe4b0,#e39a43 55%,#7a4313)}
+.tabline{position:absolute;left:50px;top:103px;display:flex;gap:12px}
+.tab{padding:0;background:none;border:0;color:#a88a72;font-size:10px;letter-spacing:.5px}
+.tab[aria-selected=true]{color:#f6d2ac}
+.tab[aria-selected=true]:before{content:"";display:inline-block;width:5px;height:5px;margin-right:4px;border-radius:50%;vertical-align:1px;background:radial-gradient(circle at 35% 30%,#d6fff4,#3fb6a5 55%,#0d4a44)}
+.bead{position:absolute;top:102px;width:17px;height:17px;border-radius:50%;padding:0;border:0;color:#2a1608;font:bold 9px/17px Arial,sans-serif;box-shadow:0 0 0 1.5px #2a170d,0 0 0 2.6px #b8703f,0 2px 3px #000b;
+ background:radial-gradient(circle at 34% 28%,#fff3cf,#eaa64c 40%,#8c4b12 85%)}
+.bead.next{background:radial-gradient(circle at 34% 28%,#e3fff8,#3db7a8 42%,#0b4943 88%)}
+.bead:hover{filter:brightness(1.18)}
+.run{left:292px}.next{left:322px}
+.mini{position:absolute;left:16px;top:24px;width:216px;height:40px;border-radius:7px;padding:4px 10px;font-size:10px;color:#cfdcd7;line-height:1.35;
+ background:radial-gradient(70px 30px at 100% 0%,#4fa5ae30,transparent 70%),linear-gradient(165deg,#14272d,#091417);box-shadow:inset 0 2px 6px #000d}
+.mini strong{font:400 16px/1 Georgia,serif;color:#f2b866;margin-right:4px}
+.lens{position:absolute;left:243px;top:34px;width:17px;height:17px;border-radius:50%;box-shadow:0 0 0 1.5px #2a170d,0 0 0 2.6px #b8703f;background:radial-gradient(circle at 34% 28%,#f2ffd6,#8fc24a 45%,#2f5a12 90%)}
+.strip{position:absolute;left:40px;right:40px;top:9px;height:22px;display:flex;align-items:center;justify-content:space-between;gap:10px;pointer-events:none;opacity:0}
+.strip b{font:italic 400 15px/1 Georgia,serif;color:#f3c9a3;text-shadow:0 1px #000}
+.strip span{padding:2px 10px;border-radius:7px;font-size:11px;color:#e9efe9;background:linear-gradient(165deg,#14272d,#091417);box-shadow:inset 0 1px 4px #000c,0 0 0 1px #b8703f88}
+.strip span em{font-style:normal;color:#f2b866}
+.small .strip{left:26px;right:26px;top:6px}
+.hit{pointer-events:all;cursor:pointer}
+.hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
+.ringfocus{opacity:0}
+.about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#bba997;font-size:13px}
+.about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#f0d6bd}.about h2 small{font:11px -apple-system,sans-serif;color:#9c8573;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
+.about p{margin:0 0 6px}
+.hint{color:#8f7d6f;font-size:12px}
+@media(max-width:800px){.about{grid-template-columns:1fr}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#33211a"/><stop offset=".5" stop-color="#1d130e"/><stop offset="1" stop-color="#140c08"/></linearGradient>
+ <pattern id="hammer" width="17" height="13" patternUnits="userSpaceOnUse"><ellipse cx="4" cy="4" rx="3.4" ry="2.4" fill="#ffd7b0" fill-opacity=".035"/><ellipse cx="12.5" cy="9.5" rx="3.6" ry="2.6" fill="#ffd7b0" fill-opacity=".03"/><ellipse cx="13" cy="2.5" rx="2.2" ry="1.6" fill="#000" fill-opacity=".14"/><ellipse cx="4" cy="11" rx="2" ry="1.4" fill="#000" fill-opacity=".12"/></pattern>
+ <filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter>
+</defs><path id="probe" fill="none"/></svg>
+<header><div><h1>Wire, beads &amp; stones <span>/ Claude skin study</span></h1><p>Oxidised copper frames, coil-bound cabochon displays, bead buttons. <a href="index.html">All pages</a></p></div>
+<div class="controls" role="group" aria-label="Skin controls">
+ <div class="row" id="stateRow"><span>State</span></div>
+ <div class="row" id="joinRow"><span>Join</span></div>
+ <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
+</div></header>
+<div id="viewport"><main id="stage" aria-label="Wire skin stage">
+<div class="topline"><p id="status" role="status" aria-live="polite">Drag a nameplate toward the other pendant, or use the state buttons.</p><span id="phase"></span></div>
+<svg id="under" class="layer" viewBox="0 0 1200 600" aria-hidden="true"></svg>
+
+<section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="a" aria-label="Move Jarvis"><span><b>Jarvis</b>agent control</span><span class="dots">⋮⋮</span></button>
+ <div class="screen" aria-label="Jarvis display"><div class="pages">
+  <div class="page"><div class="tiny">Jarvis / active workflow</div><strong class="runText">03 <em>agents running</em></strong><small>Reviewing the capsule renderer</small><div class="beads" aria-hidden="true"><i data-n="2"></i><i data-n="4"></i><i data-n="3"></i><i data-n="5"></i><i data-n="3"></i></div></div>
+  <div class="page"><div class="tiny">Jarvis / current task</div><strong style="font-size:18px">Verify shell assembly</strong><small>12 checks passed · 2 queued</small></div>
+  <div class="page"><div class="tiny">Jarvis / event log</div><small>10:42 &nbsp;joined display state retained<br>10:43 &nbsp;waiting for your next action</small></div>
+ </div></div>
+ <div class="tabline" role="tablist" aria-label="Jarvis screens"><button class="tab" role="tab" data-page="0">Status</button><button class="tab" role="tab" data-page="1">Task</button><button class="tab" role="tab" data-page="2">Log</button></div>
+ <button class="bead run" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button><button class="bead next" aria-label="Next Jarvis screen" title="Next screen">›</button>
+ <div class="strip" aria-hidden="true"><b>Jarvis</b><span><em>03</em> agents running</span></div>
+</section>
+
+<section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="b" aria-label="Move GitDiscuss"><span><b>GitDiscuss</b>review queue</span><span class="dots">⋮⋮</span></button>
+ <div class="screen" aria-label="GitDiscuss display"><div class="pages">
+  <div class="page"><div class="tiny">GitDiscuss / incoming</div><strong>02 <em>need a decision</em></strong><small>Capsule joining · design feedback</small></div>
+  <div class="page"><div class="tiny">GitDiscuss / selected discussion</div><strong style="font-size:18px">Shared casing geometry</strong><small>Brent · 4 comments · ready to review</small></div>
+  <div class="page"><div class="tiny">GitDiscuss / event log</div><small>10:41 &nbsp;feedback collected<br>10:43 &nbsp;no workflow links created</small></div>
+ </div></div>
+ <div class="tabline" role="tablist" aria-label="GitDiscuss screens"><button class="tab" role="tab" data-page="0">Queue</button><button class="tab" role="tab" data-page="1">Thread</button><button class="tab" role="tab" data-page="2">Log</button></div>
+ <button class="bead run" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button><button class="bead next" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+ <div class="strip" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em> need a decision</span></div>
+</section>
+
+<section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="dots">⋮⋮</span></button>
+ <div class="mini"><strong>12 / 14</strong> checks passed<br>2 waiting for approval</div><span class="lens" aria-hidden="true"></span>
+ <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
+</section>
+
+<svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
+</main></div>
+<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
+const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,ease=t=>t*t*(3-2*t),seg=(t,a,b)=>clamp((t-a)/(b-a));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+const f=n=>Math.round(n*10)/10;
+
+/* ---------- Wire drawing kit ---------- */
+const METAL={copper:['#1f110a','#9b5b35','#f3bd92'],brass:['#2a1d08','#b68b34','#fde9a8'],hot:['#3a1a06','#e08a3c','#fff0c8']};
+function wire(d,m='copper',w=3,op=1){
+ const c=METAL[m];
+ return `<g opacity="${op}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="${c[0]}" stroke-width="${w+1.7}"/><path d="${d}" stroke="${c[1]}" stroke-width="${w}"/><path d="${d}" stroke="${c[2]}" stroke-width="${f(w*.32)}" stroke-opacity=".85" transform="translate(-.5 -.6)"/></g>`;
+}
+function rrect(x,y,w,h,r){r=Math.min(r,h/2,w/2);return `M${f(x+r)} ${f(y)}H${f(x+w-r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+w)} ${f(y+r)}V${f(y+h-r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+w-r)} ${f(y+h)}H${f(x+r)}A${f(r)} ${f(r)} 0 0 1 ${f(x)} ${f(y+h-r)}V${f(y+r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+r)} ${f(y)}Z`}
+const circ=(cx,cy,r)=>`M${f(cx-r)} ${f(cy)}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0`;
+// Coil turns wrapped around any path: one short slanted stroke per step, merged into one path.
+function coilsAlong(d,step=2.3,half=2.5,from=0,to=1){
+ const p=$('#probe');p.setAttribute('d',d);const L=p.getTotalLength();let out='';
+ for(let s=L*from;s<=L*to;s+=step){const a=p.getPointAtLength(s),b=p.getPointAtLength(Math.min(L,s+.5));let tx=b.x-a.x,ty=b.y-a.y;const n=Math.hypot(tx,ty)||1;tx/=n;ty/=n;const nx=-ty,ny=tx;
+  out+=`M${f(a.x-nx*half-tx*.7)} ${f(a.y-ny*half-ty*.7)}Q${f(a.x+tx*.9)} ${f(a.y+ty*.9)} ${f(a.x+nx*half-tx*.7)} ${f(a.y+ny*half-ty*.7)}`}
+ return out;
+}
+function band(x,y,vertical,n,span=9,gap=2.5){let d='';for(let i=0;i<n;i++){const o=(i-(n-1)/2)*gap;d+=vertical?`M${f(x-span/2)} ${f(y+o-.6)}Q${x} ${f(y+o+.9)} ${f(x+span/2)} ${f(y+o-.6)}`:`M${f(x+o-.6)} ${f(y-span/2)}Q${f(x+o+.9)} ${y} ${f(x+o-.6)} ${f(y+span/2)}`}return d}
+function spiral(cx,cy,r,turns,dir=1,start=0){let d='';const n=48;for(let i=0;i<=n;i++){const t=i/n,a=start+dir*t*turns*Math.PI*2,rr=r*(1-t*.86);d+=(i?'L':'M')+f(cx+Math.cos(a)*rr)+' '+f(cy+Math.sin(a)*rr)}return d}
+
+/* Casing: hammered backplate, double wire frame bound by coil bands, scroll curls, coiled stone bezel. */
+const casingCache={};
+function casing(w,h,small){
+ const key=w+'x'+Math.round(h);if(casingCache[key])return casingCache[key];
+ const full=small?CH:H,flat=small?CHS:HS,k=clamp((full-h)/(full-flat));
+ const r=Math.min(small?20:26,(h-10)/2),outer=rrect(5,5,w-10,h-10,r),inner=rrect(10.5,10.5,w-21,h-21,Math.max(2,r-5.5));
+ let s=`<path d="${outer}" fill="url(#plate)"/><path d="${outer}" fill="url(#hammer)"/><path d="${rrect(8,8,w-16,h-16,r-3)}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="3"/>`;
+ s+=wire(inner,'copper',1.7,clamp(1-k*1.6));
+ s+=wire(outer,'copper',3.1);
+ const sc=small?.75:1,sy=small?13:16;
+ s+=wire(spiral(small?17:22,sy,6.5*sc,1.6,1,Math.PI*.9),'copper',1.9)+wire(spiral(w-(small?17:22),sy,6.5*sc,1.6,-1,Math.PI*.1),'copper',1.9);
+ const n=Math.max(2,Math.min(7,Math.floor((h-26)/2.6)));
+ s+=wire(band(7.8,h/2,true,n,10)+band(w-7.8,h/2,true,n,10)+band(w/2,h-7.8,false,small?5:7,10),'copper',1.25);
+ if(k<1){
+  const st=small?[14,22,220,44,9]:[43,29,304,68,10];
+  const bez=rrect(st[0],st[1],st[2],st[3],st[4]);
+  s+=`<g opacity="${f(clamp(1-k*1.5))}"><path d="${bez}" fill="none" stroke="#120906" stroke-width="5"/>${wire(coilsAlong(bez,2.35,2.4),'copper',1.15)}</g>`;
+ }
+ return casingCache[key]=s;
+}
+
+/* ---------- Options ---------- */
+// Each join draws the widgets' joinable ends plus anything under/over them, from one join progress jt (0..1).
+const JOINS={
+ jumpring:{label:'Jump ring',kind:'Hinge',gap:56,
+  about:'Each pendant ends in an eye loop on a wrapped stem. A brass jump ring swings in, threads both loops and twists shut. <b>Near:</b> the loops warm. <b>Ready:</b> a ghost ring appears between them. <b>Release:</b> click the ring, or focus it and press Enter; it twists open and lifts away. The pendants hang a ring\'s width apart, like links in a chain, which is what later lets this join pivot.',
+  end(side,lit,h){
+   const x=side>0?W-5:5,y=h/2,cx=x+side*19;let s='';
+   if(lit>0)s+=`<circle cx="${cx}" cy="${y}" r="13" fill="#ffb15e" opacity="${f(lit*.75)}" filter="url(#soft)"/>`;
+   s+=wire(`M${x} ${y}H${f(x+side*11)}`,lit>.5?'hot':'copper',2.4)+wire(band(x+side*6,y,false,3,7.5,2.3),'copper',1.1);
+   s+=wire(circ(cx,y,7),lit>.5?'hot':'copper',2.3);
+   return s;
+  },
+  ring(c){
+   const la={x:c.a.x+W+14,y:c.a.y+c.h/2},lb={x:c.b.x-14,y:c.b.y+c.h/2},cx=(la.x+lb.x)/2,cy0=(la.y+lb.y)/2;
+   const d=seg(c.jt,.35,.72),e=ease(d),close=ease(seg(c.jt,.8,.94)),bt=seg(c.jt,.92,1);
+   const cy=cy0-78*(1-e)+(bt>0?Math.sin(bt*Math.PI*2)*2.2*(1-bt):0);
+   return {cx,cy,R:14,ry:14*(1-.58*e),phi:-1.15*(1-e),gap:1.35*(1-close),threaded:d>=1,show:c.jt>.35,op:seg(c.jt,.35,.43),spark:seg(c.jt,.86,1)};
+  },
+  arc(g,a0,a1){
+   let d='',pen=false;const n=40,gc=Math.PI/2,cs=Math.cos(g.phi),sn=Math.sin(g.phi);
+   for(let i=0;i<=n;i++){const th=a0+(a1-a0)*i/n;let dd=Math.abs(((th-gc)%(2*Math.PI)+3*Math.PI)%(2*Math.PI)-Math.PI);
+    if(dd<g.gap/2){pen=false;continue}
+    const x=g.R*Math.cos(th),y=g.ry*Math.sin(th);d+=(pen?'L':'M')+f(g.cx+x*cs-y*sn)+' '+f(g.cy+x*sn+y*cs);pen=true}
+   return d;
+  },
+  under(c){const g=this.ring(c);return g.show&&g.threaded?wire(this.arc(g,Math.PI,2*Math.PI),'brass',2.6,g.op):''},
+  over(c){
+   let s='';const g=this.ring(c);
+   if(c.ghost>0&&c.jt===0){const la={x:c.a.x+W+14,y:c.a.y+c.h/2},lb={x:c.b.x-14,y:c.b.y+c.h/2};
+    s+=`<ellipse cx="${f((la.x+lb.x)/2)}" cy="${f((la.y+lb.y)/2)}" rx="14" ry="6" fill="none" stroke="#ffe3a8" stroke-width="1.6" stroke-dasharray="3 3" opacity="${f(c.ghost*.85)}"/>`}
+   if(!g.show)return s;
+   s+=wire(this.arc(g,0,g.threaded?Math.PI:2*Math.PI),'brass',2.6,g.op);
+   if(g.spark>0&&g.spark<1){const p={x:g.cx,y:g.cy+g.ry},r=3+7*g.spark,o=1-g.spark;
+    s+=`<path d="M${f(p.x-r)} ${f(p.y)}H${f(p.x+r)}M${f(p.x)} ${f(p.y-r)}V${f(p.y+r)}" stroke="#fff4d0" stroke-width="1.3" stroke-linecap="round" opacity="${f(o)}"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(2.4*o)}" fill="#fffbe8" opacity="${f(o)}"/>`}
+   if(c.jt===1)s+=`<g class="hit" id="ringHit" tabindex="0" role="button" aria-label="Jump ring: open to separate the widgets"><title>Twist the ring open to release</title><circle cx="${f(g.cx)}" cy="${f(g.cy)}" r="20" fill="transparent"/><circle class="ringfocus" cx="${f(g.cx)}" cy="${f(g.cy)}" r="20" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+   return s;
+  }
+ }
+};
+const SHADES={
+ tuck:{label:'Plain tuck',kind:'Page baseline',
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar) are built and added here.'}
+};
+
+/* ---------- Model ---------- */
+const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',jt:0,st:0,path:null,glow:0,ghost:0,busy:false};
+let anim=0,shadeAnim=0,drag=null;
+const J=()=>JOINS[model.join];
+
+function separatePose(){
+ const g=J().gap;let ax=clamp(model.a.x,24,1200-2*W-g-SEP-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}};
+}
+function joinedPose(fixed='a'){
+ const g=J().gap;
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
+ let ax=clamp(model.a.x,24,1200-2*W-g-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+}
+function setJt(t){
+ model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.5));
+ for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
+}
+function tween(from,to,ms,fn){
+ const token=++anim;model.busy=true;
+ return new Promise(res=>{
+  if(reduce.matches){fn(to);model.busy=false;render();return res(true)}
+  const t0=performance.now();
+  (function step(now){if(token!==anim)return res(false);const t=clamp((now-t0)/ms);fn(lerp(from,to,t));render();if(t<1)requestAnimationFrame(step);else{model.busy=false;render();res(true)}})(t0);
+ });
+}
+const say=t=>$('#status').textContent=t;
+
+async function doJoin(fixed='a',ms=1500){
+ if(model.jt===1)return;
+ if(!model.path||model.jt===0)model.path={s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose(fixed)};
+ say('The loops warm, the ring swings in and threads them, then twists shut.');
+ if(await tween(model.jt,1,ms*(1-model.jt),setJt)){model.path=null;say('Joined by a jump ring. Drag either nameplate to move the pair. Click the ring to open it.')}
+}
+async function doSeparate(){
+ if(model.jt===0)return;
+ if(model.jt===1||!model.path)model.path={s:separatePose(),j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}};
+ say('The ring twists open and lifts away; the pendants drift apart.');
+ if(await tween(model.jt,0,1100*model.jt,setJt)){model.path=null;say('Separate. Displays and pages were not touched.')}
+}
+function holdJoining(){
+ ++anim;model.busy=false;
+ if(model.jt===0||!model.path){const s=model.jt===1?separatePose():{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}};
+  if(model.jt===0){model.path={s,j:joinedPose('a')}}else{model.path={s,j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}}}}
+ setJt(.55);render();say('Held mid-join. Use the scrubber to step through the animation frame by frame.');
+}
+function toggleShade(){
+ const to=model.st>.5?0:1;const start=model.st;const token=++shadeAnim;
+ // Shade runs on its own clock so it can overlap a join.
+ const t0=performance.now(),ms=reduce.matches?0:520*Math.abs(to-start);
+ (function step(now){if(token!==shadeAnim)return;const t=ms?clamp((now-t0)/ms):1;model.st=lerp(start,to,t);render();if(t<1)requestAnimationFrame(step)})(t0);
+ say(to?'Shaded: frames close down to a strip with the name and one value.':'Unshaded.');
+}
+
+/* ---------- Rendering ---------- */
+function ctx(){const h=lerp(H,HS,ease(model.st));return{a:model.a,b:model.b,h,jt:model.jt,ghost:model.ghost}}
+function render(){
+ const c=ctx(),j=J(),ch=lerp(CH,CHS,ease(model.st));
+ const lit=Math.max(model.glow,model.jt>0&&model.jt<1?seg(model.jt,.04,.25)*(1-seg(model.jt,.86,1)):0);
+ for(const id of ['a','b','c']){
+  const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
+  el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=f(h)+'px';
+  const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
+  let s=casing(w,h,small);
+  if(id==='a')s+=j.end(1,lit,h);if(id==='b')s+=j.end(-1,lit,h);
+  svg.innerHTML=s;
+  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  el.querySelectorAll('.screen,.tabline,.bead,.mini,.lens').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
+  el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
+  el.querySelector('.strip').style.opacity=f(strip);
+  if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
+   const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
+ }
+ $('#a .runText').innerHTML=model.a.run?'03 <em>agents running</em>':'03 <em>agents paused</em>';
+ $('#under').innerHTML=j.under(c);
+ const focused=document.activeElement&&document.activeElement.id==='ringHit';
+ $('#over').innerHTML=j.over(c);
+ const hit=$('#ringHit');if(hit){hit.onclick=doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ // Controls reflect state
+ const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
+ $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
+ $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
+ $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
+ $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
+ const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()};
+ $('#phase').textContent=(drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
+}
+
+/* ---------- Controls ---------- */
+const STATES=[['separate','Separate','1'],['joining','Joining','2'],['joined','Joined','3'],['shade','Shade','4']];
+STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.state=k;b.innerHTML=`<kbd>${key}</kbd>${l}`;b.onclick=()=>act(k);$('#stateRow').append(b)});
+function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
+function options(row,set,key,aboutEl){
+ Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)});
+}
+function pick(key,id){
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='shade')model.shade=id;
+ describe();render();
+}
+function describe(){
+ const j=J(),s=SHADES[model.shade];
+ $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
+ $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
+}
+options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
+$('#scrub').oninput=e=>{++anim;model.busy=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:{a:{...model.a},b:{...model.b}}}:{s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0)model.path=null;render()};
+document.addEventListener('keydown',e=>{
+ if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
+ const key=e.key.toLowerCase();
+ if(e.key==='Escape')cancelDrag();
+ const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
+ if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
+});
+['a','b'].forEach(id=>{
+ const el=$('#'+id),m=model[id],name=id==='a'?'Jarvis':'GitDiscuss';
+ el.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{m.page=+t.dataset.page;render()});
+ el.querySelector('.next').onclick=()=>{m.page=(m.page+1)%3;render()};
+ el.querySelector('.run').onclick=()=>{m.run=!m.run;render();say(name+' simulated activity '+(m.run?'resumed.':'paused.'))};
+});
+
+/* ---------- Dragging with near / ready ---------- */
+function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:(e.clientX-r.left)/s,y:(e.clientY-r.top)/s}}
+function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
+stage.addEventListener('pointerdown',e=>{
+ const g=e.target.closest('[data-drag]');if(!g||e.button!==0)return;e.preventDefault();
+ const id=g.dataset.drag,p=local(e);
+ // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
+ if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null}
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
+ stage.setPointerCapture(e.pointerId);
+});
+stage.addEventListener('pointermove',e=>{
+ if(!drag)return;const p=local(e),dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
+ if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,10,1200-CW-10);model.c.y=clamp(s.c.y+dy,top,600-CH-10);render();return}
+ if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,top,bottom)};
+ const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
+ drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
+ const pull=drag.state==='ready'?.88:drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
+ m.x=lerp(raw.x,t.x,pull);m.y=lerp(raw.y,t.y,pull);
+ model.glow=drag.state==='ready'?1:drag.state==='near'?.18+.44*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
+ model.ghost=drag.state==='ready'?1:0;
+ if(drag.state==='ready')say('Ready: release to link them with a jump ring.');else if(drag.state==='near')say('Nearby: the loops warm. Move closer.');
+ render();
+});
+function endDrag(){
+ if(!drag)return;const d=drag;drag=null;const ready=d.state==='ready';model.glow=0;model.ghost=0;
+ if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
+}
+function cancelDrag(){if(!drag)return;const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=model.ghost=0;render();say('Move cancelled.')}
+stage.addEventListener('pointerup',endDrag);
+stage.addEventListener('pointercancel',cancelDrag);
+$$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
+ const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
+ const id=b.dataset.drag;
+ if(model.jt>0&&model.jt<1&&id!=='c')return;
+ const bottom=600-(model.st>.5?HS:H)-14;
+ if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],10,1200-w-10);m.y=clamp(m.y+k[1],46,id==='c'?600-CH-10:bottom)}render();
+}));
+
+/* Bead meter columns */
+$$('.beads i').forEach(i=>{i.innerHTML='<b></b>'.repeat(+i.dataset.n)});
+function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
+addEventListener('resize',fit);fit();describe();render();
+window.wireSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade};
+</script></body></html>

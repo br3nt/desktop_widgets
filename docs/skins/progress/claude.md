@@ -1,0 +1,99 @@
+# Claude skin study: progress
+
+One item per run, in this order. Aesthetics are interleaved so none waits long. Pages: `prototypes/skins/claude/<skin>.html` and `combined.html`, with the index at `prototypes/skins/claude/index.html`.
+
+- [x] **wire** · Join: jump ring (Hinge). Brass ring swings through eye loops on each end and twists shut; click the ring to open
+  - Built in `wire.html`, which is a new page: copper wire frames, coiled cabochon displays and bead buttons. Loops warm when near, a ghost ring shows when ready, the ring threads and twists shut, and clicking it opens it again. A "plain tuck" baseline shade is included so the shade state works.
+- [ ] **felt** · Join: zipper (Interlock). Teeth lift on approach, the pull runs the seam; the pull is the release grip
+- [ ] **gothic** · Join: half-rose window (Interlock). Halves rotate into alignment; the full rose is the indicator; turn it to release
+- [ ] **hollow** · Join: silk stitch (Bind). A needle darts red thread through eyelets and pulls taut; slash to release
+- [ ] **elven** · Join: vine (Grow). Tendrils reach, spiral round each other and leaf out; drag apart to unwind
+- [ ] **combined** · Layer stack: felt cathedral (gothic structure, felt material, stop-motion)
+- [ ] **wire** · Shade: bead strand (Distil). Widget collapses into a necklace; stones are statuses, a flat tag bead carries the name
+- [ ] **felt** · Shade: pocket (Sink). Widget slides into a felt pocket; a woven name tag and a cross-stitch value peek out
+- [ ] **gothic** · Shade: clerestory (Distil). A row of lit lancets, one per status, with tooltips
+- [ ] **hollow** · Shade: cocoon (Cinch). Thread spins the widget into a slim cocoon with one lit seam
+- [ ] **elven** · Shade: constellation (Distil). A silver line with star points; each star a status
+- [ ] **combined** · Half-coupler: gothic stone boss + felt button tab
+- [ ] **wire** · Join: bead strand bridge (Bridge). Beads with gold spacers slide along a wire across the gap and click into place
+- [ ] **felt** · Join: blanket stitch (Bind). A needle stitches the seam and the felt puckers; scissors snip to release
+- [ ] **gothic** · Join: flying buttress (Bridge). Voussoirs drop in, keystone seats with dust; lift the keystone to release
+- [ ] **hollow** · Join: bell and chain (Clasp). A short chain with a bell; joining rings it; tap twice to release
+- [ ] **elven** · Join: leaf brooch (Clasp). A leaf cloak pin descends and pins the seam; lift it to release
+- [ ] **combined** · Containment: gothic reliquary bay holds a felt widget behind glass
+- [ ] **wire** · Shade: coil band (Cinch). Casing compresses into a tight coiled band with a stamped plaque for name and value
+- [ ] **felt** · Shade: bolster (Roll). Rolls into a stuffed tube tied with ribbon, name embroidered; unrolling bounces
+- [ ] **gothic** · Shade: triptych closing (Fold). Wings fold over the display, grisaille name and value on their backs
+- [ ] **hollow** · Shade: map roll (Roll). The parchment rolls into a thread-tied scroll with a quill label
+- [ ] **elven** · Shade: leaf furl (Roll). Curls into a slender leaf; the vein is a progress line, the tip the count
+- [ ] **combined** · Pairwise seam: wire coil-wraps a gothic pier
+- [ ] **wire** · Angle: jump-ring pivot. Drag to set the angle; the ring turns in the loops; optional detents
+- [ ] **felt** · Angle: cloth hinge. Any angle; creases on the inside corner, stretch on the outside
+- [ ] **gothic** · Angle: rose as dial. Turn the rose to set the angle; petals are detents
+- [ ] **hollow** · Angle: hanging bracket. An iron bracket sets the angle; the bell or lamp hangs plumb
+- [ ] **elven** · Angle: branching. A fork in a branch; golden-angle soft detents
+- [ ] **combined** · Layer stack: silver filigree (wire material, elven ornament)
+- [ ] **wire** · Join: coil wrap (Bind). A wire end leaps across and wraps the other frame three times; grab a band to unwind
+- [ ] **felt** · Join: button tab (Clasp). A felt tab flops over and buttons on, overshoots and settles; tug to release
+- [ ] **gothic** · Join: lead came solder (Bind). One shared window; molten solder runs the came and cools; a knife cracks it open
+- [ ] **hollow** · Join: carapace overlap (Interlock). Edge shell plates telescope over each other with a click
+- [ ] **elven** · Join: moonlight bridge (Bridge). A span of light draws across and solidifies into filigree
+- [ ] **combined** · Dominant skin: felt Checks turns to stone in a gothic group
+- [ ] **wire** · Morph: tree growth. Cabochon, then branch with two displays, then hoop tree; beads slide out to new tips
+- [ ] **felt** · Morph: stuffing. Growing inflates like a cushion; shrinking deflates with wrinkles; squash on landing
+- [ ] **gothic** · Morph: build by bays. Scaffolding appears, stones rise, scaffold falls away
+- [ ] **hollow** · Morph: map unfurl. Growing unrolls more parchment regions
+- [ ] **elven** · Morph: growth. A branch extends and a leaf opens with a new display; shrinking is autumn
+- [ ] **combined** · Half-coupler: wire coil grips an elven tendril
+- [ ] **wire** · Shade: hoop rim (Sink). Contents retract into the frame wire; an empty outline with a single bead readout
+- [ ] **felt** · Shade: drawstring (Cinch). Casing gathers into ruffles; pull the toggle to open
+- [ ] **gothic** · Shade: cornice. Facade drops behind its top moulding; crockets, carved name, one lit lancet slit
+- [ ] **hollow** · Shade: hanging sign (Distil). A signboard on two chains with name and one value; swings on change
+- [ ] **elven** · Shade: lantern sleep (Sink). Casing dims to a lit rim with the script nameplate; hover wakes
+- [ ] **combined** · Pairwise seam: Hollow needle stitches felt with red thread
+- [ ] **wire** · Join: twisted trunk (Fuse). Parallel wires meet and twist into a rope that frays into each frame
+- [ ] **felt** · Join: ribbon bow (Bind). Ribbon laces through grommets and ties a bow; pull the tail to release
+- [ ] **gothic** · Join: compound pier (Fuse). End walls become a clustered column with a lamp-bearer niche
+- [ ] **hollow** · Join: ink bleed (Fuse). Outlines touch, ink flows together, splatter pulls back into a clean outline
+- [ ] **elven** · Join: runic seal (Interlock). Invented runes light on approach and match when aligned
+- [ ] **combined** · Containment: felt pocket holds a wire widget, tag over the edge
+- [ ] **wire** · Shade: folded branches (Fold). Branches fold down along the trunk like an umbrella; beads line the trunk
+- [ ] **felt** · Angle: safety pin pivot. A visible pin as an explicit angle joint
+- [ ] **gothic** · Angle: apse geometry. 22.5/30 degree steps; a canted wall segment with its own lancet
+- [ ] **hollow** · Angle: shell articulation. Segments overlap more on the inside of the angle
+- [ ] **elven** · Shade: wing fold (Fold). Translucent panels fold back along their veins
+- [ ] **combined** · Layer stack: ruined bug cathedral (gothic structure, Hollow palette and brush line)
+- [ ] **wire** · Join: caged bead (Clasp). A spiral cage forms around a seam bead from both sides
+- [ ] **felt** · Shade: pleats (Fold). Concertina folds whose edge stripes are status colours
+- [ ] **gothic** · Shade: crypt (Sink). Lowers into a floor slab; only arch tips and window glow remain
+- [ ] **hollow** · Shade: curl (Roll). Rolls up like a pill bug; light leaks from the segment gaps
+- [ ] **elven** · Join: weave (Bind). Border threads unravel and re-weave into one interlace knot
+- [ ] **combined** · Half-coupler: gothic buttress lands on a Hollow iron bracket
+- [ ] **wire** · Angle: caged-bead ball joint. Rotate the bead to change the angle
+- [ ] **felt** · Join: applique patch (Clasp). Patch laid over the seam, pinned, then stitched round; carries a group badge
+- [ ] **gothic** · Join: nave doors (Clasp). Oak doors swing shut and a bar drops; portcullis variant
+- [ ] **hollow** · Join: lamppost (Bridge). A wrought-iron lamppost rises between them; its lantern is the join light
+- [ ] **elven** · Morph: plant silhouettes. Seed pod, leaf, branch with leaves
+- [ ] **combined** · Pairwise seam: elven vine grows up gothic tracery
+- [ ] **wire** · Morph: bezel resize. Coils loosen, the stone grows, coils tighten again
+- [ ] **felt** · Morph: patches. New panels are sewn on: patch slides in, pins, stitches
+- [ ] **gothic** · Morph: window types as form factors. Lancet, rose, oculus, Perpendicular grid
+- [ ] **hollow** · Morph: moult. The old casing cracks and the larger form steps out
+- [ ] **elven** · Shade: mist (Distil). Casing dissolves to mist and recondenses as a frosted text band
+- [ ] **combined** · Containment: wire hoop holds any widget as its cabochon
+- [ ] **wire** · Shade: caterpillar (Distil, character). Beaded caterpillar on a wire; segments are statuses, head nods on change
+- [ ] **felt** · Shade: woven label (Distil). A clothing-label strip with name and value
+- [ ] **gothic** · Shade: inscription drum. A carved band rotates to show successive lines
+- [ ] **hollow** · Shade: fog sink (Sink). Sinks behind a fog bank; spire tips and lantern glow remain
+- [ ] **elven** · Join: quicksilver (Fuse). Liquid silver edges meet, ripple and seal into one rim
+- [ ] **combined** · Layer stack: felt bugs (wire structure in felt material)
+- [ ] **wire** · Join: nest (Grow). Fine wires tangle across the gap around a small cabochon; snap back with a twang on release
+- [ ] **felt** · Join: velcro (Fuse). Press together with a squash; fibres stretch and snap on release
+- [ ] **gothic** · Join: frieze procession (Fuse, decorative). Carved figures walk across the seam, then freeze
+- [ ] **hollow** · Join: mycelium (Grow). Pale fungal threads reach across and knit together
+- [ ] **combined** · Material bleed: stone turns to felt across the seam via a noise mask
+- [ ] **wire** · Angle: bent-wire joint. The connecting wire bends with a visible radius and a locking coil at the bend
+- [ ] **felt** · Morph: crescent bend. The capsule bends continuously into a crescent
+- [ ] **gothic** · Angle: fan vault. Ribs fan out to fill the inside of tight angles
+- [ ] **wire** · Join: overlapping hoops (Interlock). Rings overlap into linked circles; the lens between them is the status lamp
+- [ ] **felt** · Join: mitten hands (Grow, character). Two felt mittens reach out and clasp, stop-motion
