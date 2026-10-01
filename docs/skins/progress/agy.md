@@ -22,7 +22,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Elytra Wing-Case Shield shade — Bone-white beetle wing-cases glide down over screen to slim crest (Built in prototypes/skins/agy/hollow.html with curved bleached chitin wing plates, interlocking suture micro-teeth, Pharloom brass beetle clasp with captive lumafly lens, impact spark burst, unclipped readable shade strip, and full phone width scaling)
 
 ### Cycle 3: Secondary Joins
-- [ ] Gothic: Lead-Came Solder Weld join — Molten silver solder bead flows down dark lead came channel
+- [x] Gothic: Lead-Came Solder Weld join — Molten silver solder bead flows down dark lead came channel (Built in prototypes/skins/agy/gothic.html with H-came channels, stained glass quarries, molten silver solder flow animation, cooled pewter-silver seam, three reinforcement rosettes, and center rosette release)
 - [ ] Felt: Duffel Toggle & Braid Cord join — Braided wool loops catch over turned olive-wood toggle pegs
 - [ ] Elven: Crystalline Cleavage & Harmonic Chime join — Complementary moonstone prism planes glide flush with harmonic chime
 - [ ] Wire: Wire Tree Root Braid onto Hoop join — Twisted copper roots curl tightly around heavy silver hoop rim
