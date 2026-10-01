@@ -207,6 +207,19 @@ header {
 .module.shade .module-svg {
   height: 44px;
 }
+.lotus-overlay {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+  transition: height 260ms cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+.module.shade .lotus-overlay {
+  height: 44px;
+}
 
 /* Star-Silver Grip: Curved Filigree Bow with Carved Jade Accents */
 .elven-grip {
@@ -339,7 +352,7 @@ header {
   background: linear-gradient(90deg, #101920, #192732 50%, #101920);
   border: 1px solid #4a667b;
   border-radius: 6px;
-  z-index: 2;
+  z-index: 4;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(123, 242, 198, 0.2);
 }
 .module.shade .shade-diadem {
@@ -800,14 +813,15 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Elven &amp; Intricate <span>/ living tendril braid join</span></h1>
-    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Living Art Nouveau sylvan lattice</p>
+    <h1>Elven &amp; Intricate <span>/ living tendril braid &amp; lotus petal nocturne</span></h1>
+    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Living sylvan lattice · Lotus petal nocturne shade</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
       <label for="optionSelect">Option</label>
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="tendril_braid" selected>1. Living Tendril Braid (Sylvan Weave)</option>
+        <option value="lotus_petals">2. Lotus Petal Nocturne shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -819,6 +833,7 @@ footer .note-highlight {
     </div>
     <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnLotusAnim">Close lotus petals</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -940,6 +955,7 @@ footer .note-highlight {
     <!-- Capsule A: Jarvis -->
     <section class="module" id="a" aria-label="Jarvis elven capsule">
       <svg class="module-svg" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <svg class="lotus-overlay" id="lotus-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <button class="elven-grip" data-drag="a" aria-label="Move Jarvis capsule">
         <span><span class="rune-mark">✧</span> Jarvis / Sylvan Regent</span>
         <span>⋮⋮</span>
@@ -991,6 +1007,7 @@ footer .note-highlight {
     <!-- Capsule B: GitDiscuss -->
     <section class="module" id="b" aria-label="GitDiscuss elven capsule">
       <svg class="module-svg" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <svg class="lotus-overlay" id="lotus-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <button class="elven-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
         <span><span class="rune-mark">✧</span> GitDiscuss / Archive Weaver</span>
         <span>⋮⋮</span>
@@ -1064,7 +1081,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Elven &amp; Intricate Architecture &amp; The Living Tendril Braid Join</h3>
+  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join &amp; Lotus Petal Nocturne Shade</h3>
   <p>
     Forged from spun star-silver (Ithildin), white birchwood inlays, and mother-of-pearl bezels. Contours follow swept aerodynamic swan-wing curves and delicate botanical filigree crowns, preserving high contrast and uncompromised display readability.
   </p>
@@ -1072,7 +1089,7 @@ footer .note-highlight {
     <span class="note-highlight">Option 1 — Living Tendril Braid (Sylvan Weave):</span> Fine star-silver vine tendrils rest dormant along the mating collars. As the capsules enter the magnetic capture threshold, the tendrils reach fluidly across the void, uncoiling and intertwining like living plants into an intricate Art Nouveau knot lattice. Glowing nephrite leaf buds and a moonstone brooch seal the seam. Pulling the star-silver leaf clasp right smoothly unweaves the lattice.
   </p>
   <p>
-    <span class="note-highlight">Shade Mode:</span> Transforms the instrument into an ultra-slender 44px star-silver diadem wand, with inlaid nephrite gems and a glowing starlight status ribbon.
+    <span class="note-highlight">Option 2 — Lotus Petal Nocturne shade:</span> Articulated star-silver filigree plates fold upward and inward across the screen face like the petals of a celestial water lily closing at dusk. The overlapping petals shield the crystalline display, meeting along an organic Art Nouveau seam with a carved nephrite jade lotus brooch. The instrument collapses into a slender 44px crowned diadem wand displaying glowing starlight runes.
   </p>
 </footer>
 
@@ -1095,6 +1112,8 @@ const model = {
   blend: 0,
   cap: 0,
   tendrilProgress: 0, // 0 = coiled along collar, 1 = fully intertwined living braid
+  petalFold: 0,       // 0 = bloomed open, 1 = closed lotus petal nocturne shade
+  option: 'tendril_braid',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1351,6 +1370,153 @@ function drawTendrilBraid(midX, y, progress, opacity = 1) {
   `;
 }
 
+// Option 2: The Lotus Petal Nocturne Shade Mode (Curved Filigree Petals Shield Screen)
+function drawLotusPetals(f, width = W) {
+  if (f <= 0.01) return '';
+  const midX = width / 2;
+  const leftX = 60, rightX = width - 60;
+
+  // Dynamic transform parameters based on f (0 = bloomed/open, 1 = closed nocturne)
+  const rotL = (1 - f) * 32;
+  const transXL = -(1 - f) * 16;
+  const transYL = (1 - f) * 48;
+
+  const rotR = -(1 - f) * 32;
+  const transXR = (1 - f) * 16;
+  const transYR = (1 - f) * 48;
+
+  const transYCalyx = (1 - f) * 42;
+  const shadowAlpha = 0.5 * f;
+
+  let s = `<defs>
+    <linearGradient id="lotusSilverGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f0f7fb"/>
+      <stop offset="8%" stop-color="#c8dbe6"/>
+      <stop offset="35%" stop-color="#7e9bb0"/>
+      <stop offset="65%" stop-color="#3b5263"/>
+      <stop offset="90%" stop-color="#1b2a34"/>
+      <stop offset="100%" stop-color="#4d6c82"/>
+    </linearGradient>
+    <linearGradient id="lotusVineGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#b8d5e8"/>
+      <stop offset="70%" stop-color="#55778f"/>
+      <stop offset="100%" stop-color="#1e313d"/>
+    </linearGradient>
+    <radialGradient id="lotusJadeGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#dffff5"/>
+      <stop offset="35%" stop-color="#45e6b5"/>
+      <stop offset="75%" stop-color="#148062"/>
+      <stop offset="100%" stop-color="#08382b"/>
+    </radialGradient>
+    <radialGradient id="lotusMoonGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#b6e3f9"/>
+      <stop offset="75%" stop-color="#5588a8"/>
+      <stop offset="100%" stop-color="#1b3647"/>
+    </radialGradient>
+    <linearGradient id="lotusHighlight" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7e9bb0" stop-opacity="0.2"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#7e9bb0" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+  <g class="lotus-nocturne" opacity="${Math.min(1, f * 1.5)}">`;
+
+  // 1. Left Water-Lily Petal Plate
+  s += `
+    <g transform="translate(${transXL}, ${transYL}) rotate(${rotL}, ${leftX}, 108)">
+      <path d="M 50 104 C 44 70, 52 42, 80 32 C 114 24, 158 28, 204 36 C 194 52, 208 72, 196 98 C 152 104, 102 106, 50 104 Z"
+            fill="#050a0e" opacity="${shadowAlpha}" filter="url(#etherealSilverShadow)"/>
+      <path d="M 50 104 C 44 70, 52 42, 80 32 C 114 24, 158 28, 204 36 C 194 52, 208 72, 196 98 C 152 104, 102 106, 50 104 Z"
+            fill="url(#lotusSilverGrad)" stroke="#1a2d39" stroke-width="2"/>
+      <path d="M 50 104 C 44 70, 52 42, 80 32 C 114 24, 158 28, 204 36 C 194 52, 208 72, 196 98 C 152 104, 102 106, 50 104 Z"
+            fill="url(#nacreGrain)"/>
+      <path d="M 54 100 C 48 72, 56 46, 82 36 C 114 28, 156 32, 200 40"
+            fill="none" stroke="url(#lotusHighlight)" stroke-width="1.2" opacity="0.85"/>
+      <path d="M 68 96 C 88 78, 130 52, 194 38"
+            fill="none" stroke="url(#lotusVineGrad)" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M 68 96 C 88 78, 130 52, 194 38"
+            fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.8"/>
+      <path d="M 105 76 C 96 62, 85 54, 76 46" fill="none" stroke="url(#lotusVineGrad)" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M 140 60 C 145 48, 160 42, 175 42" fill="none" stroke="url(#lotusVineGrad)" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M 125 68 C 135 78, 155 82, 172 80" fill="none" stroke="url(#lotusVineGrad)" stroke-width="1.3" stroke-linecap="round"/>
+      <circle cx="76" cy="46" r="2.4" fill="url(#lotusJadeGrad)"/>
+      <circle cx="175" cy="42" r="2.4" fill="url(#lotusJadeGrad)"/>
+      <circle cx="172" cy="80" r="2.2" fill="url(#lotusMoonGrad)"/>
+    </g>
+  `;
+
+  // 2. Right Water-Lily Petal Plate
+  s += `
+    <g transform="translate(${transXR}, ${transYR}) rotate(${rotR}, ${rightX}, 108)">
+      <path d="M 340 104 C 346 70, 338 42, 310 32 C 276 24, 232 28, 186 36 C 196 52, 182 72, 194 98 C 238 104, 288 106, 340 104 Z"
+            fill="#050a0e" opacity="${shadowAlpha}" filter="url(#etherealSilverShadow)"/>
+      <path d="M 340 104 C 346 70, 338 42, 310 32 C 276 24, 232 28, 186 36 C 196 52, 182 72, 194 98 C 238 104, 288 106, 340 104 Z"
+            fill="url(#lotusSilverGrad)" stroke="#1a2d39" stroke-width="2"/>
+      <path d="M 340 104 C 346 70, 338 42, 310 32 C 276 24, 232 28, 186 36 C 196 52, 182 72, 194 98 C 238 104, 288 106, 340 104 Z"
+            fill="url(#nacreGrain)"/>
+      <path d="M 336 100 C 342 72, 334 46, 308 36 C 276 28, 234 32, 190 40"
+            fill="none" stroke="url(#lotusHighlight)" stroke-width="1.2" opacity="0.85"/>
+      <path d="M 322 96 C 302 78, 260 52, 196 38"
+            fill="none" stroke="url(#lotusVineGrad)" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M 322 96 C 302 78, 260 52, 196 38"
+            fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.8"/>
+      <path d="M 285 76 C 294 62, 305 54, 314 46" fill="none" stroke="url(#lotusVineGrad)" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M 250 60 C 245 48, 230 42, 215 42" fill="none" stroke="url(#lotusVineGrad)" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M 265 68 C 255 78, 235 82, 218 80" fill="none" stroke="url(#lotusVineGrad)" stroke-width="1.3" stroke-linecap="round"/>
+      <circle cx="314" cy="46" r="2.4" fill="url(#lotusJadeGrad)"/>
+      <circle cx="215" cy="42" r="2.4" fill="url(#lotusJadeGrad)"/>
+      <circle cx="218" cy="80" r="2.2" fill="url(#lotusMoonGrad)"/>
+    </g>
+  `;
+
+  // 3. Central Scalloped Lotus Sepals / Calyx Plate
+  s += `
+    <g transform="translate(0, ${transYCalyx})">
+      <path d="M 132 108 Q 162 76 195 72 Q 228 76 258 108 Q 195 116 132 108 Z"
+            fill="url(#lotusSilverGrad)" stroke="#1a2d39" stroke-width="1.8"/>
+      <path d="M 132 108 Q 162 76 195 72 Q 228 76 258 108 Q 195 116 132 108 Z"
+            fill="url(#nacreGrain)"/>
+      <path d="M 195 106 V 76" stroke="url(#lotusVineGrad)" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M 195 106 Q 175 92 162 82" stroke="url(#lotusVineGrad)" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M 195 106 Q 215 92 228 82" stroke="url(#lotusVineGrad)" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="195" cy="74" r="2.6" fill="url(#lotusJadeGrad)"/>
+    </g>
+  `;
+
+  // 4. Central Celestial Lotus Brooch / Apex Clasp
+  if (f > 0.6) {
+    const broochScale = Math.min(1, (f - 0.6) / 0.4);
+    s += `
+      <g transform="translate(${midX}, 38) scale(${broochScale})">
+        <circle cx="0" cy="0" r="10" fill="#13232e" stroke="url(#lotusVineGrad)" stroke-width="1.5"/>
+        <path d="M -8 0 Q 0 -8 8 0 Q 0 8 -8 0 Z" fill="url(#lotusSilverGrad)" stroke="#d8ba66" stroke-width="1"/>
+        <path d="M 0 -8 Q 8 0 0 8 Q -8 0 0 -8 Z" fill="url(#lotusSilverGrad)" stroke="#d8ba66" stroke-width="1"/>
+        <circle cx="0" cy="0" r="5.2" fill="url(#lotusJadeGrad)" filter="url(#moonlitCausticGlow)"/>
+        <path d="M -4 0 H 4 M 0 -4 V 4" stroke="#ffffff" stroke-width="1" opacity="0.9"/>
+        <circle cx="0" cy="0" r="1.4" fill="#ffffff"/>
+      </g>
+    `;
+  }
+
+  // 5. Harmonic Chime Flash Pulse on Full Closure
+  if (f > 0.88) {
+    const chimePulse = (f - 0.88) / 0.12;
+    const r = chimePulse * 48;
+    const pulseOpacity = (1 - chimePulse) * 0.9;
+    s += `
+      <circle cx="${midX}" cy="38" r="${r}" fill="none" stroke="#7bf2c6"
+              stroke-width="${(1 - chimePulse) * 6}" opacity="${pulseOpacity}" filter="url(#moonlitCausticGlow)"/>
+      <circle cx="${midX}" cy="38" r="${r * 0.5}" fill="none" stroke="#ffffff"
+              stroke-width="${(1 - chimePulse) * 3}" opacity="${pulseOpacity}"/>
+    `;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -1405,6 +1571,14 @@ function renderHardware() {
     `;
   }
 
+  // Lotus Petal Nocturne in each module
+  for (const id of ['a', 'b']) {
+    const lEl = $('#lotus-' + id);
+    if (lEl) {
+      lEl.innerHTML = drawLotusPetals(model.petalFold, W);
+    }
+  }
+
   // Active Proximity Aura
   if (!isShade && glow > 0.05 && p < 0.98) {
     $('#elvenLightAura').innerHTML = `
@@ -1419,9 +1593,9 @@ function renderHardware() {
 }
 
 function updateStateButtons() {
-  const isShade = model.shade;
+  const isShade = model.shade || model.petalFold > 0.5;
   const isJoined = model.joined;
-  const isJoining = model.tendrilProgress > 0.1 && model.tendrilProgress < 0.95 && !isJoined;
+  const isJoining = model.tendrilProgress > 0.1 && model.tendrilProgress < 0.95 && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -1452,6 +1626,17 @@ function render() {
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.elven-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
+
+    const screenEl = el.querySelector('.elven-screen');
+    if (screenEl) {
+      if (model.shade || model.petalFold > 0.95) {
+        screenEl.style.opacity = '0';
+        screenEl.style.pointerEvents = 'none';
+      } else {
+        screenEl.style.opacity = String(Math.max(0, 1 - model.petalFold * 0.95));
+        screenEl.style.pointerEvents = model.petalFold > 0.25 ? 'none' : 'auto';
+      }
+    }
 
     const btn = el.querySelector('.run-btn');
     btn.textContent = m.running ? 'Ⅱ' : '▶';
@@ -1507,6 +1692,12 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
+  const btnLotus = $('#btnLotusAnim');
+  if (btnLotus) {
+    btnLotus.textContent = (model.shade || model.petalFold > 0.5) ? 'Bloom lotus petals' : 'Close lotus petals';
+    btnLotus.disabled = model.busy;
+  }
+
   $('#harmonyValue').textContent = model.limit;
   $('#harmonyDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
 
@@ -1517,8 +1708,8 @@ function render() {
   release.style.setProperty('--tension', model.tension);
 
   if (!model.busy) {
-    if (model.shade) {
-      $('#phase').textContent = 'Shade mode / Star-silver diadem wand';
+    if (model.shade || model.petalFold > 0.5) {
+      $('#phase').textContent = 'Shade mode / Lotus Petal Nocturne diadem wand';
     } else if (model.joined) {
       $('#phase').textContent = 'Joined / One unified sylvan instrument';
     } else if (model.tendrilProgress > 0.1) {
@@ -1647,13 +1838,69 @@ async function separate() {
   say('Separated. Independent sylvan star-silver hulls restored.');
 }
 
+// Option 2: Lotus Petal Nocturne Shade Mode Animations
+async function closeLotusPetals() {
+  if (model.busy || (model.shade && model.petalFold >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Lotus Petal Nocturne closing. Curved filigree plates fold upward across the obsidian screen.');
+  $('#phase').textContent = 'Lotus petals closing';
+
+  // Mark shade active so module CSS height transitions to 44px
+  model.shade = true;
+  render();
+
+  // Animate liquid petal fold (Art Nouveau decrescendo curve)
+  await tween(440, t => {
+    const fold = t === 1 ? 1 : 1 - Math.pow(1 - t, 2.6);
+    model.petalFold = fold;
+    renderHardware();
+  }, token);
+
+  model.petalFold = 1;
+  model.busy = false;
+  render();
+  say('Lotus Petal Nocturne sealed. Screen shielded by star-silver filigree petals. Diadem wand illuminated.');
+  $('#phase').textContent = 'Shade mode / Lotus Petal Nocturne';
+}
+
+async function bloomLotusPetals() {
+  if (model.busy || (!model.shade && model.petalFold <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Lotus Petal Nocturne unfurling. Star-silver petals glide open with liquid grace.');
+  $('#phase').textContent = 'Lotus petals blooming';
+
+  // Unmark shade so CSS height expands back to 130px
+  model.shade = false;
+  render();
+
+  await tween(420, t => {
+    const unfold = 1 - (t === 1 ? 1 : 1 - Math.pow(1 - t, 2.4));
+    model.petalFold = unfold;
+    renderHardware();
+  }, token);
+
+  model.petalFold = 0;
+  model.busy = false;
+  render();
+  say('Lotus petals bloomed open. Full crystalline obsidian screen and sylvan controls restored.');
+  $('#phase').textContent = model.joined ? 'Joined / One unified sylvan instrument' : 'Separate / Two sylvan star-silver hulls';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    model.shade = false;
+    if (model.shade || model.petalFold > 0.05) {
+      await bloomLotusPetals();
+    }
     if (model.joined) {
       await separate();
     } else {
@@ -1666,7 +1913,9 @@ async function applyState(stateName) {
       say('State: Separate — Two independent star-silver capsules.');
     }
   } else if (stateName === 'joining') {
-    model.shade = false;
+    if (model.shade || model.petalFold > 0.05) {
+      await bloomLotusPetals();
+    }
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.6;
@@ -1677,7 +1926,9 @@ async function applyState(stateName) {
     render();
     say('State: Joining — Mid-animation view with silver tendrils uncoiling across the chasm.');
   } else if (stateName === 'joined') {
-    model.shade = false;
+    if (model.shade || model.petalFold > 0.05) {
+      await bloomLotusPetals();
+    }
     if (!model.joined) {
       model.a.x = 220;
       model.b.x = 220 + JOIN_DISTANCE;
@@ -1690,9 +1941,11 @@ async function applyState(stateName) {
       say('State: Joined — Monolithic star-silver hull with Art Nouveau sylvan lattice.');
     }
   } else if (stateName === 'shade') {
-    model.shade = true;
-    render();
-    say('State: Shade — Collapsed to slender star-silver diadem wand.');
+    if (model.shade || model.petalFold > 0.5) {
+      await bloomLotusPetals();
+    } else {
+      await closeLotusPetals();
+    }
   }
 }
 
@@ -1750,9 +2003,13 @@ function setPage(id, p) { model[id].page = p; render(); }
 $('#btnStateSeparate').onclick = () => applyState('separate');
 $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
-$('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
+$('#btnStateShade').onclick = () => applyState('shade');
 $('#btnJoinAnim').onclick = () => join();
 $('#btnSeparateAnim').onclick = () => separate();
+$('#btnLotusAnim').onclick = () => {
+  if (model.shade || model.petalFold > 0.5) bloomLotusPetals();
+  else closeLotusPetals();
+};
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
   render();
@@ -1764,17 +2021,36 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, canopy: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, tendrilProgress: 0, light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, tendrilProgress: 0, petalFold: 0, option: 'tendril_braid', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
+  $('#btnJoinAnim').classList.add('primary-btn');
+  $('#btnLotusAnim').classList.remove('primary-btn');
+  $('#optionSelect').value = 'tendril_braid';
   render();
   say('Reset to initial Elven study configuration.');
 };
 
-$('#optionSelect').onchange = (e) => {
-  say('Option selected: Living Tendril Braid (Sylvan Weave) join.');
+$('#optionSelect').onchange = async (e) => {
+  model.option = e.target.value;
+  if (model.option === 'lotus_petals') {
+    say('Option 2: Lotus Petal Nocturne shade selected. Curved filigree plates fold upward across the screen.');
+    $('#btnLotusAnim').classList.add('primary-btn');
+    $('#btnJoinAnim').classList.remove('primary-btn');
+    if (!model.shade) {
+      await closeLotusPetals();
+    }
+  } else if (model.option === 'tendril_braid') {
+    say('Option 1: Living Tendril Braid (Sylvan Weave) join selected. Tendrils reach and intertwine across the gap.');
+    $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnLotusAnim').classList.remove('primary-btn');
+    if (model.shade) {
+      await bloomLotusPetals();
+    }
+  }
+  render();
 };
 
 $('#a .canopy-btn').onclick = () => toggleCanopy();
