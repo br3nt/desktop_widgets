@@ -9,7 +9,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Felt · Join · Needle-felt merge — fusion — Added felt.html with compressing wool shoulders, gathering fibres, a shared waist and coral release tab; four state views and 22 DOM checks passed; browser visual review blocked by sandbox and computer-use access.
 - [x] Elven · Join · Grafted ribs — fusion — Added elven.html with open silver bows, interleaving ribs and a closing enamel collar; four state views and 24 DOM/state checks passed; browser visual review blocked by computer-use access.
 - [x] Wire · Join · Hook and eye — point attachment — Added wire.html (completed; ticked by orchestrator after a usage-limit cut-off)
-- [ ] Hollow · Join · Shell lap — fusion
+- [x] Hollow · Join · Shell lap — fusion — Added ink-and-chalk shell plates, animated overlapping lips, stepped seam and release peg; 28 DOM interaction checks passed; visual review blocked by unavailable browser access and denied native Chrome access.
 - [ ] Gothic · Join · Flying buttress — external attachment
 - [ ] Felt · Join · Button and elastic loop — point attachment
 - [ ] Elven · Join · Bowstring tension — suspended attachment
