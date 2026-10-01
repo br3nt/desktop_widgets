@@ -6,7 +6,8 @@ One item per run, in this order. Aesthetics are interleaved so none waits long. 
   - Built in `wire.html`, which is a new page: copper wire frames, coiled cabochon displays and bead buttons. Loops warm when near, a ghost ring shows when ready, the ring threads and twists shut, and clicking it opens it again. A "plain tuck" baseline shade is included so the shade state works.
 - [x] **felt** · Join: zipper (Interlock). Teeth lift on approach, the pull runs the seam; the pull is the release grip
   - Built in `felt.html`, a new page: filter-puffed felt cushions, cotton patches, cross-stitch digits. The teeth stand up when near and light when ready. The cushions lean into a V and the slider climbs it in 12 fps stop-motion. Drag the felt pull down (or click it, or press Enter) to unzip. A "plain deflate" baseline shade is included. Not yet checked in a browser.
-- [ ] **gothic** · Join: half-rose window (Interlock). Halves rotate into alignment; the full rose is the indicator; turn it to release
+- [x] **gothic** · Join: half-rose window (Interlock). Halves rotate into alignment; the full rose is the indicator; turn it to release
+  - Built in `gothic.html`, a new page: limestone facades with pinnacles, cresting, half-gables at the joining ends and lit quarry-glass windows. The tracery turns into line on approach, the light blooms out from the boss and spills colour onto the stone, and you turn the rose 60° (or click it, or press Enter) to release. A "plain lower" baseline shade is included. Not yet checked in a browser (browser access was blocked this run).
 - [ ] **hollow** · Join: silk stitch (Bind). A needle darts red thread through eyelets and pulls taut; slash to release
 - [ ] **elven** · Join: vine (Grow). Tendrils reach, spiral round each other and leaf out; drag apart to unwind
 - [ ] **combined** · Layer stack: felt cathedral (gothic structure, felt material, stop-motion)
