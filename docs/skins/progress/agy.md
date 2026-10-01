@@ -24,7 +24,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 ### Cycle 3: Secondary Joins
 - [x] Gothic: Lead-Came Solder Weld join — Molten silver solder bead flows down dark lead came channel (Built in prototypes/skins/agy/gothic.html with H-came channels, stained glass quarries, molten silver solder flow animation, cooled pewter-silver seam, three reinforcement rosettes, and center rosette release)
 - [x] Felt: Duffel Toggle & Braid Cord join — Braided wool loops catch over turned olive-wood toggle pegs (Built in prototypes/skins/agy/felt.html with twin turned olive-wood toggle pegs, stitched leather anchor tabs, reaching braided wool cord loops with tension snap, and Option 3 switcher)
-- [ ] Elven: Crystalline Cleavage & Harmonic Chime join — Complementary moonstone prism planes glide flush with harmonic chime
+- [x] Elven: Crystalline Cleavage & Harmonic Chime join — Complementary moonstone prism planes glide flush with harmonic chime (Built in prototypes/skins/agy/elven.html with complementary 30° moonstone prism facets, spectral refraction beams, 30° diagonal glide approach, invisible optical seam with monolithic crystal bar, pure-harmonic chime wavefront resonance, and crystal release pin)
 - [ ] Wire: Wire Tree Root Braid onto Hoop join — Twisted copper roots curl tightly around heavy silver hoop rim
 - [ ] Hollow: Chitinous Carapace Mandible Interlock join — Serrated stag-beetle shell teeth mesh with insectoid click
 
