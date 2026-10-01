@@ -89,6 +89,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="st-gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff2b8"/><stop offset=".45" stop-color="#d4a640"/><stop offset="1" stop-color="#5c3f0c"/></linearGradient>
  <radialGradient id="st-pearl" cx=".36" cy=".3" r=".8"><stop stop-color="#fffdf6"/><stop offset=".3" stop-color="#efe3d6"/><stop offset=".7" stop-color="#c7b3b4"/><stop offset="1" stop-color="#6e5d63"/></radialGradient>
  <linearGradient id="st-slab" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#1b343b"/><stop offset=".55" stop-color="#0c1a1e"/><stop offset="1" stop-color="#060d10"/></linearGradient>
+ <linearGradient id="cb-brass" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#fbe9b4"/><stop offset=".4" stop-color="#d7ad5e"/><stop offset=".85" stop-color="#9a6b2a"/><stop offset="1" stop-color="#6b4517"/></linearGradient>
+ <linearGradient id="cb-tube" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".55"/><stop offset=".28" stop-color="#000" stop-opacity="0"/><stop offset=".38" stop-color="#fff2d8" stop-opacity=".16"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/></linearGradient>
 </defs><path id="probe" fill="none"/></svg>
 <header><div><h1>Wire, beads &amp; stones <span>/ Claude skin study</span></h1><p>Oxidised copper frames, coil-bound cabochon displays, bead buttons. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -314,8 +316,74 @@ const SHADES={
     s+=`<g opacity="${f(clamp(p*4))}">${strandItem(it,x,cy,small)}</g>`;
    });
    return s;
-  }}
+  }},
+ coil:{label:'Coil band',kind:'Cinch',ms:1500,ownStrip:true,
+  about:'The pendant squeezes down like the tightly wrapped bail at the top of a wire-wrapped pendant. The plate and stone fade as the copper frame closes to a narrow tube, then fine copper wire winds onto it from both ends toward the middle. Each fresh turn goes on loose and cinches tight, so a small ripple runs ahead of the winding, and brass end wraps lock the band off. Last, a hammered brass plaque drops onto the middle, riveted at both ends, and the name and the one key value are stamped into it left to right behind a bright punch spark, darkened like antiqued jewellery. A small bezel-set stone on the plaque carries the status: <b>amber</b> running, <b>labradorite</b> paused, <b>carnelian</b> needs a decision, <b>malachite</b> passing. Unshading unwinds the band in reverse. The eye loops and bead caps stay on the ends, so banded pendants still join.',
+  sayOn:'Shaded: the frame squeezes into a tube, copper wire winds it tight from both ends, and a brass plaque is stamped with the name and value.',
+  hk:st=>ease(seg(st,0,.4)),
+  draw(id,w,h,small,st){return coilBand(id,w,h,small,st)}}
 };
+
+/* ---------- Coil band pieces ---------- */
+const PL_NAME_F='bold 11px Georgia,serif',PL_NUM_F='bold 14px Georgia,serif',PL_WORD_F='italic 11px Georgia,serif';
+function plaqueData(id){
+ const m=model[id];
+ if(id==='a')return{name:'JARVIS',num:'03',word:m.run?'running':'paused',stone:m.run?'amber':'lab'};
+ if(id==='b')return{name:'GITDISCUSS',num:'02',word:m.run?'to decide':'paused',stone:m.run?'carn':'lab'};
+ return{name:'CHECKS',num:'12/14',word:'passed',stone:'mal'};
+}
+function coilBand(id,w,h,small,st){
+ const k=ease(seg(st,0,.4)),cy=h/2,R=small?7.5:9,x0=8,x1=w-8,half=(x1-x0)/2;
+ let s=`<g opacity="${f(1-seg(k,.2,.9))}">${casing(w,h,small,true)}</g>`;
+ // Squeeze: the outer frame closes down to the band's own tube.
+ const fh=lerp(h-10,2*R+2,k),fr=Math.min(small?20:26,fh/2),frame=rrect(5,cy-fh/2,w-10,fh,fr);
+ s+=`<path d="${frame}" fill="#110a06" opacity="${f(seg(k,.3,1))}"/>`+wire(frame,'copper',lerp(3.1,1.6,k));
+ // Winding front, 0..1.15 so the middle turns also get time to cinch.
+ const bt=seg(st,.36,.8)*1.15;
+ if(bt>0){
+  const p=small?2.5:2.7;let front='',back='';
+  for(let x=x0+4;x<=x1-4;x+=p){
+   const d=Math.min(x-x0,x1-x)/half;if(d>bt)continue;
+   // A fresh turn goes on loose and cinches tight.
+   const r=R*(1+.5*(1-ease(clamp((bt-d)/.16))));
+   front+=`M${f(x-p*.35)} ${f(cy-r)}Q${f(x+p*.7)} ${f(cy)} ${f(x+p*.35)} ${f(cy+r)}`;
+   back+=`M${f(x+p*.35)} ${f(cy+r)}L${f(x+p*.65)} ${f(cy-r)}`;
+  }
+  s+=`<path d="${back}" stroke="#2a150a" stroke-width="1.1" fill="none"/>`+wire(front,'copper',1.35);
+  // Cylinder shading over the wound turns only.
+  const wl=Math.min(half,bt*half);
+  s+=`<g fill="url(#cb-tube)"><rect x="${x0}" y="${f(cy-R-1.5)}" width="${f(wl)}" height="${f(2*R+3)}"/><rect x="${f(x1-wl)}" y="${f(cy-R-1.5)}" width="${f(wl)}" height="${f(2*R+3)}"/></g>`;
+  if(bt<1){
+   // The two working ends, still hot from the draw plate.
+   for(const sd of [1,-1]){const xl=sd>0?x0+bt*half:x1-bt*half;
+    s+=wire(`M${f(xl)} ${f(cy-R)}q${sd*3} -7 ${sd*10} -6`,'hot',1.2)+`<circle cx="${f(xl+sd*10)}" cy="${f(cy-R-6)}" r="1.6" fill="#fff4d0"/>`}
+  }
+  s+=wire(band(x0+2,cy,false,3,2*R+5,2.3)+band(x1-2,cy,false,3,2*R+5,2.3),'brass',1.2,seg(bt,0,.15));
+ }
+ const pt=seg(st,.74,.9);if(pt<=0)return s;
+ // Plaque: rivet, bezel stone, NAME, punched dot, number, word, rivet.
+ const P=plaqueData(id),ls=1.3;
+ const nw=measure(P.name,PL_NAME_F)+ls*P.name.length,uw=measure(P.num,PL_NUM_F),ww=measure(P.word,PL_WORD_F);
+ const ph=small?22:24,pad=13,tw=nw+14+uw+4+ww,pw=Math.ceil(pad+11+tw+pad),px=w/2-pw/2;
+ const land=backOut(pt),py=cy-ph/2-24*(1-land),op=f(clamp(pt*4));
+ s+=`<g opacity="${op}"><ellipse cx="${f(w/2+2)}" cy="${f(cy+ph/2-2)}" rx="${f(pw*.5)}" ry="4" fill="#000" opacity="${f(.45*clamp(pt*1.4))}" filter="url(#soft)"/>`+
+  `<rect x="${f(px)}" y="${f(py)}" width="${pw}" height="${ph}" rx="3" fill="url(#cb-brass)" stroke="#3a2408" stroke-width="1"/>`+
+  `<rect x="${f(px)}" y="${f(py)}" width="${pw}" height="${ph}" rx="3" fill="url(#hammer)"/>`+
+  `<path d="M${f(px+2.5)} ${f(py+1.4)}H${f(px+pw-2.5)}" stroke="#fffbe6" stroke-opacity=".7" stroke-width=".9"/>`+
+  `<path d="M${f(px+2.5)} ${f(py+ph-1.2)}H${f(px+pw-2.5)}" stroke="#4a2e0b" stroke-opacity=".7" stroke-width=".9"/>`;
+ for(const rx of [px+5.5,px+pw-5.5])s+=`<circle cx="${f(rx)}" cy="${f(py+ph/2)}" r="2.1" fill="url(#st-gold)" stroke="#3a2408" stroke-width=".6"/><circle cx="${f(rx-.6)}" cy="${f(py+ph/2-.7)}" r=".6" fill="#fff"/>`;
+ let tx=px+pad;const sc=tx+3.5;
+ s+=`<circle cx="${f(sc)}" cy="${f(py+ph/2)}" r="5.2" fill="#3a2408"/>`+strandItem({k:'bead',r:4,stone:P.stone},sc,py+ph/2)+wire(circ(sc,py+ph/2,4.6),'brass',.8);
+ tx+=11;
+ // Letters are stamped in left to right once the plaque has landed.
+ const sp=seg(st,.86,1),reveal=tx+tw*sp,ty=py+ph/2+.5;
+ const txt=(dy,fill,o)=>`<text y="${f(ty+dy)}" dominant-baseline="central" fill="${fill}" opacity="${o}"><tspan x="${f(tx)}" font-family="Georgia,serif" font-weight="bold" font-size="11" letter-spacing="${ls}">${P.name}</tspan><tspan x="${f(tx+nw+14)}" font-family="Georgia,serif" font-weight="bold" font-size="14">${P.num}</tspan><tspan dx="4" font-family="Georgia,serif" font-style="italic" font-size="11">${P.word}</tspan></text>`;
+ s+=`<clipPath id="cbclip-${id}"><rect x="${f(px)}" y="${f(py-2)}" width="${f(reveal-px+(sp>=1?4:0))}" height="${ph+4}"/></clipPath>`+
+  `<g clip-path="url(#cbclip-${id})">${txt(.8,'#fff3c4',.6)}${txt(0,'#2a1606',1)}<circle cx="${f(tx+nw+7)}" cy="${f(py+ph/2)}" r="1.5" fill="#2a1606"/></g>`;
+ if(sp>0&&sp<1){const o=Math.sin(Math.PI*sp),fy=py+ph/2;
+  s+=`<path d="M${f(reveal-5)} ${f(fy)}H${f(reveal+5)}M${f(reveal)} ${f(fy-5)}V${f(fy+5)}" stroke="#fffbe8" stroke-width="1.1" stroke-linecap="round" opacity="${f(o)}"/>`}
+ return s+'</g>';
+}
 
 /* ---------- Bead strand pieces ---------- */
 const measure=(()=>{const c=document.createElement('canvas').getContext('2d');return(t,font)=>{c.font=font;return c.measureText(t).width}})();
