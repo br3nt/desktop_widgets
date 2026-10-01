@@ -74,7 +74,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
-.clsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -98,6 +98,11 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="lg-pass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e2f8c8"/><stop offset=".45" stop-color="#55b35e"/><stop offset="1" stop-color="#1c5c2c"/></linearGradient>
  <filter id="lglow" x="-200%" y="-60%" width="500%" height="220%"><feGaussianBlur stdDeviation="2.6"/></filter>
  <filter id="soft"x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
+ <linearGradient id="gris" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c6c4bd"/><stop offset="1" stop-color="#a8a69f"/></linearGradient>
+ <linearGradient id="tpGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6dc8c"/><stop offset=".5" stop-color="#d1a03e"/><stop offset="1" stop-color="#8a5e1a"/></linearGradient>
+ <pattern id="tpDots" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".6" fill="#7b5413" opacity=".55"/></pattern>
+ <linearGradient id="tpShT" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".8"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+ <linearGradient id="tpShB" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#000" stop-opacity=".8"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
 </defs></svg>
 <header><div><h1>Gothic cathedral <span>/ Claude skin study</span></h1><p>Weathered limestone facades with pinnacles and cresting, lit windows of clear quarry glass in coloured borders, carved bosses. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -150,6 +155,9 @@ const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,ease=
 const backOut=t=>{const c=1.9;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)};
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
+
+// Triptych wings sit above the display, so each widget gets a top overlay.
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -412,7 +420,10 @@ const SHADES={
   about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It keeps the shade state working until the gothic shade modes (clerestory, triptych, crypt, cornice, inscription drum) are built and added here.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
-  about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'}
+  about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
+ triptych:{label:'Triptych',kind:'Fold',ms:2300,h:small=>small?46:64,lowAt:[.5,.92],
+  on:'Shaded: the wings swing out, flash their gold and fold shut over the window; the closed altarpiece carries the name and value in grisaille.',off:'Unshaded: the latches turn, the wings swing open and the window shows again.',
+  about:'Gothic altarpieces were hinged: painted wings closed over the centre panel on ordinary days, and their outsides were painted in grisaille, grey monochrome that imitates carved stone. Here the window is the centre panel. A gilt frame comes up round it, and two wings hinged at its top and bottom edges swing out from the frame, showing their gilded insides (a tooled gold ground and a row of haloed saints), then fall shut over the display one after the other with a small rebound and a puff of dust. Gilt turn-buttons on the frame rotate across the seam and catch the light. The wall then lowers and the frame closes in round the shut altarpiece. <b>The strip is the closed altarpiece:</b> on the top wing, the name in incised capitals between two painted statues in niches; on the bottom wing, the key value on a painted banderole. Cool grey against the warm limestone, so it reads as a different, painted object. Unshading turns the latches back and swings the wings open. Joins still work on the shaded pair.'}
 };
 /* Clerestory: one lancet per status. Each status is [colour, tooltip]. */
 const LIGHTS={
@@ -462,6 +473,74 @@ function placeLights(id,el,w,h,on){
 function showTip(b){const t=$('#tip'),r=b.getBoundingClientRect();t.innerHTML=`<i style="background:${LCOL[b.dataset.c]}"></i>${b.dataset.tip}`;
  t.style.left=clamp(r.left+r.width/2,t.offsetWidth/2+6,innerWidth-t.offsetWidth/2-6)+'px';t.style.top=(r.top-8)+'px';t.classList.add('on')}
 function hideTip(){$('#tip').classList.remove('on')}
+
+/* Triptych: two wings hinged at the window's top and bottom edges. Outside in grisaille (name and value), inside gilt. */
+const tpText=id=>id==='a'?['Jarvis','03',model.a.run?'agents running':'agents paused']:id==='b'?['GitDiscuss','02','need a decision']:['Checks','12 / 14','passed'];
+function tpGeo(id){const[x,y,sw,sh,b]=SCR[id],x0=x-b-1,t0=y-b,b0=y+sh+b;return{x0,Wd:sw+2*b+2,t0,b0,L:(b0-t0)/2,F:id==='c'?[10,38]:[14,52]}}
+const tpCache={};
+// One wing drawn flat in local coordinates: hinge at y 0; the top wing spans 0..L, the bottom wing -L..0; the meeting edge is at +L or -L.
+function tpWing(id,top,inner){
+ const[name,num,val]=tpText(id),key=[id,top,inner,name,val].join('|');if(tpCache[key])return tpCache[key];
+ const{Wd,L}=tpGeo(id),sm=id==='c',y0=top?0:-L,cx=Wd/2;let s;
+ if(inner){
+  // Tooled gold ground, a red border and a row of haloed saints, upright when the wing lies open.
+  s=`<rect y="${y0}" width="${f(Wd)}" height="${L}" fill="url(#tpGold)"/><rect y="${y0}" width="${f(Wd)}" height="${L}" fill="url(#tpDots)"/><rect x="2" y="${y0+2}" width="${f(Wd-4)}" height="${L-4}" fill="none" stroke="#8e1f2b" stroke-width="2.4"/>`;
+  const n=Math.max(4,Math.floor(Wd/30)),hr=sm?3.4:4.6,hy=top?L-hr-4:-hr-4,fy=top?4.5:-L+4.5,d=Math.sign(fy-hy);
+  for(let i=0;i<n;i++){const x=(i+.5)*Wd/n;
+   s+=`<path d="M${f(x-1.6)} ${f(hy+d*hr*.75)}L${f(x-hr*1.25)} ${f(fy)}H${f(x+hr*1.25)}L${f(x+1.6)} ${f(hy+d*hr*.75)}Z" fill="${['#2b56b3','#a3222f','#25603f'][i%3]}" stroke="#4a2c06" stroke-width=".5"/><circle cx="${f(x)}" cy="${f(hy)}" r="${hr}" fill="#f7dc8a" stroke="#7b5413" stroke-width=".7"/><circle cx="${f(x)}" cy="${f(hy)}" r="${f(hr*.46)}" fill="#ecd2ae"/>`}
+  return tpCache[key]=s;
+ }
+ s=`<rect y="${y0}" width="${f(Wd)}" height="${L}" fill="url(#gris)"/><rect x="2.5" y="${y0+2.5}" width="${f(Wd-5)}" height="${L-5}" fill="none" stroke="#fbfaf5" stroke-opacity=".6" stroke-width=".8"/><rect x="3.3" y="${y0+3.3}" width="${f(Wd-5.8)}" height="${f(L-5.8)}" fill="none" stroke="#3e3c38" stroke-opacity=".42" stroke-width=".8"/>`;
+ // A painted blind arcade along the hinge side (hidden by the frame once the strip closes in)
+ if(!sm){const ya=top?5.5:-18.5,yb=top?18.5:-5.5;for(let x=12;x<Wd-8;x+=9)s+=`<path d="${lancet(x,yb,ya,2.5)}" fill="#55524c" opacity=".26"/><path d="M${f(x-2.5)} ${f(yb+.7)}H${f(x+2.5)}" stroke="#fbfaf5" stroke-opacity=".5" stroke-width=".7"/>`}
+ // Iron strap hinges
+ for(const x of[sm?7:11,Wd-(sm?7:11)])s+=`<path d="M${x-1.8} 0V${top?9:-9}L${x} ${top?12:-12}L${x+1.8} ${top?9:-9}V0Z" fill="#2b2724"/><circle cx="${x}" cy="${top?4:-4}" r=".7" fill="#8d877c"/>`;
+ const e=top?L:-L,k=sm?.82:1,nw=12*k,nh=15*k;
+ for(const nx of[(sm?6:9),Wd-(sm?6:9)-nw]){const ny0=top?e-2-nh:e+2,xc=nx+nw/2;
+  if(top){// Painted statue in a niche
+   s+=`<path d="${lancet(xc,ny0+nh,ny0,nw/2)}" fill="#6e6b64"/><path d="M${f(xc+nw/2-.4)} ${f(ny0+nh)}V${f(ny0+nh*.3)}" stroke="#3a3833" stroke-width=".8" opacity=".6"/>`+
+    `<path d="M${f(xc-1.2)} ${f(ny0+5.4*k)}L${f(xc-3.6*k)} ${f(ny0+nh-.6)}H${f(xc+3.6*k)}L${f(xc+1.2)} ${f(ny0+5.4*k)}Z" fill="#e6e3da"/><path d="M${f(xc+.6)} ${f(ny0+6*k)}L${f(xc+2.4*k)} ${f(ny0+nh-.6)}H${f(xc+3.6*k)}L${f(xc+1.2)} ${f(ny0+5.4*k)}Z" fill="#9b988f"/><circle cx="${f(xc)}" cy="${f(ny0+3.6*k)}" r="${f(1.9*k)}" fill="#ece9e1"/>`;
+  }else{// Painted quatrefoil
+   const qy=ny0+nh/2-1.5*k,r=2.4*k;s+=`<g fill="#6e6b64">${[[-1,0],[1,0],[0,-1],[0,1]].map(([a,b])=>`<circle cx="${f(xc+a*r)}" cy="${f(qy+b*r)}" r="${f(r*1.05)}"/>`).join('')}</g><circle cx="${f(xc)}" cy="${f(qy)}" r="${f(r*.7)}" fill="#e6e3da"/>`}
+ }
+ if(top){const fs=sm?10:12,ls=sm?2.4:3.2,ty=e-(sm?3.8:6);
+  s+=`<g font-family="Georgia,serif" font-size="${fs}" letter-spacing="${ls}" text-anchor="middle"><text x="${f(cx+ls/2)}" y="${f(ty+.9)}" fill="#fbfaf5" opacity=".85">${name.toUpperCase()}</text><text x="${f(cx+ls/2)}" y="${f(ty)}" fill="#2a2925">${name.toUpperCase()}</text></g>`;
+ }else{// The key value on a painted banderole
+  const fs=sm?10:11,yt=e+(sm?2:3),yb=yt+(sm?11:13),bw=Math.min(Wd-70,24+(num.length+1+val.length)*fs*.54),x0=cx-bw/2,x1=cx+bw/2,ym=(yt+yb)/2;
+  s+=`<path d="M${f(x0+1)} ${f(yt+2)}L${f(x0-9)} ${f(yt+3.5)}L${f(x0-5)} ${f(ym+1.5)}L${f(x0-9)} ${f(yb+1.5)}L${f(x0+1)} ${f(yb)}ZM${f(x1-1)} ${f(yt+2)}L${f(x1+9)} ${f(yt+3.5)}L${f(x1+5)} ${f(ym+1.5)}L${f(x1+9)} ${f(yb+1.5)}L${f(x1-1)} ${f(yb)}Z" fill="#8c8982" stroke="#4a4843" stroke-width=".6"/>`+
+   `<path d="M${f(x0)} ${f(yt)}Q${f(cx)} ${f(yt-1.6)} ${f(x1)} ${f(yt)}V${f(yb)}Q${f(cx)} ${f(yb-1.6)} ${f(x0)} ${f(yb)}Z" fill="#dedbd3" stroke="#4a4843" stroke-width=".6"/><path d="M${f(x0+.5)} ${f(yb-1.2)}Q${f(cx)} ${f(yb-2.8)} ${f(x1-.5)} ${f(yb-1.2)}" stroke="#8c8982" stroke-width=".8" fill="none"/>`+
+   `<text x="${f(cx)}" y="${f(yb-(sm?2.9:3.4))}" font-family="Georgia,serif" font-size="${fs}" text-anchor="middle" fill="#2a2925"><tspan font-weight="700" font-size="${fs+1}">${num}</tspan> ${val}</text>`;
+ }
+ return tpCache[key]=s;
+}
+const sparkle=(x,y,r)=>`<path d="M${f(x)} ${f(y-r)}L${f(x+r*.14)} ${f(y-r*.14)}L${f(x+r)} ${f(y)}L${f(x+r*.14)} ${f(y+r*.14)}L${f(x)} ${f(y+r)}L${f(x-r*.14)} ${f(y+r*.14)}L${f(x-r)} ${f(y)}L${f(x-r*.14)} ${f(y-r*.14)}Z" fill="#fff8de"/>`;
+// Wing angle over its own run: out from edge-on to wide open (gold showing), then falls shut and rebounds once.
+const tpSwing=t=>t<.3?90+75*Math.sin(Math.PI/2*t/.3):t<.86?165*(1-Math.pow((t-.3)/.56,2)):6*Math.sin(Math.PI*(t-.86)/.14);
+function triptych(id,k){
+ const G=tpGeo(id),{x0,Wd,L}=G,u=ease(seg(k,...SHADES.triptych.lowAt)),top=lerp(G.t0,G.F[0],u),bot=lerp(G.b0,G.F[1],u),mid=(top+bot)/2,fade=seg(k,0,.08);
+ const wing=(isTop,t)=>{
+  if(t<=0)return '';const th=tpSwing(t)*Math.PI/180,c=Math.cos(th),sn=Math.sin(th),hinge=isTop?mid-L:mid+L,free=hinge+(isTop?1:-1)*c*L;let o='';
+  // Shadow cast onto the display just beyond the closing wing's edge
+  if(c>0&&sn>.02)o+=`<rect x="${f(x0)}" y="${f(isTop?free:free-10*sn)}" width="${f(Wd)}" height="${f(10*sn)}" fill="url(#tpSh${isTop?'T':'B'})" opacity="${f(.6*sn)}"/>`;
+  if(Math.abs(c)>.015)o+=`<g transform="translate(${f(x0)} ${f(hinge)}) scale(1 ${f(c*1000)/1000})">${tpWing(id,isTop,c<0)}<rect y="${isTop?0:-L}" width="${f(Wd)}" height="${L}" fill="#000" opacity="${f(.5*(1-Math.abs(c)))}"/></g>`;
+  // The wing's free edge, seen while it stands out from the wall
+  if(sn>.06)o+=`<rect x="${f(x0)}" y="${f(free-1.5*sn)}" width="${f(Wd)}" height="${f(3*sn)}" fill="#6b4626" stroke="#d8aa48" stroke-width=".5"/>`;
+  return o;
+ };
+ let s=`<defs><clipPath id="tpc-${id}"><rect x="${f(x0-1)}" y="${f(u>0?top:-300)}" width="${f(Wd+2)}" height="${f(u>0?bot-top:900)}"/></clipPath></defs>`;
+ // The top wing closes first; the bottom one laps over it.
+ s+=`<g clip-path="url(#tpc-${id})" opacity="${f(fade)}">${wing(true,seg(k,.02,.4))}${wing(false,seg(k,.1,.47))}</g>`;
+ const fr=`<rect x="${f(x0)}" y="${f(top)}" width="${f(Wd)}" height="${f(bot-top)}"`;
+ s+=`<g fill="none" opacity="${f(fade)}">${fr} stroke="#1d1612" stroke-width="5"/>${fr} stroke="#d4c7a8" stroke-width="3"/>${fr} stroke="url(#gild)" stroke-width="1.3"/></g>`;
+ // Dust where the wings meet
+ const dt=seg(k,.42,.56);if(dt>0&&dt<1)for(const p of[.18,.5,.82])s+=JOINS.buttress.dust(x0+Wd*p,mid,dt,4,id==='c'?8:11,70+p*10);
+ // Gilt turn-buttons on the frame swing across the seam and lock it
+ const tb=seg(k,.43,.5),gl=Math.sin(Math.PI*seg(k,.48,.62));
+ if(tb>0)for(const[px,dir]of[[x0,1],[x0+Wd,-1]]){
+  s+=`<g opacity="${f(seg(tb,0,.3))}" transform="translate(${f(px)} ${f(mid)}) rotate(${f(dir*90*(1-backOut(tb)))})"><rect x="${dir>0?-1.6:-8.4}" y="-1.7" width="10" height="3.4" rx="1.3" fill="url(#gild)" stroke="#3a2608" stroke-width=".6"/><circle r="1.5" fill="#fff0c0" stroke="#3a2608" stroke-width=".5"/></g>`;
+  if(gl>.05)s+=`<g opacity="${f(gl)}">${sparkle(px+dir*5,mid,gl*6)}</g>`}
+ return s;
+}
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
@@ -525,11 +604,11 @@ function toggleShade(){
 
 /* ---------- Rendering ---------- */
 // Shaded height per option; some shades lower the wall in the first part of their run and use the rest for detail.
-function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small):small?CHS:HS,t=s.drop?ease(seg(ease(st),0,s.drop)):ease(st);return Math.round(lerp(small?CH:H,lo,t))}
+function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small):small?CHS:HS,t=s.lowAt?ease(seg(ease(st),...s.lowAt)):s.drop?ease(seg(ease(st),0,s.drop)):ease(st);return Math.round(lerp(small?CH:H,lo,t))}
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory';
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych';
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -537,9 +616,13 @@ function render(){
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h)}
   // Window contents fade with the wall's height, so they never hang below a wall that drops early.
   const k=ease(model.st),hk=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(hk*2.2),strip=seg(k,.55,1);
-  el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
+  // Triptych: the display hides once the wings are shut over it.
+  const vis=tp?show*(1-seg(k,.44,.5)):show;
+  el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(vis);n.style.visibility=vis<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(strip);
+  el.querySelector('.strip').style.opacity=f(tp?0:strip);
+  const ts=el.querySelector('.tpsvg'),tkey=tp&&model.st>0?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
+  if(ts.dataset.key!==tkey){ts.dataset.key=tkey;ts.setAttribute('width',w);ts.setAttribute('height',h);ts.innerHTML=tkey?triptych(id,k):''}
   const cs=el.querySelector('.clsvg'),ckey=cl&&model.st>0?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(cs.dataset.key!==ckey){cs.dataset.key=ckey;cs.setAttribute('width',w);cs.setAttribute('height',h);cs.setAttribute('viewBox',`0 0 ${w} ${h}`);cs.innerHTML=ckey?clerestory(id,w,h,k):''}
   placeLights(id,el,w,h,cl&&model.st>.97);
