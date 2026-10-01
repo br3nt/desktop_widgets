@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hollow mood · Claude skin study</title>
+<style>
+:root{color-scheme:dark;--chalk:#e9edf1;--muted:#8f9cb0;--red:#b3232c}
+*{box-sizing:border-box}
+body{margin:0;background:#0a0d13;color:#dfe4ea;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #e9edf1;outline-offset:3px}
+a{color:#e9a9a2;text-underline-offset:3px}
+header{padding:18px 28px 14px;display:flex;gap:20px 40px;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;border-bottom:1px solid #b3232c40}
+h1{margin:0;font:400 23px/1.2 Georgia,"Times New Roman",serif;letter-spacing:.5px}h1 span{color:var(--muted);font-size:17px}
+header p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.controls{display:flex;flex-direction:column;gap:7px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.row>span{font-size:10px;color:#7d8aa0;text-transform:uppercase;letter-spacing:1.4px;width:58px}
+.row button{border:1px solid #c9d2de2e;background:linear-gradient(#26303f,#171d27);color:#dfe4ea;border-radius:10px 2px 10px 2px;padding:4px 12px;font-size:12px;box-shadow:0 2px 0 #000a}
+.row button:hover{background:linear-gradient(#303b4c,#1d2430)}
+.row button[aria-pressed=true]{background:linear-gradient(#e7e2d4,#cfc6b0);border-color:#fff;color:#14110d}
+.row button kbd{font:10px Georgia,serif;color:#9fb0c6;margin-right:5px}
+.row button[aria-pressed=true] kbd{color:#9c2028}
+.row input[type=range]{width:180px;accent-color:#b3232c}
+.row output{font:11px Georgia,serif;color:#c4ccd8;width:38px}
+#viewport{overflow:hidden}
+#stage{position:relative;width:1200px;height:600px;margin:auto;overflow:hidden;touch-action:none;
+ background:radial-gradient(ellipse 60% 46% at 50% 44%,#3a4a63,#212c3e 52%,#0d1119 92%),#0d1119}
+.bg{position:absolute;inset:0;width:1200px;height:600px;pointer-events:none;z-index:0}
+.topline{position:absolute;top:16px;left:28px;right:28px;display:flex;justify-content:space-between;gap:30px;z-index:20;pointer-events:none}
+.topline p{margin:0;color:#c9d1dc;font-size:13px;max-width:760px}
+#phase{font:italic 12px/1.5 Georgia,serif;color:#f0b3ad;white-space:nowrap;letter-spacing:.3px}
+.layer{position:absolute;inset:0;width:1200px;height:600px;overflow:visible;pointer-events:none}
+#over{z-index:6}
+.w{position:absolute;width:390px;height:130px;user-select:none;touch-action:none;z-index:2;filter:drop-shadow(0 10px 9px #000b)}
+.w.small{width:276px;height:78px}
+.casing{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+/* Nameplate: chalk letters on the shell */
+.grip{position:absolute;top:10px;height:17px;border:0;background:none;color:#93a3bb;cursor:grab;display:flex;justify-content:space-between;align-items:center;padding:0 6px;font:italic 10px/1 Georgia,serif;text-shadow:0 1px 1px #000}
+.grip b{font:400 12px/1 Georgia,serif;letter-spacing:3.4px;text-transform:uppercase;color:var(--chalk);margin-right:9px;font-style:normal}
+.grip:active{cursor:grabbing}
+.grip .orn{color:#c4313a;font-style:normal;font-size:10px}
+#a .grip,#a .strip{left:44px;right:40px}#b .grip,#b .strip{left:40px;right:44px}
+.small .grip,.small .strip{left:40px;right:40px;top:6px;height:15px}
+/* Display: a cartographer's parchment sheet pinned to the shell */
+.screen,.mini{position:absolute;overflow:hidden;color:#231b14;border-radius:3px 6px 2px 5px/5px 2px 6px 3px;
+ background:radial-gradient(ellipse 26% 50% at 4% 92%,#7a582a38,transparent 70%),radial-gradient(ellipse 22% 46% at 97% 8%,#7a582a30,transparent 70%),radial-gradient(ellipse 90% 140% at 46% 40%,#f5eedb,#e8dbbb 66%,#cfba8f);
+ box-shadow:inset 0 0 9px #6e4f2650,0 0 0 1.3px #05070b,1.5px 3px 0 1px #05070b99}
+.screen:before,.screen:after,.mini:before{content:"";position:absolute;top:3px;width:5px;height:5px;border-radius:50%;z-index:2;background:radial-gradient(circle at 35% 30%,#fff,#c3c8d0 50%,#565c66);box-shadow:0 1px 1px #0009}
+.screen:before,.mini:before{left:3px}.screen:after{right:3px}
+.screen{top:33px;width:300px;height:62px}#a .screen{left:36px}#b .screen{left:54px}
+.pages{height:100%;width:300%;display:flex;transition:transform 260ms cubic-bezier(.2,.8,.2,1)}
+.page{width:33.3333%;flex:none;padding:5px 13px;position:relative;overflow:hidden}
+.page .tiny{font:italic 10px/1.45 Georgia,serif;color:#5c4a36;letter-spacing:.6px}
+.page .big{display:flex;align-items:baseline;gap:8px;height:24px;margin:0 0 1px}
+.num{font:700 23px/1 Georgia,serif;color:#8f1c22;letter-spacing:.5px}
+.page .big em{font:italic 400 15px/1 Georgia,serif;color:#2e241a}
+.page strong{font:400 17px/1.2 Georgia,serif;display:block;color:#231b14;margin:2px 0}
+.page small{font-size:11px;line-height:1.55;color:#4a3b2b;display:block}
+.bars{position:absolute;right:13px;top:9px}.bars svg{display:block}
+.tabline{position:absolute;top:105px;display:flex;gap:13px}#a .tabline{left:42px}#b .tabline{left:60px}
+.tab{padding:0;background:none;border:0;color:#9aa8bc;font:italic 10.5px/1.4 Georgia,serif;letter-spacing:.8px;text-shadow:0 1px 1px #000}
+.tab[aria-selected=true]{color:var(--chalk)}
+.tab[aria-selected=true]:before{content:"";display:inline-block;width:9px;height:1.6px;margin-right:5px;vertical-align:3px;background:var(--red);box-shadow:0 0 3px #ff5a5a88;border-radius:1px}
+/* Iron studs with a brass collar */
+.knob{position:absolute;top:103px;width:20px;height:20px;border-radius:50%;padding:0;border:0;color:#e8ecf0;font:bold 10px/20px Georgia,serif;
+ background:radial-gradient(circle at 38% 30%,#556070,#1f252e 60%,#0b0d12);box-shadow:0 0 0 1.4px #b8934a,0 0 0 2.6px #05070b,0 2px 3px #000a}
+.knob.run{color:#f1c46a}
+#a .run{left:296px}#a .next{left:324px}#b .run{left:314px}#b .next{left:342px}
+.knob:hover{filter:brightness(1.2)}
+.mini{left:40px;top:30px;width:184px;height:34px;padding:3px 11px;font-size:10px;line-height:1.35;color:#4a3b2b}
+.mini .num{font-size:12px;margin-right:4px}
+.lampdot{position:absolute;left:238px;top:39px;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#f2fff9,#8fe0cf 45%,#2a7b70);box-shadow:0 0 0 1.5px #b8934a,0 0 0 2.6px #05070b,0 0 10px 3px #8fe0cf55}
+.strip{position:absolute;top:10px;height:17px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 6px;pointer-events:none;opacity:0}
+.strip b{font:400 12px/1 Georgia,serif;letter-spacing:3.4px;text-transform:uppercase;color:var(--chalk);text-shadow:0 1px 1px #000}
+.strip span{padding:1px 9px;font:11px Georgia,serif;color:#231b14;border-radius:2px 4px 2px 3px;background:radial-gradient(ellipse at 50% 30%,#f5eedb,#e2d3b0);box-shadow:0 0 0 1.3px #05070b}
+.strip span em{font-style:normal;color:#8f1c22;font-weight:700}
+.hit{pointer-events:all;cursor:crosshair}
+.hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
+.ringfocus{opacity:0}
+.about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
+.about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#eef1f4}.about h2 small{font:11px -apple-system,sans-serif;color:#7d8aa0;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
+.about p{margin:0 0 6px}
+.hint{color:#7d8798;font-size:12px}
+@media(max-width:800px){.about{grid-template-columns:1fr}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <linearGradient id="shell" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4a5c78"/><stop offset=".22" stop-color="#2f3d54"/><stop offset=".7" stop-color="#1c2535"/><stop offset="1" stop-color="#121822"/></linearGradient>
+ <radialGradient id="sheen" cx=".3" cy=".1" r=".75"><stop stop-color="#c7d6ea" stop-opacity=".22"/><stop offset="1" stop-color="#c7d6ea" stop-opacity="0"/></radialGradient>
+ <linearGradient id="iron" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#454e5c"/><stop offset=".45" stop-color="#1d222b"/><stop offset="1" stop-color="#0c0e13"/></linearGradient>
+ <radialGradient id="brass" cx=".35" cy=".3" r=".75"><stop stop-color="#fbe3a2"/><stop offset=".5" stop-color="#b98d3e"/><stop offset="1" stop-color="#4f3712"/></radialGradient>
+ <radialGradient id="lamp"><stop stop-color="#ffd98a" stop-opacity=".55"/><stop offset=".4" stop-color="#ffb648" stop-opacity=".18"/><stop offset="1" stop-color="#ffb648" stop-opacity="0"/></radialGradient>
+ <radialGradient id="eyeGlow"><stop stop-color="#fff4d0" stop-opacity=".9"/><stop offset=".45" stop-color="#ffd27a" stop-opacity=".35"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+ <filter id="wob" x="-5%" y="-30%" width="110%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <filter id="chitin" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".9 .25" numOctaves="2" seed="9" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 .8  0 0 0 0 .86  0 0 0 0 .95  0 0 0 -1.1 .62" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="gi"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="gi"/></feMerge></filter>
+ <filter id="blur3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+</defs></svg>
+<header><div><h1>Hollow mood <span>/ Claude skin study</span></h1><p>Dark carapace shells with brush-ink outlines, scalloped belly plates, wrought-iron scrolls with small lanterns, and parchment map sheets pinned on as displays. <a href="index.html">All pages</a></p></div>
+<div class="controls" role="group" aria-label="Skin controls">
+ <div class="row" id="stateRow"><span>State</span></div>
+ <div class="row" id="joinRow"><span>Join</span></div>
+ <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
+</div></header>
+<div id="viewport"><main id="stage" aria-label="Hollow skin stage">
+<svg class="bg" id="bg" viewBox="0 0 1200 600" aria-hidden="true"></svg>
+<div class="topline"><p id="status" role="status" aria-live="polite">Drag a nameplate toward the other shell, or use the state buttons.</p><span id="phase"></span></div>
+
+<section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="a" aria-label="Move Jarvis"><span><b>Jarvis</b>agent control</span><span class="orn" aria-hidden="true">◆</span></button>
+ <div class="screen" aria-label="Jarvis display"><div class="pages">
+  <div class="page"><div class="tiny">Jarvis · active workflow</div><div class="big"><span class="num">03</span><em class="runText">agents running</em></div><small>Reviewing the capsule renderer</small><span class="bars" aria-hidden="true"></span></div>
+  <div class="page"><div class="tiny">Jarvis · current task</div><strong>Verify shell assembly</strong><small>12 checks passed · 2 queued</small></div>
+  <div class="page"><div class="tiny">Jarvis · event log</div><small>10:42 &nbsp;joined display state retained<br>10:43 &nbsp;waiting for your next action</small></div>
+ </div></div>
+ <div class="tabline" role="tablist" aria-label="Jarvis screens"><button class="tab" role="tab" data-page="0">Status</button><button class="tab" role="tab" data-page="1">Task</button><button class="tab" role="tab" data-page="2">Log</button></div>
+ <button class="knob run" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button><button class="knob next" aria-label="Next Jarvis screen" title="Next screen">›</button>
+ <div class="strip" aria-hidden="true"><b>Jarvis</b><span><em>03</em> agents running</span></div>
+</section>
+
+<section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="b" aria-label="Move GitDiscuss"><span><b>GitDiscuss</b>review queue</span><span class="orn" aria-hidden="true">◆</span></button>
+ <div class="screen" aria-label="GitDiscuss display"><div class="pages">
+  <div class="page"><div class="tiny">GitDiscuss · incoming</div><div class="big"><span class="num">02</span><em>need a decision</em></div><small>Capsule joining · design feedback</small></div>
+  <div class="page"><div class="tiny">GitDiscuss · selected discussion</div><strong>Shared casing geometry</strong><small>Brent · 4 comments · ready to review</small></div>
+  <div class="page"><div class="tiny">GitDiscuss · event log</div><small>10:41 &nbsp;feedback collected<br>10:43 &nbsp;no workflow links created</small></div>
+ </div></div>
+ <div class="tabline" role="tablist" aria-label="GitDiscuss screens"><button class="tab" role="tab" data-page="0">Queue</button><button class="tab" role="tab" data-page="1">Thread</button><button class="tab" role="tab" data-page="2">Log</button></div>
+ <button class="knob run" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button><button class="knob next" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+ <div class="strip" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em> need a decision</span></div>
+</section>
+
+<section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="orn" aria-hidden="true">◆</span></button>
+ <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="lampdot" aria-hidden="true"></span>
+ <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
+</section>
+
+<svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
+</main></div>
+<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
+const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,ease=t=>t*t*(3-2*t),seg=(t,a,b)=>clamp((t-a)/(b-a));
+const backOut=t=>{const c=2.2;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)};
+const dart=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+const f=n=>Math.round(n*10)/10,P=(p)=>f(p.x)+' '+f(p.y);
+const INK='#05070b',RED='#b3232c',REDHI='#f08a82';
+
+/* Jarvis bars: inked strokes, one in red */
+$('.bars').innerHTML=`<svg width="40" height="22" viewBox="0 0 40 22">${[9,15,11,19,13].map((hh,i)=>{const x=i*8+1;return `<path d="M${x} 22L${x+.6} ${22-hh}Q${x+2.6} ${21-hh} ${x+4.6} ${22-hh+1}L${x+5} 22Z" fill="${i===3?'#8f1c22':'#2b241d'}"/>`}).join('')}</svg>`;
+
+/* ---------- Backdrop: fog, far spires, an iron railing. Drawn once. ---------- */
+(function(){let r=11;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
+ let far='',mid='',lit='';
+ for(let x=-10;x<1220;){const w=10+rnd()*22,h=60+rnd()*150,b=600,top=b-h-120;
+  far+=`<path d="M${f(x)} ${b}V${f(top)}L${f(x+w/2)} ${f(top-w*1.9)}L${f(x+w)} ${f(top)}V${b}Z"/>`;
+  if(rnd()<.55)far+=`<rect x="${f(x+w/2-.6)}" y="${f(top-w*1.9-14)}" width="1.2" height="14"/>`;
+  if(rnd()<.4)lit+=`<circle cx="${f(x+w/2)}" cy="${f(top+12+rnd()*30)}" r="1.4"/>`;
+  x+=w+8+rnd()*46}
+ for(let x=-30;x<1230;){const w=30+rnd()*40,h=40+rnd()*70,top=600-h-40;
+  mid+=`<path d="M${f(x)} 600V${f(top+w*.5)}Q${f(x)} ${f(top)} ${f(x+w/2)} ${f(top-w*.35)}Q${f(x+w)} ${f(top)} ${f(x+w)} ${f(top+w*.5)}V600Z"/>`;x+=w+30+rnd()*90}
+ let rail='';for(let x=6;x<1200;x+=15)rail+=`<path d="M${x} 600V578M${x-2.4} 580L${x} 572L${x+2.4} 580"/>`;
+ let motes='';for(let i=0;i<16;i++)motes+=`<circle cx="${f(rnd()*1200)}" cy="${f(60+rnd()*460)}" r="${f(.6+rnd()*1.1)}"/>`;
+ const chain=(x,len)=>`<path d="M${x} 0V${len}" stroke="#0a0e16" stroke-width="1.4" stroke-dasharray="3 1.5"/><path d="M${x-5} ${len+6}L${x} ${len}L${x+5} ${len+6}V${len+16}H${x-5}Z" fill="#0a0e16"/><rect x="${x-3}" y="${len+7}" width="6" height="7" fill="#e9b45a" opacity=".55"/><circle cx="${x}" cy="${len+10}" r="20" fill="url(#lamp)" opacity=".6"/>`;
+ $('#bg').innerHTML=`<defs><linearGradient id="fog" x1="0" y1="0" x2="0" y2="1"><stop offset=".55" stop-color="#8ea2bf" stop-opacity="0"/><stop offset=".78" stop-color="#8ea2bf" stop-opacity=".16"/><stop offset="1" stop-color="#8ea2bf" stop-opacity=".05"/></linearGradient></defs>
+  <g fill="#1d2738" opacity=".9">${far}</g><g fill="#e8eef5" opacity=".35">${lit}</g><rect width="1200" height="600" fill="url(#fog)"/>
+  <g fill="#111824">${mid}</g><rect y="470" width="1200" height="130" fill="url(#fog)" opacity=".7"/>
+  <g stroke="#06080d" stroke-width="2" fill="none">${rail}<path d="M0 584H1200"/></g>
+  ${chain(64,70)}${chain(1150,40)}<g fill="#eef3f8" opacity=".3">${motes}</g>`;
+})();
+
+/* ---------- Carapace casing, drawn for a widget whose joining end is on the right; b is mirrored ---------- */
+function taper(p,w0,w1){const L=[],R=[];for(let i=0;i<p.length;i++){const a=p[Math.max(0,i-1)],b=p[Math.min(p.length-1,i+1)],dx=b[0]-a[0],dy=b[1]-a[1],l=Math.hypot(dx,dy)||1,w=lerp(w0,w1,i/(p.length-1))/2;
+ L.push([p[i][0]-dy/l*w,p[i][1]+dx/l*w]);R.push([p[i][0]+dy/l*w,p[i][1]-dx/l*w])}
+ return 'M'+L.concat(R.reverse()).map(q=>f(q[0])+' '+f(q[1])).join('L')+'Z'}
+// An iron scroll rising from the outer top corner and curling outward.
+const SCROLL=(()=>{const pts=[],n=44,t0=48*Math.PI/180,t1=-372*Math.PI/180;for(let i=0;i<=n;i++){const t=i/n,a=lerp(t0,t1,t),r=lerp(27,4.5,Math.pow(t,.8));pts.push([8+r*Math.cos(a),-6+r*Math.sin(a)])}return pts})();
+const HANG=SCROLL[24];
+function belly(x0,x1,h){const n=Math.max(2,Math.round((x0-x1)/34)),d=(x0-x1)/n;let s='',lips='';
+ for(let i=0;i<n;i++){const xa=x0-i*d,xb=xa-d;s+=`Q${f(xa-d/2)} ${f(h+3.6)} ${f(xb)} ${f(h-4)}`;lips+=`M${f(xa-3)} ${f(h-7.5)}Q${f(xa-d/2)} ${f(h-1.6)} ${f(xb+3)} ${f(h-7.5)}`}
+ return{s,lips,notch:Array.from({length:n-1},(_,i)=>{const x=x0-(i+1)*d;return `M${f(x)} ${f(h-4)}L${f(x+1.2)} ${f(h-11)}`}).join('')}}
+function casing(id,w,h,lit){
+ const small=id==='c',join=!small,top=small?6:10,R=join?w-12:w-26;
+ const bl=belly(join?R:w-24,24,h);
+ const left=`C6 ${h-4} 1 ${f(h*.62)} 2 ${f(h*.45)}C3 ${f(h*.22)} 10 ${top+6} 26 ${top+2}`;
+ const arch=`C${f(w*.32)} ${top-10} ${f(w*.68)} ${top-10} ${R} ${top+(join?1:2)}`;
+ const right=join?`L${R} ${h-4}`:`C${w-10} ${top+6} ${w-3} ${f(h*.22)} ${w-2} ${f(h*.45)}C${w-1} ${f(h*.62)} ${w-6} ${h-4} ${w-24} ${h-4}`;
+ const body=`M24 ${h-4}${left}${arch}${right}${bl.s}Z`;
+ const E=join?R-10:R;
+ let o='';
+ // Brush-ink outline: a heavier underside (the body shifted down in ink) and a wobbling stroke.
+ o+=`<path d="${body}" fill="${INK}" transform="translate(0 2.6)"/>`;
+ o+=`<path d="${body}" fill="url(#shell)" filter="url(#chitin)"/><path d="${body}" fill="url(#sheen)"/>`;
+ // Chalk highlight along the dorsal ridge, thick in the middle and tapering to nothing.
+ o+=`<path d="M40 ${top+3}C${f(w*.32)} ${top-5} ${f(w*.68)} ${top-5} ${E} ${top+3}C${f(w*.68)} ${top-1.4} ${f(w*.32)} ${top-1.4} 40 ${top+3}Z" fill="#e3eaf2" opacity=".55"/>`;
+ // Plate seams: one under the nameplate, one curling round the outer end, and lips on each belly plate.
+ o+=`<g fill="none" stroke-linecap="round"><path d="M30 ${top+21}Q${w/2} ${top+14} ${E} ${top+21}" stroke="${INK}" stroke-width="1.5" opacity=".8"/><path d="M30 ${top+22.4}Q${w/2} ${top+15.4} ${E} ${top+22.4}" stroke="#c9d6e6" stroke-width=".8" opacity=".28"/>`;
+ o+=`<path d="M19 ${h-9}C11 ${f(h*.72)} 11 ${f(h*.42)} 21 ${top+17}" stroke="${INK}" stroke-width="1.6" opacity=".85"/><path d="M20.4 ${h-10}C12.6 ${f(h*.72)} 12.6 ${f(h*.42)} 22.4 ${top+18}" stroke="#c9d6e6" stroke-width=".8" opacity=".25"/>`;
+ if(!join)o+=`<path d="M${w-19} ${h-9}C${w-11} ${f(h*.72)} ${w-11} ${f(h*.42)} ${w-21} ${top+17}" stroke="${INK}" stroke-width="1.6" opacity=".85"/>`;
+ o+=`<path d="${bl.lips}" stroke="#c9d6e6" stroke-width=".9" opacity=".22"/><path d="${bl.notch}" stroke="${INK}" stroke-width="1.4"/></g>`;
+ o+=`<path d="${body}" fill="none" stroke="${INK}" stroke-width="2.3" stroke-linejoin="round" filter="url(#wob)"/>`;
+ // Iron scroll and its lantern.
+ o+=`<g filter="url(#wob)"><path d="${taper(SCROLL,6,1.4)}" fill="#0b0e14"/><circle cx="${f(SCROLL[44][0])}" cy="${f(SCROLL[44][1])}" r="1.5" fill="#0b0e14"/></g>`;
+ o+=`<path d="${taper(SCROLL.slice(0,20),1.4,.3)}" fill="#7d8ca3" opacity=".55" transform="translate(-.6 -.8)"/>`;
+ const lx=f(HANG[0]),ly=f(HANG[1]+2);
+ if(lit)o+=`<circle cx="${lx}" cy="${ly+19}" r="22" fill="url(#lamp)"/>`;
+ o+=`<path d="M${lx} ${ly}V${ly+11}" stroke="#0b0e14" stroke-width="1.3" stroke-dasharray="2.2 1.1"/><path d="M${lx-4.8} ${ly+15}L${lx} ${ly+10.5}L${lx+4.8} ${ly+15}Z" fill="#0b0e14"/>`+
+  `<rect x="${lx-3.7}" y="${ly+15}" width="7.4" height="9" rx="1.2" fill="${lit?'#ffd581':'#3c3022'}" stroke="${INK}"/><path d="M${lx} ${ly+15}V${ly+24}" stroke="${INK}" stroke-width=".8"/>`+
+  `<path d="M${lx-4.4} ${ly+24}H${lx+4.4}L${lx+1.6} ${ly+27}H${lx-1.6}Z" fill="#0b0e14"/>`;
+ // Iron strap with three brass eyelets on the joining end.
+ if(join){const sx=w-16;
+  o+=`<path d="M${sx} ${top+2}L${sx+6.5} ${top-10}L${sx+13} ${top+2}Z" fill="url(#iron)" stroke="${INK}" stroke-width="1.2"/>`;
+  o+=`<rect x="${sx}" y="${top}" width="13" height="${h-top-1}" rx="3.5" fill="url(#iron)" stroke="${INK}" stroke-width="1.5"/>`;
+  for(const y of rows(h))o+=`<circle cx="${w-9.5}" cy="${f(y)}" r="4.4" fill="url(#brass)" stroke="${INK}" stroke-width="1"/><circle cx="${w-9.5}" cy="${f(y)}" r="1.9" fill="${INK}"/>`;
+  o+=`<circle cx="${w-9.5}" cy="${top+3.5}" r=".9" fill="#9aa6b6"/><circle cx="${w-9.5}" cy="${h-5}" r=".9" fill="#9aa6b6"/>`}
+ return id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${o}</g>`:o;
+}
+const rows=h=>[.25,.5,.75].map(k=>h*k);
+
+/* ---------- Options ---------- */
+const JOINS={
+ silk:{label:'Silk stitch',kind:'Bind',gap:24,
+  about:'Each joining end is an iron strap with three brass eyelets. <b>Near:</b> the eyelets catch the light. <b>Ready:</b> a pale needle appears, poised over the gap, and a ghost of the lacing shows where the thread will go. Joining: the shells close to a hand-width apart and the needle darts through the eyelets in two quick passes, down and back up, pausing for a beat at each one, trailing red thread. The thread hangs slack until the last pass, then pulls taut with a small bounce and is knotted off. The seam is an open lacing of two red crosses with the fog showing through. <b>Release:</b> slash across the threads (a quick drag through the seam): they part with a white flash and the cut ends recoil to their eyelets before the shells drift apart. Click the seam, or focus it and press Enter, to do the same.',
+  over(c){
+   const h=c.h,ay=model.a.y,by=model.b.y,ys=rows(h);
+   const A=ys.map(y=>({x:model.a.x+W-9.5,y:ay+y})),B=ys.map(y=>({x:model.b.x+9.5,y:by+y}));
+   const LACE=[[A[0],B[1]],[B[1],A[2]],[A[2],B[2]],[B[2],A[1]],[A[1],B[0]],[B[0],A[0]]];
+   const mx=(A[0].x+B[0].x)/2,jt=c.jt;let s='';
+   if(jt===0){const g=c.glow;
+    if(g>0)s+=glints(A.concat(B),g);
+    if(g>=1){s+=`<g opacity=".4" stroke-dasharray="3 3">${LACE.map(([p,q])=>thread(p,q,6,1)).join('')}</g>`;
+     const tip={x:mx-4,y:ay-14};s+=needle(tip,Math.atan2(A[0].y-tip.y,A[0].x-tip.x)-.5,0,1)}
+    return s;
+   }
+   if(model.dir<0&&jt<1)return s+cutThreads(LACE,1-jt);
+   if(jt===1){s+=LACE.map(([p,q])=>thread(p,q,0,1)).join('')+knot(A[0]);
+    if(drag&&drag.slash&&drag.pts.length>1)s+=trail(drag.pts);
+    const x0=A[0].x-14,y0=Math.min(ay,by)+4;
+    s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Silk lacing: slash across it, or press Enter, to separate the widgets"><title>Slash across the threads to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(B[0].x-A[0].x+28)}" height="${f(h-8)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(B[0].x-A[0].x+28)}" height="${f(h-8)}" rx="6" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`;
+    return s;
+   }
+   // Two passes of the needle: down through the crosses, back up, and away.
+   const PATH=[A[0],B[1],A[2],B[2],A[1],B[0],A[0]],start=model.poised?{x:mx-4,y:ay-14}:{x:mx-90,y:ay-80},exit={x:mx+70,y:ay-90},PT=[start,...PATH,exit];
+   const WTS=[1.4,1,1,1.15,1,1,1,1.3],tot=WTS.reduce((x,y)=>x+y),q=seg(jt,.3,.86)*tot;
+   let i=0,acc=0;while(i<7&&acc+WTS[i]<q){acc+=WTS[i];i++}
+   const u=clamp((q-acc)/WTS[i]),d=u<.7?dart(u/.7):1,from=PT[i],to=PT[i+1];
+   const tip={x:lerp(from.x,to.x,d),y:lerp(from.y,to.y,d)},ang=Math.atan2(to.y-from.y,to.x-from.x),dx=Math.cos(ang),dy=Math.sin(ang);
+   const done=jt>=.86,slack=done?1-backOut(seg(jt,.86,1)):1;
+   const reached=done?PATH:PT.slice(1,i+1);
+   s+=glints(A.concat(B),done?1-seg(jt,.86,1):.45);
+   for(let k=1;k<reached.length;k++)s+=thread(reached[k-1],reached[k],9*slack,1);
+   if(!done){const eye={x:tip.x-dx*22,y:tip.y-dy*22};
+    if(reached.length)s+=thread(reached[reached.length-1],eye,0,1);
+    else s+=`<path d="M${P(eye)}L${f(eye.x-dx*50)} ${f(eye.y-dy*50)}" stroke="${RED}" stroke-width="1.6" opacity=".8"/>`;
+    if(u>=.7&&i<7){const k=(u-.7)/.3;s+=spark(to,1-k,5+6*k)}
+    s+=needle(tip,ang,u<.7?Math.sin(Math.PI*u/.7):0,i===7?1-seg(u,.5,1):1);
+   }
+   if(reached.length===7)s+=knot(A[0],done?seg(jt,.86,.95):0);
+   return s;
+  }
+ }
+};
+const SHADES={
+ draw:{label:'Plain draw-in',kind:'Page baseline',
+  about:'Not a brainstorm item. The shell draws in until only its dorsal plate, chalk nameplate and a scrap of parchment with one value remain; the iron scroll and lantern stay. It keeps the shade state working until the Hollow shade modes (cocoon, curl, hanging sign, fog sink, map roll) are built and added here. Shading while joined keeps the lacing, pulled closer.'}
+};
+
+/* ---------- Thread, needle and flash drawing ---------- */
+function thread(p,q,sag,op){const c={x:(p.x+q.x)/2,y:(p.y+q.y)/2+sag},d=`M${P(p)}Q${P(c)} ${P(q)}`;
+ return `<g fill="none" stroke-linecap="round" opacity="${f(op*100)/100}"><path d="${d}" stroke="#3a070b" stroke-width="2.6"/><path d="${d}" stroke="${RED}" stroke-width="1.7"/><path d="${d}" stroke="${REDHI}" stroke-width=".6" transform="translate(0 -.4)"/></g>`}
+function needle(tip,ang,streak,op){
+ let s=`<g opacity="${f(op*100)/100}" transform="translate(${P(tip)}) rotate(${f(ang*180/Math.PI)})">`;
+ if(streak>.05)s+=`<path d="M-24 0H${f(-24-46*streak)}" stroke="#eef2f6" stroke-width="1.2" stroke-linecap="round" opacity="${f(.5*streak)}"/><path d="M-20 -3.5H${f(-20-26*streak)}M-20 3.5H${f(-20-20*streak)}" stroke="#eef2f6" stroke-width=".7" opacity="${f(.35*streak)}"/>`;
+ return s+`<path d="M0 0L-19 -1.7Q-24.4 -2.2 -24.8 0Q-24.4 2.2 -19 1.7Z" fill="#ece7da" stroke="${INK}" stroke-width=".7"/><ellipse cx="-21.6" rx="1.7" ry=".55" fill="${INK}"/><path d="M-3 -.5L-17 -1.2" stroke="#fff" stroke-width=".5" opacity=".8"/></g>`}
+function glints(pts,g){return pts.map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(4+6*g)}" fill="url(#eyeGlow)" opacity="${f(g)}"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="4.4" fill="none" stroke="#ffe7a8" stroke-width="1" opacity="${f(g*.8)}"/>`).join('')}
+function spark(p,a,r){return `<path d="M${f(p.x)} ${f(p.y-r)}L${f(p.x+r*.14)} ${f(p.y-r*.14)}L${f(p.x+r)} ${f(p.y)}L${f(p.x+r*.14)} ${f(p.y+r*.14)}L${f(p.x)} ${f(p.y+r)}L${f(p.x-r*.14)} ${f(p.y+r*.14)}L${f(p.x-r)} ${f(p.y)}L${f(p.x-r*.14)} ${f(p.y-r*.14)}Z" fill="#fff" opacity="${f(a)}"/>`}
+function knot(p,k=1){const s=f(k*100)/100;return `<g opacity="${s}"><path d="M${P(p)}q-3 6 1 11q3 4 -2 8" fill="none" stroke="${RED}" stroke-width="1.4" stroke-linecap="round"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="2.6" fill="${RED}" stroke="#3a070b" stroke-width=".8"/></g>`}
+function trail(pts){return `<polyline points="${pts.map(P).join(' ')}" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".35" filter="url(#blur3)"/><polyline points="${pts.map(P).join(' ')}" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>`}
+function cutThreads(LACE,r){
+ const k=model.cut,rec=ease(seg(r,0,.3)),fade=1-seg(r,.18,.42),fl=1-seg(r,0,.24);let s='';
+ const cx=k.x2-k.x1,cy=k.y2-k.y1;
+ for(const[p,q]of LACE){const ex=q.x-p.x,ey=q.y-p.y,den=ex*cy-ey*cx;let t=den?((k.x1-p.x)*cy-(k.y1-p.y)*cx)/den:.5;if(!(t>.1&&t<.9))t=.5;
+  const C={x:p.x+ex*t,y:p.y+ey*t};
+  if(fade>0)for(const E of [p,q]){const end={x:lerp(C.x,E.x,.82*rec),y:lerp(C.y,E.y,.82*rec)+7*rec};s+=thread(E,end,6*rec,fade)}
+  if(fl>0)s+=spark(C,fl,4+5*(1-fl));
+ }
+ if(fl>0){const L=Math.hypot(cx,cy)||1,ux=cx/L,uy=cy/L,m={x:(k.x1+k.x2)/2,y:(k.y1+k.y2)/2},n=Math.max(L,60)*.75;
+  const a={x:m.x-ux*n,y:m.y-uy*n},b={x:m.x+ux*n,y:m.y+uy*n};
+  s+=`<g opacity="${f(fl*100)/100}"><path d="M${P(a)}L${P(b)}" stroke="#fff" stroke-width="9" stroke-linecap="round" filter="url(#blur3)" opacity=".7"/><path d="M${P(a)}Q${f(m.x+uy*4)} ${f(m.y-ux*4)} ${P(b)}" stroke="#fff" stroke-width="${f(1+2.2*fl)}" fill="none" stroke-linecap="round"/></g>`}
+ return s;
+}
+
+/* ---------- Model ---------- */
+const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null};
+let anim=0,shadeAnim=0,drag=null;
+const J=()=>JOINS[model.join];
+function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
+function joinedPose(fixed='a'){
+ const g=J().gap;
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+34,1200-W-34);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
+ let ax=clamp(model.a.x,34,1200-2*W-g-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+}
+const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
+function setJt(t){
+ model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,model.dir<0?.55:.3));
+ for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
+}
+function tween(from,to,ms,fn){
+ const token=++anim;model.busy=true;
+ return new Promise(res=>{
+  if(reduce.matches||ms<=0){fn(to);model.busy=false;render();return res(true)}
+  const t0=performance.now();
+  (function step(now){if(token!==anim)return res(false);
+   const t=clamp((now-t0)/ms);fn(lerp(from,to,t));if(t>=1)model.busy=false;render();
+   if(t<1)requestAnimationFrame(step);else res(true)})(t0);
+ });
+}
+const say=t=>$('#status').textContent=t;
+function autoCut(){const h=ctx().h,mx=(model.a.x+W+model.b.x)/2,y=model.a.y;return{x1:mx-16,y1:y+8,x2:mx+16,y2:y+h-8}}
+
+async function doJoin(fixed='a',ms=2600){
+ if(model.jt===1)return;
+ if(model.dir<0){model.dir=1;model.cut=null}
+ if(model.jt===0){model.path={s:here(),j:joinedPose(fixed)}}
+ else if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};
+ model.ready=false;model.glow=0;
+ say('The shells close, and the needle darts through the eyelets trailing red thread.');
+ const ok=await tween(model.jt,1,ms*(1-model.jt),setJt);
+ if(ok){model.poised=false;model.path=null;say('Joined: laced with red silk. Drag either nameplate to move the pair. Slash across the threads to release.')}
+}
+async function doSeparate(){
+ if(model.jt===0)return;
+ model.poised=false;
+ // From joined, the threads are cut; part-way through a join the needle simply backs out.
+ if(model.jt===1){model.dir=-1;if(!model.cut)model.cut=autoCut();model.path={s:separatePose(),j:here()};say('Cut: the threads part with a flash and spring back to their eyelets.')}
+ else{if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say('The needle backs out and the thread unpicks.')}
+ const ms=model.dir<0?1500*model.jt:1300*model.jt;
+ if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.cut=null;say('Separate. Displays and pages were not touched.')}
+}
+function holdJoining(){
+ ++anim;model.busy=false;model.poised=false;model.glow=0;
+ if(model.dir<0){model.dir=1;model.cut=null}
+ if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
+ setJt(.6);render();say('Held mid-join: the needle on its second pass. Use the scrubber to step through the animation.');
+}
+function toggleShade(){
+ const to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=520*Math.abs(to-start),t0=performance.now();
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,ease(t));render();if(t<1)requestAnimationFrame(step)})(t0);
+ say(to?'Shaded: the shell draws in to its dorsal plate, nameplate and one value.':'Unshaded: the shell opens again.');
+}
+
+/* ---------- Rendering ---------- */
+function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,ease(model.st))),jt:model.jt,glow:model.glow}}
+function render(){
+ const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,ease(model.st)));
+ for(const id of ['a','b','c']){
+  const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
+  el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
+  const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
+  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
+  el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
+  el.querySelector('.strip').style.opacity=f(strip);
+  if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
+   const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
+ }
+ $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
+ const focused=document.activeElement&&document.activeElement.id==='seamHit';
+ $('#over').innerHTML=j.over(c);
+ const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();model.cut=autoCut();doSeparate()}};if(focused)hit.focus()}
+ const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
+ $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
+ $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
+ $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
+ $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
+ const p=Math.round(model.jt*100),jt=model.jt,r=1-jt;
+ const mid=model.dir>0?(jt<.3?'Joining · closing in ':jt<.59?'Joining · the needle, first pass ':jt<.86?'Joining · second pass ':'Joining · pulling taut '):(r<.3?'Releasing · threads cut ':r<.45?'Releasing · ends recoil ':'Releasing · parting ');
+ const ph={separate:'Separate · two shells',joining:mid+p+'%',joined:'Joined · '+j.label.toLowerCase()};
+ $('#phase').textContent=(drag&&drag.slash?'Slash across the threads':drag&&drag.state==='ready'?'Ready · the needle is poised':drag&&drag.state==='near'?'Nearby · the eyelets catch the light':ph[state])+(model.st>.5?' · shaded':'');
+}
+
+/* ---------- Controls ---------- */
+const STATES=[['separate','Separate','1'],['joining','Joining','2'],['joined','Joined','3'],['shade','Shade','4']];
+STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.state=k;b.innerHTML=`<kbd>${key}</kbd>${l}`;b.onclick=()=>act(k);$('#stateRow').append(b)});
+function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
+function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
+function pick(key,id){
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='shade')model.shade=id;
+ describe();render();
+}
+function describe(){
+ const j=J(),s=SHADES[model.shade];
+ $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
+ $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
+}
+options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
+$('#scrub').oninput=e=>{++anim;model.busy=false;model.poised=false;model.glow=0;
+ if(model.dir<0){model.dir=1;model.cut=null}
+ if(model.jt===0||model.jt===1||!model.path)model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};
+ setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
+document.addEventListener('keydown',e=>{
+ if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
+ const key=e.key.toLowerCase();
+ if(e.key==='Escape')cancelDrag();
+ const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
+ if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
+});
+['a','b'].forEach(id=>{
+ const el=$('#'+id),m=model[id],name=id==='a'?'Jarvis':'GitDiscuss';
+ el.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{m.page=+t.dataset.page;render()});
+ el.querySelector('.next').onclick=()=>{m.page=(m.page+1)%3;render()};
+ el.querySelector('.run').onclick=()=>{m.run=!m.run;render();say(name+' simulated activity '+(m.run?'resumed; its lantern is lit.':'paused; its lantern goes dark.'))};
+});
+
+/* ---------- Dragging with near / ready, and slashing the lacing ---------- */
+function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:(e.clientX-r.left)/s,y:(e.clientY-r.top)/s}}
+function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
+stage.addEventListener('pointerdown',e=>{
+ if(e.button!==0)return;
+ if(e.target.closest('#seamHit')&&model.jt===1){e.preventDefault();const p=local(e);drag={slash:true,p0:p,pts:[p],len:0};stage.setPointerCapture(e.pointerId);render();return}
+ const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
+ const id=g.dataset.drag,p=local(e);
+ // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
+ if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1;model.cut=null}
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
+ stage.setPointerCapture(e.pointerId);
+});
+stage.addEventListener('pointermove',e=>{
+ if(!drag)return;const p=local(e);
+ if(drag.slash){const l=drag.pts[drag.pts.length-1];drag.len+=Math.hypot(p.x-l.x,p.y-l.y);drag.pts.push(p);if(drag.pts.length>9)drag.pts.shift();
+  if(drag.len>=34){const d=drag;drag=null;$('#a .grip').focus();model.cut=Math.hypot(p.x-d.p0.x,p.y-d.p0.y)>8?{x1:d.p0.x,y1:d.p0.y,x2:p.x,y2:p.y}:autoCut();doSeparate();return}
+  render();return}
+ const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
+ if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
+ if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,30,1200-2*W-g-30),ay=clamp(s.a.y+dy,TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,30,1200-W-30),y:clamp(s[id].y+dy,TOP,bottom)};
+ const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
+ drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
+ const pull=drag.state==='ready'?.88:drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
+ m.x=lerp(raw.x,t.x,pull);m.y=lerp(raw.y,t.y,pull);
+ model.glow=drag.state==='ready'?1:drag.state==='near'?.15+.6*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
+ if(drag.state==='ready')say('Ready: the needle is poised over the gap. Release to stitch.');else if(drag.state==='near')say('Nearby: the eyelets catch the light. Move closer.');
+ render();
+});
+function endDrag(){
+ if(!drag)return;const d=drag;drag=null;
+ if(d.slash){if(d.len<5){$('#a .grip').focus();model.cut=autoCut();doSeparate()}else{render();say('Too short to cut. Slash right through the threads.')}return}
+ if(d.state==='ready'){model.ready=true;model.poised=true;model.path=null;doJoin(d.id==='b'?'a':'b',2100)}else{model.glow=0;render()}
+}
+function cancelDrag(){
+ if(!drag)return;const d=drag;drag=null;
+ if(d.slash){render();return}
+ const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
+}
+stage.addEventListener('pointerup',endDrag);
+stage.addEventListener('pointercancel',cancelDrag);
+$$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
+ const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
+ const id=b.dataset.drag;
+ if(model.jt>0&&model.jt<1&&id!=='c')return;
+ const bottom=600-(model.st>.5?HS:H)-14;
+ if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-CH-10:bottom)}render();
+}));
+
+function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
+addEventListener('resize',fit);fit();describe();render();
+window.hollowSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade};
+</script></body></html>
