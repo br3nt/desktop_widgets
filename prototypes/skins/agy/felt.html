@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tactile Felt Skin — Desktop Widgets</title>
+<style>
+:root {
+  color-scheme: dark;
+  --wool-bg: #181c1a;
+  --felt-stage: #141716;
+  --wool-pine: #28362d;
+  --wool-pine-light: #3e5246;
+  --wool-sage: #5a7565;
+  --wool-terracotta: #543329;
+  --wool-terracotta-light: #77493b;
+  --wool-rust: #8d523f;
+  --wool-oatmeal: #e8e2d3;
+  --wool-cream: #fbf8f0;
+  --stitch-gold: #e2b13c;
+  --stitch-coral: #e75c40;
+  --stitch-ivory: #faf6eb;
+  --stitch-mint: #7ee2b0;
+  --wood-toggle: #9a6d38;
+  --wood-toggle-dark: #583c1b;
+  --brass-snap: #d4a742;
+  --display-ink: #111513;
+  --display-text: #fbf7ec;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--felt-stage);
+  color: #dbe4dc;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  overflow-x: hidden;
+}
+
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .4; cursor: default; }
+button:focus-visible, a:focus-visible, select:focus-visible {
+  outline: 2px solid var(--stitch-gold);
+  outline-offset: 3px;
+}
+a { color: var(--stitch-mint); text-underline-offset: 3px; }
+
+header {
+  padding: 16px 24px;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #2e3a32;
+  background: linear-gradient(180deg, #222a25 0%, #161c18 100%);
+}
+.header-titles h1 {
+  font-size: 20px;
+  letter-spacing: -0.4px;
+  margin: 0;
+  font-weight: 600;
+  color: var(--wool-cream);
+}
+.header-titles h1 span {
+  font-weight: 400;
+  color: var(--stitch-gold);
+  font-size: 15px;
+}
+.header-titles p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #92a498;
+}
+
+.controls-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #1c2420;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid #334439;
+}
+.control-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8da495;
+  margin-right: 4px;
+}
+.controls-bar button, .controls-bar select {
+  border: 1px solid #43584a;
+  background: linear-gradient(180deg, #2a372f, #1e2822);
+  color: var(--wool-cream);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 120ms ease;
+}
+.controls-bar button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #37493e, #27342c);
+  border-color: #637f6d;
+}
+.controls-bar button.active, .controls-bar button[aria-pressed="true"] {
+  border-color: var(--stitch-gold);
+  color: var(--stitch-ivory);
+  background: linear-gradient(180deg, #483d21, #2f2713);
+  box-shadow: 0 0 6px rgba(226, 177, 60, 0.35);
+}
+.controls-bar .primary-btn {
+  border-color: #947a2e;
+  background: linear-gradient(180deg, #53451e, #362c11);
+  color: #fbf2d5;
+}
+.controls-bar .primary-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #6c5a28, #453816);
+  border-color: var(--stitch-gold);
+}
+
+#viewport {
+  overflow: auto;
+  background:
+    radial-gradient(ellipse at 46% 32%, #2c3830 0%, #131715 75%),
+    radial-gradient(circle at 80% 80%, rgba(84, 51, 41, 0.25) 0%, transparent 50%);
+  position: relative;
+  min-height: 720px;
+}
+#stage {
+  position: relative;
+  width: 1200px;
+  height: 720px;
+  margin: auto;
+  overflow: hidden;
+  touch-action: none;
+  background:
+    radial-gradient(circle at 600px 120px, rgba(226, 177, 60, 0.04) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent 0 160px, rgba(255, 255, 255, 0.012) 161px 320px);
+}
+
+.topline {
+  position: absolute;
+  top: 18px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+}
+.topline p {
+  margin: 0;
+  color: #b0c4b6;
+  font-size: 13px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+#phase {
+  font: 11px/1.4 "Courier New", monospace;
+  color: var(--stitch-gold);
+  background: rgba(22, 28, 24, 0.9);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #3d4f43;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Hardware and SVG Canvas */
+#stage-svg {
+  position: absolute;
+  inset: 0;
+  width: 1200px;
+  height: 720px;
+  pointer-events: none;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, 0.65));
+}
+
+/* Modules: Jarvis (a) & GitDiscuss (b) */
+.module {
+  position: absolute;
+  width: 390px;
+  height: 130px;
+  user-select: none;
+  touch-action: none;
+  isolation: isolate;
+  transition: height 260ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+.module.shade {
+  height: 44px;
+}
+.module-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+  transition: height 260ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+.module.shade .module-svg {
+  height: 44px;
+}
+
+/* Felt Grip & Embroidered Title Bar */
+.felt-grip {
+  position: absolute;
+  top: 6px;
+  left: 44px;
+  width: 282px;
+  height: 22px;
+  cursor: grab;
+  background: none;
+  border: 0;
+  color: var(--wool-cream);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+.felt-grip:active { cursor: grabbing; }
+.felt-grip .felt-tag-pip {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  margin-right: 6px;
+  background: var(--stitch-gold);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* Die-cut Display Screen with Running Stitches */
+.felt-screen {
+  position: absolute;
+  left: 46px;
+  top: 32px;
+  width: 290px;
+  height: 64px;
+  background: var(--display-ink);
+  border-radius: 6px;
+  border: 1px solid #232c26;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.95), 0 0 0 1px #485c4f, 0 2px 4px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  color: var(--stitch-mint);
+  z-index: 2;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.module.shade .felt-screen {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+
+/* Subtle wool weave texture overlay on screen */
+.felt-screen::after, .pocket-mini-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0, 20, 10, 0.28) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+.screen-pages {
+  height: 100%;
+  width: 300%;
+  display: flex;
+  transition: transform 280ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.screen-page {
+  width: 33.33333%;
+  flex: none;
+  padding: 6px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.screen-page .felt-label {
+  font: 10px/1.3 "Courier New", monospace;
+  color: #9ab3a3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.screen-page strong {
+  font: bold 18px/1.1 "Courier New", monospace;
+  letter-spacing: -0.5px;
+  display: block;
+  color: var(--wool-cream);
+}
+.screen-page strong em {
+  font-style: normal;
+  color: var(--stitch-mint);
+}
+.screen-page small {
+  font: 11px/1.5 "Courier New", monospace;
+  color: #9cb4a5;
+}
+.screen-page .felt-meter-bar {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  height: 25px;
+}
+.felt-meter-bar i {
+  width: 4px;
+  background: var(--stitch-gold);
+  border-radius: 1px;
+  box-shadow: 0 0 3px rgba(226, 177, 60, 0.6);
+}
+
+/* Shade Mode Padded Strip Display */
+.shade-strip {
+  position: absolute;
+  left: 46px;
+  top: 7px;
+  width: 290px;
+  height: 30px;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  font: bold 11px/1 "Courier New", monospace;
+  color: var(--wool-cream);
+  z-index: 5;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+.module.shade .shade-strip {
+  display: flex;
+}
+.shade-strip .shade-tag {
+  color: var(--stitch-gold);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.shade-strip .shade-pips {
+  display: flex;
+  gap: 5px;
+}
+.shade-pips i {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--stitch-coral);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.5), 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+.shade-pips i.gold { background: var(--stitch-gold); }
+.shade-pips i.mint { background: var(--stitch-mint); }
+
+/* Navigation & Felt Buttons */
+.tab-row {
+  position: absolute;
+  left: 48px;
+  top: 102px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 2;
+  transition: opacity 200ms ease;
+}
+.module.shade .tab-row { opacity: 0; pointer-events: none; }
+.tab-row button {
+  padding: 2px 7px;
+  background: rgba(22, 28, 24, 0.85);
+  border: 1px solid #3d4f43;
+  border-radius: 4px;
+  color: #9cb2a3;
+  font: 10px/1.2 "Courier New", monospace;
+  transition: all 120ms ease;
+}
+.tab-row button[aria-selected="true"] {
+  border-color: var(--stitch-gold);
+  color: var(--wool-cream);
+  background: #334438;
+}
+
+.felt-btn {
+  position: absolute;
+  top: 100px;
+  border-radius: 50%;
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: 2px solid #1a221d;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.75);
+  background: radial-gradient(circle at 35% 25%, #eed38f, #9c7329 55%, #4c350e 100%);
+  color: #1a1306;
+  font: bold 10px/1 Arial;
+  z-index: 2;
+  transition: opacity 200ms ease, filter 150ms ease;
+}
+.felt-btn:hover { filter: brightness(1.2); }
+.module.shade .felt-btn { opacity: 0; pointer-events: none; }
+.run-btn { left: 288px; }
+.next-btn {
+  left: 318px;
+  background: radial-gradient(circle at 35% 25%, #aeece5, #2f9488 55%, #113f39 100%);
+  color: #05211d;
+}
+.pocket-btn {
+  position: absolute;
+  left: 184px;
+  top: 99px;
+  width: 90px;
+  height: 22px;
+  border: 1px solid #3d5043;
+  clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
+  color: var(--wool-cream);
+  background: linear-gradient(180deg, #44584a, #2b3930 50%, #1c2720);
+  font: bold 9px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.15);
+  z-index: 2;
+  transition: opacity 200ms ease;
+}
+.module.shade .pocket-btn { opacity: 0; pointer-events: none; }
+
+/* Craft Tool Pocket Drawer (Activity Bay) */
+#feltPocket {
+  position: absolute;
+  width: 324px;
+  height: 220px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+#feltPocketBody {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 324px;
+  height: 206px;
+  transform: translateY(-194px);
+  transition: transform 420ms cubic-bezier(0.18, 0.8, 0.22, 1);
+  background: linear-gradient(135deg, #334338 0%, #1e2922 50%, #161e19 100%);
+  border: 2px solid #526b5a;
+  border-radius: 4px 4px 20px 20px;
+  box-shadow: inset 0 0 0 3px #18221c, inset 0 0 0 5px #405446, 0 14px 18px rgba(0, 0, 0, 0.8);
+  pointer-events: auto;
+}
+#feltPocket.open #feltPocketBody { transform: translateY(0); }
+.pocket-ribbon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: repeating-linear-gradient(180deg, #e2b13c 0 4px, #362c12 4px 6px);
+  box-shadow: inset 0 0 0 1px #19241e, 0 0 3px rgba(0, 0, 0, 0.6);
+}
+.pocket-ribbon.l { left: 8px; }
+.pocket-ribbon.r { right: 8px; }
+
+.pocket-head {
+  position: absolute;
+  top: 10px;
+  left: 26px;
+  right: 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--wool-cream);
+  font-size: 11px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+.pocket-head button {
+  border: 1px solid #4a6352;
+  border-radius: 3px;
+  color: var(--wool-cream);
+  background: #1f2c24;
+  font-size: 10px;
+  padding: 2px 7px;
+}
+
+#pocketBay {
+  position: absolute;
+  left: 22px;
+  top: 40px;
+  width: 276px;
+  height: 82px;
+  border: 1px dashed #597561;
+  background: #0f1512;
+  border-radius: 8px;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8da696;
+  font-size: 11px;
+  transition: all 180ms ease;
+}
+#pocketBay.hot, #pocketBay[data-dock-state="ready"] {
+  background: #1b2d22;
+  border-style: solid;
+  border-color: var(--stitch-gold);
+  box-shadow: inset 0 0 16px rgba(226, 177, 60, 0.35), 0 0 12px rgba(226, 177, 60, 0.3);
+}
+#emptyPocketBay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+#emptyPocketBay button {
+  font-size: 10px;
+  padding: 3px 8px;
+  color: var(--wool-cream);
+  background: #27372d;
+  border: 1px solid #587460;
+  border-radius: 3px;
+}
+.pocket-footer {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  top: 130px;
+  font: 10px/1.5 "Courier New", monospace;
+  color: #9cb5a5;
+}
+.pocket-footer strong { color: var(--stitch-gold); }
+.concurrency-toggle-wrap {
+  position: absolute;
+  right: 28px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #a4bea9;
+}
+#concurrencyToggle {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #202d24;
+  background: radial-gradient(circle at 35% 30%, #a87e45, #684821 65%, #38240d 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), inset 0 1px rgba(255, 255, 255, 0.25);
+  position: relative;
+  cursor: ns-resize;
+}
+#concurrencyToggle::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 3px;
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  background: #171007;
+  transform-origin: 1px 11px;
+  transform: rotate(var(--angle, 0deg));
+}
+
+/* Checks Widget (Felt Needle-Pouch / Cartridge) */
+#needlePouch {
+  position: absolute;
+  width: 276px;
+  height: 80px;
+  touch-action: none;
+  user-select: none;
+  z-index: 8;
+  filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.75));
+}
+.pouch-case {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #64816d;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #44594c 0%, #29382e 50%, #1a251e 100%);
+  box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.18), inset 0 -2px 4px rgba(0, 0, 0, 0.7);
+}
+.pouch-grip {
+  position: absolute;
+  left: 14px;
+  top: 2px;
+  width: 215px;
+  height: 18px;
+  background: none;
+  border: 0;
+  color: var(--wool-cream);
+  text-align: left;
+  font: bold 9px/18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: grab;
+}
+.pocket-mini-screen {
+  position: absolute;
+  left: 12px;
+  right: 40px;
+  top: 24px;
+  height: 42px;
+  border: 2px solid #0f1612;
+  border-radius: 4px;
+  background: var(--display-ink);
+  box-shadow: 0 0 0 1px #4e6556;
+  overflow: hidden;
+  padding: 4px 8px;
+  color: var(--stitch-mint);
+  font: 10px/1.3 "Courier New", monospace;
+}
+.pocket-mini-screen strong {
+  font-size: 15px;
+  color: var(--stitch-gold);
+}
+.pouch-snap {
+  position: absolute;
+  right: 12px;
+  top: 34px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fde79a, #d4a742 55%, #6a4f15);
+  border: 2px solid #1a241e;
+  box-shadow: 0 0 5px rgba(212, 167, 66, 0.5), inset 0 1px 1px #fff;
+}
+#ejectPouch {
+  position: absolute;
+  right: 12px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  background: none;
+  color: var(--wool-cream);
+  padding: 0;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* Turned Wooden Toggle & Stitched Wool Pull-Tab Release Grip */
+.felt-toggle-release {
+  position: absolute;
+  width: 28px;
+  height: 46px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+  transition: opacity 160ms ease;
+}
+.felt-toggle-release[hidden] { display: none; }
+.felt-toggle-release::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 32px;
+  left: 9px;
+  top: 7px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #442f15, #a3753b 40%, #c59858 60%, #442f15);
+  border: 1px solid #23190b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), inset 0 1px rgba(255, 255, 255, 0.35);
+}
+.felt-toggle-release:hover::before { border-color: var(--stitch-gold); }
+.felt-toggle-release::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  right: 6px;
+  width: 2px;
+  height: calc(24px * var(--tension, 0));
+  background: var(--stitch-gold);
+  box-shadow: 0 0 4px var(--stitch-gold);
+}
+
+/* Port Overlay for Design Mode */
+#portOverlay { position: absolute; inset: 0; pointer-events: none; }
+.socket-port {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--stitch-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(226, 177, 60, 0.4);
+  display: none;
+}
+.socket-port::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #fbeec8;
+  border-radius: 50%;
+}
+.socket-port::after {
+  position: absolute;
+  top: -26px;
+  left: -40px;
+  white-space: nowrap;
+  color: var(--wool-cream);
+  font: 10px "Courier New", monospace;
+  content: attr(data-label);
+  background: rgba(18, 24, 20, 0.9);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #415547;
+}
+#stage.design .socket-port { display: block; }
+#stage.design #pocketBay { outline: 1px dashed var(--stitch-gold); outline-offset: 4px; }
+#stage.design .felt-screen { outline: 1px dashed #7ee2b0; outline-offset: 3px; }
+
+/* Footer and Aesthetic Notes */
+footer {
+  padding: 20px 28px 30px;
+  border-top: 1px solid #28362d;
+  background: #121714;
+  color: #8da496;
+  font-size: 13px;
+}
+footer h3 {
+  color: var(--wool-cream);
+  font-size: 15px;
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+footer p {
+  margin: 0 0 10px;
+  max-width: 900px;
+  line-height: 1.6;
+}
+footer .note-highlight {
+  color: var(--stitch-gold);
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-titles">
+    <h1>Tactile Felt <span>/ needle-felt fiber entanglement join</span></h1>
+    <p>Dense carded wool roving · Hand-sewn embroidery stitches · Fiber entanglement lock</p>
+  </div>
+  <nav class="controls-bar" aria-label="Experiment state and option controls">
+    <div class="control-group">
+      <label for="optionSelect">Option</label>
+      <select id="optionSelect" aria-label="Select skin exploration option">
+        <option value="entanglement" selected>1. Needle-Felt Fiber Entanglement</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>State</label>
+      <button id="btnStateSeparate" class="active" aria-pressed="true">Separate</button>
+      <button id="btnStateJoining" aria-pressed="false">Joining</button>
+      <button id="btnStateJoined" aria-pressed="false">Joined</button>
+      <button id="btnStateShade" aria-pressed="false">Shade</button>
+    </div>
+    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
+    <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnDesign" aria-pressed="false">Design mode</button>
+    <button id="btnReset">Reset</button>
+  </nav>
+</header>
+
+<div id="viewport">
+  <main id="stage" aria-label="Tactile Felt skin interactive stage">
+    <div class="topline">
+      <p id="status" role="status" aria-live="polite">Drag capsules toward each other to watch the wool fibers interweave, or use the state controls.</p>
+      <span id="phase">Separate / Two wool housings</span>
+    </div>
+
+    <!-- Architectural SVG Canvas for Shared Felt Body, Roving Entanglement, Stitches & Light -->
+    <svg id="stage-svg" viewBox="0 0 1200 720" aria-hidden="true">
+      <defs>
+        <!-- Jarvis Sage Wool Heather Gradient -->
+        <linearGradient id="sageWoolGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4d6556"/>
+          <stop offset="8%" stop-color="#3b4e42"/>
+          <stop offset="35%" stop-color="#2a3930"/>
+          <stop offset="65%" stop-color="#212d26"/>
+          <stop offset="90%" stop-color="#18221c"/>
+          <stop offset="100%" stop-color="#36493d"/>
+        </linearGradient>
+
+        <!-- GitDiscuss Terracotta Wool Heather Gradient -->
+        <linearGradient id="terracottaWoolGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#73493b"/>
+          <stop offset="8%" stop-color="#5c382d"/>
+          <stop offset="35%" stop-color="#472b22"/>
+          <stop offset="65%" stop-color="#38211a"/>
+          <stop offset="90%" stop-color="#241510"/>
+          <stop offset="100%" stop-color="#523227"/>
+        </linearGradient>
+
+        <!-- Shared Unified Felt Seam Melange Gradient -->
+        <linearGradient id="unifiedFeltGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#2a3930"/>
+          <stop offset="38%" stop-color="#35453a"/>
+          <stop offset="50%" stop-color="#3c372f"/>
+          <stop offset="62%" stop-color="#4e3127"/>
+          <stop offset="100%" stop-color="#472b22"/>
+        </linearGradient>
+
+        <!-- Turned Wood Toggle Gradient -->
+        <linearGradient id="toggleWoodGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#c59858"/>
+          <stop offset="25%" stop-color="#9a6d38"/>
+          <stop offset="70%" stop-color="#583c1b"/>
+          <stop offset="100%" stop-color="#34220e"/>
+        </linearGradient>
+
+        <!-- Subtle Needle Punch Texture Pattern -->
+        <pattern id="needlePunchPat" width="40" height="24" patternUnits="userSpaceOnUse">
+          <circle cx="10" cy="6" r="1.2" fill="#141c17" opacity="0.6"/>
+          <circle cx="10" cy="6.8" r="0.8" fill="#586f60" opacity="0.3"/>
+          <circle cx="30" cy="18" r="1.2" fill="#141c17" opacity="0.6"/>
+          <circle cx="30" cy="18.8" r="0.8" fill="#586f60" opacity="0.3"/>
+        </pattern>
+
+        <!-- Soft Felt Glow & Diffuse Filter -->
+        <filter id="feltDiffuseGlow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- Shared Wool Casing and Entangled Fiber Seam -->
+      <g id="sharedFeltStage"></g>
+      <!-- Roving fiber magnetic proximity glow and needle dimples -->
+      <g id="feltProximityAura"></g>
+    </svg>
+
+    <!-- Activity Bay / Craft Tool Pocket -->
+    <div id="feltPocket" aria-label="Jarvis activity tool pocket">
+      <div id="feltPocketBody" inert>
+        <i class="pocket-ribbon l"></i><i class="pocket-ribbon r"></i>
+        <div class="pocket-head">
+          <span id="bayStatus">Craft Pocket Bay</span>
+          <button id="closePocket" aria-label="Close activity tool pocket">▴ close</button>
+        </div>
+        <div id="pocketBay" aria-label="Checks widget bay">
+          <div id="emptyPocketBay">
+            <span>Drop the Checks needle-pouch here</span>
+            <button id="insertChecks">Insert Checks widget</button>
+          </div>
+        </div>
+        <div class="pocket-footer">
+          <strong id="activityState">Pocket running</strong><br>
+          Pocket belongs to Jarvis.<br>
+          Contents stay with its felt chassis.
+        </div>
+        <div class="concurrency-toggle-wrap">
+          <span>Stitch Batch <b id="concurrencyValue">3</b></span>
+          <button id="concurrencyToggle" aria-label="Cycle stitch batch limit"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capsule A: Jarvis (Sage Green Felt) -->
+    <section class="module" id="a" aria-label="Jarvis felt capsule">
+      <svg class="module-svg" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="felt-grip" data-drag="a" aria-label="Move Jarvis capsule">
+        <span><span class="felt-tag-pip"></span> Jarvis / Craft Master</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Full Felt Screen -->
+      <div class="felt-screen" aria-label="Jarvis digital display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="felt-label">Jarvis / Active Stitch</div>
+            <strong id="runText">03 <em>agents running</em></strong>
+            <small>Reviewing the felt fiber renderer</small>
+            <div class="felt-meter-bar">
+              <i style="height:9px"></i><i style="height:22px"></i><i style="height:15px"></i>
+              <i style="height:25px"></i><i style="height:17px"></i>
+            </div>
+          </div>
+          <div class="screen-page">
+            <div class="felt-label">Jarvis / Current Task</div>
+            <strong style="font-size:16px">Verify shell assembly</strong>
+            <small>12 checks passed · 2 queued in pocket</small>
+          </div>
+          <div class="screen-page">
+            <div class="felt-label">Jarvis / Event Log</div>
+            <small>10:42 joined felt state retained<br>10:43 waiting for your next action</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shade Strip Display -->
+      <div class="shade-strip">
+        <span class="shade-tag"><span>●</span> JARVIS · 03 AGENTS</span>
+        <div class="shade-pips">
+          <i class="gold"></i><i class="mint"></i><i class="gold"></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="Jarvis screens">
+        <button class="felt-tab" role="tab" aria-selected="true" data-page="0">Status</button>
+        <button class="felt-tab" role="tab" aria-selected="false" data-page="1">Task</button>
+        <button class="felt-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+      <button class="pocket-btn" aria-label="Open craft tool pocket" aria-expanded="false">▾ craft pocket</button>
+      <button class="felt-btn run-btn" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button>
+      <button class="felt-btn next-btn" aria-label="Next Jarvis screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Capsule B: GitDiscuss (Terracotta Wool Felt) -->
+    <section class="module" id="b" aria-label="GitDiscuss felt capsule">
+      <svg class="module-svg" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="felt-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
+        <span><span class="felt-tag-pip" style="background:var(--stitch-coral);"></span> GitDiscuss / Review Queue</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Full Felt Screen -->
+      <div class="felt-screen" aria-label="GitDiscuss digital display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="felt-label">GitDiscuss / Incoming</div>
+            <strong>02 <em>need a decision</em></strong>
+            <small>Capsule joining · design feedback</small>
+          </div>
+          <div class="screen-page">
+            <div class="felt-label">Discussion Roll / Pattern</div>
+            <strong style="font-size:16px">Shared casing geometry</strong>
+            <small>Brent · 4 comments · ready to review</small>
+          </div>
+          <div class="screen-page">
+            <div class="felt-label">Discussion Roll / Log</div>
+            <small>10:41 feedback collected in queue<br>10:43 no workflow links created</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shade Strip Display -->
+      <div class="shade-strip">
+        <span class="shade-tag"><span>●</span> GITDISCUSS · 02 DECISIONS</span>
+        <div class="shade-pips">
+          <i style="background:var(--stitch-coral)"></i><i class="gold"></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
+        <button class="felt-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
+        <button class="felt-tab" role="tab" aria-selected="false" data-page="1">Thread</button>
+        <button class="felt-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+      <button class="pocket-btn" aria-label="Open selected discussion">▸ view thread</button>
+      <button class="felt-btn run-btn" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button>
+      <button class="felt-btn next-btn" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Checks Widget (Felt Needle-Pouch) -->
+    <section id="needlePouch" aria-label="Checks widget">
+      <div class="pouch-case"></div>
+      <button class="pouch-grip" data-drag="meter" aria-label="Move Checks widget">
+        Checks / Needle-Pouch ⋮⋮
+      </button>
+      <div class="pocket-mini-screen">
+        <strong>12 / 14</strong> checks passed<br>
+        2 waiting for approval
+      </div>
+      <span class="pouch-snap" aria-hidden="true"></span>
+      <button id="ejectPouch" aria-label="Eject Checks widget" title="Eject from pocket" hidden>↗</button>
+    </section>
+
+    <!-- Turned Wood Toggle & Pull-Tab Release Grip -->
+    <button id="toggleRelease" class="felt-toggle-release" data-drag="release"
+            aria-label="Release GitDiscuss: pull right or press Enter"
+            title="Pull right to peel fibers · Enter to separate" hidden>
+    </button>
+
+    <!-- Socket Overlay for Design Mode -->
+    <div id="portOverlay" aria-hidden="true">
+      <div class="socket-port" id="portA" data-label="Felt Roving Collar · A"></div>
+      <div class="socket-port" id="portB" data-label="Felt Roving Collar · B"></div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <h3>Tactile Felt Architecture &amp; The Needle-Felt Fiber Entanglement Join</h3>
+  <p>
+    This skin explores dense compressed wool felt (3mm–5mm thickness) with hand-sewn cotton embroidery stitches and turned boxwood fittings. The casing has pillowy, bevelled contours, diffuse ambient occlusion shadows, and visible needle-punched fiber texture.
+  </p>
+  <p>
+    <span class="note-highlight">Option 1 — Needle-Felt Fiber Entanglement:</span> The docking edges feature loose, wispy carded wool roving fringes (sage green on Jarvis, warm terracotta on GitDiscuss). When the capsules are moved into proximity, the fibers reach across and interweave with rapid needle-punching indentations. On latch, the two bodies compress together with a cushioned squash, fusing into a seamless blended felt band reinforced by a column of tight ivory cross-stitches.
+  </p>
+  <p>
+    <span class="note-highlight">Shade Mode:</span> Squeezes the plush felt body vertically into a compact, padded wool ribbon strip with embroidered border stitches and glanceable agent status pips.
+  </p>
+</footer>
+
+<script>
+// Tactile Felt Skin Controller
+const $ = s => document.querySelector(s);
+const stage = $('#stage');
+const W = 390, H = 130, JOIN_DISTANCE = 316;
+
+const model = {
+  a: { x: 140, y: 220, page: 0, running: true },
+  b: { x: 680, y: 220, page: 0, running: true },
+  meter: { x: 805, y: 510 },
+  joined: false,
+  busy: false,
+  pocket: false,
+  docked: false,
+  design: false,
+  shade: false,
+  blend: 0,
+  cap: 0,
+  entangle: 0, // 0 = wispy free fringes, 1 = fully interwoven & compressed
+  light: 0,
+  limit: 3,
+  feel: 'free',
+  tension: 0,
+  front: 'b'
+};
+
+const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let drag = null, animationToken = 0, dragFrame = 0, glowFrame = 0, glowTime = 0;
+const DOCKING = { near: 130, capture: 45 };
+const connectionGlow = { socket: { value: 0, target: 0 }, bay: { value: 0, target: 0 } };
+
+function say(text) { $('#status').textContent = text; }
+
+// SVG Path Generator for Pillowy Felt Capsule
+function feltCapsulePath(x, y, width, isShade = false) {
+  const h = isShade ? 44 : 126;
+  const r = isShade ? 10 : 22;
+  return `M${x+r+24} ${y+4} H${x+width-r-24} Q${x+width-6} ${y+4} ${x+width-6} ${y+r+10} ` +
+         `V${y+h-r-10} Q${x+width-6} ${y+h+2} ${x+width-r-24} ${y+h+2} ` +
+         `H${x+r+24} Q${x+6} ${y+h+2} ${x+6} ${y+h-r-10} ` +
+         `V${y+r+10} Q${x+6} ${y+4} ${x+r+24} ${y+4} Z`;
+}
+
+// Draw Plush Wool Casing with Hand-Sewn Running Stitches and Needle Dimples
+function drawFeltCasing(x, y, width, fillGrad, opacity = 1, isShade = false) {
+  const d = feltCapsulePath(x, y, width, isShade);
+  const h = isShade ? 44 : 126;
+  let s = `<g opacity="${opacity}">`;
+
+  // Soft diffused drop shadow beneath thick wool
+  s += `<path d="${d}" fill="#0a0e0b" opacity="0.4" transform="translate(0, 5)"/>`;
+
+  // Main thick wool felt body
+  s += `<path d="${d}" fill="${fillGrad}" stroke="#131915" stroke-width="2.5"/>`;
+
+  // Needle-punched texture overlay
+  s += `<path d="${d}" fill="url(#needlePunchPat)"/>`;
+
+  // Soft pillowy highlight along top shoulder
+  s += `<path d="M${x+34} ${y+8} H${x+width-34}" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.14"/>`;
+  // Dark ambient occlusion groove along bottom
+  s += `<path d="M${x+36} ${y+h} H${x+width-36}" stroke="#090d0a" stroke-width="2.2" stroke-linecap="round" opacity="0.4"/>`;
+
+  if (!isShade) {
+    // Hand-sewn decorative running stitch perimeter (Ivory floss)
+    const stitchPath = `M${x+38} ${y+14} H${x+width-38} Q${x+width-16} ${y+14} ${x+width-16} ${y+36} ` +
+                       `V${y+94} Q${x+width-16} ${y+116} ${x+width-38} ${y+116} ` +
+                       `H${x+38} Q${x+16} ${y+116} ${x+16} ${y+94} ` +
+                       `V${y+36} Q${x+16} ${y+14} ${x+38} ${y+14} Z`;
+    s += `<path d="${stitchPath}" fill="none" stroke="#faf6eb" stroke-width="1.6" stroke-dasharray="5 4" stroke-linecap="round" opacity="0.75"/>`;
+
+    // Recessed die-cut border around display screen
+    s += `<rect x="${x+44}" y="${y+30}" width="${width-88}" height="68" rx="7" fill="none" stroke="#0e1310" stroke-width="3"/>`;
+    s += `<rect x="${x+45}" y="${y+31}" width="${width-90}" height="66" rx="6" fill="none" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.65"/>`;
+
+    // Felt corner reinforcement buttons / french knots
+    s += `<circle cx="${x+26}" cy="${y+26}" r="3.5" fill="#e2b13c" stroke="#161c18" stroke-width="1"/>`;
+    s += `<circle cx="${x+width-26}" cy="${y+26}" r="3.5" fill="#e2b13c" stroke="#161c18" stroke-width="1"/>`;
+    s += `<circle cx="${x+26}" cy="${y+104}" r="3.5" fill="#e2b13c" stroke="#161c18" stroke-width="1"/>`;
+    s += `<circle cx="${x+width-26}" cy="${y+104}" r="3.5" fill="#e2b13c" stroke="#161c18" stroke-width="1"/>`;
+  } else {
+    // Shade mode stitched linear edging
+    s += `<path d="M${x+24} ${y+8} H${x+width-24}" stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.6"/>`;
+    s += `<path d="M${x+24} ${y+36} H${x+width-24}" stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.6"/>`;
+  }
+  s += `</g>`;
+  return s;
+}
+
+// Loose Carded Wool Roving Fringes on the docking collars
+function drawRovingCap(x, y, isRight, isTerracotta = false, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const dir = isRight ? 1 : -1;
+  const startX = isRight ? x + W - 12 : x + 12;
+  const scaleX = (1 - retract) * dir;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  const c1 = isTerracotta ? '#8d523f' : '#5a7565';
+  const c2 = isTerracotta ? '#e75c40' : '#e2b13c';
+  const c3 = '#faf6eb';
+
+  return `
+    <g transform="translate(${startX}, ${y+64}) scale(${scaleX}, 1)">
+      <!-- Carded Wool Roving Fibers reaching outward -->
+      <path d="M0 -42 Q16 -38 24 -46 Q32 -36 12 -30" fill="none" stroke="${c1}" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+      <path d="M2 -32 Q22 -26 30 -32 Q34 -20 16 -18" fill="none" stroke="${c2}" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+      <path d="M0 -20 Q24 -16 34 -22 Q38 -8 18 -6" fill="none" stroke="${c3}" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/>
+      <path d="M4 -8 Q28 -4 36 -12 Q40 6 20 6" fill="none" stroke="${c1}" stroke-width="2.6" stroke-linecap="round" opacity="0.8"/>
+      <path d="M2 4 Q30 8 38 0 Q42 20 22 18" fill="none" stroke="${c2}" stroke-width="2.2" stroke-linecap="round" opacity="0.85"/>
+      <path d="M0 16 Q26 22 34 16 Q36 30 16 30" fill="none" stroke="${c3}" stroke-width="1.8" stroke-linecap="round" opacity="0.9"/>
+      <path d="M2 28 Q22 34 28 26 Q30 42 12 40" fill="none" stroke="${c1}" stroke-width="2.4" stroke-linecap="round" opacity="0.8"/>
+      <!-- Felt Collar Reinforcement Hem -->
+      <path d="M-2 -48 V48" stroke="#17221b" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-1 -46 V46" stroke="${c2}" stroke-width="1.4" stroke-dasharray="3 3"/>
+    </g>
+  `;
+}
+
+// Soft Wool Light Glow for Magnetic Proximity Feedback
+function drawFeltSocketLight(x, y, amount) {
+  if (!amount) return '';
+  return `
+    <g opacity="${amount}">
+      <!-- Warm diffuse wool amber glow -->
+      <ellipse cx="${x}" cy="${y+64}" rx="18" ry="48" fill="#e2b13c" opacity="0.35" filter="url(#feltDiffuseGlow)"/>
+      <rect x="${x-6}" y="${y+28}" width="12" height="72" rx="6" fill="#faf6eb" opacity="0.7" filter="url(#feltDiffuseGlow)"/>
+      <rect x="${x-2}" y="${y+32}" width="4" height="64" rx="2" fill="#ffffff" opacity="0.9"/>
+    </g>
+  `;
+}
+
+// Option 1: Needle-Felt Fiber Entanglement at the Joined Seam
+function drawEntangledFeltSeam(midX, y, entangleRatio, opacity = 1) {
+  // entangleRatio: 0 = loose wispy, 1 = fully compressed into blended melange with cross-stitches
+  const h = 126;
+  let s = `<g id="fiberEntanglementSeam" opacity="${opacity}">`;
+
+  if (entangleRatio > 0.1) {
+    // Interlaced wavy roving locks spanning between both modules
+    const span = 20 * (1 - entangleRatio * 0.5);
+    s += `
+      <!-- Intertwining green & terracotta wool locks -->
+      <path d="M${midX-span} ${y+22} C${midX} ${y+14}, ${midX} ${y+34}, ${midX+span} ${y+24}"
+            fill="none" stroke="#5a7565" stroke-width="${3 * entangleRatio + 1}" stroke-linecap="round"/>
+      <path d="M${midX-span} ${y+36} C${midX-6} ${y+44}, ${midX+6} ${y+26}, ${midX+span} ${y+38}"
+            fill="none" stroke="#8d523f" stroke-width="${3 * entangleRatio + 1}" stroke-linecap="round"/>
+      <path d="M${midX-span} ${y+52} C${midX+8} ${y+46}, ${midX-8} ${y+60}, ${midX+span} ${y+54}"
+            fill="none" stroke="#e2b13c" stroke-width="${2.2 * entangleRatio + 1}" stroke-linecap="round"/>
+      <path d="M${midX-span} ${y+68} C${midX} ${y+76}, ${midX} ${y+60}, ${midX+span} ${y+70}"
+            fill="none" stroke="#faf6eb" stroke-width="${2 * entangleRatio + 1}" stroke-linecap="round"/>
+      <path d="M${midX-span} ${y+84} C${midX-6} ${y+92}, ${midX+8} ${y+76}, ${midX+span} ${y+86}"
+            fill="none" stroke="#5a7565" stroke-width="${2.8 * entangleRatio + 1}" stroke-linecap="round"/>
+      <path d="M${midX-span} ${y+100} C${midX+6} ${y+106}, ${midX-6} ${y+94}, ${midX+span} ${y+102}"
+            fill="none" stroke="#8d523f" stroke-width="${3 * entangleRatio + 1}" stroke-linecap="round"/>
+    `;
+  }
+
+  // Barbed Felting Needle Dimples (animated during joining / fully settled when joined)
+  if (entangleRatio > 0.3) {
+    const dimpleAlpha = Math.min(1, (entangleRatio - 0.3) * 1.5);
+    s += `<g opacity="${dimpleAlpha}">`;
+    for (let cy = y + 20; cy <= y + 108; cy += 14) {
+      s += `<circle cx="${midX}" cy="${cy}" r="3" fill="#151b17" stroke="#3d4f43" stroke-width="1"/>`;
+      s += `<circle cx="${midX}" cy="${cy}" r="1.2" fill="#0d120f"/>`;
+    }
+    s += `</g>`;
+  }
+
+  // Hand-Sewn Cross-Stitch Zipper / Reinforcement (locks the seam at full join)
+  if (entangleRatio > 0.6) {
+    const stitchAlpha = Math.min(1, (entangleRatio - 0.6) * 2.5);
+    s += `<g opacity="${stitchAlpha}">`;
+    for (let cy = y + 24; cy <= y + 104; cy += 16) {
+      s += `<line x1="${midX-7}" y1="${cy-6}" x2="${midX+7}" y2="${cy+6}" stroke="#faf6eb" stroke-width="2" stroke-linecap="round"/>`;
+      s += `<line x1="${midX-7}" y1="${cy+6}" x2="${midX+7}" y2="${cy-6}" stroke="#faf6eb" stroke-width="2" stroke-linecap="round"/>`;
+      s += `<circle cx="${midX}" cy="${cy}" r="1.4" fill="#e2b13c"/>`;
+    }
+    s += `</g>`;
+  }
+
+  // Turned Boxwood Toggle and Braided Floss Loop at the top seam
+  if (entangleRatio > 0.7) {
+    const toggleAlpha = Math.min(1, (entangleRatio - 0.7) * 3.3);
+    s += `
+      <g opacity="${toggleAlpha}" transform="translate(${midX}, ${y+10})">
+        <!-- Braided wool loop -->
+        <path d="M-14 -2 C-10 -12 10 -12 14 -2" fill="none" stroke="#faf6eb" stroke-width="2" stroke-linecap="round"/>
+        <!-- Turned Boxwood Toggle Pin -->
+        <rect x="-11" y="-6" width="22" height="8" rx="4" fill="url(#toggleWoodGrad)" stroke="#1a1208" stroke-width="1.2"/>
+        <line x1="-3" y1="-5" x2="-3" y2="1" stroke="#251a0c" stroke-width="1.2"/>
+        <line x1="3" y1="-5" x2="3" y2="1" stroke="#251a0c" stroke-width="1.2"/>
+      </g>
+    `;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Render the entire hardware layer
+function renderHardware() {
+  const a = model.a, b = model.b, p = model.blend;
+  const isShade = model.shade;
+  const glow = model.busy ? model.light : connectionGlow.socket.value;
+  let shared = '';
+
+  const midX = (a.x + W - 22 + b.x + 22) / 2;
+
+  if (p > 0) {
+    // Continuous Monolithic Plush Felt Chassis
+    shared += drawFeltCasing(a.x, a.y, (b.x + W) - a.x, 'url(#unifiedFeltGrad)', p, isShade);
+  }
+
+  // Draw Option 1 Entangled Fiber Seam
+  if (!isShade && (model.joined || model.entangle > 0.02 || (glow > 0.3 && !model.joined))) {
+    const entRatio = model.joined ? 1 : model.entangle || Math.max(0, (glow - 0.25) / 0.75);
+    const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 16 + b.x + 16) / 2;
+    shared += drawEntangledFeltSeam(kMidX, a.y, entRatio, Math.max(p, glow > 0.3 ? 0.9 : entRatio));
+  }
+
+  if (model.joined && model.design) {
+    shared += `<line x1="${a.x + JOIN_DISTANCE}" y1="${a.y + 10}" x2="${a.x + JOIN_DISTANCE}" y2="${a.y + 120}"
+                     stroke="#e2b13c" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+  }
+
+  $('#sharedFeltStage').innerHTML = shared;
+
+  // Individual capsules: A = Sage Green Wool, B = Terracotta Wool
+  for (const id of ['a', 'b']) {
+    const isA = id === 'a';
+    const grad = isA ? 'url(#sageWoolGrad)' : 'url(#terracottaWoolGrad)';
+    const individual = drawFeltCasing(0, 0, W, grad, 1, isShade) +
+      drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, isShade) +
+      drawRovingCap(0, 0, true, !isA, isA ? model.cap : 0, isShade);
+
+    $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawFeltSocketLight(isA ? W - 22 : 22, 0, glow)}</g>`;
+  }
+
+  // Socket proximity aura
+  if (!isShade && glow > 0.05 && p < 0.98) {
+    $('#feltProximityAura').innerHTML = `
+      <g opacity="${glow}">
+        ${drawFeltSocketLight(a.x + W - 22, a.y, glow)}
+        ${drawFeltSocketLight(b.x + 22, b.y, glow)}
+      </g>
+    `;
+  } else {
+    $('#feltProximityAura').innerHTML = '';
+  }
+}
+
+function updateStateButtons() {
+  const isShade = model.shade;
+  const isJoined = model.joined;
+  const isJoining = model.entangle > 0.1 && model.entangle < 0.95 && !isJoined;
+  const isSep = !isJoined && !isJoining && !isShade;
+
+  $('#btnStateSeparate').classList.toggle('active', isSep);
+  $('#btnStateSeparate').setAttribute('aria-pressed', String(isSep));
+
+  $('#btnStateJoining').classList.toggle('active', isJoining);
+  $('#btnStateJoining').setAttribute('aria-pressed', String(isJoining));
+
+  $('#btnStateJoined').classList.toggle('active', isJoined && !isShade);
+  $('#btnStateJoined').setAttribute('aria-pressed', String(isJoined && !isShade));
+
+  $('#btnStateShade').classList.toggle('active', isShade);
+  $('#btnStateShade').setAttribute('aria-pressed', String(isShade));
+}
+
+function render() {
+  updateGlowTargets();
+  renderHardware();
+  paintGlowValues();
+  updateStateButtons();
+
+  ['a', 'b'].forEach(id => {
+    const m = model[id], el = $('#' + id);
+    el.style.left = m.x + 'px';
+    el.style.top = m.y + 'px';
+    el.style.zIndex = model.front === id ? '4' : '2';
+    el.classList.toggle('shade', model.shade);
+
+    el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
+    el.querySelectorAll('.felt-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
+
+    const btn = el.querySelector('.run-btn');
+    btn.textContent = m.running ? 'Ⅱ' : '▶';
+    btn.setAttribute('aria-label', (m.running ? 'Pause ' : 'Resume ') + (id === 'a' ? 'Jarvis' : 'GitDiscuss'));
+  });
+
+  $('#runText').innerHTML = model.a.running ? '03 <em>agents running</em>' : '03 <em>agents paused</em>';
+  $('#activityState').textContent = model.a.running ? 'Pocket running' : 'Pocket paused';
+
+  const bayState = connectionState('bay');
+  $('#pocketBay').dataset.dockState = bayState;
+  const bayLabel = bayState === 'ready' ? 'Release to tuck in pocket' :
+                   bayState === 'near' ? 'Near craft pocket · move closer' : 'Craft Pocket Bay';
+  $('#bayStatus').textContent = bayLabel;
+
+  const pocket = $('#feltPocket');
+  pocket.style.left = (model.a.x + 36) + 'px';
+  pocket.style.top = (model.a.y + (model.shade ? 40 : 121)) + 'px';
+  pocket.classList.toggle('open', model.pocket);
+  $('#feltPocketBody').inert = !model.pocket;
+
+  $('#a .pocket-btn').setAttribute('aria-expanded', String(model.pocket));
+  $('#a .pocket-btn').textContent = model.pocket ? '▴ craft pocket' : '▾ craft pocket';
+
+  const meter = $('#needlePouch');
+  if (model.docked) {
+    if (meter.parentElement !== $('#pocketBay')) $('#pocketBay').append(meter);
+    meter.style.left = '0px';
+    meter.style.top = '0px';
+    meter.style.transform = `translate(${drag?.kind === 'meterLatch' ? drag.deflect.x : 0}px, ${drag?.kind === 'meterLatch' ? drag.deflect.y : 0}px) scale(0.98)`;
+    meter.style.transformOrigin = 'top left';
+    meter.inert = !model.pocket;
+  } else {
+    if (meter.parentElement !== stage) stage.append(meter);
+    meter.style.left = model.meter.x + 'px';
+    meter.style.top = model.meter.y + 'px';
+    meter.style.transform = '';
+    meter.inert = false;
+  }
+
+  $('#emptyPocketBay').hidden = model.docked;
+  $('#emptyPocketBay').style.display = model.docked ? 'none' : 'flex';
+  $('#ejectPouch').hidden = !model.docked;
+
+  stage.classList.toggle('design', model.design);
+  $('#btnDesign').setAttribute('aria-pressed', String(model.design));
+
+  $('#portA').style.left = (model.a.x + W - 30) + 'px';
+  $('#portA').style.top = (model.a.y + 54) + 'px';
+  $('#portB').style.left = (model.b.x + 12) + 'px';
+  $('#portB').style.top = (model.b.y + 54) + 'px';
+
+  $('#btnJoinAnim').disabled = model.joined || model.busy;
+  $('#btnSeparateAnim').disabled = !model.joined || model.busy;
+
+  $('#concurrencyValue').textContent = model.limit;
+  $('#concurrencyToggle').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
+
+  const release = $('#toggleRelease');
+  release.hidden = !model.joined || model.busy || model.shade;
+  release.style.left = (model.a.x + 338) + 'px';
+  release.style.top = (model.a.y + 42) + 'px';
+  release.style.setProperty('--tension', model.tension);
+
+  if (!model.busy) {
+    if (model.shade) {
+      $('#phase').textContent = 'Shade mode / Padded wool lozenge';
+    } else if (model.joined) {
+      $('#phase').textContent = 'Joined / Interwoven fiber chassis';
+    } else if (model.entangle > 0.1) {
+      $('#phase').textContent = 'Joining / Roving fibers interweaving';
+    } else {
+      $('#phase').textContent = 'Separate / Two wool housings';
+    }
+  }
+}
+
+function tween(duration, fn, token) {
+  return new Promise(resolve => {
+    if (motion.matches) {
+      if (token === animationToken) fn(1);
+      resolve(token === animationToken);
+      return;
+    }
+    let start = performance.now();
+    function step(now) {
+      if (token !== animationToken) { resolve(false); return; }
+      let t = Math.min(1, (now - start) / duration);
+      let e = t * t * (3 - 2 * t);
+      fn(e);
+      if (t < 1) requestAnimationFrame(step);
+      else resolve(true);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// Option 1 Join Animation: Loose roving fringes reach out, interweave, compress with squash & cross-stitches
+async function join(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Roving fibers reach out and interweave. Needle dimples compress the wool seam.');
+  $('#phase').textContent = 'Roving fibers attracting';
+
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 90 : 250, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  $('#phase').textContent = 'Wool fibers interweaving';
+  if (!await tween(fromDrag ? 140 : 320, t => {
+    model.cap = t;
+    model.entangle = t * 0.6;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.pocket ? 305 : 385, model.a.y));
+
+  $('#phase').textContent = 'Compressing fiber seam';
+  if (!await tween(fromDrag ? 280 : 500, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.entangle = 0.6 + t * 0.4;
+    model.light = 1 - t;
+    render();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.entangle = 1;
+  model.light = 0;
+  render();
+  say('Fibers entangled and cross-stitched. One plush felt chassis. Pull the wooden toggle right to peel apart.');
+}
+
+async function separate() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Peeling entangled wool fibers. Modules separate back to individual felt cases.');
+
+  $('#phase').textContent = 'Releasing cross-stitches';
+  if (!await tween(260, t => {
+    model.entangle = 1 - t * 0.6;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Separating wool housings';
+  if (!await tween(540, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.6);
+    model.cap = 1 - Math.max(0, (t - 0.4) / 0.6);
+    model.entangle = Math.max(0, 0.4 * (1 - t));
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.entangle = 0;
+  render();
+  say('Separated. Independent tactile felt housings restored.');
+}
+
+// Preset State Switchers
+async function applyState(stateName) {
+  if (model.busy) return;
+  ++animationToken;
+
+  if (stateName === 'separate') {
+    model.shade = false;
+    if (model.joined) {
+      await separate();
+    } else {
+      model.entangle = 0;
+      model.cap = 0;
+      model.blend = 0;
+      model.a.x = 140;
+      model.b.x = 680;
+      render();
+      say('State: Separate — Two independent tactile felt capsules.');
+    }
+  } else if (stateName === 'joining') {
+    model.shade = false;
+    model.joined = false;
+    model.blend = 0.25;
+    model.cap = 0.5;
+    model.entangle = 0.55; // mid-flight fibers reaching and crossing
+    model.light = 0.75;
+    model.a.x = 240;
+    model.b.x = 240 + W + 50; // near each other
+    render();
+    say('State: Joining — Mid-animation view with roving fibers interweaving.');
+  } else if (stateName === 'joined') {
+    model.shade = false;
+    if (!model.joined) {
+      model.a.x = 220;
+      model.b.x = 220 + JOIN_DISTANCE;
+      model.joined = true;
+      model.blend = 1;
+      model.cap = 1;
+      model.entangle = 1;
+      model.light = 0;
+      render();
+      say('State: Joined — Plush unified felt chassis with hand-sewn cross-stitches.');
+    }
+  } else if (stateName === 'shade') {
+    model.shade = true;
+    render();
+    say('State: Shade — Collapsed to compact padded wool lozenge.');
+  }
+}
+
+// Drawer & Cartridge Actions
+function togglePocket(open = !model.pocket) {
+  if (drag) cancelDrag();
+  model.pocket = open;
+  if (open && model.a.y > 310) {
+    const dy = model.a.y - 310;
+    model.a.y = 310;
+    if (model.joined) model.b.y -= dy;
+  }
+  render();
+  say(open ? 'Craft tool pocket open. Drag Checks into its pocket bay, or use Insert.' : 'Craft tool pocket closed.');
+}
+
+async function insertChecks() {
+  if (model.busy || model.docked) return;
+  if (!model.pocket) togglePocket(true);
+  stopDrag();
+  model.busy = true;
+  model.feel = 'free';
+  model.light = 0;
+  const token = ++animationToken, start = { ...model.meter }, target = pocketTarget();
+  render();
+
+  const dist = Math.hypot(start.x - target.x, start.y - target.y);
+  if (!await tween(dist < 75 ? 160 : 340, t => {
+    model.meter.x = start.x + (target.x - start.x) * t;
+    model.meter.y = start.y + (target.y - start.y) * t;
+    render();
+  }, token)) return;
+
+  model.docked = true;
+  model.busy = false;
+  $('#pocketBay').classList.remove('hot');
+  render();
+  say('Checks needle-pouch tucked in pocket bay. Pull deliberately to free, or use Eject.');
+}
+
+function ejectChecks() {
+  if (model.busy) return;
+  stopDrag();
+  model.feel = 'free';
+  model.docked = false;
+  model.meter.x = Math.min(900, model.a.x + 430);
+  model.meter.y = Math.min(510, model.a.y + 190);
+  render();
+  say('Checks needle-pouch ejected from craft pocket.');
+}
+
+function setPage(id, p) { model[id].page = p; render(); }
+
+// Event Wiring
+$('#btnStateSeparate').onclick = () => applyState('separate');
+$('#btnStateJoining').onclick = () => applyState('joining');
+$('#btnStateJoined').onclick = () => applyState('joined');
+$('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
+$('#btnJoinAnim').onclick = () => join();
+$('#btnSeparateAnim').onclick = () => separate();
+$('#btnDesign').onclick = () => {
+  model.design = !model.design;
+  render();
+  say(model.design ? 'Design mode: Showing felt roving collars & pocket bay.' : 'Design mode off.');
+};
+$('#btnReset').onclick = () => {
+  ++animationToken;
+  stopDrag();
+  resetGlow();
+  Object.assign(model, {
+    joined: false, busy: false, pocket: false, docked: false, design: false, shade: false,
+    blend: 0, cap: 0, entangle: 0, light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+  });
+  Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
+  Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
+  Object.assign(model.meter, { x: 805, y: 510 });
+  render();
+  say('Reset to initial felt study configuration.');
+};
+
+// Option selector change
+$('#optionSelect').onchange = (e) => {
+  say('Option selected: Needle-Felt Fiber Entanglement join.');
+};
+
+// Drawer controls
+$('#a .pocket-btn').onclick = () => togglePocket();
+$('#closePocket').onclick = () => togglePocket(false);
+$('#insertChecks').onclick = () => insertChecks();
+$('#ejectPouch').onclick = () => ejectChecks();
+
+// Concurrency toggle dial
+$('#concurrencyToggle').onclick = () => {
+  model.limit = (model.limit % 6) + 1;
+  render();
+};
+
+// Jarvis & GitDiscuss Screen Controls
+['a', 'b'].forEach(id => {
+  const el = $('#' + id);
+  el.querySelectorAll('.felt-tab').forEach((tab, index) => {
+    tab.onclick = () => setPage(id, index);
+  });
+  el.querySelector('.next-btn').onclick = () => {
+    setPage(id, (model[id].page + 1) % 3);
+  };
+  el.querySelector('.run-btn').onclick = () => {
+    model[id].running = !model[id].running;
+    render();
+  };
+});
+
+// Dragging & Interaction Physics
+function alignedTarget() {
+  return { x: model.a.x + JOIN_DISTANCE, y: model.a.y };
+}
+function pocketTarget() {
+  return { x: model.a.x + 58, y: model.a.y + (model.shade ? 40 : 121) + 40 };
+}
+function pointerDistance(target, current) {
+  return Math.hypot(target.x - current.x, target.y - current.y);
+}
+function connectionState(type) {
+  const dist = type === 'socket' ?
+    (model.joined ? 0 : pointerDistance(alignedTarget(), model.b)) :
+    (model.docked ? 0 : (!model.pocket ? 999 : pointerDistance(pocketTarget(), model.meter)));
+  if (dist <= DOCKING.capture) return 'ready';
+  if (dist <= DOCKING.near) return 'near';
+  return 'none';
+}
+function calculateGlowTarget(dist) {
+  if (dist > DOCKING.near) return 0;
+  if (dist <= DOCKING.capture) return 1;
+  const ratio = (DOCKING.near - dist) / (DOCKING.near - DOCKING.capture);
+  return 0.18 + 0.44 * Math.pow(ratio, 0.8);
+}
+function updateGlowTargets() {
+  if (model.joined) connectionGlow.socket.target = 0;
+  else connectionGlow.socket.target = calculateGlowTarget(pointerDistance(alignedTarget(), model.b));
+
+  if (model.docked || !model.pocket) connectionGlow.bay.target = 0;
+  else connectionGlow.bay.target = calculateGlowTarget(pointerDistance(pocketTarget(), model.meter));
+}
+function stepGlow(current, target, dt) {
+  if (motion.matches) return target;
+  return target + (current - target) * Math.exp(-dt / 40);
+}
+function animateGlow(time) {
+  glowFrame = requestAnimationFrame(animateGlow);
+  const dt = glowTime ? Math.min(32, time - glowTime) : 16;
+  glowTime = time;
+  connectionGlow.socket.value = stepGlow(connectionGlow.socket.value, connectionGlow.socket.target, dt);
+  connectionGlow.bay.value = stepGlow(connectionGlow.bay.value, connectionGlow.bay.target, dt);
+  paintGlowValues();
+}
+function resetGlow() {
+  connectionGlow.socket.value = connectionGlow.socket.target = 0;
+  connectionGlow.bay.value = connectionGlow.bay.target = 0;
+  paintGlowValues();
+}
+function paintGlowValues() {
+  $('#pocketBay').style.setProperty('--dock-glow', connectionGlow.bay.value.toFixed(3));
+}
+
+// Pointer Drag Handlers
+function startDrag(e) {
+  if (model.busy || e.button !== 0) return;
+  const grip = e.target.closest('[data-drag]');
+  if (!grip) return;
+
+  const kind = grip.dataset.drag;
+  e.preventDefault();
+  grip.setPointerCapture(e.pointerId);
+
+  const startPointer = { x: e.clientX, y: e.clientY };
+  if (kind === 'a' || kind === 'b') {
+    model.front = kind;
+    drag = {
+      kind: 'module', id: kind, pointerId: e.pointerId, startPointer,
+      startA: { ...model.a }, startB: { ...model.b },
+      offset: { x: e.clientX - model[kind].x, y: e.clientY - model[kind].y }
+    };
+  } else if (kind === 'meter') {
+    if (model.docked) {
+      drag = {
+        kind: 'meterLatch', pointerId: e.pointerId, startPointer,
+        deflect: { x: 0, y: 0 }, origin: { ...model.meter }
+      };
+    } else {
+      drag = {
+        kind: 'meter', pointerId: e.pointerId, startPointer,
+        offset: { x: e.clientX - model.meter.x, y: e.clientY - model.meter.y }
+      };
+    }
+  } else if (kind === 'release') {
+    drag = {
+      kind: 'release', pointerId: e.pointerId, startPointer,
+      released: false, dx: 0
+    };
+  }
+}
+
+function onPointerMove(e) {
+  if (!drag || drag.pointerId !== e.pointerId) return;
+  const dx = e.clientX - drag.startPointer.x, dy = e.clientY - drag.startPointer.y;
+
+  if (drag.kind === 'module') {
+    if (model.joined) {
+      model.a.x = Math.max(20, Math.min(1200 - (JOIN_DISTANCE + W) - 20, drag.startA.x + dx));
+      model.a.y = Math.max(100, Math.min(model.pocket ? 305 : 385, drag.startA.y + dy));
+      model.b.x = model.a.x + JOIN_DISTANCE;
+      model.b.y = model.a.y;
+    } else {
+      const m = model[drag.id];
+      const start = drag.id === 'a' ? drag.startA : drag.startB;
+      let rawX = start.x + dx, rawY = start.y + dy;
+      rawX = Math.max(20, Math.min(1200 - W - 20, rawX));
+      rawY = Math.max(100, Math.min(model.pocket && drag.id === 'a' ? 305 : 385, rawY));
+
+      if (drag.id === 'b') {
+        const align = alignedTarget();
+        const dist = Math.hypot(align.x - rawX, align.y - rawY);
+        if (dist <= DOCKING.capture) {
+          rawX = align.x + (rawX - align.x) * 0.12;
+          rawY = align.y + (rawY - align.y) * 0.12;
+          model.feel = 'captured';
+        } else if (dist <= DOCKING.near) {
+          model.feel = 'near';
+        } else {
+          model.feel = 'free';
+        }
+      }
+      m.x = rawX;
+      m.y = rawY;
+    }
+    render();
+  } else if (drag.kind === 'meter') {
+    let rawX = drag.startPointer.x + dx - drag.offset.x;
+    let rawY = drag.startPointer.y + dy - drag.offset.y;
+    rawX = Math.max(20, Math.min(1200 - 276 - 20, rawX));
+    rawY = Math.max(80, Math.min(600, rawY));
+
+    if (model.pocket) {
+      const target = pocketTarget();
+      const dist = Math.hypot(target.x - rawX, target.y - rawY);
+      if (dist <= DOCKING.capture) {
+        rawX = target.x + (rawX - target.x) * 0.12;
+        rawY = target.y + (rawY - target.y) * 0.12;
+        model.feel = 'bayCaptured';
+      }
+    }
+    model.meter.x = rawX;
+    model.meter.y = rawY;
+    render();
+  } else if (drag.kind === 'meterLatch') {
+    const pullDist = Math.hypot(dx, dy);
+    if (pullDist > 46) {
+      model.docked = false;
+      const target = pocketTarget();
+      model.meter.x = target.x + dx;
+      model.meter.y = target.y + dy;
+      drag = {
+        kind: 'meter', pointerId: e.pointerId, startPointer: { x: e.clientX, y: e.clientY },
+        offset: { x: 138, y: 40 }
+      };
+      say('Checks needle-pouch freed from craft pocket.');
+      render();
+    } else {
+      drag.deflect = { x: dx * 0.25, y: dy * 0.25 };
+      render();
+    }
+  } else if (drag.kind === 'release') {
+    const pullX = Math.max(0, dx);
+    drag.dx = pullX;
+    model.tension = Math.min(1, pullX / 72);
+    render();
+    if (pullX >= 72 && !drag.released) {
+      drag.released = true;
+      separate();
+    }
+  }
+}
+
+function onPointerUp(e) {
+  if (!drag || drag.pointerId !== e.pointerId) return;
+  if (drag.kind === 'module' && drag.id === 'b' && !model.joined) {
+    if (pointerDistance(alignedTarget(), model.b) <= DOCKING.capture) {
+      join(true);
+      return;
+    }
+  } else if (drag.kind === 'meter' && !model.docked && model.pocket) {
+    if (pointerDistance(pocketTarget(), model.meter) <= DOCKING.capture) {
+      insertChecks();
+      return;
+    }
+  }
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  render();
+}
+
+function stopDrag() {
+  drag = null;
+}
+function cancelDrag() {
+  if (!drag) return;
+  if (drag.kind === 'module') {
+    model.a.x = drag.startA.x; model.a.y = drag.startA.y;
+    model.b.x = drag.startB.x; model.b.y = drag.startB.y;
+  }
+  stopDrag();
+  render();
+}
+
+// Global listeners
+window.addEventListener('pointerdown', startDrag);
+window.addEventListener('pointermove', onPointerMove);
+window.addEventListener('pointerup', onPointerUp);
+window.addEventListener('pointercancel', onPointerUp);
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') cancelDrag();
+  if (e.key === 'Enter' && document.activeElement === $('#toggleRelease')) separate();
+});
+
+// Initialize
+requestAnimationFrame(animateGlow);
+render();
+say('Tactile Felt skin loaded: Dense carded wool with Needle-Felt Fiber Entanglement join.');
+</script>
+</body>
+</html>
