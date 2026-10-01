@@ -74,6 +74,13 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
+.clsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
+.lights button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
+.lights button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
+#tip{position:fixed;z-index:50;pointer-events:none;opacity:0;transition:opacity .15s;transform:translate(-50%,-100%);white-space:nowrap;padding:3px 10px 4px;font:12px/1.4 Georgia,serif;color:#2c2117;
+ background:radial-gradient(ellipse at 50% 0,#fffbf1,#efdfbd);outline:1.5px solid #1d1612;box-shadow:0 0 0 3px #cbbd9f,0 0 0 4px #4a3d2c,0 6px 14px #000a}
+#tip.on{opacity:1}#tip i{display:inline-block;width:7px;height:7px;margin-right:7px;transform:rotate(45deg);vertical-align:1px;outline:1px solid #1d1612}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#bdb29f;font-size:13px}
 .about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#f1e2c2}.about h2 small{font:11px -apple-system,sans-serif;color:#968a7a;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
 .about p{margin:0 0 6px}
@@ -85,7 +92,12 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="glassHi" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient>
  <radialGradient id="gild" cx=".38" cy=".32" r=".7"><stop stop-color="#fff4c4"/><stop offset=".45" stop-color="#e0ad40"/><stop offset="1" stop-color="#6e4a12"/></radialGradient>
  <radialGradient id="pane" cx=".5" cy=".5" r=".5"><stop stop-color="#2a3f86"/><stop offset="1" stop-color="#121c44"/></radialGradient>
- <filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
+ <linearGradient id="lg-run" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff2c4"/><stop offset=".45" stop-color="#f0b43a"/><stop offset="1" stop-color="#9a6210"/></linearGradient>
+ <linearGradient id="lg-idle" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#cfe0ff"/><stop offset=".45" stop-color="#5a82d6"/><stop offset="1" stop-color="#22357a"/></linearGradient>
+ <linearGradient id="lg-need" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffd0c0"/><stop offset=".45" stop-color="#dc3f3c"/><stop offset="1" stop-color="#701219"/></linearGradient>
+ <linearGradient id="lg-pass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e2f8c8"/><stop offset=".45" stop-color="#55b35e"/><stop offset="1" stop-color="#1c5c2c"/></linearGradient>
+ <filter id="lglow" x="-200%" y="-60%" width="500%" height="220%"><feGaussianBlur stdDeviation="2.6"/></filter>
+ <filter id="soft"x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="6"/></filter>
 </defs></svg>
 <header><div><h1>Gothic cathedral <span>/ Claude skin study</span></h1><p>Weathered limestone facades with pinnacles and cresting, lit windows of clear quarry glass in coloured borders, carved bosses. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -97,7 +109,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <div id="viewport"><main id="stage" aria-label="Gothic skin stage">
 <div class="topline"><p id="status" role="status" aria-live="polite">Drag a nameplate toward the other facade, or use the state buttons.</p><span id="phase"></span></div>
 
-<section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg>
+<section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg><svg class="clsvg" aria-hidden="true"></svg><div class="lights" role="group"></div>
  <button class="grip" data-drag="a" aria-label="Move Jarvis"><span><b>Jarvis</b>agent control</span><span class="orn" aria-hidden="true">❖</span></button>
  <div class="screen" aria-label="Jarvis display"><div class="pages">
   <div class="page"><div class="tiny">Jarvis / active workflow</div><div class="big"><span class="num">03</span><em class="runText">agents running</em></div><small>Reviewing the capsule renderer</small><span class="bars" aria-hidden="true"></span></div>
@@ -109,7 +121,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="strip" aria-hidden="true"><b>Jarvis</b><span><em>03</em> agents running</span></div>
 </section>
 
-<section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg>
+<section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg><svg class="clsvg" aria-hidden="true"></svg><div class="lights" role="group"></div>
  <button class="grip" data-drag="b" aria-label="Move GitDiscuss"><span><b>GitDiscuss</b>review queue</span><span class="orn" aria-hidden="true">❖</span></button>
  <div class="screen" aria-label="GitDiscuss display"><div class="pages">
   <div class="page"><div class="tiny">GitDiscuss / incoming</div><div class="big"><span class="num">02</span><em>need a decision</em></div><small>Capsule joining · design feedback</small></div>
@@ -121,14 +133,14 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="strip" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em> need a decision</span></div>
 </section>
 
-<section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
+<section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg><svg class="clsvg" aria-hidden="true"></svg><div class="lights" role="group"></div>
  <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="orn" aria-hidden="true">❖</span></button>
  <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="knot" aria-hidden="true"></span>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
 </section>
 
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
-</main></div>
+</main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
 <p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
@@ -283,8 +295,59 @@ const JOINS={
 };
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It keeps the shade state working until the gothic shade modes (clerestory, triptych, crypt, cornice, inscription drum) are built and added here.'}
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It keeps the shade state working until the gothic shade modes (clerestory, triptych, crypt, cornice, inscription drum) are built and added here.'},
+ clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
+  on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
+  about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'}
 };
+/* Clerestory: one lancet per status. Each status is [colour, tooltip]. */
+const LIGHTS={
+ a:()=>{const r=model.a.run;return[...['reviewing the capsule renderer','verifying shell assembly','drafting the event log'].map((t,i)=>[r?'run':'idle',`Agent ${i+1} · ${r?'running':'paused'}: ${t}`]),['pass','Shell checks · 12 passed'],['idle','Shell checks · 2 queued']]},
+ b:()=>[['need','Capsule joining · needs your decision'],['need','Design feedback · needs your decision'],['run','Shared casing geometry · ready to review'],['pass','Feedback · collected'],['idle','Workflow links · none created']],
+ c:()=>Array.from({length:14},(_,i)=>i<12?['pass',`Check ${i+1} of 14 · passed`]:['need',`Check ${i+1} of 14 · waiting for your approval`])
+};
+const LCOL={run:'#f0b43a',idle:'#5a82d6',need:'#dc3f3c',pass:'#55b35e'};
+// Lancet slots along the wall between the piers, centred; status windows sit in the middle bays.
+function bays(id,w,h){
+ const small=id==='c',s=SK[id],L=s.join==='l'?JP:small?16:20,Rw=s.join==='r'?JP:small?16:20,x0=L+5,x1=w-Rw-5;
+ const P=small?15:16,S=LIGHTS[id]();let n=Math.floor((x1-x0)/P);if((n-S.length)%2)n--;const first=(n-S.length)/2;
+ const yt=(small?5:8)+2+(small?14:17)+5,yb=h-13;
+ return{P,n,S,first,hw:small?3:3.6,yt,yb,xc:i=>x0+((x1-x0)-n*P)/2+P/2+i*P};
+}
+const lancet=(xc,yb,yt,hw)=>{const sp=Math.min(yb,yt+hw*1.7);return `M${f(xc-hw)} ${f(yb)}V${f(sp)}Q${f(xc-hw)} ${f(yt+hw*.55)} ${f(xc)} ${f(yt)}Q${f(xc+hw)} ${f(yt+hw*.55)} ${f(xc+hw)} ${f(sp)}V${f(yb)}Z`};
+function clerestory(id,w,h,k){
+ const B=bays(id,w,h);let back='',glass='',glow='';
+ for(let i=0;i<B.n;i++){
+  const j=i-B.first,st=j>=0&&j<B.S.length?B.S[j]:null,x=B.xc(i);
+  // Rise: bays come up out of the string course, outer bays a touch later than the centre.
+  const d=Math.abs(i-(B.n-1)/2)/Math.max(1,B.n/2),r=ease(seg(k,.32+.18*d,.52+.18*d));if(r<=0)continue;
+  const yt=lerp(B.yb,B.yt,r);
+  back+=`<path d="${lancet(x,B.yb+1.2,yt-1.6,B.hw+1.7)}" fill="#24180d" opacity="${f(.5*r)}"/><path d="M${f(x-B.hw-2.4)} ${f(B.yb+1.8)}H${f(x+B.hw+2.4)}" stroke="#fff6e2" stroke-opacity="${f(.6*r)}"/>`;
+  if(!st){back+=`<path d="${lancet(x,B.yb,yt,B.hw*.75)}" fill="#3a2a18" opacity="${f(.28*r)}"/>`;continue}
+  // Kindle: left to right, each with a small flare as it catches.
+  const S=B.S.length,a=.64+.27*(S>1?j/(S-1):0),l=seg(k,a,a+.09),p=lancet(x,B.yb,yt,B.hw);
+  glass+=`<path d="${p}" fill="#16131f"/>`;
+  if(l>0){glass+=`<path d="${p}" fill="url(#lg-${st[0]})" opacity="${f(l)}"/>`;
+   glow+=`<path d="${lancet(x,B.yb+2,yt-3,B.hw+3)}" fill="${LCOL[st[0]]}" opacity="${f(.75*l)}"/><ellipse cx="${f(x)}" cy="${f(B.yb+3.5)}" rx="${f(B.hw+5)}" ry="2.2" fill="${LCOL[st[0]]}" opacity="${f(.6*l)}"/>`;
+   const fl=Math.sin(Math.PI*l);if(fl>.02&&l<1)glass+=`<path d="${p}" fill="#fffbe8" opacity="${f(.75*fl)}"/>`}
+  // Lead outline and a saddle bar across each light
+  const sb=lerp(B.yb,yt,.42);
+  glass+=`<path d="${p}" fill="none" stroke="#1d1612" stroke-width=".9"/><path d="M${f(x-B.hw)} ${f(sb)}H${f(x+B.hw)}" stroke="#1d1612" stroke-width=".8" opacity="${f(r)}"/>`;
+ }
+ return `${back}<g filter="url(#lglow)" style="mix-blend-mode:screen">${glow}</g>${glass}`;
+}
+function placeLights(id,el,w,h,on){
+ const box=el.querySelector('.lights'),key=on?`${w}x${h}|${model.a.run}`:'';
+ box.classList.toggle('on',on);if(box.dataset.key===key)return;box.dataset.key=key;box.innerHTML='';if(!on)return;
+ const B=bays(id,w,h);box.setAttribute('aria-label',el.getAttribute('aria-label').replace(' widget',' statuses'));
+ B.S.forEach(([c,t],j)=>{const b=document.createElement('button'),x=B.xc(B.first+j);
+  b.style.cssText=`left:${f(x-B.P/2+1)}px;top:${f(B.yt-2)}px;width:${B.P-2}px;height:${f(B.yb-B.yt+5)}px`;
+  b.setAttribute('aria-label',t);b.dataset.tip=t;b.dataset.c=c;
+  b.onpointerenter=b.onfocus=b.onclick=()=>showTip(b);b.onpointerleave=b.onblur=hideTip;box.append(b)});
+}
+function showTip(b){const t=$('#tip'),r=b.getBoundingClientRect();t.innerHTML=`<i style="background:${LCOL[b.dataset.c]}"></i>${b.dataset.tip}`;
+ t.style.left=clamp(r.left+r.width/2,t.offsetWidth/2+6,innerWidth-t.offsetWidth/2-6)+'px';t.style.top=(r.top-8)+'px';t.classList.add('on')}
+function hideTip(){$('#tip').classList.remove('on')}
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
@@ -340,25 +403,32 @@ function holdJoining(){
  startJoinFrom({...REST},0);setJt(.62);render();say('Held mid-join: petals aligned, light rising. Use the scrubber to step through the animation.');
 }
 function toggleShade(){
- const to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=700*Math.abs(to-start),t0=performance.now();
+ const to=model.st>.5?0:1,start=model.st,token=++shadeAnim,sh=SHADES[model.shade],ms=(sh.ms||700)*Math.abs(to-start),t0=performance.now();hideTip();
  // Shade runs on its own clock so it can overlap a join.
  (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,ease(t));render();if(t<1)requestAnimationFrame(step)})(t0);
- say(to?'Shaded: the wall lowers to its cornice, nameplate and one lit value.':'Unshaded: the wall rises again.');
+ say(to?sh.on||'Shaded: the wall lowers to its cornice, nameplate and one lit value.':sh.off||'Unshaded: the wall rises again.');
 }
 
 /* ---------- Rendering ---------- */
-function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,ease(model.st))),jt:model.jt,glow:model.glow}}
+// Shaded height per option; some shades lower the wall in the first part of their run and use the rest for detail.
+function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small):small?CHS:HS,t=s.drop?ease(seg(ease(st),0,s.drop)):ease(st);return Math.round(lerp(small?CH:H,lo,t))}
+const lowH=()=>model.st>.5?shadeH(false,1):H;
+function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,ease(model.st)));
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory';
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   const svg=el.querySelector('.casing'),key=w+'x'+h;
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h)}
-  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  // Window contents fade with the wall's height, so they never hang below a wall that drops early.
+  const k=ease(model.st),hk=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(hk*2.2),strip=seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
+  const cs=el.querySelector('.clsvg'),ckey=cl&&model.st>0?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
+  if(cs.dataset.key!==ckey){cs.dataset.key=ckey;cs.setAttribute('width',w);cs.setAttribute('height',h);cs.setAttribute('viewBox',`0 0 ${w} ${h}`);cs.innerHTML=ckey?clerestory(id,w,h,k):''}
+  placeLights(id,el,w,h,cl&&model.st>.97);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
@@ -415,6 +485,7 @@ function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:
 function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
+ if(!e.target.closest('.lights'))hideTip();
  if(e.target.closest('#roseHit')&&model.jt===1){
   e.preventDefault();++anim;model.busy=false;model.dir=-1;model.tsign=1;model.path={s:separatePose(),j:here()};
   const p=local(e),cx=model.a.x+W,cy=model.a.y+ctx().h/2;
@@ -435,7 +506,7 @@ stage.addEventListener('pointermove',e=>{
   if(Math.abs(d)>3)drag.moved=true;drag.deg=clamp(d,-60,60);if(Math.abs(drag.deg)>1)model.tsign=drag.deg<0?-1:1;
   setJt(1-.4*Math.abs(drag.deg)/60);render();return;
  }
- const s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
+ const s=drag.saved,bottom=600-lowH()-14;
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,14,1200-CW-14);model.c.y=clamp(s.c.y+dy,TOP-20,600-CH-10);render();return}
  if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,TOP,bottom)};
@@ -464,12 +535,12 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
- const bottom=600-(model.st>.5?HS:H)-14;
+ const bottom=600-lowH()-14;
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],14,1200-w-14);m.y=clamp(m.y+k[1],id==='c'?TOP-20:TOP,id==='c'?600-CH-10:bottom)}render();
 }));
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
-addEventListener('resize',fit);fit();describe();render();
+addEventListener('resize',fit);addEventListener('scroll',hideTip,{passive:true});fit();describe();render();
 window.gothicSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade};
 </script></body></html>
