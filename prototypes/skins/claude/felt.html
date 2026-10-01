@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Felt · Claude skin study</title>
+<style>
+:root{color-scheme:dark;--wool:#ecb862;--muted:#b49c82}
+*{box-sizing:border-box}
+body{margin:0;background:#18110d;color:#efe1cc;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #ffd08a;outline-offset:3px}
+a{color:var(--wool);text-underline-offset:3px}
+header{padding:18px 28px 14px;display:flex;gap:20px 40px;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;border-bottom:1px dashed #f3d3a333}
+h1{margin:0;font:400 23px/1.2 Georgia,"Times New Roman",serif}h1 span{color:var(--muted);font-size:17px}
+header p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.controls{display:flex;flex-direction:column;gap:7px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.row>span{font-size:10px;color:#a8907a;text-transform:uppercase;letter-spacing:1.4px;width:58px}
+.row button{border:0;background:#4b3628;color:#f2e2c8;border-radius:8px;padding:4px 12px;font-size:12px;outline:1px dashed #f3d9b04d;outline-offset:-4px;box-shadow:0 2px 0 #0007}
+.row button:hover{background:#5b4231}
+.row button[aria-pressed=true]{background:#b4532a;color:#fff6e6;outline-color:#ffe6bfaa}
+.row button kbd{font:10px "Courier New",monospace;color:#e6bf94;margin-right:5px}
+.row button[aria-pressed=true] kbd{color:#ffe2bd}
+.row input[type=range]{width:180px;accent-color:#d0703f}
+.row output{font:11px "Courier New",monospace;color:#e2c3a0;width:38px}
+#viewport{overflow:hidden}
+#stage{position:relative;width:1200px;height:600px;margin:auto;overflow:hidden;touch-action:none;
+ background:radial-gradient(ellipse 62% 66% at 46% 40%,#5c4433,#3a2b20 52%,#1e1611 92%),#1e1611}
+#stage:before{content:"";position:absolute;inset:0;pointer-events:none;
+ background:repeating-linear-gradient(0deg,#ffffff06 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,#00000018 0 1px,transparent 1px 3px)}
+.topline{position:absolute;top:18px;left:28px;right:28px;display:flex;justify-content:space-between;gap:30px;z-index:20;pointer-events:none}
+.topline p{margin:0;color:#dcc6ad;font-size:13px;max-width:760px}
+#phase{font:11px/1.5 "Courier New",monospace;color:#f0b77a;white-space:nowrap}
+.layer{position:absolute;inset:0;width:1200px;height:600px;overflow:visible;pointer-events:none}
+#over{z-index:6}
+.w{position:absolute;width:390px;height:130px;user-select:none;touch-action:none;z-index:2;filter:drop-shadow(0 7px 6px #000a)}
+.w.small{width:276px;height:78px}
+#a{--thread:#6a3f0f;--x1:#b4492a;--x2:#7a2e17;--accent:#a8431f}
+#b{--thread:#163f3b;--x1:#2d6d68;--x2:#1b4542;--accent:#2a6964}
+#c{--thread:#3f1c34;--x1:#7b3a63;--x2:#4b2140;--accent:#7b3a63}
+.casing{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.grip{position:absolute;top:6px;left:40px;right:40px;height:21px;border:0;background:none;color:#fbe9cc;cursor:grab;display:flex;justify-content:space-between;align-items:center;padding:0 8px;font-size:10px;letter-spacing:.6px;text-shadow:0 1px 0 #0007}
+.grip b{font:italic 400 15px/1 Georgia,serif;letter-spacing:.2px;color:#fff3dc;margin-right:7px}
+.grip:active{cursor:grabbing}
+.grip .dots{color:#fbe9cc99;letter-spacing:1px}
+.small .grip{left:24px;right:24px;top:4px;height:19px}
+/* Display: a smooth cotton patch sewn into the felt */
+.screen,.mini{position:absolute;overflow:hidden;color:#3a2a1e;border-radius:4px;
+ background:repeating-linear-gradient(0deg,#5a40280b 0 1px,transparent 1px 2.5px),repeating-linear-gradient(90deg,#5a40280b 0 1px,transparent 1px 2.5px),linear-gradient(170deg,#f8efdb,#efe2c6);
+ box-shadow:0 1px 1.5px #0006,inset 0 0 0 1px #6b4d3014;outline:1.4px dashed var(--thread);outline-offset:3px}
+.screen{left:45px;top:33px;width:300px;height:62px}
+.pages{height:100%;width:300%;display:flex;transition:transform 280ms cubic-bezier(.2,.7,.2,1)}
+.page{width:33.3333%;flex:none;padding:5px 12px;position:relative;overflow:hidden}
+.page .tiny{font-size:10px;line-height:1.4;color:#8c725b;letter-spacing:.2px}
+.page .big{display:flex;align-items:flex-end;gap:8px;height:23px;margin:2px 0 1px}
+.page .big em{font:italic 400 16px/1 Georgia,serif;color:var(--accent);padding-bottom:1px}
+.page strong{font:400 18px/1.15 Georgia,serif;display:block;color:#3a2a1e;margin:2px 0}
+.page small{font-size:11px;line-height:1.55;color:#5d4838;display:block}
+.xs svg{display:block}
+.bars{position:absolute;right:12px;top:8px}
+.tabline{position:absolute;left:50px;top:104px;display:flex;gap:12px}
+.tab{padding:0;background:none;border:0;color:#fff2dcb3;font-size:10px;letter-spacing:.5px;text-shadow:0 1px 0 #0008}
+.tab[aria-selected=true]{color:#fff8ea}
+.tab[aria-selected=true]:before{content:"";display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;vertical-align:0;background:radial-gradient(circle at 38% 32%,#fffaf0,#efd5a6 55%,#9b7442);box-shadow:0 1px 1px #0008}
+/* Felt buttons: domed circles with a stitched ring */
+.knob{position:absolute;top:101px;width:22px;height:22px;border-radius:50%;padding:0;border:0;color:#4a2c12;font:bold 10px/22px Arial,sans-serif;
+ background:radial-gradient(circle at 38% 30%,#fbebcb,#e5c08a 52%,#a77c48);outline:1px dashed #6b471f99;outline-offset:-5px;box-shadow:0 2px 2px #0008,inset 0 -1px 2px #0003}
+.knob.run{left:290px;background:radial-gradient(circle at 38% 30%,#f39a7c,#c4543a 55%,#7d2a19);color:#fff1e2;outline-color:#ffe0c299}
+.knob.next{left:322px}
+.knob:hover{filter:brightness(1.08)}
+.mini{left:17px;top:25px;width:212px;height:39px;padding:3px 10px;font-size:10px;line-height:1.35;color:#5d4838}
+.mini .xs{display:inline-block;vertical-align:-1px;margin-right:6px}
+.knot{position:absolute;left:243px;top:34px;width:19px;height:19px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#e3f7b9,#8fbf4f 50%,#3f6b1c);box-shadow:0 0 1.5px 1px #8fbf4f88,0 2px 2px #0008}
+.strip{position:absolute;left:40px;right:40px;top:6px;height:21px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 8px;pointer-events:none;opacity:0}
+.strip b{font:italic 400 15px/1 Georgia,serif;color:#fff3dc;text-shadow:0 1px 0 #0007}
+.strip span{padding:1px 9px;border-radius:3px;font-size:11px;color:#3a2a1e;background:linear-gradient(170deg,#f8efdb,#ecdcbd);box-shadow:0 1px 1px #0006;outline:1px dashed var(--thread);outline-offset:2px}
+.strip span em{font-style:normal;color:var(--accent);font-weight:600}
+.small .strip{left:24px;right:24px;top:4px}
+.hit{pointer-events:all;cursor:grab}
+.hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
+.ringfocus{opacity:0}
+.about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#c4af98;font-size:13px}
+.about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#f5dcc0}.about h2 small{font:11px -apple-system,sans-serif;color:#a8907a;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
+.about p{margin:0 0 6px}
+.hint{color:#98836f;font-size:12px}
+@media(max-width:800px){.about{grid-template-columns:1fr}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <pattern id="weave" width="3" height="3" patternUnits="userSpaceOnUse"><path d="M0 .5H3M1.5 0V3" stroke="#fff" stroke-opacity=".08" stroke-width=".8"/></pattern>
+ <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#efe9dc"/><stop offset=".45" stop-color="#a9a297"/><stop offset="1" stop-color="#5d574f"/></linearGradient>
+ <filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter>
+ <filter id="sh" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="1.3"/></filter>
+ <filter id="tagfelt" x="-40%" y="-25%" width="180%" height="150%" color-interpolation-filters="sRGB">
+  <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="5" result="n"/>
+  <feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G" result="d"/>
+  <feGaussianBlur in="d" stdDeviation="2" result="b"/>
+  <feDiffuseLighting in="b" surfaceScale="2.4" diffuseConstant="1.2" lighting-color="#fff4e6"><feDistantLight azimuth="235" elevation="56"/></feDiffuseLighting>
+  <feComposite in2="d" operator="arithmetic" k1="1"/>
+ </filter>
+</defs></svg>
+<header><div><h1>Felt <span>/ Claude skin study</span></h1><p>Stuffed wool felt casings, cotton display patches, cross-stitch numbers, felt buttons. <a href="index.html">All pages</a></p></div>
+<div class="controls" role="group" aria-label="Skin controls">
+ <div class="row" id="stateRow"><span>State</span></div>
+ <div class="row" id="joinRow"><span>Join</span></div>
+ <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
+</div></header>
+<div id="viewport"><main id="stage" aria-label="Felt skin stage">
+<div class="topline"><p id="status" role="status" aria-live="polite">Drag a nameplate toward the other cushion, or use the state buttons.</p><span id="phase"></span></div>
+
+<section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="a" aria-label="Move Jarvis"><span><b>Jarvis</b>agent control</span><span class="dots">⋮⋮</span></button>
+ <div class="screen" aria-label="Jarvis display"><div class="pages">
+  <div class="page"><div class="tiny">Jarvis / active workflow</div><div class="big"><span class="xs" data-x="03" data-c="3.1" role="img" aria-label="03"></span><em class="runText">agents running</em></div><small>Reviewing the capsule renderer</small><span class="bars" aria-hidden="true"></span></div>
+  <div class="page"><div class="tiny">Jarvis / current task</div><strong>Verify shell assembly</strong><small>12 checks passed · 2 queued</small></div>
+  <div class="page"><div class="tiny">Jarvis / event log</div><small>10:42 &nbsp;joined display state retained<br>10:43 &nbsp;waiting for your next action</small></div>
+ </div></div>
+ <div class="tabline" role="tablist" aria-label="Jarvis screens"><button class="tab" role="tab" data-page="0">Status</button><button class="tab" role="tab" data-page="1">Task</button><button class="tab" role="tab" data-page="2">Log</button></div>
+ <button class="knob run" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button><button class="knob next" aria-label="Next Jarvis screen" title="Next screen">›</button>
+ <div class="strip" aria-hidden="true"><b>Jarvis</b><span><em>03</em> agents running</span></div>
+</section>
+
+<section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="b" aria-label="Move GitDiscuss"><span><b>GitDiscuss</b>review queue</span><span class="dots">⋮⋮</span></button>
+ <div class="screen" aria-label="GitDiscuss display"><div class="pages">
+  <div class="page"><div class="tiny">GitDiscuss / incoming</div><div class="big"><span class="xs" data-x="02" data-c="3.1" role="img" aria-label="02"></span><em>need a decision</em></div><small>Capsule joining · design feedback</small></div>
+  <div class="page"><div class="tiny">GitDiscuss / selected discussion</div><strong>Shared casing geometry</strong><small>Brent · 4 comments · ready to review</small></div>
+  <div class="page"><div class="tiny">GitDiscuss / event log</div><small>10:41 &nbsp;feedback collected<br>10:43 &nbsp;no workflow links created</small></div>
+ </div></div>
+ <div class="tabline" role="tablist" aria-label="GitDiscuss screens"><button class="tab" role="tab" data-page="0">Queue</button><button class="tab" role="tab" data-page="1">Thread</button><button class="tab" role="tab" data-page="2">Log</button></div>
+ <button class="knob run" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button><button class="knob next" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+ <div class="strip" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em> need a decision</span></div>
+</section>
+
+<section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="dots">⋮⋮</span></button>
+ <div class="mini"><span class="xs" data-x="12 / 14" data-c="2.2" role="img" aria-label="12 of 14"></span>checks passed<br>2 waiting for approval</div><span class="knot" aria-hidden="true"></span>
+ <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
+</section>
+
+<svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
+</main></div>
+<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
+const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,ease=t=>t*t*(3-2*t),seg=(t,a,b)=>clamp((t-a)/(b-a));
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+const f=n=>Math.round(n*10)/10;
+
+/* ---------- Cross-stitch: a 5×7 matrix where every lit cell is an X ---------- */
+const GLYPH={0:'01110100011001110101110011000101110',1:'00100011000010000100001000010001110',2:'01110100010000100010001000100011111',3:'11111000100010000010000011000101110',4:'00010001100101010010111110001000010',
+ 5:'11111100001111000001000011000101110',6:'00110010001000011110100011000101110',7:'11111000010001000100010000100001000',8:'01110100011000101110100011000101110',9:'01110100011000101111000010001001100','/':'00001000100001000100010000100010000'};
+function xCell(cx,cy,c){const m=c*.2;return[`M${f(cx+m)} ${f(cy+c-m)}L${f(cx+c-m)} ${f(cy+m)}`,`M${f(cx+m)} ${f(cy+m)}L${f(cx+c-m)} ${f(cy+c-m)}`]}
+function xsvg(w,h,c,d1,d2){return `<svg width="${f(w)}" height="${f(h)}" viewBox="0 0 ${f(w)} ${f(h)}"><g fill="none" stroke-linecap="round" stroke-width="${f(c*.36)}"><path d="${d1}" style="stroke:var(--x2)"/><path d="${d2}" style="stroke:var(--x1)"/></g></svg>`}
+function xstitch(str,c){
+ let x=0,d1='',d2='';
+ for(const ch of str){if(ch===' '){x+=2;continue}const g=GLYPH[ch];for(let i=0;i<35;i++)if(g[i]==='1'){const[p,q]=xCell((x+i%5)*c,Math.floor(i/5)*c,c);d1+=p;d2+=q}x+=6}
+ return xsvg((x-1)*c,7*c,c,d1,d2);
+}
+function xbars(hs,c){let d1='',d2='';hs.forEach((n,i)=>{for(let r=0;r<n;r++){const[p,q]=xCell(i*c*1.6,(6-r)*c,c);d1+=p;d2+=q}});return xsvg(hs.length*c*1.6-c*.6,7*c,c,d1,d2)}
+$$('.xs').forEach(s=>s.innerHTML=xstitch(s.dataset.x,+s.dataset.c));
+$('.bars').innerHTML=xbars([2,4,3,5,3],2.9);
+
+/* ---------- Felt casing ---------- */
+const SKIN={a:{body:'#d0912f',band:'#a1631a',seed:3,r:[20,12,12,17]},b:{body:'#3f807a',band:'#2a5f5a',seed:9,r:[12,19,21,12]},c:{body:'#88506f',band:'#653953',seed:15,r:[15,12,16,13]}};
+// Rounded rect with its own radius per corner (tl,tr,br,bl), so each piece looks hand cut.
+function rr4(x,y,w,h,rs){const[a,b,c,d]=rs.map(r=>Math.max(1,Math.min(r,h/2,w/2)));
+ return `M${f(x+a)} ${f(y)}H${f(x+w-b)}Q${f(x+w)} ${f(y)} ${f(x+w)} ${f(y+b)}V${f(y+h-c)}Q${f(x+w)} ${f(y+h)} ${f(x+w-c)} ${f(y+h)}H${f(x+d)}Q${f(x)} ${f(y+h)} ${f(x)} ${f(y+h-d)}V${f(y+a)}Q${f(x)} ${f(y)} ${f(x+a)} ${f(y)}Z`}
+// Body felt: ragged fibre edge (displacement), stray-fibre halo, pillow puff (lighting on blurred alpha), fine light/dark fibre speckle.
+function feltFilters(id,s){return `
+<filter id="f-${id}" x="-4%" y="-12%" width="108%" height="124%" color-interpolation-filters="sRGB">
+ <feTurbulence class="boil" data-seed="${s}" type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="${s}" result="n"/>
+ <feDisplacementMap in="SourceGraphic" in2="n" scale="3.6" xChannelSelector="R" yChannelSelector="G" result="d"/>
+ <feTurbulence class="boil" data-seed="${s+1}" type="fractalNoise" baseFrequency="1.5 1.05" numOctaves="1" seed="${s+1}" result="fn"/>
+ <feMorphology in="d" operator="dilate" radius="1.7" result="dil"/>
+ <feComponentTransfer in="fn" result="fm"><feFuncA type="discrete" tableValues="0 0 0 0 0 .8 1 1"/></feComponentTransfer>
+ <feComposite in="dil" in2="fm" operator="in" result="halo"/>
+ <feGaussianBlur in="d" stdDeviation="4.5" result="b"/>
+ <feDiffuseLighting in="b" surfaceScale="3.2" diffuseConstant="1.18" lighting-color="#fff3e2" result="L"><feDistantLight azimuth="235" elevation="56"/></feDiffuseLighting>
+ <feComposite in="d" in2="L" operator="arithmetic" k1="1" result="lit"/>
+ <feColorMatrix in="fn" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  .6 0 0 0 -.22" result="dk"/>
+ <feComposite in="dk" in2="d" operator="in" result="dkIn"/>
+ <feColorMatrix in="fn" type="matrix" values="0 0 0 0 1  0 0 0 0 .95  0 0 0 0 .86  0 .5 0 0 -.24" result="lt"/>
+ <feComposite in="lt" in2="d" operator="in" result="ltIn"/>
+ <feMerge><feMergeNode in="halo"/><feMergeNode in="lit"/><feMergeNode in="dkIn"/><feMergeNode in="ltIn"/></feMerge>
+</filter>
+<filter id="g-${id}" x="-4%" y="-20%" width="108%" height="140%" color-interpolation-filters="sRGB">
+ <feTurbulence class="boil" data-seed="${s+2}" type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="${s+2}" result="n"/>
+ <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="d"/>
+ <feGaussianBlur in="d" stdDeviation="2.2" result="b"/>
+ <feDiffuseLighting in="b" surfaceScale="2" diffuseConstant="1.18" lighting-color="#fff3e2"><feDistantLight azimuth="235" elevation="56"/></feDiffuseLighting>
+ <feComposite in2="d" operator="arithmetic" k1="1"/>
+</filter>`}
+function casing(id,w,h){
+ const s=SKIN[id],small=id==='c',r=s.r,inset=r.map(v=>Math.max(3,v-6));
+ const bx=small?22:34,by=small?3:5,bh=small?20:22;
+ let o=`<defs>${feltFilters(id,s.seed)}</defs>`;
+ o+=`<path d="${rr4(2.5,6,w-5,h-4.5,r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/>`;
+ o+=`<path d="${rr4(EDGE,EDGE,w-2*EDGE,h-2*EDGE,r)}" fill="${s.body}" filter="url(#f-${id})"/>`;
+ const st=rr4(10,10,w-20,h-20,inset);
+ o+=`<path d="${st}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${st}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`;
+ const band=rr4(bx,by,w-2*bx,bh,[9,8,10,8]);
+ o+=`<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band}" fill="${s.band}" filter="url(#g-${id})"/>`;
+ o+=`<path d="${rr4(bx+3.5,by+3.5,w-2*bx-7,bh-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ return o;
+}
+function boil(fr){
+ for(const id of ['a','b'])$$('#'+id+' .boil').forEach(t=>t.setAttribute('seed',+t.dataset.seed+(fr<0?0:(fr%3)*31)));
+}
+
+/* ---------- Zipper geometry ---------- */
+const zTop=h=>EDGE+Math.min(14,(h-2*EDGE)*.3);
+// Where the slider sits (widget-local y) and how far the two halves lean apart, from join progress.
+function zipState(jt,h){
+ const z0=zTop(h),z1=h-z0,u=seg(jt,.5,.93);
+ const ys=jt<=.5?z1:lerp(z1,z0,u);
+ const th=jt<.4?TILT*ease(seg(jt,.04,.4)):jt<.5?TILT:TILT*(1-u);
+ return{z0,z1,ys,th,u};
+}
+const mixHex=(a,b,t)=>'#'+[0,2,4].map(i=>Math.round(lerp(parseInt(a.substr(i+1,2),16),parseInt(b.substr(i+1,2),16),t)).toString(16).padStart(2,'0')).join('');
+
+/* ---------- Options ---------- */
+const JOINS={
+ zipper:{label:'Zipper',kind:'Interlock',gap:-2*EDGE,
+  about:'Each cushion has a zipper half sewn along its joining edge: navy cotton tape with chunky red teeth, and the slider parked at the foot of Jarvis\'s half. <b>Near:</b> the teeth stand up off the tape and the felt pull swings down out of its tuck. <b>Ready:</b> both rows light up, tooth facing gap. Joining: the bottoms meet first and the two cushions lean apart in a V; the pull flips up, the slider climbs the seam and the V closes behind it, then the pull flops down and settles. <b>Release:</b> the pull is the grip. Drag it down and the sides part from the top, or click it, or focus it and press Enter.',
+  half(id,side,c,z,lift){
+   const m=model[id],ex=side>0?W-EDGE:EDGE,phi=(side>0?-1:1)*z.th,tx=side>0?ex-13:ex+3,P=7;
+   const tw=6.8+2.6*lift,body=mixHex('#8d4537','#e2563d',lift),hi=mixHex('#b07062','#ffa48a',lift),sh=.25+.45*lift;
+   // Tape and teeth between widget-local y0 and y1 (a tooth belongs to the run its centre falls in).
+   const run=(y0,y1,cap0,cap1)=>{
+    if(y1-y0<.5)return '';
+    const ty0=cap0?y0-5:y0,ty1=cap1?y1+5:y1;
+    let o=`<rect x="${tx}" y="${f(ty0)}" width="10" height="${f(ty1-ty0)}" rx="${cap0||cap1?3:0}" fill="#29324f"/><rect x="${tx}" y="${f(ty0)}" width="10" height="${f(ty1-ty0)}" fill="url(#weave)"/>`;
+    o+=`<path d="M${tx+(side>0?2.5:7.5)} ${f(Math.max(ty0,z.z0-2))}V${f(Math.min(ty1,z.z1+2))}" stroke="#f3e2c2" stroke-opacity=".8" stroke-width="1" stroke-dasharray="3 2.6"/>`;
+    let dk='',md='',lt='';
+    for(let y=z.z0+(side>0?0:P/2);y<=z.z1+.1;y+=P){if(y<y0||y>=y1)continue;const x0=ex-tw/2;
+     dk+=`M${f(x0+.8)} ${f(y-1.4+1.3*lift)}h${f(tw)}v3.6h${f(-tw)}z`;
+     md+=`M${f(x0+1.2)} ${f(y-1.9)}h${f(tw-2.4)}q1.2 0 1.2 1.2v1.4q0 1.2-1.2 1.2h${f(-(tw-2.4))}q-1.2 0-1.2-1.2v-1.4q0-1.2 1.2-1.2z`;
+     lt+=`M${f(x0+1.6)} ${f(y-1.1)}h${f(tw-3.2)}`}
+    return o+`<path d="${dk}" fill="#1a0a06" opacity="${f(sh)}"/><path d="${md}" fill="${body}" stroke="#4b1a12" stroke-width=".6"/><path d="${lt}" stroke="${hi}" stroke-width=".9" stroke-linecap="round" opacity=".9"/>`;
+   };
+   const meshed=z.th>.001&&z.ys<z.z1;
+   let s=`<g transform="translate(${f(m.x)} ${f(m.y)}) rotate(${f(phi*100)/100} ${ex} ${f(z.ys)})">`;
+   if(c.ghost>0)s+=`<rect x="${ex-15}" y="${f(z.z0-6)}" width="30" height="${f(z.z1-z.z0+12)}" rx="12" fill="#ffc36a" opacity="${f(c.ghost*.55)}" filter="url(#soft)"/>`;
+   // Above the slider the halves lean apart in a V; below it the chain is closed, so that part is drawn straight.
+   s+=meshed?run(z.z0,z.ys,true,false)+'</g>'+`<g transform="translate(${f(m.x)} ${f(m.y)})">`+run(z.ys,z.z1+.2,false,true):run(z.z0,z.z1+.2,true,true);
+   return s+'</g>';
+  },
+  tagAngle(c){
+   const jt=c.jt;
+   if(jt===0)return 72*(1-c.glow)+(c.ghost?-6:0);
+   if(jt<.4)return 72*(1-ease(seg(jt,0,.3)));
+   if(model.dir<0)return jt<1?-5:0;
+   if(jt<.5)return 180*ease(seg(jt,.4,.5));
+   if(jt<.93)return 177+(Math.round(jt*60)%2?3:-2);
+   const k=seg(jt,.93,1),q=seg(k,.45,1);return 180*(1-ease(seg(k,0,.6)))-20*Math.sin(q*Math.PI*2)*(1-q);
+  },
+  over(c){
+   const z=zipState(c.jt,c.h),lift=c.jt===1?.55:c.jt>0?1:c.glow;
+   let s=this.half('a',1,c,z,lift)+this.half('b',-1,c,z,lift);
+   const sx=model.a.x+W-EDGE,sy=model.a.y+z.ys,ang=this.tagAngle(c);
+   // Slider: wide mouth on top where the two rows enter, narrow throat below where they leave meshed.
+   s+=`<path d="M${f(sx-8.5)} ${f(sy-9)}H${f(sx+8.5)}L${f(sx+5.6)} ${f(sy+6)}Q${f(sx)} ${f(sy+8.6)} ${f(sx-5.6)} ${f(sy+6)}Z" fill="url(#metal)" stroke="#2e2a25" stroke-width=".9"/><rect x="${f(sx-2.4)}" y="${f(sy-5.5)}" width="4.8" height="9" rx="2.2" fill="#77716a" stroke="#2e2a25" stroke-width=".6"/>`;
+   // The pull: a felt teardrop on a small ring, the release grip.
+   s+=`<g transform="rotate(${f(ang)} ${f(sx)} ${f(sy+2)})"><circle cx="${f(sx)}" cy="${f(sy+4.5)}" r="2.8" fill="none" stroke="#3a3530" stroke-width="1.5"/>`;
+   const tag=`M${f(sx)} ${f(sy+6.5)}C${f(sx+9.5)} ${f(sy+11)} ${f(sx+10.5)} ${f(sy+26)} ${f(sx)} ${f(sy+34)}C${f(sx-10.5)} ${f(sy+26)} ${f(sx-9.5)} ${f(sy+11)} ${f(sx)} ${f(sy+6.5)}Z`;
+   const inner=`M${f(sx)} ${f(sy+11)}C${f(sx+6.4)} ${f(sy+14)} ${f(sx+7)} ${f(sy+25)} ${f(sx)} ${f(sy+30)}C${f(sx-7)} ${f(sy+25)} ${f(sx-6.4)} ${f(sy+14)} ${f(sx)} ${f(sy+11)}Z`;
+   s+=`<path d="${tag}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1 2)"/><path d="${tag}" fill="#bf3a2b" filter="url(#tagfelt)"/><path d="${inner}" fill="none" stroke="#f7e3c4" stroke-width="1" stroke-dasharray="2.2 2"/><circle cx="${f(sx)}" cy="${f(sy+22)}" r="2" fill="#f7e8cc"/><circle cx="${f(sx-.5)}" cy="${f(sy+21.4)}" r=".7" fill="#fff"/></g>`;
+   if(c.jt===1)s+=`<g class="hit" id="pullHit" tabindex="0" role="button" aria-label="Zipper pull: drag down or press Enter to unzip and separate the widgets"><title>Drag the pull down to unzip</title><rect x="${f(sx-14)}" y="${f(sy-11)}" width="28" height="50" rx="12" fill="transparent"/><rect class="ringfocus" x="${f(sx-14)}" y="${f(sy-11)}" width="28" height="50" rx="12" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
+   return s;
+  }
+ }
+};
+const SHADES={
+ deflate:{label:'Plain deflate',kind:'Page baseline',
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It keeps the shade state working until the felt shade modes (pocket, bolster, drawstring, pleats, woven label) are built and added here.'}
+};
+
+/* ---------- Model ---------- */
+const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'zipper',shade:'deflate',jt:0,st:0,dir:1,path:null,glow:0,ghost:0,busy:false};
+let anim=0,shadeAnim=0,drag=null;
+const J=()=>JOINS[model.join];
+
+function separatePose(){const g=J().gap;let ax=clamp(model.a.x,24,1200-2*W-g-SEP-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
+function joinedPose(fixed='a'){
+ const g=J().gap;
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
+ let ax=clamp(model.a.x,24,1200-2*W-g-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+}
+const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
+function setJt(t){
+ model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.4));
+ for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
+}
+// Stop-motion clock: the chrome is redrawn on 12 fps frames only, and the fibres boil once per frame.
+function stepped(ms,onFrame,token,isLive){
+ return new Promise(res=>{
+  if(reduce.matches||ms<=0){onFrame(1);boil(-1);return res(true)}
+  const t0=performance.now();let last=-1;
+  (function step(now){if(!isLive(token)){boil(-1);return res(false)}
+   const el=Math.max(0,now-t0),fr=Math.floor(el/FRAME);
+   if(el>=ms){onFrame(1);boil(-1);return res(true)}
+   if(fr!==last){last=fr;boil(fr);onFrame(fr*FRAME/ms)}
+   requestAnimationFrame(step)})(t0);
+ });
+}
+async function tween(from,to,ms,fn){
+ const token=++anim;model.busy=true;
+ const ok=await stepped(ms,t=>{fn(lerp(from,to,t));render()},token,k=>k===anim);
+ if(ok){model.busy=false;render()}return ok;
+}
+const say=t=>$('#status').textContent=t;
+
+// Joining time is shared out by phase, so the short catch and the pull's flop get enough 12 fps frames.
+const PH_JT=[0,.4,.5,.93,1],PH_T=[0,.3,.44,.74,1];
+const remap=(v,from,to)=>{for(let i=1;i<from.length;i++)if(v<=from[i])return lerp(to[i-1],to[i],(v-from[i-1])/(from[i]-from[i-1]));return 1};
+const jtOf=t=>remap(t,PH_T,PH_JT),timeOf=jt=>remap(jt,PH_JT,PH_T);
+async function doJoin(fixed='a',ms=1700){
+ if(model.jt===1)return;
+ model.dir=1;
+ if(!model.path||model.jt===0)model.path={s:here(),j:joinedPose(fixed)};
+ say('The teeth stand up, the bottoms meet, and the slider climbs the seam.');
+ const t0=timeOf(model.jt);
+ if(await tween(t0,1,ms*(1-t0),t=>setJt(jtOf(t)))){model.path=null;say('Zipped. Drag either nameplate to move the pair. Drag the red pull down to unzip.')}
+}
+async function doSeparate(){
+ if(model.jt===0)return;
+ model.dir=-1;
+ if(model.jt===1||!model.path)model.path={s:separatePose(),j:here()};
+ say('The slider runs down, the seam opens from the top, and the cushions part.');
+ if(await tween(model.jt,0,1300*model.jt,setJt)){model.path=null;say('Separate. Displays and pages were not touched.')}
+}
+function holdJoining(){
+ ++anim;model.busy=false;model.dir=1;
+ if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
+ setJt(.64);render();say('Held mid-zip. Use the scrubber to step through the animation.');
+}
+function toggleShade(){
+ const to=model.st>.5?0:1,start=model.st,token=++shadeAnim;
+ // Shade runs on its own clock so it can overlap a join.
+ stepped(560*Math.abs(to-start),t=>{model.st=lerp(start,to,t);render()},token,k=>k===shadeAnim);
+ say(to?'Shaded: the cushion deflates to its name band and one value.':'Unshaded: the stuffing comes back.');
+}
+
+/* ---------- Rendering ---------- */
+function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,ease(model.st))),jt:model.jt,glow:model.glow,ghost:model.ghost}}
+function render(){
+ const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,ease(model.st))),z=zipState(model.jt,c.h);
+ for(const id of ['a','b','c']){
+  const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
+  el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
+  const svg=el.querySelector('.casing'),key=w+'x'+h;
+  if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h)}
+  if(!small){const side=id==='a'?1:-1,phi=(side>0?-1:1)*z.th;
+   el.style.transformOrigin=`${side>0?W-EDGE:EDGE}px ${f(z.ys)}px`;el.style.transform=z.th>.001?`rotate(${f(phi*100)/100}deg)`:''}
+  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
+  el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
+  el.querySelector('.strip').style.opacity=f(strip);
+  if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
+   const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
+ }
+ $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
+ const focused=document.activeElement&&document.activeElement.id==='pullHit';
+ $('#over').innerHTML=j.over(c);
+ const hit=$('#pullHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
+ $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
+ $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
+ $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
+ $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
+ const ph={separate:'Separate · two cushions',joining:(model.jt<.4?'Joining · closing in ':model.jt<.5?'Joining · slider catches ':'Joining · zipping ')+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()};
+ $('#phase').textContent=(drag&&drag.pull?'Unzipping · '+Math.round(model.jt*100)+'%':drag&&drag.state==='ready'?'Ready · release to zip':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
+}
+
+/* ---------- Controls ---------- */
+const STATES=[['separate','Separate','1'],['joining','Joining','2'],['joined','Joined','3'],['shade','Shade','4']];
+STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.state=k;b.innerHTML=`<kbd>${key}</kbd>${l}`;b.onclick=()=>act(k);$('#stateRow').append(b)});
+function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
+function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
+function pick(key,id){
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='shade')model.shade=id;
+ describe();render();
+}
+function describe(){
+ const j=J(),s=SHADES[model.shade];
+ $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
+ $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
+}
+options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
+$('#scrub').oninput=e=>{++anim;model.busy=false;model.dir=1;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
+document.addEventListener('keydown',e=>{
+ if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
+ const key=e.key.toLowerCase();
+ if(e.key==='Escape')cancelDrag();
+ const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
+ if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
+});
+['a','b'].forEach(id=>{
+ const el=$('#'+id),m=model[id],name=id==='a'?'Jarvis':'GitDiscuss';
+ el.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{m.page=+t.dataset.page;render()});
+ el.querySelector('.next').onclick=()=>{m.page=(m.page+1)%3;render()};
+ el.querySelector('.run').onclick=()=>{m.run=!m.run;render();say(name+' simulated activity '+(m.run?'resumed.':'paused.'))};
+});
+
+/* ---------- Dragging with near / ready, and the zipper pull ---------- */
+function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:(e.clientX-r.left)/s,y:(e.clientY-r.top)/s}}
+function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
+stage.addEventListener('pointerdown',e=>{
+ if(e.button!==0)return;
+ if(e.target.closest('#pullHit')&&model.jt===1){
+  e.preventDefault();++anim;model.busy=false;model.dir=-1;model.path={s:separatePose(),j:here()};
+  drag={pull:true,start:local(e),moved:false};stage.setPointerCapture(e.pointerId);render();return;
+ }
+ const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
+ const id=g.dataset.drag,p=local(e);
+ // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
+ if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null}
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
+ stage.setPointerCapture(e.pointerId);
+});
+stage.addEventListener('pointermove',e=>{
+ if(!drag)return;const p=local(e),dx=p.x-drag.start.x,dy=p.y-drag.start.y;
+ if(drag.pull){
+  // The pull follows the pointer down the seam; letting go below halfway unzips the rest.
+  if(Math.abs(dy)>3)drag.moved=true;const z=zipState(1,ctx().h),travel=z.z1-z.z0;
+  setJt(dy<=2?.96:clamp(.93-.43*dy/travel,.42,.96));render();return;
+ }
+ const s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
+ if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,10,1200-CW-10);model.c.y=clamp(s.c.y+dy,top,600-CH-10);render();return}
+ if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,top,bottom)};
+ const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
+ drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
+ const pull=drag.state==='ready'?.88:drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
+ m.x=lerp(raw.x,t.x,pull);m.y=lerp(raw.y,t.y,pull);
+ model.glow=drag.state==='ready'?1:drag.state==='near'?.18+.5*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
+ model.ghost=drag.state==='ready'?1:0;
+ if(drag.state==='ready')say('Ready: the teeth line up. Release to zip.');else if(drag.state==='near')say('Nearby: the zipper teeth stand up and the pull swings out. Move closer.');
+ render();
+});
+function endDrag(){
+ if(!drag)return;const d=drag;drag=null;
+ if(d.pull){if(!d.moved||model.jt<.75)doSeparate();else{model.dir=1;tween(model.jt,1,260,setJt).then(ok=>{if(ok){model.path=null;say('Zipped back up.')}})}return}
+ const ready=d.state==='ready';model.glow=0;model.ghost=0;
+ if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',1300)}else render();
+}
+function cancelDrag(){
+ if(!drag)return;const d=drag;drag=null;
+ if(d.pull){++anim;model.busy=false;setJt(1);model.path=null;render();say('Unzip cancelled.');return}
+ const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=model.ghost=0;render();say('Move cancelled.');
+}
+stage.addEventListener('pointerup',endDrag);
+stage.addEventListener('pointercancel',cancelDrag);
+$$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
+ const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
+ const id=b.dataset.drag;
+ if(model.jt>0&&model.jt<1&&id!=='c')return;
+ const bottom=600-(model.st>.5?HS:H)-14;
+ if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],10,1200-w-10);m.y=clamp(m.y+k[1],46,id==='c'?600-CH-10:bottom)}render();
+}));
+
+function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
+addEventListener('resize',fit);fit();describe();render();
+window.feltSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade};
+</script></body></html>
