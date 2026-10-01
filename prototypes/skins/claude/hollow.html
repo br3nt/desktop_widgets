@@ -73,6 +73,19 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .strip b{font:400 12px/1 Georgia,serif;letter-spacing:3.4px;text-transform:uppercase;color:var(--chalk);text-shadow:0 1px 1px #000}
 .strip span{padding:1px 9px;font:11px Georgia,serif;color:#231b14;border-radius:2px 4px 2px 3px;background:radial-gradient(ellipse at 50% 30%,#f5eedb,#e2d3b0);box-shadow:0 0 0 1.3px #05070b}
 .strip span em{font-style:normal;color:#8f1c22;font-weight:700}
+/* Cocoon shade: silk drawn over the shell, a lit slit carrying name and value */
+.cocoon{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.cocoon .wraps,.cocoon .silkbody,.cocoon .slit{transition:transform 380ms cubic-bezier(.3,1.6,.5,1),opacity 380ms;transform-box:fill-box;transform-origin:50% 50%}
+.w.cocooned:is(:has(:focus-visible),.loose) .cocoon .wraps{transform:scale(1.015,1.17);opacity:.5}
+.w.cocooned:is(:has(:focus-visible),.loose) .cocoon .silkbody{transform:scale(1.01,1.09)}
+.w.cocooned:is(:has(:focus-visible),.loose) .cocoon .slit{transform:scaleY(1.3)}
+@media(prefers-reduced-motion:reduce){.cocoon .wraps,.cocoon .silkbody,.cocoon .slit{transition:none}}
+@media(hover:hover){.w.cocooned:hover .cocoon .wraps{transform:scale(1.015,1.17);opacity:.5}.w.cocooned:hover .cocoon .silkbody{transform:scale(1.01,1.09)}.w.cocooned:hover .cocoon .slit{transform:scaleY(1.3)}}
+.cseam{position:absolute;left:0;top:0;height:16px;display:flex;align-items:center;gap:7px;white-space:nowrap;pointer-events:none;opacity:0;padding:0 1px}
+.cseam b{font:400 10.5px/1 Georgia,serif;letter-spacing:2.4px;text-transform:uppercase;color:#24190f}
+.cseam i{font:normal 6px/1 Georgia,serif;color:#9c2028}
+.cseam span{font:italic 11px/1 Georgia,serif;color:#3a2c1e}
+.cseam em{font-style:normal;font-weight:700;color:#8f1c22;margin-right:3px}
 .hit{pointer-events:all;cursor:crosshair}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -91,6 +104,11 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="eyeGlow"><stop stop-color="#fff4d0" stop-opacity=".9"/><stop offset=".45" stop-color="#ffd27a" stop-opacity=".35"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
  <filter id="wob" x="-5%" y="-30%" width="110%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="2.4" xChannelSelector="R" yChannelSelector="G"/></filter>
  <filter id="chitin" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency=".9 .25" numOctaves="2" seed="9" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 .8  0 0 0 0 .86  0 0 0 0 .95  0 0 0 -1.1 .62" result="g"/><feComposite in="g" in2="SourceGraphic" operator="in" result="gi"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="gi"/></feMerge></filter>
+ <linearGradient id="silk" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f1f4f8"/><stop offset=".4" stop-color="#c9d2de"/><stop offset=".8" stop-color="#7f8ca0"/><stop offset="1" stop-color="#55617a"/></linearGradient>
+ <radialGradient id="silkGlow"><stop stop-color="#fff" stop-opacity=".95"/><stop offset=".4" stop-color="#e6eef8" stop-opacity=".35"/><stop offset="1" stop-color="#e6eef8" stop-opacity="0"/></radialGradient>
+ <linearGradient id="slitAmber" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f2c56e"/><stop offset=".3" stop-color="#fff3d6"/><stop offset=".7" stop-color="#fbe6b6"/><stop offset="1" stop-color="#e2a54c"/></linearGradient>
+ <linearGradient id="slitCold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a9c0dc"/><stop offset=".3" stop-color="#f1f5fa"/><stop offset=".7" stop-color="#dfe8f2"/><stop offset="1" stop-color="#8ea8c8"/></linearGradient>
+ <linearGradient id="slitTeal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8fd9c7"/><stop offset=".3" stop-color="#effcf7"/><stop offset=".7" stop-color="#d6f3ea"/><stop offset="1" stop-color="#6dc2ae"/></linearGradient>
  <filter id="blur3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
 </defs></svg>
 <header><div><h1>Hollow mood <span>/ Claude skin study</span></h1><p>Dark carapace shells with brush-ink outlines, scalloped belly plates, wrought-iron scrolls with small lanterns, and parchment map sheets pinned on as displays. <a href="index.html">All pages</a></p></div>
@@ -114,6 +132,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="tabline" role="tablist" aria-label="Jarvis screens"><button class="tab" role="tab" data-page="0">Status</button><button class="tab" role="tab" data-page="1">Task</button><button class="tab" role="tab" data-page="2">Log</button></div>
  <button class="knob run" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button><button class="knob next" aria-label="Next Jarvis screen" title="Next screen">›</button>
  <div class="strip" aria-hidden="true"><b>Jarvis</b><span><em>03</em> agents running</span></div>
+ <svg class="cocoon" aria-hidden="true"></svg><div class="cseam" aria-hidden="true"><b>Jarvis</b><i>◆</i><span><em>03</em><span class="runText">agents running</span></span></div>
 </section>
 
 <section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg>
@@ -126,12 +145,14 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="tabline" role="tablist" aria-label="GitDiscuss screens"><button class="tab" role="tab" data-page="0">Queue</button><button class="tab" role="tab" data-page="1">Thread</button><button class="tab" role="tab" data-page="2">Log</button></div>
  <button class="knob run" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button><button class="knob next" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
  <div class="strip" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em> need a decision</span></div>
+ <svg class="cocoon" aria-hidden="true"></svg><div class="cseam" aria-hidden="true"><b>GitDiscuss</b><i>◆</i><span><em>02</em>need a decision</span></div>
 </section>
 
 <section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
  <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="orn" aria-hidden="true">◆</span></button>
  <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="lampdot" aria-hidden="true"></span>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
+ <svg class="cocoon" aria-hidden="true"></svg><div class="cseam" aria-hidden="true"><b>Checks</b><i>◆</i><span><em>12 / 14</em>passed</span></div>
 </section>
 
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
@@ -189,7 +210,7 @@ function casing(id,w,h,lit){
  const right=join?`L${R} ${h-4}`:`C${w-10} ${top+6} ${w-3} ${f(h*.22)} ${w-2} ${f(h*.45)}C${w-1} ${f(h*.62)} ${w-6} ${h-4} ${w-24} ${h-4}`;
  const body=`M24 ${h-4}${left}${arch}${right}${bl.s}Z`;
  const E=join?R-10:R;
- let o='';
+ let o='<g class="body">';
  // Brush-ink outline: a heavier underside (the body shifted down in ink) and a wobbling stroke.
  o+=`<path d="${body}" fill="${INK}" transform="translate(0 2.6)"/>`;
  o+=`<path d="${body}" fill="url(#shell)" filter="url(#chitin)"/><path d="${body}" fill="url(#sheen)"/>`;
@@ -200,7 +221,7 @@ function casing(id,w,h,lit){
  o+=`<path d="M19 ${h-9}C11 ${f(h*.72)} 11 ${f(h*.42)} 21 ${top+17}" stroke="${INK}" stroke-width="1.6" opacity=".85"/><path d="M20.4 ${h-10}C12.6 ${f(h*.72)} 12.6 ${f(h*.42)} 22.4 ${top+18}" stroke="#c9d6e6" stroke-width=".8" opacity=".25"/>`;
  if(!join)o+=`<path d="M${w-19} ${h-9}C${w-11} ${f(h*.72)} ${w-11} ${f(h*.42)} ${w-21} ${top+17}" stroke="${INK}" stroke-width="1.6" opacity=".85"/>`;
  o+=`<path d="${bl.lips}" stroke="#c9d6e6" stroke-width=".9" opacity=".22"/><path d="${bl.notch}" stroke="${INK}" stroke-width="1.4"/></g>`;
- o+=`<path d="${body}" fill="none" stroke="${INK}" stroke-width="2.3" stroke-linejoin="round" filter="url(#wob)"/>`;
+ o+=`<path d="${body}" fill="none" stroke="${INK}" stroke-width="2.3" stroke-linejoin="round" filter="url(#wob)"/></g>`;
  // Iron scroll and its lantern.
  o+=`<g filter="url(#wob)"><path d="${taper(SCROLL,6,1.4)}" fill="#0b0e14"/><circle cx="${f(SCROLL[44][0])}" cy="${f(SCROLL[44][1])}" r="1.5" fill="#0b0e14"/></g>`;
  o+=`<path d="${taper(SCROLL.slice(0,20),1.4,.3)}" fill="#7d8ca3" opacity=".55" transform="translate(-.6 -.8)"/>`;
@@ -264,8 +285,61 @@ const JOINS={
 };
 const SHADES={
  draw:{label:'Plain draw-in',kind:'Page baseline',
-  about:'Not a brainstorm item. The shell draws in until only its dorsal plate, chalk nameplate and a scrap of parchment with one value remain; the iron scroll and lantern stay. It keeps the shade state working until the Hollow shade modes (cocoon, curl, hanging sign, fog sink, map roll) are built and added here. Shading while joined keeps the lacing, pulled closer.'}
+  about:'Not a brainstorm item. The shell draws in until only its dorsal plate, chalk nameplate and a scrap of parchment with one value remain; the iron scroll and lantern stay. It keeps the shade state working until the Hollow shade modes (cocoon, curl, hanging sign, fog sink, map roll) are built and added here. Shading while joined keeps the lacing, pulled closer.',
+  sayIn:'Shaded: the shell draws in to its dorsal plate, nameplate and one value.',sayOut:'Unshaded: the shell opens again.'},
+ cocoon:{label:'Cocoon',kind:'Cinch',linear:true,msIn:1900,msOut:1100,
+  cinch:s=>ease(seg(s,.08,.72)),
+  about:'The parchment is taken down and a point of white silk starts spinning at the outer tip of the shell. It runs the length of the body in one quick pass, darts back the other way to cross it, and with every turn the shell is cinched slimmer, until the carapace is gone under a pale spindle of silk with pointed ends, tethered to its iron scroll. The silk pulls taut with a small squeeze, then one seam splits open along the middle and light comes through it: amber while the widget is running, cold white when paused, sea-green for Checks. The name and the one key value sit in that lit seam in dark ink. <b>Hover</b> (or tap, or focus the nameplate) loosens the wrap: the threads slacken and the seam opens wider. The eyelet strap stays outside the silk, so cocooned shells still lace together. Unshading unspins it in reverse.',
+  sayIn:'Cocooned: silk spun round each shell, one lit seam carrying the name and value. Hover or tap to loosen.',sayOut:'The silk unspins and the shells open out again.'}
 };
+
+/* ---------- Cocoon: silk spun round the shell, drawn per frame only while it changes ---------- */
+function qsplit(p0,p1,p2,u){const a={x:lerp(p0.x,p1.x,u),y:lerp(p0.y,p1.y,u)},b={x:lerp(p1.x,p2.x,u),y:lerp(p1.y,p2.y,u)};return[a,{x:lerp(a.x,b.x,u),y:lerp(a.y,b.y,u)}]}
+function cocoon(el,id,w,h,s,tone){
+ const svg=el.querySelector('.cocoon'),seam=el.querySelector('.cseam'),on=model.shade==='cocoon'&&s>0;
+ el.classList.toggle('cocooned',model.shade==='cocoon'&&s>=1);if(!on||s<1)el.classList.remove('loose');
+ if(!on){if(svg.dataset.k){svg.innerHTML='';svg.dataset.k=''}seam.style.opacity=0;return}
+ const tw=seam.offsetWidth,key=[w,h,f(s*1000),tone,tw].join();if(svg.dataset.k===key)return;svg.dataset.k=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const join=id!=='c',L=8,R=join?w-21:w-8,len=R-L,cy=h/2;
+ // The envelope starts as the boxy shell and sharpens into a spindle; it squeezes once as the silk pulls taut.
+ const e=lerp(.12,.62,seg(s,.2,.75)),hh=(h/2-3)*(1-.09*Math.sin(Math.PI*seg(s,.72,.86)));
+ const prof=x=>{const u=clamp((x-L)/len);return Math.pow(Math.sin(Math.PI*u),e)*(1+.1*(u-.5))};
+ const top=x=>cy-hh*prof(x),bot=x=>cy+hh*1.05*prof(x);
+ let up=[],dn=[];for(let i=0;i<=40;i++){const x=L+len*i/40;up.push(f(x)+' '+f(top(x)));dn.unshift(f(x)+' '+f(bot(x)))}
+ const shape='M'+up.join('L')+'L'+dn.join('L')+'Z',fill=seg(s,.22,.66);
+ let o='';
+ // Silk tether to the iron scroll, then the silk body with an ink outline and a chalk ridge.
+ const sc=SCROLL[40],tet=seg(s,.55,.75);
+ if(tet>0)o+=`<path d="M${L+6} ${f(cy-2)}Q${f(L-6)} ${f(cy-16)} ${f(lerp(L+6,sc[0],tet))} ${f(lerp(cy-2,sc[1],tet))}" fill="none" stroke="#e8eef5" stroke-width=".9" opacity=".75"/>`;
+ if(fill>0)o+=`<g class="silkbody" opacity="${f(fill*100)/100}"><path d="${shape}" fill="${INK}" transform="translate(0 2.2)"/><path d="${shape}" fill="url(#silk)"/>`+
+  `<path d="M${L+len*.12} ${f(top(L+len*.12)+2.4)}Q${L+len*.5} ${f(cy-hh*1.06+2)} ${L+len*.88} ${f(top(L+len*.88)+2.4)}" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>`+
+  `<path d="${shape}" fill="none" stroke="${INK}" stroke-width="2" stroke-linejoin="round" filter="url(#wob)"/></g>`;
+ // Two passes of silk: out along the body, then back to cross it. Each turn is cinched to the envelope as it is now.
+ const n=Math.max(7,Math.round(len/15)),d=len/n,sl=d*.75;let wr='',tip=null;
+ for(const pass of [0,1])for(let i=0;i<n;i++){
+  const t0=pass?lerp(.42,.7,i/n):lerp(.1,.4,i/n),u=seg(s,t0,t0+.45/n);if(u<=0)continue;
+  const xm=pass?R-(i+.5)*d:L+(i+.5)*d,sg=pass?-1:1,xa=clamp(xm+sl*sg,L,R),xb=clamp(xm-sl*sg,L,R);
+  let p0={x:xa,y:top(xa)},p2={x:xb,y:bot(xb)};if(pass)[p0,p2]=[p2,p0];
+  const p1={x:(xa+xb)/2+2.5*sg,y:cy},[q,b]=u<1?qsplit(p0,p1,p2,u):[p1,p2],dd=`M${P(p0)}Q${P(q)} ${P(b)}`;
+  wr+=`<path d="${dd}" stroke="${INK}" stroke-width="2.3" opacity=".5"/><path d="${dd}" stroke="#eef2f7" stroke-width="1.05"/>`;
+  if(u<1)tip=b;
+ }
+ if(wr)o+=`<g class="wraps" fill="none" stroke-linecap="round">${wr}</g>`;
+ // The anchor knot at the outer tip, and stray filaments at both ends once it is spun.
+ const an=seg(s,.04,.1);if(an>0)o+=`<circle cx="${L+3}" cy="${f(cy)}" r="${f(2.2*an)}" fill="#eef2f7" stroke="${INK}" stroke-width=".7"/>`;
+ const fl=seg(s,.7,.8);if(fl>0)o+=`<g fill="none" stroke="#e8eef5" stroke-width=".7" stroke-linecap="round" opacity="${f(fl*.8)}"><path d="M${L} ${f(cy)}q-5 2 -9 -1M${L} ${f(cy+1)}q-4 4 -6 7${join?'':`M${R} ${f(cy)}q5 -2 8 1M${R} ${f(cy+1)}q3 4 7 5`}"/></g>`;
+ if(tip)o+=`<circle cx="${f(tip.x)}" cy="${f(tip.y)}" r="9" fill="url(#silkGlow)"/><circle cx="${f(tip.x)}" cy="${f(tip.y)}" r="1.6" fill="#fff"/>`;
+ // One lit seam splits open along the middle, sized to its words.
+ const op=Math.max(0,backOut(seg(s,.74,.9)));
+ const cx=L+len*.5;
+ if(op>0){const sw=Math.min(tw+34,len*.86),x0=cx-sw/2,x1=cx+sw/2,hs=9*op,glow={amber:'#ffc560',cold:'#bcd6ff',teal:'#8fe8d2'}[tone];
+  const sp=`M${f(x0)} ${f(cy)}Q${f(x0+12)} ${f(cy-hs)} ${f(x0+26)} ${f(cy-hs)}H${f(x1-26)}Q${f(x1-12)} ${f(cy-hs)} ${f(x1)} ${f(cy)}Q${f(x1-12)} ${f(cy+hs)} ${f(x1-26)} ${f(cy+hs)}H${f(x0+26)}Q${f(x0+12)} ${f(cy+hs)} ${f(x0)} ${f(cy)}Z`;
+  o+=`<g class="slit"><path d="${sp}" fill="none" stroke="${glow}" stroke-width="8" opacity="${f(.65*op)}" filter="url(#blur3)"/><path d="${sp}" fill="url(#slit${tone[0].toUpperCase()+tone.slice(1)})" stroke="${INK}" stroke-width="1.3"/>`+
+   `<path d="M${f(x0+3)} ${f(cy-.6)}Q${f(x0+12)} ${f(cy-hs-1.2)} ${f(x0+26)} ${f(cy-hs-1.2)}H${f(x1-26)}Q${f(x1-12)} ${f(cy-hs-1.2)} ${f(x1-3)} ${f(cy-.6)}" fill="none" stroke="#f6f8fb" stroke-width="1.5" stroke-linecap="round" opacity=".85"/></g>`}
+ svg.innerHTML=id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${o}</g>`:o;
+ seam.style.left=f((id==='b'?w-cx:cx)-tw/2)+'px';seam.style.top=f(cy-8)+'px';seam.style.opacity=f(seg(s,.82,.96));
+}
 
 /* ---------- Thread, needle and flash drawing ---------- */
 function thread(p,q,sag,op){const c={x:(p.x+q.x)/2,y:(p.y+q.y)/2+sag},d=`M${P(p)}Q${P(c)} ${P(q)}`;
@@ -347,28 +421,32 @@ function holdJoining(){
  setJt(.6);render();say('Held mid-join: the needle on its second pass. Use the scrubber to step through the animation.');
 }
 function toggleShade(){
- const to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=520*Math.abs(to-start),t0=performance.now();
- (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,ease(t));render();if(t<1)requestAnimationFrame(step)})(t0);
- say(to?'Shaded: the shell draws in to its dorsal plate, nameplate and one value.':'Unshaded: the shell opens again.');
+ const sh=SHADES[model.shade],to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||520)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));render();if(t<1)requestAnimationFrame(step)})(t0);
+ say(to?sh.sayIn:sh.sayOut);
 }
+// How far the shell has cinched toward its shaded height.
+const cinch=()=>{const s=SHADES[model.shade];return s.cinch?s.cinch(model.st):ease(model.st)};
 
 /* ---------- Rendering ---------- */
-function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,ease(model.st))),jt:model.jt,glow:model.glow}}
+function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,cinch())),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,ease(model.st)));
+ const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,cinch())),coc=model.shade==='cocoon',s=model.st;
+ $$('#a .runText').forEach(n=>n.textContent=model.a.run?'agents running':'agents paused');
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
-  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  const k=ease(s),show=coc?1-seg(s,0,.2):1-clamp(k*2.2),strip=coc?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
-  el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
+  el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
+  svg.querySelector('.body').style.opacity=coc?f(1-seg(s,.42,.74)):'';
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
- $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
  const focused=document.activeElement&&document.activeElement.id==='seamHit';
  $('#over').innerHTML=j.over(c);
  const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();model.cut=autoCut();doSeparate()}};if(focused)hit.focus()}
@@ -427,7 +505,7 @@ stage.addEventListener('pointerdown',e=>{
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1;model.cut=null}
- drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle',touch:e.pointerType!=='mouse'};
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
@@ -436,6 +514,7 @@ stage.addEventListener('pointermove',e=>{
   if(drag.len>=34){const d=drag;drag=null;$('#a .grip').focus();model.cut=Math.hypot(p.x-d.p0.x,p.y-d.p0.y)>8?{x1:d.p0.x,y1:d.p0.y,x2:p.x,y2:p.y}:autoCut();doSeparate();return}
   render();return}
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
+ drag.moved=Math.max(drag.moved||0,Math.hypot(dx,dy));
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
  if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,30,1200-2*W-g-30),ay=clamp(s.a.y+dy,TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,30,1200-W-30),y:clamp(s[id].y+dy,TOP,bottom)};
@@ -450,6 +529,8 @@ stage.addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.slash){if(d.len<5){$('#a .grip').focus();model.cut=autoCut();doSeparate()}else{render();say('Too short to cut. Slash right through the threads.')}return}
+ // A tap on a cocooned nameplate loosens or retightens its silk (hover does the same with a mouse).
+ if(d.touch&&!(d.moved>4)){const el=$('#'+d.id);if(el.classList.contains('cocooned'))el.classList.toggle('loose')}
  if(d.state==='ready'){model.ready=true;model.poised=true;model.path=null;doJoin(d.id==='b'?'a':'b',2100)}else{model.glow=0;render()}
 }
 function cancelDrag(){
