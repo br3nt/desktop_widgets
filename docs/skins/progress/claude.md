@@ -4,7 +4,8 @@ One item per run, in this order. Aesthetics are interleaved so none waits long. 
 
 - [x] **wire** · Join: jump ring (Hinge). Brass ring swings through eye loops on each end and twists shut; click the ring to open
   - Built in `wire.html`, which is a new page: copper wire frames, coiled cabochon displays and bead buttons. Loops warm when near, a ghost ring shows when ready, the ring threads and twists shut, and clicking it opens it again. A "plain tuck" baseline shade is included so the shade state works.
-- [ ] **felt** · Join: zipper (Interlock). Teeth lift on approach, the pull runs the seam; the pull is the release grip
+- [x] **felt** · Join: zipper (Interlock). Teeth lift on approach, the pull runs the seam; the pull is the release grip
+  - Built in `felt.html`, a new page: filter-puffed felt cushions, cotton patches, cross-stitch digits. The teeth stand up when near and light when ready. The cushions lean into a V and the slider climbs it in 12 fps stop-motion. Drag the felt pull down (or click it, or press Enter) to unzip. A "plain deflate" baseline shade is included. Not yet checked in a browser.
 - [ ] **gothic** · Join: half-rose window (Interlock). Halves rotate into alignment; the full rose is the indicator; turn it to release
 - [ ] **hollow** · Join: silk stitch (Bind). A needle darts red thread through eyelets and pulls taut; slash to release
 - [ ] **elven** · Join: vine (Grow). Tendrils reach, spiral round each other and leaf out; drag apart to unwind
