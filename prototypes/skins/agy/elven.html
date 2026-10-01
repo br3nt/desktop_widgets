@@ -1,0 +1,1962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Elven &amp; Intricate Skin — Desktop Widgets</title>
+<style>
+:root {
+  color-scheme: dark;
+  --star-silver-bright: #f0f7fb;
+  --star-silver: #c8dbe6;
+  --star-silver-mid: #7e9bb0;
+  --star-silver-dark: #374d5d;
+  --star-silver-deep: #16222b;
+  --electrum-gold: #f5e4a8;
+  --electrum-warm: #d8ba66;
+  --nephrite-jade: #38d9a9;
+  --nephrite-jade-bright: #7bf2c6;
+  --nephrite-jade-deep: #0c5744;
+  --moonstone-blue: #a5d8ff;
+  --starlight-white: #ffffff;
+  --obsidian-bg: #070d11;
+  --stage-bg: #0b1116;
+  --screen-bg: #050a0e;
+  --screen-border: #1a2d38;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--stage-bg);
+  color: #d6e5ef;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  overflow-x: hidden;
+}
+
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .4; cursor: default; }
+button:focus-visible, a:focus-visible, select:focus-visible {
+  outline: 2px solid var(--nephrite-jade-bright);
+  outline-offset: 3px;
+}
+a { color: var(--nephrite-jade-bright); text-underline-offset: 3px; }
+
+/* Header Navigation & Aesthetic Toolbar */
+header {
+  padding: 16px 24px;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #1c2b36;
+  background: linear-gradient(180deg, #131e26 0%, #0d151b 100%);
+}
+.header-titles h1 {
+  font-size: 20px;
+  letter-spacing: -0.4px;
+  margin: 0;
+  font-weight: 600;
+  color: var(--star-silver-bright);
+}
+.header-titles h1 span {
+  font-weight: 400;
+  color: var(--nephrite-jade-bright);
+  font-size: 15px;
+}
+.header-titles p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #8aa4b5;
+}
+
+.controls-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #111b22;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid #223543;
+}
+.control-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8da7b8;
+  margin-right: 4px;
+}
+.controls-bar button, .controls-bar select {
+  border: 1px solid #2e4454;
+  background: linear-gradient(180deg, #1d2a34, #141f27);
+  color: var(--star-silver-bright);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 120ms ease;
+}
+.controls-bar button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #283a48, #1b2934);
+  border-color: #4a6c84;
+}
+.controls-bar button.active, .controls-bar button[aria-pressed="true"] {
+  border-color: var(--nephrite-jade-bright);
+  color: #ffffff;
+  background: linear-gradient(180deg, #1b453a, #102d25);
+  box-shadow: 0 0 8px rgba(123, 242, 198, 0.4);
+}
+.controls-bar .primary-btn {
+  border-color: #2e8b6b;
+  background: linear-gradient(180deg, #1f5a48, #13392e);
+  color: #e6fff6;
+}
+.controls-bar .primary-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #2b7760, #1a4d3e);
+  border-color: var(--nephrite-jade-bright);
+}
+
+/* Stage Viewport */
+#viewport {
+  overflow: auto;
+  background:
+    radial-gradient(ellipse at 50% 28%, #162633 0%, #0a1015 75%),
+    radial-gradient(circle at 82% 82%, rgba(56, 217, 169, 0.08) 0%, transparent 50%);
+  position: relative;
+  min-height: 720px;
+}
+#stage {
+  position: relative;
+  width: 1200px;
+  height: 720px;
+  margin: auto;
+  overflow: hidden;
+  touch-action: none;
+  background:
+    radial-gradient(circle at 600px 140px, rgba(123, 242, 198, 0.04) 0%, transparent 60%),
+    repeating-linear-gradient(60deg, transparent 0 180px, rgba(165, 216, 255, 0.012) 181px 360px);
+}
+
+.topline {
+  position: absolute;
+  top: 18px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+}
+.topline p {
+  margin: 0;
+  color: #9cb5c6;
+  font-size: 13px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+#phase {
+  font: 11px/1.4 "Courier New", monospace;
+  color: var(--nephrite-jade-bright);
+  background: rgba(13, 22, 29, 0.9);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #233745;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Hardware and SVG Canvas */
+#stage-svg {
+  position: absolute;
+  inset: 0;
+  width: 1200px;
+  height: 720px;
+  pointer-events: none;
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.7));
+}
+
+/* Modules: Jarvis (a) & GitDiscuss (b) */
+.module {
+  position: absolute;
+  width: 390px;
+  height: 130px;
+  user-select: none;
+  touch-action: none;
+  isolation: isolate;
+  transition: height 260ms cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+.module.shade {
+  height: 44px;
+}
+.module-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+  transition: height 260ms cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+.module.shade .module-svg {
+  height: 44px;
+}
+
+/* Star-Silver Grip & Botanical Tiara Bar */
+.elven-grip {
+  position: absolute;
+  top: 6px;
+  left: 44px;
+  width: 284px;
+  height: 22px;
+  cursor: grab;
+  background: none;
+  border: 0;
+  color: var(--star-silver-bright);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+.elven-grip:active { cursor: grabbing; }
+.elven-grip .rune-mark {
+  color: var(--nephrite-jade-bright);
+  margin-right: 6px;
+  font-size: 12px;
+  text-shadow: 0 0 6px rgba(123, 242, 198, 0.6);
+}
+
+/* Crystalline Obsidian Screen */
+.elven-screen {
+  position: absolute;
+  left: 46px;
+  top: 32px;
+  width: 292px;
+  height: 64px;
+  background: var(--screen-bg);
+  border-radius: 6px;
+  border: 1px solid var(--screen-border);
+  box-shadow:
+    inset 0 3px 10px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(126, 155, 176, 0.3),
+    0 0 12px rgba(56, 217, 169, 0.08);
+  overflow: hidden;
+  color: var(--nephrite-jade-bright);
+  z-index: 2;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.module.shade .elven-screen {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+.elven-screen::after, .talisman-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(8, 20, 26, 0.3) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+.screen-pages {
+  height: 100%;
+  width: 300%;
+  display: flex;
+  transition: transform 280ms cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+.screen-page {
+  width: 33.33333%;
+  flex: none;
+  padding: 6px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.screen-page .elven-label {
+  font: 10px/1.3 "Courier New", monospace;
+  color: #8daec2;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.screen-page strong {
+  font: bold 18px/1.1 "Courier New", monospace;
+  letter-spacing: -0.5px;
+  display: block;
+  color: var(--star-silver-bright);
+}
+.screen-page strong em {
+  font-style: normal;
+  color: var(--nephrite-jade-bright);
+  font-weight: 500;
+}
+.screen-page small {
+  font: 11px/1.4 "Courier New", monospace;
+  color: #a4c2d4;
+}
+
+/* Starlight Rhythm Bar */
+.sylvan-bar {
+  position: absolute;
+  right: 12px;
+  top: 9px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 25px;
+}
+.sylvan-bar i {
+  width: 4px;
+  background: linear-gradient(180deg, var(--nephrite-jade-bright), var(--nephrite-jade-deep));
+  border-radius: 2px 2px 0 0;
+  box-shadow: 0 0 5px rgba(123, 242, 198, 0.4);
+}
+
+/* Shade Diadem Strip */
+.shade-diadem {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  top: 10px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  background: linear-gradient(90deg, #101920, #192732 50%, #101920);
+  border: 1px solid #374d5d;
+  border-radius: 4px;
+  z-index: 2;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 6px rgba(123, 242, 198, 0.15);
+}
+.module.shade .shade-diadem {
+  display: flex;
+}
+.shade-title {
+  font: 10px/1 "Courier New", monospace;
+  color: var(--star-silver-bright);
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.shade-title span {
+  color: var(--nephrite-jade-bright);
+}
+.shade-gems {
+  display: flex;
+  gap: 4px;
+}
+.shade-gems i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px currentColor;
+}
+.shade-gems i.jade { background: var(--nephrite-jade-bright); color: var(--nephrite-jade-bright); }
+.shade-gems i.moon { background: var(--moonstone-blue); color: var(--moonstone-blue); }
+.shade-gems i.gold { background: var(--electrum-gold); color: var(--electrum-gold); }
+
+/* Tabs & Interactive Controls */
+.tab-row {
+  position: absolute;
+  left: 50px;
+  top: 102px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 2;
+  transition: opacity 180ms ease;
+}
+.module.shade .tab-row {
+  opacity: 0;
+  pointer-events: none;
+}
+.elven-tab {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: #7b99ad;
+  font: 10px/1.2 "Courier New", monospace;
+  cursor: pointer;
+  transition: color 120ms ease;
+}
+.elven-tab:hover { color: var(--star-silver-bright); }
+.elven-tab[aria-selected="true"] {
+  color: var(--nephrite-jade-bright);
+  font-weight: 600;
+  text-shadow: 0 0 5px rgba(123, 242, 198, 0.5);
+}
+
+/* Sylvan Jewel Buttons (Pause/Next) */
+.sylvan-jewel-btn {
+  position: absolute;
+  top: 99px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  padding: 0;
+  border: 1px solid #3d586b;
+  background: radial-gradient(circle at 35% 30%, #def2fc, #7ea6bf 50%, #2a3c48 90%);
+  color: #0b151b;
+  font: bold 10px/1 Arial, sans-serif;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7), inset 0 1px 1px #ffffff;
+  z-index: 2;
+  transition: all 120ms ease;
+}
+.sylvan-jewel-btn:hover {
+  filter: brightness(1.2);
+  box-shadow: 0 0 8px rgba(165, 216, 255, 0.5);
+}
+.module.shade .sylvan-jewel-btn {
+  top: 11px;
+}
+.run-btn { left: 290px; }
+.module.shade .run-btn { left: 326px; width: 20px; height: 20px; }
+.next-btn {
+  left: 320px;
+  background: radial-gradient(circle at 35% 30%, #c4f9e8, #3ec59e 50%, #114e3e 90%);
+  border-color: #2d7a62;
+  color: #071f18;
+}
+.module.shade .next-btn { left: 352px; width: 20px; height: 20px; }
+
+/* Sylvan Canopy / Astral Chamber Button */
+.canopy-btn {
+  position: absolute;
+  left: 178px;
+  top: 99px;
+  width: 96px;
+  height: 21px;
+  border: 1px solid #365063;
+  clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+  background: linear-gradient(180deg, #324756 0%, #1e2c36 50%, #152028 100%);
+  color: var(--star-silver-bright);
+  font: 600 9px/21px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.4px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.2);
+  z-index: 2;
+  transition: opacity 180ms ease;
+}
+.canopy-btn:hover {
+  background: linear-gradient(180deg, #405a6e 0%, #283a48 50%, #1c2a34 100%);
+  border-color: var(--nephrite-jade-bright);
+}
+.module.shade .canopy-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Sylvan Canopy Drawer (Lotus Bay) */
+#sylvanCanopy {
+  position: absolute;
+  width: 324px;
+  height: 216px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+#canopyBody {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 324px;
+  height: 204px;
+  transform: translateY(-190px);
+  transition: transform 420ms cubic-bezier(0.1, 0.9, 0.2, 1);
+  background: linear-gradient(140deg, #243542 0%, #15222b 45%, #0c151c 100%);
+  border: 2px solid #3a5568;
+  border-radius: 4px 4px 26px 26px;
+  box-shadow: inset 0 0 0 3px #131e26, inset 0 0 0 4px #4d6f87, 0 12px 18px rgba(0, 0, 0, 0.85);
+  pointer-events: auto;
+}
+#sylvanCanopy.open #canopyBody {
+  transform: translateY(0);
+}
+.canopy-ribbon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(90deg, #15232c, #7e9bb0, #253947);
+  box-shadow: inset 0 0 0 1px #111b22;
+}
+.canopy-ribbon.l { left: 8px; }
+.canopy-ribbon.r { right: 8px; }
+
+.canopy-head {
+  position: absolute;
+  top: 11px;
+  left: 26px;
+  right: 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--star-silver-bright);
+  font-size: 11px;
+  font-weight: 500;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.8);
+}
+.canopy-head button {
+  border: 1px solid #3f6075;
+  border-radius: 3px;
+  color: #ddf5ee;
+  background: #182833;
+  font-size: 10px;
+  padding: 2px 8px;
+}
+.canopy-head button:hover {
+  background: #243c4c;
+  border-color: var(--nephrite-jade-bright);
+}
+
+#astralBay {
+  position: absolute;
+  left: 22px;
+  top: 42px;
+  width: 278px;
+  height: 80px;
+  border: 1px dashed #3a5b70;
+  background: #091116;
+  border-radius: 8px;
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7b9eb3;
+  font-size: 11px;
+  transition: all 180ms ease;
+}
+#astralBay.hot, #astralBay[data-dock-state="ready"] {
+  background: #0f242e;
+  border-style: solid;
+  border-color: var(--nephrite-jade-bright);
+  box-shadow: inset 0 0 18px rgba(123, 242, 198, 0.35), 0 0 14px rgba(123, 242, 198, 0.3);
+}
+#emptyAstralBay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+#emptyAstralBay button {
+  font-size: 10px;
+  padding: 3px 8px;
+  color: var(--star-silver-bright);
+  background: #182a35;
+  border: 1px solid #3c5d72;
+  border-radius: 3px;
+}
+
+.canopy-footer {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  top: 130px;
+  font: 10px/1.5 "Courier New", monospace;
+  color: #8fb1c6;
+}
+.canopy-footer strong { color: var(--nephrite-jade-bright); }
+
+.harmony-dial-wrap {
+  position: absolute;
+  right: 28px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #9cbacf;
+}
+#harmonyDial {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #16242e;
+  background: radial-gradient(circle at 35% 30%, #def2fc, #6b93ad 65%, #243744 100%);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), inset 0 1px rgba(255, 255, 255, 0.4);
+  position: relative;
+  cursor: ns-resize;
+}
+#harmonyDial::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 3px;
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  background: #0d171d;
+  transform-origin: 1px 11px;
+  transform: rotate(var(--angle, 0deg));
+}
+
+/* Checks Widget: Elven Astral Talisman */
+#astralTalisman {
+  position: absolute;
+  width: 276px;
+  height: 78px;
+  touch-action: none;
+  user-select: none;
+  z-index: 8;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.8));
+}
+.talisman-case {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #4a6d85;
+  border-radius: 18px 8px 16px 8px;
+  background: linear-gradient(160deg, #466378 0%, #233441 50%, #121c23 100%);
+  box-shadow: inset 0 2px 3px rgba(255, 255, 255, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.7);
+}
+.talisman-grip {
+  position: absolute;
+  left: 14px;
+  top: 2px;
+  width: 215px;
+  height: 18px;
+  background: none;
+  border: 0;
+  color: var(--star-silver-bright);
+  text-align: left;
+  font: bold 9px/18px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  cursor: grab;
+}
+.talisman-grip:active { cursor: grabbing; }
+
+.talisman-screen {
+  position: absolute;
+  left: 13px;
+  right: 38px;
+  top: 23px;
+  height: 42px;
+  border: 1px solid #1a2f3d;
+  border-radius: 4px;
+  background: var(--screen-bg);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.95);
+  overflow: hidden;
+  padding: 5px 10px;
+  color: var(--nephrite-jade-bright);
+  font: 10px "Courier New", monospace;
+}
+.talisman-screen strong {
+  font-size: 16px;
+  color: var(--star-silver-bright);
+}
+.talisman-gem {
+  position: absolute;
+  right: 12px;
+  top: 32px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d5ffef, #35caa0 50%, #0d5440 90%);
+  border: 1px solid #1a4d3e;
+  box-shadow: 0 0 8px rgba(53, 202, 160, 0.6);
+}
+#ejectTalisman {
+  position: absolute;
+  right: 12px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  background: none;
+  color: var(--star-silver-bright);
+  padding: 0;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* Star-Silver Vine Clasp (Release Grip) */
+.sylvan-release-clasp {
+  position: absolute;
+  width: 28px;
+  height: 44px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+  transition: opacity 160ms ease;
+}
+.sylvan-release-clasp[hidden] { display: none; }
+.sylvan-release-clasp::before {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 30px;
+  left: 10px;
+  top: 7px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #253947, #a4c4db 40%, #e8f4fc 60%, #304859);
+  border: 1px solid #1c2b36;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.8), inset 0 1px rgba(255, 255, 255, 0.5);
+}
+.sylvan-release-clasp:hover::before {
+  border-color: var(--nephrite-jade-bright);
+  box-shadow: 0 0 8px rgba(123, 242, 198, 0.5);
+}
+.sylvan-release-clasp::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  right: 6px;
+  width: 2px;
+  height: calc(24px * var(--tension, 0));
+  background: var(--nephrite-jade-bright);
+  box-shadow: 0 0 6px var(--nephrite-jade-bright);
+}
+
+/* Design Overlay */
+#portOverlay { position: absolute; inset: 0; pointer-events: none; }
+.socket-port {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--nephrite-jade-bright);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(123, 242, 198, 0.5);
+  display: none;
+}
+.socket-port::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #d4fff1;
+  border-radius: 50%;
+}
+.socket-port::after {
+  position: absolute;
+  top: -26px;
+  left: -40px;
+  white-space: nowrap;
+  color: var(--star-silver-bright);
+  font: 10px "Courier New", monospace;
+  content: attr(data-label);
+  background: rgba(13, 22, 29, 0.95);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #2f4859;
+}
+#stage.design .socket-port { display: block; }
+#stage.design #astralBay { outline: 1px dashed var(--nephrite-jade-bright); outline-offset: 4px; }
+#stage.design .elven-screen { outline: 1px dashed #7bf2c6; outline-offset: 3px; }
+
+/* Footer Documentation */
+footer {
+  padding: 20px 28px 30px;
+  border-top: 1px solid #1c2b36;
+  background: #0a1014;
+  color: #8da6b8;
+  font-size: 13px;
+}
+footer h3 {
+  color: var(--star-silver-bright);
+  font-size: 15px;
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+footer p {
+  margin: 0 0 10px;
+  max-width: 900px;
+  line-height: 1.6;
+}
+footer .note-highlight {
+  color: var(--nephrite-jade-bright);
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-titles">
+    <h1>Elven &amp; Intricate <span>/ living tendril braid join</span></h1>
+    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Living Art Nouveau sylvan lattice</p>
+  </div>
+  <nav class="controls-bar" aria-label="Experiment state and option controls">
+    <div class="control-group">
+      <label for="optionSelect">Option</label>
+      <select id="optionSelect" aria-label="Select skin exploration option">
+        <option value="tendril_braid" selected>1. Living Tendril Braid (Sylvan Weave)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>State</label>
+      <button id="btnStateSeparate" class="active" aria-pressed="true">Separate</button>
+      <button id="btnStateJoining" aria-pressed="false">Joining</button>
+      <button id="btnStateJoined" aria-pressed="false">Joined</button>
+      <button id="btnStateShade" aria-pressed="false">Shade</button>
+    </div>
+    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
+    <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnDesign" aria-pressed="false">Design mode</button>
+    <button id="btnReset">Reset</button>
+  </nav>
+</header>
+
+<div id="viewport">
+  <main id="stage" aria-label="Elven and Intricate skin interactive stage">
+    <div class="topline">
+      <p id="status" role="status" aria-live="polite">Drag capsules toward each other to watch silver tendrils intertwine, or select a state.</p>
+      <span id="phase">Separate / Two sylvan star-silver hulls</span>
+    </div>
+
+    <!-- Architectural SVG Canvas for Shared Star-Silver Hull, Tendril Weave, Jade Buds & Moonlit Light -->
+    <svg id="stage-svg" viewBox="0 0 1200 720" aria-hidden="true">
+      <defs>
+        <!-- Spun Star-Silver (Ithildin) Gradient -->
+        <linearGradient id="starSilverGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f0f7fb"/>
+          <stop offset="6%" stop-color="#c8dbe6"/>
+          <stop offset="28%" stop-color="#7e9bb0"/>
+          <stop offset="60%" stop-color="#3b5263"/>
+          <stop offset="85%" stop-color="#1b2a34"/>
+          <stop offset="100%" stop-color="#4d6c82"/>
+        </linearGradient>
+
+        <!-- Moonlit Silver Highlight Gradient -->
+        <linearGradient id="silverHighlight" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#7e9bb0" stop-opacity="0.2"/>
+          <stop offset="50%" stop-color="#ffffff" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#7e9bb0" stop-opacity="0.2"/>
+        </linearGradient>
+
+        <!-- Sylvan Filigree Vine Gradient -->
+        <linearGradient id="vineSilverGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="35%" stop-color="#b8d5e8"/>
+          <stop offset="70%" stop-color="#55778f"/>
+          <stop offset="100%" stop-color="#1e313d"/>
+        </linearGradient>
+
+        <!-- Nephrite Jade Jewel Gradient -->
+        <radialGradient id="nephriteJadeGrad" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#dffff5"/>
+          <stop offset="35%" stop-color="#45e6b5"/>
+          <stop offset="75%" stop-color="#148062"/>
+          <stop offset="100%" stop-color="#08382b"/>
+        </radialGradient>
+
+        <!-- Star-Silver Moonstone Cabochon Gradient -->
+        <radialGradient id="moonstoneGrad" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="40%" stop-color="#b6e3f9"/>
+          <stop offset="75%" stop-color="#5588a8"/>
+          <stop offset="100%" stop-color="#1b3647"/>
+        </radialGradient>
+
+        <!-- Ethereal Moonlit Proximity Glow Filter -->
+        <filter id="moonlitCausticGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4.5" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Delicate Nacre Mother-of-Pearl Weave Pattern -->
+        <pattern id="nacreGrain" width="48" height="24" patternUnits="userSpaceOnUse">
+          <path d="M0 12 Q24 6 48 12 Q24 18 0 12 Z" fill="none" stroke="#7e9bb0" stroke-width="0.7" stroke-opacity="0.2"/>
+          <path d="M-24 0 Q0 -6 24 0 Q0 6 -24 0 Z" fill="none" stroke="#7e9bb0" stroke-width="0.7" stroke-opacity="0.2"/>
+          <path d="M24 24 Q48 18 72 24 Q48 30 24 24 Z" fill="none" stroke="#7e9bb0" stroke-width="0.7" stroke-opacity="0.2"/>
+        </pattern>
+      </defs>
+
+      <!-- Shared Hull & Intertwined Tendril Weave -->
+      <g id="sharedElvenStage"></g>
+      <!-- Bioluminescent Proximity Aura & Starlight Spores -->
+      <g id="elvenLightAura"></g>
+    </svg>
+
+    <!-- Sylvan Canopy Drawer (Lotus Bay) -->
+    <div id="sylvanCanopy" aria-label="Jarvis sylvan canopy activity bay">
+      <div id="canopyBody" inert>
+        <i class="canopy-ribbon l"></i><i class="canopy-ribbon r"></i>
+        <div class="canopy-head">
+          <span id="bayStatus">Astral Lotus Bay</span>
+          <button id="closeCanopy" aria-label="Close canopy bay">▴ close</button>
+        </div>
+        <div id="astralBay" aria-label="Checks widget bay">
+          <div id="emptyAstralBay">
+            <span>Place the Astral Talisman into this lotus cradle</span>
+            <button id="insertTalisman">Insert Astral Talisman</button>
+          </div>
+        </div>
+        <div class="canopy-footer">
+          <strong id="activityState">Astral flow active</strong><br>
+          Canopy belongs to Jarvis.<br>
+          Its star-silver cradle stays with it.
+        </div>
+        <div class="harmony-dial-wrap">
+          <span>Harmonics <b id="harmonyValue">3</b></span>
+          <button id="harmonyDial" aria-label="Cycle harmonic limit"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capsule A: Jarvis -->
+    <section class="module" id="a" aria-label="Jarvis elven capsule">
+      <svg class="module-svg" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="elven-grip" data-drag="a" aria-label="Move Jarvis capsule">
+        <span><span class="rune-mark">✧</span> Jarvis / Sylvan Regent</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Full Crystalline Screen -->
+      <div class="elven-screen" aria-label="Jarvis digital display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="elven-label">Jarvis / Active Weave</div>
+            <strong id="runText">03 <em>agents running</em></strong>
+            <small>Attuning the star-silver filigree</small>
+            <div class="sylvan-bar">
+              <i style="height:10px"></i><i style="height:22px"></i><i style="height:16px"></i>
+              <i style="height:24px"></i><i style="height:18px"></i>
+            </div>
+          </div>
+          <div class="screen-page">
+            <div class="elven-label">Jarvis / Current Task</div>
+            <strong style="font-size:16px">Harmonize shell assembly</strong>
+            <small>12 checks passed · 2 in astral queue</small>
+          </div>
+          <div class="screen-page">
+            <div class="elven-label">Sylvan Chronicle / Event Log</div>
+            <small>10:42  sylvan weave docked with GitDiscuss<br>10:43  awaiting your starlight command</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact Diadem Strip for Shade Mode -->
+      <div class="shade-diadem">
+        <span class="shade-title"><span>✧</span> JARVIS · 03 AGENTS</span>
+        <div class="shade-gems">
+          <i class="jade"></i><i class="moon"></i><i class="jade"></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="Jarvis screens">
+        <button class="elven-tab" role="tab" aria-selected="true" data-page="0">Status</button>
+        <button class="elven-tab" role="tab" aria-selected="false" data-page="1">Task</button>
+        <button class="elven-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+
+      <button class="canopy-btn" aria-label="Open sylvan canopy" aria-expanded="false">▾ sylvan canopy</button>
+      <button class="sylvan-jewel-btn run-btn" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button>
+      <button class="sylvan-jewel-btn next-btn" aria-label="Next Jarvis screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Capsule B: GitDiscuss -->
+    <section class="module" id="b" aria-label="GitDiscuss elven capsule">
+      <svg class="module-svg" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="elven-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
+        <span><span class="rune-mark">✧</span> GitDiscuss / Archive Weaver</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Full Crystalline Screen -->
+      <div class="elven-screen" aria-label="GitDiscuss digital display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="elven-label">GitDiscuss / Inward Threads</div>
+            <strong>02 <em>need a decision</em></strong>
+            <small>Sylvan tendril braid · review complete</small>
+          </div>
+          <div class="screen-page">
+            <div class="elven-label">Selected Discussion</div>
+            <strong style="font-size:16px">Shared casing geometry</strong>
+            <small>Brent · 4 comments · ready to seal</small>
+          </div>
+          <div class="screen-page">
+            <div class="elven-label">Discussion Chronicle / Log</div>
+            <small>10:41  feedback aligned in moonlit bough<br>10:43  no workflow branches severed</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact Diadem Strip for Shade Mode -->
+      <div class="shade-diadem">
+        <span class="shade-title"><span>✧</span> GITDISCUSS · 02 QUEUED</span>
+        <div class="shade-gems">
+          <i class="moon"></i><i class="jade"></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
+        <button class="elven-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
+        <button class="elven-tab" role="tab" aria-selected="false" data-page="1">Thread</button>
+        <button class="elven-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+
+      <button class="canopy-btn" aria-label="Open selected thread">▸ view thread</button>
+      <button class="sylvan-jewel-btn run-btn" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button>
+      <button class="sylvan-jewel-btn next-btn" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Checks Widget (Astral Talisman) -->
+    <section id="astralTalisman" aria-label="Checks widget">
+      <div class="talisman-case"></div>
+      <button class="talisman-grip" data-drag="meter" aria-label="Move Checks widget">
+        Checks / Astral Talisman ⋮⋮
+      </button>
+      <div class="talisman-screen">
+        <strong>12 / 14</strong> checks sealed<br>
+        2 awaiting archon signet
+      </div>
+      <span class="talisman-gem" aria-hidden="true"></span>
+      <button id="ejectTalisman" aria-label="Eject Checks widget" title="Eject from canopy" hidden>↗</button>
+    </section>
+
+    <!-- Sylvan Star-Silver Vine Clasp (Release Grip) -->
+    <button id="sylvanRelease" class="sylvan-release-clasp" data-drag="release"
+            aria-label="Release GitDiscuss: pull right or press Enter"
+            title="Pull right to unweave silver tendrils · Enter to separate" hidden>
+    </button>
+
+    <!-- Socket Overlay for Design Mode -->
+    <div id="portOverlay" aria-hidden="true">
+      <div class="socket-port" id="portA" data-label="Tendril Collar · A"></div>
+      <div class="socket-port" id="portB" data-label="Tendril Collar · B"></div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <h3>Elven &amp; Intricate Architecture &amp; The Living Tendril Braid Join</h3>
+  <p>
+    Forged from spun star-silver (Ithildin), white birchwood inlays, and mother-of-pearl bezels. Contours follow swept aerodynamic swan-wing curves and delicate botanical filigree crowns, preserving high contrast and uncompromised display readability.
+  </p>
+  <p>
+    <span class="note-highlight">Option 1 — Living Tendril Braid (Sylvan Weave):</span> Fine star-silver vine tendrils rest dormant along the mating collars. As the capsules enter the magnetic capture threshold, the tendrils reach fluidly across the void, uncoiling and intertwining like living plants into an intricate Art Nouveau knot lattice. Glowing nephrite leaf buds and a moonstone brooch seal the seam. Pulling the star-silver leaf clasp right smoothly unweaves the lattice.
+  </p>
+  <p>
+    <span class="note-highlight">Shade Mode:</span> Transforms the instrument into an ultra-slender 44px star-silver diadem wand, with inlaid nephrite gems and a glowing starlight status ribbon.
+  </p>
+</footer>
+
+<script>
+// Elven & Intricate Skin Controller
+const $ = s => document.querySelector(s);
+const stage = $('#stage');
+const W = 390, H = 130, JOIN_DISTANCE = 316;
+
+const model = {
+  a: { x: 140, y: 220, page: 0, running: true },
+  b: { x: 680, y: 220, page: 0, running: true },
+  meter: { x: 805, y: 510 },
+  joined: false,
+  busy: false,
+  canopy: false,
+  docked: false,
+  design: false,
+  shade: false,
+  blend: 0,
+  cap: 0,
+  tendrilProgress: 0, // 0 = coiled along collar, 1 = fully intertwined living braid
+  light: 0,
+  limit: 3,
+  feel: 'free',
+  tension: 0,
+  front: 'b'
+};
+
+const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let drag = null, animationToken = 0, glowFrame = 0, glowTime = 0;
+const DOCKING = { near: 135, capture: 45 };
+const connectionGlow = { socket: { value: 0, target: 0 }, bay: { value: 0, target: 0 } };
+
+function say(text) { $('#status').textContent = text; }
+
+// SVG Geometric Generator: Swept Elven Aerodynamic Hull
+function elvenCapsulePath(x, y, width, isShade = false) {
+  const h = isShade ? 44 : 126;
+  // Sinuous leaf-like contour with gentle swept shoulders
+  return `
+    M ${x + 46} ${y + 4}
+    C ${x + 120} ${y + 2}, ${x + width - 120} ${y + 2}, ${x + width - 46} ${y + 4}
+    C ${x + width - 12} ${y + 6}, ${x + width - 4} ${y + 22}, ${x + width - 6} ${y + (isShade ? 22 : 48)}
+    C ${x + width - 8} ${y + h - 24}, ${x + width - 20} ${y + h + 2}, ${x + width - 46} ${y + h + 4}
+    C ${x + width - 120} ${y + h + 6}, ${x + 120} ${y + h + 6}, ${x + 46} ${y + h + 4}
+    C ${x + 20} ${y + h + 2}, ${x + 8} ${y + h - 24}, ${x + 6} ${y + (isShade ? 22 : 48)}
+    C ${x + 4} ${y + 22}, ${x + 12} ${y + 6}, ${x + 46} ${y + 4}
+    Z
+  `;
+}
+
+// Draw Star-Silver Casing with Filigree Crests, Mother-of-Pearl Inlays, and Swept Borders
+function drawElvenCasing(x, y, width, opacity = 1, isShade = false) {
+  const d = elvenCapsulePath(x, y, width, isShade);
+  const h = isShade ? 44 : 126;
+  let s = `<g opacity="${opacity}">`;
+
+  // Base Spun Star-Silver Hull
+  s += `<path d="${d}" fill="url(#starSilverGrad)" stroke="#16222b" stroke-width="2.5"/>`;
+  // Fine Nacre Texture Overlay
+  s += `<path d="${d}" fill="url(#nacreGrain)"/>`;
+  // Outer Starlight Specular Edge
+  s += `<path d="${d}" fill="none" stroke="url(#silverHighlight)" stroke-width="1.2" opacity="0.8"/>`;
+
+  if (!isShade) {
+    // Upper Filigree Tiara Crown (curling leaf motifs along the top border)
+    s += `
+      <g stroke="url(#vineSilverGrad)" fill="none" stroke-width="1.3" opacity="0.85">
+        <path d="M ${x + 48} ${y + 10} Q ${x + 90} ${y + 15} ${x + 130} ${y + 10} Q ${x + 160} ${y + 7} ${x + 195} ${y + 12}
+                 Q ${x + 230} ${y + 7} ${x + 260} ${y + 10} Q ${x + 300} ${y + 15} ${x + width - 48} ${y + 10}"/>
+        <path d="M ${x + 140} ${y + 9} Q ${x + 195} ${y + 18} ${x + 250} ${y + 9}"/>
+      </g>
+      <!-- Tiny Nephrite Jade Dewdrops in Tiara -->
+      <circle cx="${x + 100}" cy="${y + 12}" r="2" fill="url(#nephriteJadeGrad)"/>
+      <circle cx="${x + 195}" cy="${y + 14}" r="2.5" fill="url(#nephriteJadeGrad)"/>
+      <circle cx="${x + width - 100}" cy="${y + 12}" r="2" fill="url(#nephriteJadeGrad)"/>
+
+      // Lower Scalloped Base Bevel
+      <path d="M ${x + 44} ${y + 124} C ${x + 120} ${y + 122}, ${x + width - 120} ${y + 122}, ${x + width - 44} ${y + 124}"
+            fill="none" stroke="#7e9bb0" stroke-width="1.2" opacity="0.6"/>
+
+      // Display Recess Frame (Chamfered Obsidian Well with Filigree Corners)
+      <rect x="${x + 44}" y="${y + 30}" width="${width - 88}" height="68" rx="6"
+            fill="none" stroke="#162530" stroke-width="3"/>
+      <rect x="${x + 44}" y="${y + 30}" width="${width - 88}" height="68" rx="6"
+            fill="none" stroke="#4a6a80" stroke-width="1" opacity="0.7"/>
+
+      <!-- Corner Filigree Flourishes -->
+      <path d="M ${x + 46} ${y + 44} Q ${x + 54} ${y + 34} ${x + 64} ${y + 32}" fill="none" stroke="#9ec0d6" stroke-width="1.2"/>
+      <path d="M ${x + width - 46} ${y + 44} Q ${x + width - 54} ${y + 34} ${x + width - 64} ${y + 32}" fill="none" stroke="#9ec0d6" stroke-width="1.2"/>
+    `;
+  } else {
+    // Shade Diadem Silver Bevel Lines
+    s += `
+      <path d="M ${x + 30} ${y + 7} H ${x + width - 30}" stroke="#c8dbe6" stroke-width="1.5" opacity="0.8"/>
+      <path d="M ${x + 30} ${y + 37} H ${x + width - 30}" stroke="#3b5263" stroke-width="1.5"/>
+    `;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Dormant / Unfurling Tendril Collar on Docking End-Cap
+function drawElvenTendrilCap(x, y, isRight, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const dir = isRight ? -1 : 1;
+  const startX = isRight ? x + W - 18 : x + 18;
+  const scaleX = (1 - retract) * dir;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  return `
+    <g transform="translate(${startX}, ${y + 64}) scale(${scaleX}, 1)">
+      <!-- Silver Collar Flange -->
+      <path d="M -4 -48 C 12 -44 16 -24 16 0 C 16 24 12 44 -4 48"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="2.5"/>
+      <path d="M 0 -44 C 12 -38 12 38 0 44"
+            fill="none" stroke="#162530" stroke-width="1.2"/>
+
+      <!-- Dormant Coiled Silver Tendrils & Tiny Jade Leaf Buds -->
+      <path d="M 12 -32 C 22 -36 28 -24 24 -18 C 20 -12 14 -16 16 -22"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="23" cy="-24" r="2.2" fill="url(#nephriteJadeGrad)"/>
+
+      <path d="M 14 0 C 26 2 28 14 22 18 C 18 20 12 14 16 8"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="23" cy="14" r="2.2" fill="url(#nephriteJadeGrad)"/>
+
+      <path d="M 12 32 C 22 36 26 26 22 22 C 18 18 14 24 17 28"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="22" cy="28" r="2" fill="url(#nephriteJadeGrad)"/>
+    </g>
+  `;
+}
+
+// Proximity Bioluminescence (Soft Moonlit Cyan Caustics & Floating Spores)
+function drawElvenProximityAura(x, y, amount) {
+  if (!amount) return '';
+  return `
+    <g opacity="${amount}">
+      <!-- Moonlit Soft Caustic Oval -->
+      <ellipse cx="${x}" cy="${y + 64}" rx="18" ry="46" fill="#38d9a9" opacity="0.32" filter="url(#moonlitCausticGlow)"/>
+      <ellipse cx="${x}" cy="${y + 64}" rx="8" ry="32" fill="#a5d8ff" opacity="0.5" filter="url(#moonlitCausticGlow)"/>
+      <ellipse cx="${x}" cy="${y + 64}" rx="2" ry="20" fill="#ffffff" opacity="0.9"/>
+      <!-- Tiny Floating Luminous Spores -->
+      <circle cx="${x - 10}" cy="${y + 40}" r="1.5" fill="#7bf2c6" opacity="0.8"/>
+      <circle cx="${x + 8}" cy="${y + 88}" r="1.5" fill="#7bf2c6" opacity="0.8"/>
+      <circle cx="${x + 12}" cy="${y + 32}" r="1.2" fill="#ffffff" opacity="0.9"/>
+    </g>
+  `;
+}
+
+// Option 1: The Living Tendril Braid (Sylvan Weave) Join
+function drawTendrilBraid(midX, y, progress, opacity = 1) {
+  // progress = 0 (dormant/reaching), 0.5 (mid-flight reaching & crossing), 1.0 (fully locked living Art Nouveau lattice)
+  if (progress < 0.05) return '';
+
+  const reach = Math.min(1, progress * 1.4);
+  const curl = Math.min(1, progress);
+
+  return `
+    <g id="sylvanTendrilWeave" opacity="${opacity}">
+      <!-- Background Ethereal Starlight Glow along seam -->
+      <ellipse cx="${midX}" cy="${y + 65}" rx="${16 * curl}" ry="48"
+               fill="#38d9a9" opacity="${0.22 * curl}" filter="url(#moonlitCausticGlow)"/>
+
+      <!-- Primary Reaching / Intertwining Vine Tendril 1 (Upper Arc) -->
+      <path d="M ${midX - 38 * reach} ${y + 24}
+               C ${midX - 18} ${y + 20 - 12 * (1 - curl)},
+                 ${midX + 18} ${y + 44 + 8 * (1 - curl)},
+                 ${midX + 38 * reach} ${y + 40}"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="${1.8 + 0.6 * curl}"
+            stroke-linecap="round"/>
+
+      <!-- Primary Reaching / Intertwining Vine Tendril 2 (Lower Arc) -->
+      <path d="M ${midX - 38 * reach} ${y + 104}
+               C ${midX - 18} ${y + 108 + 10 * (1 - curl)},
+                 ${midX + 18} ${y + 86 - 8 * (1 - curl)},
+                 ${midX + 38 * reach} ${y + 90}"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="${1.8 + 0.6 * curl}"
+            stroke-linecap="round"/>
+
+      <!-- Central Interlocking Sylvan Infinity Loop (Crossing Over & Under) -->
+      <path d="M ${midX - 34 * reach} ${y + 48}
+               C ${midX - 12} ${y + 54},
+                 ${midX + 12} ${y + 76},
+                 ${midX + 34 * reach} ${y + 82}"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="${2 + 0.8 * curl}"
+            stroke-linecap="round"/>
+
+      <path d="M ${midX - 34 * reach} ${y + 82}
+               C ${midX - 12} ${y + 76},
+                 ${midX + 12} ${y + 54},
+                 ${midX + 34 * reach} ${y + 48}"
+            fill="none" stroke="url(#starSilverGrad)" stroke-width="${2 + 0.8 * curl}"
+            stroke-linecap="round"/>
+
+      <!-- Fine Inner Silver Highlights for Tendrils -->
+      <path d="M ${midX - 30 * reach} ${y + 48}
+               C ${midX - 10} ${y + 54}, ${midX + 10} ${y + 76}, ${midX + 30 * reach} ${y + 82}"
+            fill="none" stroke="#ffffff" stroke-width="0.8" opacity="${0.7 * curl}"/>
+
+      <!-- Sylvan Leaf Buds Nesting at Junction Points -->
+      <!-- Upper Left Leaf Bud -->
+      <g transform="translate(${midX - 16 * curl}, ${y + 36}) rotate(-25) scale(${curl})">
+        <path d="M 0 0 C 4 -6 10 -6 12 0 C 10 6 4 6 0 0 Z" fill="url(#nephriteJadeGrad)" stroke="#16382c" stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="10" y2="0" stroke="#b6ffe4" stroke-width="0.6"/>
+      </g>
+
+      <!-- Lower Right Leaf Bud -->
+      <g transform="translate(${midX + 16 * curl}, ${y + 94}) rotate(155) scale(${curl})">
+        <path d="M 0 0 C 4 -6 10 -6 12 0 C 10 6 4 6 0 0 Z" fill="url(#nephriteJadeGrad)" stroke="#16382c" stroke-width="0.8"/>
+        <line x1="0" y1="0" x2="10" y2="0" stroke="#b6ffe4" stroke-width="0.6"/>
+      </g>
+
+      <!-- Upper Right Bud -->
+      <circle cx="${midX + 22 * curl}" cy="${y + 42}" r="${2.6 * curl}"
+              fill="url(#nephriteJadeGrad)" stroke="#16382c" stroke-width="0.8"/>
+      <!-- Lower Left Bud -->
+      <circle cx="${midX - 22 * curl}" cy="${y + 88}" r="${2.6 * curl}"
+              fill="url(#nephriteJadeGrad)" stroke="#16382c" stroke-width="0.8"/>
+
+      <!-- Central Moonstone Brooch / Structural Lock Brooch -->
+      <g transform="translate(${midX}, ${y + 65}) scale(${curl})">
+        <!-- Spun Silver Prongs -->
+        <circle cx="0" cy="0" r="10.5" fill="#1b2933" stroke="url(#vineSilverGrad)" stroke-width="1.8"/>
+        <!-- Polished Oval Moonstone Cabochon -->
+        <ellipse cx="0" cy="0" rx="7.5" ry="8.5" fill="url(#moonstoneGrad)"/>
+        <!-- Pure Optical Core Highlight -->
+        <ellipse cx="-2.5" cy="-2.5" rx="2.5" ry="3" fill="#ffffff" opacity="0.85"/>
+        <!-- Star-Prong Cross -->
+        <path d="M -9 0 H 9 M 0 -9 V 9" stroke="#ffffff" stroke-width="0.8" opacity="0.65"/>
+      </g>
+
+      <!-- Bell-Like Harmonic Flash Pulse when near fully locked -->
+      ${curl > 0.88 ? `
+        <circle cx="${midX}" cy="${y + 65}" r="${(curl - 0.88) * 36}"
+                fill="none" stroke="#7bf2c6" stroke-width="${(1 - curl) * 8}"
+                opacity="${(1 - curl) * 5}" filter="url(#moonlitCausticGlow)"/>
+      ` : ''}
+    </g>
+  `;
+}
+
+// Render Complete Hardware Layer
+function renderHardware() {
+  const a = model.a, b = model.b, p = model.blend;
+  const isShade = model.shade;
+  const glow = model.busy ? model.light : connectionGlow.socket.value;
+  let shared = '';
+
+  const midX = (a.x + W - 22 + b.x + 22) / 2;
+
+  if (p > 0) {
+    // Seamless Monolithic Star-Silver Hull
+    shared += drawElvenCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
+    if (!isShade) {
+      // Connecting Botanical Crest along seam
+      shared += `
+        <g opacity="${p}">
+          <path d="M ${midX - 44} ${a.y + 10} Q ${midX} ${a.y + 16} ${midX + 44} ${a.y + 10}"
+                fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.6"/>
+          <path d="M ${midX - 40} ${a.y + 124} Q ${midX} ${a.y + 120} ${midX + 40} ${a.y + 124}"
+                fill="none" stroke="#7e9bb0" stroke-width="1.4"/>
+        </g>
+      `;
+    }
+  }
+
+  // Draw Living Tendril Braid for Option 1
+  if (!isShade && (model.joined || model.tendrilProgress > 0.02 || (glow > 0.25 && !model.joined))) {
+    const prog = model.joined ? 1 : model.tendrilProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
+    const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+    shared += drawTendrilBraid(kMidX, a.y, prog, Math.max(p, glow > 0.25 ? 0.95 : prog));
+  }
+
+  if (model.joined && model.design) {
+    shared += `<line x1="${a.x + JOIN_DISTANCE}" y1="${a.y + 8}" x2="${a.x + JOIN_DISTANCE}" y2="${a.y + 122}"
+                     stroke="#7bf2c6" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+  }
+
+  $('#sharedElvenStage').innerHTML = shared;
+
+  // Individual Capsule SVG Shells
+  for (const id of ['a', 'b']) {
+    const isA = id === 'a';
+    const individual = drawElvenCasing(0, 0, W, 1, isShade) +
+      drawElvenTendrilCap(0, 0, false, isA ? 0 : model.cap, isShade) +
+      drawElvenTendrilCap(0, 0, true, isA ? model.cap : 0, isShade);
+
+    $('#shell-' + id).innerHTML = `
+      <g opacity="${1 - p}">
+        ${individual}
+        ${drawElvenProximityAura(isA ? W - 22 : 22, 0, glow)}
+      </g>
+    `;
+  }
+
+  // Active Proximity Aura
+  if (!isShade && glow > 0.05 && p < 0.98) {
+    $('#elvenLightAura').innerHTML = `
+      <g opacity="${glow}">
+        ${drawElvenProximityAura(a.x + W - 22, a.y, glow)}
+        ${drawElvenProximityAura(b.x + 22, b.y, glow)}
+      </g>
+    `;
+  } else {
+    $('#elvenLightAura').innerHTML = '';
+  }
+}
+
+function updateStateButtons() {
+  const isShade = model.shade;
+  const isJoined = model.joined;
+  const isJoining = model.tendrilProgress > 0.1 && model.tendrilProgress < 0.95 && !isJoined;
+  const isSep = !isJoined && !isJoining && !isShade;
+
+  $('#btnStateSeparate').classList.toggle('active', isSep);
+  $('#btnStateSeparate').setAttribute('aria-pressed', String(isSep));
+
+  $('#btnStateJoining').classList.toggle('active', isJoining);
+  $('#btnStateJoining').setAttribute('aria-pressed', String(isJoining));
+
+  $('#btnStateJoined').classList.toggle('active', isJoined && !isShade);
+  $('#btnStateJoined').setAttribute('aria-pressed', String(isJoined && !isShade));
+
+  $('#btnStateShade').classList.toggle('active', isShade);
+  $('#btnStateShade').setAttribute('aria-pressed', String(isShade));
+}
+
+function render() {
+  updateGlowTargets();
+  renderHardware();
+  paintGlowValues();
+  updateStateButtons();
+
+  ['a', 'b'].forEach(id => {
+    const m = model[id], el = $('#' + id);
+    el.style.left = m.x + 'px';
+    el.style.top = m.y + 'px';
+    el.style.zIndex = model.front === id ? '4' : '2';
+    el.classList.toggle('shade', model.shade);
+
+    el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
+    el.querySelectorAll('.elven-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
+
+    const btn = el.querySelector('.run-btn');
+    btn.textContent = m.running ? 'Ⅱ' : '▶';
+    btn.setAttribute('aria-label', (m.running ? 'Pause ' : 'Resume ') + (id === 'a' ? 'Jarvis' : 'GitDiscuss'));
+  });
+
+  $('#runText').innerHTML = model.a.running ? '03 <em>agents running</em>' : '03 <em>agents paused</em>';
+  $('#activityState').textContent = model.a.running ? 'Astral flow active' : 'Astral flow paused';
+
+  const bayState = connectionState('bay');
+  $('#astralBay').dataset.dockState = bayState;
+  const bayLabel = bayState === 'ready' ? 'Release to nest in lotus cradle' :
+                   bayState === 'near' ? 'Near astral bay · glide closer' : 'Astral Lotus Bay';
+  $('#bayStatus').textContent = bayLabel;
+
+  const canopy = $('#sylvanCanopy');
+  canopy.style.left = (model.a.x + 36) + 'px';
+  canopy.style.top = (model.a.y + (model.shade ? 40 : 121)) + 'px';
+  canopy.classList.toggle('open', model.canopy);
+  $('#canopyBody').inert = !model.canopy;
+
+  $('#a .canopy-btn').setAttribute('aria-expanded', String(model.canopy));
+  $('#a .canopy-btn').textContent = model.canopy ? '▴ sylvan canopy' : '▾ sylvan canopy';
+
+  const meter = $('#astralTalisman');
+  if (model.docked) {
+    if (meter.parentElement !== $('#astralBay')) $('#astralBay').append(meter);
+    meter.style.left = '0px';
+    meter.style.top = '0px';
+    meter.style.transform = `translate(${drag?.kind === 'meterLatch' ? drag.deflect.x : 0}px, ${drag?.kind === 'meterLatch' ? drag.deflect.y : 0}px) scale(0.98)`;
+    meter.style.transformOrigin = 'top left';
+    meter.inert = !model.canopy;
+  } else {
+    if (meter.parentElement !== stage) stage.append(meter);
+    meter.style.left = model.meter.x + 'px';
+    meter.style.top = model.meter.y + 'px';
+    meter.style.transform = '';
+    meter.inert = false;
+  }
+
+  $('#emptyAstralBay').hidden = model.docked;
+  $('#emptyAstralBay').style.display = model.docked ? 'none' : 'flex';
+  $('#ejectTalisman').hidden = !model.docked;
+
+  stage.classList.toggle('design', model.design);
+  $('#btnDesign').setAttribute('aria-pressed', String(model.design));
+
+  $('#portA').style.left = (model.a.x + W - 30) + 'px';
+  $('#portA').style.top = (model.a.y + 54) + 'px';
+  $('#portB').style.left = (model.b.x + 12) + 'px';
+  $('#portB').style.top = (model.b.y + 54) + 'px';
+
+  $('#btnJoinAnim').disabled = model.joined || model.busy;
+  $('#btnSeparateAnim').disabled = !model.joined || model.busy;
+
+  $('#harmonyValue').textContent = model.limit;
+  $('#harmonyDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
+
+  const release = $('#sylvanRelease');
+  release.hidden = !model.joined || model.busy || model.shade;
+  release.style.left = (model.a.x + 338) + 'px';
+  release.style.top = (model.a.y + 44) + 'px';
+  release.style.setProperty('--tension', model.tension);
+
+  if (!model.busy) {
+    if (model.shade) {
+      $('#phase').textContent = 'Shade mode / Star-silver diadem wand';
+    } else if (model.joined) {
+      $('#phase').textContent = 'Joined / One unified sylvan instrument';
+    } else if (model.tendrilProgress > 0.1) {
+      $('#phase').textContent = 'Joining / Silver tendrils intertwining';
+    } else {
+      $('#phase').textContent = 'Separate / Two sylvan star-silver hulls';
+    }
+  }
+}
+
+function tween(duration, fn, token) {
+  return new Promise(resolve => {
+    if (motion.matches) {
+      if (token === animationToken) fn(1);
+      resolve(token === animationToken);
+      return;
+    }
+    let start = performance.now();
+    function step(now) {
+      if (token !== animationToken) { resolve(false); return; }
+      let t = Math.min(1, (now - start) / duration);
+      // Art Nouveau liquid decrescendo curve
+      let e = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      fn(e);
+      if (t < 1) requestAnimationFrame(step);
+      else resolve(true);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// Option 1 Join Animation: Silver tendrils uncoil, reach, and intertwine into Art Nouveau lattice
+async function join(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Capsules enter attraction field. Tendrils uncoil from collars; starlight bioluminescence awakens.');
+  $('#phase').textContent = 'Starlight resonance glowing';
+
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 90 : 260, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  $('#phase').textContent = 'Tendril collars unfurling';
+  if (!await tween(fromDrag ? 140 : 300, t => {
+    model.cap = t;
+    model.tendrilProgress = t * 0.45; // reaching outward
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.canopy ? 305 : 385, model.a.y));
+
+  $('#phase').textContent = 'Gliding star-silver hulls together';
+  if (!await tween(fromDrag ? 280 : 520, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.tendrilProgress = 0.45 + 0.35 * t;
+    model.light = 1 - t * 0.7;
+    render();
+  }, token)) return;
+
+  // Final braid intertwining and moonstone brooch seating
+  $('#phase').textContent = 'Intertwining sylvan lattice';
+  if (!await tween(fromDrag ? 240 : 440, t => {
+    model.tendrilProgress = 0.8 + 0.2 * t;
+    model.light = (1 - t) * 0.3;
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.tendrilProgress = 1;
+  model.light = 0;
+  render();
+  say('Silver tendrils intertwined into sylvan lattice. Star-silver brooch locked. Pull leaf clasp right to unweave.');
+}
+
+async function separate() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Unweaving the silver tendrils. Hulls glide smoothly apart.');
+
+  $('#phase').textContent = 'Releasing sylvan lattice';
+  if (!await tween(260, t => {
+    model.tendrilProgress = 1 - t * 0.6;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Gliding star-silver housings apart';
+  if (!await tween(560, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.5);
+    model.cap = 1 - Math.max(0, (t - 0.3) / 0.7);
+    model.tendrilProgress = (1 - t) * 0.4;
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.tendrilProgress = 0;
+  render();
+  say('Separated. Independent sylvan star-silver hulls restored.');
+}
+
+// Preset State Switchers
+async function applyState(stateName) {
+  if (model.busy) return;
+  ++animationToken;
+
+  if (stateName === 'separate') {
+    model.shade = false;
+    if (model.joined) {
+      await separate();
+    } else {
+      model.tendrilProgress = 0;
+      model.cap = 0;
+      model.blend = 0;
+      model.a.x = 140;
+      model.b.x = 680;
+      render();
+      say('State: Separate — Two independent star-silver capsules.');
+    }
+  } else if (stateName === 'joining') {
+    model.shade = false;
+    model.joined = false;
+    model.blend = 0.25;
+    model.cap = 0.6;
+    model.tendrilProgress = 0.58; // mid-flight reaching tendrils
+    model.light = 0.8;
+    model.a.x = 240;
+    model.b.x = 240 + W + 50; // approaching each other
+    render();
+    say('State: Joining — Mid-animation view with silver tendrils uncoiling across the chasm.');
+  } else if (stateName === 'joined') {
+    model.shade = false;
+    if (!model.joined) {
+      model.a.x = 220;
+      model.b.x = 220 + JOIN_DISTANCE;
+      model.joined = true;
+      model.blend = 1;
+      model.cap = 1;
+      model.tendrilProgress = 1;
+      model.light = 0;
+      render();
+      say('State: Joined — Monolithic star-silver hull with Art Nouveau sylvan lattice.');
+    }
+  } else if (stateName === 'shade') {
+    model.shade = true;
+    render();
+    say('State: Shade — Collapsed to slender star-silver diadem wand.');
+  }
+}
+
+// Canopy & Astral Talisman Actions
+function toggleCanopy(open = !model.canopy) {
+  if (drag) cancelDrag();
+  model.canopy = open;
+  if (open && model.a.y > 310) {
+    const dy = model.a.y - 310;
+    model.a.y = 310;
+    if (model.joined) model.b.y -= dy;
+  }
+  render();
+  say(open ? 'Astral canopy open. Place Checks into its lotus cradle, or use Insert.' : 'Astral canopy closed.');
+}
+
+async function insertChecks() {
+  if (model.busy || model.docked) return;
+  if (!model.canopy) toggleCanopy(true);
+  stopDrag();
+  model.busy = true;
+  model.feel = 'free';
+  model.light = 0;
+  const token = ++animationToken, start = { ...model.meter }, target = canopyTarget();
+  render();
+
+  const dist = Math.hypot(start.x - target.x, start.y - target.y);
+  if (!await tween(dist < 75 ? 160 : 340, t => {
+    model.meter.x = start.x + (target.x - start.x) * t;
+    model.meter.y = start.y + (target.y - start.y) * t;
+    render();
+  }, token)) return;
+
+  model.docked = true;
+  model.busy = false;
+  $('#astralBay').classList.remove('hot');
+  render();
+  say('Checks Astral Talisman nestled in lotus cradle. Pull smoothly to free, or use Eject.');
+}
+
+function ejectChecks() {
+  if (model.busy) return;
+  stopDrag();
+  model.feel = 'free';
+  model.docked = false;
+  model.meter.x = Math.min(900, model.a.x + 430);
+  model.meter.y = Math.min(510, model.a.y + 190);
+  render();
+  say('Checks Astral Talisman released from canopy.');
+}
+
+function setPage(id, p) { model[id].page = p; render(); }
+
+// Event Wiring
+$('#btnStateSeparate').onclick = () => applyState('separate');
+$('#btnStateJoining').onclick = () => applyState('joining');
+$('#btnStateJoined').onclick = () => applyState('joined');
+$('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
+$('#btnJoinAnim').onclick = () => join();
+$('#btnSeparateAnim').onclick = () => separate();
+$('#btnDesign').onclick = () => {
+  model.design = !model.design;
+  render();
+  say(model.design ? 'Design mode: Showing tendril collar bounds & astral bay.' : 'Design mode off.');
+};
+$('#btnReset').onclick = () => {
+  ++animationToken;
+  stopDrag();
+  resetGlow();
+  Object.assign(model, {
+    joined: false, busy: false, canopy: false, docked: false, design: false, shade: false,
+    blend: 0, cap: 0, tendrilProgress: 0, light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+  });
+  Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
+  Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
+  Object.assign(model.meter, { x: 805, y: 510 });
+  render();
+  say('Reset to initial Elven study configuration.');
+};
+
+$('#optionSelect').onchange = (e) => {
+  say('Option selected: Living Tendril Braid (Sylvan Weave) join.');
+};
+
+$('#a .canopy-btn').onclick = () => toggleCanopy();
+$('#closeCanopy').onclick = () => toggleCanopy(false);
+$('#insertTalisman').onclick = () => insertChecks();
+$('#ejectTalisman').onclick = () => ejectChecks();
+
+$('#harmonyDial').onclick = () => {
+  model.limit = (model.limit % 6) + 1;
+  render();
+};
+
+['a', 'b'].forEach(id => {
+  const el = $('#' + id);
+  el.querySelectorAll('.elven-tab').forEach((tab, index) => {
+    tab.onclick = () => setPage(id, index);
+  });
+  el.querySelector('.next-btn').onclick = () => {
+    setPage(id, (model[id].page + 1) % 3);
+  };
+  el.querySelector('.run-btn').onclick = () => {
+    model[id].running = !model[id].running;
+    render();
+  };
+});
+
+function alignedTarget() {
+  return { x: model.a.x + JOIN_DISTANCE, y: model.a.y };
+}
+function canopyTarget() {
+  return { x: model.a.x + 58, y: model.a.y + (model.shade ? 40 : 121) + 40 };
+}
+function pointerDistance(target, current) {
+  return Math.hypot(target.x - current.x, target.y - current.y);
+}
+function connectionState(type) {
+  const dist = type === 'socket' ?
+    (model.joined ? 0 : pointerDistance(alignedTarget(), model.b)) :
+    (model.docked ? 0 : (!model.canopy ? 999 : pointerDistance(canopyTarget(), model.meter)));
+  if (dist <= DOCKING.capture) return 'ready';
+  if (dist <= DOCKING.near) return 'near';
+  return 'none';
+}
+function calculateGlowTarget(dist) {
+  if (dist > DOCKING.near) return 0;
+  if (dist <= DOCKING.capture) return 1;
+  const ratio = (DOCKING.near - dist) / (DOCKING.near - DOCKING.capture);
+  return 0.18 + 0.44 * Math.pow(ratio, 0.8);
+}
+function updateGlowTargets() {
+  if (model.joined) connectionGlow.socket.target = 0;
+  else connectionGlow.socket.target = calculateGlowTarget(pointerDistance(alignedTarget(), model.b));
+
+  if (model.docked || !model.canopy) connectionGlow.bay.target = 0;
+  else connectionGlow.bay.target = calculateGlowTarget(pointerDistance(canopyTarget(), model.meter));
+}
+function stepGlow(current, target, dt) {
+  if (motion.matches) return target;
+  return target + (current - target) * Math.exp(-dt / 40);
+}
+function animateGlow(time) {
+  glowFrame = requestAnimationFrame(animateGlow);
+  const dt = glowTime ? Math.min(32, time - glowTime) : 16;
+  glowTime = time;
+  connectionGlow.socket.value = stepGlow(connectionGlow.socket.value, connectionGlow.socket.target, dt);
+  connectionGlow.bay.value = stepGlow(connectionGlow.bay.value, connectionGlow.bay.target, dt);
+  paintGlowValues();
+}
+function resetGlow() {
+  connectionGlow.socket.value = connectionGlow.socket.target = 0;
+  connectionGlow.bay.value = connectionGlow.bay.target = 0;
+  paintGlowValues();
+}
+function paintGlowValues() {
+  $('#astralBay').style.setProperty('--dock-glow', connectionGlow.bay.value.toFixed(3));
+}
+
+// Drag & Interaction Physics
+function startDrag(e) {
+  if (model.busy || e.button !== 0) return;
+  const grip = e.target.closest('[data-drag]');
+  if (!grip) return;
+
+  const kind = grip.dataset.drag;
+  e.preventDefault();
+  grip.setPointerCapture(e.pointerId);
+
+  const startPointer = { x: e.clientX, y: e.clientY };
+  if (kind === 'a' || kind === 'b') {
+    model.front = kind;
+    drag = {
+      kind: 'module', id: kind, pointerId: e.pointerId, startPointer,
+      startA: { ...model.a }, startB: { ...model.b },
+      offset: { x: e.clientX - model[kind].x, y: e.clientY - model[kind].y }
+    };
+  } else if (kind === 'meter') {
+    if (model.docked) {
+      drag = {
+        kind: 'meterLatch', pointerId: e.pointerId, startPointer,
+        deflect: { x: 0, y: 0 }, origin: { ...model.meter }
+      };
+    } else {
+      drag = {
+        kind: 'meter', pointerId: e.pointerId, startPointer,
+        offset: { x: e.clientX - model.meter.x, y: e.clientY - model.meter.y }
+      };
+    }
+  } else if (kind === 'release') {
+    drag = {
+      kind: 'release', pointerId: e.pointerId, startPointer,
+      released: false, dx: 0
+    };
+  }
+}
+
+function onPointerMove(e) {
+  if (!drag || drag.pointerId !== e.pointerId) return;
+  const dx = e.clientX - drag.startPointer.x, dy = e.clientY - drag.startPointer.y;
+
+  if (drag.kind === 'module') {
+    if (model.joined) {
+      model.a.x = Math.max(20, Math.min(1200 - (JOIN_DISTANCE + W) - 20, drag.startA.x + dx));
+      model.a.y = Math.max(100, Math.min(model.canopy ? 305 : 385, drag.startA.y + dy));
+      model.b.x = model.a.x + JOIN_DISTANCE;
+      model.b.y = model.a.y;
+    } else {
+      const m = model[drag.id];
+      const start = drag.id === 'a' ? drag.startA : drag.startB;
+      let rawX = start.x + dx, rawY = start.y + dy;
+      rawX = Math.max(20, Math.min(1200 - W - 20, rawX));
+      rawY = Math.max(100, Math.min(model.canopy && drag.id === 'a' ? 305 : 385, rawY));
+
+      if (drag.id === 'b') {
+        const align = alignedTarget();
+        const dist = Math.hypot(align.x - rawX, align.y - rawY);
+        if (dist <= DOCKING.capture) {
+          rawX = align.x + (rawX - align.x) * 0.12;
+          rawY = align.y + (rawY - align.y) * 0.12;
+          model.feel = 'captured';
+        } else if (dist <= DOCKING.near) {
+          model.feel = 'near';
+        } else {
+          model.feel = 'free';
+        }
+      }
+      m.x = rawX;
+      m.y = rawY;
+    }
+    render();
+  } else if (drag.kind === 'meter') {
+    let rawX = drag.startPointer.x + dx - drag.offset.x;
+    let rawY = drag.startPointer.y + dy - drag.offset.y;
+    rawX = Math.max(20, Math.min(1200 - 276 - 20, rawX));
+    rawY = Math.max(80, Math.min(600, rawY));
+
+    if (model.canopy) {
+      const target = canopyTarget();
+      const dist = Math.hypot(target.x - rawX, target.y - rawY);
+      if (dist <= DOCKING.capture) {
+        rawX = target.x + (rawX - target.x) * 0.12;
+        rawY = target.y + (rawY - target.y) * 0.12;
+        model.feel = 'bayCaptured';
+      }
+    }
+    model.meter.x = rawX;
+    model.meter.y = rawY;
+    render();
+  } else if (drag.kind === 'meterLatch') {
+    const pullDist = Math.hypot(dx, dy);
+    if (pullDist > 46) {
+      model.docked = false;
+      const target = canopyTarget();
+      model.meter.x = target.x + dx;
+      model.meter.y = target.y + dy;
+      drag = {
+        kind: 'meter', pointerId: e.pointerId, startPointer: { x: e.clientX, y: e.clientY },
+        offset: { x: 138, y: 40 }
+      };
+      say('Checks Astral Talisman freed from lotus cradle.');
+      render();
+    } else {
+      drag.deflect = { x: dx * 0.25, y: dy * 0.25 };
+      render();
+    }
+  } else if (drag.kind === 'release') {
+    const pullX = Math.max(0, dx);
+    drag.dx = pullX;
+    model.tension = Math.min(1, pullX / 72);
+    render();
+    if (pullX >= 72 && !drag.released) {
+      drag.released = true;
+      separate();
+    }
+  }
+}
+
+function onPointerUp(e) {
+  if (!drag || drag.pointerId !== e.pointerId) return;
+  if (drag.kind === 'module' && drag.id === 'b' && !model.joined) {
+    if (pointerDistance(alignedTarget(), model.b) <= DOCKING.capture) {
+      join(true);
+      return;
+    }
+  } else if (drag.kind === 'meter' && !model.docked && model.canopy) {
+    if (pointerDistance(canopyTarget(), model.meter) <= DOCKING.capture) {
+      insertChecks();
+      return;
+    }
+  }
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  render();
+}
+
+function stopDrag() {
+  drag = null;
+}
+function cancelDrag() {
+  if (!drag) return;
+  if (drag.kind === 'module') {
+    model.a.x = drag.startA.x; model.a.y = drag.startA.y;
+    model.b.x = drag.startB.x; model.b.y = drag.startB.y;
+  }
+  stopDrag();
+  render();
+}
+
+window.addEventListener('pointerdown', startDrag);
+window.addEventListener('pointermove', onPointerMove);
+window.addEventListener('pointerup', onPointerUp);
+window.addEventListener('pointercancel', onPointerUp);
+window.addEventListener('keydown', e => {
+  if (e.key === 'Escape') cancelDrag();
+  if (e.key === 'Enter' && document.activeElement === $('#sylvanRelease')) separate();
+});
+
+requestAnimationFrame(animateGlow);
+render();
+say('Elven & Intricate skin loaded: Spun star-silver with Living Tendril Braid join.');
+</script>
+</body>
+</html>
