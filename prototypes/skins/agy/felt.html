@@ -782,15 +782,16 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Tactile Felt <span>/ fiber entanglement &amp; accordion bellows pleats</span></h1>
-    <p>Dense carded wool roving · Scored accordion pleats · Needle-felt join · Bellows pleat shade</p>
+    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat &amp; duffel toggle</span></h1>
+    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Braided twisted wool loops</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
       <label for="optionSelect">Option</label>
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="entanglement">1. Needle-Felt Fiber Entanglement</option>
-        <option value="bellows" selected>2. Accordion Bellows Pleat shade</option>
+        <option value="bellows">2. Accordion Bellows Pleat shade</option>
+        <option value="duffel" selected>3. Duffel Toggle &amp; Braid Cord join</option>
       </select>
     </div>
     <div class="control-group">
@@ -800,9 +801,9 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim">Join capsules</button>
+    <button id="btnJoinAnim" class="primary-btn">Fasten duffel toggles</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
-    <button id="btnBellowsAnim" class="primary-btn">Fold accordion pleats</button>
+    <button id="btnBellowsAnim">Fold accordion pleats</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -853,6 +854,31 @@ footer .note-highlight {
           <stop offset="25%" stop-color="#9a6d38"/>
           <stop offset="70%" stop-color="#583c1b"/>
           <stop offset="100%" stop-color="#34220e"/>
+        </linearGradient>
+
+        <!-- Turned Olive-Wood Toggle Gradient for Duffel Pegs -->
+        <linearGradient id="duffelWoodGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#e2bc80"/>
+          <stop offset="18%" stop-color="#b6833c"/>
+          <stop offset="42%" stop-color="#7e5220"/>
+          <stop offset="68%" stop-color="#4e3011"/>
+          <stop offset="90%" stop-color="#2d1a08"/>
+          <stop offset="100%" stop-color="#190e04"/>
+        </linearGradient>
+
+        <!-- Dark Bridle Leather Anchor Tab Gradient -->
+        <linearGradient id="leatherTabGrad" x1="0" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stop-color="#4a3121"/>
+          <stop offset="50%" stop-color="#342013"/>
+          <stop offset="100%" stop-color="#1f1107"/>
+        </linearGradient>
+
+        <!-- Braided Twisted Wool Yarn Cord Gradient -->
+        <linearGradient id="braidCordGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="30%" stop-color="#fdfbf5"/>
+          <stop offset="70%" stop-color="#e8dec8"/>
+          <stop offset="100%" stop-color="#9a856a"/>
         </linearGradient>
 
         <!-- Subtle Needle Punch Texture Pattern -->
@@ -1053,6 +1079,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 2 — Accordion Bellows Pleat [Shade]:</span> When collapsing to shade mode, scored horizontal fold lines in the heavy 3mm wool felt allow the body to accordion-fold flat. The pleats compress with lateral concertina gusset squish, revealing authentic textile thickness, ambient occlusion fold shadows, and alternating ivory running stitches and gold cross-stitches. A woven twill stay strap with a turned olive-wood duffle toggle pin fastens the compressed pleats into an ultra-compact 44px padded ribbon. The high-contrast status text and glanceable agent pips remain perfectly readable.
   </p>
+  <p>
+    <span class="note-highlight">Option 3 — Duffel Toggle &amp; Braid Cord [Join]:</span> Module A features twin braided twisted-wool loop cords anchored by hand-sewn leather tabs. Module B carries twin hand-turned olive-wood toggle pins mounted on stitched leather patches with cross-stitched sinew. On docking, the braided cords reach across the gap, expand over the tapered toggle heads, and cinch taut into the carved waist grooves with a cushioned, muffled snap—creating a bespoke garment-style junction that holds the two plush felt casings securely together.
+  </p>
 </footer>
 
 <script>
@@ -1075,7 +1104,9 @@ const model = {
   cap: 0,
   entangle: 0, // 0 = wispy free fringes, 1 = fully interwoven & compressed
   bellowsFold: 0, // 0 = expanded full 130px height, 1 = folded flat accordion bellows (44px)
-  option: 'bellows', // 'entanglement' or 'bellows'
+  duffelLoop: 0, // 0 = resting relaxed loop, 0.65 = reaching open eyelet, 1 = cinched taut on toggle
+  duffelTension: 0, // cord tension
+  option: 'duffel', // 'entanglement', 'bellows', or 'duffel'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1472,6 +1503,208 @@ function drawEntangledFeltSeam(midX, y, entangleRatio, opacity = 1) {
   return s;
 }
 
+// Option 3: Duffel Toggle & Braid Cord Join
+function drawDuffelJoin(a, b, isJoined, duffelLoop, duffelTension, blend, bellowsFold) {
+  if (bellowsFold > 0.4) return '';
+  let s = `<g id="duffelToggleSeam">`;
+
+  // Upper toggle Y offset = 38, Lower toggle Y offset = 90
+  const yOffsets = [38, 90];
+
+  if (isJoined) {
+    const midX = a.x + JOIN_DISTANCE;
+    const tabAX = midX - 16;
+    const tabBX = midX + 16;
+
+    for (let i = 0; i < 2; i++) {
+      const cy = a.y + yOffsets[i];
+      const tilt = i === 0 ? 8 : -8; // slight asymmetrical hand-carved tilt
+
+      // 1. Leather Backing Tab on Module A (Sage Green side)
+      s += `
+        <!-- Module A Leather Anchor Tab -->
+        <g transform="translate(${tabAX}, ${cy})">
+          <path d="M-8 -14 L6 -14 Q10 -14 10 -9 L10 9 Q10 14 6 14 L-8 14 Q-12 14 -12 9 L-12 -9 Q-12 -14 -8 -14 Z"
+                fill="url(#leatherTabGrad)" stroke="#1a1109" stroke-width="1.2" filter="url(#woolPillowShadow)"/>
+          <!-- Contrast Hand Stitches -->
+          <path d="M-6 -12 L4 -12 Q8 -12 8 -8 L8 8 Q8 12 4 12 L-6 12 Q-10 12 -10 8 L-10 -8 Q-10 -12 -6 -12 Z"
+                fill="none" stroke="#faf6eb" stroke-width="1" stroke-dasharray="2.5 2" opacity="0.85"/>
+          <!-- Cord Anchor Eyelet -->
+          <circle cx="2" cy="0" r="2.5" fill="#140c06"/>
+          <circle cx="2" cy="0" r="1.2" fill="#faf6eb" opacity="0.7"/>
+        </g>
+      `;
+
+      // 2. Leather Backing Tab on Module B (Terracotta side)
+      s += `
+        <!-- Module B Leather Anchor Tab -->
+        <g transform="translate(${tabBX}, ${cy})">
+          <path d="M-6 -14 L8 -14 Q12 -14 12 -9 L12 9 Q12 14 8 14 L-6 14 Q-10 14 -10 9 L-10 -9 Q-10 -14 -6 -14 Z"
+                fill="url(#leatherTabGrad)" stroke="#1a1109" stroke-width="1.2" filter="url(#woolPillowShadow)"/>
+          <!-- Contrast Hand Stitches -->
+          <path d="M-4 -12 L6 -12 Q10 -12 10 -8 L10 8 Q10 12 6 12 L-4 12 Q-8 12 -8 8 L-8 -8 Q-8 -12 -4 -12 Z"
+                fill="none" stroke="#faf6eb" stroke-width="1" stroke-dasharray="2.5 2" opacity="0.85"/>
+          <!-- Anchor Sinew Cross Stitch -->
+          <line x1="-3" y1="-3" x2="3" y2="3" stroke="#e2b13c" stroke-width="1.2"/>
+          <line x1="-3" y1="3" x2="3" y2="-3" stroke="#e2b13c" stroke-width="1.2"/>
+        </g>
+      `;
+
+      // 3. Braided Twisted Wool Loop wrapped taut around Toggle Waist
+      const loopReach = tabBX - tabAX;
+      s += `
+        <!-- Braided Twisted Wool Loop (Taut) -->
+        <g>
+          <!-- Loop Shadow -->
+          <path d="M${tabAX + 2} ${cy - 4} Q${tabAX + loopReach * 0.5} ${cy - 2}, ${tabBX} ${cy - 2}
+                   C${tabBX + 8} ${cy - 2}, ${tabBX + 8} ${cy + 2}, ${tabBX} ${cy + 2}
+                   Q${tabAX + loopReach * 0.5} ${cy + 2}, ${tabAX + 2} ${cy + 4}"
+                fill="none" stroke="#000000" stroke-width="4" opacity="0.45" transform="translate(0, 3)"/>
+          <!-- Base Wool Braid Cord -->
+          <path d="M${tabAX + 2} ${cy - 4} Q${tabAX + loopReach * 0.5} ${cy - 2}, ${tabBX} ${cy - 2}
+                   C${tabBX + 8} ${cy - 2}, ${tabBX + 8} ${cy + 2}, ${tabBX} ${cy + 2}
+                   Q${tabAX + loopReach * 0.5} ${cy + 2}, ${tabAX + 2} ${cy + 4}"
+                fill="none" stroke="url(#braidCordGrad)" stroke-width="3.6" stroke-linecap="round"/>
+          <!-- Twisted Yarn Highlight -->
+          <path d="M${tabAX + 2} ${cy - 4} Q${tabAX + loopReach * 0.5} ${cy - 2}, ${tabBX} ${cy - 2}
+                   C${tabBX + 8} ${cy - 2}, ${tabBX + 8} ${cy + 2}, ${tabBX} ${cy + 2}
+                   Q${tabAX + loopReach * 0.5} ${cy + 2}, ${tabAX + 2} ${cy + 4}"
+                fill="none" stroke="#876f4e" stroke-width="1.3" stroke-dasharray="3.5 2.5" stroke-linecap="round"/>
+        </g>
+      `;
+
+      // 4. Turned Olive-Wood Toggle Peg seated over the loop
+      s += `
+        <!-- Turned Olive-Wood Toggle Peg -->
+        <g transform="translate(${tabBX}, ${cy}) rotate(${tilt})">
+          <!-- Toggle Drop Shadow -->
+          <path d="M-3 -16 C-1 -16 1 -16 3 -16 C5 -12 6 -6 5.5 -2 C5 -1 5 1 5.5 2 C6 6 5 12 3 16 C1 16 -1 16 -3 16 C-5 12 -6 6 -5.5 2 C-5 1 -5 -1 -5.5 -2 C-6 -6 -5 -12 -3 -16 Z"
+                fill="#000000" opacity="0.5" transform="translate(1, 4)"/>
+          <!-- Olive Wood Body -->
+          <path d="M-3 -16 C-1 -16 1 -16 3 -16 C5 -12 6 -6 5.5 -2 C5 -1 5 1 5.5 2 C6 6 5 12 3 16 C1 16 -1 16 -3 16 C-5 12 -6 6 -5.5 2 C-5 1 -5 -1 -5.5 -2 C-6 -6 -5 -12 -3 -16 Z"
+                fill="url(#duffelWoodGrad)" stroke="#221406" stroke-width="1.2"/>
+          <!-- Turned Wood Grain Rings -->
+          <path d="M-4.5 -8 Q0 -9.5 4.5 -8" stroke="#361f09" stroke-width="1" fill="none" opacity="0.7"/>
+          <path d="M-4.5 8 Q0 6.5 4.5 8" stroke="#361f09" stroke-width="1" fill="none" opacity="0.7"/>
+          <!-- Waist Groove Rim Highlight -->
+          <path d="M-4.8 -2 Q0 -3.5 4.8 -2" stroke="#f6deb3" stroke-width="0.8" fill="none" opacity="0.6"/>
+          <path d="M-4.8 2 Q0 0.5 4.8 2" stroke="#f6deb3" stroke-width="0.8" fill="none" opacity="0.6"/>
+          <!-- Satin Ridge Highlight -->
+          <path d="M-1.2 -14 L-1.2 14" stroke="#ffebc2" stroke-width="1.3" stroke-linecap="round" opacity="0.4"/>
+          <!-- Drilled Eyelets & Anchor Sinew Thread -->
+          <circle cx="0" cy="-3.5" r="1.4" fill="#1b1006"/>
+          <circle cx="0" cy="3.5" r="1.4" fill="#1b1006"/>
+          <line x1="-2.5" y1="-5.5" x2="2.5" y2="-1.5" stroke="#faf6eb" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="-2.5" y1="-1.5" x2="2.5" y2="-5.5" stroke="#faf6eb" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="-2.5" y1="1.5" x2="2.5" y2="5.5" stroke="#faf6eb" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="-2.5" y1="5.5" x2="2.5" y2="1.5" stroke="#faf6eb" stroke-width="1.2" stroke-linecap="round"/>
+        </g>
+      `;
+    }
+  } else {
+    // Separate or Joining state
+    const isJoining = duffelLoop > 0.05;
+    const tabAX = a.x + W - 16;
+    const tabBX = b.x + 18;
+
+    for (let i = 0; i < 2; i++) {
+      const cyA = a.y + yOffsets[i];
+      const cyB = b.y + yOffsets[i];
+      const tilt = isJoining ? (i === 0 ? 14 : -14) : (i === 0 ? 7 : -7);
+
+      // Leather Tab on Module A
+      s += `
+        <g transform="translate(${tabAX}, ${cyA})">
+          <path d="M-8 -14 L6 -14 Q10 -14 10 -9 L10 9 Q10 14 6 14 L-8 14 Q-12 14 -12 9 L-12 -9 Q-12 -14 -8 -14 Z"
+                fill="url(#leatherTabGrad)" stroke="#1a1109" stroke-width="1.2" filter="url(#woolPillowShadow)"/>
+          <path d="M-6 -12 L4 -12 Q8 -12 8 -8 L8 8 Q8 12 4 12 L-6 12 Q-10 12 -10 8 L-10 -8 Q-10 -12 -6 -12 Z"
+                fill="none" stroke="#faf6eb" stroke-width="1" stroke-dasharray="2.5 2" opacity="0.85"/>
+          <circle cx="2" cy="0" r="2.5" fill="#140c06"/>
+          <circle cx="2" cy="0" r="1.2" fill="#faf6eb" opacity="0.7"/>
+        </g>
+      `;
+
+      // Braided Loop on Module A
+      if (isJoining) {
+        // Reaching loop across gap toward toggle on B
+        const targetX = tabBX;
+        const targetY = cyB;
+        const reachX = tabAX + (targetX - tabAX) * Math.min(1, duffelLoop * 1.3);
+        const reachY = cyA + (targetY - cyA) * Math.min(1, duffelLoop * 1.3);
+        const openW = 9 + duffelLoop * 6; // eyelet opening expands
+
+        s += `
+          <g>
+            <!-- Reaching Loop Shadow -->
+            <path d="M${tabAX + 2} ${cyA - 4} C${tabAX + 20} ${cyA - openW}, ${reachX - 15} ${reachY - openW}, ${reachX} ${reachY - 3}
+                     C${reachX + 8} ${reachY - 2}, ${reachX + 8} ${reachY + 2}, ${reachX} ${reachY + 3}
+                     C${reachX - 15} ${reachY + openW}, ${tabAX + 20} ${cyA + openW}, ${tabAX + 2} ${cyA + 4}"
+                  fill="none" stroke="#000000" stroke-width="3.5" opacity="0.35" transform="translate(0, 3)"/>
+            <!-- Reaching Base Braid -->
+            <path d="M${tabAX + 2} ${cyA - 4} C${tabAX + 20} ${cyA - openW}, ${reachX - 15} ${reachY - openW}, ${reachX} ${reachY - 3}
+                     C${reachX + 8} ${reachY - 2}, ${reachX + 8} ${reachY + 2}, ${reachX} ${reachY + 3}
+                     C${reachX - 15} ${reachY + openW}, ${tabAX + 20} ${cyA + openW}, ${tabAX + 2} ${cyA + 4}"
+                  fill="none" stroke="url(#braidCordGrad)" stroke-width="3.4" stroke-linecap="round"/>
+            <!-- Twisted Highlight -->
+            <path d="M${tabAX + 2} ${cyA - 4} C${tabAX + 20} ${cyA - openW}, ${reachX - 15} ${reachY - openW}, ${reachX} ${reachY - 3}
+                     C${reachX + 8} ${reachY - 2}, ${reachX + 8} ${reachY + 2}, ${reachX} ${reachY + 3}
+                     C${reachX - 15} ${reachY + openW}, ${tabAX + 20} ${cyA + openW}, ${tabAX + 2} ${cyA + 4}"
+                  fill="none" stroke="#876f4e" stroke-width="1.3" stroke-dasharray="3.5 2.5" stroke-linecap="round"/>
+          </g>
+        `;
+      } else {
+        // Relaxed separate loop
+        s += `
+          <g>
+            <path d="M${tabAX + 2} ${cyA - 4} Q${tabAX + 16} ${cyA - 6}, ${tabAX + 24} ${cyA + 1}
+                     Q${tabAX + 16} ${cyA + 7}, ${tabAX + 2} ${cyA + 4}"
+                  fill="none" stroke="#000000" stroke-width="3.2" opacity="0.3" transform="translate(0, 2)"/>
+            <path d="M${tabAX + 2} ${cyA - 4} Q${tabAX + 16} ${cyA - 6}, ${tabAX + 24} ${cyA + 1}
+                     Q${tabAX + 16} ${cyA + 7}, ${tabAX + 2} ${cyA + 4}"
+                  fill="none" stroke="url(#braidCordGrad)" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M${tabAX + 2} ${cyA - 4} Q${tabAX + 16} ${cyA - 6}, ${tabAX + 24} ${cyA + 1}
+                     Q${tabAX + 16} ${cyA + 7}, ${tabAX + 2} ${cyA + 4}"
+                  fill="none" stroke="#876f4e" stroke-width="1.2" stroke-dasharray="3 2" stroke-linecap="round"/>
+          </g>
+        `;
+      }
+
+      // Leather Tab and Olive-Wood Toggle on Module B
+      s += `
+        <g transform="translate(${tabBX}, ${cyB})">
+          <path d="M-6 -14 L8 -14 Q12 -14 12 -9 L12 9 Q12 14 8 14 L-6 14 Q-10 14 -10 9 L-10 -9 Q-10 -14 -6 -14 Z"
+                fill="url(#leatherTabGrad)" stroke="#1a1109" stroke-width="1.2" filter="url(#woolPillowShadow)"/>
+          <path d="M-4 -12 L6 -12 Q10 -12 10 -8 L10 8 Q10 12 6 12 L-4 12 Q-8 12 -8 8 L-8 -8 Q-8 -12 -4 -12 Z"
+                fill="none" stroke="#faf6eb" stroke-width="1" stroke-dasharray="2.5 2" opacity="0.85"/>
+          <line x1="-3" y1="-3" x2="3" y2="3" stroke="#e2b13c" stroke-width="1.2"/>
+          <line x1="-3" y1="3" x2="3" y2="-3" stroke="#e2b13c" stroke-width="1.2"/>
+        </g>
+        <!-- Turned Olive-Wood Toggle Peg -->
+        <g transform="translate(${tabBX}, ${cyB}) rotate(${tilt})">
+          <path d="M-3 -16 C-1 -16 1 -16 3 -16 C5 -12 6 -6 5.5 -2 C5 -1 5 1 5.5 2 C6 6 5 12 3 16 C1 16 -1 16 -3 16 C-5 12 -6 6 -5.5 2 C-5 1 -5 -1 -5.5 -2 C-6 -6 -5 -12 -3 -16 Z"
+                fill="#000000" opacity="0.45" transform="translate(1, 3)"/>
+          <path d="M-3 -16 C-1 -16 1 -16 3 -16 C5 -12 6 -6 5.5 -2 C5 -1 5 1 5.5 2 C6 6 5 12 3 16 C1 16 -1 16 -3 16 C-5 12 -6 6 -5.5 2 C-5 1 -5 -1 -5.5 -2 C-6 -6 -5 -12 -3 -16 Z"
+                fill="url(#duffelWoodGrad)" stroke="#221406" stroke-width="1.2"/>
+          <path d="M-4.5 -8 Q0 -9.5 4.5 -8" stroke="#361f09" stroke-width="1" fill="none" opacity="0.7"/>
+          <path d="M-4.5 8 Q0 6.5 4.5 8" stroke="#361f09" stroke-width="1" fill="none" opacity="0.7"/>
+          <path d="M-4.8 -2 Q0 -3.5 4.8 -2" stroke="#f6deb3" stroke-width="0.8" fill="none" opacity="0.6"/>
+          <path d="M-4.8 2 Q0 0.5 4.8 2" stroke="#f6deb3" stroke-width="0.8" fill="none" opacity="0.6"/>
+          <path d="M-1.2 -14 L-1.2 14" stroke="#ffebc2" stroke-width="1.3" stroke-linecap="round" opacity="0.4"/>
+          <circle cx="0" cy="-3.5" r="1.4" fill="#1b1006"/>
+          <circle cx="0" cy="3.5" r="1.4" fill="#1b1006"/>
+          <line x1="-2.5" y1="-5.5" x2="2.5" y2="-1.5" stroke="#faf6eb" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="-2.5" y1="-1.5" x2="2.5" y2="-5.5" stroke="#faf6eb" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="-2.5" y1="1.5" x2="2.5" y2="5.5" stroke="#faf6eb" stroke-width="1.2" stroke-linecap="round"/>
+          <line x1="-2.5" y1="5.5" x2="2.5" y2="1.5" stroke="#faf6eb" stroke-width="1.2" stroke-linecap="round"/>
+        </g>
+      `;
+    }
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Render the entire hardware layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -1487,11 +1720,19 @@ function renderHardware() {
     shared += drawFeltCasing(a.x, a.y, (b.x + W) - a.x, 'url(#unifiedFeltGrad)', p, f);
   }
 
-  // Draw Option 1 Entangled Fiber Seam
-  if (!isShade && (model.joined || model.entangle > 0.02 || (glow > 0.3 && !model.joined))) {
-    const entRatio = model.joined ? 1 : model.entangle || Math.max(0, (glow - 0.25) / 0.75);
-    const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 16 + b.x + 16) / 2;
-    shared += drawEntangledFeltSeam(kMidX, a.y, entRatio, Math.max(p, glow > 0.3 ? 0.9 : entRatio));
+  if (!isShade) {
+    if (model.option === 'duffel') {
+      // Option 3: Duffel Toggle & Braid Cord Join
+      const dLoop = model.joined ? 1 : (model.duffelLoop || (glow > 0.25 ? (glow - 0.25) / 0.75 : 0));
+      shared += drawDuffelJoin(a, b, model.joined, dLoop, model.duffelTension, p, f);
+    } else {
+      // Option 1: Entangled Fiber Seam (or default)
+      if (model.joined || model.entangle > 0.02 || (glow > 0.3 && !model.joined)) {
+        const entRatio = model.joined ? 1 : model.entangle || Math.max(0, (glow - 0.25) / 0.75);
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 16 + b.x + 16) / 2;
+        shared += drawEntangledFeltSeam(kMidX, a.y, entRatio, Math.max(p, glow > 0.3 ? 0.9 : entRatio));
+      }
+    }
   }
 
   if (model.joined && model.design) {
@@ -1505,9 +1746,13 @@ function renderHardware() {
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
     const grad = isA ? 'url(#sageWoolGrad)' : 'url(#terracottaWoolGrad)';
-    const individual = drawFeltCasing(0, 0, W, grad, 1, f) +
-      drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, f) +
-      drawRovingCap(0, 0, true, !isA, isA ? model.cap : 0, f);
+    let individual = drawFeltCasing(0, 0, W, grad, 1, f);
+
+    // Only draw roving fringe caps if NOT in duffel option
+    if (model.option !== 'duffel') {
+      individual += drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, f) +
+                    drawRovingCap(0, 0, true, !isA, isA ? model.cap : 0, f);
+    }
 
     $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawFeltSocketLight(isA ? W - 22 : 22, 0, glow)}</g>`;
   }
@@ -1623,6 +1868,14 @@ function render() {
     $('#btnJoinAnim').classList.toggle('primary-btn', !isBellowsOption);
   }
 
+  if (model.option === 'duffel') {
+    $('#btnJoinAnim').textContent = 'Fasten duffel toggles';
+  } else if (model.option === 'entanglement') {
+    $('#btnJoinAnim').textContent = 'Interweave roving fibers';
+  } else {
+    $('#btnJoinAnim').textContent = 'Join capsules';
+  }
+
   $('#concurrencyValue').textContent = model.limit;
   $('#concurrencyToggle').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
 
@@ -1631,12 +1884,25 @@ function render() {
   release.style.left = (model.a.x + 338) + 'px';
   release.style.top = (model.a.y + 42) + 'px';
   release.style.setProperty('--tension', model.tension);
+  if (model.option === 'duffel') {
+    release.setAttribute('aria-label', 'Release GitDiscuss: pull right or press Enter to unhook duffel toggles');
+    release.title = 'Pull right to unloop duffel toggles · Enter to separate';
+  } else {
+    release.setAttribute('aria-label', 'Release GitDiscuss: pull right or press Enter to peel fibers');
+    release.title = 'Pull right to peel fibers · Enter to separate';
+  }
 
   if (!model.busy) {
     if (model.shade || model.bellowsFold > 0.8) {
       $('#phase').textContent = 'Shade mode / Accordion bellows folded flat';
     } else if (model.joined) {
-      $('#phase').textContent = 'Joined / Interwoven fiber chassis';
+      if (model.option === 'duffel') {
+        $('#phase').textContent = 'Joined / Fastened duffel toggles & braided cords';
+      } else {
+        $('#phase').textContent = 'Joined / Interwoven fiber chassis';
+      }
+    } else if (model.option === 'duffel' && model.duffelLoop > 0.05) {
+      $('#phase').textContent = 'Joining / Braided loops reaching toward toggles';
     } else if (model.entangle > 0.1) {
       $('#phase').textContent = 'Joining / Roving fibers interweaving';
     } else {
@@ -1752,6 +2018,123 @@ async function separate() {
   model.entangle = 0;
   render();
   say('Separated. Independent tactile felt housings restored.');
+}
+
+// Option 3 Join Animation: Braided wool loops reach out, loop over olive-wood toggle pegs, and cinch taut
+async function joinDuffel(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Braided wool loops reach out. Turned olive-wood toggle pegs align for docking.');
+  $('#phase').textContent = 'Stretching braided loops';
+
+  // 1. Initial proximity glow and loop expansion
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 90 : 240, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    model.duffelLoop = t * 0.4;
+    renderHardware();
+  }, token)) return;
+
+  // 2. Loop opening widens and extends across the gap
+  $('#phase').textContent = 'Opening braided eyelets';
+  if (!await tween(fromDrag ? 140 : 300, t => {
+    model.cap = t;
+    model.duffelLoop = 0.4 + t * 0.3; // reaches 0.7 (wide open eyelets)
+    renderHardware();
+  }, token)) return;
+
+  // 3. Modules draw together flush
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.pocket ? 305 : 385, model.a.y));
+
+  $('#phase').textContent = 'Looping over wooden toggles';
+  if (!await tween(fromDrag ? 260 : 480, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.duffelLoop = 0.7 + t * 0.2; // 0.7 -> 0.9
+    model.light = 1 - t;
+    render();
+  }, token)) return;
+
+  // 4. Cushioned snap & cinch taut into waist grooves
+  $('#phase').textContent = 'Cinching toggle waists';
+  if (!await tween(fromDrag ? 180 : 320, t => {
+    const snap = t < 0.7 ? (t / 0.7) * 1.15 : 1.15 - ((t - 0.7) / 0.3) * 0.15;
+    model.duffelLoop = 0.9 + (snap * 0.1);
+    model.duffelTension = t;
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.duffelLoop = 1;
+  model.duffelTension = 1;
+  model.light = 0;
+  render();
+  say('Duffel toggles fastened! Braided wool loops cinched taut around olive-wood pegs. Pull the toggle latch right to unloop.');
+}
+
+async function separateDuffel() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Unlooping braided cords from olive-wood toggles. Releasing tension.');
+
+  // 1. Loops ease and slip off toggle waists
+  $('#phase').textContent = 'Unlooping toggle pegs';
+  if (!await tween(260, t => {
+    model.duffelTension = 1 - t;
+    model.duffelLoop = 1 - t * 0.4;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  // 2. Modules slide apart
+  $('#phase').textContent = 'Separating felt housings';
+  if (!await tween(520, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.6);
+    model.cap = 1 - Math.max(0, (t - 0.4) / 0.6);
+    model.duffelLoop = Math.max(0, 0.6 * (1 - t));
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.duffelLoop = 0;
+  model.duffelTension = 0;
+  render();
+  say('Separated. Independent felt housings restored with relaxed duffel loops.');
+}
+
+function triggerJoin(fromDrag = false) {
+  if (model.option === 'duffel') return joinDuffel(fromDrag);
+  return join(fromDrag);
+}
+
+function triggerSeparate() {
+  if (model.option === 'duffel') return separateDuffel();
+  return separate();
 }
 
 // Option 2: Accordion Bellows Pleat Shade Animations
@@ -1876,9 +2259,11 @@ async function applyState(stateName) {
       await unfoldBellows();
     }
     if (model.joined) {
-      await separate();
+      await triggerSeparate();
     } else {
       model.entangle = 0;
+      model.duffelLoop = 0;
+      model.duffelTension = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -1893,12 +2278,24 @@ async function applyState(stateName) {
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.5;
-    model.entangle = 0.55; // mid-flight fibers reaching and crossing
+    if (model.option === 'duffel') {
+      model.duffelLoop = 0.65;
+      model.duffelTension = 0.3;
+      model.entangle = 0;
+    } else {
+      model.entangle = 0.55; // mid-flight fibers reaching and crossing
+      model.duffelLoop = 0;
+      model.duffelTension = 0;
+    }
     model.light = 0.75;
     model.a.x = 240;
     model.b.x = 240 + W + 50; // near each other
     render();
-    say('State: Joining — Mid-animation view with roving fibers interweaving.');
+    if (model.option === 'duffel') {
+      say('State: Joining — Braided wool loops reaching open toward olive-wood toggles.');
+    } else {
+      say('State: Joining — Mid-animation view with roving fibers interweaving.');
+    }
   } else if (stateName === 'joined') {
     if (model.shade || model.bellowsFold > 0.05) {
       await unfoldBellows();
@@ -1909,10 +2306,22 @@ async function applyState(stateName) {
       model.joined = true;
       model.blend = 1;
       model.cap = 1;
-      model.entangle = 1;
+      if (model.option === 'duffel') {
+        model.duffelLoop = 1;
+        model.duffelTension = 1;
+        model.entangle = 0;
+      } else {
+        model.entangle = 1;
+        model.duffelLoop = 0;
+        model.duffelTension = 0;
+      }
       model.light = 0;
       render();
-      say('State: Joined — Plush unified felt chassis with hand-sewn cross-stitches.');
+      if (model.option === 'duffel') {
+        say('State: Joined — Duffel toggles fastened with braided wool cords.');
+      } else {
+        say('State: Joined — Plush unified felt chassis with hand-sewn cross-stitches.');
+      }
     }
   } else if (stateName === 'shade') {
     if (model.shade || model.bellowsFold > 0.5) {
@@ -1978,8 +2387,8 @@ $('#btnStateSeparate').onclick = () => applyState('separate');
 $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState('shade');
-$('#btnJoinAnim').onclick = () => join();
-$('#btnSeparateAnim').onclick = () => separate();
+$('#btnJoinAnim').onclick = () => triggerJoin();
+$('#btnSeparateAnim').onclick = () => triggerSeparate();
 $('#btnBellowsAnim').onclick = () => {
   if (model.shade || model.bellowsFold > 0.5) unfoldBellows();
   else foldBellows();
@@ -1995,7 +2404,7 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, pocket: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, entangle: 0, bellowsFold: 0, option: 'bellows', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, entangle: 0, bellowsFold: 0, duffelLoop: 0, duffelTension: 0, option: 'duffel', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
@@ -2007,8 +2416,35 @@ $('#btnReset').onclick = () => {
 // Option selector change
 $('#optionSelect').onchange = (e) => {
   model.option = e.target.value;
+  if (model.joined) {
+    if (model.option === 'duffel') {
+      model.duffelLoop = 1;
+      model.duffelTension = 1;
+      model.entangle = 0;
+    } else if (model.option === 'entanglement') {
+      model.entangle = 1;
+      model.duffelLoop = 0;
+      model.duffelTension = 0;
+    }
+  } else if (!model.shade && pointerDistance(alignedTarget(), model.b) < DOCKING.near) {
+    if (model.option === 'duffel') {
+      model.duffelLoop = 0.65;
+      model.duffelTension = 0.3;
+      model.entangle = 0;
+    } else {
+      model.entangle = 0.55;
+      model.duffelLoop = 0;
+      model.duffelTension = 0;
+    }
+  } else {
+    model.duffelLoop = 0;
+    model.entangle = 0;
+    model.duffelTension = 0;
+  }
   render();
-  if (model.option === 'bellows') {
+  if (model.option === 'duffel') {
+    say('Option 3: Duffel Toggle & Braid Cord join selected. Braided wool loops catch over turned olive-wood toggle pegs.');
+  } else if (model.option === 'bellows') {
     say('Option 2: Accordion Bellows Pleat shade selected. Scored wool pleats fold flat with lateral cushioning into a padded ribbon.');
   } else {
     say('Option 1: Needle-Felt Fiber Entanglement join selected. Roving fringes reach and interweave on approach.');
@@ -2209,7 +2645,7 @@ function onPointerMove(e) {
     render();
     if (pullX >= 72 && !drag.released) {
       drag.released = true;
-      separate();
+      triggerSeparate();
     }
   }
 }
@@ -2218,7 +2654,7 @@ function onPointerUp(e) {
   if (!drag || drag.pointerId !== e.pointerId) return;
   if (drag.kind === 'module' && drag.id === 'b' && !model.joined) {
     if (pointerDistance(alignedTarget(), model.b) <= DOCKING.capture) {
-      join(true);
+      triggerJoin(true);
       return;
     }
   } else if (drag.kind === 'meter' && !model.docked && model.pocket) {
@@ -2253,7 +2689,7 @@ window.addEventListener('pointerup', onPointerUp);
 window.addEventListener('pointercancel', onPointerUp);
 window.addEventListener('keydown', e => {
   if (e.key === 'Escape') cancelDrag();
-  if (e.key === 'Enter' && document.activeElement === $('#toggleRelease')) separate();
+  if (e.key === 'Enter' && document.activeElement === $('#toggleRelease')) triggerSeparate();
 });
 
 // Viewport Scaling for Phone & Mobile Widths (390px)
@@ -2274,7 +2710,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement join & Accordion Bellows shade.');
+say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat shade & Duffel Toggle join.');
 </script>
 </body>
 </html>
