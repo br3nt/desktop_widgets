@@ -87,6 +87,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
  <pattern id="weave" width="3" height="3" patternUnits="userSpaceOnUse"><path d="M0 .5H3M1.5 0V3" stroke="#fff" stroke-opacity=".08" stroke-width=".8"/></pattern>
  <pattern id="woven" width="2" height="1.6" patternUnits="userSpaceOnUse"><path d="M0 .4H2" stroke="#6b4a2a" stroke-opacity=".13" stroke-width=".7"/><path d="M1 0V1.6" stroke="#fff" stroke-opacity=".3" stroke-width=".5"/></pattern>
+ <pattern id="satin" width="1.7" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-32)"><path d="M.4 0V4" stroke="#000" stroke-opacity=".24" stroke-width=".55"/><path d="M1.2 0V4" stroke="#fff" stroke-opacity=".22" stroke-width=".4"/></pattern>
  <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#efe9dc"/><stop offset=".45" stop-color="#a9a297"/><stop offset="1" stop-color="#5d574f"/></linearGradient>
  <filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter>
  <filter id="sh" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="1.3"/></filter>
@@ -267,6 +268,80 @@ function pocketDraw(id,w,h,small,st){
  return s+'</g>';
 }
 
+/* ---------- Bolster shade ---------- */
+const RIBBON={a:['#5e1219','#a8303a','#e3707a'],b:['#7a5414','#d9a43a','#f6d88a'],c:['#7c3a52','#d98aa4','#f8cbd8']};
+const EMB={a:['#2c0e05','#5a1f0c'],b:['#cdb48a','#fbf0d6'],c:['#d6b9c4','#fbeef2']};
+// Rolled amount r drives everything: the curl starts at the cushion's foot, grows as it climbs, and ends as a tube dF tall.
+// Rolling up: roll, settle with a squash, ribbons wrap and bows pop, the name is stitched on.
+// Unrolling: the bows untie and the ribbons slip off, the roll runs down faster and faster, and the cushion lands with a bounce.
+function bolsterParts(st,small){
+ const H0=small?CH:H,dF=small?34:42,un=model.shDir===0,u=1-st;
+ let r,sq=0,rib,bow,emb,off=0,bounce=0;
+ if(!un){r=ease(seg(st,.1,.66));sq=Math.sin(Math.PI*seg(st,.66,.78))*.1;rib=seg(st,.74,.86);bow=backOut(seg(st,.82,.92));emb=seg(st,.88,1)}
+ else{off=ease(seg(u,0,.2));rib=1;bow=1-seg(u,0,.1);emb=1-seg(u,0,.18);r=1-Math.pow(seg(u,.2,.58),1.7);
+  const k=seg(u,.58,.9);bounce=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.5)*.085:0}
+ const d=dF*Math.sqrt(r),yb=lerp(H0-d/2,d/2,r);
+ return{H0,dF,r,d,yb,sq,rib,bow,emb,off,bounce,spin:(H0-yb)*.16,h:Math.round(r>=1?dF:yb+d/2)};
+}
+function spiral(cx,cy,rx,ry,turns,ph){let d='';const N=Math.ceil(turns*28);
+ for(let i=0;i<=N;i++){const t=i/N,a=t*turns*Math.PI*2+ph,k=.12+.88*t;d+=(i?'L':'M')+f(cx+Math.cos(a)*rx*k)+' '+f(cy+Math.sin(a)*ry*k)}return d}
+function bow(x,y,k,c){
+ if(k<=.01)return '';const[dk,md,lt]=c;
+ const loop=sx=>`M${x} ${y}C${f(x+sx*4)} ${f(y-9)} ${f(x+sx*12)} ${f(y-7)} ${f(x+sx*10)} ${f(y-1)}C${f(x+sx*9)} ${f(y+3)} ${f(x+sx*4)} ${f(y+2)} ${x} ${y}Z`;
+ const tail=sx=>`M${x} ${y}L${f(x+sx*5)} ${f(y+15)}l${f(sx*1.5)} -1.6l${f(sx*1.6)} 2.4L${f(x+sx*2.4)} ${f(y+1)}Z`;
+ return `<g transform="translate(${x} ${y}) scale(${f(k*100)/100}) translate(${-x} ${-y})"><g opacity=".35" transform="translate(.8 1.4)" filter="url(#sh)"><path d="${loop(-1)+loop(1)+tail(-1)+tail(1)}" fill="#000"/></g>`+
+  `<path d="${tail(-1)+tail(1)}" fill="${dk}"/><path d="${loop(-1)+loop(1)}" fill="${md}" stroke="${dk}" stroke-width=".7"/>`+
+  `<path d="M${f(x-3)} ${f(y-3)}Q${f(x-8)} ${f(y-6)} ${f(x-9)} ${f(y-2)}M${f(x+3)} ${f(y-3)}Q${f(x+8)} ${f(y-6)} ${f(x+9)} ${f(y-2)}" fill="none" stroke="${lt}" stroke-width=".9" stroke-linecap="round" opacity=".85"/>`+
+  `<rect x="${x-2.6}" y="${y-3.2}" width="5.2" height="6.4" rx="1.8" fill="${md}" stroke="${dk}" stroke-width=".7"/></g>`;
+}
+function bolsterDraw(id,w,h,small,st){
+ const P=bolsterParts(st,small),s=SKIN[id];
+ let o='';
+ // The flat part of the cushion that hasn't been rolled yet, cut off at the roll's centre line.
+ if(P.r<1)o+=`<defs><clipPath id="bl-${id}"><rect x="-30" y="-40" width="${w+60}" height="${f(P.yb+40)}"/></clipPath></defs><g clip-path="url(#bl-${id})">${casing(id,w,P.H0)}</g>`;
+ else o+=`<defs>${feltFilters(id,s.seed)}</defs>`;
+ if(P.d<1)return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${o}</g>`:o;
+ const d=P.d,top=P.yb-d/2+.5,bot=P.yb+d/2-.5,ry=(bot-top)/2,cy=P.yb,rxL=Math.max(2,d*.28),rxR=d*.4,ex=EDGE+rxL,xr=w-EDGE-rxR;
+ const bw=small?8:9,rx=[ex+rxL+(small?18:24),w-EDGE-(small?24:32)],pin=2.2*P.rib*(1-P.off);
+ // Tube outline, pinched where each ribbon is pulled tight.
+ let tp=`M${f(ex)} ${f(top)}`,bt='';
+ for(const x of rx)tp+=`H${f(x-bw)}Q${f(x)} ${f(top+pin*2)} ${f(x+bw)} ${f(top)}`;
+ for(const x of [...rx].reverse())bt+=`H${f(x+bw)}Q${f(x)} ${f(bot-pin*2)} ${f(x-bw)} ${f(bot)}`;
+ const body=`${tp}H${f(xr)}A${f(rxR)} ${f(ry)} 0 0 1 ${f(xr)} ${f(bot)}${bt}H${f(ex)}Z`;
+ let t=`<defs><linearGradient id="cy-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6e6" stop-opacity=".2"/><stop offset=".3" stop-color="#fff" stop-opacity="0"/><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#1a0d05" stop-opacity=".42"/></linearGradient>`+
+  `<linearGradient id="rb-${id}" x1="0" y1="0" x2="1" y2="0"><stop stop-color="${RIBBON[id][0]}"/><stop offset=".3" stop-color="${RIBBON[id][1]}"/><stop offset=".5" stop-color="${RIBBON[id][2]}"/><stop offset=".7" stop-color="${RIBBON[id][1]}"/><stop offset="1" stop-color="${RIBBON[id][0]}"/></linearGradient></defs>`;
+ t+=`<path d="${body}" fill="${s.body}" filter="url(#f-${id})"/><path d="${body}" fill="url(#cy-${id})"/>`;
+ // Running stitch along the roll's top and bottom, where the cushion's own stitch line ends up.
+ const sl=`M${f(ex+rxL+4)} ${f(top+4.2)}H${f(xr+rxR*.4)}M${f(ex+rxL+4)} ${f(bot-4.2)}H${f(xr+rxR*.4)}`;
+ t+=`<path d="${sl}" stroke="#000" stroke-opacity=".25" stroke-width="1.4" stroke-dasharray="4.4 3.2" transform="translate(.4 .7)"/><path d="${sl}" stroke="#f7e8c9" stroke-opacity=".8" stroke-width="1.2" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`;
+ // The rolled end: a felt spiral that turns as the roll climbs.
+ const turns=1+2.4*P.r,sp=spiral(ex,cy,rxL-1.2,ry-1.2,turns,P.spin);
+ t+=`<ellipse cx="${f(ex)}" cy="${f(cy)}" rx="${f(rxL)}" ry="${f(ry)}" fill="${s.band}" filter="url(#g-${id})"/>`+
+  `<path d="${sp}" fill="none" stroke="${s.body}" stroke-width="${f(Math.max(1,ry/turns*.55))}" stroke-linecap="round"/><path d="${sp}" fill="none" stroke="#1a0d05" stroke-opacity=".35" stroke-width=".7" transform="translate(.6 .6)"/>`+
+  `<ellipse cx="${f(ex)}" cy="${f(cy)}" rx="${f(rxL)}" ry="${f(ry)}" fill="none" stroke="#1a0d05" stroke-opacity=".3"/>`;
+ // Ribbons wrap over the front from the top down, then the bows pop out. Unrolling, they slip off and fall.
+ if(P.rib>0&&P.off<1){const c=RIBBON[id];let rb='';
+  for(const x of rx){const y1=lerp(top,bot,P.rib);
+   rb+=`<path d="M${f(x-bw/2-1)} ${f(top+pin)}V${f(y1-pin)}M${f(x+bw/2+1)} ${f(top+pin)}V${f(y1-pin)}" stroke="#1a0d05" stroke-opacity=".3" stroke-width="1.2"/>`+
+    `<rect x="${f(x-bw/2)}" y="${f(top+pin-1)}" width="${bw}" height="${f(Math.max(0,y1-top-pin*2+2))}" fill="url(#rb-${id})"/><path d="M${f(x-bw/2+1)} ${f(top+pin+1)}V${f(y1-pin-1)}" stroke="${c[2]}" stroke-opacity=".5" stroke-width=".5"/>`+
+    bow(f(x),f(cy+1),P.bow,c)}
+  t+=`<g opacity="${f(1-P.off)}" transform="translate(0 ${f(P.off*14)})">${rb}</g>`}
+ // The name in satin stitch and the key value in cross-stitch, sewn on left to right.
+ if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?15:17,c=small?1.8:2.2,wf=small?11:12.5;
+  const x0=rx[0]+bw/2+(small?8:12),x1=rx[1]-bw/2-(small?8:12),xp=xpaths(dt.num,c);
+  const ww=measure(dt.word,`italic ${wf}px Georgia,serif`),nw=measure(nm,`italic ${nf}px Georgia,serif`);
+  const word=nw+12+xp.w+5+ww<=x1-x0,vw=xp.w+(word?5+ww:0),vx=x1-vw,vy=cy-3.5*c,[d1,d2]=EMB[id];
+  t+=`<clipPath id="em-${id}"><rect x="${f(x0-4)}" y="${f(top-6)}" width="${f((x1-x0+8)*P.emb)}" height="${f(d+12)}"/></clipPath><g clip-path="url(#em-${id})">`+
+   `<text x="${f(x0)}" y="${f(cy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="#000" fill-opacity=".35" transform="translate(.5 .9)">${nm}</text>`+
+   `<text x="${f(x0)}" y="${f(cy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="${d2}">${nm}</text>`+
+   `<text x="${f(x0)}" y="${f(cy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="url(#satin)">${nm}</text>`+
+   `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".3" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="${d1}"/><path d="${xp.d2}" stroke="${d2}"/></g>`+
+   (word?`<text x="${f(vx+xp.w+5)}" y="${f(cy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="${d2}">${dt.word}</text>`:'')+'</g>'}
+ const by=bot;
+ o+=P.sq?`<g transform="translate(${w/2} ${f(by)}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${f(-by)})">${t}</g>`:t;
+ return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${o}</g>`:o;
+}
+
 /* ---------- Zipper geometry ---------- */
 const zTop=h=>EDGE+Math.min(14,(h-2*EDGE)*.3);
 // Where the slider sits (widget-local y) and how far the two halves lean apart, from join progress.
@@ -440,13 +515,18 @@ const SHADES={
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
   height:(st,small)=>pocketParts(st,small).h,
-  show:st=>1-seg(st,0,.14),grip:st=>1-seg(st,0,.2),draw:pocketDraw}
+  show:st=>1-seg(st,0,.14),grip:st=>1-seg(st,0,.2),draw:pocketDraw},
+ bolster:{label:'Bolster',kind:'Roll',ms:2100,ownStrip:true,
+  about:'The cushion rolls itself up like a sleeping mat. The cotton display is put away, then the foot curls over and the roll climbs the cushion a frame at a time, fattening as it goes, with the felt spiral turning at its end. At the top it drops into a stuffed tube with a squash. Two satin ribbons wrap it from the top down, pinching the stuffing in, and their bows pop out. The name is satin-stitched on in the cushion\'s thread and the key value is cross-stitched beside it. Unshading unties the bows and the ribbons slip off and fall, the roll runs down faster and faster, and the cushion slaps open and bounces before its display comes back. Zipped or stitched pairs stay joined, tube to tube.',
+  sayOn:'Shaded: each cushion rolls up into a bolster and the ribbons tie it.',sayOff:'Unshaded: the ribbons slip off and the bolsters unroll with a bounce.',
+  height:(st,small)=>bolsterParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,.42,.56),draw:bolsterDraw}
 };
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS):small?CH:H};
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'zipper',shade:'deflate',jt:0,st:0,dir:1,snip:false,path:null,glow:0,ghost:0,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'zipper',shade:'deflate',jt:0,st:0,dir:1,snip:false,path:null,glow:0,ghost:0,busy:false,shDir:1};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -510,7 +590,8 @@ function holdJoining(){
 function toggleShade(){
  const to=model.st>.5?0:1,start=model.st,token=++shadeAnim;
  // Shade runs on its own clock so it can overlap a join.
- const sh=SHADES[model.shade];
+ // The direction picks the bolster's timeline; a toggle mid-run keeps it, so the pose runs back rather than jumping.
+ const sh=SHADES[model.shade];if(start===0||start===1)model.shDir=to;
  stepped((sh.ms||560)*Math.abs(to-start),t=>{model.st=lerp(start,to,t);render()},token,k=>k===shadeAnim);
  say(to?(sh.sayOn||'Shaded: the cushion deflates to its name band and one value.'):(sh.sayOff||'Unshaded: the stuffing comes back.'));
 }
@@ -523,7 +604,7 @@ function render(){
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
-  const own=sh.draw&&model.st>0,svg=el.querySelector('.casing'),key=w+'x'+h+(own?`|${model.shade}|${f(model.st*1000)}|${BO}|${m.run}`:'');
+  const own=sh.draw&&model.st>0,svg=el.querySelector('.casing'),key=w+'x'+h+(own?`|${model.shade}|${f(model.st*1000)}|${BO}|${m.run}|${model.shDir}`:'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=own?sh.draw(id,w,h,small,model.st):casing(id,w,h)}
   if(!small){const side=id==='a'?1:-1,phi=(side>0?-1:1)*z.th;
    el.style.transformOrigin=`${side>0?W-EDGE:EDGE}px ${f(z.th>.001?z.ys:h/2)}px`;el.style.transform=z.th>.001?`rotate(${f(phi*100)/100}deg)`:z.sq>.0005?`scaleX(${(1-z.sq).toFixed(4)})`:''}
