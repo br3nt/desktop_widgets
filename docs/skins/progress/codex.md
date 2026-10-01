@@ -11,7 +11,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Wire · Join · Hook and eye — point attachment — Added wire.html (completed; ticked by orchestrator after a usage-limit cut-off)
 - [x] Hollow · Join · Shell lap — fusion — Added ink-and-chalk shell plates, animated overlapping lips, stepped seam and release peg; 28 DOM interaction checks passed; visual review blocked by unavailable browser access and denied native Chrome access.
 - [x] Gothic · Join · Flying buttress — external attachment — Added a selectable rigid swinging stone rib, intact capitals, open gap and hinge-cap release; preserved keystone; 29 simulated DOM/interaction checks passed; visual review blocked by browser access.
-- [ ] Felt · Join · Button and elastic loop — point attachment
+- [x] Felt · Join · Button and elastic loop — point attachment — Added a selectable apricot elastic loop, sewn horn button, open gap and button release; retained needle-felt merge; 24 local DOM/state checks passed; visual review blocked by denied Chrome access.
 - [ ] Elven · Join · Bowstring tension — suspended attachment
 - [ ] Wire · Join · Caged bead capture — enclosure attachment
 - [ ] Hollow · Join · Silk tension seam — binding attachment
