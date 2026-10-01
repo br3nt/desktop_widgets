@@ -778,6 +778,41 @@ header {
   background: var(--nephrite-jade-bright);
   box-shadow: 0 0 6px var(--nephrite-jade-bright);
 }
+.sylvan-release-clasp.crystal-pin {
+  width: 32px;
+  height: 48px;
+  cursor: pointer;
+}
+.sylvan-release-clasp.crystal-pin::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 32px;
+  left: 11px;
+  top: 8px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #ffffff 0%, #b8e6f7 35%, #59b5d4 70%, #1a3c4f 100%);
+  border: 1.5px solid #a5d8ff;
+  box-shadow: 0 0 10px rgba(123, 242, 198, 0.6), inset 0 1px 2px #ffffff;
+  transform: rotate(calc(var(--tension, 0) * 20deg));
+  transition: transform 100ms ease;
+}
+.sylvan-release-clasp.crystal-pin:hover::before {
+  border-color: #ffffff;
+  box-shadow: 0 0 14px rgba(165, 216, 255, 0.9), inset 0 0 6px #ffffff;
+}
+.sylvan-release-clasp.crystal-pin::after {
+  content: "✧";
+  position: absolute;
+  top: 13px;
+  left: 11px;
+  width: 10px;
+  text-align: center;
+  font-size: 11px;
+  color: #ffffff;
+  text-shadow: 0 0 6px #7bf2c6;
+  pointer-events: none;
+}
 
 /* Design Overlay */
 #portOverlay { position: absolute; inset: 0; pointer-events: none; }
@@ -850,8 +885,9 @@ footer .note-highlight {
     <div class="control-group">
       <label for="optionSelect">Option</label>
       <select id="optionSelect" aria-label="Select skin exploration option">
-        <option value="tendril_braid" selected>1. Living Tendril Braid (Sylvan Weave)</option>
+        <option value="tendril_braid">1. Living Tendril Braid (Sylvan Weave)</option>
         <option value="lotus_petals">2. Lotus Petal Nocturne shade</option>
+        <option value="crystal_cleavage" selected>3. Crystalline Cleavage &amp; Harmonic Chime join</option>
       </select>
     </div>
     <div class="control-group">
@@ -861,9 +897,10 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
+    <button id="btnJoinAnim" class="primary-btn">Seat crystal prisms</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnLotusAnim">Close lotus petals</button>
+    <button id="btnChimeAnim" title="Trigger pure-harmonic chime wavefront">Chime resonance</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -945,6 +982,50 @@ footer .note-highlight {
           </feComponentTransfer>
           <feMerge>
             <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Option 3: Crystalline Cleavage Moonstone Prism Gradient -->
+        <linearGradient id="crystalPrismGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+          <stop offset="20%" stop-color="#d6f0fa" stop-opacity="0.9"/>
+          <stop offset="45%" stop-color="#8ce6cc" stop-opacity="0.8"/>
+          <stop offset="75%" stop-color="#4a9fc2" stop-opacity="0.85"/>
+          <stop offset="100%" stop-color="#1b4156" stop-opacity="0.95"/>
+        </linearGradient>
+
+        <!-- Crystal Facet Backing Gradient -->
+        <linearGradient id="crystalFacetBackGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#243d4d"/>
+          <stop offset="50%" stop-color="#12222b"/>
+          <stop offset="100%" stop-color="#09141a"/>
+        </linearGradient>
+
+        <!-- Spectral Refraction Beam Gradient -->
+        <linearGradient id="crystalBeamGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#a5d8ff" stop-opacity="0.95"/>
+          <stop offset="35%" stop-color="#ffffff" stop-opacity="1"/>
+          <stop offset="70%" stop-color="#7bf2c6" stop-opacity="0.95"/>
+          <stop offset="100%" stop-color="#b6e3f9" stop-opacity="0.9"/>
+        </linearGradient>
+
+        <!-- Laser-Fine Crystal Optical Seam Glow -->
+        <filter id="crystalOpticalGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Concentric Harmonic Chime Wavefront Pulse Glow -->
+        <filter id="harmonicChimeGlow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur1"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur2"/>
+          <feMerge>
+            <feMergeNode in="blur1"/>
+            <feMergeNode in="blur2"/>
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
@@ -1111,7 +1192,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join &amp; Lotus Petal Nocturne Shade</h3>
+  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade &amp; Crystalline Cleavage Join</h3>
   <p>
     Forged from spun star-silver (Ithildin), white birchwood inlays, and mother-of-pearl bezels. Contours follow swept aerodynamic swan-wing curves and delicate botanical filigree crowns, preserving high contrast and uncompromised display readability.
   </p>
@@ -1120,6 +1201,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 2 — Lotus Petal Nocturne shade:</span> Articulated star-silver filigree plates fold upward and inward across the screen face like the petals of a celestial water lily closing at dusk. The overlapping petals shield the crystalline display, meeting along an organic Art Nouveau seam with a carved nephrite jade lotus brooch. The instrument collapses into a slender 44px crowned diadem wand displaying glowing starlight runes.
+  </p>
+  <p>
+    <span class="note-highlight">Option 3 — Crystalline Cleavage &amp; Harmonic Chime join:</span> Complementary angled prism planes carved from pale moonstone and beryl. The mating faces feature precision 30° cleavage planes with internal refractive facets. As the capsules approach, shimmering spectral refraction rays arc across the gap; the planes glide together along the 30° bias until seating flush with mathematical perfection. At lock, a pure-harmonic chime pulse sweeps through the crystals with a bell-like resonance, dissolving the seam into an invisible optical joint through which starlight passes without refraction.
   </p>
 </footer>
 
@@ -1143,7 +1227,9 @@ const model = {
   cap: 0,
   tendrilProgress: 0, // 0 = coiled along collar, 1 = fully intertwined living braid
   petalFold: 0,       // 0 = bloomed open, 1 = closed lotus petal nocturne shade
-  option: 'tendril_braid',
+  crystalGlide: 0,    // 0 = separate 30° prism planes, 1 = seated monolithic crystal
+  chimeWave: 0,       // 0 to 1 = expanding harmonic chime wavefront ripples
+  option: 'crystal_cleavage',
   light: 0,
   limit: 3,
   feel: 'free',
