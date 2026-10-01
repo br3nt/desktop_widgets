@@ -31,7 +31,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .topline p{margin:0;color:#dcc6ad;font-size:13px;max-width:760px}
 #phase{font:12px/1.5 Georgia,serif;color:#f0b77a;white-space:nowrap;letter-spacing:.3px}
 .layer{position:absolute;inset:0;width:1200px;height:600px;overflow:visible;pointer-events:none}
-#over{z-index:6}
+#over{z-index:6}#under{z-index:1}
 .w{position:absolute;width:390px;height:130px;user-select:none;touch-action:none;z-index:2;filter:drop-shadow(0 7px 6px #000a)}
 .w.small{width:276px;height:78px}
 #a{--thread:#5e1f1a;--x1:#b5372b;--x2:#74221a;--accent:#9c2f24}
@@ -117,7 +117,12 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="limeBoss" cx=".36" cy=".3" r=".75"><stop stop-color="#f4ecda"/><stop offset=".55" stop-color="#cdbf9f"/><stop offset="1" stop-color="#857558"/></radialGradient>
  <linearGradient id="glassHi" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".2"/></linearGradient>
  <radialGradient id="gild" cx=".38" cy=".32" r=".7"><stop stop-color="#fff4c4"/><stop offset=".45" stop-color="#e0ad40"/><stop offset="1" stop-color="#6e4a12"/></radialGradient>
- <filter id="sh" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="1.3"/></filter></defs></svg>
+ <filter id="sh" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="1.3"/></filter>
+ <linearGradient id="gilt" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff1bf"/><stop offset=".5" stop-color="#d9a640"/><stop offset="1" stop-color="#7d5418"/></linearGradient>
+ <linearGradient id="niche" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#202a5c"/><stop offset="1" stop-color="#111633"/></linearGradient>
+ <linearGradient id="nicheTop" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".6"/><stop offset=".3" stop-color="#000" stop-opacity="0"/></linearGradient>
+ <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eaf4ff" stop-opacity=".13"/><stop offset=".45" stop-color="#eaf4ff" stop-opacity=".025"/><stop offset="1" stop-color="#eaf4ff" stop-opacity=".08"/></linearGradient>
+ <radialGradient id="lamp"><stop stop-color="#ffe6a6" stop-opacity=".9"/><stop offset=".4" stop-color="#ffb648" stop-opacity=".45"/><stop offset="1" stop-color="#ff9a2a" stop-opacity="0"/></radialGradient></defs></svg>
 <header><div><h1>Combined skins <span>/ Claude skin study</span></h1><p>Experiments in mixing aesthetics: layer stacks, half-couplers, containment, a dominant skin. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
  <div class="row" id="stateRow"><span>State</span></div>
@@ -128,6 +133,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="nave" viewBox="0 0 1200 600" aria-hidden="true"><g fill="none" stroke="#f6dcb4" stroke-opacity=".07" stroke-width="2" stroke-dasharray="7 5">
  <path d="M150 600V250Q150 90 330 20Q510 90 510 250V600"/><path d="M690 600V250Q690 90 870 20Q1050 90 1050 250V600"/>
  <circle cx="600" cy="150" r="62"/><circle cx="600" cy="150" r="30"/></g></svg>
+<svg id="under" class="layer" viewBox="0 0 1200 600" aria-hidden="true"></svg>
 <div class="topline"><p id="status" role="status" aria-live="polite">Drag a nameplate toward the other kneeler, or use the state buttons.</p><span id="phase"></span></div>
 
 <section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg>
@@ -163,7 +169,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -420,6 +426,42 @@ function buttonhole(x,y,a,open){
 const sparkle=(x,y,s)=>`<path d="M0 -7L1.3 -1.3L7 0L1.3 1.3L0 7L-1.3 1.3L-7 0L-1.3 -1.3Z" fill="#fffbe6" transform="translate(${f(x)} ${f(y)}) scale(${f(s*100)/100}) rotate(${f(s*30)})"/>`;
 const TAB_REST={tab:80,curl:12};
 
+/* ---------- Mix 3: containment (model E). Jarvis's stone reliquary bay holds felt GitDiscuss behind glass. ---------- */
+// The bay is anchored to Jarvis, so the empty jamb, the ghost and the built shrine always agree. GitDiscuss sits 18 px off Jarvis:
+// a 10 px colonnette, then an 8 px margin of starry niche round the cushion.
+const RQ={gap:18,jamb:10,m:8,PW:12},RQS='#d8ccb4';
+// Moving stone can't re-run the turbulence filter every display frame, so it gets a cheap speckle pattern instead.
+const GRAIN=(()=>{let s=7,o='';const r=()=>(s=(s*16807)%2147483647)/2147483647;
+ for(let i=0;i<26;i++)o+=`<circle cx="${f(r()*37)}" cy="${f(r()*29)}" r="${f(.4+r()*.9)}" fill="${r()<.62?'#4a3b2a':'#fff8ea'}" fill-opacity="${f(.12+r()*.22)}"/>`;return o})();
+const rqStone=(mass,tr='')=>`<g${tr?` transform="${tr}"`:''}><g fill="url(#lime)" stroke="#5b4b36" stroke-opacity=".5" stroke-width=".8">${mass}</g><g fill="url(#rq-grain)">${mass}</g></g>`;
+const star=(x,y,r)=>`<path d="M${x} ${f(y-r)}L${f(x+r*.28)} ${f(y-r*.28)}L${f(x+r)} ${y}L${f(x+r*.28)} ${f(y+r*.28)}L${x} ${f(y+r)}L${f(x-r*.28)} ${f(y+r*.28)}L${f(x-r)} ${y}L${f(x-r*.28)} ${f(y-r*.28)}Z" fill="#e9c46e"/>`;
+function rqGeo(c){const A=model.a,h=c.h,s=clamp((h-HS)/(H-HS)),aR=A.x+W,ox=aR+RQ.jamb,oy=A.y-RQ.m,ow=W+2*RQ.m,oh=h+RQ.m-3;
+ return{A,s,aR,ox,oy,ow,oh,R:ox+ow,PW:RQ.PW,py:oy+oh,LH:lerp(6,10,s),GH:lerp(12,26,s),PH:lerp(8,15,s)}}
+// Build order: plinth slides out, GitDiscuss is set down, the far pier rises, the canopy drops, the glass lowers, hasps turn, the lamp kindles.
+const rqParts=jt=>({plinth:ease(seg(jt,.06,.36)),pier:ease(seg(jt,.42,.52)),canopy:seg(jt,.5,.6),glass:ease(seg(jt,.62,.8)),hasp:ease(seg(jt,.8,.88)),lamp:seg(jt,.86,1)});
+// The canopy: a lintel with cusped underside carrying five crocketed gablets and pinnacles, like a shrine roof. The middle gablet holds the lamp.
+function rqCanopy(G,lamp){
+ const{aR,R,PW,oy,LH,GH,s}=G,x0=aR-1,x1=R+PW+1,n=5,gw=(x1-x0)/n,y0=oy-LH,cr=1.7*(.6+.4*s);
+ let mass=`<rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(LH)}"/>`,back='',lines='',orn='';
+ for(let i=1;i<n;i++)back+=stonePin(x0+i*gw,y0,.5+.28*s);
+ back+=stonePin(x1-PW/2,y0,.62+.3*s);
+ for(let i=0;i<n;i++){const a=x0+i*gw+1.5,b=a+gw-3,m=(a+b)/2,gh=GH*(i===2?1.3:1),ap=y0-gh;
+  mass+=`<path d="${spoly([[a,y0+.5],[m,ap],[b,y0+.5]])}"/>`+crockets(a,y0,m,ap,1,2,cr)+crockets(b,y0,m,ap,-1,2,cr)+`<circle cx="${f(m)}" cy="${f(ap-2.3)}" r="2.2"/><rect x="${f(m-3.4)}" y="${f(ap-2.9)}" width="6.8" height="1.3"/>`;
+  lines+=`M${f(a+7)} ${f(y0-.6)}L${f(m)} ${f(ap+4.5)}L${f(b-7)} ${f(y0-.6)}`;
+  if(i===2){const r=clamp(gh*.15,2.4,5.6),cy=y0-gh*.4;
+   orn+=`<g transform="translate(${f(m)} ${f(cy)})">${lamp>.01?`<circle r="${f(r*3.4)}" fill="url(#lamp)" opacity="${f(lamp)}"/>`:''}<circle r="${f(r*1.6)}" fill="none" stroke="#3a2c1c" stroke-opacity=".4" stroke-width=".8"/>`+
+    [[r*.52,0],[-r*.52,0],[0,r*.52],[0,-r*.52]].map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r*.56)}" fill="#1e140b" fill-opacity=".62"/>`).join('')+
+    (lamp>.01?[[r*.52,0],[-r*.52,0],[0,r*.52],[0,-r*.52]].map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r*.42)}" fill="#ffc45a" opacity="${f(lamp)}"/>`).join('')+`<circle r="${f(r*.4)}" fill="#fff4cf" opacity="${f(lamp)}"/>`:'')+'</g>'}
+  else{const r=Math.max(1.3,gh*.1),cy=y0-gh*.34;orn+=`<g fill="#1e140b" fill-opacity=".45">${[[0,-r*.55],[-r*.55,r*.35],[r*.55,r*.35]].map(([x,y])=>`<circle cx="${f(m+x)}" cy="${f(cy+y)}" r="${f(r*.6)}"/>`).join('')}</g>`}
+ }
+ // Cusping under the lintel: a row of little arch heads in shadow.
+ let cusp='';for(let x=x0+7;x<x1-6;x+=13)cusp+=`M${f(x)} ${f(oy)}a${f(LH*.38)} ${f(LH*.38)} 0 0 1 ${f(LH*.76)} 0Z`;
+ return rqStone(back)+rqStone(mass)+`<path d="${lines}" fill="none" stroke="#3a2c1c" stroke-opacity=".3" stroke-width=".8"/>`+orn+
+  `<path d="M${f(x0)} ${f(y0+1)}H${f(x1)}" stroke="#fff6e2" stroke-opacity=".6"/><path d="${cusp}" fill="#24180d" fill-opacity=".42"/><path d="M${f(x0)} ${f(oy-.5)}H${f(x1)}" stroke="#3a2c1c" stroke-opacity=".45"/>`;
+}
+function rqGableOutline(G){const{aR,R,PW,oy,LH,GH}=G,x0=aR-1,x1=R+PW+1,gw=(x1-x0)/5,y0=oy-LH;let d='';
+ for(let i=0;i<5;i++){const a=x0+i*gw+1.5,b=a+gw-3;d+=`M${f(a)} ${f(y0)}L${f((a+b)/2)} ${f(y0-GH*(i===2?1.3:1))}L${f(b)} ${f(y0)}`}return d}
+
 const MIXES={
  feltCathedral:{label:'Felt cathedral',kind:'Layer stack',
   stack:[['Structure','Gothic','silhouette, half-gables at the joining ends, pinnacles, cresting, blind lancets, the half-rose join'],
@@ -554,6 +596,94 @@ const MIXES={
    sepPh:'Separate · stone and felt',nearPh:'Nearby · the tab perks up',readyPh:'Ready · buttonhole open',
    mid:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.6?'Joining · the tab flops over ':'Joining · buttoning '):(jt>.6?'Releasing · tugging the tab ':jt>.4?'Releasing · the tab drops ':'Releasing · parting '),
    turn:d=>'Tugging the tab · '+Math.round(d.deg*100)+'%'}
+ },
+ reliquary:{label:'Reliquary bay',kind:'Containment',pair:'stonefelt',smooth:true,
+  stack:[['Model','Containment','one widget holds the other; there is no shared seam, so the two materials never have to meet edge to edge'],
+   ['Container','Gothic','Jarvis owns the bay: a colonnette, a moulded plinth, a far pier, a canopy of five crocketed gablets and a glazed front with gilt fittings'],
+   ['Contents','Felt','GitDiscuss rests in the niche exactly as it is on its own page; the felt cushion is the relic'],
+   ['Backing','Gothic','a vault-blue niche with gilt stars, like a painted chapel ceiling, shows in a margin round the cushion'],
+   ['Glass','Clear','faint sheen kept to the margins, off the display; the glass is chrome, so the display, tabs and buttons behind it still work'],
+   ['Motion','Each its own','stone moves smoothly, with weight and dust; the felt is set down with a squash and its fibres still shift at 12 fps']],
+  about:'Cross-skin widgets don\'t have to meet at a seam. Here Jarvis, in the gothic skin, carries a reliquary bay on its right end, and felt GitDiscuss is enshrined in it instead of joined to it. A stone niche holding a soft felt cushion behind glass reads as deliberate, the way a relic on a cushion does, where a stone edge butted against a felt edge would read as a mismatch. Only the container needs to know the contents\' size.',
+  join:{label:'Enshrined behind glass',kind:'Containment',gap:RQ.gap,
+   about:'Apart, Jarvis carries the bay\'s colonnette and a stub of plinth. <b>Near:</b> a dashed gold ghost of the whole shrine appears beside Jarvis. <b>Ready:</b> the ghost firms up, a pane of ghost glass shows and the lamp in the middle gablet flickers. Joining: the plinth slides out of Jarvis\'s foot, GitDiscuss is lifted across and set down on it with a felt squash, the far pier rises out of the plinth, the canopy drops onto both with a puff of dust, the glass lowers like a sash, two gilt hasps turn to lock it, and the lamp kindles as the join light while a gleam runs across the glass. <b>Release:</b> pull the canopy up (drag up from the gablets or lintel, or click it, or focus it and press Enter); the hasps open, the glass rises with your pull, then the canopy lifts away, the pier sinks and GitDiscuss is lifted back out.'},
+  shade:{label:'Plain lower, enshrined',kind:'Page baseline',
+   about:'Not a brainstorm item. The stone wall lowers to its carved frieze and the felt lets out its stuffing to the nameplate band. The bay shrinks with its contents: the gablets get lower, the plinth thinner and the inscription goes, but the glass, the hasps and the lamp stay, so a shaded GitDiscuss stays enshrined.'},
+  casing:(id,w,h)=>id==='a'?stoneCasing(id,w,h,false):feltCushion(id,w,h),
+  readyPose:{},
+  state:()=>({}),
+  // GitDiscuss is carried across in a low arc, then squashes as it is set down on the plinth.
+  lift(c,id){return id==='b'&&c.jt>0&&c.jt<1?-16*Math.sin(Math.PI*seg(c.jt,.02,.42)):0},
+  squash(c,id){if(id!=='b')return 0;const p=Math.sin(Math.PI*seg(c.jt,.4,.5));return p>.01?p*.9:0},
+  under(c){
+   const G=rqGeo(c),P=rqParts(c.jt),w=G.ow*P.plinth;if(w<1)return '';
+   const{ox,oy,oh}=G;
+   return `<defs><pattern id="rq-stars" x="${f(ox)}" y="${f(oy)}" width="26" height="22" patternUnits="userSpaceOnUse">${star(6,6,2.1)}${star(19,16,1.5)}<circle cx="16" cy="5" r=".7" fill="#e9c46e"/></pattern><clipPath id="rq-n"><rect x="${f(ox)}" y="${f(oy)}" width="${f(w)}" height="${f(oh)}"/></clipPath></defs>`+
+    `<g clip-path="url(#rq-n)"><rect x="${f(ox)}" y="${f(oy)}" width="${f(G.ow)}" height="${f(oh)}" fill="url(#niche)"/><rect x="${f(ox)}" y="${f(oy)}" width="${f(G.ow)}" height="${f(oh)}" fill="url(#rq-stars)" opacity=".8"/>`+
+    `<rect x="${f(ox)}" y="${f(oy)}" width="${f(G.ow)}" height="${f(oh)}" fill="url(#nicheTop)"/><rect x="${f(ox)}" y="${f(oy)}" width="5" height="${f(oh)}" fill="#000" opacity=".4"/></g>`;
+  },
+  over(c){
+   const G=rqGeo(c),P=rqParts(c.jt),{A,s,aR,ox,oy,ow,oh,R,PW,py,LH,GH,PH}=G,jt=c.jt;
+   let o=`<defs><pattern id="rq-grain" x="${f(A.x)}" y="${f(A.y)}" width="37" height="29" patternUnits="userSpaceOnUse">${GRAIN}</pattern>`+
+    `<clipPath id="rq-up"><rect x="${f(R-4)}" y="${f(oy-LH-60)}" width="${f(PW+8)}" height="${f(oh+LH+60)}"/></clipPath><clipPath id="rq-gl"><rect x="${f(ox)}" y="${f(oy)}" width="${f(ow)}" height="${f(oh*P.glass)}"/></clipPath></defs>`;
+   // Near and ready: a dashed gold ghost of the whole shrine where GitDiscuss will rest.
+   if(jt===0&&c.glow>0){const ga=.2+.55*c.glow,ready=c.glow>=1;
+    if(ready)o+=`<rect x="${f(ox)}" y="${f(oy)}" width="${f(ow)}" height="${f(oh)}" fill="url(#pane)"/><path d="M${f(ox+18)} ${f(oy)}L${f(ox+44)} ${f(oy)}L${f(ox+14)} ${f(py)}L${f(ox-12)} ${f(py)}Z" fill="#fff" opacity=".06"/>`;
+    o+=`<g fill="none" stroke="#f3c96a" stroke-opacity="${f(ga)}" stroke-width="1.2" stroke-dasharray="5 4"><rect x="${f(aR-6)}" y="${f(py)}" width="${f(R+PW+9-aR)}" height="${f(PH)}"/><rect x="${f(R)}" y="${f(oy)}" width="${PW}" height="${f(oh)}"/>`+
+     `<rect x="${f(aR-1)}" y="${f(oy-LH)}" width="${f(R+PW+2-aR)}" height="${f(LH)}"/><path d="${rqGableOutline(G)}"/>${ready?`<rect x="${f(ox)}" y="${f(oy)}" width="${f(ow)}" height="${f(oh)}" stroke-dasharray="2 3"/>`:''}</g>`;
+    if(ready){const gw=(R+PW+2-aR)/5,m=aR-1+gw*2.5,cy=oy-LH-GH*1.3*.4;o+=`<circle cx="${f(m)}" cy="${f(cy)}" r="${f(clamp(GH*1.3*.15,2.4,5.6)*3)}" fill="url(#lamp)" opacity="${f(.45+.25*Math.sin(performance.now()/90))}"/>`}}
+   // The plinth: a stub at rest, sliding out of Jarvis's foot to run under the whole bay.
+   const pl=16+(R+PW+9-aR-16)*P.plinth;
+   o+=rqStone(`<rect x="${f(aR-6)}" y="${f(py)}" width="${f(pl)}" height="${f(PH)}"/>`)+
+    `<path d="M${f(aR-5)} ${f(py+1)}H${f(aR-7+pl)}" stroke="#fff6e2" stroke-opacity=".62"/><path d="M${f(aR-5)} ${f(py+3.3)}H${f(aR-7+pl)}" stroke="#3a2c1c" stroke-opacity=".34"/><path d="M${f(aR-5)} ${f(py+PH-1.6)}H${f(aR-7+pl)}" stroke="#3a2c1c" stroke-opacity=".25"/>`;
+   if(P.plinth>=1&&s>.5)o+=`<g font-family="Georgia,serif" font-size="8.5" letter-spacing="3" text-anchor="middle" opacity="${f(seg(s,.5,1)*seg(jt,.3,.42))}"><text x="${f(ox+ow/2)}" y="${f(py+PH*.78+.8)}" fill="#fff6e2" fill-opacity=".55">✠ GITDISCVSS ✠</text><text x="${f(ox+ow/2)}" y="${f(py+PH*.78)}" fill="#3a2c1c" fill-opacity=".8">✠ GITDISCVSS ✠</text></g>`;
+   // The colonnette belongs to Jarvis: always there, with its own little pinnacle until the canopy covers it.
+   o+=rqStone(`<rect x="${f(aR+2)}" y="${f(oy+4)}" width="6" height="${f(oh-6)}"/><rect x="${f(aR)}" y="${f(oy)}" width="${RQ.jamb}" height="5"/><rect x="${f(aR)}" y="${f(py-4)}" width="${RQ.jamb}" height="4"/>`)+
+    `<path d="M${f(aR+3)} ${f(oy+5)}V${f(py-4)}" stroke="#fff6e2" stroke-opacity=".55"/><path d="M${f(aR+7.2)} ${f(oy+5)}V${f(py-4)}" stroke="#3a2c1c" stroke-opacity=".35"/>`;
+   if(P.canopy<1)o+=`<g opacity="${f(1-P.canopy)}">${rqStone(stonePin(aR+RQ.jamb/2,oy,.5))}</g>`;
+   // The far pier rises out of the plinth.
+   if(P.pier>0)o+=`<g clip-path="url(#rq-up)">${rqStone(`<rect x="${f(R)}" y="${f(oy)}" width="${PW}" height="${f(oh)}"/>`,`translate(0 ${f((1-P.pier)*(oh+4))})`)}`+
+    `<g transform="translate(0 ${f((1-P.pier)*(oh+4))})"><path d="M${f(R+1)} ${f(oy)}V${f(py)}" stroke="#fff6e2" stroke-opacity=".5"/><path d="M${f(R)} ${f(oy+oh*.55)}H${f(R+PW)}M${f(R)} ${f(oy+oh*.55+1.3)}H${f(R+PW)}" stroke="#3a2c1c" stroke-opacity=".3"/></g></g>`;
+   // The glass: lowered like a sash from under the lintel, with gilt stiles and a gilt bottom rail. Its sheen stays in the margins, off the display.
+   if(P.glass>0){const gb=oy+oh*P.glass,sw=P.lamp>0&&P.lamp<1?Math.sin(Math.PI*P.lamp):0,xs=lerp(ox-60,R+60,P.lamp);
+    o+=`<g clip-path="url(#rq-gl)"><rect x="${f(ox)}" y="${f(oy)}" width="${f(ow)}" height="${f(oh)}" fill="url(#pane)"/>`+
+     `<path d="M${f(ox+18)} ${f(oy)}L${f(ox+44)} ${f(oy)}L${f(ox+14)} ${f(py)}L${f(ox-12)} ${f(py)}Z" fill="#fff" opacity=".07"/><path d="M${f(ox+52)} ${f(oy)}L${f(ox+56)} ${f(oy)}L${f(ox+26)} ${f(py)}L${f(ox+22)} ${f(py)}Z" fill="#fff" opacity=".1"/>`+
+     `<path d="M${f(R-30)} ${f(oy)}L${f(R-20)} ${f(oy)}L${f(R-48)} ${f(py)}L${f(R-58)} ${f(py)}Z" fill="#fff" opacity=".06"/>`+
+     (sw>0?`<path d="M${f(xs)} ${f(oy)}L${f(xs+34)} ${f(oy)}L${f(xs-6)} ${f(py)}L${f(xs-40)} ${f(py)}Z" fill="#fffbe8" opacity="${f(.22*sw)}"/>`:'')+`</g>`+
+     `<path d="M${f(ox+.8)} ${f(oy)}V${f(gb)}M${f(R-.8)} ${f(oy)}V${f(gb)}" stroke="#d9a640" stroke-width="1.6"/><rect x="${f(ox)}" y="${f(oy)}" width="${f(ow)}" height="2" fill="url(#gilt)"/>`+
+     `<rect x="${f(ox)}" y="${f(gb-2.6)}" width="${f(ow)}" height="2.6" fill="url(#gilt)"/><path d="M${f(ox)} ${f(gb+.3)}H${f(R)}" stroke="#1a120b" stroke-opacity=".45"/>`}
+   // The canopy falls into place: it accelerates down, lands, and gives a one-pixel bounce.
+   if(P.canopy>0){const dy=-(1-P.canopy*P.canopy)*70-1.5*Math.sin(Math.PI*seg(jt,.6,.66));
+    o+=`<g transform="translate(0 ${f(dy)})" opacity="${f(clamp(P.canopy*4))}">${rqCanopy(G,P.lamp)}</g>`}
+   // A gilt ring pull hangs from the top rail: the cue that the glass lifts.
+   if(P.glass>0)o+=`<g transform="translate(${f(ox+ow/2)} ${f(oy+1)})"><circle cy="4.6" r="3.4" fill="none" stroke="#5a3a10" stroke-width="2.2"/><circle cy="4.6" r="3.4" fill="none" stroke="url(#gilt)" stroke-width="1.3"/><rect x="-1.6" y="-.6" width="3.2" height="2.2" fill="url(#gilt)"/></g>`;
+   // Hasps: gilt turn-buttons on the colonnette and the pier swing down over the glass to lock it.
+   if(P.glass>=1){const hy=py-7,ang=-90*(1-P.hasp),turn=`<rect x="0" y="-1.5" width="9" height="3" rx="1.5" fill="url(#gilt)" stroke="#5a3a10" stroke-width=".5"/><circle r="2" fill="url(#gild)" stroke="#5a3a10" stroke-width=".5"/>`;
+    o+=`<g transform="translate(${f(ox-2)} ${f(hy)}) rotate(${f(ang)})">${turn}</g><g transform="translate(${f(R+2)} ${f(hy)}) scale(-1 1) rotate(${f(ang)})">${turn}</g>`;
+    const g=Math.sin(Math.PI*seg(jt,.86,.96));if(g>.03)o+=sparkle(ox+6,hy-2,g*.8)+sparkle(R-6,hy-2,g*.8)}
+   // Dust shaken out of the joints as the canopy seats.
+   if(model.dir>0&&jt>.58&&jt<.8){const u=seg(jt,.58,.8);
+    for(const[x,sx]of[[aR+2,-1],[R+PW-2,1],[ox+ow*.32,-1],[ox+ow*.68,1]])for(const[dx,dy,r]of[[.5,-.5,2.4],[1,.1,3],[.3,.6,2]])
+     o+=`<circle cx="${f(x+sx*dx*(4+22*u))}" cy="${f(oy-LH*.5+dy*(4+14*u)+10*u*u)}" r="${f(r*(.6+1.4*u))}" fill="${RQS}" opacity="${f(.55*(1-u))}"/>`}
+   if(jt===1){const top=oy-LH-GH*1.3-8;
+    o+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Reliquary canopy: pull it up, or press Enter, to raise the glass and take GitDiscuss out"><title>Pull the canopy up to raise the glass and release</title><rect x="${f(aR-2)}" y="${f(top)}" width="${f(R+PW+4-aR)}" height="${f(oy+4-top)}" fill="transparent"/><rect class="ringfocus" x="${f(aR-5)}" y="${f(top-3)}" width="${f(R+PW+10-aR)}" height="${f(oy+10-top)}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+   return o;
+  },
+  // Releasing by hand: pull up; 60 px raises the glass all the way.
+  grab(p){return{y0:p.y,deg:0}},
+  pull(d,p){const up=d.y0-p.y;if(Math.abs(up)>3)d.moved=true;d.deg=clamp(up/60);return 1-.4*d.deg},
+  text:{intro:'Jarvis is carved stone with a reliquary bay; GitDiscuss and Checks are felt. Drag GitDiscuss toward the bay on Jarvis\'s right, or use the state buttons.',
+   join:'The plinth slides out, GitDiscuss is set down on it, the shrine is built round it and the glass comes down.',
+   joined:'Enshrined: GitDiscuss rests in the reliquary bay behind glass, and still works through it. Drag either nameplate to move them together. Pull the canopy up to release.',
+   sep:'The hasps open, the glass rises, the canopy lifts away and GitDiscuss is lifted out of the bay.',
+   hold:'Held mid-join: the shrine is built and the glass is coming down. Use the scrubber to step through the animation.',
+   near:'Nearby: a ghost of the shrine shows where GitDiscuss will rest. Move closer.',
+   ready:'Ready: the ghost glass is in place and the lamp flickers. Release to enshrine.',
+   back:'The glass drops back; still enshrined.',cancel:'Lift cancelled.',
+   shadeOn:'Shaded: the wall lowers to its frieze and the felt lets out its stuffing; the bay shrinks round it and keeps its glass.',shadeOff:'Unshaded: the wall rises, the stuffing comes back and the bay grows with it.',
+   sepPh:'Separate · an empty bay',nearPh:'Nearby · ghost of the shrine',readyPh:'Ready · ghost glass in place',
+   mid:(jt,dir)=>dir>0?(jt<.42?'Joining · carrying GitDiscuss in ':jt<.62?'Joining · raising the shrine ':jt<.86?'Joining · lowering the glass ':'Joining · lighting the lamp '):(jt>.8?'Releasing · unlocking ':jt>.6?'Releasing · raising the glass ':jt>.42?'Releasing · lifting the canopy ':'Releasing · taking it out '),
+   turn:d=>'Raising the glass · '+Math.round(d.deg*100)+'%'}
  }
 };
 
@@ -636,7 +766,8 @@ function render(){
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   const svg=el.querySelector('.casing'),key=model.mix+w+'x'+h;
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=x.casing(id,w,h)}
-  if(!small){el.style.transformOrigin=`${id==='a'?W:0}px ${h}px`;const sq=sqf(id);el.style.transform=sq?`scale(${f((1+.025*sq)*1000)/1000},${f((1-.045*sq)*1000)/1000})`:''}
+  if(!small){el.style.transformOrigin=`${id==='a'?W:0}px ${h}px`;const sq=sqf(id),ly=x.lift?x.lift(c,id):0;
+   el.style.transform=(ly?`translate(0,${f(ly)}px) `:'')+(sq?`scale(${f((1+.025*sq)*1000)/1000},${f((1-.045*sq)*1000)/1000})`:'')}
   const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
   // Tabs and buttons sit lowest, so they go first as the casing shrinks.
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{const o=n.matches('.tabline,.knob')?1-clamp(k*5):show;n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
@@ -647,7 +778,7 @@ function render(){
  }
  $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
  const focused=document.activeElement&&document.activeElement.id==='joinHit';
- $('#over').innerHTML=x.over(c);
+ $('#over').innerHTML=x.over(c);$('#under').innerHTML=x.under?x.under(c):'';
  const hit=$('#joinHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
