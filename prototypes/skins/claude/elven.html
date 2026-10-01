@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Elven · Claude skin study</title>
+<style>
+:root{color-scheme:dark;--silver:#eef2fc;--muted:#97a2c6;--blue:#2f4f86;--ink:#2a2f45;--script:"Snell Roundhand","Apple Chancery","URW Chancery L","Palatino Linotype",Palatino,serif;--sans:Optima,"Candara","Segoe UI",-apple-system,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#0a0c1c;color:#e2e7f6;font:14px/1.5 var(--sans)}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #dfe8ff;outline-offset:3px}
+a{color:#b9cbff;text-underline-offset:3px}
+header{padding:18px 28px 14px;display:flex;gap:20px 40px;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;border-bottom:1px solid #c9d4ee30}
+h1{margin:0;font:400 26px/1.2 var(--script);letter-spacing:.3px}h1 span{color:var(--muted);font:15px var(--sans);letter-spacing:1px}
+header p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.controls{display:flex;flex-direction:column;gap:7px}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.row>span{font-size:10px;color:#7f8ab0;text-transform:uppercase;letter-spacing:1.6px;width:58px}
+.row button{border:1px solid #dfe8ff38;background:linear-gradient(#262b52,#171a36);color:#e2e7f6;border-radius:14px 3px;padding:4px 13px;font-size:12px;letter-spacing:.4px}
+.row button:hover{background:linear-gradient(#30366a,#1c2042)}
+.row button[aria-pressed=true]{background:radial-gradient(ellipse at 35% 25%,#fff,#dfe6f4 55%,#b5c3e2);border-color:#fff;color:#1d2240;box-shadow:0 0 10px #a8c0ff55}
+.row button kbd{font:10px var(--sans);color:#9fb0dc;margin-right:5px}
+.row button[aria-pressed=true] kbd{color:var(--blue)}
+.row input[type=range]{width:180px;accent-color:#a8c0ff}
+.row output{font:11px var(--sans);color:#c4ccdf;width:38px}
+#viewport{overflow:hidden}
+#stage{position:relative;width:1200px;height:600px;margin:auto;overflow:hidden;touch-action:none;
+ background:radial-gradient(ellipse 62% 52% at 52% 40%,#2b305e,#181c3c 55%,#0a0c1c 95%),#0a0c1c}
+.bg{position:absolute;inset:0;width:1200px;height:600px;pointer-events:none;z-index:0}
+.topline{position:absolute;top:16px;left:28px;right:28px;display:flex;justify-content:space-between;gap:30px;z-index:20;pointer-events:none}
+.topline p{margin:0;color:#cdd5ea;font-size:13px;max-width:760px}
+#phase{font:italic 13px/1.5 var(--sans);color:#c8d6ff;white-space:nowrap;letter-spacing:.4px}
+.layer{position:absolute;inset:0;width:1200px;height:600px;overflow:visible;pointer-events:none}
+#over{z-index:6}
+.w{position:absolute;width:390px;height:130px;user-select:none;touch-action:none;z-index:2;filter:drop-shadow(0 12px 14px #02030ccc)}
+.w.small{width:276px;height:78px}
+.casing,.pf{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+/* Nameplate: script in silver, a small caption in spaced capitals */
+.grip{position:absolute;top:13px;height:19px;border:0;background:none;color:var(--muted);cursor:grab;display:flex;justify-content:space-between;align-items:center;padding:0 6px;font:9.5px/1 var(--sans);letter-spacing:1.6px;text-transform:uppercase}
+.grip b{font:400 17px/1 var(--script);letter-spacing:.4px;text-transform:none;color:var(--silver);margin-right:10px;text-shadow:0 0 7px #9fb8ff70}
+.grip:active{cursor:grabbing}
+.grip .orn{color:#dfe8ff;font-size:9px;opacity:.75}
+#a .grip,#a .strip{left:46px;right:26px}#b .grip,#b .strip{left:26px;right:46px}
+.small .grip,.small .strip{left:42px;right:42px;top:7px;height:17px}
+.small .grip b,.small .strip b{font-size:15px}
+/* Display: a moonstone pane with pointed ends */
+.screen,.mini{position:absolute;overflow:hidden;color:var(--ink);
+ background:linear-gradient(112deg,transparent 28%,#9ec3ff2e 44%,#b9a8ff22 56%,transparent 72%),radial-gradient(ellipse 80% 110% at 32% 18%,#fbfcff,#e7ebf4 55%,#cfd6e5)}
+.screen{top:35px;width:300px;height:62px}#a .screen{left:44px}#b .screen{left:46px}
+.pages{height:100%;width:300%;display:flex;transition:transform 420ms cubic-bezier(.3,.7,.2,1)}
+.page{width:33.3333%;flex:none;padding:5px 22px;position:relative;overflow:hidden}
+.page .tiny{font:10px/1.45 var(--sans);color:#5d6584;letter-spacing:1.1px;text-transform:uppercase}
+.page .big{display:flex;align-items:baseline;gap:8px;height:24px;margin:0 0 1px}
+.num{font:600 23px/1 var(--sans);color:var(--blue);letter-spacing:.5px}
+.page .big em{font:italic 400 14px/1 var(--sans);color:#353b56}
+.page strong{font:600 16px/1.2 var(--sans);display:block;color:#262b42;margin:2px 0}
+.page small{font-size:11px;line-height:1.55;color:#454c68;display:block}
+.bars{position:absolute;right:24px;top:9px}.bars svg{display:block}
+.tabline{position:absolute;top:104px;display:flex;gap:15px}#a .tabline{left:52px}#b .tabline{left:54px}
+.tab{padding:0;background:none;border:0;color:#9aa5c8;font:10px/1.4 var(--sans);letter-spacing:1.6px;text-transform:uppercase}
+.tab[aria-selected=true]{color:var(--silver);text-shadow:0 0 6px #a8c0ff88}
+.tab[aria-selected=true]:before{content:"✦";margin-right:5px;font-size:8px;color:#dfe8ff}
+/* Moonstone cabochons in silver bezels */
+.knob{position:absolute;top:102px;width:20px;height:20px;border-radius:50%;padding:0;border:0;color:#2a2f45;font:bold 10px/20px var(--sans);
+ background:linear-gradient(130deg,transparent 35%,#a8c4ff55 50%,transparent 65%),radial-gradient(circle at 36% 30%,#fff,#e2e8f5 42%,#a9b8da 78%,#7486b8);box-shadow:0 0 0 1.2px #e8eef8,0 0 0 2.4px #0c1022,0 0 8px #9fc0ff44}
+#a .run{left:300px}#a .next{left:328px}#b .run{left:318px}#b .next{left:346px}
+.knob:hover{box-shadow:0 0 0 1.2px #fff,0 0 0 2.4px #0c1022,0 0 12px #b9d0ff99}
+.mini{left:42px;top:28px;width:184px;height:36px;padding:3px 16px;font-size:10px;line-height:1.4;color:#454c68}
+.mini .num{font-size:13px;margin-right:4px}
+.lampdot{position:absolute;left:233px;top:33px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#cfe0ff 45%,#6f8fd0);box-shadow:0 0 0 1.2px #e8eef8,0 0 0 2.3px #0c1022,0 0 10px 3px #a8c0ff66}
+.strip{position:absolute;top:13px;height:19px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 6px;pointer-events:none;opacity:0}
+.strip b{font:400 17px/1 var(--script);color:var(--silver);text-shadow:0 0 7px #9fb8ff70}
+.strip span{padding:1px 12px;font:11px var(--sans);color:var(--ink);border-radius:9px;background:radial-gradient(ellipse at 35% 25%,#fff,#dfe6f4 60%,#bcc8e4);box-shadow:0 0 0 1px #e8eef8,0 0 0 2px #0c1022}
+.strip span em{font-style:normal;color:var(--blue);font-weight:700}
+.hit{pointer-events:all;cursor:pointer}
+.hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
+.ringfocus{opacity:0}
+.about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb6cf;font-size:13px}
+.about h2{margin:0 0 4px;font:400 21px var(--script);color:#eef1fb}.about h2 small{font:11px var(--sans);color:#7f8ab0;letter-spacing:1.4px;text-transform:uppercase;margin-left:8px}
+.about p{margin:0 0 6px}
+.hint{color:#7d849e;font-size:12px}
+@media(max-width:800px){.about{grid-template-columns:1fr}}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <linearGradient id="night" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#323868"/><stop offset=".45" stop-color="#1d2146"/><stop offset="1" stop-color="#11132b"/></linearGradient>
+ <linearGradient id="pearl" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffd9f2"/><stop offset=".3" stop-color="#c9fff0"/><stop offset=".62" stop-color="#d6d8ff"/><stop offset="1" stop-color="#ffeccf"/></linearGradient>
+ <radialGradient id="moonlit" cx=".78" cy="0" r=".85"><stop stop-color="#dbe6ff" stop-opacity=".22"/><stop offset="1" stop-color="#dbe6ff" stop-opacity="0"/></radialGradient>
+ <linearGradient id="silver" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".5" stop-color="#aeb9d6"/><stop offset="1" stop-color="#e9eefc"/></linearGradient>
+ <linearGradient id="silverV" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#7c88a8"/><stop offset=".4" stop-color="#f4f7ff"/><stop offset="1" stop-color="#6d7798"/></linearGradient>
+ <radialGradient id="silverR" cx=".35" cy=".3" r=".75"><stop stop-color="#fff"/><stop offset=".55" stop-color="#b8c3dc"/><stop offset="1" stop-color="#59627e"/></radialGradient>
+ <radialGradient id="moonstone" cx=".38" cy=".32" r=".75"><stop stop-color="#fff"/><stop offset=".45" stop-color="#dfe7f6"/><stop offset=".8" stop-color="#a9bbdf"/><stop offset="1" stop-color="#7f93c4"/></radialGradient>
+ <radialGradient id="halo"><stop stop-color="#e6edff" stop-opacity=".8"/><stop offset=".4" stop-color="#a8c0ff" stop-opacity=".25"/><stop offset="1" stop-color="#a8c0ff" stop-opacity="0"/></radialGradient>
+ <linearGradient id="vineG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f3faf4"/><stop offset="1" stop-color="#a6cbb9"/></linearGradient>
+ <linearGradient id="leafG" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eef9f1"/><stop offset=".6" stop-color="#b4dcc6"/><stop offset="1" stop-color="#86b8a0"/></linearGradient>
+ <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>
+</defs></svg>
+<header><div><h1>Elven <span>/ Claude skin study</span></h1><p>Night-glass casings with a pearl sheen and silver hairline rims, leaf-tip ends with tapered filigree, a crescent crest, and moonstone panes for displays. <a href="index.html">All pages</a></p></div>
+<div class="controls" role="group" aria-label="Skin controls">
+ <div class="row" id="stateRow"><span>State</span></div>
+ <div class="row" id="joinRow"><span>Join</span></div>
+ <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
+</div></header>
+<div id="viewport"><main id="stage" aria-label="Elven skin stage">
+<svg class="bg" id="bg" viewBox="0 0 1200 600" aria-hidden="true"></svg>
+<div class="topline"><p id="status" role="status" aria-live="polite">Drag a nameplate toward the other casing, or use the state buttons.</p><span id="phase"></span></div>
+
+<section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="a" aria-label="Move Jarvis"><span><b>Jarvis</b>agent control</span><span class="orn" aria-hidden="true">✦</span></button>
+ <div class="screen" aria-label="Jarvis display"><div class="pages">
+  <div class="page"><div class="tiny">Jarvis · active workflow</div><div class="big"><span class="num">03</span><em class="runText">agents running</em></div><small>Reviewing the capsule renderer</small><span class="bars" aria-hidden="true"></span></div>
+  <div class="page"><div class="tiny">Jarvis · current task</div><strong>Verify shell assembly</strong><small>12 checks passed · 2 queued</small></div>
+  <div class="page"><div class="tiny">Jarvis · event log</div><small>10:42 &nbsp;joined display state retained<br>10:43 &nbsp;waiting for your next action</small></div>
+ </div></div>
+ <div class="tabline" role="tablist" aria-label="Jarvis screens"><button class="tab" role="tab" data-page="0">Status</button><button class="tab" role="tab" data-page="1">Task</button><button class="tab" role="tab" data-page="2">Log</button></div>
+ <button class="knob run" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button><button class="knob next" aria-label="Next Jarvis screen" title="Next screen">›</button>
+ <div class="strip" aria-hidden="true"><b>Jarvis</b><span><em>03</em> agents running</span></div>
+</section>
+
+<section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="b" aria-label="Move GitDiscuss"><span><b>GitDiscuss</b>review queue</span><span class="orn" aria-hidden="true">✦</span></button>
+ <div class="screen" aria-label="GitDiscuss display"><div class="pages">
+  <div class="page"><div class="tiny">GitDiscuss · incoming</div><div class="big"><span class="num">02</span><em>need a decision</em></div><small>Capsule joining · design feedback</small></div>
+  <div class="page"><div class="tiny">GitDiscuss · selected discussion</div><strong>Shared casing geometry</strong><small>Brent · 4 comments · ready to review</small></div>
+  <div class="page"><div class="tiny">GitDiscuss · event log</div><small>10:41 &nbsp;feedback collected<br>10:43 &nbsp;no workflow links created</small></div>
+ </div></div>
+ <div class="tabline" role="tablist" aria-label="GitDiscuss screens"><button class="tab" role="tab" data-page="0">Queue</button><button class="tab" role="tab" data-page="1">Thread</button><button class="tab" role="tab" data-page="2">Log</button></div>
+ <button class="knob run" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button><button class="knob next" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+ <div class="strip" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em> need a decision</span></div>
+</section>
+
+<section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
+ <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="orn" aria-hidden="true">✦</span></button>
+ <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="lampdot" aria-hidden="true"></span>
+ <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
+</section>
+
+<svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
+</main></div>
+<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
+const W=390,H=130,HS=44,CW=276,CH=78,CHS=38,SEP=170,NEAR=120,READY=40,TOP=70,SNAP=46;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),lerp=(a,b,t)=>a+(b-a)*t,ease=t=>t*t*(3-2*t),seg=(t,a,b)=>clamp((t-a)/(b-a));
+const back=(t,c=1.5)=>1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+const f=n=>Math.round(n*10)/10,P=p=>f(p.x)+' '+f(p.y),PI=Math.PI;
+const NIGHT='#0c1022';
+
+/* Jarvis bars: slender spindles, one in moonstone blue */
+$('.bars').innerHTML=`<svg width="36" height="22" viewBox="0 0 36 22">${[9,15,11,19,13].map((hh,i)=>{const x=i*7+2;return `<path d="M${x} 22C${x} ${22-hh*.5} ${x+1.6} ${22-hh*.8} ${x+1.6} ${22-hh}C${x+1.6} ${22-hh*.8} ${x+3.2} ${22-hh*.5} ${x+3.2} 22Z" fill="${i===3?'#2f4f86':'#7d8bb3'}"/>`}).join('')}</svg>`;
+
+/* ---------- Shared geometry: tapered ribbons and growing curls ---------- */
+// A filled outline around a centre line, each point carrying its own width (p.w).
+function ribbon(pts,add=0){const L=[],R=[],n=pts.length;
+ for(let i=0;i<n;i++){const a=pts[Math.max(0,i-1)],b=pts[Math.min(n-1,i+1)],dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1,w=(pts[i].w+add)/2;
+  L.push(f(pts[i].x-dy/l*w)+' '+f(pts[i].y+dx/l*w));R.push(f(pts[i].x+dy/l*w)+' '+f(pts[i].y-dx/l*w))}
+ return 'M'+L.concat(R.reverse()).join('L')+'Z'}
+const widths=(pts,w0,w1)=>(pts.forEach((p,i)=>p.w=lerp(w0,w1,i/(pts.length-1))),pts);
+// A tendril: heading th, length L, turning by T in total, tighter toward the tip (a fiddlehead when T is large).
+function curlPts(p,th,L,T,sg,n=26){const pts=[{x:p.x,y:p.y}];let x=p.x,y=p.y;const ds=L/n;
+ for(let i=1;i<=n;i++){const a=th+sg*T*Math.pow((i-.5)/n,2.2);x+=Math.cos(a)*ds;y+=Math.sin(a)*ds;pts.push({x,y})}return pts}
+const leafD='M0 0C4 -4.6 10 -5.2 15 0C10 5.2 4 4.6 0 0Z';
+function leaf(x,y,deg,s,op=1){if(s<=.01)return '';return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(deg)}) scale(${f(s*100)/100})" opacity="${f(op*100)/100}"><path d="${leafD}" fill="url(#leafG)" stroke="${NIGHT}" stroke-width=".7"/><path d="M1.2 0Q7 -.6 13 0" fill="none" stroke="#5f8c7a" stroke-width=".6"/></g>`}
+function star(x,y,r,op,fill='#fff'){return `<path d="M${f(x)} ${f(y-r)}Q${f(x)} ${f(y)} ${f(x+r)} ${f(y)}Q${f(x)} ${f(y)} ${f(x)} ${f(y+r)}Q${f(x)} ${f(y)} ${f(x-r)} ${f(y)}Q${f(x)} ${f(y)} ${f(x)} ${f(y-r)}Z" fill="${fill}" opacity="${f(op*100)/100}"/>`}
+
+/* ---------- Backdrop: moon, stars, two slender trees with sprays of leaves. Drawn once. ---------- */
+(function(){let r=7;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
+ let stars='',tw='';
+ for(let i=0;i<95;i++){const x=rnd()*1200,y=rnd()*470;stars+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(.35+rnd()*.9)}" opacity="${f(.25+rnd()*.6)}"/>`}
+ for(let i=0;i<7;i++)tw+=star(120+rnd()*960,40+rnd()*300,2.5+rnd()*3,.55);
+ function tree(x0,lean,side){let o='',lv='';
+  const trunk=widths(curlPts({x:x0,y:612},-PI/2+lean,560,.5,side,30),16,2.2);
+  o+=`<path d="${ribbon(trunk)}"/>`;
+  // Branches lean into the scene and arch over, ending in a curl.
+  for(const [k,len,ang,T] of [[9,190,.9,1.4],[15,150,.55,1.9],[20,120,1.15,2.3],[25,80,.4,2.6]]){
+   const p=trunk[k],br=widths(curlPts(p,-PI/2+side*ang,len,T,side,22),Math.max(1.4,p.w*.45),.3);
+   o+=`<path d="${ribbon(br)}"/>`;
+   for(let j=4;j<br.length-3;j+=3){const q=br[j],a=Math.atan2(br[j+1].y-q.y,br[j+1].x-q.x)*180/PI;lv+=leaf(q.x,q.y,a+(j%2?62:-62),.8+rnd()*.5)}
+  }
+  return {o,lv,trunk};
+ }
+ const L=tree(46,.12,1),R=tree(1162,-.14,-1);
+ const edge=t=>`<path d="${ribbon(t.trunk.map(p=>({x:p.x+p.w*.3,y:p.y,w:.9})))}" fill="#b9c6ee" opacity=".22"/>`;
+ $('#bg').innerHTML=`<defs><radialGradient id="moonGlow"><stop stop-color="#dfe7ff" stop-opacity=".32"/><stop offset=".35" stop-color="#9fb4ff" stop-opacity=".1"/><stop offset="1" stop-color="#9fb4ff" stop-opacity="0"/></radialGradient>
+  <mask id="cres"><circle cx="1032" cy="104" r="34" fill="#fff"/><circle cx="1046" cy="94" r="30" fill="#000"/></mask>
+  <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9c4f2" stop-opacity="0"/><stop offset=".6" stop-color="#b9c4f2" stop-opacity=".1"/><stop offset="1" stop-color="#b9c4f2" stop-opacity=".04"/></linearGradient></defs>
+  <circle cx="1032" cy="104" r="170" fill="url(#moonGlow)"/><circle cx="1032" cy="104" r="34" fill="#eef2ff" mask="url(#cres)" opacity=".9"/>
+  <g fill="#e6ecff">${stars}</g>${tw}
+  <rect y="430" width="1200" height="170" fill="url(#mist)"/>
+  <g fill="#0b0d22">${L.o}${R.o}</g>${edge(L)}${edge(R)}<g opacity=".55">${L.lv}${R.lv}</g>
+  <rect y="520" width="1200" height="80" fill="url(#mist)" opacity=".8"/>`;
+})();
+
+/* ---------- Casing: a long leaf with a pointed outer tip; the joining end is squared off with a silver stem ---------- */
+function body(w,h,join,d){
+ const t=5+d,b=h-5-d,m=h/2,cx=w/2,k=Math.min(1,h/H),sh=Math.min(64,h*.5+20),tip=d*2.4,R=join?w-7-d:w-tip;
+ let s=`M${f(tip)} ${m}C${f(14+d*.6)} ${f(m-h*.3)} ${f(sh-26)} ${t} ${f(sh)} ${t}L${f(cx-30)} ${t}Q${cx} ${f(t-6*k+d*.4)} ${f(cx+30)} ${t}`;
+ if(join)s+=`L${f(R-8)} ${t}Q${f(R)} ${t} ${f(R)} ${f(t+8)}L${f(R)} ${f(b-8)}Q${f(R)} ${b} ${f(R-8)} ${b}`;
+ else s+=`L${f(w-sh)} ${t}C${f(w-sh+26)} ${t} ${f(w-14-d*.6)} ${f(m-h*.3)} ${f(R)} ${m}C${f(w-14-d*.6)} ${f(m+h*.3)} ${f(w-sh+26)} ${b} ${f(w-sh)} ${b}`;
+ return s+`L${f(cx+24)} ${b}Q${cx} ${f(b+5*k-d*.4)} ${f(cx-24)} ${b}L${f(sh)} ${b}C${f(sh-26)} ${b} ${f(14+d*.6)} ${f(m+h*.3)} ${f(tip)} ${m}Z`;
+}
+// Filigree on the leaf tip: a vein, two tendrils curling back into spirals, two small leaves.
+function tipFiligree(h,k){const m=h/2;let o='';
+ o+=`<path d="${ribbon(widths([{x:3,y:m},{x:14,y:m-.2},{x:24,y:m},{x:33,y:m+.2}],.3,1.5))}" fill="url(#silver)"/>`;
+ for(const sg of [-1,1]){const c=widths(curlPts({x:8,y:m+sg*2},sg*.95,38*k,1.8*PI,sg,30),1.9,.3);o+=`<path d="${ribbon(c)}" fill="url(#silver)" opacity=".92"/><circle cx="${f(c[c.length-1].x)}" cy="${f(c[c.length-1].y)}" r="${f(.9*k+.4)}" fill="#fff"/>`}
+ o+=leaf(26,m-.5,-146,.72*k+.15,.9)+leaf(26,m+.5,146,.72*k+.15,.9);
+ return o}
+function casing(id,w,h,lit){
+ const small=id==='c',join=!small,k=clamp(h/H,.34,1),t=5,b=h-5,cx=w/2;
+ const outer=body(w,h,join,0),inner=body(w,h,join,4);
+ let o=`<path d="${outer}" fill="none" stroke="#8fb0ff" stroke-width="6" opacity=".16" filter="url(#soft)"/>`;
+ o+=`<path d="${outer}" fill="url(#night)"/><path d="${outer}" fill="url(#pearl)" opacity=".14"/><path d="${outer}" fill="url(#moonlit)"/>`;
+ // A sprinkle of fixed star points in the night glass, kept clear of the pane.
+ for(const [x,y] of small?[[.22,.82],[.8,.18]]:[[.16,.84],[.62,.9],[.9,.88],[.4,.08]])o+=`<circle cx="${f(x*w)}" cy="${f(y*h)}" r=".7" fill="#e6ecff" opacity=".55"/>`;
+ o+=`<path d="${inner}" fill="none" stroke="#c9d4ee" stroke-width=".7" opacity=".45"/><path d="${outer}" fill="none" stroke="url(#silver)" stroke-width="1.5"/>`;
+ o+=tipFiligree(h,k);if(small)o+=`<g transform="translate(${w} 0) scale(-1 1)">${tipFiligree(h,k)}</g>`;
+ // Crest: a thin crescent on a stem above the casing's peak, its star lit while the widget is running.
+ const cy=t-12*k,r=5.5*k;
+ if(lit)o+=`<circle cx="${cx}" cy="${f(cy)}" r="${f(16*k)}" fill="url(#halo)"/>`;
+ o+=`<path d="M${cx} ${f(t-2.6*k)}L${cx} ${f(cy+r)}" stroke="url(#silverV)" stroke-width="1.1"/>`;
+ o+=`<path d="M${f(cx+1.5*k)} ${f(cy-r*.96)}A${f(r)} ${f(r)} 0 1 0 ${f(cx+1.5*k)} ${f(cy+r*.96)}A${f(r*.8)} ${f(r*.8)} 0 0 1 ${f(cx+1.5*k)} ${f(cy-r*.96)}Z" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".5"/>`;
+ o+=star(cx+5.5*k,cy-3.5*k,2.8*k,lit?1:.35,lit?'#fff':'#aeb9d6');
+ // Pendant: a moonstone drop beneath the keel.
+ o+=`<path d="M${cx} ${f(b+1.5*k)}Q${f(cx+3.4*k)} ${f(b+6*k)} ${cx} ${f(b+10.5*k)}Q${f(cx-3.4*k)} ${f(b+6*k)} ${cx} ${f(b+1.5*k)}Z" fill="url(#moonstone)" stroke="#e8eef8" stroke-width=".6"/>`;
+ // Joining end: a silver stem with two moonstone knops; the vine grows from these.
+ if(join){o+=`<rect x="${w-15}" y="${t+3}" width="7" height="${h-2*t-6}" rx="3.5" fill="url(#silverV)" stroke="${NIGHT}" stroke-width=".8"/>`;
+  for(const y of [16,h-16])o+=`<circle cx="${w-11.5}" cy="${y}" r="4.6" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><circle cx="${w-11.5}" cy="${y}" r="2.5" fill="url(#moonstone)"/>`}
+ return id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${o}</g>`:o;
+}
+// The pane's pointed outline: used as its clip path and, offset outward, as its silver bezel.
+function paneD(w,h,o){const m=h/2,c=Math.min(13,h*.42);return `M${f(-o)} ${f(m)}Q${f(1.5-o)} ${f(3-o)} ${f(c)} ${f(-o)}H${f(w-c)}Q${f(w-1.5+o)} ${f(3-o)} ${f(w+o)} ${f(m)}Q${f(w-1.5+o)} ${f(h-3+o)} ${f(w-c)} ${f(h+o)}H${f(c)}Q${f(1.5-o)} ${f(h-3+o)} ${f(-o)} ${f(m)}Z`}
+$$('.screen,.mini').forEach(el=>{
+ const w=el.offsetWidth,h=el.offsetHeight,m=h/2,x0=el.offsetLeft,y0=el.offsetTop;
+ el.style.clipPath=`path('${paneD(w,h,0)}')`;
+ const s=document.createElementNS('http://www.w3.org/2000/svg','svg');s.setAttribute('class','pf');s.setAttribute('aria-hidden','true');
+ s.setAttribute('width',w+24);s.setAttribute('height',h+12);s.setAttribute('viewBox',`-12 -6 ${w+24} ${h+12}`);s.style.left=x0-12+'px';s.style.top=y0-6+'px';
+ const fin=x=>`<path d="M${x} ${m}L${x+(x<0?4.5:-4.5)} ${f(m-2.2)}L${x+(x<0?7:-7)} ${m}L${x+(x<0?4.5:-4.5)} ${f(m+2.2)}Z" fill="url(#silver)"/>`;
+ s.innerHTML=`<path d="${paneD(w,h,3.4)}" fill="${NIGHT}" opacity=".7"/><path d="${paneD(w,h,3.4)}" fill="none" stroke="url(#silver)" stroke-width="1.3"/><path d="${paneD(w,h,1.1)}" fill="none" stroke="${NIGHT}" stroke-width="1"/>${fin(-10.5)}${fin(w+10.5)}`;
+ el.before(s);
+});
+
+/* ---------- Options ---------- */
+const JOINS={
+ vine:{label:'Vine',kind:'Grow',gap:36,
+  about:'Each joining end is a slim silver stem with two moonstone knops, and one knop holds a curled fiddlehead bud (Jarvis at the top, GitDiscuss at the bottom). <b>Near:</b> the knops glow and the buds uncurl and reach toward each other. <b>Ready:</b> the tendril tips touch with a glint. Joining: the casings drift together, the tendrils grow across the gap and spiral round each other into a two-strand braid, over and under, and each tip curls round the opposite knop. Four leaves open along the braid, then a moonflower blooms in the middle as the joined light. <b>Release:</b> pull either casing away from its partner. The braid strains and untwists, and past a hand-width it lets go: the leaves fold, the strands unwind and draw back into their buds. Clicking the moonflower, or focusing it and pressing Enter, does the same. To move the pair, drag a nameplate up, down or toward the partner.',
+  over(c){
+   const h=c.h,jt=c.jt,k=clamp(h/H,.55,1);
+   const bA={x:model.a.x+W-11.5,y:model.a.y+16},bB={x:model.b.x+11.5,y:model.b.y+h-16};
+   const D=Math.hypot(bB.x-bA.x,bB.y-bA.y),th=Math.atan2(bB.y-bA.y,bB.x-bA.x);
+   let s='';
+   const g=jt===0?c.glow:0;
+   if(g>0)s+=[bA,bB].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(8+10*g)}" fill="url(#halo)" opacity="${f(g)}"/>`).join('');
+   // Fiddleheads: tightly curled at rest, uncurling as the partner nears.
+   let u,al;
+   if(jt===0){u=g;al=1}else if(model.dir>0){u=seg(jt,0,.16);al=1-seg(jt,.14,.2)}else{u=seg(jt,0,.12);al=1-seg(jt,.1,.14)}
+   if(al>0){const e=ease(u),reach=jt===0?Math.min(D/2+3,96):22,L=lerp(13,Math.max(13,reach),e),T=lerp(2.3*PI,(jt===0?.2:.6)*PI,e);
+    const fa=widths(curlPts(bA,th,L,T,-1),2.8,.35),fb=widths(curlPts(bB,th+PI,L,T,-1),2.8,.35);
+    s+=`<g opacity="${f(al*100)/100}">${stem(fa)}${stem(fb)}</g>`;
+    if(jt===0&&g>=1){const ta=fa[fa.length-1],tb=fb[fb.length-1];s+=star((ta.x+tb.x)/2,(ta.y+tb.y)/2,7,.95)+`<circle cx="${f((ta.x+tb.x)/2)}" cy="${f((ta.y+tb.y)/2)}" r="12" fill="url(#halo)"/>`}
+   }
+   if(jt===0)return s;
+   // The braid: two strands, each running from its own knop to the far one and curling round it.
+   const extra=jt===1?model.b.x-model.a.x-W-J().gap:0,strain=clamp(extra/SNAP);
+   const tw=(model.dir<0?ease(seg(jt,.5,.86)):1)*(1-.65*strain),R=lerp(5.5,7,k)*tw;
+   const gr=model.dir>0?seg(jt,.15,.8):seg(jt,.12,.6);
+   if(gr<=0)return s;
+   const A=grow(strand(bA,bB,R),gr,k),B=grow(strand(bB,bA,R),gr,k);
+   s+=stem(A)+stem(B);
+   // B lies over A where they cross, except at the first and third crossings, where A is redrawn on top.
+   if(2*R>OFF+.5){const c0=Math.asin(OFF/(2*R));for(const tc of [(PI+c0)/(5*PI),(3*PI+c0)/(5*PI)])s+=over(A,tc-.07,tc+.07)}
+   // Leaves along the braid, then the moonflower in the middle.
+   const LV=[[A,.14,1],[B,.14,1],[A,.47,-1],[B,.47,-1]];
+   LV.forEach(([S,t,side],i)=>{const q=at(S,t);if(!q)return;
+    const sc=model.dir>0?back(seg(jt,.66+i*.05,.78+i*.05),1.4):ease(seg(jt,.84,.97));
+    s+=leaf(q.x,q.y,q.a*180/PI+side*58+strain*24*side,sc*k*1.05)});
+   const fk=model.dir>0?back(seg(jt,.84,1),1.3):ease(seg(jt,.9,1));
+   if(fk>0){const qa=at(A,.5),qb=at(B,.5);if(qa&&qb)s+=flower((qa.x+qb.x)/2,(qa.y+qb.y)/2,fk,k)}
+   if(jt===1){const x0=model.a.x+W-18,y0=Math.min(model.a.y,model.b.y)+4,wd=model.b.x+18-x0,hd=h-8,m=at(A,.5),n=at(B,.5),fx=(m.x+n.x)/2,fy=(m.y+n.y)/2;
+    s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Moonflower: click, or press Enter, to release the vine and separate the widgets"><title>Click the moonflower, or pull a casing away, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(hd)}" fill="transparent"/><circle class="ringfocus" cx="${f(fx)}" cy="${f(fy)}" r="${f(15*k)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+   return s;
+  }
+ }
+};
+const SHADES={
+ narrow:{label:'Plain narrow',kind:'Page baseline',
+  about:'Not a brainstorm item. The casing narrows to a slim leaf holding the script nameplate and one moonstone value; the crescent crest, the pendant and the tip filigree stay, drawn smaller. It keeps the shade state working until the elven shade modes (leaf furl, constellation, wing fold, lantern sleep, mist) are built and added here. Shading while joined keeps the vine, braided flatter.'}
+};
+
+/* ---------- Vine drawing ---------- */
+const OFF=6.5;
+// Points from knop p toward knop q as a helix around the line between them, then a curl round q.
+function strand(p,q,R){
+ const ux0=q.x-p.x,uy0=q.y-p.y,L0=Math.hypot(ux0,uy0)||1,ux=ux0/L0,uy=uy0/L0,nx=-uy,ny=ux;
+ const e={x:q.x+nx*OFF,y:q.y+ny*OFF},dx=e.x-p.x,dy=e.y-p.y,pts=[],N=54;
+ for(let i=0;i<=N;i++){const t=i/N,o=R*Math.sin(5*PI*t);pts.push({x:p.x+dx*t+nx*o,y:p.y+dy*t+ny*o,t})}
+ const a0=Math.atan2(ny,nx);
+ for(let i=1;i<=16;i++){const s=i/16,a=a0-s*1.55*PI,r=OFF*(1-.5*s);pts.push({x:q.x+Math.cos(a)*r,y:q.y+Math.sin(a)*r,t:1+s*.3})}
+ let acc=0;pts.forEach((p,i)=>{if(i)acc+=Math.hypot(p.x-pts[i-1].x,p.y-pts[i-1].y);p.s=acc});
+ return pts;
+}
+// The grown part of a strand, with a sharp growing tip.
+function grow(pts,g,k){
+ const len=g*pts[pts.length-1].s,out=[];
+ for(let i=0;i<pts.length;i++){if(pts[i].s<=len){out.push(pts[i]);continue}
+  const p=pts[i-1],q=pts[i],u=(len-p.s)/((q.s-p.s)||1);out.push({x:lerp(p.x,q.x,u),y:lerp(p.y,q.y,u),t:lerp(p.t,q.t,u),s:len});break}
+ const sc=lerp(.75,1,k);
+ for(const p of out){const base=p.t<=1?lerp(3.3,1.6,p.t):lerp(1.6,.45,(p.t-1)/.3);p.w=base*sc*clamp(.16+.84*(len-p.s)/16,.16,1)}
+ return out;
+}
+function stem(pts){if(pts.length<2)return '';
+ return `<path d="${ribbon(pts,1.7)}" fill="${NIGHT}"/><path d="${ribbon(pts)}" fill="url(#vineG)"/><polyline points="${pts.map(p=>f(p.x-.3)+','+f(p.y-.45)).join(' ')}" fill="none" stroke="#fff" stroke-width=".5" opacity=".55"/>`}
+// Redraw a stretch of strand on top; the light body runs a little past its outline so no seam shows.
+function over(S,lo,hi){const core=S.filter(p=>p.t>=lo&&p.t<=hi),ext=S.filter(p=>p.t>=lo-.03&&p.t<=hi+.03);if(core.length<2)return '';
+ return `<path d="${ribbon(core,1.7)}" fill="${NIGHT}"/><path d="${ribbon(ext)}" fill="url(#vineG)"/><polyline points="${ext.map(p=>f(p.x-.3)+','+f(p.y-.45)).join(' ')}" fill="none" stroke="#fff" stroke-width=".5" opacity=".55"/>`}
+function at(S,t){if(!S.length||S[S.length-1].t<t)return null;let i=1;while(i<S.length-1&&S[i].t<t)i++;const p=S[i-1],q=S[i];return{x:q.x,y:q.y,a:Math.atan2(q.y-p.y,q.x-p.x)}}
+function flower(x,y,kk,k){const sc=k*.95,op=clamp(kk*1.4);let s=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(22*sc*clamp(kk))}" fill="url(#halo)" opacity="${f(op)}"/><g transform="translate(${f(x)} ${f(y)}) rotate(${f(-50*(1-kk))}) scale(${f(sc*100)/100})">`;
+ for(let i=0;i<5;i++){const a=i*72-90;s+=`<g transform="rotate(${a})"><ellipse cx="${f(5.4*kk)}" cy="0" rx="${f(5.6*kk)}" ry="${f(2.7*clamp(kk))}" fill="#f7f8ff" stroke="#9fb0dc" stroke-width=".5" opacity="${f(op)}"/></g>`}
+ return s+`<circle r="${f(2*clamp(kk))}" fill="#fff3cf" stroke="#c8b47a" stroke-width=".4"/></g>`}
+
+/* ---------- Model ---------- */
+const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,busy:false};
+let anim=0,shadeAnim=0,drag=null;
+const J=()=>JOINS[model.join];
+function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
+function joinedPose(fixed='a'){
+ const g=J().gap;
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+34,1200-W-34);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
+ let ax=clamp(model.a.x,34,1200-2*W-g-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+}
+const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
+function setJt(t){
+ model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,model.dir<0?.55:.3));
+ for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
+}
+function tween(from,to,ms,fn){
+ const token=++anim;model.busy=true;
+ return new Promise(res=>{
+  if(reduce.matches||ms<=0){fn(to);model.busy=false;render();return res(true)}
+  const t0=performance.now();
+  (function step(now){if(token!==anim)return res(false);
+   const t=clamp((now-t0)/ms);fn(lerp(from,to,t));if(t>=1)model.busy=false;render();
+   if(t<1)requestAnimationFrame(step);else res(true)})(t0);
+ });
+}
+const say=t=>$('#status').textContent=t;
+
+async function doJoin(fixed='a',ms=3200){
+ if(model.jt===1)return;
+ model.dir=1;
+ if(model.jt===0){model.path={s:here(),j:joinedPose(fixed)}}
+ else if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};
+ model.glow=0;
+ say('The casings drift together and the tendrils grow across, twining round each other.');
+ const ok=await tween(model.jt,1,ms*(1-model.jt),setJt);
+ if(ok){model.path=null;say('Joined: a braided vine with a moonflower. Drag a nameplate to move the pair; pull one casing away, or click the flower, to release.')}
+}
+async function doSeparate(sPose){
+ if(model.jt===0)return;
+ if(model.jt===1){model.dir=-1;model.path={s:sPose||separatePose(),j:here()};say('The vine lets go: the leaves fold, the braid unwinds and the tendrils draw back into their buds.')}
+ else{if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say('The tendrils stop and draw back.')}
+ const ms=model.dir<0?2300*model.jt:1400*model.jt;
+ if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;say('Separate. Displays and pages were not touched.')}
+}
+function holdJoining(){
+ ++anim;model.busy=false;model.glow=0;model.dir=1;
+ if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
+ setJt(.55);render();say('Held mid-join: the tendrils are twining across the gap. Use the scrubber to step through the growth.');
+}
+function toggleShade(){
+ const to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=620*Math.abs(to-start),t0=performance.now();
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,ease(t));render();if(t<1)requestAnimationFrame(step)})(t0);
+ say(to?'Shaded: the casing narrows to a slim leaf with its nameplate and one value.':'Unshaded: the casing opens again.');
+}
+// A casing pulled a little way from its partner springs back along the vine.
+function springBack(id){const fixed=id==='a'?'b':'a',from=here(),to=joinedPose(fixed);
+ tween(0,1,520,v=>{const e=back(v,1.2);for(const k of ['a','b']){model[k].x=lerp(from[k].x,to[k].x,e);model[k].y=lerp(from[k].y,to[k].y,e)}})}
+
+/* ---------- Rendering ---------- */
+function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,ease(model.st))),jt:model.jt,glow:model.glow}}
+function render(){
+ const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,ease(model.st)));
+ for(const id of ['a','b','c']){
+  const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
+  el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
+  const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
+  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  el.querySelectorAll('.screen,.pf,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
+  el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
+  el.querySelector('.strip').style.opacity=f(strip);
+  if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
+   const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
+ }
+ $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
+ const focused=document.activeElement&&document.activeElement.id==='seamHit';
+ $('#over').innerHTML=j.over(c);
+ const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
+ $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
+ $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
+ $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
+ $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
+ const p=Math.round(model.jt*100),jt=model.jt;
+ const mid=model.dir>0?(jt<.16?'Joining · buds uncurl ':jt<.5?'Joining · tendrils reach ':jt<.8?'Joining · twining ':jt<.86?'Joining · leafing out ':'Joining · the moonflower opens '):(jt>.84?'Releasing · leaves fold ':jt>.6?'Releasing · the braid unwinds ':jt>.12?'Releasing · tendrils draw back ':'Releasing · buds curl ');
+ const ph={separate:'Separate · two leaves',joining:mid+p+'%',joined:'Joined · '+j.label.toLowerCase()};
+ $('#phase').textContent=(drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.state==='ready'?'Ready · the tendril tips touch':drag&&drag.state==='near'?'Nearby · the buds uncurl':ph[state])+(model.st>.5?' · shaded':'');
+}
+
+/* ---------- Controls ---------- */
+const STATES=[['separate','Separate','1'],['joining','Joining','2'],['joined','Joined','3'],['shade','Shade','4']];
+STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.state=k;b.innerHTML=`<kbd>${key}</kbd>${l}`;b.onclick=()=>act(k);$('#stateRow').append(b)});
+function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
+function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
+function pick(key,id){
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='shade')model.shade=id;
+ describe();render();
+}
+function describe(){
+ const j=J(),s=SHADES[model.shade];
+ $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
+ $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
+}
+options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
+$('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;model.dir=1;
+ if(model.jt===0||model.jt===1||!model.path)model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};
+ setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
+document.addEventListener('keydown',e=>{
+ if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
+ const key=e.key.toLowerCase();
+ if(e.key==='Escape')cancelDrag();
+ const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
+ if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
+});
+['a','b'].forEach(id=>{
+ const el=$('#'+id),m=model[id],name=id==='a'?'Jarvis':'GitDiscuss';
+ el.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{m.page=+t.dataset.page;render()});
+ el.querySelector('.next').onclick=()=>{m.page=(m.page+1)%3;render()};
+ el.querySelector('.run').onclick=()=>{m.run=!m.run;render();say(name+' simulated activity '+(m.run?'resumed; the star on its crest is lit.':'paused; the star on its crest dims.'))};
+});
+
+/* ---------- Dragging with near / ready, and pulling the vine apart ---------- */
+function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:(e.clientX-r.left)/s,y:(e.clientY-r.top)/s}}
+function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
+stage.addEventListener('pointerdown',e=>{
+ if(e.button!==0)return;
+ if(e.target.closest('#seamHit')&&model.jt===1&&!model.busy){e.preventDefault();$('#a .grip').focus();doSeparate();return}
+ const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
+ const id=g.dataset.drag,p=local(e);
+ // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
+ // A casing grabbed while springing back settles at its joined place first.
+ if(id!=='c'&&((model.jt>0&&model.jt<1)||model.busy)){++anim;model.busy=false;if(model.jt>0&&model.jt<1){if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0)}model.path=null;model.dir=1;if(model.jt===1){const j=joinedPose('a');Object.assign(model.a,j.a);Object.assign(model.b,j.b)}}
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle',strain:0};
+ stage.setPointerCapture(e.pointerId);
+});
+stage.addEventListener('pointermove',e=>{
+ if(!drag)return;const p=local(e);
+ const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
+ if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
+ if(drag.group){const g=J().gap,ay=clamp(s.a.y+dy,TOP,bottom),away=drag.id==='a'?-dx:dx;
+  if(away>0){// Pulling away: the partner holds, the held casing gives a little, and the braid strains.
+   const st=Math.pow(away,.9)*.62,held=drag.id;drag.strain=st;
+   model.a.y=model.b.y=ay;
+   if(held==='a'){model.b.x=s.b.x;model.a.x=s.a.x-st}else{model.a.x=s.a.x;model.b.x=s.b.x+st}
+   if(st>=SNAP){const d=drag;drag=null;const pose=here();
+    if(held==='a')pose.a.x=clamp(pose.a.x-110,30,1200-W-30);else pose.b.x=clamp(pose.b.x+110,30,1200-W-30);
+    doSeparate(pose);return}
+   say('The braid strains. Pull further to make it let go, or release to let it spring back.');render();return}
+  drag.strain=0;const ax=clamp(s.a.x+dx,30,1200-2*W-g-30);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,30,1200-W-30),y:clamp(s[id].y+dy,TOP,bottom)};
+ const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
+ drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
+ const pull=drag.state==='ready'?.88:drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
+ m.x=lerp(raw.x,t.x,pull);m.y=lerp(raw.y,t.y,pull);
+ model.glow=drag.state==='ready'?1:drag.state==='near'?.12+.7*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
+ if(drag.state==='ready')say('Ready: the tendril tips touch. Release to grow the vine.');else if(drag.state==='near')say('Nearby: the buds uncurl and reach toward each other. Move closer.');
+ render();
+});
+function endDrag(){
+ if(!drag)return;const d=drag;drag=null;
+ if(d.group&&d.strain>0){springBack(d.id);say('The braid holds and draws the casing back.');return}
+ if(d.state==='ready'){doJoin(d.id==='b'?'a':'b',2700)}else{model.glow=0;render()}
+}
+function cancelDrag(){
+ if(!drag)return;const d=drag;drag=null;
+ const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
+}
+stage.addEventListener('pointerup',endDrag);
+stage.addEventListener('pointercancel',cancelDrag);
+$$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
+ const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
+ const id=b.dataset.drag;
+ if((model.jt>0&&model.jt<1||model.busy)&&id!=='c')return;
+ const bottom=600-(model.st>.5?HS:H)-14;
+ if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-CH-10:bottom)}render();
+}));
+
+function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
+addEventListener('resize',fit);fit();describe();render();
+window.elvenSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade};
+</script></body></html>
