@@ -778,6 +778,41 @@ header {
   background: var(--nephrite-jade-bright);
   box-shadow: 0 0 6px var(--nephrite-jade-bright);
 }
+.sylvan-release-clasp.crystal-pin {
+  width: 32px;
+  height: 48px;
+  cursor: pointer;
+}
+.sylvan-release-clasp.crystal-pin::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 32px;
+  left: 11px;
+  top: 8px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #ffffff 0%, #b8e6f7 35%, #59b5d4 70%, #1a3c4f 100%);
+  border: 1.5px solid #a5d8ff;
+  box-shadow: 0 0 10px rgba(123, 242, 198, 0.6), inset 0 1px 2px #ffffff;
+  transform: rotate(calc(var(--tension, 0) * 20deg));
+  transition: transform 100ms ease;
+}
+.sylvan-release-clasp.crystal-pin:hover::before {
+  border-color: #ffffff;
+  box-shadow: 0 0 14px rgba(165, 216, 255, 0.9), inset 0 0 6px #ffffff;
+}
+.sylvan-release-clasp.crystal-pin::after {
+  content: "✧";
+  position: absolute;
+  top: 13px;
+  left: 11px;
+  width: 10px;
+  text-align: center;
+  font-size: 11px;
+  color: #ffffff;
+  text-shadow: 0 0 6px #7bf2c6;
+  pointer-events: none;
+}
 
 /* Design Overlay */
 #portOverlay { position: absolute; inset: 0; pointer-events: none; }
@@ -850,8 +885,9 @@ footer .note-highlight {
     <div class="control-group">
       <label for="optionSelect">Option</label>
       <select id="optionSelect" aria-label="Select skin exploration option">
-        <option value="tendril_braid" selected>1. Living Tendril Braid (Sylvan Weave)</option>
+        <option value="tendril_braid">1. Living Tendril Braid (Sylvan Weave)</option>
         <option value="lotus_petals">2. Lotus Petal Nocturne shade</option>
+        <option value="crystal_cleavage" selected>3. Crystalline Cleavage &amp; Harmonic Chime join</option>
       </select>
     </div>
     <div class="control-group">
@@ -861,9 +897,10 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
+    <button id="btnJoinAnim" class="primary-btn">Seat crystal prisms</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnLotusAnim">Close lotus petals</button>
+    <button id="btnChimeAnim" title="Trigger pure-harmonic chime wavefront">Chime resonance</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -945,6 +982,50 @@ footer .note-highlight {
           </feComponentTransfer>
           <feMerge>
             <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Option 3: Crystalline Cleavage Moonstone Prism Gradient -->
+        <linearGradient id="crystalPrismGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+          <stop offset="20%" stop-color="#d6f0fa" stop-opacity="0.9"/>
+          <stop offset="45%" stop-color="#8ce6cc" stop-opacity="0.8"/>
+          <stop offset="75%" stop-color="#4a9fc2" stop-opacity="0.85"/>
+          <stop offset="100%" stop-color="#1b4156" stop-opacity="0.95"/>
+        </linearGradient>
+
+        <!-- Crystal Facet Backing Gradient -->
+        <linearGradient id="crystalFacetBackGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#243d4d"/>
+          <stop offset="50%" stop-color="#12222b"/>
+          <stop offset="100%" stop-color="#09141a"/>
+        </linearGradient>
+
+        <!-- Spectral Refraction Beam Gradient -->
+        <linearGradient id="crystalBeamGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#a5d8ff" stop-opacity="0.95"/>
+          <stop offset="35%" stop-color="#ffffff" stop-opacity="1"/>
+          <stop offset="70%" stop-color="#7bf2c6" stop-opacity="0.95"/>
+          <stop offset="100%" stop-color="#b6e3f9" stop-opacity="0.9"/>
+        </linearGradient>
+
+        <!-- Laser-Fine Crystal Optical Seam Glow -->
+        <filter id="crystalOpticalGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Concentric Harmonic Chime Wavefront Pulse Glow -->
+        <filter id="harmonicChimeGlow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur1"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur2"/>
+          <feMerge>
+            <feMergeNode in="blur1"/>
+            <feMergeNode in="blur2"/>
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
@@ -1111,7 +1192,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join &amp; Lotus Petal Nocturne Shade</h3>
+  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade &amp; Crystalline Cleavage Join</h3>
   <p>
     Forged from spun star-silver (Ithildin), white birchwood inlays, and mother-of-pearl bezels. Contours follow swept aerodynamic swan-wing curves and delicate botanical filigree crowns, preserving high contrast and uncompromised display readability.
   </p>
@@ -1120,6 +1201,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 2 — Lotus Petal Nocturne shade:</span> Articulated star-silver filigree plates fold upward and inward across the screen face like the petals of a celestial water lily closing at dusk. The overlapping petals shield the crystalline display, meeting along an organic Art Nouveau seam with a carved nephrite jade lotus brooch. The instrument collapses into a slender 44px crowned diadem wand displaying glowing starlight runes.
+  </p>
+  <p>
+    <span class="note-highlight">Option 3 — Crystalline Cleavage &amp; Harmonic Chime join:</span> Complementary angled prism planes carved from pale moonstone and beryl. The mating faces feature precision 30° cleavage planes with internal refractive facets. As the capsules approach, shimmering spectral refraction rays arc across the gap; the planes glide together along the 30° bias until seating flush with mathematical perfection. At lock, a pure-harmonic chime pulse sweeps through the crystals with a bell-like resonance, dissolving the seam into an invisible optical joint through which starlight passes without refraction.
   </p>
 </footer>
 
@@ -1143,7 +1227,9 @@ const model = {
   cap: 0,
   tendrilProgress: 0, // 0 = coiled along collar, 1 = fully intertwined living braid
   petalFold: 0,       // 0 = bloomed open, 1 = closed lotus petal nocturne shade
-  option: 'tendril_braid',
+  crystalGlide: 0,    // 0 = separate 30° prism planes, 1 = seated monolithic crystal
+  chimeWave: 0,       // 0 to 1 = expanding harmonic chime wavefront ripples
+  option: 'crystal_cleavage',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1289,6 +1375,88 @@ function drawElvenTendrilCap(x, y, isRight, retract = 0, isShade = false) {
       <circle cx="22" cy="28" r="2" fill="url(#nephriteJadeGrad)"/>
     </g>
   `;
+}
+
+// Option 3: Complementary 30° Moonstone Prism Facets on Docking End-Caps
+function drawElvenCrystalCap(x, y, isRight, isSocket, retract = 0, isShade = false) {
+  if (isShade) return '';
+  if (retract >= 0.98) return ''; // Replaced by monolithic crystal bar in joined state
+  const scale = 1 - retract * 0.9;
+  if (scale < 0.05) return '';
+
+  if (isRight) {
+    // Module A: Protruding 30° Moonstone Prism
+    // Facet plane runs from (368, 20) down to (316, 110) along 30° bias
+    return `
+      <g class="elven-crystal-cap-a" transform="translate(${x}, ${y}) scale(${scale})" transform-origin="342px 65px">
+        <!-- Crystal Prism Body -->
+        <path d="M 326 14 L 368 20 L 316 110 L 298 120 L 312 65 Z"
+              fill="url(#crystalFacetBackGrad)" stroke="#1b3647" stroke-width="1.8"/>
+        <!-- Upper Refractive Moonstone Facet -->
+        <path d="M 326 14 L 368 20 L 342 65 L 312 65 Z"
+              fill="url(#crystalPrismGrad)" opacity="0.9" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.6"/>
+        <!-- Lower Refractive Moonstone Facet -->
+        <path d="M 312 65 L 342 65 L 316 110 L 298 120 Z"
+              fill="url(#crystalPrismGrad)" opacity="0.8" stroke="#7bf2c6" stroke-width="0.8" stroke-opacity="0.6"/>
+        <!-- Internal Refractive Cleavage Line -->
+        <line x1="326" y1="14" x2="342" y2="65" stroke="#ffffff" stroke-width="0.7" stroke-opacity="0.8"/>
+        <line x1="342" y1="65" x2="316" y2="110" stroke="#7bf2c6" stroke-width="0.7" stroke-opacity="0.8"/>
+        <line x1="368" y1="20" x2="312" y2="65" stroke="#a5d8ff" stroke-width="0.6" stroke-dasharray="3 2" stroke-opacity="0.75"/>
+        <!-- 30° Cleavage Facet Highlight -->
+        <line x1="368" y1="20" x2="316" y2="110" stroke="url(#crystalBeamGrad)" stroke-width="2.2" filter="url(#crystalOpticalGlow)"/>
+        <line x1="368" y1="20" x2="316" y2="110" stroke="#ffffff" stroke-width="0.9" opacity="0.95"/>
+        <!-- Top Star-Silver Claw Setting -->
+        <g transform="translate(368, 20) rotate(30)">
+          <path d="M -4 -6 Q 4 0 -4 6 Q 0 0 -4 -6 Z" fill="url(#starSilverGrad)" stroke="#16222b" stroke-width="0.8"/>
+          <circle cx="0" cy="0" r="2.5" fill="url(#nephriteJadeGrad)"/>
+        </g>
+        <!-- Bottom Star-Silver Claw Setting -->
+        <g transform="translate(316, 110) rotate(-150)">
+          <path d="M -4 -6 Q 4 0 -4 6 Q 0 0 -4 -6 Z" fill="url(#starSilverGrad)" stroke="#16222b" stroke-width="0.8"/>
+          <circle cx="0" cy="0" r="2.5" fill="url(#nephriteJadeGrad)"/>
+        </g>
+        <!-- Internal Starlight Sparkles -->
+        <circle cx="344" cy="42" r="1.6" fill="#ffffff" opacity="0.9"/>
+        <circle cx="330" cy="84" r="1.4" fill="#7bf2c6" opacity="0.85"/>
+      </g>
+    `;
+  } else {
+    // Module B: Receiving 30° Moonstone Prism Socket
+    // Facet plane runs from (52, 20) down to (0, 110) along identical 30° bias
+    return `
+      <g class="elven-crystal-cap-b" transform="translate(${x}, ${y}) scale(${scale})" transform-origin="26px 65px">
+        <!-- Socket Prism Body -->
+        <path d="M 52 20 L 86 14 L 74 65 L 34 120 L 0 110 Z"
+              fill="url(#crystalFacetBackGrad)" stroke="#1b3647" stroke-width="1.8"/>
+        <!-- Upper Refractive Moonstone Socket Facet -->
+        <path d="M 52 20 L 86 14 L 74 65 L 26 65 Z"
+              fill="url(#crystalPrismGrad)" opacity="0.88" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.6"/>
+        <!-- Lower Refractive Moonstone Socket Facet -->
+        <path d="M 26 65 L 74 65 L 34 120 L 0 110 Z"
+              fill="url(#crystalPrismGrad)" opacity="0.78" stroke="#7bf2c6" stroke-width="0.8" stroke-opacity="0.6"/>
+        <!-- Internal Cleavage Lines -->
+        <line x1="86" y1="14" x2="44" y2="65" stroke="#ffffff" stroke-width="0.7" stroke-opacity="0.8"/>
+        <line x1="44" y1="65" x2="0" y2="110" stroke="#7bf2c6" stroke-width="0.7" stroke-opacity="0.8"/>
+        <line x1="52" y1="20" x2="34" y2="120" stroke="#a5d8ff" stroke-width="0.6" stroke-dasharray="3 2" stroke-opacity="0.75"/>
+        <!-- 30° Cleavage Socket Highlight -->
+        <line x1="52" y1="20" x2="0" y2="110" stroke="url(#crystalBeamGrad)" stroke-width="2.2" filter="url(#crystalOpticalGlow)"/>
+        <line x1="52" y1="20" x2="0" y2="110" stroke="#ffffff" stroke-width="0.9" opacity="0.95"/>
+        <!-- Top Star-Silver Socket Claw -->
+        <g transform="translate(52, 20) rotate(-30)">
+          <path d="M 4 -6 Q -4 0 4 6 Q 0 0 4 -6 Z" fill="url(#starSilverGrad)" stroke="#16222b" stroke-width="0.8"/>
+          <circle cx="0" cy="0" r="2.5" fill="url(#nephriteJadeGrad)"/>
+        </g>
+        <!-- Bottom Star-Silver Socket Claw -->
+        <g transform="translate(0, 110) rotate(-210)">
+          <path d="M 4 -6 Q -4 0 4 6 Q 0 0 4 -6 Z" fill="url(#starSilverGrad)" stroke="#16222b" stroke-width="0.8"/>
+          <circle cx="0" cy="0" r="2.5" fill="url(#nephriteJadeGrad)"/>
+        </g>
+        <!-- Internal Starlight Sparkles -->
+        <circle cx="48" cy="46" r="1.6" fill="#ffffff" opacity="0.9"/>
+        <circle cx="28" cy="88" r="1.4" fill="#7bf2c6" opacity="0.85"/>
+      </g>
+    `;
+  }
 }
 
 // Proximity Bioluminescence (Soft Moonlit Cyan Caustics & Floating Spores)
@@ -1547,6 +1715,131 @@ function drawLotusPetals(f, width = W) {
   return s;
 }
 
+// Option 3: Crystalline Cleavage & Harmonic Chime Join
+function drawCrystalCleavageJoin(a, b, progress, isJoined, light, chimeWave, isShade = false) {
+  if (isShade) return '';
+  let s = '';
+
+  const strength = Math.max(progress, light, connectionGlow.socket.value);
+
+  // 1. Refraction Beams & Spectral Air Bridge (when separate / approaching / joining)
+  if (!isJoined && strength > 0.05) {
+    const axTop = a.x + 368, ayTop = a.y + 20;
+    const axBot = a.x + 316, ayBot = a.y + 110;
+    const bxTop = b.x + 52,  byTop = b.y + 20;
+    const bxBot = b.x + 0,   byBot = b.y + 110;
+
+    s += `<g class="crystal-refraction-bridge">`;
+    // Translucent Spectral Caustic Bridge Polygon
+    s += `<polygon points="${axTop},${ayTop} ${bxTop},${byTop} ${bxBot},${byBot} ${axBot},${ayBot}"
+                   fill="url(#crystalBeamGrad)" opacity="${0.22 * strength}" filter="url(#moonlitCausticGlow)"/>`;
+
+    // 5 Spectral Refraction Rays Bridging Across the 30° Cleavage Chasm
+    for (let k = 0; k <= 4; k++) {
+      const frac = k / 4;
+      const ax = axTop - 52 * frac;
+      const ay = ayTop + 90 * frac;
+      const bx = bxTop - 52 * frac;
+      const by = byTop + 90 * frac;
+      s += `<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}"
+                  stroke="url(#crystalBeamGrad)" stroke-width="${1.6 + 0.8 * strength}"
+                  opacity="${0.45 + 0.55 * strength}" filter="url(#crystalOpticalGlow)"/>`;
+      s += `<line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}"
+                  stroke="#ffffff" stroke-width="0.8" opacity="${0.7 * strength}"/>`;
+      // Small floating starlight beads along refraction ray
+      const midRayX = (ax + bx) / 2;
+      const midRayY = (ay + by) / 2;
+      s += `<circle cx="${midRayX}" cy="${midRayY}" r="${1 + frac * 0.8}"
+                    fill="#ffffff" opacity="${0.75 * strength}" filter="url(#crystalOpticalGlow)"/>`;
+    }
+    s += `</g>`;
+  }
+
+  // 2. Monolithic Unified Moonstone Crystal Bar with Invisible Optical Seam (when joined)
+  if (isJoined || progress >= 0.98) {
+    const midX = a.x + 342, midY = a.y + 65;
+    s += `<g class="monolithic-crystal-bar">`;
+
+    // Outer Monolithic Crystal Rhomboid
+    s += `<path d="M ${a.x + 326} ${a.y + 14}
+                   L ${a.x + 402} ${a.y + 14}
+                   L ${a.x + 390} ${a.y + 65}
+                   L ${a.x + 350} ${a.y + 120}
+                   L ${a.x + 298} ${a.y + 120}
+                   L ${a.x + 312} ${a.y + 65}
+                   Z"
+                fill="url(#crystalFacetBackGrad)" stroke="#1b3647" stroke-width="2"/>`;
+
+    // 4 Symmetrical Facet Planes across Monolithic Crystal
+    s += `<path d="M ${a.x + 326} ${a.y + 14} L ${a.x + 368} ${a.y + 20} L ${midX} ${midY} L ${a.x + 312} ${a.y + 65} Z"
+                fill="url(#crystalPrismGrad)" opacity="0.9" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.6"/>`;
+    s += `<path d="M ${a.x + 368} ${a.y + 20} L ${a.x + 402} ${a.y + 14} L ${a.x + 390} ${a.y + 65} L ${midX} ${midY} Z"
+                fill="url(#crystalPrismGrad)" opacity="0.9" stroke="#ffffff" stroke-width="0.8" stroke-opacity="0.6"/>`;
+    s += `<path d="M ${a.x + 312} ${a.y + 65} L ${midX} ${midY} L ${a.x + 316} ${a.y + 110} L ${a.x + 298} ${a.y + 120} Z"
+                fill="url(#crystalPrismGrad)" opacity="0.85" stroke="#7bf2c6" stroke-width="0.8" stroke-opacity="0.6"/>`;
+    s += `<path d="M ${midX} ${midY} L ${a.x + 390} ${a.y + 65} L ${a.x + 350} ${a.y + 120} L ${a.x + 316} ${a.y + 110} Z"
+                fill="url(#crystalPrismGrad)" opacity="0.85" stroke="#7bf2c6" stroke-width="0.8" stroke-opacity="0.6"/>`;
+
+    // Invisible Optical Seam: Hairline Starlight Guideline (Light passes through without refraction)
+    s += `<line x1="${a.x + 368}" y1="${a.y + 20}" x2="${a.x + 316}" y2="${a.y + 110}"
+                stroke="#ffffff" stroke-width="0.9" stroke-dasharray="8 4" stroke-opacity="0.4"/>`;
+    s += `<line x1="${a.x + 368}" y1="${a.y + 20}" x2="${a.x + 316}" y2="${a.y + 110}"
+                stroke="url(#crystalBeamGrad)" stroke-width="2.6" opacity="0.85" filter="url(#crystalOpticalGlow)"/>`;
+
+    // Central Starlight Moonstone Brooch
+    s += `<g transform="translate(${midX}, ${midY})">
+      <circle cx="0" cy="0" r="11" fill="#13232e" stroke="url(#vineSilverGrad)" stroke-width="1.8"/>
+      <circle cx="0" cy="0" r="7.5" fill="url(#moonstoneGrad)"/>
+      <circle cx="0" cy="0" r="3.5" fill="url(#nephriteJadeGrad)" filter="url(#moonlitCausticGlow)"/>
+      <path d="M -8 0 H 8 M 0 -8 V 8" stroke="#ffffff" stroke-width="1" opacity="0.85"/>
+      <circle cx="0" cy="0" r="1.3" fill="#ffffff"/>
+    </g>`;
+
+    // Star-Silver Crown & Keel Art Nouveau Leaf Scrolls Bridging Seam
+    s += `<path d="M ${a.x + 318} ${a.y + 12} Q ${a.x + 342} ${a.y + 4} ${a.x + 366} ${a.y + 12}"
+                fill="none" stroke="url(#vineSilverGrad)" stroke-width="2" stroke-linecap="round"/>`;
+    s += `<circle cx="${a.x + 342}" cy="${a.y + 6}" r="2.5" fill="url(#nephriteJadeGrad)"/>`;
+    s += `<path d="M ${a.x + 312} ${a.y + 122} Q ${a.x + 338} ${a.y + 128} ${a.x + 364} ${a.y + 122}"
+                fill="none" stroke="url(#vineSilverGrad)" stroke-width="2" stroke-linecap="round"/>`;
+    s += `<circle cx="${a.x + 338}" cy="${a.y + 126}" r="2.5" fill="url(#nephriteJadeGrad)"/>`;
+
+    s += `</g>`;
+  }
+
+  // 3. Concentric Harmonic Chime Wavefront Pulse & Radiating Diamond Sparkles
+  if (chimeWave > 0.001) {
+    const w = chimeWave;
+    const cx = a.x + 342, cy = a.y + 65;
+
+    s += `<g class="harmonic-chime-wavefront">`;
+    // Expanding Concentric Harmonic Rings
+    s += `<circle cx="${cx}" cy="${cy}" r="${12 + w * 180}" fill="none" stroke="#7bf2c6"
+                  stroke-width="${Math.max(0.6, (1 - w) * 4.5)}" opacity="${(1 - w) * 0.9}"
+                  filter="url(#harmonicChimeGlow)"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${6 + w * 120}" fill="none" stroke="#a5d8ff"
+                  stroke-width="${Math.max(0.5, (1 - w) * 3.5)}" opacity="${(1 - w) * 0.85}"
+                  filter="url(#harmonicChimeGlow)"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="${2 + w * 65}" fill="none" stroke="#ffffff"
+                  stroke-width="${Math.max(0.5, (1 - w) * 2.2)}" opacity="${(1 - w) * 0.95}"/>`;
+
+    // 6 Radiating Starlight Diamond Sparkles along 30° Cleavage Vectors
+    const angles = [-60, -30, 30, 120, 150, 210];
+    angles.forEach(deg => {
+      const rad = deg * Math.PI / 180;
+      const dist = w * 105;
+      const px = cx + dist * Math.cos(rad);
+      const py = cy + dist * Math.sin(rad);
+      s += `<g transform="translate(${px}, ${py}) scale(${1 - w * 0.45})">
+        <path d="M 0 -6 L 3.5 0 L 0 6 L -3.5 0 Z" fill="#ffffff" filter="url(#crystalOpticalGlow)" opacity="${(1 - w) * 0.95}"/>
+        <circle cx="0" cy="0" r="1.5" fill="#7bf2c6"/>
+      </g>`;
+    });
+    s += `</g>`;
+  }
+
+  return s;
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -1559,7 +1852,7 @@ function renderHardware() {
   if (p > 0) {
     // Seamless Monolithic Star-Silver Hull
     shared += drawElvenCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
-    if (!isShade) {
+    if (!isShade && model.option !== 'crystal_cleavage') {
       // Connecting Botanical Crest along seam
       shared += `
         <g opacity="${p}">
@@ -1572,11 +1865,16 @@ function renderHardware() {
     }
   }
 
-  // Draw Living Tendril Braid for Option 1
-  if (!isShade && (model.joined || model.tendrilProgress > 0.02 || (glow > 0.25 && !model.joined))) {
-    const prog = model.joined ? 1 : model.tendrilProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
-    const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
-    shared += drawTendrilBraid(kMidX, a.y, prog, Math.max(p, glow > 0.25 ? 0.95 : prog));
+  if (model.option === 'crystal_cleavage') {
+    // Option 3: Crystalline Cleavage & Harmonic Chime Join
+    shared += drawCrystalCleavageJoin(a, b, model.crystalGlide, model.joined, glow, model.chimeWave, isShade);
+  } else {
+    // Option 1: Living Tendril Braid (Sylvan Weave) Join
+    if (!isShade && (model.joined || model.tendrilProgress > 0.02 || (glow > 0.25 && !model.joined))) {
+      const prog = model.joined ? 1 : model.tendrilProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
+      const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+      shared += drawTendrilBraid(kMidX, a.y, prog, Math.max(p, glow > 0.25 ? 0.95 : prog));
+    }
   }
 
   if (model.joined && model.design) {
@@ -1589,14 +1887,20 @@ function renderHardware() {
   // Individual Capsule SVG Shells
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
-    const individual = drawElvenCasing(0, 0, W, 1, isShade) +
-      drawElvenTendrilCap(0, 0, false, isA ? 0 : model.cap, isShade) +
-      drawElvenTendrilCap(0, 0, true, isA ? model.cap : 0, isShade);
+    let endCaps = '';
+    if (model.option === 'crystal_cleavage') {
+      endCaps = drawElvenCrystalCap(0, 0, isA, !isA, model.joined ? 1 : 0, isShade);
+    } else {
+      endCaps = drawElvenTendrilCap(0, 0, false, isA ? 0 : model.cap, isShade) +
+        drawElvenTendrilCap(0, 0, true, isA ? model.cap : 0, isShade);
+    }
+
+    const individual = drawElvenCasing(0, 0, W, 1, isShade) + endCaps;
 
     $('#shell-' + id).innerHTML = `
       <g opacity="${1 - p}">
         ${individual}
-        ${drawElvenProximityAura(isA ? W - 22 : 22, 0, glow)}
+        ${model.option === 'crystal_cleavage' ? '' : drawElvenProximityAura(isA ? W - 22 : 22, 0, glow)}
       </g>
     `;
   }
@@ -1609,8 +1913,8 @@ function renderHardware() {
     }
   }
 
-  // Active Proximity Aura
-  if (!isShade && glow > 0.05 && p < 0.98) {
+  // Active Proximity Aura (for Tendril Braid)
+  if (model.option !== 'crystal_cleavage' && !isShade && glow > 0.05 && p < 0.98) {
     $('#elvenLightAura').innerHTML = `
       <g opacity="${glow}">
         ${drawElvenProximityAura(a.x + W - 22, a.y, glow)}
@@ -1625,7 +1929,7 @@ function renderHardware() {
 function updateStateButtons() {
   const isShade = model.shade || model.petalFold > 0.5;
   const isJoined = model.joined;
-  const isJoining = model.tendrilProgress > 0.1 && model.tendrilProgress < 0.95 && !isJoined && !isShade;
+  const isJoining = ((model.option === 'crystal_cleavage' ? (model.crystalGlide > 0.1 && model.crystalGlide < 0.95) : (model.tendrilProgress > 0.1 && model.tendrilProgress < 0.95))) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -1733,17 +2037,35 @@ function render() {
 
   const release = $('#sylvanRelease');
   release.hidden = !model.joined || model.busy || model.shade;
-  release.style.left = (model.a.x + 338) + 'px';
-  release.style.top = (model.a.y + 44) + 'px';
+  release.style.left = (model.a.x + (model.option === 'crystal_cleavage' ? 334 : 338)) + 'px';
+  release.style.top = (model.a.y + (model.option === 'crystal_cleavage' ? 12 : 44)) + 'px';
   release.style.setProperty('--tension', model.tension);
+  if (model.option === 'crystal_cleavage') {
+    release.classList.add('crystal-pin');
+    release.setAttribute('aria-label', 'Release GitDiscuss: pull crystal pin or press Enter');
+    release.setAttribute('title', 'Pull crystal pin to dissolve optical bond · Enter to separate');
+  } else {
+    release.classList.remove('crystal-pin');
+    release.setAttribute('aria-label', 'Release GitDiscuss: pull right or press Enter');
+    release.setAttribute('title', 'Pull right to unweave silver tendrils · Enter to separate');
+  }
+
+  const btnChime = $('#btnChimeAnim');
+  if (btnChime) {
+    btnChime.disabled = model.busy;
+  }
 
   if (!model.busy) {
     if (model.shade || model.petalFold > 0.5) {
       $('#phase').textContent = 'Shade mode / Lotus Petal Nocturne diadem wand';
     } else if (model.joined) {
-      $('#phase').textContent = 'Joined / One unified sylvan instrument';
-    } else if (model.tendrilProgress > 0.1) {
-      $('#phase').textContent = 'Joining / Silver tendrils intertwining';
+      $('#phase').textContent = model.option === 'crystal_cleavage'
+        ? 'Joined / Monolithic moonstone prism'
+        : 'Joined / One unified sylvan instrument';
+    } else if (model.crystalGlide > 0.1 || model.tendrilProgress > 0.1) {
+      $('#phase').textContent = model.option === 'crystal_cleavage'
+        ? 'Joining / Crystal planes gliding on 30° bias'
+        : 'Joining / Silver tendrils intertwining';
     } else {
       $('#phase').textContent = 'Separate / Two sylvan star-silver hulls';
     }
@@ -1868,6 +2190,121 @@ async function separate() {
   say('Separated. Independent sylvan star-silver hulls restored.');
 }
 
+// Option 3: Crystalline Cleavage & Harmonic Chime Join Animations
+async function joinCrystal(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Complementary 30° moonstone prism planes align. Refraction rays bridge the chasm.');
+  $('#phase').textContent = 'Prism planes refracting light';
+
+  // 1. Refraction flare pre-charge
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 80 : 200, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  // 2. Gliding along 30° bias vector
+  $('#phase').textContent = 'Gliding crystal planes on 30° bias';
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.canopy ? 305 : 385, model.a.y));
+
+  if (!await tween(fromDrag ? 260 : 480, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    // Diagonal approach guided by 30° plane: subtle vertical settlement
+    const glideDy = (1 - t) * 14;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t - glideDy;
+    model.blend = Math.max(0, (t - 0.45) / 0.55);
+    model.crystalGlide = t;
+    model.light = 1 - t * 0.4;
+    render();
+  }, token)) return;
+
+  // 3. Seating flush with pure-harmonic chime pulse!
+  $('#phase').textContent = 'Harmonic chime resonance';
+  model.joined = true;
+  model.blend = 1;
+  model.crystalGlide = 1;
+  model.light = 0;
+  render();
+
+  // Trigger harmonic chime wavefront pulse
+  await tween(fromDrag ? 340 : 540, t => {
+    model.chimeWave = t;
+    renderHardware();
+  }, token);
+
+  model.chimeWave = 0;
+  model.busy = false;
+  render();
+  say('Crystalline cleavage seated flush with mathematical perfection. Optical seam sealed. Pull crystal pin right to separate.');
+  $('#phase').textContent = 'Joined / Monolithic moonstone prism';
+}
+
+async function separateCrystal() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Releasing the crystal pin. Optical bond dissolves as planes glide apart along 30° bias.');
+
+  // 1. Dissolving chime pulse
+  $('#phase').textContent = 'Dissolving optical bond';
+  if (!await tween(220, t => {
+    model.chimeWave = t;
+    renderHardware();
+  }, token)) return;
+
+  model.chimeWave = 0;
+  model.joined = false;
+
+  // 2. Gliding apart along 30° bias
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Gliding crystal planes apart';
+  if (!await tween(540, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    const glideDy = t < 0.6 ? (t / 0.6) * 14 : (1 - (t - 0.6) / 0.4) * 14;
+    model.b.y = targetA.y - glideDy;
+    model.blend = 1 - Math.min(1, t * 2.6);
+    model.crystalGlide = 1 - t;
+    render();
+  }, token)) return;
+
+  model.busy = false;
+  model.blend = 0;
+  model.crystalGlide = 0;
+  model.chimeWave = 0;
+  render();
+  say('Separated. Independent star-silver hulls with exposed 30° moonstone prism faces.');
+  $('#phase').textContent = 'Separate / Two star-silver hulls';
+}
+
+async function triggerHarmonicChime() {
+  if (model.busy) return;
+  const token = ++animationToken;
+  say('Harmonic chime resonance! Pure crystal chime sweeps across the star-silver assembly.');
+  await tween(580, t => {
+    model.chimeWave = t;
+    renderHardware();
+  }, token);
+  model.chimeWave = 0;
+  renderHardware();
+}
+
 // Option 2: Lotus Petal Nocturne Shade Mode Animations
 async function closeLotusPetals() {
   if (model.busy || (model.shade && model.petalFold >= 0.98)) return;
@@ -1932,15 +2369,18 @@ async function applyState(stateName) {
       await bloomLotusPetals();
     }
     if (model.joined) {
-      await separate();
+      if (model.option === 'crystal_cleavage') await separateCrystal();
+      else await separate();
     } else {
       model.tendrilProgress = 0;
+      model.crystalGlide = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
       model.b.x = 680;
+      model.b.y = model.a.y;
       render();
-      say('State: Separate — Two independent star-silver capsules.');
+      say('State: Separate — Two independent star-silver capsules with exposed 30° prism faces.');
     }
   } else if (stateName === 'joining') {
     if (model.shade || model.petalFold > 0.05) {
@@ -1949,12 +2389,24 @@ async function applyState(stateName) {
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.6;
-    model.tendrilProgress = 0.58; // mid-flight reaching tendrils
-    model.light = 0.8;
-    model.a.x = 240;
-    model.b.x = 240 + W + 50; // approaching each other
-    render();
-    say('State: Joining — Mid-animation view with silver tendrils uncoiling across the chasm.');
+    model.light = 0.85;
+    if (model.option === 'crystal_cleavage') {
+      model.crystalGlide = 0.55;
+      model.tendrilProgress = 0;
+      model.a.x = 240;
+      model.b.x = 240 + W + 46;
+      model.b.y = model.a.y - 12; // 30° diagonal approach offset
+      render();
+      say('State: Joining — Mid-animation view with 30° crystal planes approaching along the bias with spectral refraction rays.');
+    } else {
+      model.tendrilProgress = 0.58; // mid-flight reaching tendrils
+      model.crystalGlide = 0;
+      model.a.x = 240;
+      model.b.x = 240 + W + 50;
+      model.b.y = model.a.y;
+      render();
+      say('State: Joining — Mid-animation view with silver tendrils uncoiling across the chasm.');
+    }
   } else if (stateName === 'joined') {
     if (model.shade || model.petalFold > 0.05) {
       await bloomLotusPetals();
@@ -1962,13 +2414,23 @@ async function applyState(stateName) {
     if (!model.joined) {
       model.a.x = 220;
       model.b.x = 220 + JOIN_DISTANCE;
+      model.b.y = model.a.y;
       model.joined = true;
       model.blend = 1;
       model.cap = 1;
-      model.tendrilProgress = 1;
       model.light = 0;
-      render();
-      say('State: Joined — Monolithic star-silver hull with Art Nouveau sylvan lattice.');
+      if (model.option === 'crystal_cleavage') {
+        model.crystalGlide = 1;
+        model.tendrilProgress = 0;
+        render();
+        say('State: Joined — Monolithic moonstone prism with invisible optical seam.');
+        triggerHarmonicChime();
+      } else {
+        model.tendrilProgress = 1;
+        model.crystalGlide = 0;
+        render();
+        say('State: Joined — Monolithic star-silver hull with Art Nouveau sylvan lattice.');
+      }
     }
   } else if (stateName === 'shade') {
     if (model.shade || model.petalFold > 0.5) {
@@ -2034,12 +2496,19 @@ $('#btnStateSeparate').onclick = () => applyState('separate');
 $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState('shade');
-$('#btnJoinAnim').onclick = () => join();
-$('#btnSeparateAnim').onclick = () => separate();
+$('#btnJoinAnim').onclick = () => {
+  if (model.option === 'crystal_cleavage') joinCrystal();
+  else join();
+};
+$('#btnSeparateAnim').onclick = () => {
+  if (model.option === 'crystal_cleavage') separateCrystal();
+  else separate();
+};
 $('#btnLotusAnim').onclick = () => {
   if (model.shade || model.petalFold > 0.5) bloomLotusPetals();
   else closeLotusPetals();
 };
+$('#btnChimeAnim').onclick = () => triggerHarmonicChime();
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
   render();
@@ -2051,21 +2520,31 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, canopy: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, tendrilProgress: 0, petalFold: 0, option: 'tendril_braid', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, tendrilProgress: 0, petalFold: 0, crystalGlide: 0, chimeWave: 0,
+    option: 'crystal_cleavage', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
+  $('#btnJoinAnim').textContent = 'Seat crystal prisms';
   $('#btnJoinAnim').classList.add('primary-btn');
   $('#btnLotusAnim').classList.remove('primary-btn');
-  $('#optionSelect').value = 'tendril_braid';
+  $('#optionSelect').value = 'crystal_cleavage';
   render();
-  say('Reset to initial Elven study configuration.');
+  say('Reset to initial Elven study configuration with Crystalline Cleavage join.');
 };
 
 $('#optionSelect').onchange = async (e) => {
   model.option = e.target.value;
-  if (model.option === 'lotus_petals') {
+  if (model.option === 'crystal_cleavage') {
+    say('Option 3: Crystalline Cleavage & Harmonic Chime join selected. 30° moonstone prism planes glide flush.');
+    $('#btnJoinAnim').textContent = 'Seat crystal prisms';
+    $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnLotusAnim').classList.remove('primary-btn');
+    if (model.shade) {
+      await bloomLotusPetals();
+    }
+  } else if (model.option === 'lotus_petals') {
     say('Option 2: Lotus Petal Nocturne shade selected. Curved filigree plates fold upward across the screen.');
     $('#btnLotusAnim').classList.add('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
@@ -2074,6 +2553,7 @@ $('#optionSelect').onchange = async (e) => {
     }
   } else if (model.option === 'tendril_braid') {
     say('Option 1: Living Tendril Braid (Sylvan Weave) join selected. Tendrils reach and intertwine across the gap.');
+    $('#btnJoinAnim').textContent = 'Weave silver tendrils';
     $('#btnJoinAnim').classList.add('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     if (model.shade) {
@@ -2269,11 +2749,12 @@ function onPointerMove(e) {
   } else if (drag.kind === 'release') {
     const pullX = Math.max(0, dx);
     drag.dx = pullX;
-    model.tension = Math.min(1, pullX / 72);
+    model.tension = Math.min(1, pullX / 65);
     render();
-    if (pullX >= 72 && !drag.released) {
+    if (pullX >= 65 && !drag.released) {
       drag.released = true;
-      separate();
+      if (model.option === 'crystal_cleavage') separateCrystal();
+      else separate();
     }
   }
 }
@@ -2282,7 +2763,8 @@ function onPointerUp(e) {
   if (!drag || drag.pointerId !== e.pointerId) return;
   if (drag.kind === 'module' && drag.id === 'b' && !model.joined) {
     if (pointerDistance(alignedTarget(), model.b) <= DOCKING.capture) {
-      join(true);
+      if (model.option === 'crystal_cleavage') joinCrystal(true);
+      else join(true);
       return;
     }
   } else if (drag.kind === 'meter' && !model.docked && model.canopy) {
@@ -2316,7 +2798,10 @@ window.addEventListener('pointerup', onPointerUp);
 window.addEventListener('pointercancel', onPointerUp);
 window.addEventListener('keydown', e => {
   if (e.key === 'Escape') cancelDrag();
-  if (e.key === 'Enter' && document.activeElement === $('#sylvanRelease')) separate();
+  if (e.key === 'Enter' && document.activeElement === $('#sylvanRelease')) {
+    if (model.option === 'crystal_cleavage') separateCrystal();
+    else separate();
+  }
 });
 
 // Viewport Scaling for Phone & Mobile Widths (390px)
@@ -2336,7 +2821,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Elven & Intricate skin loaded: Spun star-silver with Living Tendril Braid join.');
+say('Elven & Intricate skin loaded: Spun star-silver with Crystalline Cleavage & Harmonic Chime join.');
 </script>
 </body>
 </html>
