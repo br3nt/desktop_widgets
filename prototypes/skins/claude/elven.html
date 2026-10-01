@@ -81,6 +81,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit{pointer-events:all;cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
+.hit.lift{cursor:grab}.hit.lift:active{cursor:grabbing}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb6cf;font-size:13px}
 .about h2{margin:0 0 4px;font:400 21px var(--script);color:#eef1fb}.about h2 small{font:11px var(--sans);color:#7f8ab0;letter-spacing:1.4px;text-transform:uppercase;margin-left:8px}
 .about p{margin:0 0 6px}
@@ -254,7 +255,15 @@ $$('.screen,.mini').forEach(el=>{
 
 /* ---------- Options ---------- */
 const JOINS={
- vine:{label:'Vine',kind:'Grow',gap:36,
+ vine:{label:'Vine',kind:'Grow',gap:36,pull:true,
+  txt:{join:'The casings drift together and the tendrils grow across, twining round each other.',
+   joined:'Joined: a braided vine with a moonflower. Drag a nameplate to move the pair; pull one casing away, or click the flower, to release.',
+   release:'The vine lets go: the leaves fold, the braid unwinds and the tendrils draw back into their buds.',
+   stop:'The tendrils stop and draw back.',
+   hold:'Held mid-join: the tendrils are twining across the gap. Use the scrubber to step through the growth.',
+   ready:'Ready: the tendril tips touch. Release to grow the vine.',near:'Nearby: the buds uncurl and reach toward each other. Move closer.',
+   readyPh:'Ready · the tendril tips touch',nearPh:'Nearby · the buds uncurl'},
+  phase:(jt,dir)=>dir>0?(jt<.16?'Joining · buds uncurl ':jt<.5?'Joining · tendrils reach ':jt<.8?'Joining · twining ':jt<.86?'Joining · leafing out ':'Joining · the moonflower opens '):(jt>.84?'Releasing · leaves fold ':jt>.6?'Releasing · the braid unwinds ':jt>.12?'Releasing · tendrils draw back ':'Releasing · buds curl '),
   about:'Each joining end is a slim silver stem with two moonstone knops, and one knop holds a curled fiddlehead bud (Jarvis at the top, GitDiscuss at the bottom). <b>Near:</b> the knops glow and the buds uncurl and reach toward each other. <b>Ready:</b> the tendril tips touch with a glint. Joining: the casings drift together, the tendrils grow across the gap and spiral round each other into a two-strand braid, over and under, and each tip curls round the opposite knop. Four leaves open along the braid, then a moonflower blooms in the middle as the joined light. <b>Release:</b> pull either casing away from its partner. The braid strains and untwists, and past a hand-width it lets go: the leaves fold, the strands unwind and draw back into their buds. Clicking the moonflower, or focusing it and pressing Enter, does the same. To move the pair, drag a nameplate up, down or toward the partner.',
   over(c){
    const h=c.h,jt=c.jt,k=clamp(h/H,.55,1);
@@ -292,11 +301,93 @@ const JOINS={
     s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Moonflower: click, or press Enter, to release the vine and separate the widgets"><title>Click the moonflower, or pull a casing away, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(hd)}" fill="transparent"/><circle class="ringfocus" cx="${f(fx)}" cy="${f(fy)}" r="${f(15*k)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
    return s;
   }
+ },
+ brooch:{label:'Leaf brooch',kind:'Clasp',gap:28,lift:true,
+  txt:{join:'The casings close, an eyelet unfurls from each stem, and a leaf brooch drifts down like a falling leaf.',
+   joined:'Joined: a leaf brooch pins the seam, its moonstone lit. Drag a nameplate to move the pair; lift the brooch up (or click it) to release.',
+   release:'The moonstone dims, the pin swings open, and the brooch lifts away on the air; the eyelets curl back into the stems.',
+   stop:'The brooch drifts back up.',
+   hold:'Held mid-join: the brooch is drifting down toward the seam. Use the scrubber to step through its fall.',
+   ready:'Ready: the brooch hovers over the seam. Release to pin the casings together.',near:'Nearby: the stems glow and their eyelets begin to curl. Move closer.',
+   readyPh:'Ready · the brooch hovers',nearPh:'Nearby · eyelets stir'},
+  phase:(jt,dir)=>dir>0?(jt<.26?'Joining · eyelets unfurl ':jt<.7?'Joining · the brooch drifts down ':jt<.84?'Joining · the pin swings shut ':'Joining · the moonstone kindles '):(jt>.9?'Releasing · the moonstone dims ':jt>.78?'Releasing · the pin swings open ':jt>.56?'Releasing · the brooch lifts away ':jt>.42?'Releasing · eyelets curl back ':'Releasing · the casings part '),
+  about:'One calm object on the seam. The joining ends close to a narrow gap between their silver stems. <b>Near:</b> the stems glow and a silver eyelet starts to curl out of each one. <b>Ready:</b> a ghost of the brooch hovers over the seam above a dashed outline of where it will land. Joining: the eyelets unfurl into two small rings on one slanted line, and a leaf brooch drifts down onto them like a falling leaf, swaying and turning. It is a frosted green-silver leaf with silver veins and rim, a moonstone set at its base, and a hinged pin held open beneath it. Its shadow sharpens on the casings as it lands. The pin swings shut through both eyelets and clicks into the catch at the leaf tip with a glint. Then the moonstone kindles as the joined light and a glint runs up the midrib. <b>Release:</b> lift the brooch: drag it upward (it rises with your finger and its pin starts to open) past a short distance, or click it, or focus it and press Enter. The moonstone dims, the pin swings open, the brooch floats up and away, the eyelets curl back into the stems, and the casings part. Pulling the casings apart does nothing: the pin holds. Drag a nameplate to move the pair.',
+  over(c){
+   const h=c.h,jt=c.jt,sc=lerp(.62,1,clamp((h-HS)/(H-HS))),TH=-22*PI/180;
+   const cA={x:model.a.x+W-11.5,y:model.a.y+h/2},cB={x:model.b.x+11.5,y:model.b.y+h/2};
+   const S={x:(cA.x+cB.x)/2,y:(cA.y+cB.y)/2},th=TH+clamp(Math.atan2(cB.y-cA.y,cB.x-cA.x),-.4,.4);
+   let s='';
+   if(jt===0){const g=c.glow;if(g<=0)return s;
+    s+=[cA,cB].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(8+10*g)}" fill="url(#halo)" opacity="${f(g)}"/>`).join('');
+    s+=eyelets(cA,cB,S,th,sc,g*.45,false);
+    if(g>=1){s+=`<g transform="translate(${f(S.x)} ${f(S.y)}) rotate(${f(th*180/PI)}) scale(${f(sc*100)/100}) translate(-5 -12)"><path d="${BLADE}" fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/></g>`;
+     s+=brooch(S.x+6,S.y-34,th*180/PI-8,sc*1.08,{open:1,glow:0,op:.42,shadow:34})}
+    return s}
+   // Phase values: eyelets (eye), the fall (1 = landed), the pin (1 = shut), the moonstone (gl).
+   let eye,fall,pin,gl,spark=0,glint=0;
+   if(model.dir>0){eye=back(seg(jt,.08,.3),1.3);fall=seg(jt,.26,.7);pin=back(seg(jt,.7,.82),1.6);gl=ease(seg(jt,.84,1));spark=Math.sin(PI*seg(jt,.8,.88));glint=seg(jt,.86,.99)}
+   else{eye=ease(seg(jt,.42,.58));fall=seg(jt,.56,.78);pin=ease(seg(jt,.78,.9));gl=ease(seg(jt,.9,1))}
+   // The lift only shows while joined, and fades out over the start of a release.
+   const lift=jt===1?model.lift:model.dir<0?model.lift*seg(jt,.78,1):0;
+   s+=eyelets(cA,cB,S,th,sc,eye,true);
+   if(fall>0){const e=ease(fall),u=1-e,wav=fall*PI*2.4;
+    const x=S.x+Math.sin(wav)*22*u,y=S.y-120*u-lift*12,deg=th*180/PI+Math.sin(wav+.9)*16*u;
+    s+=brooch(x,y,deg,sc*(1+.16*u+.03*lift),{open:clamp(1-pin+lift*.3,-.1,1),glow:gl*(1-lift*.5),op:clamp(fall*3),shadow:u*120+lift*12,glint,spark,S,th});
+   }
+   s+=eyeFronts(S,th,sc,eye);
+   if(jt===1){
+    s+=`<g class="hit lift" id="seamHit" tabindex="0" role="button" aria-label="Leaf brooch: drag it up, click it, or press Enter, to lift it off and separate the widgets" transform="translate(${f(S.x)} ${f(S.y-lift*12)}) rotate(${f(th*180/PI)}) scale(${f(sc*100)/100}) translate(-5 -12)"><title>Lift the brooch off to release</title><rect x="-56" y="-17" width="116" height="36" rx="14" fill="transparent"/><path class="ringfocus" d="${BLADE}" fill="none" stroke="#fff" stroke-width="1.4" stroke-dasharray="3 3" transform="translate(-3 0) scale(1.12)"/></g>`}
+   return s;
+  }
  }
 };
+/* ---------- Leaf brooch drawing ---------- */
+// Brooch coordinates: the midrib runs along x from the base (-40) to the tip (46); the pin hangs below it on y = 12.
+const BLADE='M-40 0C-30 -10 -8 -13.5 10 -10C26 -7 38 -3 46 0C38 3 26 7 10 10C-8 13.5 -30 10 -40 0Z';
+const R2=(p,th,u,v)=>({x:p.x+u*Math.cos(th)-v*Math.sin(th),y:p.y+u*Math.sin(th)+v*Math.cos(th)});
+const BVEINS=(()=>{let o='';for(const [u0,u1,dv] of [[-26,-16,8],[-14,-2,9],[-2,10,8.4],[10,22,6.6],[22,32,4.6]])for(const sg of [-1,1])o+=`M${u0} 0Q${u0+5} ${f(sg*dv*.35)} ${u1} ${f(sg*dv)}`;return o})();
+function brooch(x,y,deg,sc,o){
+ let s='';const k=f(sc*100)/100;
+ // Shadow on the casings: offset and softened by height.
+ if(o.shadow!==undefined){const hgt=o.shadow;s+=`<g transform="translate(${f(x+3+hgt*.16)} ${f(y+5+hgt)}) rotate(${f(deg)}) scale(${k}) translate(-5 -12)" opacity="${f(clamp(.5-hgt/300)*o.op*100)/100}"><path d="${BLADE}" fill="#02030c" filter="url(#soft)"/></g>`}
+ s+=`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(deg)}) scale(${k}) translate(-5 -12)" opacity="${f(o.op*100)/100}">`;
+ // The pin, hinged at the base, swings down when open.
+ const pd=ribbon(widths([{x:-46,y:12},{x:-10,y:12},{x:26,y:12},{x:56,y:12}],2.1,.35));
+ s+=`<g transform="rotate(${f(o.open*26)} -46 12)"><path d="${pd}" fill="${NIGHT}" stroke="${NIGHT}" stroke-width="1.4"/><path d="${pd}" fill="url(#silver)"/></g>`;
+ // Hinge boss with a small curl, and the stem up to the leaf base.
+ const curl=widths(curlPts({x:-48,y:13},PI*.92,13,1.8*PI,1,22),1.7,.3);
+ s+=`<path d="M-40 0Q-49 3 -46 12" fill="none" stroke="${NIGHT}" stroke-width="3.6"/><path d="M-40 0Q-49 3 -46 12" fill="none" stroke="url(#silver)" stroke-width="2"/>`;
+ s+=`<path d="${ribbon(curl,1.2)}" fill="${NIGHT}"/><path d="${ribbon(curl)}" fill="url(#silver)"/><circle cx="-46" cy="12" r="3.3" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/>`;
+ // The catch: a silver spur off the leaf tip, hooked round the pin's point.
+ s+=`<path d="M44 1Q52 3 55.5 8.4Q60.5 12 55.5 16" fill="none" stroke="${NIGHT}" stroke-width="3.2" stroke-linecap="round"/><path d="M44 1Q52 3 55.5 8.4Q60.5 12 55.5 16" fill="none" stroke="url(#silver)" stroke-width="1.6" stroke-linecap="round"/>`;
+ // The blade: frosted enamel over night glass, a silver rim, veins and a tapered midrib.
+ s+=`<path d="${BLADE}" fill="${NIGHT}" stroke="${NIGHT}" stroke-width="3"/><path d="${BLADE}" fill="url(#leafG)" opacity=".86"/><path d="${BLADE}" fill="url(#pearl)" opacity=".22"/>`;
+ s+=`<path d="M-36 -2C-20 -10 6 -11 30 -5" fill="none" stroke="#fff" stroke-width="1.1" opacity=".6"/>`;
+ s+=`<path d="${BVEINS}" fill="none" stroke="#f4f8ff" stroke-width=".7" opacity=".85"/><path d="${BVEINS}" fill="none" stroke="#4f7b6a" stroke-width=".5" opacity=".5" transform="translate(.4 .6)"/>`;
+ s+=`<path d="${ribbon(widths([{x:-38,y:0},{x:-10,y:-.3},{x:18,y:-.2},{x:44,y:0}],2,.3))}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".4"/>`;
+ s+=`<path d="${BLADE}" fill="none" stroke="url(#silver)" stroke-width="1.5"/>`;
+ // The moonstone at the base: the joined light.
+ if(o.glow>0)s+=`<circle cx="-31" cy="0" r="${f(7+10*o.glow)}" fill="url(#halo)" opacity="${f(o.glow)}"/>`;
+ s+=`<ellipse cx="-31" cy="0" rx="7.4" ry="5.6" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><ellipse cx="-31" cy="0" rx="5.4" ry="3.9" fill="url(#moonstone)"/>`;
+ s+=`<ellipse cx="-31" cy="0" rx="5.4" ry="3.9" fill="#eef4ff" opacity="${f(o.glow*.75)}"/><ellipse cx="-32.6" cy="-1.3" rx="1.8" ry="1.1" fill="#fff" opacity=".9"/>`;
+ if(o.glint>0&&o.glint<1)s+=star(lerp(-26,44,o.glint),0,4.5,Math.sin(PI*o.glint));
+ if(o.spark>0)s+=`<circle cx="56" cy="12" r="10" fill="url(#halo)" opacity="${f(o.spark)}"/>`+star(56,12,7*o.spark,o.spark);
+ return s+'</g>'}
+// Eyelets: a small ring curls out of each stem onto the pin's line. Back halves and stems first; front halves go over the pin.
+function eyePts(S,th,sc){return [R2(S,th,-20*sc,0),R2(S,th,20*sc,0)]}
+function eyelets(cA,cB,S,th,sc,e,full){if(e<=0)return '';
+ const E=eyePts(S,th,sc);let s='';
+ [[cA,E[0]],[cB,E[1]]].forEach(([st,p])=>{
+  const dir=Math.sign(p.x-st.x)||1,tx=lerp(st.x,p.x-dir*4.6*sc,clamp(e)),stem=widths([{x:st.x,y:p.y},{x:lerp(st.x,tx,.5),y:p.y},{x:tx,y:p.y}],2.2,1.3);
+  s+=`<path d="${ribbon(stem,1.2)}" fill="${NIGHT}"/><path d="${ribbon(stem)}" fill="url(#silver)"/>`;
+  const r=clamp(e,0,1.3);
+  if(r>.05)s+=`<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(th*180/PI)}) scale(${f(sc*r*100)/100})"><path d="M0 -4.8A2 4.8 0 0 0 0 4.8" fill="none" stroke="${NIGHT}" stroke-width="3"/><path d="M0 -4.8A2 4.8 0 0 0 0 4.8" fill="none" stroke="#9aa6c6" stroke-width="1.5"/>${full?'':`<path d="M0 -4.8A2 4.8 0 0 1 0 4.8" fill="none" stroke="url(#silver)" stroke-width="1.5"/>`}</g>`});
+ return s}
+function eyeFronts(S,th,sc,e){if(e<=.05)return '';const r=clamp(e,0,1.3);
+ return eyePts(S,th,sc).map(p=>`<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(th*180/PI)}) scale(${f(sc*r*100)/100})"><path d="M0 -4.8A2 4.8 0 0 1 0 4.8" fill="none" stroke="${NIGHT}" stroke-width="3"/><path d="M0 -4.8A2 4.8 0 0 1 0 4.8" fill="none" stroke="url(#silver)" stroke-width="1.5"/><circle cx="1.6" cy="-2.6" r=".7" fill="#fff"/></g>`).join('')}
 const SHADES={
  narrow:{label:'Plain narrow',kind:'Page baseline',
-  about:'Not a brainstorm item. The casing narrows to a slim leaf holding the script nameplate and one moonstone value; the crescent crest, the pendant and the tip filigree stay, drawn smaller. It was the first shade here, kept as a plain reference beside the elven shade modes (constellation so far; leaf furl, wing fold, lantern sleep and mist to come). Shading while joined keeps the vine, braided flatter.'},
+  about:'Not a brainstorm item. The casing narrows to a slim leaf holding the script nameplate and one moonstone value; the crescent crest, the pendant and the tip filigree stay, drawn smaller. It was the first shade here, kept as a plain reference beside the elven shade modes (constellation so far; leaf furl, wing fold, lantern sleep and mist to come). Shading while joined keeps the join: the vine braids flatter and the brooch draws smaller.'},
  constellation:{label:'Constellation',kind:'Distil',linear:true,msIn:2600,msOut:1700,
   sayIn:'The leaf is read as a constellation: its outline settles into one silver line, and the stars kindle one by one.',
   sayOut:'The line draws back out into its leaf, and the night glass fills in behind it.',
@@ -402,7 +493,7 @@ function flower(x,y,kk,k){const sc=k*.95,op=clamp(kk*1.4);let s=`<circle cx="${f
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,busy:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -433,22 +524,22 @@ async function doJoin(fixed='a',ms=3200){
  model.dir=1;
  if(model.jt===0){model.path={s:here(),j:joinedPose(fixed)}}
  else if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};
- model.glow=0;
- say('The casings drift together and the tendrils grow across, twining round each other.');
+ model.glow=0;model.lift=0;
+ say(J().txt.join);
  const ok=await tween(model.jt,1,ms*(1-model.jt),setJt);
- if(ok){model.path=null;say('Joined: a braided vine with a moonflower. Drag a nameplate to move the pair; pull one casing away, or click the flower, to release.')}
+ if(ok){model.path=null;say(J().txt.joined)}
 }
 async function doSeparate(sPose){
  if(model.jt===0)return;
- if(model.jt===1){model.dir=-1;model.path={s:sPose||separatePose(),j:here()};say('The vine lets go: the leaves fold, the braid unwinds and the tendrils draw back into their buds.')}
- else{if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say('The tendrils stop and draw back.')}
+ if(model.jt===1){model.dir=-1;model.path={s:sPose||separatePose(),j:here()};say(J().txt.release)}
+ else{if(model.dir>0)model.lift=0;if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say(J().txt.stop)}
  const ms=model.dir<0?2300*model.jt:1400*model.jt;
- if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;say('Separate. Displays and pages were not touched.')}
+ if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.lift=0;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
- ++anim;model.busy=false;model.glow=0;model.dir=1;
+ ++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
- setJt(.55);render();say('Held mid-join: the tendrils are twining across the gap. Use the scrubber to step through the growth.');
+ setJt(.55);render();say(J().txt.hold);
 }
 function toggleShade(){
  const sh=SHADES[model.shade],to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||620)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;
@@ -491,9 +582,8 @@ function render(){
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
- const mid=model.dir>0?(jt<.16?'Joining · buds uncurl ':jt<.5?'Joining · tendrils reach ':jt<.8?'Joining · twining ':jt<.86?'Joining · leafing out ':'Joining · the moonflower opens '):(jt>.84?'Releasing · leaves fold ':jt>.6?'Releasing · the braid unwinds ':jt>.12?'Releasing · tendrils draw back ':'Releasing · buds curl ');
- const ph={separate:'Separate · two leaves',joining:mid+p+'%',joined:'Joined · '+j.label.toLowerCase()};
- $('#phase').textContent=(drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.state==='ready'?'Ready · the tendril tips touch':drag&&drag.state==='near'?'Nearby · the buds uncurl':ph[state])+(model.st>.5?' · shaded':'');
+ const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()};
+ $('#phase').textContent=(drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?'Lifting · the brooch rises':drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -502,7 +592,8 @@ STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.
 function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(drag)cancelDrag();
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.lift=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  describe();render();
 }
@@ -512,7 +603,7 @@ function describe(){
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
-$('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;model.dir=1;
+$('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
  if(model.jt===0||model.jt===1||!model.path)model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};
  setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
 document.addEventListener('keydown',e=>{
@@ -534,21 +625,27 @@ function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:
 function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
- if(e.target.closest('#seamHit')&&model.jt===1&&!model.busy){e.preventDefault();$('#a .grip').focus();doSeparate();return}
+ if(e.target.closest('#seamHit')&&model.jt===1&&!model.busy){e.preventDefault();$('#a .grip').focus();
+  // The brooch is lifted off: it follows the pointer up, and past a short distance (or on a plain click) it lets go.
+  if(J().lift){drag={lift:true,start:local(e),moved:0};stage.setPointerCapture(e.pointerId);render();return}
+  doSeparate();return}
  const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  // A casing grabbed while springing back settles at its joined place first.
- if(id!=='c'&&((model.jt>0&&model.jt<1)||model.busy)){++anim;model.busy=false;if(model.jt>0&&model.jt<1){if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0)}model.path=null;model.dir=1;if(model.jt===1){const j=joinedPose('a');Object.assign(model.a,j.a);Object.assign(model.b,j.b)}}
+ if(id!=='c'&&((model.jt>0&&model.jt<1)||model.busy)){++anim;model.busy=false;model.lift=0;if(model.jt>0&&model.jt<1){if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0)}model.path=null;model.dir=1;if(model.jt===1){const j=joinedPose('a');Object.assign(model.a,j.a);Object.assign(model.b,j.b)}}
  drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle',strain:0};
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
+ if(drag.lift){const up=drag.start.y-p.y;drag.moved=Math.max(drag.moved,Math.hypot(p.x-drag.start.x,up));model.lift=clamp(up/40);
+  if(model.lift>=1){drag=null;doSeparate();return}
+  if(model.lift>0)say('The brooch rises with your finger and its pin starts to open. Keep lifting to take it off.');render();return}
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
  if(drag.group){const g=J().gap,ay=clamp(s.a.y+dy,TOP,bottom),away=drag.id==='a'?-dx:dx;
-  if(away>0){// Pulling away: the partner holds, the held casing gives a little, and the braid strains.
+  if(away>0&&J().pull){// Pulling away: the partner holds, the held casing gives a little, and the braid strains.
    const st=Math.pow(away,.9)*.62,held=drag.id;drag.strain=st;
    model.a.y=model.b.y=ay;
    if(held==='a'){model.b.x=s.b.x;model.a.x=s.a.x-st}else{model.a.x=s.a.x;model.b.x=s.b.x+st}
@@ -563,16 +660,19 @@ stage.addEventListener('pointermove',e=>{
  const pull=drag.state==='ready'?.88:drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
  m.x=lerp(raw.x,t.x,pull);m.y=lerp(raw.y,t.y,pull);
  model.glow=drag.state==='ready'?1:drag.state==='near'?.12+.7*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
- if(drag.state==='ready')say('Ready: the tendril tips touch. Release to grow the vine.');else if(drag.state==='near')say('Nearby: the buds uncurl and reach toward each other. Move closer.');
+ if(drag.state==='ready')say(J().txt.ready);else if(drag.state==='near')say(J().txt.near);
  render();
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.lift){if(model.lift>=.5||d.moved<5){doSeparate();return}
+  tween(model.lift,0,320,v=>model.lift=v);say('The brooch settles back onto the seam.');return}
  if(d.group&&d.strain>0){springBack(d.id);say('The braid holds and draws the casing back.');return}
  if(d.state==='ready'){doJoin(d.id==='b'?'a':'b',2700)}else{model.glow=0;render()}
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.lift){model.lift=0;render();return}
  const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
 }
 stage.addEventListener('pointerup',endDrag);
