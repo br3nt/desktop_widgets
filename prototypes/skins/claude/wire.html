@@ -87,6 +87,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="st-mal" cx=".38" cy=".32" r=".75"><stop stop-color="#dcffe6"/><stop offset=".35" stop-color="#3fae6a"/><stop offset=".8" stop-color="#145a33"/><stop offset="1" stop-color="#0a321c"/></radialGradient>
  <linearGradient id="st-flash" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5fe0ff" stop-opacity="0"/><stop offset=".5" stop-color="#5fe0ff" stop-opacity=".7"/><stop offset=".75" stop-color="#9dff9a" stop-opacity=".35"/><stop offset="1" stop-color="#9dff9a" stop-opacity="0"/></linearGradient>
  <linearGradient id="st-gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff2b8"/><stop offset=".45" stop-color="#d4a640"/><stop offset="1" stop-color="#5c3f0c"/></linearGradient>
+ <radialGradient id="st-pearl" cx=".36" cy=".3" r=".8"><stop stop-color="#fffdf6"/><stop offset=".3" stop-color="#efe3d6"/><stop offset=".7" stop-color="#c7b3b4"/><stop offset="1" stop-color="#6e5d63"/></radialGradient>
  <linearGradient id="st-slab" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#1b343b"/><stop offset=".55" stop-color="#0c1a1e"/><stop offset="1" stop-color="#060d10"/></linearGradient>
 </defs><path id="probe" fill="none"/></svg>
 <header><div><h1>Wire, beads &amp; stones <span>/ Claude skin study</span></h1><p>Oxidised copper frames, coil-bound cabochon displays, bead buttons. <a href="index.html">All pages</a></p></div>
@@ -185,6 +186,10 @@ function casing(w,h,small,noFrame){
 const JOINS={
  jumpring:{label:'Jump ring',kind:'Hinge',gap:56,
   about:'Each pendant ends in an eye loop on a wrapped stem. A brass jump ring swings in, threads both loops and twists shut. <b>Near:</b> the loops warm. <b>Ready:</b> a ghost ring appears between them. <b>Release:</b> click the ring, or focus it and press Enter; it twists open and lifts away. The pendants hang a ring\'s width apart, like links in a chain, which is what later lets this join pivot.',
+  sayJoin:'The loops warm, the ring swings in and threads them, then twists shut.',
+  sayJoined:'Joined by a jump ring. Drag either nameplate to move the pair. Click the ring to open it.',
+  sayRelease:'The ring twists open and lifts away; the pendants drift apart.',
+  sayReady:'Ready: release to link them with a jump ring.',sayNear:'Nearby: the loops warm. Move closer.',
   end(side,lit,h){
    const x=side>0?W-5:5,y=h/2,cx=x+side*19;let s='';
    if(lit>0)s+=`<circle cx="${cx}" cy="${y}" r="13" fill="#ffb15e" opacity="${f(lit*.75)}" filter="url(#soft)"/>`;
@@ -214,7 +219,74 @@ const JOINS={
    s+=wire(this.arc(g,0,g.threaded?Math.PI:2*Math.PI),'brass',2.6,g.op);
    if(g.spark>0&&g.spark<1){const p={x:g.cx,y:g.cy+g.ry},r=3+7*g.spark,o=1-g.spark;
     s+=`<path d="M${f(p.x-r)} ${f(p.y)}H${f(p.x+r)}M${f(p.x)} ${f(p.y-r)}V${f(p.y+r)}" stroke="#fff4d0" stroke-width="1.3" stroke-linecap="round" opacity="${f(o)}"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(2.4*o)}" fill="#fffbe8" opacity="${f(o)}"/>`}
-   if(c.jt===1)s+=`<g class="hit" id="ringHit" tabindex="0" role="button" aria-label="Jump ring: open to separate the widgets"><title>Twist the ring open to release</title><circle cx="${f(g.cx)}" cy="${f(g.cy)}" r="20" fill="transparent"/><circle class="ringfocus" cx="${f(g.cx)}" cy="${f(g.cy)}" r="20" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+   if(c.jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Jump ring: open to separate the widgets"><title>Twist the ring open to release</title><circle cx="${f(g.cx)}" cy="${f(g.cy)}" r="20" fill="transparent"/><circle class="ringfocus" cx="${f(g.cx)}" cy="${f(g.cy)}" r="20" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+   return s;
+  }
+ },
+ strand:{label:'Bead strand bridge',kind:'Bridge',gap:136,slow:1.7,
+  about:'The pendants stay a hand\'s width apart and a short necklace spans the gap. Each joinable end carries a gold bead cap and crimp. A brass wire feeds out of Jarvis\'s cap and across to GitDiscuss\'s, then the stones slide along it one at a time like an abacus, each with a gold spacer, and click into place. The wire sags a little more with each one. A pearl drops last into the middle and a glint runs the strand. The strand carries the group\'s statuses: one <b>amber</b> per running Jarvis agent, one <b>carnelian</b> per GitDiscuss decision, <b>labradorite</b> when that widget is paused. <b>Near:</b> the bead caps warm. <b>Ready:</b> a ghost strand with empty bead rings appears. <b>Release:</b> tap the pearl, or focus it and press Enter; it lifts off, the stones slide home and the wire draws back. The desktop stays visible through the open span.',
+  sayJoin:'A wire feeds across the gap, then the stones slide along it one at a time and click into place.',
+  sayJoined:'Joined by a bead strand. Drag either nameplate to move the pair. Tap the pearl to lift it off and release.',
+  sayRelease:'The pearl lifts off, the stones slide home and the wire draws back.',
+  sayReady:'Ready: release to string a bead strand between them.',sayNear:'Nearby: the bead caps warm. Move closer.',
+  end(side,lit,h){
+   const x=side>0?W-5:5,y=h/2,b0=x+side*9,b1=x+side*18;let s='';
+   if(lit>0)s+=`<circle cx="${x+side*14}" cy="${y}" r="12" fill="#ffc46e" opacity="${f(lit*.75)}" filter="url(#soft)"/>`;
+   s+=wire(`M${x} ${y}H${x+side*10}`,lit>.5?'hot':'copper',2.4)+wire(band(x+side*5,y,false,3,7.5,2.3),'copper',1.1);
+   // Gold bead cap (a flared cone) and a crimp tube where the strand wire is anchored.
+   s+=`<path d="M${b0} ${f(y-6)}Q${b0+side*6} ${f(y-5)} ${b1} ${f(y-1.6)}V${f(y+1.6)}Q${b0+side*6} ${f(y+5)} ${b0} ${f(y+6)}Z" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".7"/>`+
+    `<path d="M${b0+side*3} ${f(y-4.6)}V${f(y+4.6)}" stroke="#5c3f0c" stroke-width=".7" opacity=".7"/>`+
+    `<rect x="${Math.min(b1,b1+side*4)}" y="${f(y-2)}" width="4" height="4" rx="1" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".6"/>`;
+   if(lit>.5)s+=`<circle cx="${b0+side*2}" cy="${f(y-3)}" r="1.4" fill="#fffbe8" opacity="${f(lit)}"/>`;
+   return s;
+  },
+  // Left to right: Jarvis's stones (spacer on the inner side), the pearl, GitDiscuss's stones. slot is the sliding order, innermost first.
+  units(){
+   const a=model.a.run?'amber':'lab',b=model.b.run?'carn':'lab',R=5.2,SP=3.4,PR=7.6;
+   const u=[{s:a,side:1,slot:4},{s:a,side:1,slot:2},{s:a,side:1,slot:0},{pearl:1},{s:b,side:-1,slot:1},{s:b,side:-1,slot:3}];
+   let total=0;u.forEach(x=>{x.r=x.pearl?PR:R;x.w=x.pearl?2*PR+2:2*R+1+SP;total+=x.w});
+   let o=-total/2;
+   u.forEach(x=>{const bw=2*x.r+1;if(x.pearl)x.c=o+x.w/2;else if(x.side>0){x.c=o+bw/2;x.sp=o+bw+SP/2}else{x.sp=o+SP/2;x.c=o+SP+bw/2}o+=x.w});
+   return u;
+  },
+  under(){return ''},
+  over(c){
+   const p0={x:c.a.x+W+17,y:c.a.y+c.h/2},p1={x:c.b.x-17,y:c.b.y+c.h/2},dx=p1.x-p0.x,U=this.units();let s='';
+   const pt=(t,sag)=>{const my=(p0.y+p1.y)/2+2*sag,u=1-t;return{x:p0.x+dx*t,y:u*u*p0.y+2*u*t*my+t*t*p1.y}};
+   const curve=(sag,t1=1)=>{let d='';const n=Math.max(2,Math.ceil(26*t1));for(let i=0;i<=n;i++){const q=pt(t1*i/n,sag);d+=(i?'L':'M')+f(q.x)+' '+f(q.y)}return d};
+   const at=x=>(dx/2+x)/dx;
+   if(c.ghost>0&&c.jt===0){
+    s+=`<g opacity="${f(c.ghost*.8)}" fill="none" stroke="#ffe3a8" stroke-width="1.2" stroke-dasharray="3 3"><path d="${curve(10)}"/>`;
+    U.forEach(u=>{const q=pt(at(u.c),10);s+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${u.r}"/>`});s+='</g>';
+   }
+   const feed=ease(seg(c.jt,.24,.5));if(feed<=0)return s;
+   const prog=U.map(u=>u.pearl?seg(c.jt,.82,.95):seg(c.jt,.5+u.slot*.064,.63+u.slot*.064));
+   const pp=prog[3],dip=pp>.6?3.5*Math.sin(Math.PI*(pp-.6)/.4):0;
+   const sag=3+8*ease(prog.reduce((a,b)=>a+b,0)/U.length)+dip,path=curve(sag,feed);
+   s+=`<path d="${path}" transform="translate(2 7)" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="3" stroke-linecap="round"/>`+wire(path,'brass',1.5);
+   if(feed<1){const q=pt(feed,sag);s+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="2" fill="#fff0c8"/>`}
+   const softBack=t=>1+2.2*Math.pow(t-1,3)+1.2*Math.pow(t-1,2);
+   U.forEach((u,i)=>{
+    const p=prog[i];if(p<=0)return;
+    if(u.pearl){
+     const q=pt(at(u.c),sag),y=q.y+(p<.6?-48*(1-Math.pow(p/.6,2)):-4*Math.sin(Math.PI*(p-.6)/.4)),r=u.r,o=f(clamp(p*5));
+     s+=`<g opacity="${o}"><ellipse cx="${f(q.x+2)}" cy="${f(q.y+8)}" rx="${f(r*.9)}" ry="2.4" fill="#000" opacity="${f(.3*clamp(p/.6))}"/>`+
+      `<circle cx="${f(q.x)}" cy="${f(y)}" r="${r}" fill="url(#st-pearl)" stroke="#3a2c30" stroke-width=".7"/>`+
+      `<ellipse cx="${f(q.x+r*.25)}" cy="${f(y+r*.35)}" rx="${f(r*.55)}" ry="${f(r*.25)}" fill="#f6c6d6" opacity=".35"/>`+
+      `<ellipse cx="${f(q.x-r*.35)}" cy="${f(y-r*.4)}" rx="${f(r*.32)}" ry="${f(r*.2)}" fill="#fff" opacity=".85"/></g>`;
+     if(p>.6&&p<1){const k=seg(p,.6,1),rr=4+9*k;s+=`<path d="M${f(q.x-rr)} ${f(q.y)}H${f(q.x+rr)}M${f(q.x)} ${f(q.y-rr*.7)}V${f(q.y+rr*.7)}" stroke="#fff4d0" stroke-width="1.1" stroke-linecap="round" opacity="${f(1-k)}"/>`}
+     return;
+    }
+    // Stones enter from their own widget's crimp and slide inward, overshooting a hair before they click home.
+    const t=lerp(u.side>0?0:1,at(u.c),softBack(p)),q=pt(t,sag),qs=pt(t+(u.sp-u.c)/dx,sag),o=f(clamp(p*6));
+    s+=`<g opacity="${o}">${strandItem({k:'sp'},qs.x,qs.y,true)}${strandItem({k:'bead',r:u.r,stone:u.s},q.x,q.y)}</g>`;
+    if(p>.72&&p<1){const k=Math.sin(Math.PI*seg(p,.72,1)),x=qs.x+u.side*3,y=qs.y;
+     s+=`<path d="M${f(x)} ${f(y-6)}v-3M${f(x+u.side*3)} ${f(y-4.5)}l${u.side*2.4} -2.2M${f(x+u.side*3)} ${f(y+4.5)}l${u.side*2.4} 2.2" stroke="#fff0c8" stroke-width="1" stroke-linecap="round" opacity="${f(k)}"/>`}
+   });
+   const g=seg(c.jt,.93,1);
+   if(g>0&&g<1){const q=pt(g,sag),o=Math.sin(Math.PI*g);s+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="7" fill="#fff6dc" opacity="${f(o*.6)}" filter="url(#soft)"/><circle cx="${f(q.x-1)}" cy="${f(q.y-2)}" r="1.4" fill="#fff" opacity="${f(o)}"/>`}
+   if(c.jt===1){const q=pt(at(U[3].c),sag);
+    s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Bead strand: lift the pearl to separate the widgets"><title>Lift the pearl to release</title><circle cx="${f(q.x)}" cy="${f(q.y)}" r="18" fill="transparent"/><circle class="ringfocus" cx="${f(q.x)}" cy="${f(q.y)}" r="12" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
    return s;
   }
  }
@@ -330,14 +402,14 @@ const say=t=>$('#status').textContent=t;
 async function doJoin(fixed='a',ms=1500){
  if(model.jt===1)return;
  if(!model.path||model.jt===0)model.path={s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose(fixed)};
- say('The loops warm, the ring swings in and threads them, then twists shut.');
- if(await tween(model.jt,1,ms*(1-model.jt),setJt)){model.path=null;say('Joined by a jump ring. Drag either nameplate to move the pair. Click the ring to open it.')}
+ const j=J();say(j.sayJoin);
+ if(await tween(model.jt,1,ms*(j.slow||1)*(1-model.jt),setJt)){model.path=null;say(j.sayJoined)}
 }
 async function doSeparate(){
  if(model.jt===0)return;
  if(model.jt===1||!model.path)model.path={s:separatePose(),j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}};
- say('The ring twists open and lifts away; the pendants drift apart.');
- if(await tween(model.jt,0,1100*model.jt,setJt)){model.path=null;say('Separate. Displays and pages were not touched.')}
+ const j=J();say(j.sayRelease);
+ if(await tween(model.jt,0,1100*(j.slow||1)*model.jt,setJt)){model.path=null;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
  ++anim;model.busy=false;
@@ -375,9 +447,9 @@ function render(){
  }
  $('#a .runText').innerHTML=model.a.run?'03 <em>agents running</em>':'03 <em>agents paused</em>';
  $('#under').innerHTML=j.under(c);
- const focused=document.activeElement&&document.activeElement.id==='ringHit';
+ const focused=document.activeElement&&document.activeElement.id==='joinHit';
  $('#over').innerHTML=j.over(c);
- const hit=$('#ringHit');if(hit){hit.onclick=doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ const hit=$('#joinHit');if(hit){hit.onclick=doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
  // Controls reflect state
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
@@ -443,7 +515,7 @@ stage.addEventListener('pointermove',e=>{
  m.x=lerp(raw.x,t.x,pull);m.y=lerp(raw.y,t.y,pull);
  model.glow=drag.state==='ready'?1:drag.state==='near'?.18+.44*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
  model.ghost=drag.state==='ready'?1:0;
- if(drag.state==='ready')say('Ready: release to link them with a jump ring.');else if(drag.state==='near')say('Nearby: the loops warm. Move closer.');
+ if(drag.state==='ready')say(J().sayReady);else if(drag.state==='near')say(J().sayNear);
  render();
 });
 function endDrag(){
