@@ -1,0 +1,2137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hollow Knight &amp; Silksong Skin — Desktop Widgets</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bone-white: #f5f6ee;
+  --bone-cream: #e5e6d6;
+  --bone-shadow: #9ea08f;
+  --bone-deep: #4f5246;
+  --slate-obsidian: #090d0f;
+  --slate-deep: #11171a;
+  --slate-mid: #1d252a;
+  --slate-edge: #38464f;
+  --slate-highlight: #5b6f7d;
+  --silk-white: #fffde6;
+  --silk-gold: #fcc042;
+  --silk-amber: #e08316;
+  --silk-shadow: #7a3f05;
+  --lumafly-bright: #ffff94;
+  --lumafly-amber: #ffbe3b;
+  --lumafly-glow: #e68d17;
+  --brass-pharloom: #e0b053;
+  --brass-mid: #a37a2c;
+  --brass-dark: #4d360f;
+  --iron-nail: #8598a3;
+  --iron-dark: #222b30;
+  --screen-bg: #0b1012;
+  --stage-bg: #090c0e;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--stage-bg);
+  color: #e5e9e2;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  overflow-x: hidden;
+}
+
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .4; cursor: default; }
+button:focus-visible, a:focus-visible, select:focus-visible {
+  outline: 2px solid var(--silk-gold);
+  outline-offset: 3px;
+}
+a { color: var(--silk-gold); text-underline-offset: 3px; }
+
+/* Header & Controls Toolbar */
+header {
+  padding: 16px 24px;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #232c33;
+  background: linear-gradient(180deg, #141b1f 0%, #0d1214 100%);
+}
+.header-titles h1 {
+  font-size: 20px;
+  letter-spacing: -0.4px;
+  margin: 0;
+  font-weight: 600;
+  color: var(--bone-white);
+}
+.header-titles h1 span {
+  font-weight: 400;
+  color: var(--silk-gold);
+  font-size: 15px;
+}
+.header-titles p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #8c9da8;
+}
+
+.controls-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #11171a;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid #26333b;
+}
+.control-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8fa2ad;
+  margin-right: 4px;
+}
+.controls-bar button, .controls-bar select {
+  border: 1px solid #2f3e47;
+  background: linear-gradient(180deg, #1b2429, #10161a);
+  color: var(--bone-cream);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 120ms ease;
+}
+.controls-bar button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #28363d, #161e24);
+  border-color: var(--silk-gold);
+  color: var(--bone-white);
+}
+.controls-bar button.active, .controls-bar button[aria-pressed="true"] {
+  border-color: var(--silk-gold);
+  color: #ffffff;
+  background: linear-gradient(180deg, #4d380f, #241904);
+  box-shadow: 0 0 10px rgba(252, 192, 66, 0.4);
+}
+.controls-bar .primary-btn {
+  border-color: #8a6519;
+  background: linear-gradient(180deg, #4d380f, #241904);
+  color: var(--silk-white);
+}
+.controls-bar .primary-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #6e4e11, #382504);
+  border-color: var(--silk-gold);
+}
+
+/* Stage Viewport */
+#viewport {
+  overflow: auto;
+  background:
+    radial-gradient(ellipse at 50% 25%, #182228 0%, #090d0f 75%),
+    radial-gradient(circle at 80% 80%, rgba(252, 192, 66, 0.05) 0%, transparent 50%);
+  position: relative;
+  min-height: 720px;
+}
+#stage {
+  position: relative;
+  width: 1200px;
+  height: 720px;
+  margin: auto;
+  overflow: hidden;
+  touch-action: none;
+  background:
+    radial-gradient(circle at 600px 140px, rgba(255, 253, 230, 0.03) 0%, transparent 60%),
+    repeating-linear-gradient(135deg, transparent 0 180px, rgba(56, 70, 79, 0.03) 181px 360px);
+}
+
+.topline {
+  position: absolute;
+  top: 18px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+}
+.topline p {
+  margin: 0;
+  color: #a4b7c2;
+  font-size: 13px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+#phase {
+  font: 11px/1.4 "Courier New", monospace;
+  color: var(--silk-gold);
+  background: rgba(14, 19, 23, 0.95);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #2e3e47;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Hardware and SVG Canvas */
+#stage-svg {
+  position: absolute;
+  inset: 0;
+  width: 1200px;
+  height: 720px;
+  pointer-events: none;
+  filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.85));
+}
+
+/* Modules: Jarvis (a) & GitDiscuss (b) */
+.module {
+  position: absolute;
+  width: 390px;
+  height: 130px;
+  user-select: none;
+  touch-action: none;
+  isolation: isolate;
+  transition: height 260ms cubic-bezier(0.18, 0.85, 0.25, 1);
+}
+.module.shade {
+  height: 44px;
+}
+.module-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+  transition: height 260ms cubic-bezier(0.18, 0.85, 0.25, 1);
+}
+.module.shade .module-svg {
+  height: 44px;
+}
+
+/* Forged Cold-Iron Nail Blade Grip with Wrapped Hilt */
+.hollow-grip {
+  position: absolute;
+  top: 4px;
+  left: 52px;
+  width: 276px;
+  height: 24px;
+  cursor: grab;
+  background: linear-gradient(180deg, rgba(133, 152, 163, 0.25) 0%, rgba(22, 28, 32, 0.9) 50%, rgba(10, 14, 16, 0.98) 100%);
+  border: 1.5px solid #3d4d57;
+  border-radius: 12px;
+  color: var(--bone-white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 14px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  z-index: 2;
+  box-shadow: inset 0 1px 2px rgba(245, 246, 238, 0.3), 0 3px 6px rgba(0, 0, 0, 0.8);
+}
+.hollow-grip:active { cursor: grabbing; }
+.hollow-grip .nail-glyph {
+  color: var(--silk-gold);
+  margin-right: 6px;
+  font-size: 13px;
+  text-shadow: 0 0 6px rgba(252, 192, 66, 0.6);
+}
+
+/* Recessed Deep Subterranean Slate Screen */
+.hollow-screen {
+  position: absolute;
+  left: 48px;
+  top: 32px;
+  width: 284px;
+  height: 64px;
+  background: var(--screen-bg);
+  border-radius: 6px;
+  border: 1.5px solid #232d33;
+  box-shadow:
+    inset 0 3px 12px rgba(0, 0, 0, 0.98),
+    0 0 0 1px rgba(56, 70, 79, 0.5),
+    0 0 14px rgba(252, 192, 66, 0.08);
+  overflow: hidden;
+  color: var(--bone-white);
+  z-index: 2;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.module.shade .hollow-screen {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+.hollow-screen::after, .token-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(8, 12, 14, 0.35) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+.screen-pages {
+  height: 100%;
+  width: 300%;
+  display: flex;
+  transition: transform 280ms cubic-bezier(0.18, 0.85, 0.25, 1);
+}
+.screen-page {
+  width: 33.33333%;
+  flex: none;
+  padding: 6px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.screen-page .slate-label {
+  font: 10px/1.3 "Courier New", monospace;
+  color: #7e919c;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.screen-page strong {
+  font: bold 18px/1.1 "Courier New", monospace;
+  letter-spacing: -0.5px;
+  display: block;
+  color: var(--bone-white);
+}
+.screen-page strong em {
+  font-style: normal;
+  color: var(--silk-gold);
+  font-weight: 500;
+}
+.screen-page small {
+  font: 11px/1.4 "Courier New", monospace;
+  color: #b1c1c9;
+}
+
+/* Lumafly Spore Rhythm Gauge */
+.spore-bar {
+  position: absolute;
+  right: 12px;
+  top: 9px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 25px;
+}
+.spore-bar i {
+  width: 4px;
+  background: linear-gradient(180deg, var(--lumafly-bright), var(--silk-amber));
+  border-radius: 2px 2px 0 0;
+  box-shadow: 0 0 5px rgba(255, 190, 59, 0.5);
+}
+
+/* Compact Horn-Crest Shade Mode Strip */
+.shade-strip {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  top: 10px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: linear-gradient(90deg, #10161a, #1f2a30 50%, #10161a);
+  border: 1px solid #38464f;
+  border-radius: 6px;
+  z-index: 2;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 10px rgba(252, 192, 66, 0.2);
+}
+.module.shade .shade-strip {
+  display: flex;
+}
+.shade-title {
+  font: 10px/1 "Courier New", monospace;
+  color: var(--bone-white);
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.shade-title span {
+  color: var(--silk-gold);
+}
+.shade-eyes {
+  display: flex;
+  gap: 6px;
+}
+.shade-eyes i {
+  width: 6px;
+  height: 8px;
+  border-radius: 50% 50% 40% 40%;
+  background: var(--lumafly-bright);
+  box-shadow: 0 0 6px var(--lumafly-amber);
+}
+
+/* Tabs & Interactive Controls */
+.tab-row {
+  position: absolute;
+  left: 50px;
+  top: 102px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 2;
+  transition: opacity 180ms ease;
+}
+.module.shade .tab-row {
+  opacity: 0;
+  pointer-events: none;
+}
+.hollow-tab {
+  padding: 2px 7px;
+  background: rgba(18, 24, 28, 0.9);
+  border: 1px solid #2b3942;
+  border-radius: 3px;
+  color: #8c9da8;
+  font: 10px/1.2 "Courier New", monospace;
+}
+.hollow-tab[aria-selected="true"] {
+  color: var(--silk-gold);
+  border-color: #73551c;
+  background: #2b1f09;
+  box-shadow: 0 0 6px rgba(252, 192, 66, 0.3);
+}
+
+/* Pharloom Bell Run & Next Buttons */
+.bell-btn {
+  position: absolute;
+  top: 98px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  padding: 0;
+  border: 1.5px solid #2b1d07;
+  background: radial-gradient(circle at 35% 30%, #fffae0, #e0b053 45%, #4d360f 90%);
+  color: #1a1204;
+  font: bold 10px/1 Arial, sans-serif;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    0 0 0 1px #805c1d,
+    0 2px 4px rgba(0, 0, 0, 0.8);
+  z-index: 2;
+  transition: transform 120ms ease, filter 120ms ease;
+}
+.bell-btn:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+.bell-btn:active {
+  transform: scale(0.95);
+}
+.run-btn { left: 288px; }
+.next-btn {
+  left: 318px;
+  background: radial-gradient(circle at 35% 30%, #f5f6ee, #9ea08f 50%, #30332c 90%);
+  color: #121411;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.7),
+    0 0 0 1px #595e53,
+    0 2px 4px rgba(0, 0, 0, 0.8);
+}
+.loom-btn {
+  position: absolute;
+  left: 178px;
+  top: 99px;
+  width: 98px;
+  height: 21px;
+  border: 1px solid #364650;
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+  color: var(--bone-white);
+  background: linear-gradient(180deg, #2b3840 0%, #151d22 100%);
+  font: bold 9px/1.4 Arial, sans-serif;
+  text-shadow: 0 1px rgba(0, 0, 0, 0.9);
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.15);
+  z-index: 2;
+  transition: opacity 180ms ease;
+}
+.loom-btn:hover {
+  background: linear-gradient(180deg, #3a4b57 0%, #1d272e 100%);
+  border-color: var(--silk-gold);
+}
+.module.shade .loom-btn, .module.shade .bell-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Deepnest Silk Undercroft / Elevator Drawer */
+#silkUndercroft {
+  position: absolute;
+  width: 324px;
+  height: 216px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+#undercroftBody {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 324px;
+  height: 202px;
+  transform: translateY(-190px);
+  transition: transform 420ms cubic-bezier(0.18, 0.85, 0.25, 1);
+  background:
+    radial-gradient(ellipse at 50% 20%, #1a2328 0%, #0d1215 100%),
+    linear-gradient(180deg, #182025, #0a0e10);
+  border: 2px solid #38464f;
+  border-radius: 4px 4px 22px 22px;
+  box-shadow:
+    inset 0 0 0 4px #0c1012,
+    inset 0 0 0 5px #26333b,
+    0 12px 18px rgba(0, 0, 0, 0.85);
+  pointer-events: auto;
+}
+#silkUndercroft.open #undercroftBody {
+  transform: translateY(0);
+}
+.silk-cord {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(90deg, #7a3f05, #fcc042, #7a3f05);
+  box-shadow: inset 0 0 0 1px #2e1802, 0 0 4px rgba(252, 192, 66, 0.4);
+}
+.silk-cord.l { left: 9px; }
+.silk-cord.r { right: 9px; }
+
+.undercroft-head {
+  position: absolute;
+  top: 10px;
+  left: 26px;
+  right: 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--bone-white);
+  text-shadow: 0 1px 2px #000;
+  font-size: 11px;
+}
+.undercroft-head button {
+  border: 1px solid #38464f;
+  border-radius: 3px;
+  color: var(--bone-cream);
+  background: #172026;
+  font-size: 10px;
+  padding: 2px 8px;
+}
+.undercroft-head button:hover { background: #283742; }
+
+#tokenBay {
+  position: absolute;
+  left: 22px;
+  top: 38px;
+  width: 280px;
+  height: 82px;
+  border: 1.5px solid #38464f;
+  background: #090d0f;
+  border-radius: 8px;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8c9da8;
+  font-size: 11px;
+  transition: all 180ms ease;
+}
+#tokenBay.hot, #tokenBay[data-dock-state="ready"] {
+  background: #241c09;
+  border-color: var(--silk-gold);
+  box-shadow: inset 0 0 18px rgba(252, 192, 66, 0.4), 0 0 14px rgba(252, 192, 66, 0.4);
+}
+#emptyTokenBay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+#emptyTokenBay button {
+  font-size: 10px;
+  padding: 3px 9px;
+  color: var(--silk-white);
+  background: #2b1f09;
+  border: 1px solid #73551c;
+  border-radius: 3px;
+}
+#emptyTokenBay button:hover { background: #47320b; }
+
+.undercroft-footer {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  top: 130px;
+  font: 10px/1.5 "Courier New", monospace;
+  color: #92a4af;
+}
+.undercroft-footer strong { color: var(--bone-white); }
+
+.spool-dial-wrap {
+  position: absolute;
+  right: 28px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #8c9da8;
+}
+#spoolDial {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle at 35% 30%, #fffae0, #e0b053 45%, #4d360f 85%);
+  border-radius: 50%;
+  border: 2px solid #1a1204;
+  box-shadow: 0 0 0 1px #8a6519, 0 2px 4px rgba(0, 0, 0, 0.8);
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+}
+#spoolDial::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 2px;
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  background: #ffffff;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.9);
+  transform-origin: 1px 11px;
+  transform: rotate(var(--angle, 0deg));
+}
+
+/* Checks Widget: Pale Shell Mask Token */
+#checksToken {
+  position: absolute;
+  width: 276px;
+  height: 78px;
+  touch-action: none;
+  user-select: none;
+  z-index: 8;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.8));
+}
+.token-case {
+  position: absolute;
+  inset: 0;
+  border: 2px solid #576873;
+  border-radius: 20px 10px 20px 10px;
+  background: linear-gradient(145deg, #28363d, #141c20 50%, #0a0e10);
+  box-shadow: inset 0 1px 2px rgba(245, 246, 238, 0.3), inset 0 -2px 4px rgba(0, 0, 0, 0.85);
+}
+.token-grip {
+  position: absolute;
+  left: 14px;
+  top: 1px;
+  width: 210px;
+  height: 18px;
+  background: none;
+  border: 0;
+  color: var(--bone-white);
+  text-align: left;
+  font: bold 9px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.5px;
+  cursor: grab;
+  text-shadow: 0 1px 2px #000;
+}
+.token-grip:active { cursor: grabbing; }
+.token-screen {
+  position: absolute;
+  left: 12px;
+  right: 38px;
+  top: 24px;
+  height: 42px;
+  border: 1.5px solid #28373f;
+  border-radius: 4px;
+  background: #090d0f;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 0 1px rgba(56, 70, 79, 0.5);
+  overflow: hidden;
+  padding: 4px 8px;
+  color: var(--bone-white);
+  font: 10px/1.3 "Courier New", monospace;
+}
+.token-screen strong {
+  font-size: 15px;
+  color: var(--silk-gold);
+}
+.lumafly-lens {
+  position: absolute;
+  right: 12px;
+  top: 32px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffff94, #ffbe3b 50%, #7a3f05 90%);
+  border: 1.5px solid #8a6519;
+  box-shadow: 0 0 8px rgba(255, 190, 59, 0.6);
+}
+#ejectToken {
+  position: absolute;
+  right: 12px;
+  top: 7px;
+  width: 16px;
+  height: 14px;
+  border: 0;
+  background: none;
+  color: var(--bone-white);
+  padding: 0;
+  font-size: 11px;
+}
+#ejectToken:hover { color: var(--silk-gold); }
+
+/* Pharloom Brass Needle & Silk Release Clasp */
+.silk-release-clasp {
+  position: absolute;
+  width: 26px;
+  height: 44px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  color: var(--silk-gold);
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+}
+.silk-release-clasp[hidden] { display: none; }
+.silk-release-clasp::before {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 28px;
+  left: 10px;
+  top: 8px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #4d360f, #e0b053 35%, #fffde6 50%, #e0b053 65%, #4d360f);
+  border: 1px solid #2e1f06;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.8), 0 0 6px rgba(252, 192, 66, 0.4);
+}
+.silk-release-clasp:hover::before {
+  border-color: var(--silk-gold);
+  box-shadow: 0 0 10px rgba(252, 192, 66, 0.7);
+}
+.silk-release-clasp::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 2px;
+  height: calc(20px * var(--tension, 0));
+  background: var(--silk-white);
+  box-shadow: 0 0 4px var(--silk-gold);
+}
+
+/* Design Mode Guides */
+#stage.joined .module { pointer-events: none; }
+#stage.joined .module button, #stage.joined .module .hollow-screen { pointer-events: auto; }
+.socket-port {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--silk-gold);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(252, 192, 66, 0.5);
+  display: none;
+  pointer-events: none;
+  z-index: 20;
+}
+.socket-port::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+}
+.socket-port::after {
+  position: absolute;
+  top: -26px;
+  left: -40px;
+  white-space: nowrap;
+  color: var(--bone-white);
+  font: 10px "Courier New", monospace;
+  content: attr(data-label);
+  background: rgba(14, 19, 23, 0.95);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid #38464f;
+}
+#stage.design .socket-port { display: block; }
+#stage.design #tokenBay { outline: 1px dashed var(--silk-gold); outline-offset: 4px; }
+#stage.design .hollow-screen { outline: 1px dashed #7e919c; outline-offset: 3px; }
+
+/* Footer Documentation */
+footer {
+  padding: 20px 28px 30px;
+  border-top: 1px solid #232c33;
+  background: #0d1214;
+  color: #8c9da8;
+  font-size: 13px;
+}
+footer h3 {
+  color: var(--bone-white);
+  font-size: 15px;
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+footer p {
+  margin: 0 0 10px;
+  max-width: 900px;
+  line-height: 1.6;
+}
+footer .note-highlight {
+  color: var(--silk-gold);
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-titles">
+    <h1>Hollow Knight &amp; Silksong <span>/ weaver's silk lash join</span></h1>
+    <p>Bleached chitin shell silhouette · Golden weaver-silk rigging · Pharloom brass bells &amp; lumafly indicators</p>
+  </div>
+  <nav class="controls-bar" aria-label="Experiment state and option controls">
+    <div class="control-group">
+      <label for="optionSelect">Option</label>
+      <select id="optionSelect" aria-label="Select skin exploration option">
+        <option value="silk_lash" selected>1. Weaver's Silk Lash (Tension Twang &amp; Golden Silk)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>State</label>
+      <button id="btnStateSeparate" class="active" aria-pressed="true">Separate</button>
+      <button id="btnStateJoining" aria-pressed="false">Joining</button>
+      <button id="btnStateJoined" aria-pressed="false">Joined</button>
+      <button id="btnStateShade" aria-pressed="false">Shade</button>
+    </div>
+    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
+    <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnDesign" aria-pressed="false">Design mode</button>
+    <button id="btnReset">Reset</button>
+  </nav>
+</header>
+
+<div id="viewport">
+  <main id="stage" aria-label="Hollow Knight and Silksong skin interactive stage">
+    <div class="topline">
+      <p id="status" role="status" aria-live="polite">Drag capsules toward each other to watch golden weaver-silk lash the chitin plates, or select a state.</p>
+      <span id="phase">Separate / Two independent bleached chitin instruments</span>
+    </div>
+
+    <!-- Architectural SVG Canvas for Shared Chitin Shells, Golden Silk Rigging, and Lumafly Glow -->
+    <svg id="stage-svg" viewBox="0 0 1200 720" aria-hidden="true">
+      <defs>
+        <!-- Bleached Chitin Carapace Gradient -->
+        <linearGradient id="chitinGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="12%" stop-color="#f5f6ee"/>
+          <stop offset="35%" stop-color="#e3e5d3"/>
+          <stop offset="70%" stop-color="#b8baa7"/>
+          <stop offset="90%" stop-color="#7a7c6f"/>
+          <stop offset="100%" stop-color="#42453b"/>
+        </linearGradient>
+
+        <!-- Subterranean Slate Chassis Gradient -->
+        <linearGradient id="slateGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#2c373d"/>
+          <stop offset="15%" stop-color="#1b2327"/>
+          <stop offset="55%" stop-color="#101518"/>
+          <stop offset="85%" stop-color="#0a0e10"/>
+          <stop offset="100%" stop-color="#161d21"/>
+        </linearGradient>
+
+        <!-- Golden Weaver-Silk Thread Gradient -->
+        <linearGradient id="silkGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#e08316"/>
+          <stop offset="30%" stop-color="#fcc042"/>
+          <stop offset="50%" stop-color="#fffde6"/>
+          <stop offset="70%" stop-color="#fcc042"/>
+          <stop offset="100%" stop-color="#e08316"/>
+        </linearGradient>
+
+        <!-- Pharloom Brass Gradient -->
+        <radialGradient id="brassGrad" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#fffde6"/>
+          <stop offset="25%" stop-color="#fcc042"/>
+          <stop offset="55%" stop-color="#a37a2c"/>
+          <stop offset="85%" stop-color="#5c4314"/>
+          <stop offset="100%" stop-color="#241703"/>
+        </radialGradient>
+
+        <!-- Lumafly Bioluminescence Glow Filter -->
+        <filter id="lumaflyGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Golden Silk Bloom Filter -->
+        <filter id="silkBoom" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="glow"/>
+          <feMerge>
+            <feMergeNode in="glow"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Chitin Drop Shadow -->
+        <filter id="chitinShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.85"/>
+        </filter>
+      </defs>
+
+      <g id="sharedHollowStage"></g>
+      <g id="hollowLightAura"></g>
+    </svg>
+
+    <!-- Deepnest Silk Undercroft / Drawer -->
+    <div id="silkUndercroft" aria-label="Weaver's silk undercroft drawer">
+      <div id="undercroftBody" inert>
+        <i class="silk-cord l"></i>
+        <i class="silk-cord r"></i>
+        <div class="undercroft-head">
+          <span id="bayStatus">Weaver's Silk Undercroft Bay</span>
+          <button id="closeUndercroft" aria-label="Close undercroft drawer">▴ close</button>
+        </div>
+        <div id="tokenBay" aria-label="Checks pale token bay">
+          <div id="emptyTokenBay">
+            <span>Drop the Checks Mask Token here</span>
+            <button id="insertToken">Insert Mask Token</button>
+          </div>
+        </div>
+        <div class="undercroft-footer">
+          <strong id="activityState">Weaver active</strong><br>
+          Suspended on golden silk cords.<br>
+          Deepnest undercroft belongs to Jarvis.
+        </div>
+        <div class="spool-dial-wrap">
+          <span>Concurrency <b id="spoolValue">3</b></span>
+          <button id="spoolDial" aria-label="Cycle silk spool concurrency limit"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capsule A: Jarvis -->
+    <section class="module" id="a" aria-label="Jarvis hollow capsule">
+      <svg class="module-svg" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="hollow-grip" data-drag="a" aria-label="Move Jarvis capsule">
+        <span><span class="nail-glyph">🗡</span> Jarvis / Vessel Control</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Recessed Slate Screen -->
+      <div class="hollow-screen" aria-label="Jarvis digital display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="slate-label">Jarvis / Active Vessel</div>
+            <strong id="runText">03 <em>vessels active</em></strong>
+            <small>Weaving silk threads across shell</small>
+            <div class="spore-bar">
+              <i style="height:10px"></i>
+              <i style="height:22px"></i>
+              <i style="height:16px"></i>
+              <i style="height:25px"></i>
+              <i style="height:18px"></i>
+            </div>
+          </div>
+          <div class="screen-page">
+            <div class="slate-label">Jarvis / Current Hunt</div>
+            <strong style="font-size:16px">Verify shell assembly</strong>
+            <small>12 checks passed · 2 in cocoon</small>
+          </div>
+          <div class="screen-page">
+            <div class="slate-label">Vessel Chronicle / Log</div>
+            <small>10:42  chitin latch cinched flush<br>10:43  golden thread tension holding</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact Horn Crest for Shade Mode -->
+      <div class="shade-strip">
+        <span class="shade-title"><span>✦</span> JARVIS · 03 VESSELS ACTIVE</span>
+        <div class="shade-eyes">
+          <i></i><i></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="Jarvis screens">
+        <button class="hollow-tab" role="tab" aria-selected="true" data-page="0">Status</button>
+        <button class="hollow-tab" role="tab" aria-selected="false" data-page="1">Task</button>
+        <button class="hollow-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+
+      <button class="loom-btn" aria-label="Open silk undercroft" aria-expanded="false">▾ silk loom</button>
+      <button class="bell-btn run-btn" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button>
+      <button class="bell-btn next-btn" aria-label="Next Jarvis screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Capsule B: GitDiscuss -->
+    <section class="module" id="b" aria-label="GitDiscuss hollow capsule">
+      <svg class="module-svg" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="hollow-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
+        <span><span class="nail-glyph">✦</span> GitDiscuss / Pharloom Thread</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Recessed Slate Screen -->
+      <div class="hollow-screen" aria-label="GitDiscuss digital display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="slate-label">GitDiscuss / Thread Queue</div>
+            <strong>02 <em>need a decision</em></strong>
+            <small>Weaver's silk lash join · review</small>
+          </div>
+          <div class="screen-page">
+            <div class="slate-label">Selected Discussion</div>
+            <strong style="font-size:16px">Shared casing geometry</strong>
+            <small>Brent · 4 comments · ready to lash</small>
+          </div>
+          <div class="screen-page">
+            <div class="slate-label">Weaver Chronicle / Log</div>
+            <small>10:41  feedback collected in deepnest<br>10:43  golden silk spool calibrated</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact Horn Crest for Shade Mode -->
+      <div class="shade-strip">
+        <span class="shade-title"><span>✦</span> GITDISCUSS · 02 QUEUED</span>
+        <div class="shade-eyes">
+          <i></i><i></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
+        <button class="hollow-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
+        <button class="hollow-tab" role="tab" aria-selected="false" data-page="1">Thread</button>
+        <button class="hollow-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+
+      <button class="loom-btn" aria-label="Open selected thread">▸ view thread</button>
+      <button class="bell-btn run-btn" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button>
+      <button class="bell-btn next-btn" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Checks Widget: Pale Shell Mask Token -->
+    <section id="checksToken" aria-label="Checks widget">
+      <div class="token-case"></div>
+      <button class="token-grip" data-drag="meter" aria-label="Move Checks mask token">
+        Checks / Pale Mask Token ⋮⋮
+      </button>
+      <div class="token-screen">
+        <strong>12 / 14</strong> checks passed<br>
+        2 waiting in cocoon
+      </div>
+      <span class="lumafly-lens"></span>
+      <button id="ejectToken" aria-label="Eject Checks token" title="Eject from undercroft" hidden>↗</button>
+    </section>
+
+    <!-- Pharloom Brass Needle & Silk Release Clasp -->
+    <button id="silkRelease" class="silk-release-clasp" data-drag="release"
+            aria-label="Release GitDiscuss: pull right or press Enter"
+            title="Pull right to snap silk latch · Enter to separate" hidden>
+    </button>
+
+    <!-- Socket Overlay for Design Mode -->
+    <div id="portOverlay" aria-hidden="true">
+      <div class="socket-port" id="portA" data-label="Silk Spool Pin · A"></div>
+      <div class="socket-port" id="portB" data-label="Chitin Eyelet Catch · B"></div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <h3>Hollow Knight &amp; Silksong Architecture &amp; The Weaver's Silk Lash Join</h3>
+  <p>
+    Crafted from smooth, bone-white bleached chitin carapaces layered over deep subterranean slate frames. The silhouette features sculpted stag-beetle horn crests, insectoid mandible curvatures, and cold-forged iron nail blade grips. All displays sit in recessed slate embrasures with high-contrast bone-white typography and amber lumafly bioluminescence.
+  </p>
+  <p>
+    <span class="note-highlight">Option 1 — Weaver's Silk Lash (Tension Twang):</span> Module A carries three cast Pharloom brass bobbins with wound golden silk thread; Module B features three polished bone eyelet studs. Upon docking or selecting Joining state, three glowing golden silk threads shoot across the divide, loop through the opposing bone eyelets, and cinch tight with high-speed tension twang. The joined seam features a taut criss-cross golden silk weave spanning the void between the chitin plates. Pulling the brass needle clapper right snaps the threads and separates the modules.
+  </p>
+  <p>
+    <span class="note-highlight">Shade Mode:</span> The chitin plates compress into an ultra-compact 44px bone-white horn-crest diadem bar with glowing lumafly eye slits.
+  </p>
+</footer>
+
+<script>
+// Hollow Knight & Silksong Skin Controller
+const $ = s => document.querySelector(s);
+const stage = $('#stage');
+const W = 390, H = 130, JOIN_DISTANCE = 316;
+
+const model = {
+  a: { x: 140, y: 220, page: 0, running: true },
+  b: { x: 680, y: 220, page: 0, running: true },
+  meter: { x: 805, y: 510 },
+  joined: false,
+  busy: false,
+  cradle: false,
+  docked: false,
+  design: false,
+  shade: false,
+  blend: 0,
+  cap: 0,
+  silkWhipProgress: 0, // 0 = separate, 0.5 = threads shooting across gap, 1.0 = cinched taut
+  silkVibration: 0,    // harmonic twang offset
+  light: 0,
+  limit: 3,
+  feel: 'free',
+  tension: 0,
+  front: 'b'
+};
+
+const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let drag = null, animationToken = 0, dragFrame = 0, glowFrame = 0, glowTime = 0;
+const DOCKING = { near: 130, capture: 45 };
+const connectionGlow = { socket: { value: 0, target: 0 }, bay: { value: 0, target: 0 } };
+
+function say(text) { $('#status').textContent = text; }
+
+// Draw Bleached Chitin & Slate Casing with Horned Crest Silhouette
+function drawHollowCasing(x, y, width, opacity = 1, isShade = false) {
+  const midX = x + width / 2;
+  let s = `<g opacity="${opacity}" class="hollow-casing">`;
+
+  if (!isShade) {
+    // 1. Heavy Subterranean Drop Shadow
+    s += `<path d="M ${x + 20} ${y + 8} L ${x + width - 20} ${y + 8}
+                   Q ${x + width - 4} ${y + 8} ${x + width - 4} ${y + 24}
+                   L ${x + width - 4} ${y + 110}
+                   Q ${x + width - 4} ${y + 126} ${x + width - 20} ${y + 126}
+                   L ${x + 20} ${y + 126}
+                   Q ${x + 4} ${y + 126} ${x + 4} ${y + 110}
+                   L ${x + 4} ${y + 24}
+                   Q ${x + 4} ${y + 8} ${x + 20} ${y + 8} Z"
+                fill="#000000" opacity="0.75" filter="url(#chitinShadow)"/>`;
+
+    // 2. Slate Under-Chassis (Dark Fungal Wastes Slate Foundation)
+    s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="118" rx="16"
+                fill="url(#slateGrad)" stroke="#1a2226" stroke-width="2"/>`;
+
+    // 3. Bleached Bone-White Chitin Carapace Plates (Layered Exoskeleton)
+    // Upper Horned Crest Plate: Swept stag beetle horn points curving upward at outer corners
+    const leftHornX = x + 16, rightHornX = x + width - 16;
+    s += `<path d="M ${x + 36} ${y + 10}
+                   Q ${midX} ${y + 14} ${x + width - 36} ${y + 10}
+                   Q ${rightHornX} ${y + 2} ${rightHornX + 4} ${y - 12}
+                   Q ${rightHornX - 6} ${y + 6} ${x + width - 18} ${y + 22}
+                   L ${x + width - 10} ${y + 64}
+                   L ${x + 10} ${y + 64}
+                   L ${x + 18} ${y + 22}
+                   Q ${leftHornX + 6} ${y + 6} ${leftHornX - 4} ${y - 12}
+                   Q ${leftHornX} ${y + 2} ${x + 36} ${y + 10} Z"
+                fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="2.5" stroke-linejoin="round"/>`;
+
+    // Upper Plate Chitin Surface Highlight & Suture Grooves
+    s += `<path d="M ${x + 44} ${y + 15} Q ${midX} ${y + 18} ${x + width - 44} ${y + 15}"
+                fill="none" stroke="#ffffff" stroke-width="1.8" opacity="0.85"/>`;
+    s += `<path d="M ${midX} ${y + 13} L ${midX} ${y + 28}"
+                stroke="#54574a" stroke-width="1.5" stroke-linecap="round"/>`;
+    s += `<circle cx="${midX}" cy="${y + 30}" r="2" fill="#363830"/>`;
+
+    // Lower Mandible Chitin Plate: Segmented arthropod plates cradling the bottom
+    s += `<path d="M ${x + 10} ${y + 68}
+                   L ${x + width - 10} ${y + 68}
+                   L ${x + width - 16} ${y + 112}
+                   Q ${rightHornX} ${y + 128} ${rightHornX + 6} ${y + 138}
+                   Q ${rightHornX - 4} ${y + 126} ${x + width - 36} ${y + 124}
+                   Q ${midX} ${y + 120} ${x + 36} ${y + 124}
+                   Q ${leftHornX + 4} ${y + 126} ${leftHornX - 6} ${y + 138}
+                   Q ${leftHornX} ${y + 128} ${x + 16} ${y + 112} Z"
+                fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="2.5" stroke-linejoin="round"/>`;
+
+    // Lower Plate Chitin Suture Highlight
+    s += `<path d="M ${x + 44} ${y + 121} Q ${midX} ${y + 117} ${x + width - 44} ${y + 121}"
+                fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>`;
+
+    // 4. Recessed Subterranean Slate Display Embrasure
+    s += `<rect x="${x + 44}" y="${y + 28}" width="${width - 88}" height="72" rx="8"
+                fill="#090d0f" stroke="#1d262b" stroke-width="2.5"/>`;
+    s += `<rect x="${x + 46}" y="${y + 30}" width="${width - 92}" height="68" rx="6"
+                fill="none" stroke="#36454f" stroke-width="1"/>`;
+
+    // Chiseled corner notches on display embrasure
+    const notches = [
+      [x + 46, y + 30],
+      [x + width - 46, y + 30],
+      [x + 46, y + 98],
+      [x + width - 46, y + 98]
+    ];
+    notches.forEach(([nx, ny]) => {
+      s += `<circle cx="${nx}" cy="${ny}" r="2" fill="#5b6f7d" stroke="#11171a" stroke-width="0.8"/>`;
+    });
+
+    // 5. Breathing Amber Lumafly Lantern Indicators in Recesses
+    s += `<circle cx="${x + 26}" cy="${y + 64}" r="5" fill="url(#brassGrad)" stroke="#241703" stroke-width="1"/>`;
+    s += `<circle cx="${x + 26}" cy="${y + 64}" r="3" fill="#ffff94" filter="url(#lumaflyGlow)"/>`;
+
+    s += `<circle cx="${x + width - 26}" cy="${y + 64}" r="5" fill="url(#brassGrad)" stroke="#241703" stroke-width="1"/>`;
+    s += `<circle cx="${x + width - 26}" cy="${y + 64}" r="3" fill="#ffff94" filter="url(#lumaflyGlow)"/>`;
+
+  } else {
+    // Shade Mode: Compact Bleached Chitin Horn-Crest Bar
+    s += `<path d="M ${x + 24} ${y + 8}
+                   Q ${midX} ${y + 12} ${x + width - 24} ${y + 8}
+                   Q ${x + width - 10} ${y + 2} ${x + width - 6} ${y - 6}
+                   Q ${x + width - 8} ${y + 14} ${x + width - 12} ${y + 36}
+                   Q ${midX} ${y + 38} ${x + 12} ${y + 36}
+                   Q ${x + 8} ${y + 14} ${x + 6} ${y - 6}
+                   Q ${x + 10} ${y + 2} ${x + 24} ${y + 8} Z"
+                fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="2.2" stroke-linejoin="round"/>`;
+    s += `<path d="M ${x + 30} ${y + 12} Q ${midX} ${y + 15} ${x + width - 30} ${y + 12}"
+                fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.85"/>`;
+
+    // Slender amber lumafly eye slits on shade crest
+    s += `<ellipse cx="${midX - 18}" cy="${y + 22}" rx="5" ry="2.5" fill="#ffff94" filter="url(#lumaflyGlow)"/>`;
+    s += `<ellipse cx="${midX + 18}" cy="${y + 22}" rx="5" ry="2.5" fill="#ffff94" filter="url(#lumaflyGlow)"/>`;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Docking End-Caps:
+// Module A (Right): Pharloom brass silk spools/bobbins with wound golden silk threads
+// Module B (Left): Polished bone eyelet pins / catches awaiting silk threads
+function drawHollowCap(x, y, isRight, isMaleBobbin = false, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const dir = isRight ? 1 : -1;
+  const startX = isRight ? x + W - 14 : x + 14;
+  const scaleX = (1 - retract) * dir;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  let s = `<g transform="translate(${startX}, ${y + 64}) scale(${scaleX}, 1)">`;
+
+  if (isMaleBobbin) {
+    // Module A: 3 Cast Pharloom Brass Silk Bobbins / Spools
+    [-28, 0, 28].forEach(offsetY => {
+      // Bone mount stud
+      s += `<rect x="0" y="${offsetY - 7}" width="16" height="14" rx="4"
+                  fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="1"/>`;
+      // Brass bobbin spool
+      s += `<rect x="8" y="${offsetY - 6}" width="14" height="12" rx="3"
+                  fill="url(#brassGrad)" stroke="#241703" stroke-width="1"/>`;
+      // Wound golden silk thread core
+      s += `<rect x="10" y="${offsetY - 4}" width="10" height="8" rx="2"
+                  fill="url(#silkGrad)"/>`;
+      s += `<line x1="12" y1="${offsetY - 3}" x2="12" y2="${offsetY + 3}" stroke="#ffffff" stroke-width="0.8"/>`;
+      s += `<line x1="16" y1="${offsetY - 3}" x2="16" y2="${offsetY + 3}" stroke="#ffffff" stroke-width="0.8"/>`;
+    });
+  } else {
+    // Module B: 3 Polished Bone Eyelet Studs
+    [-28, 0, 28].forEach(offsetY => {
+      // Bone bracket
+      s += `<path d="M 0 ${offsetY - 8} L 18 ${offsetY - 6} Q 24 ${offsetY} 18 ${offsetY + 6} L 0 ${offsetY + 8} Z"
+                  fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="1.2"/>`;
+      // Eyelet hole
+      s += `<circle cx="14" cy="${offsetY}" r="4.2" fill="#090d0f" stroke="#54574a" stroke-width="1.2"/>`;
+      // Inner brass grommet
+      s += `<circle cx="14" cy="${offsetY}" r="2.2" fill="url(#brassGrad)"/>`;
+    });
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Proximity Lumafly Bioluminescence Aura
+function drawHollowProximityAura(x, y, amount) {
+  if (amount < 0.02) return '';
+  return `
+    <g opacity="${amount}">
+      <ellipse cx="${x}" cy="${y + 64}" rx="32" ry="58"
+               fill="#fcc042" opacity="0.35" filter="url(#lumaflyGlow)"/>
+      <ellipse cx="${x}" cy="${y + 64}" rx="14" ry="40"
+               fill="#ffff94" opacity="0.5" filter="url(#lumaflyGlow)"/>
+      <!-- Drifting golden spore dust particles -->
+      <circle cx="${x - 12}" cy="${y + 44}" r="2" fill="#ffff94" opacity="${amount}"/>
+      <circle cx="${x + 10}" cy="${y + 80}" r="2.5" fill="#fcc042" opacity="${amount}"/>
+      <circle cx="${x - 6}" cy="${y + 88}" r="1.5" fill="#ffffff" opacity="${amount}"/>
+    </g>
+  `;
+}
+
+// Option 1: Weaver's Silk Lash Join (Tension Twang & Golden Silk Weave)
+function drawSilkLashJoin(midX, y, progress, tensionVibe, opacity = 1) {
+  if (progress < 0.02) return '';
+  const vib = tensionVibe * 7;
+  const leftX = midX - 32 * (1 - progress * 0.4);
+  const rightX = midX + 32 * (1 - progress * 0.4);
+
+  // 3 Silk thread pathways: top, center, bottom with dynamic criss-cross weave
+  const tracks = [
+    { ay: y + 36, by: y + 36, cy: y + 36 + vib },
+    { ay: y + 64, by: y + 64, cy: y + 64 - vib },
+    { ay: y + 92, by: y + 92, cy: y + 92 + vib }
+  ];
+
+  let s = `<g opacity="${opacity}" class="silk-lash-assembly">`;
+
+  // Deep shadow slit along docking seam
+  s += `<rect x="${midX - 3}" y="${y + 12}" width="6" height="106" rx="3"
+              fill="#06090a" opacity="${progress * 0.95}"/>`;
+
+  // 3 Main Horizontal Glowing Silk Lash Threads
+  tracks.forEach((tr, i) => {
+    // Current reach of thread based on progress
+    const curRightX = leftX + (rightX - leftX) * Math.min(1, progress * 1.3);
+
+    // Glowing Silk Aura (Bloom)
+    s += `<path d="M ${leftX} ${tr.ay} Q ${midX} ${tr.cy} ${curRightX} ${tr.by}"
+                fill="none" stroke="#fcc042" stroke-width="4.5" opacity="0.75"
+                filter="url(#silkBoom)" stroke-linecap="round"/>`;
+
+    // Razor-Sharp White Silk Core
+    s += `<path d="M ${leftX} ${tr.ay} Q ${midX} ${tr.cy} ${curRightX} ${tr.by}"
+                fill="none" stroke="#fffde6" stroke-width="2.2" stroke-linecap="round"/>`;
+  });
+
+  // When progress > 0.45, threads cross over into diamond lattice weave
+  if (progress > 0.45) {
+    const weaveAlpha = Math.min(1, (progress - 0.45) / 0.55);
+    // Diagonal Silk Lashes (Criss-Cross Weave)
+    s += `<g opacity="${weaveAlpha}">
+      <!-- Top Left to Center Right -->
+      <path d="M ${leftX} ${y + 36} Q ${midX} ${y + 50 + vib} ${rightX} ${y + 64}"
+            fill="none" stroke="#fcc042" stroke-width="3" filter="url(#silkBoom)"/>
+      <path d="M ${leftX} ${y + 36} Q ${midX} ${y + 50 + vib} ${rightX} ${y + 64}"
+            fill="none" stroke="#fffde6" stroke-width="1.6"/>
+
+      <!-- Center Left to Top Right -->
+      <path d="M ${leftX} ${y + 64} Q ${midX} ${y + 50 - vib} ${rightX} ${y + 36}"
+            fill="none" stroke="#fcc042" stroke-width="3" filter="url(#silkBoom)"/>
+      <path d="M ${leftX} ${y + 64} Q ${midX} ${y + 50 - vib} ${rightX} ${y + 36}"
+            fill="none" stroke="#fffde6" stroke-width="1.6"/>
+
+      <!-- Center Left to Bottom Right -->
+      <path d="M ${leftX} ${y + 64} Q ${midX} ${y + 78 + vib} ${rightX} ${y + 92}"
+            fill="none" stroke="#fcc042" stroke-width="3" filter="url(#silkBoom)"/>
+      <path d="M ${leftX} ${y + 64} Q ${midX} ${y + 78 + vib} ${rightX} ${y + 92}"
+            fill="none" stroke="#fffde6" stroke-width="1.6"/>
+
+      <!-- Bottom Left to Center Right -->
+      <path d="M ${leftX} ${y + 92} Q ${midX} ${y + 78 - vib} ${rightX} ${y + 64}"
+            fill="none" stroke="#fcc042" stroke-width="3" filter="url(#silkBoom)"/>
+      <path d="M ${leftX} ${y + 92} Q ${midX} ${y + 78 - vib} ${rightX} ${y + 64}"
+            fill="none" stroke="#fffde6" stroke-width="1.6"/>
+    </g>`;
+
+    // Center Golden Diamond Weaver Knot
+    s += `<polygon points="${midX} ${y + 58 - vib}, ${midX + 7} ${y + 64}, ${midX} ${y + 70 + vib}, ${midX - 7} ${y + 64}"
+                  fill="url(#brassGrad)" stroke="#241703" stroke-width="1.2" opacity="${weaveAlpha}"/>`;
+    s += `<circle cx="${midX}" cy="${y + 64}" r="2.5" fill="#ffffff" opacity="${weaveAlpha}" filter="url(#lumaflyGlow)"/>`;
+  }
+
+  // Tension Spark Flash on full cinch
+  if (progress > 0.88) {
+    const flashScale = (progress - 0.88) / 0.12;
+    s += `<circle cx="${midX}" cy="${y + 64}" r="${flashScale * 28}"
+                  fill="none" stroke="#fffde6" stroke-width="${(1 - flashScale) * 6}"
+                  opacity="${(1 - flashScale) * 5}" filter="url(#silkBoom)"/>`;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Render Complete Hardware Layer
+function renderHardware() {
+  const a = model.a, b = model.b, p = model.blend;
+  const isShade = model.shade;
+  const glow = model.busy ? model.light : connectionGlow.socket.value;
+  let shared = '';
+
+  const midX = (a.x + W - 22 + b.x + 22) / 2;
+
+  if (p > 0) {
+    // Seamless Monolithic Chitin Carapace Frame
+    shared += drawHollowCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
+    if (!isShade) {
+      // Chitin bridge sutures across seam
+      shared += `
+        <g opacity="${p}">
+          <path d="M ${midX - 36} ${a.y + 12} Q ${midX} ${a.y + 18} ${midX + 36} ${a.y + 12}"
+                fill="none" stroke="#ffffff" stroke-width="1.8" opacity="0.8"/>
+          <path d="M ${midX - 36} ${a.y + 124} Q ${midX} ${a.y + 118} ${midX + 36} ${a.y + 124}"
+                fill="none" stroke="#ffffff" stroke-width="1.8" opacity="0.8"/>
+        </g>
+      `;
+    }
+  }
+
+  // Draw Weaver's Silk Lash Join for Option 1
+  if (!isShade && (model.joined || model.silkWhipProgress > 0.02 || (glow > 0.25 && !model.joined))) {
+    const prog = model.joined ? 1 : model.silkWhipProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
+    const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+    shared += drawSilkLashJoin(kMidX, a.y, prog, model.silkVibration, Math.max(p, glow > 0.25 ? 0.95 : prog));
+  }
+
+  if (model.joined && model.design) {
+    shared += `<line x1="${a.x + JOIN_DISTANCE}" y1="${a.y + 8}" x2="${a.x + JOIN_DISTANCE}" y2="${a.y + 122}"
+                     stroke="#fcc042" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+  }
+
+  $('#sharedHollowStage').innerHTML = shared;
+
+  // Individual Capsule SVG Shells
+  for (const id of ['a', 'b']) {
+    const isA = id === 'a';
+    const individual = drawHollowCasing(0, 0, W, 1, isShade) +
+      drawHollowCap(0, 0, false, false, isA ? 0 : model.cap, isShade) +
+      drawHollowCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+
+    $('#shell-' + id).innerHTML = `
+      <g opacity="${1 - p}">
+        ${individual}
+        ${drawHollowProximityAura(isA ? W - 22 : 22, 0, glow)}
+      </g>
+    `;
+  }
+
+  // Active Proximity Lumafly Bioluminescence Aura
+  if (!isShade && glow > 0.05 && p < 0.98) {
+    $('#hollowLightAura').innerHTML = `
+      <g opacity="${glow}">
+        ${drawHollowProximityAura(a.x + W - 22, a.y, glow)}
+        ${drawHollowProximityAura(b.x + 22, b.y, glow)}
+      </g>
+    `;
+  } else {
+    $('#hollowLightAura').innerHTML = '';
+  }
+}
+
+function updateStateButtons() {
+  const isShade = model.shade;
+  const isJoined = model.joined;
+  const isJoining = model.silkWhipProgress > 0.1 && model.silkWhipProgress < 0.95 && !isJoined;
+  const isSep = !isJoined && !isJoining && !isShade;
+
+  $('#btnStateSeparate').classList.toggle('active', isSep);
+  $('#btnStateSeparate').setAttribute('aria-pressed', String(isSep));
+
+  $('#btnStateJoining').classList.toggle('active', isJoining);
+  $('#btnStateJoining').setAttribute('aria-pressed', String(isJoining));
+
+  $('#btnStateJoined').classList.toggle('active', isJoined && !isShade);
+  $('#btnStateJoined').setAttribute('aria-pressed', String(isJoined && !isShade));
+
+  $('#btnStateShade').classList.toggle('active', isShade);
+  $('#btnStateShade').setAttribute('aria-pressed', String(isShade));
+}
+
+function render() {
+  updateGlowTargets();
+  renderHardware();
+  paintGlowValues();
+  updateStateButtons();
+
+  ['a', 'b'].forEach(id => {
+    const m = model[id], el = $('#' + id);
+    el.style.left = m.x + 'px';
+    el.style.top = m.y + 'px';
+    el.style.zIndex = model.front === id ? '4' : '2';
+    el.classList.toggle('shade', model.shade);
+
+    el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
+    el.querySelectorAll('.hollow-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
+
+    const btn = el.querySelector('.run-btn');
+    btn.textContent = m.running ? 'Ⅱ' : '▶';
+    btn.setAttribute('aria-label', (m.running ? 'Pause ' : 'Resume ') + (id === 'a' ? 'Jarvis' : 'GitDiscuss'));
+  });
+
+  $('#runText').innerHTML = model.a.running ? '03 <em>vessels active</em>' : '03 <em>vessels resting</em>';
+  $('#activityState').textContent = model.a.running ? 'Weaver active' : 'Weaver resting';
+
+  const bayState = connectionState('bay');
+  $('#tokenBay').dataset.dockState = bayState;
+  const bayLabel = bayState === 'ready' ? 'Release to nest mask token in loom' :
+                   bayState === 'near' ? 'Near silk undercroft · slide closer' : "Weaver's Silk Undercroft Bay";
+  $('#bayStatus').textContent = bayLabel;
+
+  const undercroft = $('#silkUndercroft');
+  undercroft.style.left = (model.a.x + 36) + 'px';
+  undercroft.style.top = (model.a.y + (model.shade ? 40 : 121)) + 'px';
+  undercroft.classList.toggle('open', model.cradle);
+  $('#undercroftBody').inert = !model.cradle;
+
+  $('#a .loom-btn').setAttribute('aria-expanded', String(model.cradle));
+  $('#a .loom-btn').textContent = model.cradle ? '▴ silk loom' : '▾ silk loom';
+
+  const meter = $('#checksToken');
+  if (model.docked) {
+    if (meter.parentElement !== $('#tokenBay')) $('#tokenBay').append(meter);
+    meter.style.left = '0px';
+    meter.style.top = '0px';
+    meter.style.transform = `translate(${drag?.kind === 'meterLatch' ? drag.deflect.x : 0}px, ${drag?.kind === 'meterLatch' ? drag.deflect.y : 0}px) scale(0.98)`;
+    meter.style.transformOrigin = 'top left';
+    meter.inert = !model.cradle;
+  } else {
+    if (meter.parentElement !== stage) stage.append(meter);
+    meter.style.left = model.meter.x + 'px';
+    meter.style.top = model.meter.y + 'px';
+    meter.style.transform = '';
+    meter.inert = false;
+  }
+
+  $('#emptyTokenBay').hidden = model.docked;
+  $('#emptyTokenBay').style.display = model.docked ? 'none' : 'flex';
+  $('#ejectToken').hidden = !model.docked;
+
+  stage.classList.toggle('design', model.design);
+  $('#btnDesign').setAttribute('aria-pressed', String(model.design));
+
+  $('#portA').style.left = (model.a.x + W - 30) + 'px';
+  $('#portA').style.top = (model.a.y + 54) + 'px';
+  $('#portB').style.left = (model.b.x + 12) + 'px';
+  $('#portB').style.top = (model.b.y + 54) + 'px';
+
+  $('#btnJoinAnim').disabled = model.joined || model.busy;
+  $('#btnSeparateAnim').disabled = !model.joined || model.busy;
+
+  $('#spoolValue').textContent = model.limit;
+  $('#spoolDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
+
+  const release = $('#silkRelease');
+  release.hidden = !model.joined || model.busy || model.shade;
+  release.style.left = (model.a.x + 338) + 'px';
+  release.style.top = (model.a.y + 44) + 'px';
+  release.style.setProperty('--tension', model.tension);
+
+  if (!model.busy) {
+    if (model.shade) {
+      $('#phase').textContent = 'Shade mode / Bleached chitin horn-crest diadem';
+    } else if (model.joined) {
+      $('#phase').textContent = 'Joined / One monolithic chitin carapace bound in golden silk';
+    } else if (model.silkWhipProgress > 0.1) {
+      $('#phase').textContent = 'Joining / Golden silk threads whipping across chitin divide';
+    } else {
+      $('#phase').textContent = 'Separate / Two independent bleached chitin instruments';
+    }
+  }
+}
+
+function tween(duration, fn, token) {
+  return new Promise(resolve => {
+    if (motion.matches) {
+      if (token === animationToken) fn(1);
+      resolve(token === animationToken);
+      return;
+    }
+    let start = performance.now();
+    function step(now) {
+      if (token !== animationToken) { resolve(false); return; }
+      let t = Math.min(1, (now - start) / duration);
+      // Snappy insectoid physics: explosive attack with decisive stop
+      let e = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      fn(e);
+      if (t < 1) requestAnimationFrame(step);
+      else resolve(true);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// Option 1 Join Animation: Weaver's Silk Lash (Tension Twang)
+async function join(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Capsules enter attraction threshold. Weaver spools align across the divide.');
+  $('#phase').textContent = 'Spools spinning; silk threads glowing';
+
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 90 : 220, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  $('#phase').textContent = 'Silk threads whipping across gap';
+  if (!await tween(fromDrag ? 140 : 260, t => {
+    model.cap = t;
+    model.silkWhipProgress = t * 0.55; // shooting across gap
+    model.silkVibration = Math.sin(t * Math.PI * 4) * (1 - t);
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.cradle ? 305 : 385, model.a.y));
+
+  $('#phase').textContent = 'Lacing through eyelets & cinching tight';
+  if (!await tween(fromDrag ? 260 : 450, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.4) / 0.6);
+    model.silkWhipProgress = 0.55 + 0.35 * t;
+    model.silkVibration = Math.sin(t * Math.PI * 6) * (1 - t) * 0.8;
+    model.light = 1 - t * 0.7;
+    render();
+  }, token)) return;
+
+  // Final Tension Twang Cinch
+  $('#phase').textContent = 'Tension twang: golden silk locked taut';
+  if (!await tween(fromDrag ? 180 : 360, t => {
+    model.silkWhipProgress = 0.9 + 0.1 * t;
+    model.silkVibration = Math.sin(t * Math.PI * 8) * (1 - t);
+    model.blend = 1;
+    model.cap = 1;
+    model.light = (1 - t) * 0.3;
+    render();
+  }, token)) return;
+
+  model.silkVibration = 0;
+  model.silkWhipProgress = 1;
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.light = 0;
+  render();
+  say('Joined. The Weaver\'s golden silk lashes the chitin shells into one unified instrument.');
+}
+
+async function separate(distance = 160) {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Pharloom needle clapper pulled right. Golden silk latch snaps open.');
+  $('#phase').textContent = 'Silk threads snapping & recoiling';
+
+  const startB = { ...model.b };
+  const targetBX = Math.min(1200 - W - 20, startB.x + distance);
+
+  // Quick snap twang
+  await tween(120, t => {
+    model.tension = 1 - t;
+    model.silkVibration = Math.sin(t * Math.PI * 5) * 1.2;
+    renderHardware();
+  }, token);
+
+  await tween(380, t => {
+    model.b.x = startB.x + (targetBX - startB.x) * t;
+    model.blend = 1 - t;
+    model.cap = 1 - t;
+    model.silkWhipProgress = 1 - t;
+    model.silkVibration = Math.sin(t * Math.PI * 6) * (1 - t);
+    model.light = Math.sin(t * Math.PI) * 0.4;
+    render();
+  }, token);
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.light = 0;
+  model.silkVibration = 0;
+  model.silkWhipProgress = 0;
+  render();
+  say('Separated. Independent bleached chitin instruments restored.');
+}
+
+// Preset State Switchers
+async function applyState(stateName) {
+  if (model.busy) return;
+  ++animationToken;
+
+  if (stateName === 'separate') {
+    model.shade = false;
+    if (model.joined) {
+      await separate();
+    } else {
+      model.silkWhipProgress = 0;
+      model.silkVibration = 0;
+      model.cap = 0;
+      model.blend = 0;
+      model.a.x = 140;
+      model.b.x = 680;
+      render();
+      say('State: Separate — Two independent bleached chitin instruments.');
+    }
+  } else if (stateName === 'joining') {
+    model.shade = false;
+    model.joined = false;
+    model.blend = 0.25;
+    model.cap = 0.6;
+    model.silkWhipProgress = 0.55; // threads mid-flight shooting across gap
+    model.silkVibration = 0.4;
+    model.light = 0.8;
+    model.a.x = 240;
+    model.b.x = 240 + W + 50; // approaching each other
+    render();
+    say('State: Joining — Mid-animation view with golden silk threads whipping across the gap.');
+  } else if (stateName === 'joined') {
+    model.shade = false;
+    if (!model.joined) {
+      model.a.x = 220;
+      model.b.x = 220 + JOIN_DISTANCE;
+      model.joined = true;
+      model.blend = 1;
+      model.cap = 1;
+      model.silkWhipProgress = 1;
+      model.silkVibration = 0;
+      model.light = 0;
+      render();
+      say('State: Joined — Monolithic chitin carapace with locked golden silk lash seam.');
+    }
+  } else if (stateName === 'shade') {
+    model.shade = true;
+    render();
+    say('State: Shade — Collapsed to compact bleached chitin horn-crest diadem.');
+  }
+}
+
+// Undercroft & Token Actions
+function toggleUndercroft(open = !model.cradle) {
+  if (drag) cancelDrag();
+  model.cradle = open;
+  if (open && model.a.y > 310) {
+    const dy = model.a.y - 310;
+    model.a.y = 310;
+    if (model.joined) model.b.y -= dy;
+  }
+  render();
+  say(open ? 'Weaver\'s silk undercroft open. Place Checks into its slate bay, or use Insert.' : 'Silk undercroft closed.');
+}
+
+function undercroftTarget() {
+  return {
+    x: model.a.x + 36 + 22,
+    y: model.a.y + (model.shade ? 40 : 121) + 38
+  };
+}
+
+async function insertChecks() {
+  if (model.busy || model.docked) return;
+  if (!model.cradle) toggleUndercroft(true);
+  stopDrag();
+  model.busy = true;
+  model.feel = 'free';
+  model.light = 0;
+  const token = ++animationToken, start = { ...model.meter }, target = undercroftTarget();
+  render();
+
+  const dist = Math.hypot(start.x - target.x, start.y - target.y);
+  if (!await tween(dist < 75 ? 160 : 340, t => {
+    model.meter.x = start.x + (target.x - start.x) * t;
+    model.meter.y = start.y + (target.y - start.y) * t;
+    render();
+  }, token)) return;
+
+  model.docked = true;
+  model.busy = false;
+  $('#tokenBay').classList.remove('hot');
+  render();
+  say('Checks Mask Token nested in silk undercroft. Pull smoothly to free, or use Eject.');
+}
+
+function ejectChecks() {
+  if (model.busy) return;
+  stopDrag();
+  model.feel = 'free';
+  model.docked = false;
+  model.meter.x = Math.min(900, model.a.x + 430);
+  model.meter.y = Math.min(510, model.a.y + 190);
+  render();
+  say('Checks Mask Token released from undercroft.');
+}
+
+function setPage(id, p) { model[id].page = p; render(); }
+
+// Event Wiring
+$('#btnStateSeparate').onclick = () => applyState('separate');
+$('#btnStateJoining').onclick = () => applyState('joining');
+$('#btnStateJoined').onclick = () => applyState('joined');
+$('#btnStateShade').onclick = () => applyState('shade');
+
+$('#btnJoinAnim').onclick = () => join();
+$('#btnSeparateAnim').onclick = () => separate();
+
+$('#btnDesign').onclick = () => {
+  model.design = !model.design;
+  render();
+  say(model.design ? 'Design mode active. Outlines and bay boundaries visible.' : 'Design mode exited.');
+};
+
+$('#btnReset').onclick = () => {
+  if (model.busy) return;
+  stopDrag();
+  ++animationToken;
+  model.joined = false;
+  model.cradle = false;
+  model.docked = false;
+  model.design = false;
+  model.shade = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.silkWhipProgress = 0;
+  model.silkVibration = 0;
+  model.light = 0;
+  model.limit = 3;
+  model.tension = 0;
+  model.feel = 'free';
+  model.a = { x: 140, y: 220, page: 0, running: true };
+  model.b = { x: 680, y: 220, page: 0, running: true };
+  model.meter = { x: 805, y: 510 };
+  render();
+  say('Reset to initial experiment layout.');
+};
+
+$('#optionSelect').onchange = e => {
+  say('Selected option: ' + e.target.options[e.target.selectedIndex].text);
+};
+
+// Dial & Undercroft Controls
+$('#spoolDial').onclick = () => {
+  model.limit = (model.limit % 5) + 1;
+  render();
+  say(`Concurrency set to ${model.limit}.`);
+};
+
+$('#closeUndercroft').onclick = () => toggleUndercroft(false);
+$('#insertToken').onclick = insertChecks;
+$('#ejectToken').onclick = ejectChecks;
+
+// Capsule Interactions
+['a', 'b'].forEach(id => {
+  const el = $('#' + id);
+  el.querySelectorAll('.hollow-tab').forEach(tab => {
+    tab.onclick = () => setPage(id, Number(tab.dataset.page));
+  });
+
+  el.querySelector('.run-btn').onclick = () => {
+    model[id].running = !model[id].running;
+    render();
+    say(`${id === 'a' ? 'Jarvis' : 'GitDiscuss'} ${model[id].running ? 'resumed' : 'paused'}.`);
+  };
+
+  el.querySelector('.next-btn').onclick = () => {
+    setPage(id, (model[id].page + 1) % 3);
+  };
+});
+
+$('#a .loom-btn').onclick = () => toggleUndercroft();
+$('#b .loom-btn').onclick = () => {
+  setPage('b', 1);
+  say('Opened thread view on GitDiscuss.');
+};
+
+// Physics, Glow Calculation & Magnetic Guidance
+function socketDistance(a = model.a, b = model.b) {
+  const targetX = a.x + JOIN_DISTANCE, targetY = a.y;
+  return Math.hypot(b.x - targetX, b.y - targetY);
+}
+
+function bayDistance() {
+  const target = undercroftTarget();
+  return Math.hypot(model.meter.x - target.x, model.meter.y - target.y);
+}
+
+function connectionState(type) {
+  if (type === 'socket') {
+    if (model.joined) return 'docked';
+    const d = socketDistance();
+    if (d <= DOCKING.capture) return 'ready';
+    if (d <= DOCKING.near) return 'near';
+    return 'none';
+  } else {
+    if (model.docked) return 'docked';
+    if (!model.cradle) return 'none';
+    const d = bayDistance();
+    if (d <= DOCKING.capture) return 'ready';
+    if (d <= DOCKING.near) return 'near';
+    return 'none';
+  }
+}
+
+function updateGlowTargets() {
+  const sDist = socketDistance();
+  let sTarget = 0;
+  if (!model.joined && !model.shade) {
+    if (sDist <= DOCKING.capture) sTarget = 1;
+    else if (sDist <= DOCKING.near) sTarget = 0.18 + 0.44 * Math.pow((DOCKING.near - sDist) / (DOCKING.near - DOCKING.capture), 0.8);
+  }
+  connectionGlow.socket.target = sTarget;
+
+  const bDist = bayDistance();
+  let bTarget = 0;
+  if (model.cradle && !model.docked) {
+    if (bDist <= DOCKING.capture) bTarget = 1;
+    else if (bDist <= DOCKING.near) bTarget = 0.18 + 0.44 * Math.pow((DOCKING.near - bDist) / (DOCKING.near - DOCKING.capture), 0.8);
+  }
+  connectionGlow.bay.target = bTarget;
+}
+
+function paintGlowValues() {
+  const sVal = connectionGlow.socket.value;
+  if (!model.busy && !model.shade) model.light = sVal;
+  $('#tokenBay').style.setProperty('--dock-glow', connectionGlow.bay.value.toFixed(3));
+}
+
+function stepGlowAnimation(now) {
+  if (!glowTime) glowTime = now;
+  const dt = Math.min(32, now - glowTime);
+  glowTime = now;
+  let changed = false;
+
+  ['socket', 'bay'].forEach(k => {
+    const g = connectionGlow[k];
+    if (Math.abs(g.value - g.target) > 0.002) {
+      const alpha = 1 - Math.exp(-dt / 40);
+      g.value += (g.target - g.value) * alpha;
+      changed = true;
+    } else if (g.value !== g.target) {
+      g.value = g.target;
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    paintGlowValues();
+    if (!model.busy && (model.silkWhipProgress > 0 || connectionGlow.socket.value > 0.02)) {
+      renderHardware();
+    }
+  }
+  glowFrame = requestAnimationFrame(stepGlowAnimation);
+}
+glowFrame = requestAnimationFrame(stepGlowAnimation);
+
+// Pointer Dragging Engine
+function pointerPoint(e) {
+  const r = stage.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+
+function startDrag(kind, e) {
+  if (model.busy) return;
+  const p = pointerPoint(e);
+  e.preventDefault();
+
+  if (kind === 'a' || kind === 'b') {
+    model.front = kind;
+    drag = {
+      kind,
+      pointerId: e.pointerId,
+      start: p,
+      originA: { ...model.a },
+      originB: { ...model.b },
+      candidatePos: { ...(kind === 'a' ? model.a : model.b) }
+    };
+  } else if (kind === 'meter') {
+    if (model.docked) {
+      drag = {
+        kind: 'meterLatch',
+        pointerId: e.pointerId,
+        start: p,
+        deflect: { x: 0, y: 0 }
+      };
+    } else {
+      drag = {
+        kind: 'meter',
+        pointerId: e.pointerId,
+        start: p,
+        originMeter: { ...model.meter }
+      };
+    }
+  } else if (kind === 'release') {
+    drag = {
+      kind: 'release',
+      pointerId: e.pointerId,
+      start: p,
+      originB: { ...model.b },
+      traveled: 0
+    };
+  }
+
+  window.addEventListener('pointermove', onPointerMove);
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerCancel);
+}
+
+function onPointerMove(e) {
+  if (!drag || e.pointerId !== drag.pointerId) return;
+  const p = pointerPoint(e);
+
+  if (drag.kind === 'a' || drag.kind === 'b') {
+    const dx = p.x - drag.start.x, dy = p.y - drag.start.y;
+    if (model.joined) {
+      const minX = 20, maxX = 1200 - (JOIN_DISTANCE + W) - 20;
+      const minY = 30, maxY = 550;
+      const nx = Math.max(minX, Math.min(maxX, drag.originA.x + dx));
+      const ny = Math.max(minY, Math.min(maxY, drag.originA.y + dy));
+      model.a.x = nx; model.a.y = ny;
+      model.b.x = nx + JOIN_DISTANCE; model.b.y = ny;
+    } else {
+      const activeObj = drag.kind === 'a' ? model.a : model.b;
+      const originObj = drag.kind === 'a' ? drag.originA : drag.originB;
+      const otherObj = drag.kind === 'a' ? model.b : model.a;
+
+      let rawX = originObj.x + dx, rawY = originObj.y + dy;
+      rawX = Math.max(10, Math.min(1200 - W - 10, rawX));
+      rawY = Math.max(20, Math.min(560, rawY));
+
+      const targetX = drag.kind === 'b' ? otherObj.x + JOIN_DISTANCE : otherObj.x - JOIN_DISTANCE;
+      const targetY = otherObj.y;
+      const dist = Math.hypot(rawX - targetX, rawY - targetY);
+
+      if (dist <= DOCKING.near) {
+        const pull = dist <= DOCKING.capture ? 0.88 : (1 - (dist - DOCKING.capture) / (DOCKING.near - DOCKING.capture)) * 0.45;
+        activeObj.x = rawX + (targetX - rawX) * pull;
+        activeObj.y = rawY + (targetY - rawY) * pull;
+      } else {
+        activeObj.x = rawX;
+        activeObj.y = rawY;
+      }
+    }
+    render();
+  } else if (drag.kind === 'meter') {
+    const dx = p.x - drag.start.x, dy = p.y - drag.start.y;
+    let rx = drag.originMeter.x + dx, ry = drag.originMeter.y + dy;
+    rx = Math.max(10, Math.min(1200 - 276 - 10, rx));
+    ry = Math.max(20, Math.min(620, ry));
+
+    if (model.cradle) {
+      const target = undercroftTarget();
+      const dist = Math.hypot(rx - target.x, ry - target.y);
+      if (dist <= DOCKING.near) {
+        const pull = dist <= DOCKING.capture ? 0.92 : (1 - (dist - DOCKING.capture) / (DOCKING.near - DOCKING.capture)) * 0.5;
+        model.meter.x = rx + (target.x - rx) * pull;
+        model.meter.y = ry + (target.y - ry) * pull;
+      } else {
+        model.meter.x = rx; model.meter.y = ry;
+      }
+    } else {
+      model.meter.x = rx; model.meter.y = ry;
+    }
+    render();
+  } else if (drag.kind === 'meterLatch') {
+    const dx = p.x - drag.start.x, dy = p.y - drag.start.y;
+    drag.deflect = { x: dx * 0.35, y: dy * 0.35 };
+    const pullDist = Math.hypot(dx, dy);
+    if (pullDist > 46) {
+      stopDrag();
+      ejectChecks();
+    } else {
+      render();
+    }
+  } else if (drag.kind === 'release') {
+    const dx = Math.max(0, p.x - drag.start.x);
+    drag.traveled = dx;
+    model.tension = Math.min(1, dx / 72);
+    model.b.x = drag.originB.x + dx * 0.45;
+    if (dx > 72) {
+      stopDrag();
+      separate(180);
+    } else {
+      render();
+    }
+  }
+}
+
+function onPointerUp(e) {
+  if (!drag || e.pointerId !== drag.pointerId) return;
+  const currentDrag = drag;
+  stopDrag();
+
+  if (currentDrag.kind === 'a' || currentDrag.kind === 'b') {
+    if (!model.joined && socketDistance() <= DOCKING.capture) {
+      join(true);
+    }
+  } else if (currentDrag.kind === 'meter') {
+    if (model.cradle && bayDistance() <= DOCKING.capture) {
+      insertChecks();
+    }
+  } else if (currentDrag.kind === 'release') {
+    model.tension = 0;
+    model.b.x = currentDrag.originB.x;
+    render();
+  }
+}
+
+function onPointerCancel(e) {
+  if (drag && e.pointerId === drag.pointerId) cancelDrag();
+}
+
+function stopDrag() {
+  if (!drag) return;
+  drag = null;
+  window.removeEventListener('pointermove', onPointerMove);
+  window.removeEventListener('pointerup', onPointerUp);
+  window.removeEventListener('pointercancel', onPointerCancel);
+}
+
+function cancelDrag() {
+  if (!drag) return;
+  if (drag.kind === 'a' || drag.kind === 'b') {
+    model.a = { ...drag.originA };
+    model.b = { ...drag.originB };
+  } else if (drag.kind === 'meter') {
+    model.meter = { ...drag.originMeter };
+  } else if (drag.kind === 'release') {
+    model.tension = 0;
+    model.b = { ...drag.originB };
+  }
+  stopDrag();
+  render();
+  say('Drag cancelled.');
+}
+
+// Bind Drag Grips
+$('#a .hollow-grip').onpointerdown = e => startDrag('a', e);
+$('#b .hollow-grip').onpointerdown = e => startDrag('b', e);
+$('#checksToken .token-grip').onpointerdown = e => startDrag('meter', e);
+$('#silkRelease').onpointerdown = e => startDrag('release', e);
+
+// Keyboard Navigation & Shortcuts
+window.addEventListener('keydown', e => {
+  if (e.target.matches('input, select, textarea')) return;
+  if (e.key === 'Escape') {
+    if (drag) cancelDrag();
+  } else if (e.key === '1') {
+    applyState('separate');
+  } else if (e.key === '2') {
+    applyState('joining');
+  } else if (e.key === '3') {
+    applyState('joined');
+  } else if (e.key === '4') {
+    applyState('shade');
+  } else if (e.key === 'j' || e.key === 'J') {
+    if (!model.joined) join();
+  } else if (e.key === 's' || e.key === 'S') {
+    if (model.joined) separate();
+  } else if (e.key === 'Enter') {
+    if (document.activeElement === $('#silkRelease') && model.joined) {
+      separate();
+    }
+  }
+});
+
+// Initial Render
+render();
+</script>
+</body>
+</html>
