@@ -355,19 +355,19 @@ header {
 /* Shade Mode Strip Display - High-contrast readable carved stone lintel plaque */
 .shade-strip {
   position: absolute;
-  left: 48px;
+  left: 56px;
   top: 7px;
-  width: 284px;
+  width: 250px;
   height: 30px;
   display: none;
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
-  font: 700 11px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font: 700 12px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
   letter-spacing: 0.5px;
   color: var(--parchment);
   z-index: 12;
-  background: #0f1512;
+  background: #0d1210;
   border: 1.5px solid #5a7062;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.95), inset 0 1px 2px rgba(230, 180, 71, 0.35);
   text-shadow: 0 1px 2px #000;
@@ -381,21 +381,26 @@ header {
   display: flex;
 }
 .shade-strip .shade-tag {
-  color: var(--gold-glow);
+  color: var(--parchment);
   display: flex;
   align-items: center;
   gap: 6px;
   font-weight: 700;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .shade-strip .shade-tag em {
   font-style: normal;
-  color: #ffffff;
-  font-weight: 600;
+  color: var(--gold-glow);
+  font-weight: 700;
+  margin-left: 2px;
 }
 .shade-strip .shade-votives {
   display: flex;
   gap: 4px;
+  flex-shrink: 0;
+  margin-left: 6px;
 }
 .shade-votives i {
   display: inline-block;
@@ -729,6 +734,49 @@ header {
   box-shadow: 0 0 4px var(--gold-glow);
 }
 
+/* Solder Seam Center Rosette Release Key */
+.solder-release {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 160ms ease, transform 120ms ease;
+}
+.solder-release[hidden] { display: none; }
+.solder-release::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  border: 1.5px solid #d4ded8;
+  background: radial-gradient(circle at 35% 30%, #ffffff, #8fa2aa 45%, #252d28);
+  box-shadow: 0 0 6px rgba(255, 209, 102, 0.6), 0 2px 5px rgba(0, 0, 0, 0.9);
+}
+.solder-release:hover::before {
+  border-color: #ffd166;
+  box-shadow: 0 0 10px rgba(255, 209, 102, 0.95);
+  transform: scale(1.08);
+}
+.solder-release::after {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff9e6, #ffaa00);
+  box-shadow: 0 0 calc(12px * var(--tension, 0.2)) #ff9e00;
+  opacity: calc(0.3 + 0.7 * var(--tension, 0));
+}
+
 /* Port Overlay for Design Mode */
 #portOverlay { position: absolute; inset: 0; pointer-events: none; }
 .socket-port {
@@ -793,8 +841,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Gothic Basilica <span>/ nave vaulting, keystone &amp; portcullis</span></h1>
-    <p>Monumental chiseled limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis guillotine shade</p>
+    <h1>Gothic Basilica <span>/ nave vaulting, keystone &amp; lead came</span></h1>
+    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -802,6 +850,7 @@ footer .note-highlight {
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="keystone" selected>1. Keystone Drop (Nave Vault Key)</option>
         <option value="portcullis">2. Lancet Portcullis Guillotine shade</option>
+        <option value="leadcame">3. Lead-Came Solder Weld join</option>
       </select>
     </div>
     <div class="control-group">
@@ -919,6 +968,41 @@ footer .note-highlight {
           <stop offset="75%" stop-color="#1c231f"/>
           <stop offset="100%" stop-color="#0e1310"/>
         </linearGradient>
+
+        <!-- Option 3: Lead Came Profile Gradient -->
+        <linearGradient id="leadCameGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#101512"/>
+          <stop offset="25%" stop-color="#3c4740"/>
+          <stop offset="50%" stop-color="#5a6c62"/>
+          <stop offset="75%" stop-color="#3c4740"/>
+          <stop offset="100%" stop-color="#0e1310"/>
+        </linearGradient>
+
+        <!-- Option 3: Molten Liquid Silver Solder Gradient -->
+        <linearGradient id="moltenSolderGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7e9185"/>
+          <stop offset="50%" stop-color="#ffd166"/>
+          <stop offset="85%" stop-color="#ffffff"/>
+          <stop offset="100%" stop-color="#ff9e00"/>
+        </linearGradient>
+
+        <!-- Option 3: Solidified Cooled Lead-Silver Solder Seam Gradient -->
+        <linearGradient id="cooledSolderGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#242d28"/>
+          <stop offset="25%" stop-color="#7e9084"/>
+          <stop offset="50%" stop-color="#dce6e0"/>
+          <stop offset="75%" stop-color="#7e9084"/>
+          <stop offset="100%" stop-color="#1c2420"/>
+        </linearGradient>
+
+        <!-- Option 3: Hot Soldering Iron Incandescent Glow Filter -->
+        <filter id="hotIronGlow" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.5" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
       <!-- Shared arch, keystone and decorative joints -->
@@ -1069,10 +1153,16 @@ footer .note-highlight {
       <button id="ejectCrypt" aria-label="Eject Checks widget" title="Eject from undercroft" hidden>↗</button>
     </section>
 
-    <!-- Keystone Release Bar / Cotter Pin -->
+    <!-- Keystone Release Bar / Cotter Pin (Option 1) -->
     <button id="keystoneRelease" class="keystone-release" data-drag="release"
             aria-label="Release GitDiscuss: pull right or press Enter"
             title="Pull right to lift keystone · Enter to separate" hidden>
+    </button>
+
+    <!-- Solder Seam Center Rosette Release Key (Option 3) -->
+    <button id="solderRelease" class="solder-release" data-drag="release"
+            aria-label="Separate soldered seam: pull right or press Enter"
+            title="Pull right to melt solder seam · Enter to separate" hidden>
     </button>
 
     <!-- Socket Overlay for Design Mode -->
@@ -1084,7 +1174,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Gothic Basilica Architecture · Keystone Join &amp; Portcullis Shade</h3>
+  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade &amp; Lead-Came Solder Weld</h3>
   <p>
     In this aesthetic, modules are carved from dressed ashlar limestone. Pointed lancet arches frame the clerestory displays, supported by fluted colonnettes. When separate, each module's mating end forms one half of a monumental pointed arch (a voussoir springer).
   </p>
@@ -1093,6 +1183,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 2 — Lancet Portcullis Guillotine [Shade]:</span> When collapsing to shade mode, a heavy forged-iron portcullis grille with barbed spike shoes drops vertically from behind the carved stone machicolations with gravity acceleration. The lower display bays slide upward behind the frieze, locking the widget into a fortified 44px architectural lintel. The status text and votive jewels remain cleanly visible and readable through the iron grille bars. Raising the portcullis winches the iron gate smoothly upward back into the clerestory vault.
+  </p>
+  <p>
+    <span class="note-highlight">Option 3 — Lead-Came Solder Weld [Join]:</span> The meeting edges are bordered by authentic dark H-profile lead came channels holding jewel-toned stained glass quarry panes (liturgical ruby and cobalt on Jarvis, emerald and amethyst on GitDiscuss). Upon docking, a bright hot-iron point of light zips down the vertical channel, depositing a glowing molten silver bead that rapidly cools into a satiny pewter-silver soldered seam with three reinforcement rosettes. The stained glass panels unite across the seam into an unbroken narrative clerestory frieze. Pulling the center rosette releases the seam with a brief hot-flux melt glow.
   </p>
 </footer>
 
@@ -1116,7 +1209,8 @@ const model = {
   cap: 0,
   keystoneDrop: 0, // 0 = retracted / aloft, 1 = fully dropped and locked
   portcullisDrop: 0, // 0 = hoisted aloft in clerestory vault, 1 = plunged & spiked shut
-  option: 'keystone', // 'keystone' or 'portcullis'
+  solderProgress: 0, // 0 = cold un-soldered came, 1 = fully soldered with lead came
+  option: 'keystone', // 'keystone', 'portcullis', or 'leadcame'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1331,6 +1425,210 @@ function drawGothicCap(x, y, isRight, retract = 0, isShade = false) {
   `;
 }
 
+// Option 3: Lead-Came & Stained Glass End-Cap (Bordered by dark H-cames holding jewel-toned glass quarries)
+function drawLeadCameEndCap(x, y, isRight, isModuleA, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const scaleX = 1 - retract;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  if (isModuleA && isRight) {
+    // Right mating end of Module A (Jarvis)
+    const base = x + W - 36;
+    return `
+      <g class="lead-came-collar a-collar" transform="translate(${base}, 0)" opacity="${scaleX}">
+        <!-- Dark Ashlar Backing Sinking into Embrasure -->
+        <rect x="0" y="${y + 18}" width="34" height="104" rx="2" fill="#0d1210" stroke="#1c2420" stroke-width="1.2"/>
+        
+        <!-- Stained Glass Quarry Panes (Liturgical Ruby, Sapphire, Amber) -->
+        <!-- 1. Top Quarry: Liturgical Ruby Glass with Leaded Tracery -->
+        <rect x="3" y="${y + 22}" width="22" height="28" rx="1.5" fill="#a80d22" stroke="#121815" stroke-width="1.5"/>
+        <rect x="4" y="${y + 23}" width="20" height="26" fill="url(#stoneBevel)" opacity="0.25"/>
+        <circle cx="14" cy="${y + 36}" r="6.5" fill="#e63946" stroke="#161c19" stroke-width="1.2"/>
+        <path d="M 14 ${y + 30} V ${y + 42} M 8 ${y + 36} H 20" stroke="#161c19" stroke-width="1.2"/>
+        <circle cx="14" cy="${y + 36}" r="2" fill="#ffd166" opacity="0.9" filter="url(#votiveGlow)"/>
+
+        <!-- 2. Middle Quarry: Cathedral Royal Sapphire Cobalt Glass -->
+        <rect x="3" y="${y + 54}" width="22" height="32" rx="1.5" fill="#142c4c" stroke="#121815" stroke-width="1.5"/>
+        <polygon points="14,${y + 57} 22,${y + 70} 14,${y + 83} 6,${y + 70}" fill="#2a6f97" stroke="#121815" stroke-width="1.2"/>
+        <circle cx="14" cy="${y + 70}" r="3" fill="#64dfdf" opacity="0.9" filter="url(#votiveGlow)"/>
+
+        <!-- 3. Bottom Quarry: Sacred Amber Gold Glass -->
+        <rect x="3" y="${y + 90}" width="22" height="28" rx="1.5" fill="#b07d10" stroke="#121815" stroke-width="1.5"/>
+        <polygon points="14,${y + 93} 21,${y + 104} 7,${y + 104}" fill="#f4a261" stroke="#121815" stroke-width="1.2"/>
+        <circle cx="14" cy="${y + 102}" r="2.5" fill="#fff3b0" filter="url(#votiveGlow)"/>
+
+        <!-- Vertical Outer Lead H-Came Border Extrusion -->
+        <rect x="25" y="${y + 18}" width="8" height="104" rx="1" fill="url(#leadCameGrad)" stroke="#0e1310" stroke-width="1.2"/>
+        <line x1="29" y1="${y + 18}" x2="29" y2="${y + 122}" stroke="#141916" stroke-width="2"/>
+        <line x1="0" y1="${y + 52}" x2="26" y2="${y + 52}" stroke="#18201c" stroke-width="2"/>
+        <line x1="0" y1="${y + 88}" x2="26" y2="${y + 88}" stroke="#18201c" stroke-width="2"/>
+
+        <!-- Rosette Solder Anchors along the outer came -->
+        <circle cx="29" cy="${y + 22}" r="3.5" fill="#5a6b62" stroke="#101512" stroke-width="1"/>
+        <circle cx="29" cy="${y + 70}" r="4.5" fill="#5a6b62" stroke="#101512" stroke-width="1.2"/>
+        <circle cx="29" cy="${y + 118}" r="3.5" fill="#5a6b62" stroke="#101512" stroke-width="1"/>
+      </g>
+    `;
+  } else if (!isModuleA && !isRight) {
+    // Left mating end of Module B (GitDiscuss)
+    return `
+      <g class="lead-came-collar b-collar" transform="translate(${x + 2}, 0)" opacity="${scaleX}">
+        <!-- Dark Ashlar Backing Sinking into Embrasure -->
+        <rect x="0" y="${y + 18}" width="34" height="104" rx="2" fill="#0d1210" stroke="#1c2420" stroke-width="1.2"/>
+
+        <!-- Vertical Outer Lead H-Came Border Extrusion -->
+        <rect x="0" y="${y + 18}" width="8" height="104" rx="1" fill="url(#leadCameGrad)" stroke="#0e1310" stroke-width="1.2"/>
+        <line x1="4" y1="${y + 18}" x2="4" y2="${y + 122}" stroke="#141916" stroke-width="2"/>
+        <line x1="7" y1="${y + 52}" x2="34" y2="${y + 52}" stroke="#18201c" stroke-width="2"/>
+        <line x1="7" y1="${y + 88}" x2="34" y2="${y + 88}" stroke="#18201c" stroke-width="2"/>
+
+        <!-- Stained Glass Quarry Panes (Emerald Green, Liturgical Amethyst, Amber) -->
+        <!-- 1. Top Quarry: Celadon / Emerald Green Glass -->
+        <rect x="9" y="${y + 22}" width="22" height="28" rx="1.5" fill="#1b4d3e" stroke="#121815" stroke-width="1.5"/>
+        <circle cx="20" cy="${y + 36}" r="6.5" fill="#2a9d8f" stroke="#161c19" stroke-width="1.2"/>
+        <path d="M 20 ${y + 30} V ${y + 42} M 14 ${y + 36} H 26" stroke="#161c19" stroke-width="1.2"/>
+        <circle cx="20" cy="${y + 36}" r="2" fill="#a7c957" opacity="0.9" filter="url(#votiveGlow)"/>
+
+        <!-- 2. Middle Quarry: Liturgical Amethyst / Violet Glass -->
+        <rect x="9" y="${y + 54}" width="22" height="32" rx="1.5" fill="#3c096c" stroke="#121815" stroke-width="1.5"/>
+        <polygon points="20,${y + 57} 28,${y + 70} 20,${y + 83} 12,${y + 70}" fill="#7b2cbf" stroke="#121815" stroke-width="1.2"/>
+        <circle cx="20" cy="${y + 70}" r="3" fill="#e0aaff" opacity="0.9" filter="url(#votiveGlow)"/>
+
+        <!-- 3. Bottom Quarry: Sacred Amber Gold Glass -->
+        <rect x="9" y="${y + 90}" width="22" height="28" rx="1.5" fill="#b07d10" stroke="#121815" stroke-width="1.5"/>
+        <polygon points="20,${y + 93} 27,${y + 104} 13,${y + 104}" fill="#f4a261" stroke="#121815" stroke-width="1.2"/>
+        <circle cx="20" cy="${y + 102}" r="2.5" fill="#fff3b0" filter="url(#votiveGlow)"/>
+
+        <!-- Rosette Solder Anchors along the outer came -->
+        <circle cx="4" cy="${y + 22}" r="3.5" fill="#5a6b62" stroke="#101512" stroke-width="1"/>
+        <circle cx="4" cy="${y + 70}" r="4.5" fill="#5a6b62" stroke="#101512" stroke-width="1.2"/>
+        <circle cx="4" cy="${y + 118}" r="3.5" fill="#5a6b62" stroke="#101512" stroke-width="1"/>
+      </g>
+    `;
+  }
+  // If outer non-docking end (left of A or right of B), retain the cathedral stone voussoir/buttress
+  return drawGothicCap(x, y, isRight, retract, isShade);
+}
+
+// Option 3: Lead-Came Solder Weld Seam & Stained Glass Clerestory Frieze
+function drawLeadCameWeld(midX, y, solderProgress = 0, isJoined = false, opacity = 1) {
+  let s = `<g class="lead-came-weld-seam" opacity="${opacity}">`;
+
+  // 1. Unified Stained Glass Clerestory Frieze Backing (Ruby, Sapphire, Amber on left; Emerald, Amethyst, Amber on right)
+  s += `
+    <!-- Deep Church Recess Shadow Behind Came Seam -->
+    <rect x="${midX - 32}" y="${y + 18}" width="64" height="104" rx="2" fill="#090d0b" stroke="#161c18" stroke-width="1.5"/>
+    
+    <!-- Left Stained Glass Panels (Jarvis) -->
+    <g class="frieze-left">
+      <rect x="${midX - 30}" y="${y + 21}" width="26" height="28" rx="1.5" fill="#a80d22" stroke="#121815" stroke-width="1.2"/>
+      <circle cx="${midX - 17}" cy="${y + 35}" r="7" fill="#e63946" stroke="#161c19" stroke-width="1"/>
+      <circle cx="${midX - 17}" cy="${y + 35}" r="2" fill="#ffd166" opacity="0.9" filter="url(#votiveGlow)"/>
+
+      <rect x="${midX - 30}" y="${y + 53}" width="26" height="32" rx="1.5" fill="#142c4c" stroke="#121815" stroke-width="1.2"/>
+      <polygon points="${midX - 17},${y + 56} ${midX - 8},${y + 69} ${midX - 17},${y + 82} ${midX - 26},${y + 69}" fill="#2a6f97" stroke="#121815" stroke-width="1"/>
+      <circle cx="${midX - 17}" cy="${y + 69}" r="3" fill="#64dfdf" opacity="0.9" filter="url(#votiveGlow)"/>
+
+      <rect x="${midX - 30}" y="${y + 89}" width="26" height="28" rx="1.5" fill="#b07d10" stroke="#121815" stroke-width="1.2"/>
+      <polygon points="${midX - 17},${y + 92} ${midX - 8},${y + 103} ${midX - 26},${y + 103}" fill="#f4a261" stroke="#121815" stroke-width="1"/>
+    </g>
+
+    <!-- Right Stained Glass Panels (GitDiscuss) -->
+    <g class="frieze-right">
+      <rect x="${midX + 4}" y="${y + 21}" width="26" height="28" rx="1.5" fill="#1b4d3e" stroke="#121815" stroke-width="1.2"/>
+      <circle cx="${midX + 17}" cy="${y + 35}" r="7" fill="#2a9d8f" stroke="#161c19" stroke-width="1"/>
+      <circle cx="${midX + 17}" cy="${y + 35}" r="2" fill="#a7c957" opacity="0.9" filter="url(#votiveGlow)"/>
+
+      <rect x="${midX + 4}" y="${y + 53}" width="26" height="32" rx="1.5" fill="#3c096c" stroke="#121815" stroke-width="1.2"/>
+      <polygon points="${midX + 17},${y + 56} ${midX + 26},${y + 69} ${midX + 17},${y + 82} ${midX + 8},${y + 69}" fill="#7b2cbf" stroke="#121815" stroke-width="1"/>
+      <circle cx="${midX + 17}" cy="${y + 69}" r="3" fill="#e0aaff" opacity="0.9" filter="url(#votiveGlow)"/>
+
+      <rect x="${midX + 4}" y="${y + 89}" width="26" height="28" rx="1.5" fill="#b07d10" stroke="#121815" stroke-width="1.2"/>
+      <polygon points="${midX + 17},${y + 92} ${midX + 26},${y + 103} ${midX + 8},${y + 103}" fill="#f4a261" stroke="#121815" stroke-width="1"/>
+    </g>
+
+    <!-- Stained Glass Colored Caustics / Radiance Through Panes -->
+    <ellipse cx="${midX}" cy="${y + 69}" rx="36" ry="50" fill="#e6b447" opacity="${0.22 * (isJoined ? 1 : solderProgress)}" filter="url(#votiveGlow)"/>
+  `;
+
+  // 2. Dark H-Profile Central Lead Came Channel
+  s += `
+    <rect x="${midX - 4}" y="${y + 18}" width="8" height="104" rx="1" fill="url(#leadCameGrad)" stroke="#0e1310" stroke-width="1.2"/>
+    <line x1="${midX}" y1="${y + 18}" x2="${midX}" y2="${y + 122}" stroke="#101512" stroke-width="2.2"/>
+  `;
+
+  // 3. Solder Flow Animation (when in progress or joined)
+  const currentSolder = isJoined ? 1 : solderProgress;
+  const startY = y + 20;
+  const endY = y + 118;
+  const tipY = startY + (endY - startY) * currentSolder;
+
+  if (currentSolder > 0.02) {
+    if (!isJoined && currentSolder < 0.98) {
+      // Flowing Molten Silver Solder Bead with High-Temperature Liquid Core
+      s += `
+        <!-- Molten liquid silver solder flow path -->
+        <line x1="${midX}" y1="${startY}" x2="${midX}" y2="${tipY}" stroke="url(#moltenSolderGrad)" stroke-width="5" stroke-linecap="round"/>
+        <line x1="${midX}" y1="${startY}" x2="${midX}" y2="${tipY}" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+
+        <!-- Hot Soldering Iron Point of Light / Incandescent Heat Core -->
+        <circle cx="${midX}" cy="${tipY}" r="9" fill="#ff9e00" opacity="0.65" filter="url(#hotIronGlow)"/>
+        <ellipse cx="${midX}" cy="${tipY}" rx="14" ry="7" fill="#ff5400" opacity="0.4" filter="url(#votiveGlow)"/>
+        <circle cx="${midX}" cy="${tipY}" r="4.5" fill="#ffffff" filter="url(#hotIronGlow)"/>
+        <circle cx="${midX}" cy="${tipY}" r="2" fill="#fff9e6"/>
+
+        <!-- Soldering Sparks / Vapor Particles -->
+        <circle cx="${midX - 5}" cy="${tipY - 6}" r="1.5" fill="#ffd166" filter="url(#hotIronGlow)"/>
+        <circle cx="${midX + 6}" cy="${tipY - 4}" r="1.2" fill="#ffffff"/>
+        <circle cx="${midX - 7}" cy="${tipY + 4}" r="1" fill="#ffaa00"/>
+        <circle cx="${midX + 7}" cy="${tipY + 6}" r="1.4" fill="#ffd166"/>
+      `;
+    } else {
+      // Fully Solidified, Cooled Pewter-Silver Solder Seam
+      s += `
+        <!-- Solid lead-silver alloy solder bead -->
+        <line x1="${midX}" y1="${startY}" x2="${midX}" y2="${endY}" stroke="url(#cooledSolderGrad)" stroke-width="5" stroke-linecap="round"/>
+        <line x1="${midX}" y1="${startY + 2}" x2="${midX}" y2="${endY - 2}" stroke="#ffffff" stroke-width="1.2" opacity="0.75" stroke-linecap="round"/>
+        <!-- Fine hand-soldered ripple textures -->
+        <ellipse cx="${midX}" cy="${y + 44}" rx="2.5" ry="1.2" fill="#ffffff" opacity="0.55"/>
+        <ellipse cx="${midX}" cy="${y + 88}" rx="2.5" ry="1.2" fill="#ffffff" opacity="0.55"/>
+      `;
+    }
+
+    // 4. Three Soldered Rosette Reinforcement Nubs (Top, Center, Bottom)
+    // Top Rosette
+    s += `
+      <g transform="translate(${midX}, ${y + 22})">
+        <circle cx="0" cy="0" r="7" fill="#202724" stroke="#0e1310" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="${currentSolder > 0.15 ? 4.5 : 2.5}" fill="${currentSolder > 0.95 ? 'url(#cooledSolderGrad)' : '#ffaa00'}"/>
+        <circle cx="0" cy="0" r="2" fill="#dbe4dc"/>
+      </g>
+    `;
+
+    // Center Rosette (Release Key Anchor)
+    s += `
+      <g transform="translate(${midX}, ${y + 69})">
+        <circle cx="0" cy="0" r="10" fill="#202724" stroke="#0e1310" stroke-width="1.8"/>
+        <circle cx="0" cy="0" r="${currentSolder > 0.5 ? 6.5 : 3.5}" fill="${currentSolder > 0.95 ? 'url(#cooledSolderGrad)' : '#ff9e00'}" filter="${currentSolder < 0.95 ? 'url(#hotIronGlow)' : 'none'}"/>
+        <circle cx="0" cy="0" r="3.2" fill="#ffd166"/>
+        <path d="M-5 0 H5 M0 -5 V5" stroke="#161c18" stroke-width="1.2"/>
+      </g>
+    `;
+
+    // Bottom Rosette
+    s += `
+      <g transform="translate(${midX}, ${y + 116})">
+        <circle cx="0" cy="0" r="7" fill="#202724" stroke="#0e1310" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="${currentSolder > 0.85 ? 4.5 : 2.5}" fill="${currentSolder > 0.95 ? 'url(#cooledSolderGrad)' : '#ffaa00'}"/>
+        <circle cx="0" cy="0" r="2" fill="#dbe4dc"/>
+      </g>
+    `;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Stained-Glass Votive Light for Proximity & Capture Feedback
 function drawGothicSocketLight(x, y, amount) {
   if (!amount) return '';
@@ -1475,21 +1773,32 @@ function renderHardware() {
     // Continuous Monolithic Cathedral Facade
     shared += drawGothicCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
     if (!isShade) {
-      // United nave pointed arch ribbing at the seam
-      shared += `<g opacity="${p}">
-        <path d="M${midX-40} ${a.y+123} Q${midX} ${a.y+26} ${midX+40} ${a.y+123}"
-              fill="none" stroke="url(#archRib)" stroke-width="4"/>
-        <path d="M${midX-36} ${a.y+123} Q${midX} ${a.y+32} ${midX+36} ${a.y+123}"
-              fill="none" stroke="#18201c" stroke-width="1.5"/>
-      </g>`;
+      if (model.option === 'leadcame') {
+        // Option 3: Lead-came soldered seam with continuous stained glass clerestory frieze
+        shared += drawLeadCameWeld(midX, a.y, model.joined ? 1 : model.solderProgress, model.joined, p);
+      } else {
+        // Option 1 & 2: United nave pointed arch ribbing at the seam
+        shared += `<g opacity="${p}">
+          <path d="M${midX-40} ${a.y+123} Q${midX} ${a.y+26} ${midX+40} ${a.y+123}"
+                fill="none" stroke="url(#archRib)" stroke-width="4"/>
+          <path d="M${midX-36} ${a.y+123} Q${midX} ${a.y+32} ${midX+36} ${a.y+123}"
+                fill="none" stroke="#18201c" stroke-width="1.5"/>
+        </g>`;
+      }
     }
   }
 
   // Draw Keystone for Option 1
-  if (!isShade && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
+  if (!isShade && model.option !== 'leadcame' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
     const drop = model.joined ? 1 : model.keystoneDrop || Math.max(0, (glow - 0.3) / 0.7 * 0.7);
     const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 18 + b.x + 18) / 2;
     shared += drawKeystone(kMidX, a.y, drop, Math.max(p, glow > 0.3 ? 0.9 : drop));
+  }
+
+  // Draw Lead Came Solder Weld for Option 3 during approach or joining state
+  if (!isShade && model.option === 'leadcame' && !model.joined && (model.solderProgress > 0.02 || glow > 0.25)) {
+    const sp = model.solderProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.5);
+    shared += drawLeadCameWeld(midX, a.y, sp, false, Math.max(0.85, glow));
   }
 
   if (model.joined && model.design) {
@@ -1502,9 +1811,15 @@ function renderHardware() {
   // Individual capsules
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
-    const individual = drawGothicCasing(0, 0, W, 1, isShade) +
-      drawGothicCap(0, 0, false, isA ? 0 : model.cap, isShade) +
-      drawGothicCap(0, 0, true, isA ? model.cap : 0, isShade);
+    let capL, capR;
+    if (model.option === 'leadcame') {
+      capL = drawLeadCameEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
+      capR = drawLeadCameEndCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+    } else {
+      capL = drawGothicCap(0, 0, false, isA ? 0 : model.cap, isShade);
+      capR = drawGothicCap(0, 0, true, isA ? model.cap : 0, isShade);
+    }
+    const individual = drawGothicCasing(0, 0, W, 1, isShade) + capL + capR;
 
     $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawGothicSocketLight(isA ? W - 22 : 22, 0, glow)}</g>`;
   }
@@ -1533,7 +1848,7 @@ function renderHardware() {
 function updateStateButtons() {
   const isShade = model.shade;
   const isJoined = model.joined;
-  const isJoining = model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95 && !isJoined && !isShade;
+  const isJoining = ((model.option === 'leadcame' ? model.solderProgress > 0.05 && model.solderProgress < 0.95 : model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95)) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -1619,6 +1934,17 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
+  if (model.option === 'leadcame') {
+    $('#btnJoinAnim').textContent = model.joined ? 'Seam soldered' : 'Solder lead seam';
+    $('#btnSeparateAnim').textContent = 'Melt & separate';
+  } else if (model.option === 'portcullis') {
+    $('#btnJoinAnim').textContent = model.joined ? 'Joined' : 'Join capsules';
+    $('#btnSeparateAnim').textContent = 'Separate';
+  } else {
+    $('#btnJoinAnim').textContent = model.joined ? 'Vault locked' : 'Drop keystone join';
+    $('#btnSeparateAnim').textContent = 'Lift keystone';
+  }
+
   const portBtn = $('#btnPortcullisAnim');
   if (portBtn) {
     portBtn.textContent = model.shade ? 'Lift portcullis' : 'Drop portcullis';
@@ -1632,16 +1958,32 @@ function render() {
   $('#concurrencyDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
 
   const release = $('#keystoneRelease');
-  release.hidden = !model.joined || model.busy || model.shade;
-  release.style.left = (model.a.x + 338) + 'px';
-  release.style.top = (model.a.y + 44) + 'px';
-  release.style.setProperty('--tension', model.tension);
+  const solderRel = $('#solderRelease');
+  if (model.option === 'leadcame') {
+    release.hidden = true;
+    solderRel.hidden = !model.joined || model.busy || model.shade;
+    solderRel.style.left = (model.a.x + JOIN_DISTANCE - 14) + 'px';
+    solderRel.style.top = (model.a.y + 55) + 'px';
+    solderRel.style.setProperty('--tension', model.tension);
+  } else {
+    solderRel.hidden = true;
+    release.hidden = !model.joined || model.busy || model.shade;
+    release.style.left = (model.a.x + 338) + 'px';
+    release.style.top = (model.a.y + 44) + 'px';
+    release.style.setProperty('--tension', model.tension);
+  }
 
   if (!model.busy) {
     if (model.shade) {
       $('#phase').textContent = 'Shade mode / Portcullis guillotine locked';
     } else if (model.joined) {
-      $('#phase').textContent = 'Joined / One monolithic basilica';
+      if (model.option === 'leadcame') {
+        $('#phase').textContent = 'Joined / Lead-came soldered frieze';
+      } else {
+        $('#phase').textContent = 'Joined / One monolithic basilica';
+      }
+    } else if (model.option === 'leadcame' && model.solderProgress > 0.05) {
+      $('#phase').textContent = 'Joining / Molten silver solder flowing';
     } else if (model.keystoneDrop > 0.1) {
       $('#phase').textContent = 'Joining / Keystone poised in descent';
     } else {
@@ -1821,6 +2163,108 @@ async function liftPortcullis() {
   $('#phase').textContent = model.joined ? 'Joined / One monolithic basilica' : 'Separate / Two stone housings';
 }
 
+// Option 3: Lead-Came Solder Weld Animations
+async function solderWeld(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Cathedral lead cames align. Preparing soldering iron and molten silver alloy.');
+  $('#phase').textContent = 'Heating lead came channel';
+
+  // 1. Pre-heating flux light
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 80 : 200, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  // 2. Retract end caps as modules close flush
+  $('#phase').textContent = 'Aligning stained glass borders';
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.undercroft ? 305 : 385, model.a.y));
+
+  if (!await tween(fromDrag ? 240 : 440, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.cap = t;
+    render();
+  }, token)) return;
+
+  // 3. Hot Soldering Iron zips down the vertical seam from top to bottom
+  $('#phase').textContent = 'Molten silver solder flowing down seam';
+  say('Hot soldering point zips down the lead came channel, depositing a molten silver bead.');
+  if (!await tween(fromDrag ? 300 : 520, t => {
+    model.solderProgress = t;
+    renderHardware();
+  }, token)) return;
+
+  // 4. Solder cools and solidifies into satiny pewter-silver
+  $('#phase').textContent = 'Solder cooling into pewter came seam';
+  if (!await tween(180, t => {
+    model.light = 1 - t;
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.solderProgress = 1;
+  model.light = 0;
+  render();
+  say('Lead-came seam soldered. Stained glass frieze united. Pull the center rosette right to melt & separate.');
+}
+
+async function meltSeparate() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Hot soldering iron applied to center rosette. Melting solder seam to separate capsules.');
+
+  // Center rosette heats up with molten glow
+  $('#phase').textContent = 'Melting solder seam';
+  if (!await tween(220, t => {
+    model.light = t;
+    model.solderProgress = 1 - t * 0.4;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Separating lead came borders';
+  if (!await tween(520, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.6);
+    model.cap = 1 - Math.max(0, (t - 0.4) / 0.6);
+    model.solderProgress = Math.max(0, 0.6 * (1 - t * 2));
+    model.light = 1 - t;
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.solderProgress = 0;
+  model.light = 0;
+  render();
+  say('Separated. Independent cathedral housings with stained glass lead cames restored.');
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -1831,9 +2275,11 @@ async function applyState(stateName) {
       await liftPortcullis();
     }
     if (model.joined) {
-      await separate();
+      if (model.option === 'leadcame') await meltSeparate();
+      else await separate();
     } else {
       model.keystoneDrop = 0;
+      model.solderProgress = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -1846,14 +2292,22 @@ async function applyState(stateName) {
       await liftPortcullis();
     }
     model.joined = false;
-    model.blend = 0.25;
+    model.blend = 0.35;
     model.cap = 0.5;
-    model.keystoneDrop = 0.52; // mid-flight aloft
-    model.light = 0.75;
+    model.light = 0.8;
     model.a.x = 240;
-    model.b.x = 240 + W + 50; // near each other
-    render();
-    say('State: Joining — Mid-animation view with keystone descending into the arch apex.');
+    model.b.x = 240 + W + 44; // near each other
+    if (model.option === 'leadcame') {
+      model.solderProgress = 0.52; // mid-flight solder flow down came channel
+      model.keystoneDrop = 0;
+      render();
+      say('State: Joining — Mid-animation view with molten silver solder flowing down the lead came channel.');
+    } else {
+      model.keystoneDrop = 0.52; // mid-flight aloft
+      model.solderProgress = 0;
+      render();
+      say('State: Joining — Mid-animation view with keystone descending into the arch apex.');
+    }
   } else if (stateName === 'joined') {
     if (model.shade) {
       await liftPortcullis();
@@ -1864,10 +2318,18 @@ async function applyState(stateName) {
       model.joined = true;
       model.blend = 1;
       model.cap = 1;
-      model.keystoneDrop = 1;
       model.light = 0;
-      render();
-      say('State: Joined — Monolithic basilican arch locked by granite keystone.');
+      if (model.option === 'leadcame') {
+        model.solderProgress = 1;
+        model.keystoneDrop = 0;
+        render();
+        say('State: Joined — Seamless lead-came solder seam with stained glass frieze.');
+      } else {
+        model.keystoneDrop = 1;
+        model.solderProgress = 0;
+        render();
+        say('State: Joined — Monolithic basilican arch locked by granite keystone.');
+      }
     }
   } else if (stateName === 'shade') {
     if (!model.shade) {
@@ -1933,8 +2395,14 @@ $('#btnStateSeparate').onclick = () => applyState('separate');
 $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
-$('#btnJoinAnim').onclick = () => join();
-$('#btnSeparateAnim').onclick = () => separate();
+$('#btnJoinAnim').onclick = () => {
+  if (model.option === 'leadcame') solderWeld();
+  else join();
+};
+$('#btnSeparateAnim').onclick = () => {
+  if (model.option === 'leadcame') meltSeparate();
+  else separate();
+};
 $('#btnPortcullisAnim').onclick = () => {
   if (model.shade) liftPortcullis();
   else dropPortcullis();
@@ -1946,8 +2414,13 @@ $('#optionSelect').onchange = async e => {
     if (!model.shade) {
       await dropPortcullis();
     }
+  } else if (model.option === 'leadcame') {
+    say('Option 3: Lead-Came Solder Weld join selected. Dark lead came channel & stained glass quarries.');
+    if (model.shade) {
+      await liftPortcullis();
+    }
   } else if (model.option === 'keystone') {
-    say('Option 1: Keystone Drop join selected.');
+    say('Option 1: Keystone Drop join selected. Ashlar voussoirs & granite key.');
     if (model.shade) {
       await liftPortcullis();
     }
@@ -1965,7 +2438,7 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, undercroft: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   $('#optionSelect').value = 'keystone';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
@@ -2009,12 +2482,12 @@ function snapshot() {
   return {
     a: { ...model.a }, b: { ...model.b }, meter: { ...model.meter },
     joined: model.joined, docked: model.docked, cap: model.cap, blend: model.blend,
-    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, option: model.option, front: model.front
+    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, option: model.option, front: model.front
   };
 }
 function restore(s) {
   for (const id of ['a', 'b', 'meter']) Object.assign(model[id], s[id]);
-  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'option', 'front']) model[k] = s[k];
+  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'option', 'front']) model[k] = s[k];
 }
 function cancelDrag() {
   if (!drag) return;
@@ -2090,9 +2563,14 @@ function magneticGoal(raw, target, id) {
   model.light = id === 'meter' ? 0 : p.brightness;
 
   if (id !== 'meter' && p.brightness > 0) {
-    model.keystoneDrop = p.brightness * 0.7; // keystone hovers downward as you approach!
+    if (model.option === 'leadcame') {
+      model.solderProgress = p.brightness * 0.45;
+    } else {
+      model.keystoneDrop = p.brightness * 0.7; // keystone hovers downward as you approach!
+    }
   } else if (!model.joined) {
     model.keystoneDrop = 0;
+    model.solderProgress = 0;
   }
 
   return target ? { x: raw.x + (target.x - raw.x) * strength, y: raw.y + (target.y - raw.y) * strength } : raw;
@@ -2147,14 +2625,23 @@ stage.addEventListener('pointermove', e => {
   if (Math.abs(dx) + Math.abs(dy) > 3) d.moved = true;
 
   if (d.kind === 'shellLatch') {
-    model.tension = clamp(dx / 72, 0, 1);
-    model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
-    model.keystoneDrop = 1 - model.tension * 0.6; // keystone begins lifting!
-    if (dx < 72) { render(); return; }
-    model.joined = false; model.blend = 0; model.cap = 1; model.tension = 0; model.keystoneDrop = 0;
-    d.kind = 'move';
-    d.origin.x = d.saved.a.x + W + 14;
-    say('Keystone released! Modules separated.');
+    if (model.option === 'leadcame') {
+      model.tension = clamp(dx / 60, 0, 1);
+      model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
+      model.solderProgress = 1 - model.tension * 0.5;
+      if (dx < 60) { render(); return; }
+      meltSeparate();
+      return;
+    } else {
+      model.tension = clamp(dx / 72, 0, 1);
+      model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
+      model.keystoneDrop = 1 - model.tension * 0.6; // keystone begins lifting!
+      if (dx < 72) { render(); return; }
+      model.joined = false; model.blend = 0; model.cap = 1; model.tension = 0; model.keystoneDrop = 0;
+      d.kind = 'move';
+      d.origin.x = d.saved.a.x + W + 14;
+      say('Keystone released! Modules separated.');
+    }
   }
 
   if (d.kind === 'meterLatch') {
@@ -2202,6 +2689,7 @@ stage.addEventListener('pointerup', () => {
   $('#cryptBay').classList.remove('hot');
   if (ready) {
     if (d.id === 'meter') insertChecks();
+    else if (model.option === 'leadcame') solderWeld(true);
     else join(true);
     return;
   }
@@ -2211,13 +2699,45 @@ stage.addEventListener('pointerup', () => {
     model.cap = 0;
     model.blend = 0;
     model.keystoneDrop = 0;
+    model.solderProgress = 0;
   }
   render();
 });
 
 stage.addEventListener('pointercancel', cancelDrag);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') cancelDrag(); });
 $('#keystoneRelease').onclick = e => { if (e.detail === 0) separate(); };
+$('#solderRelease').onclick = e => { if (e.detail === 0) meltSeparate(); };
+
+window.addEventListener('keydown', e => {
+  if (e.target.matches('input, select, textarea')) return;
+  if (e.key === 'Escape') {
+    if (drag) cancelDrag();
+  } else if (e.key === '1') {
+    applyState('separate');
+  } else if (e.key === '2') {
+    applyState('joining');
+  } else if (e.key === '3') {
+    applyState('joined');
+  } else if (e.key === '4') {
+    applyState('shade');
+  } else if (e.key === 'j' || e.key === 'J') {
+    if (!model.joined) {
+      if (model.option === 'leadcame') solderWeld();
+      else join();
+    }
+  } else if (e.key === 's' || e.key === 'S') {
+    if (model.joined) {
+      if (model.option === 'leadcame') meltSeparate();
+      else separate();
+    }
+  } else if (e.key === 'p' || e.key === 'P') {
+    if (model.shade) liftPortcullis();
+    else dropPortcullis();
+  } else if (e.key === 'Enter') {
+    if (document.activeElement === $('#keystoneRelease') && model.joined) separate();
+    else if (document.activeElement === $('#solderRelease') && model.joined) meltSeparate();
+  }
+});
 
 function fit() {
   const availableWidth = window.innerWidth;
