@@ -86,7 +86,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .cseam i{font:normal 6px/1 Georgia,serif;color:#9c2028}
 .cseam span{font:italic 11px/1 Georgia,serif;color:#3a2c1e}
 .cseam em{font-style:normal;font-weight:700;color:#8f1c22;margin-right:3px}
-.hit{pointer-events:all;cursor:crosshair}
+.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
@@ -109,7 +109,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="slitAmber" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f2c56e"/><stop offset=".3" stop-color="#fff3d6"/><stop offset=".7" stop-color="#fbe6b6"/><stop offset="1" stop-color="#e2a54c"/></linearGradient>
  <linearGradient id="slitCold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a9c0dc"/><stop offset=".3" stop-color="#f1f5fa"/><stop offset=".7" stop-color="#dfe8f2"/><stop offset="1" stop-color="#8ea8c8"/></linearGradient>
  <linearGradient id="slitTeal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8fd9c7"/><stop offset=".3" stop-color="#effcf7"/><stop offset=".7" stop-color="#d6f3ea"/><stop offset="1" stop-color="#6dc2ae"/></linearGradient>
- <filter id="blur3" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
+ <linearGradient id="bellG" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#4f3712"/><stop offset=".22" stop-color="#c99b4a"/><stop offset=".34" stop-color="#fff0c2"/><stop offset=".46" stop-color="#d9ab55"/><stop offset=".8" stop-color="#6e4c1a"/><stop offset="1" stop-color="#3a280c"/></linearGradient>
+ <filter id="blur3"x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
 </defs></svg>
 <header><div><h1>Hollow mood <span>/ Claude skin study</span></h1><p>Dark carapace shells with brush-ink outlines, scalloped belly plates, wrought-iron scrolls with small lanterns, and parchment map sheets pinned on as displays. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -244,6 +245,18 @@ const rows=h=>[.25,.5,.75].map(k=>h*k);
 const JOINS={
  silk:{label:'Silk stitch',kind:'Bind',gap:24,
   about:'Each joining end is an iron strap with three brass eyelets. <b>Near:</b> the eyelets catch the light. <b>Ready:</b> a pale needle appears, poised over the gap, and a ghost of the lacing shows where the thread will go. Joining: the shells close to a hand-width apart and the needle darts through the eyelets in two quick passes, down and back up, pausing for a beat at each one, trailing red thread. The thread hangs slack until the last pass, then pulls taut with a small bounce and is knotted off. The seam is an open lacing of two red crosses with the fog showing through. <b>Release:</b> slash across the threads (a quick drag through the seam): they part with a white flash and the cut ends recoil to their eyelets before the shells drift apart. Click the seam, or focus it and press Enter, to do the same.',
+  text:{join:'The shells close, and the needle darts through the eyelets trailing red thread.',joined:'Joined: laced with red silk. Drag either nameplate to move the pair. Slash across the threads to release.',
+   release:'Cut: the threads part with a flash and spring back to their eyelets.',back:'The needle backs out and the thread unpicks.',hold:'Held mid-join: the needle on its second pass. Use the scrubber to step through the animation.',
+   ready:'Ready: the needle is poised over the gap. Release to stitch.',near:'Nearby: the eyelets catch the light. Move closer.',phReady:'Ready · the needle is poised',phNear:'Nearby · the eyelets catch the light',phDrag:'Slash across the threads'},
+  holdAt:.6,
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.3?'Joining · closing in ':jt<.59?'Joining · the needle, first pass ':jt<.86?'Joining · second pass ':'Joining · pulling taut '):(r<.3?'Releasing · threads cut ':r<.45?'Releasing · ends recoil ':'Releasing · parting ')},
+  releaseStart(){if(!model.cut)model.cut=autoCut()},
+  key(){$('#a .grip').focus();model.cut=autoCut();doSeparate()},
+  seamDown(p){return{seam:true,slash:true,p0:p,pts:[p],len:0}},
+  seamMove(d,p){const l=d.pts[d.pts.length-1];d.len+=Math.hypot(p.x-l.x,p.y-l.y);d.pts.push(p);if(d.pts.length>9)d.pts.shift();
+   if(d.len>=34){drag=null;$('#a .grip').focus();model.cut=Math.hypot(p.x-d.p0.x,p.y-d.p0.y)>8?{x1:d.p0.x,y1:d.p0.y,x2:p.x,y2:p.y}:autoCut();doSeparate();return}
+   render()},
+  seamUp(d){if(d.len<5){$('#a .grip').focus();model.cut=autoCut();doSeparate()}else{render();say('Too short to cut. Slash right through the threads.')}},
   over(c){
    const h=c.h,ay=model.a.y,by=model.b.y,ys=rows(h);
    const A=ys.map(y=>({x:model.a.x+W-9.5,y:ay+y})),B=ys.map(y=>({x:model.b.x+9.5,y:by+y}));
@@ -279,6 +292,66 @@ const JOINS={
     s+=needle(tip,ang,u<.7?Math.sin(Math.PI*u/.7):0,i===7?1-seg(u,.5,1):1);
    }
    if(reached.length===7)s+=knot(A[0],done?seg(jt,.86,.95):0);
+   return s;
+  }
+ },
+ bell:{label:'Bell and chain',kind:'Clasp',gap:46,holdAt:.48,msOut:1800,
+  about:'Jarvis carries a short iron chain with a small brass bell, stowed in a loop against its eyelet strap: one end ringed through the top eyelet, the hook resting in the middle one. <b>Near:</b> the eyelets catch the light and the bell stirs on its chain as you move. <b>Ready:</b> the far top eyelet is ringed in gold and a dotted ghost of the span shows where the chain will hang. Joining: the shells close to a bell\'s width apart, the hook lifts out and the chain swings across in one quick arc, the bell trailing. The hook catches the far eyelet with a spark, the chain drops into a sag with a small bounce, and the bell rings: three swings, the clapper striking, and three rings pulse out once and fade. The seam is open, fog showing through, with the bell hanging in it as the join light, warm and still. <b>Release:</b> tap the bell twice (the first tap rings it, the second unhooks), or pull the chain down. The bell peals, the hook lifts out, the chain swings home to its loop and the shells drift apart. Enter on the focused bell works like a tap.',
+  text:{join:'The shells close; the chain swings across, hooks the far eyelet and the bell rings.',joined:'Joined: a brass bell hangs on a short chain between the shells. Tap the bell twice, or pull the chain down, to release.',
+   release:'Unhooked: the bell peals, the hook lifts out of the eyelet and the chain swings home.',back:'The chain swings back to its own shell.',hold:'Held mid-join: the chain in mid-swing. Use the scrubber to step through the animation.',
+   ready:'Ready: the hook is lined up with the far eyelet. Release to clasp.',near:'Nearby: the bell stirs on its chain. Move closer.',phReady:'Ready · the hook is lined up',phNear:'Nearby · the bell stirs',phDrag:'Pull the chain down to unhook'},
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.34?'Joining · closing in ':jt<.6?'Joining · the chain swings across ':jt<.72?'Joining · hooked ':'Joining · the bell rings '):(r<.22?'Releasing · the bell peals ':r<.47?'Releasing · the chain swings home ':'Releasing · parting ')},
+  releaseStart(){model.armed=0},
+  // First tap rings the bell; a second within a moment unhooks the chain.
+  tap(){const now=performance.now();if(model.armed&&now<model.armed){model.armed=0;$('#a .grip').focus();doSeparate();return}
+   model.armed=now+1400;ringBell();say('The bell rings. Tap it again to unhook the chain.')},
+  key(){this.tap()},
+  seamDown(p){return{seam:true,p0:p,pull:0,moved:0}},
+  seamMove(d,p){const dy=p.y-d.p0.y;d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,dy));d.pull=clamp(dy,0,30);
+   if(dy>26){drag=null;$('#a .grip').focus();doSeparate();return}render()},
+  seamUp(d){if(d.moved<6)this.tap();else{render();if(d.pull>2)say('The chain springs back. Pull further down to unhook it, or tap the bell twice.')}},
+  over(c){
+   const h=c.h,ys=rows(h),A=ys.map(y=>({x:model.a.x+W-9.5,y:model.a.y+y})),B=ys.map(y=>({x:model.b.x+9.5,y:model.b.y+y}));
+   const jt=c.jt,S=A[0],H0=A[1],now=performance.now();
+   // Stowed: a loop from the top eyelet to the middle one. Joined: a sag of 15 across the gap.
+   const stow={x:S.x+30,y:(S.y+H0.y)/2+20},span=(pull=0)=>({x:(S.x+B[0].x)/2,y:(S.y+B[0].y)/2+30+pull*1.6});
+   let E=H0,Q=stow,ang=0,clap=0,hooked=false,lit=false,rings=[],s='',after='';
+   if(jt===0){const g=c.glow;
+    if(g>0){s+=glints([S,H0,B[0]],g);if(drag&&!drag.seam){ang=Math.sin(now/38)*6*g;clap=Math.sin(now/38-1)*2.4*g}}
+    if(g>=1){const sp=span();s+=`<path d="M${P(S)}Q${P(sp)} ${P(B[0])}" fill="none" stroke="#e9edf1" stroke-width="1.6" stroke-dasharray="2.5 4" stroke-linecap="round" opacity=".55"/><circle cx="${f(B[0].x)}" cy="${f(B[0].y)}" r="6.6" fill="none" stroke="#ffe7a8" stroke-width="1.2" stroke-dasharray="2 2"/>`}
+   }else if(jt===1){hooked=lit=true;E=B[0];Q=span(drag&&drag.seam?drag.pull:0);
+    const pe=model.peal?(now-model.peal)/1000:1;
+    if(pe<1){ang=18*Math.sin(4*Math.PI*pe)*(1-pe);clap=-4*Math.sin(4*Math.PI*pe-.7)*(1-pe);rings=[.125,.375].map(e=>seg(pe,e,e+.45))}
+   }else if(model.dir>0){
+    if(jt<.34)s+=glints([S,H0,B[0]],1-seg(jt,0,.3));
+    else if(jt<.6){const u=seg(jt,.34,.6),d=dart(u),sp=span();
+     E={x:lerp(H0.x,B[0].x,d),y:lerp(H0.y,B[0].y,d)-34*Math.sin(Math.PI*d)};Q={x:lerp(stow.x,sp.x,d),y:lerp(stow.y,Math.max(S.y,E.y)+22,d)};
+     ang=26*Math.sin(Math.PI*u);clap=-3*Math.sin(Math.PI*u)}
+    else{hooked=true;E=B[0];const sp=span(),v=seg(jt,.6,.72);Q={x:sp.x,y:lerp(Math.max(S.y,B[0].y)+22,sp.y,backOut(v))};
+     if(jt<.72){ang=-12*Math.sin(Math.PI*v);after+=spark(B[0],1-v,5+7*v)}
+     else{const v2=seg(jt,.72,1);lit=true;ang=22*Math.sin(6*Math.PI*v2)*Math.pow(1-v2,1.3);clap=-4.5*Math.sin(6*Math.PI*v2-.7)*(1-v2);rings=[.083,.25,.417].map(e=>seg(v2,e,e+.4))}}
+   }else{const r=1-jt,sp=span();rings=[.02,.09].map(e=>seg(r,e,e+.18));
+    if(r<.22){hooked=true;E=B[0];Q=sp;const w=seg(r,0,.22);ang=20*Math.sin(4*Math.PI*w)*(1-w*.6);clap=-4*Math.sin(4*Math.PI*w-.7)}
+    else if(r<.47){const u=seg(r,.22,.47),lift=seg(u,0,.2),d=dart(seg(u,.2,1)),up={x:B[0].x,y:B[0].y-7*lift};
+     E={x:lerp(up.x,H0.x,d),y:lerp(up.y,H0.y,d)-30*Math.sin(Math.PI*d)};Q={x:lerp(sp.x,stow.x,d),y:lerp(sp.y,stow.y,d)};ang=-24*Math.sin(Math.PI*d);
+     if(lift<1)after+=spark(B[0],1-lift,4+5*lift)}
+    else ang=7*Math.sin(Math.PI*seg(r,.47,.62));
+   }
+   // The chain: alternating face-on and edge-on links along the curve, ringed through the eyelets.
+   const pt=t=>({x:(1-t)*(1-t)*S.x+2*t*(1-t)*Q.x+t*t*E.x,y:(1-t)*(1-t)*S.y+2*t*(1-t)*Q.y+t*t*E.y});
+   const tg=t=>f(Math.atan2(2*(1-t)*(Q.y-S.y)+2*t*(E.y-Q.y),2*(1-t)*(Q.x-S.x)+2*t*(E.x-Q.x))*180/Math.PI);
+   let ch='';for(let k=0;k<12;k++){const t=(k+.5)/12;
+    ch+=`<g transform="translate(${P(pt(t))}) rotate(${tg(t)})">`+(k%2?`<path d="M-3.4 0H3.4" stroke="${INK}" stroke-width="2.8"/><path d="M-3 0H3" stroke="#8593a6" stroke-width="1"/>`:`<ellipse rx="4.3" ry="2.4" stroke="${INK}" stroke-width="2.4"/><ellipse rx="4.3" ry="2.4" stroke="#6f7c90" stroke-width=".9"/>`)+'</g>'}
+   const ring=p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="3.6" stroke="${INK}" stroke-width="2.4"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="3.6" stroke="#9aa6b6" stroke-width=".9"/>`;
+   const end=hooked||E===H0?ring(E):`<g transform="translate(${P(E)}) rotate(${tg(1)})"><path d="M-2 0H1.5Q5.2 0 5.2 3.5T1.4 7" stroke="${INK}" stroke-width="2.6"/><path d="M-2 0H1.5Q5.2 0 5.2 3.5T1.4 7" stroke="#9aa6b6" stroke-width="1"/></g>`;
+   s+=`<g fill="none" stroke-linecap="round">${ch}${ring(S)}${end}</g>`;
+   const pv=pt(.5),ra=ang*Math.PI/180,mouth={x:pv.x-Math.sin(ra)*13,y:pv.y+Math.cos(ra)*13};
+   s+=drawBell(pv,ang,clap,lit);
+   for(const k of rings)if(k>0&&k<1){const R=10+46*ease(k);
+    s+=`<circle cx="${f(mouth.x)}" cy="${f(mouth.y)}" r="${f(R)}" fill="none" stroke="#f3e2b0" stroke-width="${f(.4+2.2*(1-k))}" opacity="${f(.8*(1-k))}"/><circle cx="${f(mouth.x)}" cy="${f(mouth.y)}" r="${f(R*.8)}" fill="none" stroke="#fff" stroke-width=".7" opacity="${f(.35*(1-k))}"/>`}
+   s+=after;
+   if(jt===1){const x0=S.x-8,y0=Math.min(S.y,B[0].y)-10,wd=B[0].x-S.x+16,ht=pv.y+36-y0;
+    s+=`<g class="hit bellhit" id="seamHit" tabindex="0" role="button" aria-label="Bell and chain: tap the bell twice, or pull the chain down, to separate the widgets. Enter rings it."><title>Tap the bell twice, or pull the chain down, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" rx="6" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
    return s;
   }
  }
@@ -351,6 +424,15 @@ function needle(tip,ang,streak,op){
 function glints(pts,g){return pts.map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(4+6*g)}" fill="url(#eyeGlow)" opacity="${f(g)}"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="4.4" fill="none" stroke="#ffe7a8" stroke-width="1" opacity="${f(g*.8)}"/>`).join('')}
 function spark(p,a,r){return `<path d="M${f(p.x)} ${f(p.y-r)}L${f(p.x+r*.14)} ${f(p.y-r*.14)}L${f(p.x+r)} ${f(p.y)}L${f(p.x+r*.14)} ${f(p.y+r*.14)}L${f(p.x)} ${f(p.y+r)}L${f(p.x-r*.14)} ${f(p.y+r*.14)}L${f(p.x-r)} ${f(p.y)}L${f(p.x-r*.14)} ${f(p.y-r*.14)}Z" fill="#fff" opacity="${f(a)}"/>`}
 function knot(p,k=1){const s=f(k*100)/100;return `<g opacity="${s}"><path d="M${P(p)}q-3 6 1 11q3 4 -2 8" fill="none" stroke="${RED}" stroke-width="1.4" stroke-linecap="round"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="2.6" fill="${RED}" stroke="#3a070b" stroke-width=".8"/></g>`}
+// A small brass bell hanging from its crown loop at `at`; `lit` adds the warm join light.
+function drawBell(at,ang,clap,lit){
+ return `<g transform="translate(${P(at)}) rotate(${f(ang)})">${lit?'<circle cy="14" r="22" fill="url(#lamp)"/>':''}`+
+  `<circle cy="1.6" r="2.3" fill="none" stroke="${INK}" stroke-width="2.4"/><circle cy="1.6" r="2.3" fill="none" stroke="#c9a456" stroke-width="1"/>`+
+  `<circle cx="${f(clap)}" cy="20.6" r="2" fill="#262c36" stroke="${INK}" stroke-width=".8"/>`+
+  `<path d="M-3.2 4Q-6.4 4.4 -6.6 10Q-6.9 15.4 -9.4 17.6Q-9.9 19.3 -8 19.4H8Q9.9 19.3 9.4 17.6Q6.9 15.4 6.6 10Q6.4 4.4 3.2 4Z" fill="url(#bellG)" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>`+
+  `<path d="M-8.4 17Q0 18.5 8.4 17" fill="none" stroke="${INK}" stroke-width=".9" opacity=".7"/><path d="M-3.4 6.4Q-4.8 10 -5.6 15" fill="none" stroke="#fff6da" stroke-width="1.1" stroke-linecap="round" opacity=".8"/>`+
+  `<ellipse cy="19.3" rx="7.4" ry="1.1" fill="#140f08"/></g>`}
+function ringBell(){model.peal=performance.now();(function step(){render();if(!reduce.matches&&model.jt===1&&performance.now()-model.peal<1000)requestAnimationFrame(step)})()}
 function trail(pts){return `<polyline points="${pts.map(P).join(' ')}" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".35" filter="url(#blur3)"/><polyline points="${pts.map(P).join(' ')}" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>`}
 function cutThreads(LACE,r){
  const k=model.cut,rec=ease(seg(r,0,.3)),fade=1-seg(r,.18,.42),fl=1-seg(r,0,.24);let s='';
@@ -368,7 +450,7 @@ function cutThreads(LACE,r){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -401,24 +483,25 @@ async function doJoin(fixed='a',ms=2600){
  if(model.jt===0){model.path={s:here(),j:joinedPose(fixed)}}
  else if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};
  model.ready=false;model.glow=0;
- say('The shells close, and the needle darts through the eyelets trailing red thread.');
+ say(J().text.join);
  const ok=await tween(model.jt,1,ms*(1-model.jt),setJt);
- if(ok){model.poised=false;model.path=null;say('Joined: laced with red silk. Drag either nameplate to move the pair. Slash across the threads to release.')}
+ if(ok){model.poised=false;model.path=null;say(J().text.joined)}
 }
 async function doSeparate(){
  if(model.jt===0)return;
  model.poised=false;
  // From joined, the threads are cut; part-way through a join the needle simply backs out.
- if(model.jt===1){model.dir=-1;if(!model.cut)model.cut=autoCut();model.path={s:separatePose(),j:here()};say('Cut: the threads part with a flash and spring back to their eyelets.')}
- else{if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say('The needle backs out and the thread unpicks.')}
- const ms=model.dir<0?1500*model.jt:1300*model.jt;
+ const j=J();
+ if(model.jt===1){model.dir=-1;j.releaseStart();model.path={s:separatePose(),j:here()};say(j.text.release)}
+ else{if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say(j.text.back)}
+ const ms=model.dir<0?(j.msOut||1500)*model.jt:1300*model.jt;
  if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.cut=null;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
  ++anim;model.busy=false;model.poised=false;model.glow=0;
  if(model.dir<0){model.dir=1;model.cut=null}
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
- setJt(.6);render();say('Held mid-join: the needle on its second pass. Use the scrubber to step through the animation.');
+ setJt(J().holdAt);render();say(J().text.hold);
 }
 function toggleShade(){
  const sh=SHADES[model.shade],to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||520)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;
@@ -449,16 +532,15 @@ function render(){
  }
  const focused=document.activeElement&&document.activeElement.id==='seamHit';
  $('#over').innerHTML=j.over(c);
- const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();model.cut=autoCut();doSeparate()}};if(focused)hit.focus()}
+ const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();J().key()}};if(focused)hit.focus()}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
- const p=Math.round(model.jt*100),jt=model.jt,r=1-jt;
- const mid=model.dir>0?(jt<.3?'Joining · closing in ':jt<.59?'Joining · the needle, first pass ':jt<.86?'Joining · second pass ':'Joining · pulling taut '):(r<.3?'Releasing · threads cut ':r<.45?'Releasing · ends recoil ':'Releasing · parting ');
- const ph={separate:'Separate · two shells',joining:mid+p+'%',joined:'Joined · '+j.label.toLowerCase()};
- $('#phase').textContent=(drag&&drag.slash?'Slash across the threads':drag&&drag.state==='ready'?'Ready · the needle is poised':drag&&drag.state==='near'?'Nearby · the eyelets catch the light':ph[state])+(model.st>.5?' · shaded':'');
+ const p=Math.round(model.jt*100),T=j.text;
+ const ph={separate:'Separate · two shells',joining:j.phase(model.dir,model.jt)+p+'%',joined:'Joined · '+j.label.toLowerCase()};
+ $('#phase').textContent=(drag&&drag.seam?T.phDrag:drag&&drag.state==='ready'?T.phReady:drag&&drag.state==='near'?T.phNear:ph[state])+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -467,7 +549,8 @@ STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.
 function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(drag)cancelDrag();
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;model.peal=model.armed=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  describe();render();
 }
@@ -500,7 +583,7 @@ function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:
 function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
- if(e.target.closest('#seamHit')&&model.jt===1){e.preventDefault();const p=local(e);drag={slash:true,p0:p,pts:[p],len:0};stage.setPointerCapture(e.pointerId);render();return}
+ if(e.target.closest('#seamHit')&&model.jt===1){e.preventDefault();drag=J().seamDown(local(e));stage.setPointerCapture(e.pointerId);render();return}
  const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
@@ -510,9 +593,7 @@ stage.addEventListener('pointerdown',e=>{
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
- if(drag.slash){const l=drag.pts[drag.pts.length-1];drag.len+=Math.hypot(p.x-l.x,p.y-l.y);drag.pts.push(p);if(drag.pts.length>9)drag.pts.shift();
-  if(drag.len>=34){const d=drag;drag=null;$('#a .grip').focus();model.cut=Math.hypot(p.x-d.p0.x,p.y-d.p0.y)>8?{x1:d.p0.x,y1:d.p0.y,x2:p.x,y2:p.y}:autoCut();doSeparate();return}
-  render();return}
+ if(drag.seam){J().seamMove(drag,p);return}
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
  drag.moved=Math.max(drag.moved||0,Math.hypot(dx,dy));
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
@@ -523,19 +604,19 @@ stage.addEventListener('pointermove',e=>{
  const pull=drag.state==='ready'?.88:drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
  m.x=lerp(raw.x,t.x,pull);m.y=lerp(raw.y,t.y,pull);
  model.glow=drag.state==='ready'?1:drag.state==='near'?.15+.6*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
- if(drag.state==='ready')say('Ready: the needle is poised over the gap. Release to stitch.');else if(drag.state==='near')say('Nearby: the eyelets catch the light. Move closer.');
+ if(drag.state==='ready')say(J().text.ready);else if(drag.state==='near')say(J().text.near);
  render();
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
- if(d.slash){if(d.len<5){$('#a .grip').focus();model.cut=autoCut();doSeparate()}else{render();say('Too short to cut. Slash right through the threads.')}return}
+ if(d.seam){J().seamUp(d);return}
  // A tap on a cocooned nameplate loosens or retightens its silk (hover does the same with a mouse).
  if(d.touch&&!(d.moved>4)){const el=$('#'+d.id);if(el.classList.contains('cocooned'))el.classList.toggle('loose')}
  if(d.state==='ready'){model.ready=true;model.poised=true;model.path=null;doJoin(d.id==='b'?'a':'b',2100)}else{model.glow=0;render()}
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
- if(d.slash){render();return}
+ if(d.seam){render();return}
  const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
 }
 stage.addEventListener('pointerup',endDrag);
