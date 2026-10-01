@@ -7,7 +7,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 
 - [x] Gothic · Join · Keystone lock — fusion — Added gothic.html with a descending brass key, four state views, retained widget controls and keyboard access; 17 DOM interaction checks passed; visual review blocked by browser access.
 - [x] Felt · Join · Needle-felt merge — fusion — Added felt.html with compressing wool shoulders, gathering fibres, a shared waist and coral release tab; four state views and 22 DOM checks passed; browser visual review blocked by sandbox and computer-use access.
-- [ ] Elven · Join · Grafted ribs — fusion
+- [x] Elven · Join · Grafted ribs — fusion — Added elven.html with open silver bows, interleaving ribs and a closing enamel collar; four state views and 24 DOM/state checks passed; browser visual review blocked by computer-use access.
 - [ ] Wire · Join · Hook and eye — point attachment
 - [ ] Hollow · Join · Shell lap — fusion
 - [ ] Gothic · Join · Flying buttress — external attachment
