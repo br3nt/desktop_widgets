@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gothic Basilica Skin — Desktop Widgets</title>
+<style>
+:root {
+  color-scheme: dark;
+  --stone-dark: #121514;
+  --stone-ashlar: #252b28;
+  --stone-mid: #38423d;
+  --stone-light: #526058;
+  --stone-highlight: #7e9185;
+  --parchment: #f4e8c1;
+  --gold-glow: #e6b447;
+  --ruby: #e63946;
+  --emerald: #2a9d8f;
+  --sapphire: #3a86ff;
+  --iron: #181c1a;
+  --iron-rust: #423832;
+  --display-bg: #090c0b;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #0d100f;
+  color: #dbe4dc;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  overflow-x: hidden;
+}
+
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .4; cursor: default; }
+button:focus-visible, a:focus-visible, select:focus-visible {
+  outline: 2px solid var(--gold-glow);
+  outline-offset: 3px;
+}
+a { color: #cfdc8e; text-underline-offset: 3px; }
+
+header {
+  padding: 16px 24px;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #36443c;
+  background: linear-gradient(180deg, #1b221f 0%, #111614 100%);
+}
+.header-titles h1 {
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  margin: 0;
+  font-weight: 600;
+  color: #e8eee6;
+}
+.header-titles h1 span {
+  font-weight: 400;
+  color: var(--gold-glow);
+  font-size: 16px;
+}
+.header-titles p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #8fa394;
+}
+
+.controls-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #161c19;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid #2f3d35;
+}
+.control-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #7b9083;
+  margin-right: 4px;
+}
+.controls-bar button, .controls-bar select {
+  border: 1px solid #43544a;
+  background: linear-gradient(180deg, #2b3831, #1d2621);
+  color: #dbe4dc;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 120ms ease;
+}
+.controls-bar button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #37473e, #26332c);
+  border-color: #637b6d;
+}
+.controls-bar button.active, .controls-bar button[aria-pressed="true"] {
+  border-color: var(--gold-glow);
+  color: var(--parchment);
+  background: linear-gradient(180deg, #443c22, #292415);
+  box-shadow: 0 0 6px rgba(230, 180, 71, 0.3);
+}
+.controls-bar .primary-btn {
+  border-color: #8c7836;
+  background: linear-gradient(180deg, #514421, #332b15);
+  color: #fcebbb;
+}
+.controls-bar .primary-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #6b5a2b, #43391c);
+  border-color: var(--gold-glow);
+}
+
+#viewport {
+  overflow: auto;
+  background: radial-gradient(ellipse at 45% 25%, #25332c 0%, #0d1210 70%);
+  position: relative;
+  min-height: 720px;
+}
+#stage {
+  position: relative;
+  width: 1200px;
+  height: 720px;
+  margin: auto;
+  overflow: hidden;
+  touch-action: none;
+  background:
+    radial-gradient(circle at 600px 100px, rgba(230, 180, 71, 0.05) 0%, transparent 60%),
+    repeating-linear-gradient(120deg, transparent 0 200px, rgba(255, 255, 255, 0.015) 201px 400px);
+}
+
+.topline {
+  position: absolute;
+  top: 18px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+}
+.topline p {
+  margin: 0;
+  color: #a8bcad;
+  font-size: 13px;
+  text-shadow: 0 1px 3px #000;
+}
+#phase {
+  font: 11px/1.4 "Courier New", monospace;
+  color: var(--gold-glow);
+  background: rgba(14, 18, 16, 0.85);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #3d4a40;
+  text-shadow: 0 0 4px rgba(230, 180, 71, 0.4);
+}
+
+/* Hardware and SVG Canvas */
+#stage-svg {
+  position: absolute;
+  inset: 0;
+  width: 1200px;
+  height: 720px;
+  pointer-events: none;
+  filter: drop-shadow(0 16px 20px rgba(0, 0, 0, 0.7));
+}
+
+/* Modules: Jarvis (a) & GitDiscuss (b) */
+.module {
+  position: absolute;
+  width: 390px;
+  height: 130px;
+  user-select: none;
+  touch-action: none;
+  isolation: isolate;
+  transition: height 260ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+.module.shade {
+  height: 44px;
+}
+.module-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+  transition: height 260ms cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+.module.shade .module-svg {
+  height: 44px;
+}
+
+/* Architectural Stone Grip & Title Bar */
+.stone-grip {
+  position: absolute;
+  top: 6px;
+  left: 44px;
+  width: 282px;
+  height: 22px;
+  cursor: grab;
+  background: none;
+  border: 0;
+  color: var(--parchment);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  text-shadow: 0 1px 2px #000, 0 0 8px rgba(230, 180, 71, 0.3);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", serif;
+  font-size: 11px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  z-index: 2;
+}
+.stone-grip:active { cursor: grabbing; }
+.stone-grip .cross-boss {
+  font-size: 13px;
+  color: var(--gold-glow);
+}
+
+/* Clerestory Display Screen */
+.clerestory-screen {
+  position: absolute;
+  left: 46px;
+  top: 32px;
+  width: 290px;
+  height: 64px;
+  background: var(--display-bg);
+  border-radius: 4px;
+  border: 1px solid #202723;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.9), 0 0 0 1px #46554b;
+  overflow: hidden;
+  color: #72efc7;
+  z-index: 2;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.module.shade .clerestory-screen {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-10px);
+}
+
+/* Scanline / Lead-vein overlay */
+.clerestory-screen::after, .crypt-mini-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0, 20, 10, 0.35) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+.screen-pages {
+  height: 100%;
+  width: 300%;
+  display: flex;
+  transition: transform 280ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.screen-page {
+  width: 33.33333%;
+  flex: none;
+  padding: 6px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.screen-page .gothic-label {
+  font: 10px/1.3 "Courier New", monospace;
+  color: #8da999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.screen-page strong {
+  font: bold 18px/1.1 "Courier New", monospace;
+  letter-spacing: -0.5px;
+  display: block;
+  color: var(--parchment);
+}
+.screen-page strong em {
+  font-style: normal;
+  color: #63e6be;
+}
+.screen-page small {
+  font: 11px/1.5 "Courier New", monospace;
+  color: #92b0a0;
+}
+.screen-page .stone-bar {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  display: flex;
+  align-items: end;
+  gap: 3px;
+  height: 25px;
+}
+.stone-bar i {
+  width: 4px;
+  background: var(--gold-glow);
+  box-shadow: 0 0 5px rgba(230, 180, 71, 0.5);
+}
+
+/* Shade Mode Strip Display */
+.shade-strip {
+  position: absolute;
+  left: 46px;
+  top: 7px;
+  width: 290px;
+  height: 30px;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  font: bold 11px/1 "Courier New", monospace;
+  color: var(--parchment);
+  z-index: 5;
+  text-shadow: 0 0 5px rgba(230, 180, 71, 0.5);
+}
+.module.shade .shade-strip {
+  display: flex;
+}
+.shade-strip .shade-tag {
+  color: var(--gold-glow);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.shade-strip .shade-votives {
+  display: flex;
+  gap: 4px;
+}
+.shade-votives i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ruby);
+  box-shadow: 0 0 4px var(--ruby);
+}
+.shade-votives i.gold { background: var(--gold-glow); box-shadow: 0 0 4px var(--gold-glow); }
+.shade-votives i.emerald { background: var(--emerald); box-shadow: 0 0 4px var(--emerald); }
+
+/* Navigation and Gothic Buttons */
+.tab-row {
+  position: absolute;
+  left: 48px;
+  top: 102px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 2;
+  transition: opacity 200ms ease;
+}
+.module.shade .tab-row { opacity: 0; pointer-events: none; }
+.tab-row button {
+  padding: 1px 6px;
+  background: rgba(14, 18, 16, 0.7);
+  border: 1px solid #334239;
+  border-radius: 3px;
+  color: #8da394;
+  font: 10px/1.2 "Courier New", monospace;
+}
+.tab-row button[aria-selected="true"] {
+  border-color: var(--gold-glow);
+  color: var(--parchment);
+  background: #252e27;
+}
+
+.stone-btn {
+  position: absolute;
+  top: 100px;
+  border-radius: 50%;
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  border: 2px solid #141b17;
+  box-shadow: inset 0 1px 2px rgba(255, 230, 150, 0.4), 0 2px 4px rgba(0, 0, 0, 0.8);
+  background: radial-gradient(circle at 35% 25%, #e0c885, #9b7728 50%, #3e2e0e 100%);
+  color: #171205;
+  font: bold 10px/1 Arial;
+  z-index: 2;
+  transition: opacity 200ms ease, filter 150ms ease;
+}
+.stone-btn:hover { filter: brightness(1.2); }
+.module.shade .stone-btn { opacity: 0; pointer-events: none; }
+.run-btn { left: 288px; }
+.next-btn {
+  left: 318px;
+  background: radial-gradient(circle at 35% 25%, #aee8e2, #24878a 50%, #0d383b 100%);
+}
+.undercroft-btn {
+  position: absolute;
+  left: 184px;
+  top: 99px;
+  width: 90px;
+  height: 22px;
+  border: 1px solid #2f3e35;
+  clip-path: polygon(8% 0, 100% 0, 92% 100%, 0 100%);
+  color: #e5ece6;
+  background: linear-gradient(180deg, #44544a, #232d27 50%, #1a221d);
+  font: bold 9px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 2px #000;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.15);
+  z-index: 2;
+  transition: opacity 200ms ease;
+}
+.module.shade .undercroft-btn { opacity: 0; pointer-events: none; }
+
+/* Reliquary Undercroft Drawer (Activity Bay) */
+#undercroft {
+  position: absolute;
+  width: 324px;
+  height: 220px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+#undercroftBody {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 324px;
+  height: 206px;
+  transform: translateY(-194px);
+  transition: transform 420ms cubic-bezier(0.18, 0.8, 0.22, 1);
+  background: linear-gradient(135deg, #2b332f 0%, #161c19 50%, #111513 100%);
+  border: 2px solid #4a5c51;
+  border-radius: 4px 4px 20px 20px;
+  box-shadow: inset 0 0 0 3px #131916, inset 0 0 0 5px #3a4740, 0 14px 18px rgba(0, 0, 0, 0.85);
+  pointer-events: auto;
+}
+#undercroft.open #undercroftBody { transform: translateY(0); }
+.stone-rib {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 9px;
+  background: linear-gradient(90deg, #18201c, #4f5f56 50%, #202b25);
+  box-shadow: inset 0 0 0 1px #111814;
+}
+.stone-rib.l { left: 8px; }
+.stone-rib.r { right: 8px; }
+
+.undercroft-head {
+  position: absolute;
+  top: 10px;
+  left: 26px;
+  right: 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--parchment);
+  font-size: 11px;
+  text-shadow: 0 1px 2px #000;
+}
+.undercroft-head button {
+  border: 1px solid #485c4f;
+  border-radius: 3px;
+  color: #d8e5dc;
+  background: #19241e;
+  font-size: 10px;
+  padding: 2px 7px;
+}
+
+#cryptBay {
+  position: absolute;
+  left: 22px;
+  top: 40px;
+  width: 276px;
+  height: 82px;
+  border: 1px solid #3d4d42;
+  background: #090e0b;
+  border-radius: 6px;
+  box-shadow: inset 0 5px 12px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #7b9686;
+  font-size: 11px;
+  transition: all 180ms ease;
+}
+#cryptBay.hot, #cryptBay[data-dock-state="ready"] {
+  background: #172a1e;
+  border-color: var(--gold-glow);
+  box-shadow: inset 0 0 18px rgba(230, 180, 71, 0.4), 0 0 12px rgba(230, 180, 71, 0.3);
+}
+#emptyCryptBay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+#emptyCryptBay button {
+  font-size: 10px;
+  padding: 3px 8px;
+  color: var(--parchment);
+  background: #25332b;
+  border: 1px solid #4a5c50;
+  border-radius: 3px;
+}
+
+.undercroft-footer {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  top: 135px;
+  font: 10px/1.5 "Courier New", monospace;
+  color: #8da998;
+}
+.undercroft-footer strong { color: var(--gold-glow); }
+
+.concurrency-knob-wrap {
+  position: absolute;
+  right: 28px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: #a4bea9;
+}
+#concurrencyDial {
+  appearance: none;
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle at 35% 30%, #e8dec0, #8d7a4f 50%, #2f2512);
+  border-radius: 50%;
+  border: 3px solid #161e19;
+  box-shadow: 0 0 0 1px #596b5f, 0 3px 5px rgba(0, 0, 0, 0.7);
+  position: relative;
+  cursor: pointer;
+}
+#concurrencyDial::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 2px;
+  width: 3px;
+  height: 9px;
+  border-radius: 1px;
+  background: #1a221b;
+  transform-origin: 1px 12px;
+  transform: rotate(var(--angle, 0deg));
+}
+
+/* Checks Widget (Meter / Crypt Reliquary) */
+#cryptReliquary {
+  position: absolute;
+  width: 276px;
+  height: 80px;
+  touch-action: none;
+  user-select: none;
+  z-index: 8;
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.75));
+}
+.crypt-case {
+  position: absolute;
+  inset: 0;
+  border: 1px solid #5a6e60;
+  border-radius: 14px 6px 14px 6px;
+  background: linear-gradient(160deg, #44544a 0%, #222c26 45%, #131a15 100%);
+  box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.2), inset 0 -2px 3px rgba(0, 0, 0, 0.8);
+}
+.crypt-grip {
+  position: absolute;
+  left: 14px;
+  top: 2px;
+  width: 215px;
+  height: 18px;
+  background: none;
+  border: 0;
+  color: var(--parchment);
+  text-align: left;
+  font: bold 9px/18px -apple-system, BlinkMacSystemFont, "Segoe UI", serif;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  cursor: grab;
+}
+.crypt-mini-screen {
+  position: absolute;
+  left: 12px;
+  right: 40px;
+  top: 24px;
+  height: 42px;
+  border: 2px solid #0d1410;
+  border-radius: 3px;
+  background: var(--display-bg);
+  box-shadow: 0 0 0 1px #4a5c50;
+  overflow: hidden;
+  padding: 4px 8px;
+  color: #72efc7;
+  font: 10px/1.3 "Courier New", monospace;
+}
+.crypt-mini-screen strong {
+  font-size: 15px;
+  color: var(--gold-glow);
+}
+.crypt-jewel {
+  position: absolute;
+  right: 12px;
+  top: 34px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ff9f9f, #d90429 55%, #47000b);
+  border: 2px solid #1a221b;
+  box-shadow: 0 0 6px rgba(230, 57, 70, 0.6);
+}
+#ejectCrypt {
+  position: absolute;
+  right: 12px;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border: 0;
+  background: none;
+  color: var(--parchment);
+  padding: 0;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+/* Keystone Release Grip */
+.keystone-release {
+  position: absolute;
+  width: 26px;
+  height: 44px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+  transition: opacity 160ms ease;
+}
+.keystone-release[hidden] { display: none; }
+.keystone-release::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 32px;
+  left: 8px;
+  top: 6px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #1d2521, #5d7064 40%, #8ca193 60%, #1d2521);
+  border: 1px solid #141b17;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), inset 0 1px rgba(255, 255, 255, 0.3);
+}
+.keystone-release:hover::before { border-color: var(--gold-glow); }
+.keystone-release::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  right: 6px;
+  width: 2px;
+  height: calc(24px * var(--tension, 0));
+  background: var(--gold-glow);
+  box-shadow: 0 0 4px var(--gold-glow);
+}
+
+/* Port Overlay for Design Mode */
+#portOverlay { position: absolute; inset: 0; pointer-events: none; }
+.socket-port {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--gold-glow);
+  border-radius: 50%;
+  box-shadow: 0 0 12px rgba(230, 180, 71, 0.4);
+  display: none;
+}
+.socket-port::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #fcebbb;
+  border-radius: 50%;
+}
+.socket-port::after {
+  position: absolute;
+  top: -26px;
+  left: -40px;
+  white-space: nowrap;
+  color: var(--parchment);
+  font: 10px "Courier New", monospace;
+  content: attr(data-label);
+  background: rgba(14, 18, 16, 0.85);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid #3f4e44;
+}
+#stage.design .socket-port { display: block; }
+#stage.design #cryptBay { outline: 1px dashed var(--gold-glow); outline-offset: 4px; }
+#stage.design .clerestory-screen { outline: 1px dashed #63e6be; outline-offset: 3px; }
+
+/* Footer and Aesthetic Explanations */
+footer {
+  padding: 20px 28px 30px;
+  border-top: 1px solid #2d3831;
+  background: #111513;
+  color: #8fa394;
+  font-size: 13px;
+}
+footer h3 {
+  color: var(--parchment);
+  font-size: 15px;
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+footer p {
+  margin: 0 0 10px;
+  max-width: 900px;
+  line-height: 1.6;
+}
+footer .note-highlight {
+  color: var(--gold-glow);
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-titles">
+    <h1>Gothic Basilica <span>/ nave vaulting &amp; keystone join</span></h1>
+    <p>Monumental chiseled limestone · Pointed lancet arch · Carved granite keystone lock</p>
+  </div>
+  <nav class="controls-bar" aria-label="Experiment state and option controls">
+    <div class="control-group">
+      <label for="optionSelect">Option</label>
+      <select id="optionSelect" aria-label="Select skin exploration option">
+        <option value="keystone" selected>1. Keystone Drop (Nave Vault Key)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>State</label>
+      <button id="btnStateSeparate" class="active" aria-pressed="true">Separate</button>
+      <button id="btnStateJoining" aria-pressed="false">Joining</button>
+      <button id="btnStateJoined" aria-pressed="false">Joined</button>
+      <button id="btnStateShade" aria-pressed="false">Shade</button>
+    </div>
+    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
+    <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnDesign" aria-pressed="false">Design mode</button>
+    <button id="btnReset">Reset</button>
+  </nav>
+</header>
+
+<div id="viewport">
+  <main id="stage" aria-label="Gothic Basilica skin interactive stage">
+    <div class="topline">
+      <p id="status" role="status" aria-live="polite">Drag capsules toward each other to trigger the keystone drop, or use the state buttons.</p>
+      <span id="phase">Separate / Two stone housings</span>
+    </div>
+
+    <!-- Architectural SVG Canvas for Shared Geometry, Keystone, Arch Vault & Lighting -->
+    <svg id="stage-svg" viewBox="0 0 1200 720" aria-hidden="true">
+      <defs>
+        <!-- Ashlar limestone gradient -->
+        <linearGradient id="gothStone" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4d5a52"/>
+          <stop offset="7%" stop-color="#343d38"/>
+          <stop offset="25%" stop-color="#232a26"/>
+          <stop offset="50%" stop-color="#1b211e"/>
+          <stop offset="75%" stop-color="#2d3731"/>
+          <stop offset="93%" stop-color="#141816"/>
+          <stop offset="100%" stop-color="#39453e"/>
+        </linearGradient>
+
+        <!-- Weathered stone bevel -->
+        <linearGradient id="stoneBevel" x1="0" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stop-color="#7e9084"/>
+          <stop offset="20%" stop-color="#48564e"/>
+          <stop offset="50%" stop-color="#18201c"/>
+          <stop offset="80%" stop-color="#3e4c43"/>
+          <stop offset="100%" stop-color="#111613"/>
+        </linearGradient>
+
+        <!-- Granite keystone gradient -->
+        <linearGradient id="keystoneGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#8a9990"/>
+          <stop offset="15%" stop-color="#55635b"/>
+          <stop offset="55%" stop-color="#2c3631"/>
+          <stop offset="85%" stop-color="#1b221e"/>
+          <stop offset="100%" stop-color="#414e46"/>
+        </linearGradient>
+
+        <!-- Pointed Arch Tracery Rib Gradient -->
+        <linearGradient id="archRib" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#161c19"/>
+          <stop offset="35%" stop-color="#5a6c62"/>
+          <stop offset="50%" stop-color="#8aa092"/>
+          <stop offset="65%" stop-color="#5a6c62"/>
+          <stop offset="100%" stop-color="#161c19"/>
+        </linearGradient>
+
+        <!-- Stained glass rosette glow filter -->
+        <filter id="votiveGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Ashlar masonry joint pattern -->
+        <pattern id="ashlarPattern" width="90" height="24" patternUnits="userSpaceOnUse">
+          <path d="M0 12H90M45 0V12M0 24H90M22 12V24M67 12V24" stroke="#121714" stroke-width="1.2" stroke-opacity="0.6"/>
+          <path d="M0 13H90M45 1V13M0 25H90M22 13V25M67 13V25" stroke="#687a70" stroke-width="0.8" stroke-opacity="0.25"/>
+        </pattern>
+      </defs>
+
+      <!-- Shared arch, keystone and decorative joints -->
+      <g id="sharedGothicStage"></g>
+      <!-- Atmospheric niche glow and light rays -->
+      <g id="gothicLightAura"></g>
+    </svg>
+
+    <!-- Activity Bay / Undercroft Drawer -->
+    <div id="undercroft" aria-label="Jarvis reliquary undercroft activity bay">
+      <div id="undercroftBody" inert>
+        <i class="stone-rib l"></i><i class="stone-rib r"></i>
+        <div class="undercroft-head">
+          <span id="bayStatus">Reliquary Undercroft Bay</span>
+          <button id="closeUndercroft" aria-label="Close activity undercroft">▴ close</button>
+        </div>
+        <div id="cryptBay" aria-label="Checks widget bay">
+          <div id="emptyCryptBay">
+            <span>Drop the Checks widget into this stone niche</span>
+            <button id="insertChecks">Insert Checks widget</button>
+          </div>
+        </div>
+        <div class="undercroft-footer">
+          <strong id="activityState">Undercroft running</strong><br>
+          Bay belongs to Jarvis.<br>
+          Contents stay with its stone chassis.
+        </div>
+        <div class="concurrency-knob-wrap">
+          <span>Tithe / Concurrency <b id="concurrencyValue">3</b></span>
+          <button id="concurrencyDial" aria-label="Cycle concurrency limit"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capsule A: Jarvis -->
+    <section class="module" id="a" aria-label="Jarvis cathedral capsule">
+      <svg class="module-svg" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="stone-grip" data-drag="a" aria-label="Move Jarvis capsule">
+        <span><span class="cross-boss">✠</span> Jarvis / Nave Master</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Full Clerestory Display -->
+      <div class="clerestory-screen" aria-label="Jarvis clerestory display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="gothic-label">Cathedral Nave / Active Choir</div>
+            <strong id="runText">03 <em>agents running</em></strong>
+            <small>Reviewing the capsule stone renderer</small>
+            <div class="stone-bar">
+              <i style="height:9px"></i><i style="height:22px"></i><i style="height:15px"></i>
+              <i style="height:25px"></i><i style="height:17px"></i>
+            </div>
+          </div>
+          <div class="screen-page">
+            <div class="gothic-label">Jarvis / Clerestory Task</div>
+            <strong style="font-size:16px">Verify shell assembly</strong>
+            <small>12 checks passed · 2 queued in crypt</small>
+          </div>
+          <div class="screen-page">
+            <div class="gothic-label">Cathedral Archives / Log</div>
+            <small>10:42 joined stone vault retained<br>10:43 awaiting next benediction</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shade Strip Display -->
+      <div class="shade-strip">
+        <span class="shade-tag"><span>✠</span> JARVIS · 03 AGENTS</span>
+        <div class="shade-votives">
+          <i class="gold"></i><i class="emerald"></i><i class="gold"></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="Jarvis screens">
+        <button class="gothic-tab" role="tab" aria-selected="true" data-page="0">Status</button>
+        <button class="gothic-tab" role="tab" aria-selected="false" data-page="1">Task</button>
+        <button class="gothic-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+      <button class="undercroft-btn" aria-label="Open reliquary undercroft" aria-expanded="false">▾ undercroft</button>
+      <button class="stone-btn run-btn" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button>
+      <button class="stone-btn next-btn" aria-label="Next Jarvis screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Capsule B: GitDiscuss -->
+    <section class="module" id="b" aria-label="GitDiscuss cathedral capsule">
+      <svg class="module-svg" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="stone-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
+        <span><span class="cross-boss">✠</span> GitDiscuss / Chapter House</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Full Clerestory Display -->
+      <div class="clerestory-screen" aria-label="GitDiscuss clerestory display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="gothic-label">GitDiscuss / Chapter House</div>
+            <strong>02 <em>need a decision</em></strong>
+            <small>Capsule joining · design feedback</small>
+          </div>
+          <div class="screen-page">
+            <div class="gothic-label">Discussion Roll / Epistle</div>
+            <strong style="font-size:16px">Shared casing geometry</strong>
+            <small>Brent · 4 comments · ready to review</small>
+          </div>
+          <div class="screen-page">
+            <div class="gothic-label">Chapter Roll / Event Log</div>
+            <small>10:41 feedback collected in nave<br>10:43 no workflow links created</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shade Strip Display -->
+      <div class="shade-strip">
+        <span class="shade-tag"><span>✠</span> GITDISCUSS · 02 DECISIONS</span>
+        <div class="shade-votives">
+          <i class="ruby"></i><i class="gold"></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
+        <button class="gothic-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
+        <button class="gothic-tab" role="tab" aria-selected="false" data-page="1">Thread</button>
+        <button class="gothic-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+      <button class="undercroft-btn" aria-label="Open selected discussion">▸ view thread</button>
+      <button class="stone-btn run-btn" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button>
+      <button class="stone-btn next-btn" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Checks Widget (Crypt Reliquary) -->
+    <section id="cryptReliquary" aria-label="Checks widget">
+      <div class="crypt-case"></div>
+      <button class="crypt-grip" data-drag="meter" aria-label="Move Checks widget">
+        Checks / Reliquary Box ⋮⋮
+      </button>
+      <div class="crypt-mini-screen">
+        <strong>12 / 14</strong> checks passed<br>
+        2 awaiting archdeacon sign-off
+      </div>
+      <span class="crypt-jewel" aria-hidden="true"></span>
+      <button id="ejectCrypt" aria-label="Eject Checks widget" title="Eject from undercroft" hidden>↗</button>
+    </section>
+
+    <!-- Keystone Release Bar / Cotter Pin -->
+    <button id="keystoneRelease" class="keystone-release" data-drag="release"
+            aria-label="Release GitDiscuss: pull right or press Enter"
+            title="Pull right to lift keystone · Enter to separate" hidden>
+    </button>
+
+    <!-- Socket Overlay for Design Mode -->
+    <div id="portOverlay" aria-hidden="true">
+      <div class="socket-port" id="portA" data-label="Pointed Arch Springer · A"></div>
+      <div class="socket-port" id="portB" data-label="Pointed Arch Springer · B"></div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <h3>Gothic Basilica Architecture &amp; The Keystone Drop Join</h3>
+  <p>
+    In this aesthetic, modules are carved from dressed ashlar limestone. Pointed lancet arches frame the clerestory displays, supported by fluted colonnettes. When separate, each module's mating end forms one half of a monumental pointed arch (a voussoir springer).
+  </p>
+  <p>
+    <span class="note-highlight">Option 1 — Keystone Drop (Nave Vault Key):</span> As the two housings meet within the magnetic field, the voussoirs align. A carved granite keystone with an embossed trefoil and gothic cross descends vertically into the apex niche, locking the two independent modules into a continuous, monumental basilican arch. The release grip acts as a forged iron tie-wedge: pulling right unlocks the keystone.
+  </p>
+  <p>
+    <span class="note-highlight">Shade Mode:</span> Collapses the stone structure into an architectural lintel frieze with a gothic status strip, preserving glanceable agent state.
+  </p>
+</footer>
+
+<script>
+// Gothic Basilica Skin Controller
+const $ = s => document.querySelector(s);
+const stage = $('#stage');
+const W = 390, H = 130, JOIN_DISTANCE = 316;
+
+const model = {
+  a: { x: 140, y: 220, page: 0, running: true },
+  b: { x: 680, y: 220, page: 0, running: true },
+  meter: { x: 805, y: 510 },
+  joined: false,
+  busy: false,
+  undercroft: false,
+  docked: false,
+  design: false,
+  shade: false,
+  blend: 0,
+  cap: 0,
+  keystoneDrop: 0, // 0 = retracted / aloft, 1 = fully dropped and locked
+  light: 0,
+  limit: 3,
+  feel: 'free',
+  tension: 0,
+  front: 'b'
+};
+
+const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let drag = null, animationToken = 0, dragFrame = 0, glowFrame = 0, glowTime = 0;
+const DOCKING = { near: 130, capture: 45 };
+const connectionGlow = { socket: { value: 0, target: 0 }, bay: { value: 0, target: 0 } };
+
+function say(text) { $('#status').textContent = text; }
+
+// SVG Path Generators for Gothic Architecture
+function gothicCapsulePath(x, y, width, isShade = false) {
+  const h = isShade ? 44 : 126;
+  const r = isShade ? 6 : 14;
+  return `M${x+50} ${y+4} H${x+width-50} Q${x+width-12} ${y+4} ${x+width-6} ${y+r+20} ` +
+         `V${y+h-r-10} Q${x+width-10} ${y+h+4} ${x+width-50} ${y+h+4} ` +
+         `H${x+50} Q${x+10} ${y+h+4} ${x+6} ${y+h-r-10} ` +
+         `V${y+r+20} Q${x+12} ${y+4} ${x+50} ${y+4} Z`;
+}
+
+// Draw Gothic Limestone Casing with Masonry Joints, Lancet Framing, and Colonnettes
+function drawGothicCasing(x, y, width, opacity = 1, isShade = false) {
+  const d = gothicCapsulePath(x, y, width, isShade);
+  const h = isShade ? 44 : 126;
+  let s = `<g opacity="${opacity}">`;
+  // Heavy ashlar base fill
+  s += `<path d="${d}" fill="url(#gothStone)" stroke="#111614" stroke-width="3.5"/>`;
+  // Ashlar masonry pattern overlay
+  s += `<path d="${d}" fill="url(#ashlarPattern)"/>`;
+
+  if (!isShade) {
+    // Upper Cornice Molding and Trefoil Frieze
+    s += `<path d="M${x+34} ${y+8} H${x+width-34}" stroke="#7e9084" stroke-width="1.8" stroke-linecap="round"/>`;
+    s += `<path d="M${x+40} ${y+11} H${x+width-40}" stroke="#161c19" stroke-width="1.5"/>`;
+    // Lower Base Plinth Molding
+    s += `<path d="M${x+36} ${y+123} H${x+width-36}" stroke="#68786f" stroke-width="1.5"/>`;
+    s += `<path d="M${x+42} ${y+120} H${x+width-42}" stroke="#161c19" stroke-width="1.2"/>`;
+
+    // Pointed Lancet embrasure around display
+    s += `<path d="M${x+44} ${y+30} H${x+width-44} V${y+98} H${x+44} Z" fill="none" stroke="#161c19" stroke-width="3"/>`;
+    s += `<path d="M${x+44} ${y+30} H${x+width-44} V${y+98} H${x+44} Z" fill="none" stroke="#66776e" stroke-width="1"/>`;
+
+    // Carved Corner Trefoils
+    s += `<circle cx="${x+26}" cy="${y+26}" r="6" fill="#1b211e" stroke="#5a6a61" stroke-width="1.5"/>`;
+    s += `<circle cx="${x+width-26}" cy="${y+26}" r="6" fill="#1b211e" stroke="#5a6a61" stroke-width="1.5"/>`;
+    s += `<circle cx="${x+26}" cy="${y+104}" r="5" fill="#1b211e" stroke="#5a6a61" stroke-width="1.2"/>`;
+    s += `<circle cx="${x+width-26}" cy="${y+104}" r="5" fill="#1b211e" stroke="#5a6a61" stroke-width="1.2"/>`;
+  } else {
+    // Shade mode architectural lintel lines
+    s += `<path d="M${x+20} ${y+6} H${x+width-20}" stroke="#7e9084" stroke-width="1.5"/>`;
+    s += `<path d="M${x+20} ${y+38} H${x+width-20}" stroke="#48564e" stroke-width="1.5"/>`;
+  }
+  s += `</g>`;
+  return s;
+}
+
+// Pointed Arch Springer End-Cap (the half pointed arch on the docking end)
+function drawGothicCap(x, y, isRight, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const dir = isRight ? -1 : 1;
+  const startX = isRight ? x + W - 16 : x + 16;
+  const scaleX = (1 - retract) * dir;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  return `
+    <g transform="translate(${startX}, ${y+64}) scale(${scaleX}, 1)">
+      <!-- Fluted Half-Column Shaft -->
+      <path d="M-4 -48 L6 -52 L18 -50 L22 50 L10 52 L-4 48 Z" fill="#29332d" stroke="#161c19" stroke-width="1.5"/>
+      <path d="M4 -50 L8 50" stroke="#607267" stroke-width="1.2"/>
+      <path d="M12 -50 L14 50" stroke="#161c19" stroke-width="1.2"/>
+      <!-- Carved Stone Capital -->
+      <path d="M-6 -48 Q10 -60 24 -46 L20 -40 L-4 -42 Z" fill="#3f4d45" stroke="#161c19" stroke-width="1.2"/>
+      <!-- Voussoir Half Arch Curve -->
+      <path d="M0 -42 Q28 -20 28 20 Q12 45 0 45" fill="none" stroke="url(#archRib)" stroke-width="3"/>
+      <!-- Stained Glass Rosette Eyelet -->
+      <circle cx="12" cy="0" r="7" fill="#141a16" stroke="#48564e" stroke-width="1.5"/>
+      <circle cx="12" cy="0" r="4.5" fill="${isRight ? '#2a9d8f' : '#e63946'}" opacity="0.85" filter="url(#votiveGlow)"/>
+    </g>
+  `;
+}
+
+// Stained-Glass Votive Light for Proximity & Capture Feedback
+function drawGothicSocketLight(x, y, amount) {
+  if (!amount) return '';
+  return `
+    <g opacity="${amount}">
+      <!-- Warm Votive Candle / Stained Glass Glow -->
+      <ellipse cx="${x}" cy="${y+64}" rx="14" ry="46" fill="#e6b447" opacity="0.3" filter="url(#votiveGlow)"/>
+      <rect x="${x-5}" y="${y+30}" width="10" height="68" rx="4" fill="#f4e8c1" opacity="0.85" filter="url(#votiveGlow)"/>
+      <rect x="${x-1.5}" y="${y+34}" width="3" height="60" rx="1.5" fill="#ffffff"/>
+    </g>
+  `;
+}
+
+// Option 1: Carved Granite Keystone Drop Mechanism
+function drawKeystone(midX, y, dropRatio, opacity = 1) {
+  // dropRatio = 0 (high above/aloft), 1 = fully dropped into nave vault apex
+  const aloftY = y - 55;
+  const seatedY = y + 16;
+  const currentY = aloftY + (seatedY - aloftY) * dropRatio;
+
+  return `
+    <g id="naveKeystone" opacity="${opacity}" transform="translate(${midX}, ${currentY})">
+      <!-- Ancient Forged Iron Suspension Rod -->
+      <line x1="0" y1="-80" x2="0" y2="-18" stroke="#181e1a" stroke-width="3"/>
+      <line x1="0" y1="-80" x2="0" y2="-18" stroke="#5d6e64" stroke-width="1" stroke-dasharray="4 2"/>
+      <!-- Iron Suspension Ring -->
+      <circle cx="0" cy="-20" r="5" fill="none" stroke="#252d28" stroke-width="2.5"/>
+
+      <!-- Wedge-Shaped Granite Keystone Body -->
+      <path d="M-19 -16 L19 -16 L13 36 L-13 36 Z"
+            fill="url(#keystoneGrad)" stroke="#111613" stroke-width="2.5"/>
+      <path d="M-17 -14 L17 -14 L11 34 L-11 34 Z"
+            fill="none" stroke="#8a9c91" stroke-width="1" opacity="0.6"/>
+
+      <!-- Embossed Trefoil / Cross Relief -->
+      <circle cx="0" cy="4" r="7" fill="#1f2622" stroke="#687a70" stroke-width="1.2"/>
+      <path d="M-4 4 H4 M0 0 V8" stroke="#e6b447" stroke-width="1.8" stroke-linecap="round"/>
+
+      <!-- Lower Corbel Latch Boss -->
+      <path d="M-8 36 L8 36 L5 44 L-5 44 Z" fill="#2d3731" stroke="#121714" stroke-width="1.5"/>
+
+      <!-- Compression Dust Puffs (when near fully seated) -->
+      ${dropRatio > 0.88 ? `
+        <circle cx="-16" cy="34" r="${(dropRatio-0.88)*30}" fill="#90a095" opacity="${(1-dropRatio)*6}" filter="url(#votiveGlow)"/>
+        <circle cx="16" cy="34" r="${(dropRatio-0.88)*30}" fill="#90a095" opacity="${(1-dropRatio)*6}" filter="url(#votiveGlow)"/>
+      ` : ''}
+    </g>
+  `;
+}
+
+// Render the entire hardware layer
+function renderHardware() {
+  const a = model.a, b = model.b, p = model.blend;
+  const isShade = model.shade;
+  const glow = model.busy ? model.light : connectionGlow.socket.value;
+  let shared = '';
+
+  const midX = (a.x + W - 22 + b.x + 22) / 2;
+
+  if (p > 0) {
+    // Continuous Monolithic Cathedral Facade
+    shared += drawGothicCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
+    if (!isShade) {
+      // United nave pointed arch ribbing at the seam
+      shared += `<g opacity="${p}">
+        <path d="M${midX-40} ${a.y+123} Q${midX} ${a.y+26} ${midX+40} ${a.y+123}"
+              fill="none" stroke="url(#archRib)" stroke-width="4"/>
+        <path d="M${midX-36} ${a.y+123} Q${midX} ${a.y+32} ${midX+36} ${a.y+123}"
+              fill="none" stroke="#18201c" stroke-width="1.5"/>
+      </g>`;
+    }
+  }
+
+  // Draw Keystone for Option 1
+  if (!isShade && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
+    const drop = model.joined ? 1 : model.keystoneDrop || Math.max(0, (glow - 0.3) / 0.7 * 0.7);
+    const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 18 + b.x + 18) / 2;
+    shared += drawKeystone(kMidX, a.y, drop, Math.max(p, glow > 0.3 ? 0.9 : drop));
+  }
+
+  if (model.joined && model.design) {
+    shared += `<line x1="${a.x + JOIN_DISTANCE}" y1="${a.y + 10}" x2="${a.x + JOIN_DISTANCE}" y2="${a.y + 120}"
+                     stroke="#e6b447" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+  }
+
+  $('#sharedGothicStage').innerHTML = shared;
+
+  // Individual capsules
+  for (const id of ['a', 'b']) {
+    const isA = id === 'a';
+    const individual = drawGothicCasing(0, 0, W, 1, isShade) +
+      drawGothicCap(0, 0, false, isA ? 0 : model.cap, isShade) +
+      drawGothicCap(0, 0, true, isA ? model.cap : 0, isShade);
+
+    $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawGothicSocketLight(isA ? W - 22 : 22, 0, glow)}</g>`;
+  }
+
+  // Socket proximity aura
+  if (!isShade && glow > 0.05 && p < 0.98) {
+    $('#gothicLightAura').innerHTML = `
+      <g opacity="${glow}">
+        ${drawGothicSocketLight(a.x + W - 22, a.y, glow)}
+        ${drawGothicSocketLight(b.x + 22, b.y, glow)}
+      </g>
+    `;
+  } else {
+    $('#gothicLightAura').innerHTML = '';
+  }
+}
+
+function updateStateButtons() {
+  const isShade = model.shade;
+  const isJoined = model.joined;
+  const isJoining = model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95 && !isJoined;
+  const isSep = !isJoined && !isJoining && !isShade;
+
+  $('#btnStateSeparate').classList.toggle('active', isSep);
+  $('#btnStateSeparate').setAttribute('aria-pressed', String(isSep));
+
+  $('#btnStateJoining').classList.toggle('active', isJoining);
+  $('#btnStateJoining').setAttribute('aria-pressed', String(isJoining));
+
+  $('#btnStateJoined').classList.toggle('active', isJoined && !isShade);
+  $('#btnStateJoined').setAttribute('aria-pressed', String(isJoined && !isShade));
+
+  $('#btnStateShade').classList.toggle('active', isShade);
+  $('#btnStateShade').setAttribute('aria-pressed', String(isShade));
+}
+
+function render() {
+  updateGlowTargets();
+  renderHardware();
+  paintGlowValues();
+  updateStateButtons();
+
+  ['a', 'b'].forEach(id => {
+    const m = model[id], el = $('#' + id);
+    el.style.left = m.x + 'px';
+    el.style.top = m.y + 'px';
+    el.style.zIndex = model.front === id ? '4' : '2';
+    el.classList.toggle('shade', model.shade);
+
+    el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
+    el.querySelectorAll('.gothic-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
+
+    const btn = el.querySelector('.run-btn');
+    btn.textContent = m.running ? 'Ⅱ' : '▶';
+    btn.setAttribute('aria-label', (m.running ? 'Pause ' : 'Resume ') + (id === 'a' ? 'Jarvis' : 'GitDiscuss'));
+  });
+
+  $('#runText').innerHTML = model.a.running ? '03 <em>agents running</em>' : '03 <em>agents paused</em>';
+  $('#activityState').textContent = model.a.running ? 'Undercroft running' : 'Undercroft paused';
+
+  const bayState = connectionState('bay');
+  $('#cryptBay').dataset.dockState = bayState;
+  const bayLabel = bayState === 'ready' ? 'Release to seat in crypt' :
+                   bayState === 'near' ? 'Near crypt bay · move closer' : 'Reliquary Undercroft Bay';
+  $('#bayStatus').textContent = bayLabel;
+
+  const undercroft = $('#undercroft');
+  undercroft.style.left = (model.a.x + 36) + 'px';
+  undercroft.style.top = (model.a.y + (model.shade ? 40 : 121)) + 'px';
+  undercroft.classList.toggle('open', model.undercroft);
+  $('#undercroftBody').inert = !model.undercroft;
+
+  $('#a .undercroft-btn').setAttribute('aria-expanded', String(model.undercroft));
+  $('#a .undercroft-btn').textContent = model.undercroft ? '▴ undercroft' : '▾ undercroft';
+
+  const meter = $('#cryptReliquary');
+  if (model.docked) {
+    if (meter.parentElement !== $('#cryptBay')) $('#cryptBay').append(meter);
+    meter.style.left = '0px';
+    meter.style.top = '0px';
+    meter.style.transform = `translate(${drag?.kind === 'meterLatch' ? drag.deflect.x : 0}px, ${drag?.kind === 'meterLatch' ? drag.deflect.y : 0}px) scale(0.98)`;
+    meter.style.transformOrigin = 'top left';
+    meter.inert = !model.undercroft;
+  } else {
+    if (meter.parentElement !== stage) stage.append(meter);
+    meter.style.left = model.meter.x + 'px';
+    meter.style.top = model.meter.y + 'px';
+    meter.style.transform = '';
+    meter.inert = false;
+  }
+
+  $('#emptyCryptBay').hidden = model.docked;
+  $('#emptyCryptBay').style.display = model.docked ? 'none' : 'flex';
+  $('#ejectCrypt').hidden = !model.docked;
+
+  stage.classList.toggle('design', model.design);
+  $('#btnDesign').setAttribute('aria-pressed', String(model.design));
+
+  $('#portA').style.left = (model.a.x + W - 30) + 'px';
+  $('#portA').style.top = (model.a.y + 54) + 'px';
+  $('#portB').style.left = (model.b.x + 12) + 'px';
+  $('#portB').style.top = (model.b.y + 54) + 'px';
+
+  $('#btnJoinAnim').disabled = model.joined || model.busy;
+  $('#btnSeparateAnim').disabled = !model.joined || model.busy;
+
+  $('#concurrencyValue').textContent = model.limit;
+  $('#concurrencyDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
+
+  const release = $('#keystoneRelease');
+  release.hidden = !model.joined || model.busy || model.shade;
+  release.style.left = (model.a.x + 338) + 'px';
+  release.style.top = (model.a.y + 44) + 'px';
+  release.style.setProperty('--tension', model.tension);
+
+  if (!model.busy) {
+    if (model.shade) {
+      $('#phase').textContent = 'Shade mode / Architectural lintel';
+    } else if (model.joined) {
+      $('#phase').textContent = 'Joined / One monolithic basilica';
+    } else if (model.keystoneDrop > 0.1) {
+      $('#phase').textContent = 'Joining / Keystone poised in descent';
+    } else {
+      $('#phase').textContent = 'Separate / Two stone housings';
+    }
+  }
+}
+
+function tween(duration, fn, token) {
+  return new Promise(resolve => {
+    if (motion.matches) {
+      if (token === animationToken) fn(1);
+      resolve(token === animationToken);
+      return;
+    }
+    let start = performance.now();
+    function step(now) {
+      if (token !== animationToken) { resolve(false); return; }
+      let t = Math.min(1, (now - start) / duration);
+      let e = t * t * (3 - 2 * t);
+      fn(e);
+      if (t < 1) requestAnimationFrame(step);
+      else resolve(true);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// Option 1 Join Animation: Modules close, voussoirs meet, keystone drops firmly
+async function join(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Cathedral voussoirs align. Inner caps retract; the granite keystone prepares to descend.');
+  $('#phase').textContent = 'Sanctuary light glowing';
+
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 90 : 250, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  $('#phase').textContent = 'Springers aligning';
+  if (!await tween(fromDrag ? 140 : 300, t => {
+    model.cap = t;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.undercroft ? 305 : 385, model.a.y));
+
+  $('#phase').textContent = 'Closing nave vault';
+  if (!await tween(fromDrag ? 280 : 500, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.6) / 0.4);
+    model.light = 1 - t;
+    render();
+  }, token)) return;
+
+  // Keystone monumental drop into place
+  $('#phase').textContent = 'Keystone dropping into apex';
+  if (!await tween(fromDrag ? 240 : 420, t => {
+    model.keystoneDrop = t;
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.keystoneDrop = 1;
+  model.light = 0;
+  render();
+  say('Keystone locked into nave vault. One shared cathedral housing. Pull the iron release bar right to separate.');
+}
+
+async function separate() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Releasing the keystone. Modules separate back to individual chapels.');
+
+  // Keystone lifts out first
+  $('#phase').textContent = 'Lifting keystone';
+  if (!await tween(280, t => {
+    model.keystoneDrop = 1 - t;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Separating stone housings';
+  if (!await tween(560, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.8);
+    model.cap = 1 - Math.max(0, (t - 0.4) / 0.6);
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.keystoneDrop = 0;
+  render();
+  say('Separated. Independent stone housings restored.');
+}
+
+// Preset State Switchers
+async function applyState(stateName) {
+  if (model.busy) return;
+  ++animationToken;
+
+  if (stateName === 'separate') {
+    model.shade = false;
+    if (model.joined) {
+      await separate();
+    } else {
+      model.keystoneDrop = 0;
+      model.cap = 0;
+      model.blend = 0;
+      model.a.x = 140;
+      model.b.x = 680;
+      render();
+      say('State: Separate — Two independent stone capsules.');
+    }
+  } else if (stateName === 'joining') {
+    model.shade = false;
+    model.joined = false;
+    model.blend = 0.25;
+    model.cap = 0.5;
+    model.keystoneDrop = 0.52; // mid-flight aloft
+    model.light = 0.75;
+    model.a.x = 240;
+    model.b.x = 240 + W + 50; // near each other
+    render();
+    say('State: Joining — Mid-animation view with keystone descending into the arch apex.');
+  } else if (stateName === 'joined') {
+    model.shade = false;
+    if (!model.joined) {
+      model.a.x = 220;
+      model.b.x = 220 + JOIN_DISTANCE;
+      model.joined = true;
+      model.blend = 1;
+      model.cap = 1;
+      model.keystoneDrop = 1;
+      model.light = 0;
+      render();
+      say('State: Joined — Monolithic basilican arch locked by granite keystone.');
+    }
+  } else if (stateName === 'shade') {
+    model.shade = true;
+    render();
+    say('State: Shade — Collapsed to compact architectural stone lintel.');
+  }
+}
+
+// Drawer & Cartridge Actions
+function toggleUndercroft(open = !model.undercroft) {
+  if (drag) cancelDrag();
+  model.undercroft = open;
+  if (open && model.a.y > 310) {
+    const dy = model.a.y - 310;
+    model.a.y = 310;
+    if (model.joined) model.b.y -= dy;
+  }
+  render();
+  say(open ? 'Reliquary Undercroft open. Drag Checks into its niche, or use Insert.' : 'Undercroft closed.');
+}
+
+async function insertChecks() {
+  if (model.busy || model.docked) return;
+  if (!model.undercroft) toggleUndercroft(true);
+  stopDrag();
+  model.busy = true;
+  model.feel = 'free';
+  model.light = 0;
+  const token = ++animationToken, start = { ...model.meter }, target = cryptTarget();
+  render();
+
+  const dist = Math.hypot(start.x - target.x, start.y - target.y);
+  if (!await tween(dist < 75 ? 160 : 340, t => {
+    model.meter.x = start.x + (target.x - start.x) * t;
+    model.meter.y = start.y + (target.y - start.y) * t;
+    render();
+  }, token)) return;
+
+  model.docked = true;
+  model.busy = false;
+  $('#cryptBay').classList.remove('hot');
+  render();
+  say('Checks seated in reliquary bay. Pull deliberately to free, or use Eject.');
+}
+
+function ejectChecks() {
+  if (model.busy) return;
+  stopDrag();
+  model.feel = 'free';
+  model.docked = false;
+  model.meter.x = Math.min(900, model.a.x + 430);
+  model.meter.y = Math.min(510, model.a.y + 190);
+  render();
+  say('Checks ejected from undercroft.');
+}
+
+function setPage(id, p) { model[id].page = p; render(); }
+
+// Event Wiring
+$('#btnStateSeparate').onclick = () => applyState('separate');
+$('#btnStateJoining').onclick = () => applyState('joining');
+$('#btnStateJoined').onclick = () => applyState('joined');
+$('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
+$('#btnJoinAnim').onclick = () => join();
+$('#btnSeparateAnim').onclick = () => separate();
+$('#btnDesign').onclick = () => {
+  model.design = !model.design;
+  render();
+  say(model.design ? 'Design mode: Showing nave arch springers & crypt bay.' : 'Design mode off.');
+};
+$('#btnReset').onclick = () => {
+  ++animationToken;
+  stopDrag();
+  resetGlow();
+  Object.assign(model, {
+    joined: false, busy: false, undercroft: false, docked: false, design: false, shade: false,
+    blend: 0, cap: 0, keystoneDrop: 0, light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+  });
+  Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
+  Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
+  Object.assign(model.meter, { x: 805, y: 510 });
+  render();
+  say('Reset to initial state.');
+};
+
+['a', 'b'].forEach(id => {
+  $('#' + id).querySelectorAll('.gothic-tab').forEach(btn => btn.onclick = () => setPage(id, +btn.dataset.page));
+  $('#' + id + ' .next-btn').onclick = () => setPage(id, (model[id].page + 1) % 3);
+  $('#' + id + ' .run-btn').onclick = () => {
+    model[id].running = !model[id].running;
+    render();
+    say((id === 'a' ? 'Jarvis' : 'GitDiscuss') + ' activity ' + (model[id].running ? 'resumed.' : 'paused.'));
+  };
+});
+
+$('#a .undercroft-btn').onclick = () => toggleUndercroft();
+$('#b .undercroft-btn').onclick = () => setPage('b', 1);
+$('#closeUndercroft').onclick = () => toggleUndercroft(false);
+$('#insertChecks').onclick = insertChecks;
+$('#ejectCrypt').onclick = ejectChecks;
+$('#concurrencyDial').onclick = () => {
+  model.limit = (model.limit % 6) + 1;
+  render();
+  say('Concurrency tithe set to: ' + model.limit);
+};
+
+// Drag & Drop Mechanics
+function local(e) {
+  const r = stage.getBoundingClientRect();
+  const scale = r.width / 1200;
+  return { x: (e.clientX - r.left) / scale, y: (e.clientY - r.top) / scale };
+}
+const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+function cryptTarget() { return { x: model.a.x + 58, y: model.a.y + (model.shade ? 80 : 162) }; }
+function stopDrag() { cancelAnimationFrame(dragFrame); dragFrame = 0; drag = null; }
+function snapshot() {
+  return {
+    a: { ...model.a }, b: { ...model.b }, meter: { ...model.meter },
+    joined: model.joined, docked: model.docked, cap: model.cap, blend: model.blend,
+    keystoneDrop: model.keystoneDrop, front: model.front
+  };
+}
+function restore(s) {
+  for (const id of ['a', 'b', 'meter']) Object.assign(model[id], s[id]);
+  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'front']) model[k] = s[k];
+}
+function cancelDrag() {
+  if (!drag) return;
+  const s = drag.saved;
+  stopDrag();
+  restore(s);
+  model.feel = 'free';
+  model.tension = 0;
+  model.light = 0;
+  $('#cryptBay').classList.remove('hot');
+  render();
+  say('Move cancelled.');
+}
+function targetFor(id) {
+  if (id === 'meter') return model.undercroft && !model.docked ? cryptTarget() : null;
+  if (model.joined) return null;
+  return id === 'a' ? { x: model.b.x - W - 14, y: model.b.y } : { x: model.a.x + W + 14, y: model.a.y };
+}
+function proximity(raw, target) {
+  if (!raw || !target) return { state: 'idle', distance: Infinity, brightness: 0 };
+  const d = Math.hypot(raw.x - target.x, raw.y - target.y);
+  if (d > DOCKING.near) return { state: 'idle', distance: d, brightness: 0 };
+  if (d <= DOCKING.capture) return { state: 'ready', distance: d, brightness: 1 };
+  const approach = (DOCKING.near - d) / (DOCKING.near - DOCKING.capture);
+  return { state: 'near', distance: d, brightness: 0.2 + 0.44 * Math.pow(approach, 0.8) };
+}
+function activeProximity(kind) {
+  if (!drag || drag.kind !== 'move' || model.busy || !drag.moved || (kind === 'bay') !== (drag.id === 'meter')) {
+    return proximity(null, null);
+  }
+  return proximity(drag.raw, targetFor(drag.id));
+}
+function connectionState(kind) { return activeProximity(kind).state; }
+function paintGlowValues() {
+  $('#cryptBay').style.setProperty('--dock-glow', connectionGlow.bay.value);
+}
+function glowTick(now) {
+  glowFrame = 0;
+  const dt = Math.min(64, now - (glowTime || now - 16));
+  glowTime = now;
+  let pending = false;
+  for (const g of Object.values(connectionGlow)) {
+    g.value += (g.target - g.value) * (1 - Math.exp(-dt / 40));
+    if (Math.abs(g.target - g.value) < 0.002) g.value = g.target;
+    else pending = true;
+  }
+  renderHardware();
+  paintGlowValues();
+  if (pending) glowFrame = requestAnimationFrame(glowTick);
+  else glowTime = 0;
+}
+function updateGlowTargets() {
+  for (const kind of ['socket', 'bay']) {
+    const g = connectionGlow[kind];
+    g.target = activeProximity(kind).brightness;
+    if (motion.matches) g.value = g.target;
+  }
+  if (!motion.matches && !glowFrame && Object.values(connectionGlow).some(g => g.value !== g.target)) {
+    glowTime = performance.now();
+    glowFrame = requestAnimationFrame(glowTick);
+  }
+}
+function resetGlow() {
+  cancelAnimationFrame(glowFrame);
+  glowFrame = 0;
+  glowTime = 0;
+  for (const g of Object.values(connectionGlow)) g.value = g.target = 0;
+}
+function magneticGoal(raw, target, id) {
+  const p = proximity(raw, target);
+  drag.captured = p.state === 'ready';
+  const strength = drag.captured ? 0.88 : p.state === 'near' ? Math.pow(1 - p.distance / DOCKING.near, 0.8) * 0.85 : 0;
+  model.light = id === 'meter' ? 0 : p.brightness;
+
+  if (id !== 'meter' && p.brightness > 0) {
+    model.keystoneDrop = p.brightness * 0.7; // keystone hovers downward as you approach!
+  } else if (!model.joined) {
+    model.keystoneDrop = 0;
+  }
+
+  return target ? { x: raw.x + (target.x - raw.x) * strength, y: raw.y + (target.y - raw.y) * strength } : raw;
+}
+
+function runDragFrame(now) {
+  if (!drag) return;
+  const d = drag, dt = Math.min(0.032, (now - (d.time || now - 16)) / 1000);
+  d.time = now;
+  if (d.goal && d.kind === 'move') {
+    const m = model[d.id];
+    if (motion.matches) {
+      m.x = d.goal.x; m.y = d.goal.y; d.vx = d.vy = 0;
+    } else {
+      const step = dt / 3;
+      for (let i = 0; i < 3; i++) {
+        d.vx += ((d.goal.x - m.x) * 400 - d.vx * 40) * step;
+        d.vy += ((d.goal.y - m.y) * 400 - d.vy * 40) * step;
+        m.x += d.vx * step;
+        m.y += d.vy * step;
+      }
+      if (Math.abs(d.goal.x - m.x) < 0.03 && Math.abs(d.vx) < 0.1) { m.x = d.goal.x; d.vx = 0; }
+    }
+  }
+  render();
+  dragFrame = requestAnimationFrame(runDragFrame);
+}
+
+stage.addEventListener('pointerdown', e => {
+  const target = e.target.closest('[data-drag]');
+  if (!target || e.button !== 0 || model.busy) return;
+  e.preventDefault();
+  const id = target.dataset.drag, saved = snapshot(), p = local(e);
+  const kind = id === 'release' ? 'shellLatch' :
+               id === 'meter' && model.docked ? 'meterLatch' :
+               model.joined && id !== 'meter' ? 'group' : 'move';
+  if (id === 'release' && !model.joined) return;
+  if ((id === 'a' || id === 'b') && !model.joined) model.front = id;
+  const actual = id === 'release' ? 'b' : id;
+  drag = {
+    id: actual, kind, start: p, saved,
+    origin: kind === 'meterLatch' ? cryptTarget() : { ...model[actual] },
+    captured: false, raw: null, moved: false, vx: 0, vy: 0, deflect: { x: 0, y: 0 }, goal: null
+  };
+  stage.setPointerCapture(e.pointerId);
+  dragFrame = requestAnimationFrame(runDragFrame);
+});
+
+stage.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const d = drag, p = local(e), dx = p.x - d.start.x, dy = p.y - d.start.y;
+  if (Math.abs(dx) + Math.abs(dy) > 3) d.moved = true;
+
+  if (d.kind === 'shellLatch') {
+    model.tension = clamp(dx / 72, 0, 1);
+    model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
+    model.keystoneDrop = 1 - model.tension * 0.6; // keystone begins lifting!
+    if (dx < 72) { render(); return; }
+    model.joined = false; model.blend = 0; model.cap = 1; model.tension = 0; model.keystoneDrop = 0;
+    d.kind = 'move';
+    d.origin.x = d.saved.a.x + W + 14;
+    say('Keystone released! Modules separated.');
+  }
+
+  if (d.kind === 'meterLatch') {
+    const dist = Math.hypot(dx, dy);
+    d.deflect = { x: clamp(dx * 0.13, -5, 5), y: clamp(dy * 0.13, -5, 5) };
+    if (dist < 46) { render(); return; }
+    model.docked = false;
+    Object.assign(model.meter, d.origin);
+    d.kind = 'move';
+    say('Checks widget freed from undercroft.');
+  }
+
+  if (d.kind === 'group') {
+    const x = clamp(d.saved.a.x + dx, 20, 1200 - JOIN_DISTANCE - W - 20);
+    const y = clamp(d.saved.a.y + dy, 110, model.undercroft ? 310 : 440);
+    Object.assign(model.a, { x, y });
+    Object.assign(model.b, { x: x + JOIN_DISTANCE, y });
+    render();
+    return;
+  }
+
+  const raw = {
+    x: clamp(d.origin.x + dx, d.id === 'meter' ? 12 : 20, d.id === 'meter' ? 912 : 790),
+    y: clamp(d.origin.y + dy, 110, d.id === 'meter' ? 560 : d.id === 'a' && model.undercroft ? 310 : 440)
+  };
+  d.raw = raw;
+  const goal = magneticGoal(raw, targetFor(d.id), d.id);
+  d.goal = {
+    x: clamp(goal.x, 12, d.id === 'meter' ? 912 : 790),
+    y: clamp(goal.y, 110, d.id === 'meter' ? 560 : d.id === 'a' && model.undercroft ? 310 : 440)
+  };
+
+  if (model.feel === 'free') {
+    Object.assign(model[d.id], d.goal);
+    d.vx = d.vy = 0;
+  }
+  render();
+});
+
+stage.addEventListener('pointerup', () => {
+  if (!drag) return;
+  const d = drag;
+  const ready = connectionState(d.id === 'meter' ? 'bay' : 'socket') === 'ready';
+  stopDrag();
+  $('#cryptBay').classList.remove('hot');
+  if (ready) {
+    if (d.id === 'meter') insertChecks();
+    else join(true);
+    return;
+  }
+  model.light = 0;
+  model.tension = 0;
+  if (!model.joined) {
+    model.cap = 0;
+    model.blend = 0;
+    model.keystoneDrop = 0;
+  }
+  render();
+});
+
+stage.addEventListener('pointercancel', cancelDrag);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cancelDrag(); });
+$('#keystoneRelease').onclick = e => { if (e.detail === 0) separate(); };
+
+function fit() {
+  const width = $('#viewport').clientWidth;
+  if (width < 900) {
+    stage.style.margin = '0';
+    stage.style.transform = 'none';
+    $('#viewport').style.height = '720px';
+    $('#viewport').style.overflow = 'auto';
+  } else {
+    const scale = Math.min(1, width / 1200);
+    stage.style.margin = width >= 1200 ? 'auto' : '0';
+    stage.style.transform = `scale(${scale})`;
+    stage.style.transformOrigin = 'top left';
+    $('#viewport').style.height = (720 * scale) + 'px';
+    $('#viewport').style.overflow = 'hidden';
+  }
+}
+window.addEventListener('resize', fit);
+render();
+fit();
+</script>
+</body>
+</html>
