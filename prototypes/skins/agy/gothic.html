@@ -200,6 +200,19 @@ header {
 .module.shade .module-svg {
   height: 44px;
 }
+.portcullis-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  pointer-events: none;
+  z-index: 4;
+  overflow: visible;
+}
+.module.shade .stone-grip {
+  opacity: 0;
+  pointer-events: none;
+}
 
 /* Architectural Stone Grip & Title Bar */
 .stone-grip {
@@ -325,8 +338,13 @@ header {
   padding: 0 10px;
   font: bold 11px/1 "Courier New", monospace;
   color: var(--parchment);
-  z-index: 5;
-  text-shadow: 0 0 5px rgba(230, 180, 71, 0.5);
+  z-index: 3;
+  text-shadow: 0 0 6px rgba(230, 180, 71, 0.7), 0 1px 2px #000;
+  cursor: grab;
+  border-radius: 2px;
+}
+.shade-strip:active {
+  cursor: grabbing;
 }
 .module.shade .shade-strip {
   display: flex;
@@ -737,14 +755,15 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Gothic Basilica <span>/ nave vaulting &amp; keystone join</span></h1>
-    <p>Monumental chiseled limestone · Pointed lancet arch · Carved granite keystone lock</p>
+    <h1>Gothic Basilica <span>/ nave vaulting, keystone &amp; portcullis</span></h1>
+    <p>Monumental chiseled limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis guillotine shade</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
       <label for="optionSelect">Option</label>
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="keystone" selected>1. Keystone Drop (Nave Vault Key)</option>
+        <option value="portcullis">2. Lancet Portcullis Guillotine shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -756,6 +775,7 @@ footer .note-highlight {
     </div>
     <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnPortcullisAnim">Drop portcullis</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -836,6 +856,31 @@ footer .note-highlight {
           <path d="M0 12H90M45 0V12M0 24H90M22 12V24M67 12V24" stroke="#121714" stroke-width="1.2" stroke-opacity="0.6"/>
           <path d="M0 13H90M45 1V13M0 25H90M22 13V25M67 13V25" stroke="#687a70" stroke-width="0.8" stroke-opacity="0.25"/>
         </pattern>
+
+        <!-- Portcullis forged iron vertical bar gradient -->
+        <linearGradient id="ironBarGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#141816"/>
+          <stop offset="25%" stop-color="#3c4741"/>
+          <stop offset="55%" stop-color="#697a70"/>
+          <stop offset="78%" stop-color="#3c4741"/>
+          <stop offset="100%" stop-color="#101412"/>
+        </linearGradient>
+
+        <!-- Portcullis forged iron horizontal cross-rail gradient -->
+        <linearGradient id="ironTieGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#63766a"/>
+          <stop offset="30%" stop-color="#35403a"/>
+          <stop offset="75%" stop-color="#1c231f"/>
+          <stop offset="100%" stop-color="#101412"/>
+        </linearGradient>
+
+        <!-- Portcullis barbed spike shoe gradient -->
+        <linearGradient id="spikeGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#7a8d81"/>
+          <stop offset="45%" stop-color="#3d4941"/>
+          <stop offset="75%" stop-color="#1c231f"/>
+          <stop offset="100%" stop-color="#0e1310"/>
+        </linearGradient>
       </defs>
 
       <!-- Shared arch, keystone and decorative joints -->
@@ -902,13 +947,16 @@ footer .note-highlight {
         </div>
       </div>
 
-      <!-- Shade Strip Display -->
-      <div class="shade-strip">
+      <!-- Shade Strip Display (Illuminated Gold Runes Behind Portcullis Bars) -->
+      <div class="shade-strip" data-drag="a" title="Drag Jarvis lintel">
         <span class="shade-tag"><span>✠</span> JARVIS · 03 AGENTS</span>
         <div class="shade-votives">
           <i class="gold"></i><i class="emerald"></i><i class="gold"></i>
         </div>
       </div>
+
+      <!-- Portcullis Guillotine Layer -->
+      <svg class="portcullis-svg" id="portcullis-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
       <div class="tab-row" role="tablist" aria-label="Jarvis screens">
         <button class="gothic-tab" role="tab" aria-selected="true" data-page="0">Status</button>
@@ -948,13 +996,16 @@ footer .note-highlight {
         </div>
       </div>
 
-      <!-- Shade Strip Display -->
-      <div class="shade-strip">
+      <!-- Shade Strip Display (Illuminated Gold Runes Behind Portcullis Bars) -->
+      <div class="shade-strip" data-drag="b" title="Drag GitDiscuss lintel">
         <span class="shade-tag"><span>✠</span> GITDISCUSS · 02 DECISIONS</span>
         <div class="shade-votives">
           <i class="ruby"></i><i class="gold"></i>
         </div>
       </div>
+
+      <!-- Portcullis Guillotine Layer -->
+      <svg class="portcullis-svg" id="portcullis-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
       <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
         <button class="gothic-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
@@ -995,15 +1046,15 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Gothic Basilica Architecture &amp; The Keystone Drop Join</h3>
+  <h3>Gothic Basilica Architecture · Keystone Join &amp; Portcullis Shade</h3>
   <p>
     In this aesthetic, modules are carved from dressed ashlar limestone. Pointed lancet arches frame the clerestory displays, supported by fluted colonnettes. When separate, each module's mating end forms one half of a monumental pointed arch (a voussoir springer).
   </p>
   <p>
-    <span class="note-highlight">Option 1 — Keystone Drop (Nave Vault Key):</span> As the two housings meet within the magnetic field, the voussoirs align. A carved granite keystone with an embossed trefoil and gothic cross descends vertically into the apex niche, locking the two independent modules into a continuous, monumental basilican arch. The release grip acts as a forged iron tie-wedge: pulling right unlocks the keystone.
+    <span class="note-highlight">Option 1 — Keystone Drop (Nave Vault Key) [Join]:</span> As the two housings meet within the magnetic field, the voussoirs align. A carved granite keystone with an embossed trefoil and gothic cross descends vertically into the apex niche, locking the two independent modules into a continuous, monumental basilican arch. The release grip acts as a forged iron tie-wedge: pulling right unlocks the keystone.
   </p>
   <p>
-    <span class="note-highlight">Shade Mode:</span> Collapses the stone structure into an architectural lintel frieze with a gothic status strip, preserving glanceable agent state.
+    <span class="note-highlight">Option 2 — Lancet Portcullis Guillotine [Shade]:</span> When collapsing to shade mode, a heavy forged-iron portcullis grille with barbed spike shoes drops vertically from behind the carved stone machicolations with gravity acceleration. The lower display bays slide upward behind the frieze, locking the widget into a fortified 44px architectural lintel. The status text and votive jewels remain cleanly visible and readable through the iron grille bars. Raising the portcullis winches the iron gate smoothly upward back into the clerestory vault.
   </p>
 </footer>
 
@@ -1026,6 +1077,8 @@ const model = {
   blend: 0,
   cap: 0,
   keystoneDrop: 0, // 0 = retracted / aloft, 1 = fully dropped and locked
+  portcullisDrop: 0, // 0 = hoisted aloft in clerestory vault, 1 = plunged & spiked shut
+  option: 'keystone', // 'keystone' or 'portcullis'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1177,7 +1230,7 @@ function drawGothicCasing(x, y, width, opacity = 1, isShade = false) {
     }
 
   } else {
-    // Shade Mode: Heavy Ashlar Cornice Lintel with Portcullis Grille
+    // Shade Mode: Heavy Ashlar Cornice Lintel with Embrasure Recesses & Corbel Plinth
     s += `<path d="
       M ${x - 4} ${y + 44}
       H ${x + width + 4}
@@ -1186,14 +1239,28 @@ function drawGothicCasing(x, y, width, opacity = 1, isShade = false) {
       Z" fill="url(#gothStone)" stroke="#111614" stroke-width="2.5"/>`;
     s += `<path d="M ${x - 4} ${y + 4} H ${x + width + 4}" stroke="#7e9084" stroke-width="2.2"/>`;
     s += `<path d="M ${x - 4} ${y + 42} H ${x + width + 4}" stroke="#39473e" stroke-width="2"/>`;
-    // Blind trefoil arcading along shade lintel
-    for (let ax = x + 30; ax <= x + width - 30; ax += 32) {
-      s += `<path d="M ${ax - 12} ${y + 36} V ${y + 14} Q ${ax} ${y + 6} ${ax + 12} ${y + 14} V ${y + 36}" fill="none" stroke="#5a6d61" stroke-width="1.2"/>`;
-      s += `<circle cx="${ax}" cy="${y + 16}" r="2" fill="#e6b447" opacity="0.75"/>`;
+
+    // Recessed dark basalt embrasure window behind the portcullis and shade strip
+    if (width > W) {
+      // Joined: dual embrasure windows
+      s += `<rect x="${x + 44}" y="${y + 6}" width="288" height="34" rx="2" fill="#090d0b" stroke="#18201c" stroke-width="1.5"/>`;
+      s += `<rect x="${x + width - 332}" y="${y + 6}" width="288" height="34" rx="2" fill="#090d0b" stroke="#18201c" stroke-width="1.5"/>`;
+      // Carved central join boss on lintel
+      const mid = x + width / 2;
+      s += `<circle cx="${mid}" cy="${y + 24}" r="10" fill="#1f2723" stroke="#687b70" stroke-width="1.5"/>`;
+      s += `<path d="M ${mid - 5} ${y + 24} H ${mid + 5} M ${mid} ${y + 19} V ${mid} ${y + 29}" stroke="#e6b447" stroke-width="1.5"/>`;
+    } else {
+      // Single capsule embrasure
+      s += `<rect x="${x + 44}" y="${y + 6}" width="288" height="34" rx="2" fill="#090d0b" stroke="#18201c" stroke-width="1.5"/>`;
     }
-    // Portcullis iron spikes peeking below the bottom edge
-    for (let px = x + 20; px <= x + width - 20; px += 24) {
-      s += `<path d="M ${px - 3} ${y + 44} L ${px} ${y + 50} L ${px + 3} ${y + 44} Z" fill="#141916" stroke="#4a5a50" stroke-width="1"/>`;
+
+    // Machicolation corbel teeth along top cornice
+    for (let cx = x + 18; cx <= x + width - 18; cx += 22) {
+      s += `<rect x="${cx - 2}" y="${y + 3}" width="4" height="4" fill="#2d3731" stroke="#111614" stroke-width="0.8"/>`;
+    }
+    // Mortise sockets along bottom sill where portcullis spike tips seat
+    for (let sx = x + 56; sx <= x + width - 56; sx += 33) {
+      s += `<rect x="${sx - 3}" y="${y + 41}" width="6" height="3" fill="#0d110f" stroke="#252e29" stroke-width="0.8"/>`;
     }
   }
 
@@ -1276,6 +1343,87 @@ function drawKeystone(midX, y, dropRatio, opacity = 1) {
   `;
 }
 
+// Option 2: Lancet Portcullis Guillotine Shade Mechanism
+function drawPortcullis(dropRatio = 0, width = 390) {
+  // dropRatio: 0 = fully aloft in clerestory vault, 1 = plunged & spiked shut
+  const aloftY = -56;
+  const droppedY = 0;
+  const currentY = aloftY + (droppedY - aloftY) * dropRatio;
+
+  const barXs = [56, 89, 122, 155, 188, 221, 254, 287, 320];
+  let s = `<g class="portcullis-assembly" transform="translate(0, ${currentY})">`;
+
+  // 1. Suspension Chains extending up to stone pulleys at x = 89 and x = 287
+  for (const cx of [89, 287]) {
+    s += `<g class="portcullis-chain">`;
+    // Machicolation chain slot in lintel ceiling
+    s += `<rect x="${cx - 5}" y="-40" width="10" height="8" fill="#0d110f" stroke="#3d4941" stroke-width="1"/>`;
+    s += `<circle cx="${cx}" cy="-36" r="2.5" fill="#67786e" stroke="#121614" stroke-width="0.8"/>`;
+    // Forged iron chain links
+    for (let ly = -30; ly <= 8; ly += 9) {
+      s += `<ellipse cx="${cx}" cy="${ly}" rx="3.2" ry="5.5" fill="none" stroke="#4d5c52" stroke-width="2"/>`;
+      s += `<ellipse cx="${cx}" cy="${ly}" rx="1.6" ry="3.5" fill="none" stroke="#7e9185" stroke-width="0.8" opacity="0.6"/>`;
+    }
+    // Heavy forged mounting shackle attaching chain to top tie-bar
+    s += `<path d="M ${cx - 4} 8 L ${cx - 4} 14 L ${cx + 4} 14 L ${cx + 4} 8 Z" fill="#252e29" stroke="#101512" stroke-width="1"/>`;
+    s += `<circle cx="${cx}" cy="11" r="1.5" fill="#8ca093"/>`;
+    s += `</g>`;
+  }
+
+  // 2. Flanking Vertical Iron Guide Tracks (channels embedded in ashlar jambs)
+  s += `<rect x="46" y="-30" width="6" height="84" fill="#141916" stroke="#2c3730" stroke-width="1"/>`;
+  s += `<line x1="49" y1="-30" x2="49" y2="54" stroke="#48584e" stroke-width="1.2"/>`;
+  s += `<circle cx="49" cy="14" r="1.5" fill="#7d9084"/>`;
+  s += `<circle cx="49" cy="36" r="1.5" fill="#7d9084"/>`;
+
+  s += `<rect x="324" y="-30" width="6" height="84" fill="#141916" stroke="#2c3730" stroke-width="1"/>`;
+  s += `<line x1="327" y1="-30" x2="327" y2="54" stroke="#48584e" stroke-width="1.2"/>`;
+  s += `<circle cx="327" cy="14" r="1.5" fill="#7d9084"/>`;
+  s += `<circle cx="327" cy="36" r="1.5" fill="#7d9084"/>`;
+
+  // 3. Horizontal Forged Cross-Rails (Tie-Plates)
+  // Upper cross-rail at y = 12
+  s += `<rect x="50" y="12" width="276" height="6" rx="1" fill="url(#ironTieGrad)" stroke="#111613" stroke-width="1.2"/>`;
+  s += `<line x1="51" y1="13" x2="325" y2="13" stroke="#7e9084" stroke-width="0.8" opacity="0.7"/>`;
+  // Lower cross-rail at y = 34
+  s += `<rect x="50" y="34" width="276" height="6" rx="1" fill="url(#ironTieGrad)" stroke="#111613" stroke-width="1.2"/>`;
+  s += `<line x1="51" y1="35" x2="325" y2="35" stroke="#7e9084" stroke-width="0.8" opacity="0.7"/>`;
+
+  // 4. Vertical Forged Iron Bars & Menacing Spike Shoes
+  barXs.forEach(bx => {
+    // Vertical square iron bar
+    s += `<rect x="${bx - 2}" y="0" width="4" height="44" fill="url(#ironBarGrad)" stroke="#101412" stroke-width="0.8"/>`;
+    s += `<line x1="${bx}" y1="0" x2="${bx}" y2="44" stroke="#7a8c80" stroke-width="0.8" opacity="0.5"/>`;
+
+    // Square domed rivets at intersections with cross-rails
+    [15, 37].forEach(ry => {
+      s += `<rect x="${bx - 2.5}" y="${ry - 2.5}" width="5" height="5" rx="0.5" fill="#2d3731" stroke="#0e1310" stroke-width="0.8"/>`;
+      s += `<rect x="${bx - 1.5}" y="${ry - 1.5}" width="2" height="2" fill="#8ea194"/>`;
+    });
+
+    // Menacing Barbed Iron Spike Shoe (Arrowhead / Spear point)
+    s += `<polygon points="${bx - 5} 44, ${bx} 57, ${bx + 5} 44, ${bx + 2} 41, ${bx - 2} 41"
+                   fill="url(#spikeGrad)" stroke="#0e1310" stroke-width="1.2"/>`;
+    s += `<line x1="${bx}" y1="42" x2="${bx}" y2="56" stroke="#8fa395" stroke-width="1"/>`;
+    // Spike barb lateral chamfers
+    s += `<line x1="${bx - 5}" y1="44" x2="${bx}" y2="50" stroke="#161c18" stroke-width="0.8"/>`;
+    s += `<line x1="${bx + 5}" y1="44" x2="${bx}" y2="50" stroke="#607267" stroke-width="0.8"/>`;
+
+    // 5. Impact Sparks & Dust at Spikes (when dropped with momentum)
+    if (dropRatio > 0.88) {
+      const sparkOpacity = (1 - dropRatio) * 8;
+      const sparkSpread = (dropRatio - 0.88) * 22;
+      s += `<circle cx="${bx}" cy="56" r="${sparkSpread}" fill="#ffd885" opacity="${sparkOpacity}" filter="url(#votiveGlow)"/>`;
+      s += `<circle cx="${bx}" cy="56" r="${sparkSpread * 0.5}" fill="#ffffff" opacity="${sparkOpacity}"/>`;
+      s += `<line x1="${bx}" y1="56" x2="${bx - 3}" y2="51" stroke="#e6b447" stroke-width="1" opacity="${sparkOpacity}"/>`;
+      s += `<line x1="${bx}" y1="56" x2="${bx + 3}" y2="51" stroke="#e6b447" stroke-width="1" opacity="${sparkOpacity}"/>`;
+    }
+  });
+
+  s += `</g>`;
+  return s;
+}
+
 // Render the entire hardware layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -1323,6 +1471,14 @@ function renderHardware() {
     $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawGothicSocketLight(isA ? W - 22 : 22, 0, glow)}</g>`;
   }
 
+  // Portcullis Guillotine in each module
+  for (const id of ['a', 'b']) {
+    const pEl = $('#portcullis-' + id);
+    if (pEl) {
+      pEl.innerHTML = drawPortcullis(model.portcullisDrop, W);
+    }
+  }
+
   // Socket proximity aura
   if (!isShade && glow > 0.05 && p < 0.98) {
     $('#gothicLightAura').innerHTML = `
@@ -1339,7 +1495,7 @@ function renderHardware() {
 function updateStateButtons() {
   const isShade = model.shade;
   const isJoined = model.joined;
-  const isJoining = model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95 && !isJoined;
+  const isJoining = model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95 && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -1425,6 +1581,15 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
+  const portBtn = $('#btnPortcullisAnim');
+  if (portBtn) {
+    portBtn.textContent = model.shade ? 'Lift portcullis' : 'Drop portcullis';
+    portBtn.disabled = model.busy;
+    const isPortOption = model.option === 'portcullis';
+    portBtn.classList.toggle('primary-btn', isPortOption);
+    $('#btnJoinAnim').classList.toggle('primary-btn', !isPortOption);
+  }
+
   $('#concurrencyValue').textContent = model.limit;
   $('#concurrencyDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
 
@@ -1436,7 +1601,7 @@ function render() {
 
   if (!model.busy) {
     if (model.shade) {
-      $('#phase').textContent = 'Shade mode / Architectural lintel';
+      $('#phase').textContent = 'Shade mode / Portcullis guillotine locked';
     } else if (model.joined) {
       $('#phase').textContent = 'Joined / One monolithic basilica';
     } else if (model.keystoneDrop > 0.1) {
@@ -1561,13 +1726,72 @@ async function separate() {
   say('Separated. Independent stone housings restored.');
 }
 
+// Option 2: Lancet Portcullis Guillotine Drop & Lift Animations
+async function dropPortcullis() {
+  if (model.busy || (model.shade && model.portcullisDrop >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Guillotine release! Heavy iron-spiked portcullis plunges over the clerestory opening.');
+  $('#phase').textContent = 'Guillotine dropping';
+
+  // Mark shade active so module CSS height begins collapsing to 44px
+  model.shade = true;
+  render();
+
+  // Animate gravity drop
+  await tween(380, t => {
+    // Gravity acceleration curve (t^2.2)
+    const gravity = Math.pow(t, 2.2);
+    model.portcullisDrop = gravity;
+    renderHardware();
+  }, token);
+
+  model.portcullisDrop = 1;
+  model.busy = false;
+  render();
+  say('Portcullis locked shut. Spiked iron shoes bite the stone sill. Golden status runes illuminated.');
+  $('#phase').textContent = 'Shade mode / Portcullis locked';
+}
+
+async function liftPortcullis() {
+  if (model.busy || (!model.shade && model.portcullisDrop <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Winching portcullis aloft. Forged iron chains hoist the gate into the clerestory vault.');
+  $('#phase').textContent = 'Winching portcullis';
+
+  // Unmark shade so CSS height expands back to 130px
+  model.shade = false;
+  render();
+
+  // Animate winching
+  await tween(360, t => {
+    // Smooth hoist curve
+    const winch = 1 - Math.sin(t * Math.PI / 2);
+    model.portcullisDrop = winch;
+    renderHardware();
+  }, token);
+
+  model.portcullisDrop = 0;
+  model.busy = false;
+  render();
+  say('Portcullis hoisted. Full clerestory display and cathedral controls restored.');
+  $('#phase').textContent = model.joined ? 'Joined / One monolithic basilica' : 'Separate / Two stone housings';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    model.shade = false;
+    if (model.shade) {
+      await liftPortcullis();
+    }
     if (model.joined) {
       await separate();
     } else {
@@ -1580,7 +1804,9 @@ async function applyState(stateName) {
       say('State: Separate — Two independent stone capsules.');
     }
   } else if (stateName === 'joining') {
-    model.shade = false;
+    if (model.shade) {
+      await liftPortcullis();
+    }
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.5;
@@ -1591,7 +1817,9 @@ async function applyState(stateName) {
     render();
     say('State: Joining — Mid-animation view with keystone descending into the arch apex.');
   } else if (stateName === 'joined') {
-    model.shade = false;
+    if (model.shade) {
+      await liftPortcullis();
+    }
     if (!model.joined) {
       model.a.x = 220;
       model.b.x = 220 + JOIN_DISTANCE;
@@ -1604,9 +1832,11 @@ async function applyState(stateName) {
       say('State: Joined — Monolithic basilican arch locked by granite keystone.');
     }
   } else if (stateName === 'shade') {
-    model.shade = true;
-    render();
-    say('State: Shade — Collapsed to compact architectural stone lintel.');
+    if (!model.shade) {
+      await dropPortcullis();
+    } else {
+      await liftPortcullis();
+    }
   }
 }
 
@@ -1667,6 +1897,25 @@ $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
 $('#btnJoinAnim').onclick = () => join();
 $('#btnSeparateAnim').onclick = () => separate();
+$('#btnPortcullisAnim').onclick = () => {
+  if (model.shade) liftPortcullis();
+  else dropPortcullis();
+};
+$('#optionSelect').onchange = async e => {
+  model.option = e.target.value;
+  if (model.option === 'portcullis') {
+    say('Option 2: Lancet Portcullis Guillotine shade selected.');
+    if (!model.shade) {
+      await dropPortcullis();
+    }
+  } else if (model.option === 'keystone') {
+    say('Option 1: Keystone Drop join selected.');
+    if (model.shade) {
+      await liftPortcullis();
+    }
+  }
+  render();
+};
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
   render();
@@ -1678,8 +1927,9 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, undercroft: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, keystoneDrop: 0, light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
+  $('#optionSelect').value = 'keystone';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
@@ -1721,12 +1971,12 @@ function snapshot() {
   return {
     a: { ...model.a }, b: { ...model.b }, meter: { ...model.meter },
     joined: model.joined, docked: model.docked, cap: model.cap, blend: model.blend,
-    keystoneDrop: model.keystoneDrop, front: model.front
+    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, option: model.option, front: model.front
   };
 }
 function restore(s) {
   for (const id of ['a', 'b', 'meter']) Object.assign(model[id], s[id]);
-  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'front']) model[k] = s[k];
+  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'option', 'front']) model[k] = s[k];
 }
 function cancelDrag() {
   if (!drag) return;
