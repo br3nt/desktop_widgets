@@ -13,7 +13,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Gothic · Join · Flying buttress — external attachment — Added a selectable rigid swinging stone rib, intact capitals, open gap and hinge-cap release; preserved keystone; 29 simulated DOM/interaction checks passed; visual review blocked by browser access.
 - [x] Felt · Join · Button and elastic loop — point attachment — Added a selectable apricot elastic loop, sewn horn button, open gap and button release; retained needle-felt merge; 24 local DOM/state checks passed; visual review blocked by denied Chrome access.
 - [x] Elven · Join · Bowstring tension — suspended attachment — Added selectable tightening cords, intact silver bows, a 52 px open gap and saddle-bead release; retained grafted ribs; 31 simulated DOM/state checks passed; visual review blocked by sandbox browser launch and unavailable browser UI.
-- [ ] Wire · Join · Caged bead capture — enclosure attachment
+- [x] Wire · Join · Caged bead capture — enclosure attachment — Added a selectable four-rib copper basket, cloudy green bead and sliding release collar; retained hook and eye; 29 simulated DOM, animation and pointer checks passed; full-page visual review blocked by unavailable browser access and sandbox browser launch.
 - [ ] Hollow · Join · Silk tension seam — binding attachment
 - [ ] Gothic · Join · Lead-came solder — surface fusion
 - [ ] Felt · Join · Zip closure — line attachment
