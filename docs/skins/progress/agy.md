@@ -15,7 +15,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Weaver's Silk Lash (Tension Twang) join — Glowing silk threads shoot across gap and cinch taut (Built in prototypes/skins/agy/hollow.html with bleached chitin horned carapace, Pharloom brass bobbins, golden silk whip and criss-cross cinch with tension twang, brass needle clapper release, and deepnest undercroft bay)
 
 ### Cycle 2: Primary Shades
-- [ ] Gothic: Lancet Portcullis Guillotine shade — Display slides up behind carved frieze with spiked iron portcullis
+- [x] Gothic: Lancet Portcullis Guillotine shade — Heavy forged-iron portcullis with barbed spike shoes drops with gravity physics into compact 44px stone lintel with glowing gold runes (Built in prototypes/skins/agy/gothic.html with animated guillotine drop, suspension chains, iron impact sparks, and Option 2 switcher)
 - [ ] Felt: Accordion Bellows Pleat shade — Heavy wool felt pleats fold flat into a padded ribbon
 - [ ] Elven: Lotus Petal Nocturne shade — Curved filigree petals close over screen leaving crowned diadem bar
 - [ ] Wire: Abacus Bead-Strand Compression shade — Parallel copper rods compress gemstone beads into jeweled rod
