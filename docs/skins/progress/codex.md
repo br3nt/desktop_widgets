@@ -15,7 +15,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Elven · Join · Bowstring tension — suspended attachment — Added selectable tightening cords, intact silver bows, a 52 px open gap and saddle-bead release; retained grafted ribs; 31 simulated DOM/state checks passed; visual review blocked by sandbox browser launch and unavailable browser UI.
 - [x] Wire · Join · Caged bead capture — enclosure attachment — Added a selectable four-rib copper basket, cloudy green bead and sliding release collar; retained hook and eye; 29 simulated DOM, animation and pointer checks passed; full-page visual review blocked by unavailable browser access and sandbox browser launch.
 - [x] Hollow · Join · Silk tension seam — binding attachment — Added selectable crossing silk, reinforced pinholes, a 26 px open gap and rust-red release loop; retained shell lap; 28 simulated DOM, animation and pointer checks passed; browser visual review blocked by denied Chrome access and sandbox browser launch.
-- [ ] Gothic · Join · Lead-came solder — surface fusion
+- [x] Gothic · Join · Lead-came solder — surface fusion — Added selectable sliding glass leaves, a descending solder highlight, leaded mullion and crown release catch; retained both earlier options; 38 simulated DOM, animation, state and touch-pointer checks passed; full-page visual review blocked by sandbox browser launch and denied Chrome access.
 - [ ] Felt · Join · Zip closure — line attachment
 - [ ] Elven · Join · Iris clasp — enclosing attachment
 - [ ] Wire · Join · Coil ferrule — binding attachment
