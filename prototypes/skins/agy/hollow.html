@@ -784,6 +784,37 @@ header {
   box-shadow: 0 0 4px var(--silk-gold);
 }
 
+/* Stag-Beetle Mandible Release Spur Lever */
+.silk-release-clasp.mandible-mode::before {
+  width: 9px;
+  height: 32px;
+  left: 8px;
+  top: 6px;
+  border-radius: 4px 4px 12px 2px;
+  background: linear-gradient(135deg, #ffffff 0%, #e5e6d6 45%, #9ea08f 80%, #30332c 100%);
+  border: 1.5px solid #2d3029;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.9), inset 0 1px 2px rgba(255, 255, 255, 0.9);
+  transform-origin: 4px 4px;
+  transform: rotate(calc(var(--tension, 0) * 35deg));
+  transition: transform 90ms cubic-bezier(0.18, 0.85, 0.25, 1);
+}
+.silk-release-clasp.mandible-mode:hover::before {
+  border-color: #ffffff;
+  box-shadow: 0 0 10px rgba(245, 246, 238, 0.7);
+}
+.silk-release-clasp.mandible-mode::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  left: 10px;
+  top: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fffae0, #e0b053 50%, #4d360f 90%);
+  border: 1px solid #241703;
+  box-shadow: 0 0 4px rgba(252, 192, 66, 0.5);
+}
+
 /* Design Mode Guides */
 #stage.joined .module { pointer-events: none; }
 #stage.joined .module button, #stage.joined .module .hollow-screen { pointer-events: auto; }
@@ -851,15 +882,16 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Hollow Knight &amp; Silksong <span>/ weaver's silk lash join &amp; elytra wing-case shield</span></h1>
-    <p>Bleached chitin shell silhouette · Golden weaver-silk rigging · Elytra wing-case shield shade · Pharloom brass &amp; lumaflies</p>
+    <h1>Hollow Knight &amp; Silksong <span>/ silk lash, elytra shield &amp; mandible interlock</span></h1>
+    <p>Bleached chitin shell silhouette · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Pharloom brass &amp; lumaflies</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
       <label for="optionSelect">Option</label>
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="silk_lash">1. Weaver's Silk Lash (Tension Twang &amp; Golden Silk)</option>
-        <option value="elytra_shield" selected>2. Elytra Wing-Case Shield shade (Folding Beetle Wings)</option>
+        <option value="elytra_shield">2. Elytra Wing-Case Shield shade (Folding Beetle Wings)</option>
+        <option value="mandible_interlock" selected>3. Chitinous Carapace Mandible Interlock join (Serrated Stag-Beetle Shell Teeth)</option>
       </select>
     </div>
     <div class="control-group">
@@ -869,9 +901,9 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim">Join capsules</button>
+    <button id="btnJoinAnim" class="primary-btn">Interlock mandibles</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
-    <button id="btnElytraAnim" class="primary-btn">Fold elytra</button>
+    <button id="btnElytraAnim">Fold elytra</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -1125,6 +1157,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 2 — Elytra Wing-Case Shield shade:</span> Two curved, bone-white beetle wing-cases (elytra) glide down from the upper chitin rim over the screen surface like the folding wings of a resting beetle, shielding the inner embrasure with interlocking suture teeth and a central Pharloom brass beetle clasp. The casing collapses into an ultra-compact 44px bone-white horn-crest diadem bar with glowing lumafly eye slits and an unclipped, crystal-clear status readout.
   </p>
+  <p>
+    <span class="note-highlight">Option 3 — Chitinous Carapace Mandible Interlock join:</span> Stepped, serrated teeth carved from bleached stag-beetle shell with sharp insectoid cusps, spine carinae, and dark respiration spiracles. On approach or selecting Joining state, the complementary chitin jaws slide into engagement with a rapid insectoid chittering vibration and white chalk slash glints. Once docked, the teeth seat flush into a crisp, hand-drawn zig-zag suture line in bone white, pinned by three Pharloom brass carapace cleats. Pulling the stag-beetle mandible spur lever disengages the chitin teeth with an insectoid recoil.
+  </p>
 </footer>
 
 <script>
@@ -1148,7 +1183,9 @@ const model = {
   silkWhipProgress: 0, // 0 = separate, 0.5 = threads shooting across gap, 1.0 = cinched taut
   silkVibration: 0,    // harmonic twang offset
   elytraGlide: 0,      // 0 = spread aloft, 1.0 = folded shut over screen
-  option: 'elytra_shield',
+  mandibleProgress: 0, // 0 = separate, 0.5 = teeth sliding together, 1.0 = interlocked flush
+  mandibleChitter: 0,  // high-frequency insectoid vibration
+  option: 'mandible_interlock',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1310,6 +1347,84 @@ function drawHollowCap(x, y, isRight, isMaleBobbin = false, retract = 0, isShade
   return s;
 }
 
+// Option 3: Stepped Stag-Beetle Shell Mandible Docking Teeth & Sockets
+function drawMandibleCap(x, y, isRight, isModuleA, retract = 0, isShade = false) {
+  if (isShade) return '';
+  // Outer ends (left of A or right of B) retain the smooth horned carapace
+  if ((!isRight && isModuleA) || (isRight && !isModuleA)) {
+    return drawHollowCap(x, y, isRight, false, 0, isShade);
+  }
+
+  const scale = 1 - retract;
+  if (scale < 0.04) return '';
+
+  let s = '';
+  if (isModuleA && isRight) {
+    // Module A (Right Flank of Jarvis): Protruding Stepped Stag-Beetle Mandible Teeth
+    const startX = x + W - 20;
+    s += `<g class="mandible-cap-a" transform="translate(${startX}, ${y + 64}) scale(${scale}, 1)">`;
+    // Chitin Drop Shadow
+    s += `<path d="M 0 -54 L 14 -46 L 26 -38 L 8 -26 L 28 -14 L 6 0 L 32 14 L 6 28 L 28 42 L 8 54 L 0 60 Z"
+                fill="#000000" opacity="0.65" filter="url(#chitinShadow)"/>`;
+    // Carved Bone-White Chitin Mandible Teeth Shell
+    s += `<path d="M 0 -54
+                   L 14 -46
+                   L 26 -38
+                   L 8 -26
+                   L 28 -14
+                   L 6 0
+                   L 32 14
+                   L 6 28
+                   L 28 42
+                   L 8 54
+                   L 0 60 Z"
+                fill="url(#chitinGrad)" stroke="#242820" stroke-width="2.2" stroke-linejoin="round"/>`;
+    // Chitin Tooth Ridge Highlights (Spines of the serrated teeth)
+    s += `<path d="M 0 -50 L 22 -38 M 0 -22 L 24 -14 M 0 4 L 28 14 M 0 24 L 24 42 M 0 52 L 14 -46"
+                stroke="#ffffff" stroke-width="1.6" opacity="0.85" stroke-linecap="round"/>`;
+    // Dark Arthropod Respiration Spiracles along the jaw root
+    [[-32], [-8], [18], [44]].forEach(([sy]) => {
+      s += `<ellipse cx="6" cy="${sy}" rx="2.5" ry="3.8" fill="#090d0f" stroke="#4f5246" stroke-width="1"/>`;
+      s += `<circle cx="6" cy="${sy}" r="1.2" fill="#ffd269" filter="url(#lumaflyGlow)"/>`;
+    });
+    // Pharloom Brass Accent Washer on Central Talon
+    s += `<circle cx="8" cy="14" r="3.5" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>`;
+    s += `</g>`;
+  } else if (!isModuleA && !isRight) {
+    // Module B (Left Flank of GitDiscuss): Complementary Interlocking Mandible Socket & Teeth
+    const startX = x + 20;
+    s += `<g class="mandible-cap-b" transform="translate(${startX}, ${y + 64}) scale(${scale}, 1)">`;
+    // Drop Shadow
+    s += `<path d="M 0 -54 L -8 -46 L 4 -38 L -24 -26 L 4 -14 L -26 0 L 2 14 L -26 28 L 4 42 L -24 54 L 0 60 Z"
+                fill="#000000" opacity="0.65" filter="url(#chitinShadow)"/>`;
+    // Carved Bone-White Chitin Mandible Socket Body
+    s += `<path d="M 0 -54
+                   L -8 -46
+                   L 4 -38
+                   L -24 -26
+                   L 4 -14
+                   L -26 0
+                   L 2 14
+                   L -26 28
+                   L 4 42
+                   L -24 54
+                   L 0 60 Z"
+                fill="url(#chitinGrad)" stroke="#242820" stroke-width="2.2" stroke-linejoin="round"/>`;
+    // Chitin Tooth Ridge Highlights
+    s += `<path d="M 0 -30 L -20 -26 M 0 -4 L -22 0 M 0 24 L -22 28 M 0 50 L -20 54"
+                stroke="#ffffff" stroke-width="1.6" opacity="0.85" stroke-linecap="round"/>`;
+    // Respiration Spiracles on Module B's side
+    [[-24], [2], [30]].forEach(([sy]) => {
+      s += `<ellipse cx="-6" cy="${sy}" rx="2.5" ry="3.8" fill="#090d0f" stroke="#4f5246" stroke-width="1"/>`;
+      s += `<circle cx="-6" cy="${sy}" r="1.2" fill="#ffd269" filter="url(#lumaflyGlow)"/>`;
+    });
+    // Brass Receiving Bushing on Central Talon Socket
+    s += `<circle cx="-6" cy="14" r="3.5" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>`;
+    s += `</g>`;
+  }
+  return s;
+}
+
 // Proximity Lumafly Bioluminescence Aura
 function drawHollowProximityAura(x, y, amount) {
   if (amount < 0.02) return '';
@@ -1404,6 +1519,126 @@ function drawSilkLashJoin(midX, y, progress, tensionVibe, opacity = 1) {
     s += `<circle cx="${midX}" cy="${y + 64}" r="${flashScale * 28}"
                   fill="none" stroke="#fffde6" stroke-width="${(1 - flashScale) * 6}"
                   opacity="${(1 - flashScale) * 5}" filter="url(#silkBoom)"/>`;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Option 3: Chitinous Carapace Mandible Interlock Join (Serrated Stag-Beetle Shell Teeth & Zig-Zag Suture)
+function drawMandibleInterlockJoin(midX, y, progress, chitter = 0, opacity = 1) {
+  if (progress < 0.02) return '';
+  const clampedProg = Math.min(1, Math.max(0, progress));
+  const isJoined = clampedProg >= 0.98;
+  const chitterY = Math.sin(clampedProg * Math.PI * 10) * chitter * 4;
+
+  let s = `<g opacity="${opacity}" class="mandible-interlock-assembly">`;
+
+  // Deep Subterranean Seam Shadow
+  s += `<rect x="${midX - 10}" y="${y + 10}" width="20" height="110" rx="4"
+              fill="#06090a" opacity="${Math.min(0.9, clampedProg * 1.2)}"/>`;
+
+  if (!isJoined) {
+    // 1. Approaching / Interlacing Mandibles with Chittering Vibration
+    const spread = (1 - clampedProg) * 36;
+    const teethA_X = midX - spread;
+    const teethB_X = midX + spread;
+
+    // Module A Teeth sliding toward center
+    s += `<g transform="translate(${teethA_X}, ${y + 64 + chitterY})">
+      <path d="M -8 -54 L 6 -46 L 18 -38 L 0 -26 L 20 -14 L -2 0 L 24 14 L -2 28 L 20 42 L 0 54 L -8 60 Z"
+            fill="url(#chitinGrad)" stroke="#242820" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M -6 -50 L 14 -38 M -6 -22 L 16 -14 M -6 4 L 20 14 M -6 24 L 16 42"
+            stroke="#ffffff" stroke-width="1.6" opacity="0.9" stroke-linecap="round"/>
+    </g>`;
+
+    // Module B Teeth sliding toward center
+    s += `<g transform="translate(${teethB_X}, ${y + 64 - chitterY})">
+      <path d="M 8 -54 L 0 -46 L 12 -38 L -16 -26 L 12 -14 L -18 0 L 10 14 L -18 28 L 12 42 L -16 54 L 8 60 Z"
+            fill="url(#chitinGrad)" stroke="#242820" stroke-width="2.2" stroke-linejoin="round"/>
+      <path d="M 6 -30 L -12 -26 M 6 -4 L -14 0 M 6 24 L -14 28 M 6 50 L -12 54"
+            stroke="#ffffff" stroke-width="1.6" opacity="0.9" stroke-linecap="round"/>
+    </g>`;
+
+    // White insectoid friction slash highlights / spark glints at tooth tips
+    if (clampedProg > 0.35) {
+      const sparkAlpha = Math.min(1, (clampedProg - 0.35) / 0.5);
+      s += `<g opacity="${sparkAlpha}">
+        <line x1="${midX - 12}" y1="${y + 50 + chitterY}" x2="${midX + 12}" y2="${y + 50 - chitterY}"
+              stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" filter="url(#silkBoom)"/>
+        <line x1="${midX - 16}" y1="${y + 78 + chitterY}" x2="${midX + 10}" y2="${y + 78 - chitterY}"
+              stroke="#ffff94" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="${midX}" cy="${y + 64}" r="3" fill="#ffffff" filter="url(#lumaflyGlow)"/>
+        <circle cx="${midX - 6}" cy="${y + 36}" r="1.8" fill="#ffff94"/>
+        <circle cx="${midX + 8}" cy="${y + 92}" r="2" fill="#fcc042"/>
+      </g>`;
+    }
+  } else {
+    // 2. Fully Interlocked Flush Carapace Seam (Monolithic Locked Suture)
+    // The crisp, hand-drawn zig-zag suture line in bone white
+    const suturePoints = `
+      M ${midX} ${y + 12}
+      L ${midX + 8} ${y + 24}
+      L ${midX - 7} ${y + 36}
+      L ${midX + 9} ${y + 48}
+      L ${midX - 8} ${y + 58}
+      L ${midX + 11} ${y + 68}
+      L ${midX - 8} ${y + 78}
+      L ${midX + 9} ${y + 88}
+      L ${midX - 7} ${y + 100}
+      L ${midX + 8} ${y + 110}
+      L ${midX} ${y + 122}
+    `;
+
+    // Dark subterranean under-shadow stroke
+    s += `<path d="${suturePoints}"
+                fill="none" stroke="#090d0f" stroke-width="4.2"
+                stroke-linejoin="round" stroke-linecap="round"/>`;
+
+    // Bleached bone-white suture highlight
+    s += `<path d="${suturePoints}"
+                fill="none" stroke="#f5f6ee" stroke-width="2.2"
+                stroke-linejoin="round" stroke-linecap="round"/>`;
+
+    // Secondary razor-thin pure white reflection core
+    s += `<path d="${suturePoints}"
+                fill="none" stroke="#ffffff" stroke-width="0.8"
+                stroke-linejoin="round" stroke-linecap="round" opacity="0.95"/>`;
+
+    // Paired Arthropod Respiration Spiracles along the interlocked seam
+    const spiracles = [
+      [midX - 16, y + 30], [midX + 16, y + 30],
+      [midX - 18, y + 54], [midX + 18, y + 54],
+      [midX - 18, y + 82], [midX + 18, y + 82],
+      [midX - 16, y + 104], [midX + 16, y + 104]
+    ];
+    spiracles.forEach(([sx, sy]) => {
+      s += `<ellipse cx="${sx}" cy="${sy}" rx="2.5" ry="3.5" fill="#090d0f" stroke="#3d4941" stroke-width="1"/>`;
+      s += `<circle cx="${sx}" cy="${sy}" r="1.2" fill="#ffd269" filter="url(#lumaflyGlow)"/>`;
+    });
+
+    // 3 Pharloom Brass Carapace Cleats / Rivets pinning the interlocked jaws
+    [y + 36, y + 68, y + 100].forEach(cy => {
+      s += `<g transform="translate(${midX}, ${cy})">
+        <!-- Chitin socket recess -->
+        <circle cx="0" cy="0" r="6" fill="#141a1d" stroke="#2a353c" stroke-width="1.2"/>
+        <!-- Cast Pharloom brass cleat stud -->
+        <circle cx="0" cy="0" r="4.2" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>
+        <!-- Center cross-boss -->
+        <line x1="-2.5" y1="0" x2="2.5" y2="0" stroke="#241703" stroke-width="0.8"/>
+        <line x1="0" y1="-2.5" x2="0" y2="2.5" stroke="#241703" stroke-width="0.8"/>
+        <circle cx="0" cy="0" r="1.2" fill="#ffff94"/>
+      </g>`;
+    });
+
+    // Impact Sparks on Full Chitin Lock (transient shockwave)
+    if (clampedProg >= 0.88 && clampedProg < 1) {
+      const sparkAlpha = (clampedProg - 0.88) / 0.12;
+      s += `<g opacity="${(1 - sparkAlpha) * 4}">
+        <circle cx="${midX}" cy="${y + 68}" r="${sparkAlpha * 32}" fill="none" stroke="#ffffff" stroke-width="2.5" filter="url(#silkBoom)"/>
+        <circle cx="${midX}" cy="${y + 68}" r="${sparkAlpha * 18}" fill="none" stroke="#fcc042" stroke-width="2"/>
+      </g>`;
+    }
   }
 
   s += `</g>`;
@@ -1535,11 +1770,21 @@ function renderHardware() {
     }
   }
 
-  // Draw Weaver's Silk Lash Join for Option 1
-  if (!isShade && (model.joined || model.silkWhipProgress > 0.02 || (glow > 0.25 && !model.joined))) {
-    const prog = model.joined ? 1 : model.silkWhipProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
-    const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
-    shared += drawSilkLashJoin(kMidX, a.y, prog, model.silkVibration, Math.max(p, glow > 0.25 ? 0.95 : prog));
+  // Draw Mandible Interlock Join for Option 3 or Weaver's Silk Lash Join for Option 1 & 2
+  if (!isShade) {
+    if (model.option === 'mandible_interlock') {
+      if (model.joined || model.mandibleProgress > 0.02 || (glow > 0.25 && !model.joined)) {
+        const prog = model.joined ? 1 : model.mandibleProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+        shared += drawMandibleInterlockJoin(kMidX, a.y, prog, model.mandibleChitter, Math.max(p, glow > 0.25 ? 0.95 : prog));
+      }
+    } else {
+      if (model.joined || model.silkWhipProgress > 0.02 || (glow > 0.25 && !model.joined)) {
+        const prog = model.joined ? 1 : model.silkWhipProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+        shared += drawSilkLashJoin(kMidX, a.y, prog, model.silkVibration, Math.max(p, glow > 0.25 ? 0.95 : prog));
+      }
+    }
   }
 
   if (model.joined && model.design) {
@@ -1552,9 +1797,15 @@ function renderHardware() {
   // Individual Capsule SVG Shells & Elytra Wing-Case Shields
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
-    const individual = drawHollowCasing(0, 0, W, 1, isShade) +
-      drawHollowCap(0, 0, false, false, isA ? 0 : model.cap, isShade) +
-      drawHollowCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+    let capL, capR;
+    if (model.option === 'mandible_interlock') {
+      capL = drawMandibleCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
+      capR = drawMandibleCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+    } else {
+      capL = drawHollowCap(0, 0, false, false, isA ? 0 : model.cap, isShade);
+      capR = drawHollowCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+    }
+    const individual = drawHollowCasing(0, 0, W, 1, isShade) + capL + capR;
 
     $('#shell-' + id).innerHTML = `
       <g opacity="${1 - p}">
@@ -1586,7 +1837,7 @@ function renderHardware() {
 function updateStateButtons() {
   const isShade = model.shade;
   const isJoined = model.joined;
-  const isJoining = model.silkWhipProgress > 0.1 && model.silkWhipProgress < 0.95 && !isJoined;
+  const isJoining = ((model.option === 'mandible_interlock' ? model.mandibleProgress > 0.05 && model.mandibleProgress < 0.95 : model.silkWhipProgress > 0.1 && model.silkWhipProgress < 0.95)) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -1664,6 +1915,13 @@ function render() {
   stage.classList.toggle('design', model.design);
   $('#btnDesign').setAttribute('aria-pressed', String(model.design));
 
+  if (model.option === 'mandible_interlock') {
+    $('#portA').dataset.label = 'Stag Mandible Teeth · A';
+    $('#portB').dataset.label = 'Mandible Suture Socket · B';
+  } else {
+    $('#portA').dataset.label = 'Silk Spool Pin · A';
+    $('#portB').dataset.label = 'Chitin Eyelet Catch · B';
+  }
   $('#portA').style.left = (model.a.x + W - 30) + 'px';
   $('#portA').style.top = (model.a.y + 54) + 'px';
   $('#portB').style.left = (model.b.x + 12) + 'px';
@@ -1672,13 +1930,26 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
+  const joinBtn = $('#btnJoinAnim');
+  if (joinBtn) {
+    if (model.option === 'mandible_interlock') {
+      joinBtn.textContent = 'Interlock mandibles';
+      joinBtn.classList.toggle('primary-btn', !model.joined);
+    } else if (model.option === 'silk_lash') {
+      joinBtn.textContent = 'Join with silk';
+      joinBtn.classList.toggle('primary-btn', !model.joined);
+    } else {
+      joinBtn.textContent = 'Join capsules';
+      joinBtn.classList.toggle('primary-btn', false);
+    }
+  }
+
   const elytraBtn = $('#btnElytraAnim');
   if (elytraBtn) {
     elytraBtn.textContent = model.shade ? 'Spread elytra' : 'Fold elytra';
     elytraBtn.disabled = model.busy;
     const isElytraOption = model.option === 'elytra_shield';
     elytraBtn.classList.toggle('primary-btn', isElytraOption);
-    $('#btnJoinAnim').classList.toggle('primary-btn', !isElytraOption && !model.joined);
   }
 
   $('#spoolValue').textContent = model.limit;
@@ -1689,14 +1960,30 @@ function render() {
   release.style.left = (model.a.x + 338) + 'px';
   release.style.top = (model.a.y + 44) + 'px';
   release.style.setProperty('--tension', model.tension);
+  release.classList.toggle('mandible-mode', model.option === 'mandible_interlock');
+  if (model.option === 'mandible_interlock') {
+    release.setAttribute('aria-label', 'Release GitDiscuss: pull right or press Enter to unlatch mandibles');
+    release.setAttribute('title', 'Pull right to unlatch stag-beetle mandibles · Enter to separate');
+  } else {
+    release.setAttribute('aria-label', 'Release GitDiscuss: pull right or press Enter');
+    release.setAttribute('title', 'Pull right to snap silk latch · Enter to separate');
+  }
 
   if (!model.busy) {
     if (model.shade) {
       $('#phase').textContent = 'Shade mode / Bleached chitin horn-crest diadem';
     } else if (model.joined) {
-      $('#phase').textContent = 'Joined / One monolithic chitin carapace bound in golden silk';
-    } else if (model.silkWhipProgress > 0.1) {
-      $('#phase').textContent = 'Joining / Golden silk threads whipping across chitin divide';
+      if (model.option === 'mandible_interlock') {
+        $('#phase').textContent = 'Joined / Monolithic chitin carapace with mandible interlock';
+      } else {
+        $('#phase').textContent = 'Joined / One monolithic chitin carapace bound in golden silk';
+      }
+    } else if (model.mandibleProgress > 0.1 || model.silkWhipProgress > 0.1) {
+      if (model.option === 'mandible_interlock') {
+        $('#phase').textContent = 'Joining / Serrated stag-beetle mandible teeth meshing';
+      } else {
+        $('#phase').textContent = 'Joining / Golden silk threads whipping across chitin divide';
+      }
     } else {
       $('#phase').textContent = 'Separate / Two independent bleached chitin instruments';
     }
@@ -1724,7 +2011,7 @@ function tween(duration, fn, token) {
   });
 }
 
-// Option 1 Join Animation: Weaver's Silk Lash (Tension Twang)
+// Join Animations
 async function join(fromDrag = false) {
   if (model.busy || model.joined) return;
   model.busy = true;
@@ -1732,6 +2019,66 @@ async function join(fromDrag = false) {
   model.feel = 'free';
   const token = ++animationToken;
   render();
+
+  if (model.option === 'mandible_interlock') {
+    say('Capsules enter attraction threshold. Serrated stag-beetle mandibles align across the divide.');
+    $('#phase').textContent = 'Mandibles extending & chittering';
+
+    const initialLight = model.light;
+    if (!await tween(fromDrag ? 90 : 200, t => {
+      model.light = initialLight + (1 - initialLight) * t;
+      renderHardware();
+    }, token)) return;
+
+    $('#phase').textContent = 'Teeth sliding into engagement';
+    if (!await tween(fromDrag ? 140 : 260, t => {
+      model.cap = t;
+      model.mandibleProgress = t * 0.55;
+      model.mandibleChitter = Math.sin(t * Math.PI * 6) * (1 - t);
+      renderHardware();
+    }, token)) return;
+
+    const startA = { ...model.a }, startB = { ...model.b };
+    const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+    const targetY = Math.max(110, Math.min(model.cradle ? 305 : 385, model.a.y));
+
+    $('#phase').textContent = 'Mandibles interlocking with insectoid click';
+    if (!await tween(fromDrag ? 240 : 420, t => {
+      model.a.x = startA.x + (targetX - startA.x) * t;
+      model.a.y = startA.y + (targetY - startA.y) * t;
+      model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+      model.b.y = startB.y + (targetY - startB.y) * t;
+      model.blend = Math.max(0, (t - 0.35) / 0.65);
+      model.mandibleProgress = 0.55 + 0.35 * t;
+      model.mandibleChitter = Math.sin(t * Math.PI * 8) * (1 - t) * 0.9;
+      model.light = 1 - t * 0.7;
+      render();
+    }, token)) return;
+
+    // Final decisive lock snap
+    $('#phase').textContent = 'Insectoid lock: serrated suture locked flush';
+    if (!await tween(fromDrag ? 160 : 300, t => {
+      model.mandibleProgress = 0.9 + 0.1 * t;
+      model.mandibleChitter = Math.sin(t * Math.PI * 10) * (1 - t) * 0.5;
+      model.blend = 1;
+      model.cap = 1;
+      model.light = (1 - t) * 0.3;
+      render();
+    }, token)) return;
+
+    model.mandibleChitter = 0;
+    model.mandibleProgress = 1;
+    model.joined = true;
+    model.busy = false;
+    model.blend = 1;
+    model.cap = 1;
+    model.light = 0;
+    render();
+    say('Joined. Serrated stag-beetle shell teeth interlocked into a monolithic chitin carapace.');
+    return;
+  }
+
+  // Option 1: Weaver's Silk Lash Join (Tension Twang)
   say('Capsules enter attraction threshold. Weaver spools align across the divide.');
   $('#phase').textContent = 'Spools spinning; silk threads glowing';
 
@@ -1794,6 +2141,44 @@ async function separate(distance = 160) {
   stopDrag();
   model.feel = 'free';
   const token = ++animationToken;
+
+  if (model.option === 'mandible_interlock') {
+    say('Stag-beetle mandible spur lever unlatched. Chitinous teeth disengage with an insectoid click.');
+    $('#phase').textContent = 'Mandibles disengaging & recoiling';
+
+    const startB = { ...model.b };
+    const targetBX = Math.min(1200 - W - 20, startB.x + distance);
+
+    // Quick tooth unlatch snap
+    await tween(110, t => {
+      model.tension = 1 - t;
+      model.mandibleChitter = Math.sin(t * Math.PI * 5) * 1.2;
+      renderHardware();
+    }, token);
+
+    await tween(360, t => {
+      model.b.x = startB.x + (targetBX - startB.x) * t;
+      model.blend = 1 - t;
+      model.cap = 1 - t;
+      model.mandibleProgress = 1 - t;
+      model.mandibleChitter = Math.sin(t * Math.PI * 6) * (1 - t);
+      model.light = Math.sin(t * Math.PI) * 0.4;
+      render();
+    }, token);
+
+    model.joined = false;
+    model.busy = false;
+    model.blend = 0;
+    model.cap = 0;
+    model.light = 0;
+    model.mandibleChitter = 0;
+    model.mandibleProgress = 0;
+    render();
+    say('Separated. Independent bleached chitin instruments restored.');
+    return;
+  }
+
+  // Option 1: Silk Lash Separate
   say('Pharloom needle clapper pulled right. Golden silk latch snaps open.');
   $('#phase').textContent = 'Silk threads snapping & recoiling';
 
@@ -1896,6 +2281,8 @@ async function applyState(stateName) {
     } else {
       model.silkWhipProgress = 0;
       model.silkVibration = 0;
+      model.mandibleProgress = 0;
+      model.mandibleChitter = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -1910,13 +2297,25 @@ async function applyState(stateName) {
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.6;
-    model.silkWhipProgress = 0.55; // threads mid-flight shooting across gap
-    model.silkVibration = 0.4;
     model.light = 0.8;
     model.a.x = 240;
     model.b.x = 240 + W + 50; // approaching each other
-    render();
-    say('State: Joining — Mid-animation view with golden silk threads whipping across the gap.');
+
+    if (model.option === 'mandible_interlock') {
+      model.mandibleProgress = 0.55;
+      model.mandibleChitter = 0.5;
+      model.silkWhipProgress = 0;
+      model.silkVibration = 0;
+      render();
+      say('State: Joining — Mid-animation view with serrated stag-beetle mandible teeth sliding into engagement.');
+    } else {
+      model.silkWhipProgress = 0.55;
+      model.silkVibration = 0.4;
+      model.mandibleProgress = 0;
+      model.mandibleChitter = 0;
+      render();
+      say('State: Joining — Mid-animation view with golden silk threads whipping across the gap.');
+    }
   } else if (stateName === 'joined') {
     if (model.shade) {
       await spreadElytra();
@@ -1927,11 +2326,23 @@ async function applyState(stateName) {
       model.joined = true;
       model.blend = 1;
       model.cap = 1;
-      model.silkWhipProgress = 1;
-      model.silkVibration = 0;
       model.light = 0;
-      render();
-      say('State: Joined — Monolithic chitin carapace with locked golden silk lash seam.');
+
+      if (model.option === 'mandible_interlock') {
+        model.mandibleProgress = 1;
+        model.mandibleChitter = 0;
+        model.silkWhipProgress = 0;
+        model.silkVibration = 0;
+        render();
+        say('State: Joined — Monolithic chitin carapace with locked serrated mandible suture seam.');
+      } else {
+        model.silkWhipProgress = 1;
+        model.silkVibration = 0;
+        model.mandibleProgress = 0;
+        model.mandibleChitter = 0;
+        render();
+        say('State: Joined — Monolithic chitin carapace with locked golden silk lash seam.');
+      }
     }
   } else if (stateName === 'shade') {
     if (!model.shade) {
@@ -2032,7 +2443,9 @@ $('#btnReset').onclick = () => {
   model.silkWhipProgress = 0;
   model.silkVibration = 0;
   model.elytraGlide = 0;
-  model.option = 'elytra_shield';
+  model.mandibleProgress = 0;
+  model.mandibleChitter = 0;
+  model.option = 'mandible_interlock';
   model.light = 0;
   model.limit = 3;
   model.tension = 0;
@@ -2040,7 +2453,7 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
-  $('#optionSelect').value = 'elytra_shield';
+  $('#optionSelect').value = 'mandible_interlock';
   render();
   say('Reset to initial experiment layout.');
 };
@@ -2052,11 +2465,18 @@ $('#optionSelect').onchange = async e => {
     if (!model.shade) {
       await foldElytra();
     }
+  } else if (model.option === 'mandible_interlock') {
+    if (model.shade) {
+      await spreadElytra();
+    }
+    say('Option 3: Chitinous Carapace Mandible Interlock join selected. Serrated stag-beetle shell teeth & zig-zag suture.');
   } else if (model.option === 'silk_lash') {
     if (model.shade) {
       await spreadElytra();
     }
+    say('Option 1: Weaver\'s Silk Lash join selected. Golden silk thread rigging & tension twang.');
   }
+  render();
 };
 
 // Dial & Undercroft Controls
