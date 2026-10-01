@@ -20,6 +20,16 @@ Three agents (Claude, Codex, agy) each explore on their own branch. The goal is 
 
 Avoid both failure modes: boring and generic, and so overboard it stops being usable. Displays must stay readable.
 
+## How you work: one option at a time, never pick a winner
+
+This is an experiment. Don't choose one join or shade style; Brent wants to see the options and decide.
+
+- Turn every idea in your brainstorm (joins, shades, morphs, angles, skin-combining) into a checklist in `docs/skins/progress/<agent>.md`, interleaving the five aesthetics.
+- Each run, build exactly **one** unchecked item, add it to the right page as a new selectable option, make it work and look finished, tick it with a one-line note, and stop.
+- Never remove or replace an earlier option. Pages grow.
+- Each finished item is merged to `main`, which Brent is using live, so every run must leave your pages working.
+- Read `docs/skins/feedback.md` at the start of every run. It holds Brent's likes and dislikes and overrides your own ideas.
+
 ## Mechanics (the only fixed rules, so results can be compared)
 
 - Start from `prototypes/capsule-study.html` and use its widgets: Jarvis, GitDiscuss and the Checks widget, with the same content.
