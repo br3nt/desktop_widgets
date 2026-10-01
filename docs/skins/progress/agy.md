@@ -4,6 +4,9 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 
 ## Interleaved Roadmap
 
+### Milestone 0: Casing Silhouette & Material Rework (Brent's Feedback)
+- [x] Casing Silhouette & Material Rework: Gothic, Felt, and Elven — Reworked all 3 casings with dramatic architectural, textile, and filigree silhouettes, materials, bespoke hardware, and bezels (Built in gothic.html, felt.html, elven.html)
+
 ### Cycle 1: Primary Joins
 - [x] Gothic: Keystone Drop (Nave Vault Key) join — Carved granite keystone descends into pointed arch gap (Built in prototypes/skins/agy/gothic.html with pointed arch springers, magnetic keystone drop, iron cotter pin release bar, reliquary undercroft bay, and state controls)
 - [x] Felt: Needle-Felt Fiber Entanglement join — Loose roving fringes interweave and compress (Built in prototypes/skins/agy/felt.html with carded wool roving fibers, needle-punching compression, ivory cross-stitch seam, turned boxwood toggle release, and craft pocket bay)
