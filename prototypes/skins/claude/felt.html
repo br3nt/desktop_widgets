@@ -85,6 +85,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
  <pattern id="weave" width="3" height="3" patternUnits="userSpaceOnUse"><path d="M0 .5H3M1.5 0V3" stroke="#fff" stroke-opacity=".08" stroke-width=".8"/></pattern>
+ <pattern id="woven" width="2" height="1.6" patternUnits="userSpaceOnUse"><path d="M0 .4H2" stroke="#6b4a2a" stroke-opacity=".13" stroke-width=".7"/><path d="M1 0V1.6" stroke="#fff" stroke-opacity=".3" stroke-width=".5"/></pattern>
  <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#efe9dc"/><stop offset=".45" stop-color="#a9a297"/><stop offset="1" stop-color="#5d574f"/></linearGradient>
  <filter id="soft" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="4"/></filter>
  <filter id="sh" x="-20%" y="-40%" width="140%" height="180%"><feGaussianBlur stdDeviation="1.3"/></filter>
@@ -152,11 +153,12 @@ const GLYPH={0:'01110100011001110101110011000101110',1:'001000110000100001000010
  5:'11111100001111000001000011000101110',6:'00110010001000011110100011000101110',7:'11111000010001000100010000100001000',8:'01110100011000101110100011000101110',9:'01110100011000101111000010001001100','/':'00001000100001000100010000100010000'};
 function xCell(cx,cy,c){const m=c*.2;return[`M${f(cx+m)} ${f(cy+c-m)}L${f(cx+c-m)} ${f(cy+m)}`,`M${f(cx+m)} ${f(cy+m)}L${f(cx+c-m)} ${f(cy+c-m)}`]}
 function xsvg(w,h,c,d1,d2){return `<svg width="${f(w)}" height="${f(h)}" viewBox="0 0 ${f(w)} ${f(h)}"><g fill="none" stroke-linecap="round" stroke-width="${f(c*.36)}"><path d="${d1}" style="stroke:var(--x2)"/><path d="${d2}" style="stroke:var(--x1)"/></g></svg>`}
-function xstitch(str,c){
+function xpaths(str,c){
  let x=0,d1='',d2='';
  for(const ch of str){if(ch===' '){x+=2;continue}const g=GLYPH[ch];for(let i=0;i<35;i++)if(g[i]==='1'){const[p,q]=xCell((x+i%5)*c,Math.floor(i/5)*c,c);d1+=p;d2+=q}x+=6}
- return xsvg((x-1)*c,7*c,c,d1,d2);
+ return{d1,d2,w:(x-1)*c};
 }
+function xstitch(str,c){const p=xpaths(str,c);return xsvg(p.w,7*c,c,p.d1,p.d2)}
 function xbars(hs,c){let d1='',d2='';hs.forEach((n,i)=>{for(let r=0;r<n;r++){const[p,q]=xCell(i*c*1.6,(6-r)*c,c);d1+=p;d2+=q}});return xsvg(hs.length*c*1.6-c*.6,7*c,c,d1,d2)}
 $$('.xs').forEach(s=>s.innerHTML=xstitch(s.dataset.x,+s.dataset.c));
 $('.bars').innerHTML=xbars([2,4,3,5,3],2.9);
@@ -167,11 +169,13 @@ const SKIN={a:{body:'#d0912f',band:'#a1631a',seed:3,r:[20,12,12,17]},b:{body:'#3
 function rr4(x,y,w,h,rs){const[a,b,c,d]=rs.map(r=>Math.max(1,Math.min(r,h/2,w/2)));
  return `M${f(x+a)} ${f(y)}H${f(x+w-b)}Q${f(x+w)} ${f(y)} ${f(x+w)} ${f(y+b)}V${f(y+h-c)}Q${f(x+w)} ${f(y+h)} ${f(x+w-c)} ${f(y+h)}H${f(x+d)}Q${f(x)} ${f(y+h)} ${f(x)} ${f(y+h-d)}V${f(y+a)}Q${f(x)} ${f(y)} ${f(x+a)} ${f(y)}Z`}
 // Body felt: ragged fibre edge (displacement), stray-fibre halo, pillow puff (lighting on blurred alpha), fine light/dark fibre speckle.
+// BO is the current boil offset, so casings redrawn mid-animation keep boiling.
+let BO=0;
 function feltFilters(id,s){return `
 <filter id="f-${id}" x="-4%" y="-12%" width="108%" height="124%" color-interpolation-filters="sRGB">
- <feTurbulence class="boil" data-seed="${s}" type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="${s}" result="n"/>
+ <feTurbulence class="boil" data-seed="${s}" type="fractalNoise" baseFrequency=".75" numOctaves="2" seed="${s+BO}" result="n"/>
  <feDisplacementMap in="SourceGraphic" in2="n" scale="3.6" xChannelSelector="R" yChannelSelector="G" result="d"/>
- <feTurbulence class="boil" data-seed="${s+1}" type="fractalNoise" baseFrequency="1.5 1.05" numOctaves="1" seed="${s+1}" result="fn"/>
+ <feTurbulence class="boil" data-seed="${s+1}" type="fractalNoise" baseFrequency="1.5 1.05" numOctaves="1" seed="${s+1+BO}" result="fn"/>
  <feMorphology in="d" operator="dilate" radius="1.7" result="dil"/>
  <feComponentTransfer in="fn" result="fm"><feFuncA type="discrete" tableValues="0 0 0 0 0 .8 1 1"/></feComponentTransfer>
  <feComposite in="dil" in2="fm" operator="in" result="halo"/>
@@ -185,7 +189,7 @@ function feltFilters(id,s){return `
  <feMerge><feMergeNode in="halo"/><feMergeNode in="lit"/><feMergeNode in="dkIn"/><feMergeNode in="ltIn"/></feMerge>
 </filter>
 <filter id="g-${id}" x="-4%" y="-20%" width="108%" height="140%" color-interpolation-filters="sRGB">
- <feTurbulence class="boil" data-seed="${s+2}" type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="${s+2}" result="n"/>
+ <feTurbulence class="boil" data-seed="${s+2}" type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="${s+2+BO}" result="n"/>
  <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="d"/>
  <feGaussianBlur in="d" stdDeviation="2.2" result="b"/>
  <feDiffuseLighting in="b" surfaceScale="2" diffuseConstant="1.18" lighting-color="#fff3e2"><feDistantLight azimuth="235" elevation="56"/></feDiffuseLighting>
@@ -205,7 +209,61 @@ function casing(id,w,h){
  return o;
 }
 function boil(fr){
- for(const id of ['a','b'])$$('#'+id+' .boil').forEach(t=>t.setAttribute('seed',+t.dataset.seed+(fr<0?0:(fr%3)*31)));
+ BO=fr<0?0:(fr%3)*31;
+ for(const id of ['a','b'])$$('#'+id+' .boil').forEach(t=>t.setAttribute('seed',+t.dataset.seed+BO));
+}
+
+/* ---------- Pocket shade ---------- */
+const POCKET={a:'#36557a',b:'#8a3046',c:'#56703a'};
+const TAG_F="700 11px 'Avenir Next',Avenir,'Segoe UI',Helvetica,sans-serif",TAG_FS="700 10px 'Avenir Next',Avenir,'Segoe UI',Helvetica,sans-serif";
+const measure=(()=>{const c=document.createElement('canvas').getContext('2d');return(t,font)=>{c.font=font;return c.measureText(t).width}})();
+const backOut=t=>{const c=1.9;return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2)};
+function pocketData(id){
+ if(id==='a')return{name:'JARVIS',num:'03',word:model.a.run?'agents running':'agents paused'};
+ if(id==='b')return{name:'GITDISCUSS',num:'02',word:'need a decision'};
+ return{name:'CHECKS',num:'12 / 14',word:'passed'};
+}
+// The timeline: the pocket pops up over the cushion's foot, the cushion drops into it,
+// the pocket squashes as it lands, the pair rises to the nameplate line, then the tag pops out.
+function pocketParts(st,small){
+ const H0=small?CH:H,HP=small?46:56,D=H0-HP,rise=ease(seg(st,.68,.92));
+ return{H0,HP,D,rise,pop:backOut(seg(st,.02,.26)),sink:Math.pow(seg(st,.26,.64),2),tag:backOut(seg(st,.8,1)),
+  sq:Math.sin(Math.PI*seg(st,.62,.8))*.08,h:Math.round(HP+D*(1-rise))};
+}
+function pocketDraw(id,w,h,small,st){
+ const P=pocketParts(st,small),g=small?{lip:17,r:9,c:1.8,hem:5,fs:11}:{lip:21,r:12,c:2.3,hem:6,fs:12.5};
+ const Hp=P.HP-2-g.lip,top=h-2-Hp,x0=1.5,x1=w-1.5,mid=w/2+(small?5:8),r=g.r;
+ const cushTop=P.D*P.sink*(1-P.rise);
+ // Below the pocket's floor the cushion is inside it, so it is clipped away once the pocket is up.
+ let s=`<defs><clipPath id="pk-${id}"><rect x="-30" y="-40" width="${w+60}" height="${st>.24?h+34:999}"/></clipPath></defs>`;
+ s+=`<g clip-path="url(#pk-${id})"><g transform="translate(0 ${f(cushTop)})">${casing(id,w,P.H0)}</g></g>`;
+ if(P.pop<=0)return s;
+ const sy=P.pop*(1-P.sq),sx=1+P.sq*.5;
+ s+=`<g transform="translate(${f(w/2)} ${h-2}) scale(${f(sx*1000)/1000} ${f(sy*1000)/1000}) translate(${f(-w/2)} ${-Hp})">`;
+ // Woven name tag, tucked behind the pocket front so only its top shows.
+ const d=pocketData(id),font=small?TAG_FS:TAG_F,ls=1.4,tw=Math.ceil(measure(d.name,font)+ls*d.name.length)+12,th=small?20:24,tx=small?18:26;
+ const ty=lerp(5,small?-14:-16,P.tag);
+ s+=`<g transform="rotate(-3 ${f(tx+tw/2)} 0)"><rect x="${tx}" y="${f(ty)}" width="${tw}" height="${th}" rx="1.2" fill="#000" opacity=".3" filter="url(#sh)" transform="translate(1 1.5)"/>`+
+  `<rect x="${tx}" y="${f(ty)}" width="${tw}" height="${th}" rx="1.2" fill="#f3ead5"/><rect x="${tx}" y="${f(ty)}" width="${tw}" height="${th}" fill="url(#woven)"/>`+
+  `<path d="M${tx+1} ${f(ty+2.4)}H${tx+tw-1}M${tx+1} ${f(ty+3.9)}H${tx+tw-1}" stroke="#b3402c" stroke-width=".8"/>`+
+  `<text x="${f(tx+tw/2+ls/2)}" y="${f(ty+(small?11.5:13.5))}" text-anchor="middle" style="font:${font};letter-spacing:${ls}px" fill="#4a1d14">${d.name}</text></g>`;
+ // Pocket front: a patch of contrasting felt with a sagging mouth.
+ const lip=`M${x0} 0Q${f(mid)} 5 ${x1} 0`,front=`${lip}V${Hp-r}Q${x1} ${Hp} ${x1-r} ${Hp}H${x0+r+1}Q${x0+1} ${Hp} ${x0+.5} ${Hp-r}Z`;
+ s+=`<path d="${front}" fill="#000" opacity=".5" filter="url(#sh)" transform="translate(0 -1.3)"/><path d="${front}" fill="${POCKET[id]}" filter="url(#g-${id})"/>`;
+ s+=`<path d="${lip}V${g.hem}Q${f(mid)} ${g.hem+5} ${x0} ${g.hem}Z" fill="#000" opacity=".16"/><path d="M${x0+2} 1.2Q${f(mid)} 6.2 ${x1-2} 1.2" fill="none" stroke="#fff" stroke-opacity=".16"/>`;
+ // Blanket stitch over the mouth, a running stitch round the sides, bar tacks at the corners.
+ let bl='';const n=Math.floor((x1-x0)/7);
+ for(let i=0;i<=n;i++){const t=(i+.5)/(n+1),bx=(1-t)*(1-t)*x0+2*t*(1-t)*mid+t*t*x1,by=10*t*(1-t);bl+=`M${f(bx)} ${f(by+.8)}v4`}
+ bl+=`M${x0+1} .8Q${f(mid)} 5.8 ${x1-1} .8`;
+ const run=`M${x0+5} ${g.hem+3}V${Hp-5-r*.5}Q${x0+5} ${Hp-5} ${f(x0+5+r*.6)} ${Hp-5}H${f(x1-5-r*.6)}Q${x1-5} ${Hp-5} ${x1-5} ${Hp-5-r*.5}V${g.hem+3}`;
+ const tack=x=>`M${x-2} 1.6l1 3.6l1-3.6l1 3.6l1-3.6`;
+ s+=`<g fill="none" stroke-linecap="round"><path d="${run}" stroke="#000" stroke-opacity=".3" stroke-width="1.3" stroke-dasharray="3.6 2.8" transform="translate(.4 .7)"/><path d="${run}" stroke="#f4e3c3" stroke-opacity=".8" stroke-width="1.1" stroke-dasharray="3.6 2.8"/>`+
+  `<path d="${bl}" stroke="#f7e8cc" stroke-opacity=".92" stroke-width="1.1"/><path d="${tack(x0+6)+tack(x1-8)}" stroke="#f7e8cc" stroke-width="1"/></g>`;
+ // One value, cross-stitched on the pocket face in cream thread.
+ const xp=xpaths(d.num,g.c),ww=measure(d.word,`italic ${g.fs}px Georgia,serif`),vx=x1-(small?15:22)-(xp.w+6+ww),vy=g.hem+(Hp-g.hem-7*g.c)/2+.5;
+ s+=`<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(g.c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".3" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="#cdb48a"/><path d="${xp.d2}" stroke="#fbf0d6"/></g>`+
+  `<text x="${f(vx+xp.w+6)}" y="${f(vy+3.5*g.c)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${g.fs}" fill="#f6e8cc">${d.word}</text>`;
+ return s+'</g>';
 }
 
 /* ---------- Zipper geometry ---------- */
@@ -273,8 +331,14 @@ const JOINS={
 };
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It keeps the shade state working until the felt shade modes (pocket, bolster, drawstring, pleats, woven label) are built and added here.'}
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It keeps the shade state working until the felt shade modes (pocket, bolster, drawstring, pleats, woven label) are built and added here.'},
+ pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
+  about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
+  sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
+  height:(st,small)=>pocketParts(st,small).h,
+  show:st=>1-seg(st,0,.14),grip:st=>1-seg(st,0,.2),draw:pocketDraw}
 };
+const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS):small?CH:H};
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
@@ -339,24 +403,26 @@ function holdJoining(){
 function toggleShade(){
  const to=model.st>.5?0:1,start=model.st,token=++shadeAnim;
  // Shade runs on its own clock so it can overlap a join.
- stepped(560*Math.abs(to-start),t=>{model.st=lerp(start,to,t);render()},token,k=>k===shadeAnim);
- say(to?'Shaded: the cushion deflates to its name band and one value.':'Unshaded: the stuffing comes back.');
+ const sh=SHADES[model.shade];
+ stepped((sh.ms||560)*Math.abs(to-start),t=>{model.st=lerp(start,to,t);render()},token,k=>k===shadeAnim);
+ say(to?(sh.sayOn||'Shaded: the cushion deflates to its name band and one value.'):(sh.sayOff||'Unshaded: the stuffing comes back.'));
 }
 
 /* ---------- Rendering ---------- */
-function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,ease(model.st))),jt:model.jt,glow:model.glow,ghost:model.ghost}}
+const shH=small=>{const s=SHADES[model.shade];return s.height?s.height(model.st,small):Math.round(lerp(small?CH:H,small?CHS:HS,ease(model.st)))};
+function ctx(){return{a:model.a,b:model.b,h:shH(false),jt:model.jt,glow:model.glow,ghost:model.ghost}}
 function render(){
- const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,ease(model.st))),z=zipState(model.jt,c.h);
+ const c=ctx(),j=J(),sh=SHADES[model.shade],ch=shH(true),z=zipState(model.jt,c.h);
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
-  const svg=el.querySelector('.casing'),key=w+'x'+h;
-  if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h)}
+  const own=sh.draw&&model.st>0,svg=el.querySelector('.casing'),key=w+'x'+h+(own?`|${model.shade}|${f(model.st*1000)}|${BO}|${m.run}`:'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=own?sh.draw(id,w,h,small,model.st):casing(id,w,h)}
   if(!small){const side=id==='a'?1:-1,phi=(side>0?-1:1)*z.th;
    el.style.transformOrigin=`${side>0?W-EDGE:EDGE}px ${f(z.ys)}px`;el.style.transform=z.th>.001?`rotate(${f(phi*100)/100}deg)`:''}
-  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  const k=ease(model.st),show=sh.show?sh.show(model.st):1-clamp(k*2.2),strip=sh.ownStrip?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
-  el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
+  el.querySelector('.grip').style.opacity=f(sh.grip?sh.grip(model.st):1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
@@ -428,7 +494,7 @@ stage.addEventListener('pointermove',e=>{
   if(Math.abs(dy)>3)drag.moved=true;const z=zipState(1,ctx().h),travel=z.z1-z.z0;
   setJt(dy<=2?.96:clamp(.93-.43*dy/travel,.42,.96));render();return;
  }
- const s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
+ const s=drag.saved,top=46,bottom=600-lowH(false)-14;
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,10,1200-CW-10);model.c.y=clamp(s.c.y+dy,top,600-CH-10);render();return}
  if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,top,bottom)};
@@ -458,7 +524,7 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
- const bottom=600-(model.st>.5?HS:H)-14;
+ const bottom=600-lowH(false)-14;
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],10,1200-w-10);m.y=clamp(m.y+k[1],46,id==='c'?600-CH-10:bottom)}render();
 }));
