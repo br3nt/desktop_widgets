@@ -248,6 +248,10 @@ header {
   font-size: 13px;
   text-shadow: 0 0 6px rgba(228, 158, 255, 0.6);
 }
+.module.shade .wire-grip {
+  opacity: 0;
+  pointer-events: none;
+}
 
 /* Recessed Oxidized Copper Display Screen */
 .wire-screen {
@@ -333,33 +337,35 @@ header {
   box-shadow: 0 0 5px rgba(82, 240, 222, 0.4);
 }
 
-/* Shade Mode Strip: Wire-Wrapped Rod with Gemstone Indicators */
 .shade-rod {
   position: absolute;
   left: 48px;
   right: 48px;
-  top: 10px;
-  height: 24px;
+  top: 8px;
+  height: 28px;
   display: none;
   align-items: center;
   justify-content: space-between;
-  padding: 0 10px;
-  background: linear-gradient(90deg, #1c0e08, #2e170c 50%, #1c0e08);
-  border: 1px solid var(--copper-mid);
+  padding: 0 12px;
+  background: linear-gradient(180deg, #24130a 0%, #150904 50%, #0c0402 100%);
+  border: 1.5px solid var(--copper-mid);
   border-radius: 6px;
-  z-index: 2;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(249, 169, 121, 0.25);
+  z-index: 5;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.85), inset 0 1px 1px rgba(255, 212, 184, 0.3);
+  cursor: grab;
 }
+.shade-rod:active { cursor: grabbing; }
 .module.shade .shade-rod {
   display: flex;
 }
 .shade-title {
-  font: 10px/1 "Courier New", monospace;
+  font: bold 11px/1 "Courier New", monospace;
   color: var(--copper-hot);
   letter-spacing: 0.8px;
   display: flex;
   align-items: center;
   gap: 6px;
+  text-shadow: 0 1px 2px #000, 0 0 6px rgba(249, 169, 121, 0.4);
 }
 .shade-title span {
   color: var(--amethyst-bright);
@@ -369,14 +375,15 @@ header {
   gap: 5px;
 }
 .shade-beads i {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  box-shadow: 0 0 4px currentColor;
+  box-shadow: 0 0 5px currentColor;
 }
 .shade-beads i.amethyst { background: var(--amethyst-bright); color: var(--amethyst-bright); }
 .shade-beads i.turquoise { background: var(--turquoise-bright); color: var(--turquoise-bright); }
 .shade-beads i.carnelian { background: var(--carnelian-bright); color: var(--carnelian-bright); }
+.shade-beads i.pearl { background: var(--pearl-nacre); color: var(--pearl-nacre); }
 
 /* Tabs & Interactive Controls */
 .tab-row {
@@ -801,14 +808,15 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Wire, Beads &amp; Stones <span>/ caged-bead bayonet socket join</span></h1>
-    <p>Raw and oxidized copper wire · Caged faceted amethyst jewel · Gemstone bead controls</p>
+    <h1>Wire, Beads &amp; Stones <span>/ caged-bead bayonet join &amp; abacus bead compression</span></h1>
+    <p>Raw and oxidized copper wire · Caged amethyst jewel · Abacus bead compression shade</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
       <label for="optionSelect">Option</label>
       <select id="optionSelect" aria-label="Select skin exploration option">
-        <option value="caged_bead" selected>1. Caged-Bead Bayonet Socket (Spiral Copper Cage &amp; Amethyst)</option>
+        <option value="caged_bead">1. Caged-Bead Bayonet Socket (Spiral Copper Cage &amp; Amethyst)</option>
+        <option value="abacus_compression" selected>2. Abacus Bead-Strand Compression shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -818,8 +826,9 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
+    <button id="btnJoinAnim">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnAbacusAnim" class="primary-btn">Compress abacus</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -990,7 +999,7 @@ footer .note-highlight {
       </div>
 
       <!-- Compact Rod Strip for Shade Mode -->
-      <div class="shade-rod">
+      <div class="shade-rod" data-drag="a" title="Drag Jarvis jeweled rod">
         <span class="shade-title"><span>✦</span> JARVIS · 03 AGENTS</span>
         <div class="shade-beads">
           <i class="amethyst"></i><i class="turquoise"></i><i class="carnelian"></i>
@@ -1037,10 +1046,10 @@ footer .note-highlight {
       </div>
 
       <!-- Compact Rod Strip for Shade Mode -->
-      <div class="shade-rod">
-        <span class="shade-title"><span>✦</span> GITDISCUSS · 02 QUEUED</span>
+      <div class="shade-rod" data-drag="b" title="Drag GitDiscuss jeweled rod">
+        <span class="shade-title"><span>✦</span> GITDISCUSS · 02 DECISIONS</span>
         <div class="shade-beads">
-          <i class="amethyst"></i><i class="turquoise"></i>
+          <i class="carnelian"></i><i class="turquoise"></i><i class="pearl"></i>
         </div>
       </div>
 
@@ -1084,15 +1093,15 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Wire, Beads &amp; Stones Architecture &amp; The Caged-Bead Bayonet Socket Join</h3>
+  <h3>Wire, Beads &amp; Stones Architecture · Caged-Bead Bayonet Socket &amp; Abacus Bead Compression</h3>
   <p>
     Formed from heavy 12-gauge bent copper wire frames, wrapped with tight 20-gauge copper coils, sterling silver craft wire details, and natural gemstones (faceted amethyst, polished turquoise, carnelian, and freshwater pearls). The displays sit recessed in oxidized copper bezels, isolated from wire ornamentation to guarantee complete legibility.
   </p>
   <p>
-    <span class="note-highlight">Option 1 — Caged-Bead Bayonet Socket:</span> Module A features an extended spiral-coiled copper wire cage (beehive lantern, ref 6) holding a glowing faceted purple amethyst jewel. Module B carries a complementary open-coil copper receiving sleeve with a helical guide slot. As the capsules enter the magnetic capture threshold, the caged bead slides into the sleeve, compresses an internal copper coil spring, and twists 30° into a locked bayonet detent with a crisp metallic click. Pulling the shepherd's crook clasp right unlocks the detent.
+    <span class="note-highlight">Option 1 — Caged-Bead Bayonet Socket Join:</span> Module A features an extended spiral-coiled copper wire cage (beehive lantern, ref 6) holding a glowing faceted purple amethyst jewel. Module B carries a complementary open-coil copper receiving sleeve with a helical guide slot. As the capsules enter the magnetic capture threshold, the caged bead slides into the sleeve, compresses an internal copper coil spring, and twists 30° into a locked bayonet detent with a crisp metallic click. Pulling the shepherd's crook clasp right unlocks the detent.
   </p>
   <p>
-    <span class="note-highlight">Shade Mode:</span> Collapses the housing into a 44px wire-wrapped jewelry rod with glowing amethyst, turquoise, and carnelian status beads.
+    <span class="note-highlight">Option 2 — Abacus Bead-Strand Compression Shade:</span> Inspired by threaded stone and pearl bead strands (ref 7). Parallel 16-gauge copper wire guide rods run vertically through tiers of genuine gemstone beads (amethysts, turquoises, carnelians, and freshwater pearls). Triggering shade mode winches the sliding bottom copper rail upward along the parallel rods, compressing all beads tightly against the heavy upper copper wire hoop. The casing collapses into a dense 44px jeweled rod with an ultra-legible illuminated copper-bezel status strip. Releasing the abacus allows the spring tensioners to slide the beads smoothly back down into full display mode.
   </p>
 </footer>
 
@@ -1112,6 +1121,8 @@ const model = {
   docked: false,
   design: false,
   shade: false,
+  abacusCompress: 0, // 0 = relaxed full abacus, 1 = compressed jeweled rod
+  option: 'abacus_compression',
   blend: 0,
   cap: 0,
   bayonetProgress: 0, // 0 = separate, 0.5 = sleeve entry & spring compression, 1.0 = 30-deg twist locked
@@ -1129,9 +1140,173 @@ const connectionGlow = { socket: { value: 0, target: 0 }, bay: { value: 0, targe
 
 function say(text) { $('#status').textContent = text; }
 
+// Draw Abacus Bead Strands on Parallel Copper Guide Rods (Option 2)
+function drawAbacusBeads(x, y, width, compress = 0) {
+  let s = `<g class="abacus-bead-system">`;
+  const c = Math.max(0, Math.min(1, compress));
+  const railY = 120 - c * 82; // slides from y+120 (relaxed) to y+38 (compressed)
+
+  // If joined (width > 420), draw both module A and module B arrays
+  const moduleOffsets = width > 420 ? [x, x + JOIN_DISTANCE] : [x];
+  const moduleWidth = width > 420 ? W : width;
+
+  moduleOffsets.forEach(mx => {
+    // 6 Vertical Guide Rods (3 on left, 3 on right flanking screen)
+    const rodXList = [
+      mx + 18,
+      mx + 28,
+      mx + 38,
+      mx + moduleWidth - 38,
+      mx + moduleWidth - 28,
+      mx + moduleWidth - 18
+    ];
+
+    const rodConfigs = [
+      // Left Bank Rod 0 (x + 18)
+      [
+        { type: 'amethyst', r: 3.5, yRelax: 22, yMin: 15 },
+        { type: 'pearl', r: 2.8, yRelax: 52, yMin: 21.5 },
+        { type: 'turquoise', r: 3.2, yRelax: 82, yMin: 27.5 },
+        { type: 'carnelian', r: 3.8, yRelax: 112, yMin: 34 }
+      ],
+      // Left Bank Rod 1 (x + 28)
+      [
+        { type: 'turquoise', r: 3.5, yRelax: 20, yMin: 14.5 },
+        { type: 'copper', r: 2.6, yRelax: 50, yMin: 20.5 },
+        { type: 'amethyst', r: 3.4, yRelax: 80, yMin: 26.5 },
+        { type: 'pearl', r: 3.6, yRelax: 110, yMin: 33.5 }
+      ],
+      // Left Bank Rod 2 (x + 38)
+      [
+        { type: 'carnelian', r: 3.4, yRelax: 24, yMin: 15.5 },
+        { type: 'pearl', r: 2.8, yRelax: 54, yMin: 22 },
+        { type: 'copper', r: 2.6, yRelax: 84, yMin: 27.5 },
+        { type: 'turquoise', r: 3.6, yRelax: 114, yMin: 34 }
+      ],
+      // Right Bank Rod 3 (x + width - 38)
+      [
+        { type: 'turquoise', r: 3.4, yRelax: 24, yMin: 15.5 },
+        { type: 'pearl', r: 2.8, yRelax: 54, yMin: 22 },
+        { type: 'amethyst', r: 3.4, yRelax: 84, yMin: 28 },
+        { type: 'carnelian', r: 3.6, yRelax: 114, yMin: 34 }
+      ],
+      // Right Bank Rod 4 (x + width - 28)
+      [
+        { type: 'amethyst', r: 3.5, yRelax: 20, yMin: 14.5 },
+        { type: 'copper', r: 2.6, yRelax: 50, yMin: 20.5 },
+        { type: 'turquoise', r: 3.4, yRelax: 80, yMin: 26.5 },
+        { type: 'carnelian', r: 3.6, yRelax: 110, yMin: 33.5 }
+      ],
+      // Right Bank Rod 5 (x + width - 18)
+      [
+        { type: 'carnelian', r: 3.6, yRelax: 22, yMin: 15 },
+        { type: 'pearl', r: 2.8, yRelax: 52, yMin: 21.5 },
+        { type: 'copper', r: 2.6, yRelax: 82, yMin: 27 },
+        { type: 'amethyst', r: 3.8, yRelax: 112, yMin: 34 }
+      ]
+    ];
+
+    const rodBottomY = c > 0.85 ? y + 42 : y + 122;
+    rodXList.forEach(rx => {
+      s += `<line x1="${rx}" y1="${y + 8}" x2="${rx}" y2="${rodBottomY}" stroke="url(#copperGrad)" stroke-width="1.8" stroke-linecap="round"/>`;
+      s += `<line x1="${rx + 0.3}" y1="${y + 8}" x2="${rx + 0.3}" y2="${rodBottomY}" stroke="#ffd4b8" stroke-width="0.6" opacity="0.65"/>`;
+      s += `<circle cx="${rx}" cy="${y + 8}" r="2" fill="none" stroke="#ffd4b8" stroke-width="0.8"/>`;
+    });
+
+    rodXList.forEach((rx, idx) => {
+      const cfg = rodConfigs[idx];
+      const b3 = Math.min(cfg[3].yRelax, Math.max(cfg[3].yMin, railY - cfg[3].r));
+      const b2 = Math.min(cfg[2].yRelax, Math.max(cfg[2].yMin, b3 - (cfg[3].r + cfg[2].r)));
+      const b1 = Math.min(cfg[1].yRelax, Math.max(cfg[1].yMin, b2 - (cfg[2].r + cfg[1].r)));
+      const b0 = Math.min(cfg[0].yRelax, Math.max(cfg[0].yMin, b1 - (cfg[1].r + cfg[0].r)));
+      const beadYs = [b0, b1, b2, b3];
+
+      if (c < 0.25) {
+        s += `<line x1="${rx - 2}" y1="${y + cfg[1].yRelax - cfg[1].r - 1.5}" x2="${rx + 2}" y2="${y + cfg[1].yRelax - cfg[1].r - 1.5}" stroke="#ffd4b8" stroke-width="1"/>`;
+        s += `<line x1="${rx - 2}" y1="${y + cfg[2].yRelax - cfg[2].r - 1.5}" x2="${rx + 2}" y2="${y + cfg[2].yRelax - cfg[2].r - 1.5}" stroke="#ffd4b8" stroke-width="1"/>`;
+      }
+
+      beadYs.forEach((by, bIdx) => {
+        const b = cfg[bIdx];
+        const cy = y + by;
+        const r = b.r;
+
+        if (b.type === 'amethyst') {
+          s += `<circle cx="${rx}" cy="${cy}" r="${r}" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="0.8"/>`;
+          s += `<circle cx="${rx - r * 0.35}" cy="${cy - r * 0.35}" r="${r * 0.35}" fill="#ffffff" opacity="0.85"/>`;
+        } else if (b.type === 'turquoise') {
+          s += `<circle cx="${rx}" cy="${cy}" r="${r}" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.8"/>`;
+          s += `<circle cx="${rx - r * 0.35}" cy="${cy - r * 0.35}" r="${r * 0.3}" fill="#ffffff" opacity="0.75"/>`;
+        } else if (b.type === 'carnelian') {
+          s += `<circle cx="${rx}" cy="${cy}" r="${r}" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+          s += `<circle cx="${rx - r * 0.35}" cy="${cy - r * 0.35}" r="${r * 0.3}" fill="#ffffff" opacity="0.8"/>`;
+        } else if (b.type === 'pearl') {
+          s += `<circle cx="${rx}" cy="${cy}" r="${r}" fill="url(#pearlBead)" stroke="#5e5447" stroke-width="0.7"/>`;
+          s += `<circle cx="${rx - r * 0.3}" cy="${cy - r * 0.3}" r="${r * 0.35}" fill="#ffffff" opacity="0.95"/>`;
+        } else if (b.type === 'copper') {
+          s += `<circle cx="${rx}" cy="${cy}" r="${r}" fill="url(#copperRondelle)" stroke="#2b0e03" stroke-width="0.8"/>`;
+          s += `<circle cx="${rx - r * 0.3}" cy="${cy - r * 0.3}" r="${r * 0.35}" fill="#ffffff" opacity="0.9"/>`;
+        }
+
+        if (c > 0.8) {
+          const glintAlpha = (c - 0.8) * 5;
+          s += `<circle cx="${rx + r * 0.4}" cy="${cy + r * 0.4}" r="1" fill="#ffffff" opacity="${glintAlpha}"/>`;
+        }
+      });
+    });
+
+    // Sliding bottom rail with looped eyelets
+    s += `<g class="abacus-sliding-rail">`;
+    s += `<path d="M ${mx + 10} ${y + railY} L ${mx + 44} ${y + railY}" fill="none" stroke="url(#copperGrad)" stroke-width="2.6" stroke-linecap="round"/>`;
+    s += `<path d="M ${mx + 11} ${y + railY - 0.5} L ${mx + 43} ${y + railY - 0.5}" fill="none" stroke="#ffd4b8" stroke-width="0.8" opacity="0.8"/>`;
+    s += `<path d="M ${mx + moduleWidth - 44} ${y + railY} L ${mx + moduleWidth - 10} ${y + railY}" fill="none" stroke="url(#copperGrad)" stroke-width="2.6" stroke-linecap="round"/>`;
+    s += `<path d="M ${mx + moduleWidth - 43} ${y + railY - 0.5} L ${mx + moduleWidth - 11} ${y + railY - 0.5}" fill="none" stroke="#ffd4b8" stroke-width="0.8" opacity="0.8"/>`;
+
+    rodXList.forEach(rx => {
+      s += `<circle cx="${rx}" cy="${y + railY}" r="2.2" fill="none" stroke="#ffd4b8" stroke-width="1.2"/>`;
+      s += `<circle cx="${rx}" cy="${y + railY}" r="1.2" fill="#240c04"/>`;
+    });
+
+    if (c > 0.88) {
+      const claspAlpha = (c - 0.88) * 8.3;
+      s += `<path d="M ${mx + 8} ${y + railY} Q ${mx + 4} ${y + 24} ${mx + 8} ${y + 10}" fill="none" stroke="url(#copperGrad)" stroke-width="1.6" opacity="${claspAlpha}"/>`;
+      s += `<circle cx="${mx + 8}" cy="${y + 10}" r="1.8" fill="#ffd4b8" opacity="${claspAlpha}"/>`;
+      s += `<path d="M ${mx + moduleWidth - 8} ${y + railY} Q ${mx + moduleWidth - 4} ${y + 24} ${mx + moduleWidth - 8} ${y + 10}" fill="none" stroke="url(#copperGrad)" stroke-width="1.6" opacity="${claspAlpha}"/>`;
+      s += `<circle cx="${mx + moduleWidth - 8}" cy="${y + 10}" r="1.8" fill="#ffd4b8" opacity="${claspAlpha}"/>`;
+    }
+    s += `</g>`;
+
+    // Sub-screen strands when relaxed
+    if (c < 0.6) {
+      const subAlpha = 1 - c / 0.6;
+      const midXList = [mx + 95, mx + 155, mx + moduleWidth - 155, mx + moduleWidth - 95];
+      const subRailY = y + railY;
+
+      s += `<g opacity="${subAlpha}" class="subscreen-beads">`;
+      s += `<path d="M ${mx + 44} ${subRailY} L ${mx + moduleWidth - 44} ${subRailY}" fill="none" stroke="url(#copperGrad)" stroke-width="2.2"/>`;
+      s += `<path d="M ${mx + 45} ${subRailY - 0.5} L ${mx + moduleWidth - 45} ${subRailY - 0.5}" fill="none" stroke="#ffd4b8" stroke-width="0.7" opacity="0.7"/>`;
+
+      midXList.forEach((rx, mIdx) => {
+        s += `<line x1="${rx}" y1="${y + 100}" x2="${rx}" y2="${subRailY}" stroke="url(#copperGrad)" stroke-width="1.5"/>`;
+        const beadY1 = y + 100 + (subRailY - (y + 100)) * 0.35;
+        const beadY2 = y + 100 + (subRailY - (y + 100)) * 0.72;
+        const beadType = (mIdx % 2 === 0) ? 'turquoise' : 'carnelian';
+
+        s += `<circle cx="${rx}" cy="${beadY1}" r="3" fill="${beadType === 'turquoise' ? 'url(#turquoiseBead)' : 'url(#carnelianBead)'}" stroke="#1f0a03" stroke-width="0.7"/>`;
+        s += `<circle cx="${rx}" cy="${beadY2}" r="3.2" fill="${beadType === 'turquoise' ? 'url(#carnelianBead)' : 'url(#turquoiseBead)'}" stroke="#1f0a03" stroke-width="0.7"/>`;
+      });
+      s += `</g>`;
+    }
+  });
+
+  s += `</g>`;
+  return s;
+}
+
 // Draw Handcrafted Wire & Beads Casing
-function drawWireCasing(x, y, width, opacity = 1, isShade = false) {
+function drawWireCasing(x, y, width, opacity = 1, isShade = false, compress = (typeof model !== 'undefined' && model ? model.abacusCompress : 0)) {
   const midX = x + width / 2;
+  const c = Math.max(0, Math.min(1, compress));
   let s = `<g opacity="${opacity}" class="wire-casing">`;
 
   if (!isShade) {
@@ -1163,7 +1338,6 @@ function drawWireCasing(x, y, width, opacity = 1, isShade = false) {
     coilAnchors.forEach(([cx, cy, cw, ch]) => {
       s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2"
                   fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
-      // Fine coil striations
       if (cw > ch) {
         for (let ix = cx + 2; ix < cx + cw - 2; ix += 3) {
           s += `<line x1="${ix}" y1="${cy}" x2="${ix}" y2="${cy + ch}" stroke="#ffd4b8" stroke-width="0.8"/>`;
@@ -1177,18 +1351,14 @@ function drawWireCasing(x, y, width, opacity = 1, isShade = false) {
 
     // 5. Tree of Life / Branched Wire Crest at Top Center (Inspired by ref 3 & 4)
     s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
-      <!-- Main twisted wire trunk extending down to grip -->
       <path d="M ${midX - 18} ${y + 6} Q ${midX - 10} ${y - 8} ${midX} ${y - 14} Q ${midX + 10} ${y - 8} ${midX + 18} ${y + 6}" stroke-width="2.5"/>
       <path d="M ${midX - 8} ${y + 6} Q ${midX} ${y - 12} ${midX + 8} ${y + 6}" stroke-width="1.8"/>
-
-      <!-- Branched gemstone leaf wires curling outward -->
       <path d="M ${midX} ${y - 14} Q ${midX - 22} ${y - 20} ${midX - 36} ${y - 12}" stroke-width="1.6"/>
       <path d="M ${midX} ${y - 14} Q ${midX + 22} ${y - 20} ${midX + 36} ${y - 12}" stroke-width="1.6"/>
       <path d="M ${midX - 18} ${y - 18} Q ${midX - 24} ${y - 28} ${midX - 14} ${y - 26}" stroke-width="1.2"/>
       <path d="M ${midX + 18} ${y - 18} Q ${midX + 24} ${y - 28} ${midX + 14} ${y - 26}" stroke-width="1.2"/>
     </g>`;
 
-    // Gemstone beads wired into the Tree of Life branches (Amethyst, Turquoise, Peridot)
     s += `<circle cx="${midX - 36}" cy="${y - 12}" r="3.2" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
     s += `<circle cx="${midX + 36}" cy="${y - 12}" r="3.2" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
     s += `<circle cx="${midX - 14}" cy="${y - 26}" r="3" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8"/>`;
@@ -1215,25 +1385,56 @@ function drawWireCasing(x, y, width, opacity = 1, isShade = false) {
       </g>`;
     });
 
-    // 7. Beaded Wire Garland along Bottom Rail
-    s += `<path d="M ${x + 50} ${y + 124} Q ${midX} ${y + 130} ${x + width - 50} ${y + 124}"
-                fill="none" stroke="url(#copperGrad)" stroke-width="2" stroke-linecap="round"/>`;
-    s += `<circle cx="${midX - 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
-    s += `<circle cx="${midX}" cy="${y + 127}" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
-    s += `<circle cx="${midX + 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+    // 7. Draw Abacus Bead Strands on Parallel Copper Guide Rods
+    s += drawAbacusBeads(x, y, width, c);
+
+    // 8. Beaded Wire Garland along Bottom Rail (visible when relaxed)
+    if (c < 0.2) {
+      s += `<path d="M ${x + 50} ${y + 124} Q ${midX} ${y + 130} ${x + width - 50} ${y + 124}"
+                  fill="none" stroke="url(#copperGrad)" stroke-width="2" stroke-linecap="round"/>`;
+      s += `<circle cx="${midX - 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX}" cy="${y + 127}" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX + 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+    }
 
   } else {
-    // Shade Mode: Wire-Wrapped Compact Jewelry Rod
-    s += `<rect x="${x + 8}" y="${y + 8}" width="${width - 16}" height="28" rx="10"
-                fill="url(#copperGrad)" stroke="#381406" stroke-width="2"/>`;
-    s += `<rect x="${x + 12}" y="${y + 11}" width="${width - 24}" height="22" rx="8"
-                fill="#1c0e08" stroke="#5c260f" stroke-width="1.2"/>`;
+    // Shade Mode: Compressed Jeweled Abacus Rod (height 44px)
+    s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="32" rx="10"
+                fill="#000000" opacity="0.65" filter="url(#wireShadow)"/>`;
+    s += `<rect x="${x + 8}" y="${y + 7}" width="${width - 16}" height="30" rx="9"
+                fill="#180e09" stroke="#3b1d10" stroke-width="1.8"/>`;
+    s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="32" rx="10"
+                fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>`;
+    s += `<rect x="${x + 7}" y="${y + 7}" width="${width - 14}" height="30" rx="9"
+                fill="none" stroke="#ffd4b8" stroke-width="1" opacity="0.65"/>`;
 
-    // Center wire wrap on shade bar
-    s += `<rect x="${midX - 24}" y="${y + 8}" width="48" height="28" fill="url(#copperGrad)" opacity="0.4"/>`;
-    for (let ix = midX - 22; ix < midX + 22; ix += 4) {
-      s += `<line x1="${ix}" y1="${y + 8}" x2="${ix}" y2="${y + 36}" stroke="#ffd4b8" stroke-width="1"/>`;
-    }
+    // Corner wire sleeves
+    const shadeCoils = [
+      [x + 10, y + 7, 16, 6],
+      [x + width - 26, y + 7, 16, 6],
+      [x + 10, y + 31, 16, 6],
+      [x + width - 26, y + 31, 16, 6]
+    ];
+    shadeCoils.forEach(([cx, cy, cw, ch]) => {
+      s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2"
+                  fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+      for (let ix = cx + 2; ix < cx + cw - 2; ix += 3) {
+        s += `<line x1="${ix}" y1="${cy}" x2="${ix}" y2="${cy + ch}" stroke="#ffd4b8" stroke-width="0.8"/>`;
+      }
+    });
+
+    // Tree of Life Crest crowning top hoop of shade rod
+    s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
+      <path d="M ${midX - 14} ${y + 6} Q ${midX} ${y - 6} ${midX + 14} ${y + 6}" stroke-width="2"/>
+      <path d="M ${midX} ${y - 6} Q ${midX - 16} ${y - 12} ${midX - 26} ${y - 6}" stroke-width="1.4"/>
+      <path d="M ${midX} ${y - 6} Q ${midX + 16} ${y - 12} ${midX + 26} ${y - 6}" stroke-width="1.4"/>
+    </g>`;
+    s += `<circle cx="${midX - 26}" cy="${y - 6}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.7"/>`;
+    s += `<circle cx="${midX + 26}" cy="${y - 6}" r="2.8" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.7"/>`;
+    s += `<circle cx="${midX}" cy="${y - 8}" r="3.2" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8" filter="url(#gemGlow)"/>`;
+
+    // Draw full compressed abacus bead columns (c = 1)
+    s += drawAbacusBeads(x, y, width, 1);
   }
 
   s += `</g>`;
@@ -1410,6 +1611,7 @@ function drawCagedBeadJoin(midX, y, progress, opacity = 1) {
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
   const isShade = model.shade;
+  const compress = model.abacusCompress || (model.shade ? 1 : 0);
   const glow = model.busy ? model.light : connectionGlow.socket.value;
   let shared = '';
 
@@ -1417,7 +1619,7 @@ function renderHardware() {
 
   if (p > 0) {
     // Seamless Monolithic Copper Wire Frame
-    shared += drawWireCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
+    shared += drawWireCasing(a.x, a.y, (b.x + W) - a.x, p, isShade, compress);
     if (!isShade) {
       // Connecting wire bridge along seam
       shared += `
@@ -1448,7 +1650,7 @@ function renderHardware() {
   // Individual Capsule SVG Shells
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
-    const individual = drawWireCasing(0, 0, W, 1, isShade) +
+    const individual = drawWireCasing(0, 0, W, 1, isShade, compress) +
       drawWireCap(0, 0, false, false, isA ? 0 : model.cap, isShade) +
       drawWireCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
 
@@ -1573,7 +1775,7 @@ function render() {
 
   if (!model.busy) {
     if (model.shade) {
-      $('#phase').textContent = 'Shade mode / Wire-wrapped jewelry rod';
+      $('#phase').textContent = 'Shade mode / Compressed abacus jeweled rod';
     } else if (model.joined) {
       $('#phase').textContent = 'Joined / One unified handcrafted instrument';
     } else if (model.bayonetProgress > 0.1) {
@@ -1582,6 +1784,7 @@ function render() {
       $('#phase').textContent = 'Separate / Two handcrafted copper wire armatures';
     }
   }
+  updateAbacusButtonText();
 }
 
 function tween(duration, fn, token) {
@@ -1702,13 +1905,73 @@ async function separate() {
   say('Separated. Independent handcrafted wire armatures restored.');
 }
 
+// Option 2: Abacus Bead-Strand Compression Animations
+async function compressAbacus() {
+  if (model.busy) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Compressing abacus bead strands. Parallel copper rods slide gemstone beads into a jeweled shade rod.');
+  $('#phase').textContent = 'Compressing abacus beads';
+
+  model.shade = true;
+  render();
+
+  await tween(420, t => {
+    model.abacusCompress = t;
+    renderHardware();
+  }, token);
+
+  model.abacusCompress = 1;
+  model.busy = false;
+  render();
+  say('Abacus bead strands compressed! Gemstone beads stacked tightly into jeweled shade rod.');
+  $('#phase').textContent = 'Shade mode / Compressed abacus jeweled rod';
+  updateAbacusButtonText();
+}
+
+async function expandAbacus() {
+  if (model.busy) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Releasing abacus beads. Spring tension releases and gemstone beads glide down copper rods.');
+  $('#phase').textContent = 'Expanding abacus beads';
+
+  model.shade = false;
+  render();
+
+  await tween(380, t => {
+    model.abacusCompress = 1 - t;
+    renderHardware();
+  }, token);
+
+  model.abacusCompress = 0;
+  model.busy = false;
+  render();
+  say('Abacus beads relaxed. Full wire frames and digital displays restored.');
+  $('#phase').textContent = model.joined ? 'Joined / One unified handcrafted instrument' : 'Separate / Two handcrafted copper wire armatures';
+  updateAbacusButtonText();
+}
+
+function updateAbacusButtonText() {
+  const btn = $('#btnAbacusAnim');
+  if (btn) {
+    btn.textContent = (model.shade || model.abacusCompress > 0.5) ? 'Expand abacus' : 'Compress abacus';
+  }
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    model.shade = false;
+    if (model.shade || model.abacusCompress > 0) {
+      await expandAbacus();
+    }
     if (model.joined) {
       await separate();
     } else {
@@ -1721,7 +1984,9 @@ async function applyState(stateName) {
       say('State: Separate — Two independent copper wire capsules.');
     }
   } else if (stateName === 'joining') {
-    model.shade = false;
+    if (model.shade || model.abacusCompress > 0) {
+      await expandAbacus();
+    }
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.6;
@@ -1732,7 +1997,9 @@ async function applyState(stateName) {
     render();
     say('State: Joining — Mid-animation view with caged bead entering sleeve and compressing wire spring.');
   } else if (stateName === 'joined') {
-    model.shade = false;
+    if (model.shade || model.abacusCompress > 0) {
+      await expandAbacus();
+    }
     if (!model.joined) {
       model.a.x = 220;
       model.b.x = 220 + JOIN_DISTANCE;
@@ -1745,10 +2012,13 @@ async function applyState(stateName) {
       say('State: Joined — Monolithic wire armature with locked caged-bead lantern seam.');
     }
   } else if (stateName === 'shade') {
-    model.shade = true;
-    render();
-    say('State: Shade — Collapsed to compact wire-wrapped jewelry rod.');
+    if (model.shade || model.abacusCompress > 0.5) {
+      await expandAbacus();
+    } else {
+      await compressAbacus();
+    }
   }
+  updateAbacusButtonText();
 }
 
 // Cradle & Amulet Actions
@@ -1816,6 +2086,10 @@ $('#btnStateShade').onclick = () => applyState('shade');
 
 $('#btnJoinAnim').onclick = () => join();
 $('#btnSeparateAnim').onclick = () => separate();
+$('#btnAbacusAnim').onclick = () => {
+  if (model.shade || model.abacusCompress > 0.5) expandAbacus();
+  else compressAbacus();
+};
 
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
@@ -1832,6 +2106,8 @@ $('#btnReset').onclick = () => {
   model.docked = false;
   model.design = false;
   model.shade = false;
+  model.abacusCompress = 0;
+  model.option = 'abacus_compression';
   model.blend = 0;
   model.cap = 0;
   model.bayonetProgress = 0;
@@ -1842,12 +2118,26 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
+  $('#optionSelect').value = 'abacus_compression';
+  updateAbacusButtonText();
   render();
   say('Reset to initial experiment layout.');
 };
 
-$('#optionSelect').onchange = e => {
-  say('Selected option: ' + e.target.options[e.target.selectedIndex].text);
+$('#optionSelect').onchange = async e => {
+  model.option = e.target.value;
+  if (model.option === 'abacus_compression') {
+    say('Option 2: Abacus Bead-Strand Compression shade selected.');
+    if (!model.shade) {
+      await compressAbacus();
+    }
+  } else if (model.option === 'caged_bead') {
+    say('Option 1: Caged-Bead Bayonet Socket join selected.');
+    if (model.shade) {
+      await expandAbacus();
+    }
+  }
+  render();
 };
 
 // Dial and Interactive Elements
