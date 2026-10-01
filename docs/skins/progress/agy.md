@@ -11,7 +11,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Gothic: Keystone Drop (Nave Vault Key) join — Carved granite keystone descends into pointed arch gap (Built in prototypes/skins/agy/gothic.html with pointed arch springers, magnetic keystone drop, iron cotter pin release bar, reliquary undercroft bay, and state controls)
 - [x] Felt: Needle-Felt Fiber Entanglement join — Loose roving fringes interweave and compress (Built in prototypes/skins/agy/felt.html with carded wool roving fibers, needle-punching compression, ivory cross-stitch seam, turned boxwood toggle release, and craft pocket bay)
 - [x] Elven: Living Tendril Braid (Sylvan Weave) join — Art Nouveau silver vines intertwine into organic lattice (Built in prototypes/skins/agy/elven.html with spun star-silver hulls, unfurling collar tendrils, interlocking sylvan lattice, moonstone brooch lock, and sylvan canopy bay)
-- [ ] Wire: Caged-Bead Bayonet Socket join — Spiral copper beehive cage seats faceted amethyst bead
+- [x] Wire: Caged-Bead Bayonet Socket join — Spiral copper beehive cage seats faceted amethyst bead (Built in prototypes/skins/agy/wire.html with heavy bent 12-gauge copper wire hoop, coiled wire sleeves, Tree of Life gemstone crest, 30° rotary twist bayonet lock, shepherd's crook release, and wire cradle bay)
 - [ ] Hollow: Weaver's Silk Lash (Tension Twang) join — Glowing silk threads shoot across gap and cinch taut
 
 ### Cycle 2: Primary Shades

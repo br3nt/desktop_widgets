@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wire, Beads &amp; Stones Skin — Desktop Widgets</title>
+<style>
+:root {
+  color-scheme: dark;
+  --copper-hot: #ffd4b8;
+  --copper-bright: #f9a979;
+  --copper-light: #df7a47;
+  --copper-mid: #b05327;
+  --copper-dark: #662a11;
+  --copper-deep: #381406;
+  --copper-verdigris: #1d3d34;
+  --silver-wire: #e2edf2;
+  --silver-wire-dark: #7a8e9d;
+  --brass-wire: #e5b958;
+  --amethyst-bright: #e49eff;
+  --amethyst-mid: #9b38c2;
+  --amethyst-deep: #470e61;
+  --turquoise-bright: #52f0de;
+  --turquoise-mid: #1ba696;
+  --turquoise-deep: #094740;
+  --carnelian-bright: #ff8b54;
+  --carnelian-mid: #cc4918;
+  --carnelian-deep: #661d05;
+  --pearl-nacre: #fffdf5;
+  --pearl-shadow: #b3a490;
+  --screen-bg: #090e0c;
+  --screen-border: #332018;
+  --stage-bg: #100d0b;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--stage-bg);
+  color: #ebdcd4;
+  font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+  overflow-x: hidden;
+}
+
+button { font: inherit; cursor: pointer; }
+button:disabled { opacity: .4; cursor: default; }
+button:focus-visible, a:focus-visible, select:focus-visible {
+  outline: 2px solid var(--copper-bright);
+  outline-offset: 3px;
+}
+a { color: var(--copper-bright); text-underline-offset: 3px; }
+
+/* Header Navigation & Aesthetic Toolbar */
+header {
+  padding: 16px 24px;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #3d2318;
+  background: linear-gradient(180deg, #1f140e 0%, #120b08 100%);
+}
+.header-titles h1 {
+  font-size: 20px;
+  letter-spacing: -0.4px;
+  margin: 0;
+  font-weight: 600;
+  color: var(--copper-hot);
+}
+.header-titles h1 span {
+  font-weight: 400;
+  color: var(--copper-bright);
+  font-size: 15px;
+}
+.header-titles p {
+  margin: 3px 0 0;
+  font-size: 12px;
+  color: #ad8f81;
+}
+
+.controls-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: #1b120d;
+  padding: 3px 6px;
+  border-radius: 6px;
+  border: 1px solid #3d2417;
+}
+.control-group label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #b08e7e;
+  margin-right: 4px;
+}
+.controls-bar button, .controls-bar select {
+  border: 1px solid #4a2919;
+  background: linear-gradient(180deg, #2b180f, #190c06);
+  color: var(--copper-hot);
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 120ms ease;
+}
+.controls-bar button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #3d2215, #241007);
+  border-color: var(--copper-light);
+}
+.controls-bar button.active, .controls-bar button[aria-pressed="true"] {
+  border-color: var(--copper-bright);
+  color: #ffffff;
+  background: linear-gradient(180deg, #662b11, #381406);
+  box-shadow: 0 0 8px rgba(249, 169, 121, 0.4);
+}
+.controls-bar .primary-btn {
+  border-color: #8f3e17;
+  background: linear-gradient(180deg, #57220b, #301004);
+  color: #ffeae0;
+}
+.controls-bar .primary-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #752d0d, #421605);
+  border-color: var(--copper-bright);
+}
+
+/* Stage Viewport */
+#viewport {
+  overflow: auto;
+  background:
+    radial-gradient(ellipse at 50% 28%, #241610 0%, #0d0908 75%),
+    radial-gradient(circle at 82% 82%, rgba(223, 122, 71, 0.08) 0%, transparent 50%);
+  position: relative;
+  min-height: 720px;
+}
+#stage {
+  position: relative;
+  width: 1200px;
+  height: 720px;
+  margin: auto;
+  overflow: hidden;
+  touch-action: none;
+  background:
+    radial-gradient(circle at 600px 140px, rgba(249, 169, 121, 0.04) 0%, transparent 60%),
+    repeating-linear-gradient(45deg, transparent 0 160px, rgba(223, 122, 71, 0.015) 161px 320px);
+}
+
+.topline {
+  position: absolute;
+  top: 18px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 15;
+  pointer-events: none;
+}
+.topline p {
+  margin: 0;
+  color: #c4a799;
+  font-size: 13px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+#phase {
+  font: 11px/1.4 "Courier New", monospace;
+  color: var(--copper-bright);
+  background: rgba(22, 13, 9, 0.92);
+  padding: 4px 10px;
+  border-radius: 4px;
+  border: 1px solid #4a2818;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* Hardware and SVG Canvas */
+#stage-svg {
+  position: absolute;
+  inset: 0;
+  width: 1200px;
+  height: 720px;
+  pointer-events: none;
+  filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.8));
+}
+
+/* Modules: Jarvis (a) & GitDiscuss (b) */
+.module {
+  position: absolute;
+  width: 390px;
+  height: 130px;
+  user-select: none;
+  touch-action: none;
+  isolation: isolate;
+  transition: height 260ms cubic-bezier(0.18, 0.85, 0.25, 1);
+}
+.module.shade {
+  height: 44px;
+}
+.module-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 0;
+  transition: height 260ms cubic-bezier(0.18, 0.85, 0.25, 1);
+}
+.module.shade .module-svg {
+  height: 44px;
+}
+
+/* Twisted Copper Wire Rope Grip with Beaded Terminals */
+.wire-grip {
+  position: absolute;
+  top: 4px;
+  left: 54px;
+  width: 272px;
+  height: 24px;
+  cursor: grab;
+  background: linear-gradient(180deg, rgba(249, 169, 121, 0.2) 0%, rgba(56, 20, 6, 0.85) 50%, rgba(20, 8, 3, 0.95) 100%);
+  border: 1.5px solid var(--copper-mid);
+  border-radius: 12px;
+  color: var(--copper-hot);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 14px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 8px rgba(249, 169, 121, 0.4);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  z-index: 2;
+  box-shadow: inset 0 1px 2px rgba(255, 212, 184, 0.4), 0 3px 6px rgba(0, 0, 0, 0.75);
+}
+.wire-grip:active { cursor: grabbing; }
+.wire-grip .gem-boss {
+  color: var(--amethyst-bright);
+  margin-right: 6px;
+  font-size: 13px;
+  text-shadow: 0 0 6px rgba(228, 158, 255, 0.6);
+}
+
+/* Recessed Oxidized Copper Display Screen */
+.wire-screen {
+  position: absolute;
+  left: 48px;
+  top: 32px;
+  width: 284px;
+  height: 64px;
+  background: var(--screen-bg);
+  border-radius: 8px;
+  border: 1.5px solid var(--screen-border);
+  box-shadow:
+    inset 0 3px 10px rgba(0, 0, 0, 0.95),
+    0 0 0 1px rgba(176, 83, 39, 0.4),
+    0 0 12px rgba(82, 240, 222, 0.1);
+  overflow: hidden;
+  color: var(--turquoise-bright);
+  z-index: 2;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+.module.shade .wire-screen {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-8px);
+}
+.wire-screen::after, .amulet-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(16, 8, 4, 0.35) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+
+.screen-pages {
+  height: 100%;
+  width: 300%;
+  display: flex;
+  transition: transform 280ms cubic-bezier(0.18, 0.85, 0.25, 1);
+}
+.screen-page {
+  width: 33.33333%;
+  flex: none;
+  padding: 6px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.screen-page .wire-label {
+  font: 10px/1.3 "Courier New", monospace;
+  color: #c49683;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.screen-page strong {
+  font: bold 18px/1.1 "Courier New", monospace;
+  letter-spacing: -0.5px;
+  display: block;
+  color: var(--copper-hot);
+}
+.screen-page strong em {
+  font-style: normal;
+  color: var(--turquoise-bright);
+  font-weight: 500;
+}
+.screen-page small {
+  font: 11px/1.4 "Courier New", monospace;
+  color: #d1b5a9;
+}
+
+/* Gemstone Rhythm Gauge */
+.gem-bar {
+  position: absolute;
+  right: 12px;
+  top: 9px;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 25px;
+}
+.gem-bar i {
+  width: 4px;
+  background: linear-gradient(180deg, var(--turquoise-bright), var(--turquoise-deep));
+  border-radius: 2px 2px 0 0;
+  box-shadow: 0 0 5px rgba(82, 240, 222, 0.4);
+}
+
+/* Shade Mode Strip: Wire-Wrapped Rod with Gemstone Indicators */
+.shade-rod {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  top: 10px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: linear-gradient(90deg, #1c0e08, #2e170c 50%, #1c0e08);
+  border: 1px solid var(--copper-mid);
+  border-radius: 6px;
+  z-index: 2;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(249, 169, 121, 0.25);
+}
+.module.shade .shade-rod {
+  display: flex;
+}
+.shade-title {
+  font: 10px/1 "Courier New", monospace;
+  color: var(--copper-hot);
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.shade-title span {
+  color: var(--amethyst-bright);
+}
+.shade-beads {
+  display: flex;
+  gap: 5px;
+}
+.shade-beads i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  box-shadow: 0 0 4px currentColor;
+}
+.shade-beads i.amethyst { background: var(--amethyst-bright); color: var(--amethyst-bright); }
+.shade-beads i.turquoise { background: var(--turquoise-bright); color: var(--turquoise-bright); }
+.shade-beads i.carnelian { background: var(--carnelian-bright); color: var(--carnelian-bright); }
+
+/* Tabs & Interactive Controls */
+.tab-row {
+  position: absolute;
+  left: 50px;
+  top: 102px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 2;
+  transition: opacity 180ms ease;
+}
+.module.shade .tab-row {
+  opacity: 0;
+  pointer-events: none;
+}
+.wire-tab {
+  padding: 2px 7px;
+  background: rgba(27, 15, 10, 0.85);
+  border: 1px solid #4a2a1b;
+  border-radius: 3px;
+  color: #ad8a7b;
+  font: 10px/1.2 "Courier New", monospace;
+  cursor: pointer;
+  transition: all 120ms ease;
+}
+.wire-tab:hover { color: var(--copper-hot); border-color: var(--copper-light); }
+.wire-tab[aria-selected="true"] {
+  border-color: var(--copper-bright);
+  color: var(--copper-bright);
+  background: #3b1c10;
+  font-weight: 600;
+  box-shadow: 0 0 6px rgba(249, 169, 121, 0.35);
+}
+
+/* Faceted Gemstone Buttons (Pause/Next) */
+.gem-btn {
+  position: absolute;
+  top: 99px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  padding: 0;
+  border: 1.5px solid var(--copper-mid);
+  color: #170903;
+  font: bold 10px/1 Arial, sans-serif;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.8), inset 0 1px 2px #ffffff;
+  z-index: 2;
+  transition: all 120ms ease;
+}
+.gem-btn:hover {
+  filter: brightness(1.25);
+  box-shadow: 0 0 8px rgba(249, 169, 121, 0.6);
+}
+.module.shade .gem-btn { opacity: 0; pointer-events: none; }
+.run-btn {
+  left: 286px;
+  background: radial-gradient(circle at 35% 30%, #ffc4a6, #cc4918 50%, #571603 90%);
+  color: #fff2eb;
+}
+.next-btn {
+  left: 316px;
+  background: radial-gradient(circle at 35% 30%, #c2faf4, #1ba696 50%, #064038 90%);
+  color: #042621;
+  border-color: #1ba696;
+}
+
+/* Gemstone Cradle / Wire Drawer Button */
+.cradle-btn {
+  position: absolute;
+  left: 178px;
+  top: 99px;
+  width: 96px;
+  height: 22px;
+  border: 1.5px solid var(--copper-mid);
+  clip-path: polygon(7% 0, 100% 0, 93% 100%, 0 100%);
+  color: var(--copper-hot);
+  background: linear-gradient(180deg, #4d2615, #291208 50%, #170803);
+  font: bold 9px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.4px;
+  text-shadow: 0 1px 2px #000;
+  box-shadow: inset 0 1px rgba(255, 212, 184, 0.25);
+  z-index: 2;
+  transition: opacity 200ms ease;
+}
+.cradle-btn:hover {
+  background: linear-gradient(180deg, #66321b 0%, #38190b 50%, #210c04 100%);
+  border-color: var(--copper-bright);
+}
+.module.shade .cradle-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Gemstone Cradle Activity Drawer */
+#gemstoneCradle {
+  position: absolute;
+  width: 324px;
+  height: 216px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+#cradleBody {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 324px;
+  height: 204px;
+  transform: translateY(-190px);
+  transition: transform 420ms cubic-bezier(0.18, 0.85, 0.25, 1);
+  background: linear-gradient(140deg, #33180c 0%, #1c0c05 45%, #0f0602 100%);
+  border: 2px solid var(--copper-mid);
+  border-radius: 4px 4px 26px 26px;
+  box-shadow: inset 0 0 0 3px #170803, inset 0 0 0 4px #5c2912, 0 12px 18px rgba(0, 0, 0, 0.85);
+  pointer-events: auto;
+}
+#gemstoneCradle.open #cradleBody {
+  transform: translateY(0);
+}
+.cradle-rail {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: linear-gradient(90deg, #2b1106, #df7a47, #592209);
+  box-shadow: inset 0 0 0 1px #140702;
+}
+.cradle-rail.l { left: 8px; }
+.cradle-rail.r { right: 8px; }
+
+.cradle-head {
+  position: absolute;
+  top: 10px;
+  left: 26px;
+  right: 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--copper-hot);
+  text-shadow: 0 1px 2px #000;
+  font-size: 11px;
+}
+.cradle-head button {
+  border: 1px solid var(--copper-mid);
+  border-radius: 3px;
+  color: var(--copper-hot);
+  background: #2b1207;
+  font-size: 10px;
+  padding: 2px 8px;
+}
+.cradle-head button:hover { background: #451e0d; }
+
+#amuletBay {
+  position: absolute;
+  left: 22px;
+  top: 38px;
+  width: 280px;
+  height: 82px;
+  border: 1.5px solid var(--copper-mid);
+  background: #0d0805;
+  border-radius: 8px;
+  box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ad8f81;
+  font-size: 11px;
+  transition: all 180ms ease;
+}
+#amuletBay.hot, #amuletBay[data-dock-state="ready"] {
+  background: #2b1409;
+  border-color: var(--copper-bright);
+  box-shadow: inset 0 0 18px rgba(249, 169, 121, 0.4), 0 0 12px rgba(249, 169, 121, 0.4);
+}
+#emptyAmuletBay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+#emptyAmuletBay button {
+  font-size: 10px;
+  padding: 3px 9px;
+  color: var(--copper-hot);
+  background: #33170a;
+  border: 1px solid var(--copper-mid);
+  border-radius: 3px;
+}
+#emptyAmuletBay button:hover { background: #4f2310; }
+
+.cradle-footer {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  top: 130px;
+  font: 10px/1.5 "Courier New", monospace;
+  color: #c29d8d;
+}
+.cradle-footer strong { color: var(--copper-hot); }
+
+.spindle-dial-wrap {
+  position: absolute;
+  right: 28px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #b59283;
+}
+#spindleDial {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle at 35% 30%, #ffd4b8, #b05327 45%, #381406 85%);
+  border-radius: 50%;
+  border: 2px solid #210c04;
+  box-shadow: 0 0 0 1px var(--copper-mid), 0 2px 4px rgba(0, 0, 0, 0.7);
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+}
+#spindleDial::after {
+  content: "";
+  position: absolute;
+  left: 13px;
+  top: 2px;
+  width: 2px;
+  height: 8px;
+  border-radius: 1px;
+  background: #ffffff;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.8);
+  transform-origin: 1px 11px;
+  transform: rotate(var(--angle, 0deg));
+}
+
+/* Checks Widget: Wire-Wrapped Gemstone Amulet */
+#checksAmulet {
+  position: absolute;
+  width: 276px;
+  height: 78px;
+  touch-action: none;
+  user-select: none;
+  z-index: 8;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.75));
+}
+.amulet-case {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--copper-mid);
+  border-radius: 20px 10px 20px 10px;
+  background: linear-gradient(145deg, #3d1c0e, #210d05 50%, #120602);
+  box-shadow: inset 0 1px 2px rgba(255, 212, 184, 0.35), inset 0 -2px 4px rgba(0, 0, 0, 0.8);
+}
+.amulet-grip {
+  position: absolute;
+  left: 14px;
+  top: 1px;
+  width: 210px;
+  height: 18px;
+  background: none;
+  border: 0;
+  color: var(--copper-hot);
+  text-align: left;
+  font: bold 9px/1.8 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.5px;
+  cursor: grab;
+  text-shadow: 0 1px 2px #000;
+}
+.amulet-grip:active { cursor: grabbing; }
+.amulet-screen {
+  position: absolute;
+  left: 12px;
+  right: 38px;
+  top: 24px;
+  height: 42px;
+  border: 1.5px solid #3d2115;
+  border-radius: 4px;
+  background: #090e0c;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(176, 83, 39, 0.4);
+  overflow: hidden;
+  padding: 4px 8px;
+  color: var(--turquoise-bright);
+  font: 10px/1.3 "Courier New", monospace;
+}
+.amulet-screen strong {
+  font-size: 15px;
+  color: var(--copper-hot);
+}
+.amulet-gem {
+  position: absolute;
+  right: 12px;
+  top: 32px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #e49eff, #9b38c2 50%, #470e61 90%);
+  border: 1.5px solid var(--copper-mid);
+  box-shadow: 0 0 6px rgba(228, 158, 255, 0.5);
+}
+#ejectAmulet {
+  position: absolute;
+  right: 12px;
+  top: 7px;
+  width: 16px;
+  height: 14px;
+  border: 0;
+  background: none;
+  color: var(--copper-hot);
+  padding: 0;
+  font-size: 11px;
+}
+#ejectAmulet:hover { color: #ffffff; }
+
+/* Shepherd's Crook & Wire Release Clasp */
+.wire-release-clasp {
+  position: absolute;
+  width: 24px;
+  height: 44px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  color: var(--copper-hot);
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+}
+.wire-release-clasp[hidden] { display: none; }
+.wire-release-clasp::before {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 28px;
+  left: 8px;
+  top: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #3d1b0d, #df7a47 35%, #ffd4b8 50%, #df7a47 65%, #3d1b0d);
+  border: 1.5px solid var(--copper-dark);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 6px rgba(249, 169, 121, 0.4);
+}
+.wire-release-clasp:hover::before, .wire-release-clasp:focus-visible::before {
+  border-color: var(--copper-bright);
+  filter: brightness(1.25);
+}
+.wire-release-clasp::after {
+  content: "";
+  position: absolute;
+  bottom: 8px;
+  right: 6px;
+  width: 2px;
+  height: calc(22px * var(--tension, 0));
+  background: var(--amethyst-bright);
+  box-shadow: 0 0 4px var(--amethyst-bright);
+}
+
+/* Design Overlay */
+#portOverlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.socket-port {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--copper-bright);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(249, 169, 121, 0.4);
+  display: none;
+}
+.socket-port::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+}
+.socket-port::after {
+  position: absolute;
+  top: -26px;
+  left: -40px;
+  white-space: nowrap;
+  color: var(--copper-hot);
+  font: 10px "Courier New", monospace;
+  content: attr(data-label);
+  background: rgba(22, 13, 9, 0.95);
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--copper-mid);
+}
+#stage.design .socket-port { display: block; }
+#stage.design #amuletBay { outline: 1px dashed var(--copper-bright); outline-offset: 4px; }
+#stage.design .wire-screen { outline: 1px dashed var(--turquoise-bright); outline-offset: 3px; }
+
+/* Footer Documentation */
+footer {
+  padding: 20px 28px 30px;
+  border-top: 1px solid #3d2318;
+  background: #120b08;
+  color: #b08e7e;
+  font-size: 13px;
+}
+footer h3 {
+  color: var(--copper-hot);
+  font-size: 15px;
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+footer p {
+  margin: 0 0 10px;
+  max-width: 900px;
+  line-height: 1.6;
+}
+footer .note-highlight {
+  color: var(--copper-bright);
+  font-weight: 500;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-titles">
+    <h1>Wire, Beads &amp; Stones <span>/ caged-bead bayonet socket join</span></h1>
+    <p>Raw and oxidized copper wire · Caged faceted amethyst jewel · Gemstone bead controls</p>
+  </div>
+  <nav class="controls-bar" aria-label="Experiment state and option controls">
+    <div class="control-group">
+      <label for="optionSelect">Option</label>
+      <select id="optionSelect" aria-label="Select skin exploration option">
+        <option value="caged_bead" selected>1. Caged-Bead Bayonet Socket (Spiral Copper Cage &amp; Amethyst)</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <label>State</label>
+      <button id="btnStateSeparate" class="active" aria-pressed="true">Separate</button>
+      <button id="btnStateJoining" aria-pressed="false">Joining</button>
+      <button id="btnStateJoined" aria-pressed="false">Joined</button>
+      <button id="btnStateShade" aria-pressed="false">Shade</button>
+    </div>
+    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
+    <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnDesign" aria-pressed="false">Design mode</button>
+    <button id="btnReset">Reset</button>
+  </nav>
+</header>
+
+<div id="viewport">
+  <main id="stage" aria-label="Wire, Beads and Stones skin interactive stage">
+    <div class="topline">
+      <p id="status" role="status" aria-live="polite">Drag capsules toward each other to watch the beehive caged bead engage, or select a state.</p>
+      <span id="phase">Separate / Two handcrafted copper wire armatures</span>
+    </div>
+
+    <!-- Architectural SVG Canvas for Shared Wire Armature, Caged-Bead Bayonet Socket, and Ambient Glints -->
+    <svg id="stage-svg" viewBox="0 0 1200 720" aria-hidden="true">
+      <defs>
+        <!-- Structural Copper Wire Gradient -->
+        <linearGradient id="copperGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffd4b8"/>
+          <stop offset="10%" stop-color="#f9a979"/>
+          <stop offset="35%" stop-color="#df7a47"/>
+          <stop offset="65%" stop-color="#99431b"/>
+          <stop offset="85%" stop-color="#4a1c09"/>
+          <stop offset="100%" stop-color="#b05327"/>
+        </linearGradient>
+
+        <!-- Polished Copper Radial Glint -->
+        <radialGradient id="copperRondelle" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="25%" stop-color="#ffd4b8"/>
+          <stop offset="55%" stop-color="#df7a47"/>
+          <stop offset="85%" stop-color="#7a2e0e"/>
+          <stop offset="100%" stop-color="#2b0e03"/>
+        </radialGradient>
+
+        <!-- Sterling Silver Craft Wire Gradient -->
+        <linearGradient id="silverCraftWire" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="35%" stop-color="#e2edf2"/>
+          <stop offset="70%" stop-color="#7a8e9d"/>
+          <stop offset="100%" stop-color="#38454d"/>
+        </linearGradient>
+
+        <!-- Faceted Amethyst Gemstone Gradient -->
+        <radialGradient id="facetedAmethyst" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="20%" stop-color="#f0c2ff"/>
+          <stop offset="45%" stop-color="#b84fe0"/>
+          <stop offset="75%" stop-color="#69168f"/>
+          <stop offset="100%" stop-color="#2d0540"/>
+        </radialGradient>
+
+        <!-- Polished Turquoise Cabochon Gradient -->
+        <radialGradient id="turquoiseBead" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#d4fffa"/>
+          <stop offset="30%" stop-color="#52f0de"/>
+          <stop offset="70%" stop-color="#199486"/>
+          <stop offset="100%" stop-color="#083832"/>
+        </radialGradient>
+
+        <!-- Translucent Carnelian Gemstone Gradient -->
+        <radialGradient id="carnelianBead" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#fff0e8"/>
+          <stop offset="25%" stop-color="#ff8b54"/>
+          <stop offset="65%" stop-color="#cc4918"/>
+          <stop offset="100%" stop-color="#4d1402"/>
+        </radialGradient>
+
+        <!-- Luminous Freshwater Pearl Gradient -->
+        <radialGradient id="pearlBead" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="40%" stop-color="#fffcf0"/>
+          <stop offset="75%" stop-color="#d9cdb8"/>
+          <stop offset="100%" stop-color="#807261"/>
+        </radialGradient>
+
+        <!-- Gemstone Glint Bloom Filter -->
+        <filter id="gemGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+
+        <!-- Tight Coiled Wire Wrap Pattern (20-gauge copper coils) -->
+        <pattern id="wireCoilPattern" width="6" height="20" patternUnits="userSpaceOnUse">
+          <line x1="1" y1="0" x2="1" y2="20" stroke="#ffd4b8" stroke-width="1.2"/>
+          <line x1="3" y1="0" x2="3" y2="20" stroke="#b05327" stroke-width="1.8"/>
+          <line x1="5" y1="0" x2="5" y2="20" stroke="#381406" stroke-width="1"/>
+        </pattern>
+
+        <!-- Heavy Wire Frame Drop Shadow Filter -->
+        <filter id="wireShadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="5"/>
+          <feOffset dx="0" dy="7" result="offsetblur"/>
+          <feComponentTransfer>
+            <feFuncA type="linear" slope="0.6"/>
+          </feComponentTransfer>
+          <feMerge>
+            <feMergeNode/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <!-- Shared Wire Stage (Unified Casing & Seam) -->
+      <g id="sharedWireStage"></g>
+      <!-- Radiant Gemstone Proximity Glow Aura -->
+      <g id="wireLightAura"></g>
+    </svg>
+
+    <!-- Activity Bay / Gemstone Cradle Drawer -->
+    <div id="gemstoneCradle" aria-label="Jarvis gemstone cradle activity bay">
+      <div id="cradleBody" inert>
+        <i class="cradle-rail l"></i><i class="cradle-rail r"></i>
+        <div class="cradle-head">
+          <span id="bayStatus">Gemstone Cradle Bay</span>
+          <button id="closeCradle" aria-label="Close gemstone cradle">▴ close</button>
+        </div>
+        <div id="amuletBay" aria-label="Checks widget bay">
+          <div id="emptyAmuletBay">
+            <span>Nest the Checks wire amulet into this cradle</span>
+            <button id="insertAmulet">Insert Checks Amulet</button>
+          </div>
+        </div>
+        <div class="cradle-footer">
+          <strong id="activityState">Wire workshop active</strong><br>
+          Cradle belongs to Jarvis.<br>
+          Its copper chassis stays with it.
+        </div>
+        <div class="spindle-dial-wrap">
+          <span>Tension Spindle <b id="spindleValue">3</b></span>
+          <button id="spindleDial" aria-label="Cycle tension spindle setting"></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capsule A: Jarvis -->
+    <section class="module" id="a" aria-label="Jarvis wire capsule">
+      <svg class="module-svg" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="wire-grip" data-drag="a" aria-label="Move Jarvis capsule">
+        <span><span class="gem-boss">✦</span> Jarvis / Wire Artisan</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Full Oxidized Copper Screen -->
+      <div class="wire-screen" aria-label="Jarvis digital display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="wire-label">Jarvis / Active Weave</div>
+            <strong id="runText">03 <em>agents running</em></strong>
+            <small>Coiling bayonet sleeve · verifying tension</small>
+            <div class="gem-bar">
+              <i style="height:8px"></i><i style="height:20px"></i><i style="height:14px"></i>
+              <i style="height:24px"></i><i style="height:16px"></i>
+            </div>
+          </div>
+          <div class="screen-page">
+            <div class="wire-label">Jarvis / Workbench Task</div>
+            <strong style="font-size:16px">Verify wire assembly</strong>
+            <small>12 checks passed · 2 queued in cradle</small>
+          </div>
+          <div class="screen-page">
+            <div class="wire-label">Artisan Chronicle / Log</div>
+            <small>10:42  caged bead socket aligned<br>10:43  spring detent seated firmly</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact Rod Strip for Shade Mode -->
+      <div class="shade-rod">
+        <span class="shade-title"><span>✦</span> JARVIS · 03 AGENTS</span>
+        <div class="shade-beads">
+          <i class="amethyst"></i><i class="turquoise"></i><i class="carnelian"></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="Jarvis screens">
+        <button class="wire-tab" role="tab" aria-selected="true" data-page="0">Status</button>
+        <button class="wire-tab" role="tab" aria-selected="false" data-page="1">Task</button>
+        <button class="wire-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+
+      <button class="cradle-btn" aria-label="Open gemstone cradle" aria-expanded="false">▾ wire cradle</button>
+      <button class="gem-btn run-btn" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button>
+      <button class="gem-btn next-btn" aria-label="Next Jarvis screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Capsule B: GitDiscuss -->
+    <section class="module" id="b" aria-label="GitDiscuss wire capsule">
+      <svg class="module-svg" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <button class="wire-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
+        <span><span class="gem-boss">✦</span> GitDiscuss / Bead Weaver</span>
+        <span>⋮⋮</span>
+      </button>
+
+      <!-- Full Oxidized Copper Screen -->
+      <div class="wire-screen" aria-label="GitDiscuss digital display">
+        <div class="screen-pages">
+          <div class="screen-page">
+            <div class="wire-label">GitDiscuss / Strand Queue</div>
+            <strong>02 <em>need a decision</em></strong>
+            <small>Caged-bead bayonet join · review</small>
+          </div>
+          <div class="screen-page">
+            <div class="wire-label">Selected Discussion</div>
+            <strong style="font-size:16px">Shared casing geometry</strong>
+            <small>Brent · 4 comments · ready to lock</small>
+          </div>
+          <div class="screen-page">
+            <div class="wire-label">Weaver Chronicle / Log</div>
+            <small>10:41  feedback collected at workbench<br>10:43  helical wire track aligned</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact Rod Strip for Shade Mode -->
+      <div class="shade-rod">
+        <span class="shade-title"><span>✦</span> GITDISCUSS · 02 QUEUED</span>
+        <div class="shade-beads">
+          <i class="amethyst"></i><i class="turquoise"></i>
+        </div>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
+        <button class="wire-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
+        <button class="wire-tab" role="tab" aria-selected="false" data-page="1">Thread</button>
+        <button class="wire-tab" role="tab" aria-selected="false" data-page="2">Log</button>
+      </div>
+
+      <button class="cradle-btn" aria-label="Open selected thread">▸ view thread</button>
+      <button class="gem-btn run-btn" aria-label="Pause GitDiscuss" title="Pause GitDiscuss">Ⅱ</button>
+      <button class="gem-btn next-btn" aria-label="Next GitDiscuss screen" title="Next screen">›</button>
+    </section>
+
+    <!-- Checks Widget (Wire-Wrapped Gemstone Amulet) -->
+    <section id="checksAmulet" aria-label="Checks widget">
+      <div class="amulet-case"></div>
+      <button class="amulet-grip" data-drag="meter" aria-label="Move Checks amulet">
+        Checks / Wire Amulet ⋮⋮
+      </button>
+      <div class="amulet-screen">
+        <strong>12 / 14</strong> checks passed<br>
+        2 waiting for approval
+      </div>
+      <span class="amulet-gem"></span>
+      <button id="ejectAmulet" aria-label="Eject Checks amulet" title="Eject from cradle" hidden>↗</button>
+    </section>
+
+    <!-- Shepherd's Crook & Wire Release Clasp -->
+    <button id="wireRelease" class="wire-release-clasp" data-drag="release"
+            aria-label="Release GitDiscuss: pull right or press Enter"
+            title="Pull right to disengage bayonet lock · Enter to separate" hidden>
+    </button>
+
+    <!-- Socket Overlay for Design Mode -->
+    <div id="portOverlay" aria-hidden="true">
+      <div class="socket-port" id="portA" data-label="Bayonet Cage · A"></div>
+      <div class="socket-port" id="portB" data-label="Bayonet Sleeve · B"></div>
+    </div>
+  </main>
+</div>
+
+<footer>
+  <h3>Wire, Beads &amp; Stones Architecture &amp; The Caged-Bead Bayonet Socket Join</h3>
+  <p>
+    Formed from heavy 12-gauge bent copper wire frames, wrapped with tight 20-gauge copper coils, sterling silver craft wire details, and natural gemstones (faceted amethyst, polished turquoise, carnelian, and freshwater pearls). The displays sit recessed in oxidized copper bezels, isolated from wire ornamentation to guarantee complete legibility.
+  </p>
+  <p>
+    <span class="note-highlight">Option 1 — Caged-Bead Bayonet Socket:</span> Module A features an extended spiral-coiled copper wire cage (beehive lantern, ref 6) holding a glowing faceted purple amethyst jewel. Module B carries a complementary open-coil copper receiving sleeve with a helical guide slot. As the capsules enter the magnetic capture threshold, the caged bead slides into the sleeve, compresses an internal copper coil spring, and twists 30° into a locked bayonet detent with a crisp metallic click. Pulling the shepherd's crook clasp right unlocks the detent.
+  </p>
+  <p>
+    <span class="note-highlight">Shade Mode:</span> Collapses the housing into a 44px wire-wrapped jewelry rod with glowing amethyst, turquoise, and carnelian status beads.
+  </p>
+</footer>
+
+<script>
+// Wire, Beads & Stones Skin Controller
+const $ = s => document.querySelector(s);
+const stage = $('#stage');
+const W = 390, H = 130, JOIN_DISTANCE = 316;
+
+const model = {
+  a: { x: 140, y: 220, page: 0, running: true },
+  b: { x: 680, y: 220, page: 0, running: true },
+  meter: { x: 805, y: 510 },
+  joined: false,
+  busy: false,
+  cradle: false,
+  docked: false,
+  design: false,
+  shade: false,
+  blend: 0,
+  cap: 0,
+  bayonetProgress: 0, // 0 = separate, 0.5 = sleeve entry & spring compression, 1.0 = 30-deg twist locked
+  light: 0,
+  limit: 3,
+  feel: 'free',
+  tension: 0,
+  front: 'b'
+};
+
+const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let drag = null, animationToken = 0, dragFrame = 0, glowFrame = 0, glowTime = 0;
+const DOCKING = { near: 130, capture: 45 };
+const connectionGlow = { socket: { value: 0, target: 0 }, bay: { value: 0, target: 0 } };
+
+function say(text) { $('#status').textContent = text; }
+
+// Draw Handcrafted Wire & Beads Casing
+function drawWireCasing(x, y, width, opacity = 1, isShade = false) {
+  const midX = x + width / 2;
+  let s = `<g opacity="${opacity}" class="wire-casing">`;
+
+  if (!isShade) {
+    // 1. Heavy Wire Outer Frame Drop Shadow
+    s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="118" rx="20"
+                fill="#000000" opacity="0.65" filter="url(#wireShadow)"/>`;
+
+    // 2. Oxidized Copper Chassis Plate (Background with subtle verdigris depth)
+    s += `<rect x="${x + 8}" y="${y + 8}" width="${width - 16}" height="114" rx="18"
+                fill="#180e09" stroke="#3b1d10" stroke-width="2"/>`;
+
+    // 3. Heavy 12-Gauge Bent Structural Copper Wire Armature (Outer Perimeter Hoop)
+    s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="118" rx="18"
+                fill="none" stroke="url(#copperGrad)" stroke-width="4.5" stroke-linecap="round"/>`;
+
+    // Inner wire highlight for 3D metallic tube sheen
+    s += `<rect x="${x + 7}" y="${y + 7}" width="${width - 14}" height="116" rx="17"
+                fill="none" stroke="#ffd4b8" stroke-width="1.2" opacity="0.65"/>`;
+
+    // 4. Coiled Wire Sleeves at Corners and Structural Anchors (20-gauge copper coils)
+    const coilAnchors = [
+      [x + 14, y + 8, 22, 7],
+      [x + width - 36, y + 8, 22, 7],
+      [x + 14, y + 115, 22, 7],
+      [x + width - 36, y + 115, 22, 7],
+      [x + 6, y + 54, 7, 22],
+      [x + width - 13, y + 54, 7, 22]
+    ];
+    coilAnchors.forEach(([cx, cy, cw, ch]) => {
+      s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2"
+                  fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+      // Fine coil striations
+      if (cw > ch) {
+        for (let ix = cx + 2; ix < cx + cw - 2; ix += 3) {
+          s += `<line x1="${ix}" y1="${cy}" x2="${ix}" y2="${cy + ch}" stroke="#ffd4b8" stroke-width="0.8"/>`;
+        }
+      } else {
+        for (let iy = cy + 2; iy < cy + ch - 2; iy += 3) {
+          s += `<line x1="${cx}" y1="${iy}" x2="${cx + cw}" y2="${iy}" stroke="#ffd4b8" stroke-width="0.8"/>`;
+        }
+      }
+    });
+
+    // 5. Tree of Life / Branched Wire Crest at Top Center (Inspired by ref 3 & 4)
+    s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
+      <!-- Main twisted wire trunk extending down to grip -->
+      <path d="M ${midX - 18} ${y + 6} Q ${midX - 10} ${y - 8} ${midX} ${y - 14} Q ${midX + 10} ${y - 8} ${midX + 18} ${y + 6}" stroke-width="2.5"/>
+      <path d="M ${midX - 8} ${y + 6} Q ${midX} ${y - 12} ${midX + 8} ${y + 6}" stroke-width="1.8"/>
+
+      <!-- Branched gemstone leaf wires curling outward -->
+      <path d="M ${midX} ${y - 14} Q ${midX - 22} ${y - 20} ${midX - 36} ${y - 12}" stroke-width="1.6"/>
+      <path d="M ${midX} ${y - 14} Q ${midX + 22} ${y - 20} ${midX + 36} ${y - 12}" stroke-width="1.6"/>
+      <path d="M ${midX - 18} ${y - 18} Q ${midX - 24} ${y - 28} ${midX - 14} ${y - 26}" stroke-width="1.2"/>
+      <path d="M ${midX + 18} ${y - 18} Q ${midX + 24} ${y - 28} ${midX + 14} ${y - 26}" stroke-width="1.2"/>
+    </g>`;
+
+    // Gemstone beads wired into the Tree of Life branches (Amethyst, Turquoise, Peridot)
+    s += `<circle cx="${midX - 36}" cy="${y - 12}" r="3.2" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+    s += `<circle cx="${midX + 36}" cy="${y - 12}" r="3.2" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+    s += `<circle cx="${midX - 14}" cy="${y - 26}" r="3" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8"/>`;
+    s += `<circle cx="${midX + 14}" cy="${y - 26}" r="3" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+    s += `<circle cx="${midX}" cy="${y - 16}" r="3.8" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="1" filter="url(#gemGlow)"/>`;
+
+    // 6. Recessed Display Window Frame with 4 Wire Claw Prongs
+    s += `<rect x="${x + 44}" y="${y + 28}" width="${width - 88}" height="72" rx="10"
+                fill="#090e0c" stroke="#3d2115" stroke-width="2.5"/>`;
+    s += `<rect x="${x + 46}" y="${y + 30}" width="${width - 92}" height="68" rx="8"
+                fill="none" stroke="#66331a" stroke-width="1.2"/>`;
+
+    // 4 Corner Bent-Wire Claw Prongs holding the screen
+    const prongs = [
+      [x + 47, y + 33, -45],
+      [x + width - 47, y + 33, 45],
+      [x + 47, y + 95, -135],
+      [x + width - 47, y + 95, 135]
+    ];
+    prongs.forEach(([px, py, rot]) => {
+      s += `<g transform="translate(${px}, ${py}) rotate(${rot})">
+        <path d="M 0 0 L 8 0 Q 11 0 11 3 L 8 4 L 0 0 Z" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="0.8"/>
+        <circle cx="3" cy="0" r="1.2" fill="#ffd4b8"/>
+      </g>`;
+    });
+
+    // 7. Beaded Wire Garland along Bottom Rail
+    s += `<path d="M ${x + 50} ${y + 124} Q ${midX} ${y + 130} ${x + width - 50} ${y + 124}"
+                fill="none" stroke="url(#copperGrad)" stroke-width="2" stroke-linecap="round"/>`;
+    s += `<circle cx="${midX - 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+    s += `<circle cx="${midX}" cy="${y + 127}" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+    s += `<circle cx="${midX + 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+
+  } else {
+    // Shade Mode: Wire-Wrapped Compact Jewelry Rod
+    s += `<rect x="${x + 8}" y="${y + 8}" width="${width - 16}" height="28" rx="10"
+                fill="url(#copperGrad)" stroke="#381406" stroke-width="2"/>`;
+    s += `<rect x="${x + 12}" y="${y + 11}" width="${width - 24}" height="22" rx="8"
+                fill="#1c0e08" stroke="#5c260f" stroke-width="1.2"/>`;
+
+    // Center wire wrap on shade bar
+    s += `<rect x="${midX - 24}" y="${y + 8}" width="48" height="28" fill="url(#copperGrad)" opacity="0.4"/>`;
+    for (let ix = midX - 22; ix < midX + 22; ix += 4) {
+      s += `<line x1="${ix}" y1="${y + 8}" x2="${ix}" y2="${y + 36}" stroke="#ffd4b8" stroke-width="1"/>`;
+    }
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Docking End-Caps:
+// Module A (Right side): Extended spiral copper beehive cage holding faceted amethyst bead (ref 6)
+// Module B (Left side): Open-coil copper wire receiving sleeve with helical bayonet slot
+function drawWireCap(x, y, isRight, isMaleCage = false, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const dir = isRight ? 1 : -1;
+  const startX = isRight ? x + W - 14 : x + 14;
+  const scaleX = (1 - retract) * dir;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  if (isMaleCage) {
+    // Protruding Spiral Copper Beehive Cage with Faceted Amethyst Bead (Male Docking Head)
+    return `
+      <g transform="translate(${startX}, ${y + 64}) scale(${scaleX}, 1)" id="beehiveCageGroup">
+        <!-- Structural Base Collar with Wire Wraps -->
+        <path d="M -4 -42 C 6 -40 10 -24 10 0 C 10 24 6 40 -4 42"
+              fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>
+        <path d="M 0 -36 C 8 -32 8 32 0 36"
+              fill="none" stroke="#260c03" stroke-width="1.5"/>
+
+        <!-- Coiled Wire Sleeve at base of cage -->
+        <rect x="2" y="-28" width="8" height="56" rx="4"
+              fill="url(#copperGrad)" stroke="#381406" stroke-width="1"/>
+
+        <!-- The Glowing Faceted Amethyst Jewel inside the cage -->
+        <ellipse cx="26" cy="0" rx="14" ry="17" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="1.5" filter="url(#gemGlow)"/>
+        <!-- Optical Specular Point Glint on Amethyst Facet -->
+        <circle cx="21" cy="-6" r="3.5" fill="#ffffff" opacity="0.85"/>
+        <path d="M 16 0 L 36 0 M 26 -10 L 26 10" stroke="#f5d4ff" stroke-width="0.8" opacity="0.6"/>
+
+        <!-- Spiral-Coiled Copper Wire Beehive Cage Ribs (Ref 6) -->
+        <!-- Helical wire coils wrapping around the amethyst bead -->
+        <path d="M 8 -24 C 22 -32 36 -28 42 -14 C 48 0 46 16 38 26 C 30 36 16 32 8 24"
+              fill="none" stroke="url(#copperGrad)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M 8 -14 C 28 -22 42 -14 44 0 C 46 14 34 24 10 18"
+              fill="none" stroke="#ffd4b8" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M 12 -4 C 32 -10 40 0 36 8 C 32 16 20 18 12 12"
+              fill="none" stroke="url(#copperGrad)" stroke-width="2" stroke-linecap="round"/>
+
+        <!-- Tapered Cage Nose Terminal with Bayonet Alignment Pin -->
+        <circle cx="43" cy="0" r="4.5" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="1.2"/>
+        <rect x="42" y="-7" width="5" height="14" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>
+      </g>
+    `;
+  } else {
+    // Open-Coil Copper Wire Receiving Sleeve Socket (Female Docking Socket)
+    return `
+      <g transform="translate(${startX}, ${y + 64}) scale(${scaleX}, 1)" id="bayonetSleeveGroup">
+        <!-- Structural Receiving Collar -->
+        <path d="M -4 -44 C 8 -42 12 -24 12 0 C 12 24 8 42 -4 44"
+              fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>
+
+        <!-- Open-Coil Wire Sleeve Guide Rails -->
+        <path d="M 2 -32 C 18 -34 32 -26 38 -12 C 42 0 40 14 34 26 C 26 34 16 32 2 30"
+              fill="none" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round"/>
+        <path d="M 6 -22 C 20 -24 30 -16 32 0 C 34 14 24 22 4 20"
+              fill="none" stroke="#ffd4b8" stroke-width="1.2"/>
+
+        <!-- Helical Bayonet Guide Slot (Dark recess where male pin slides) -->
+        <path d="M 8 -8 C 22 -14 32 -6 34 0 C 32 8 24 12 8 6"
+              fill="none" stroke="#100602" stroke-width="4" stroke-linecap="round"/>
+        <path d="M 8 -8 C 22 -14 32 -6 34 0 C 32 8 24 12 8 6"
+              fill="none" stroke="url(#copperGrad)" stroke-width="1.5" stroke-linecap="round"/>
+
+        <!-- Internal Spring Coils Peeking Through Sleeve -->
+        <path d="M 12 -18 L 22 -12 M 16 -6 L 26 0 M 14 6 L 24 12"
+              stroke="#e2edf2" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>
+
+        <!-- Stone Spacer Beads Flanking Sleeve Socket (Turquoise & Carnelian) -->
+        <circle cx="10" cy="-38" r="3.5" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.8"/>
+        <circle cx="10" cy="38" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>
+      </g>
+    `;
+  }
+}
+
+// Radiant Amethyst & Copper Proximity Glint Aura
+function drawWireProximityAura(x, y, amount) {
+  if (!amount) return '';
+  return `
+    <g opacity="${amount}">
+      <!-- Warm Violet Amethyst Glow -->
+      <ellipse cx="${x}" cy="${y + 64}" rx="20" ry="48" fill="#9b38c2" opacity="0.35" filter="url(#gemGlow)"/>
+      <ellipse cx="${x}" cy="${y + 64}" rx="10" ry="32" fill="#ffd4b8" opacity="0.55" filter="url(#gemGlow)"/>
+      <ellipse cx="${x}" cy="${y + 64}" rx="3" ry="18" fill="#ffffff" opacity="0.9"/>
+      <!-- Sparkling Gemstone Glints -->
+      <circle cx="${x - 12}" cy="${y + 36}" r="1.8" fill="#52f0de" opacity="0.85"/>
+      <circle cx="${x + 10}" cy="${y + 92}" r="1.8" fill="#e49eff" opacity="0.9"/>
+      <circle cx="${x + 14}" cy="${y + 28}" r="1.4" fill="#ffffff" opacity="0.95"/>
+    </g>
+  `;
+}
+
+// Option 1: The Caged-Bead Bayonet Socket Join (Spiral Copper Cage & Amethyst Jewel)
+function drawCagedBeadJoin(midX, y, progress, opacity = 1) {
+  // progress = 0 (dormant/separate), 0.5 (cage inserting into open sleeve & spring compressing), 1.0 (30-deg twist lock clicked)
+  if (progress < 0.05) return '';
+
+  const insert = Math.min(1, progress * 1.3);
+  const twist = Math.max(0, (progress - 0.7) / 0.3); // 30-deg twist on final lock
+  const rotAngle = twist * 30;
+
+  return `
+    <g id="cagedBeadBayonetSeam" opacity="${opacity}">
+      <!-- Radiant Amethyst & Copper Glow Core -->
+      <ellipse cx="${midX}" cy="${y + 64}" rx="${18 * insert}" ry="48"
+               fill="#9b38c2" opacity="${0.28 * insert}" filter="url(#gemGlow)"/>
+
+      <!-- Interlocked Copper Wire Hoop Ring Bridging Seam -->
+      <path d="M ${midX - 28 * insert} ${y + 20}
+               C ${midX - 10} ${y + 14}, ${midX + 10} ${y + 14},
+                 ${midX + 28 * insert} ${y + 20}"
+            fill="none" stroke="url(#copperGrad)" stroke-width="${2 + insert}" stroke-linecap="round"/>
+      <path d="M ${midX - 28 * insert} ${y + 108}
+               C ${midX - 10} ${y + 114}, ${midX + 10} ${y + 114},
+                 ${midX + 28 * insert} ${y + 108}"
+            fill="none" stroke="url(#copperGrad)" stroke-width="${2 + insert}" stroke-linecap="round"/>
+
+      <!-- Central Caged Amethyst Beehive Lantern Housing -->
+      <g transform="translate(${midX}, ${y + 64}) rotate(${rotAngle}) scale(${insert})">
+        <!-- Structural Lantern Collar -->
+        <ellipse cx="0" cy="0" rx="16" ry="24" fill="#140803" stroke="url(#copperGrad)" stroke-width="2"/>
+
+        <!-- The Radiant Amethyst Core -->
+        <ellipse cx="0" cy="0" rx="12" ry="16" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="1.2" filter="url(#gemGlow)"/>
+        <!-- Gemstone Brilliant Optical Core -->
+        <circle cx="-3" cy="-4" r="3" fill="#ffffff" opacity="0.9"/>
+        <path d="M -8 0 H 8 M 0 -10 V 10" stroke="#f5d4ff" stroke-width="0.8" opacity="0.7"/>
+
+        <!-- Interlaced Beehive Cage Spirals Crossing Over Amethyst -->
+        <path d="M -15 -14 Q 0 -24 15 -14 Q 18 0 10 14 Q 0 22 -14 12"
+              fill="none" stroke="url(#copperGrad)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M -12 14 Q 0 24 14 12 Q 16 0 8 -12 Q 0 -18 -12 -10"
+              fill="none" stroke="#ffd4b8" stroke-width="1.4" stroke-linecap="round"/>
+
+        <!-- Compressed Copper Wire Spring Detent -->
+        <path d="M -16 -6 L -10 -2 L -14 4 L -8 8"
+              stroke="#e2edf2" stroke-width="1.8" stroke-linecap="round"/>
+
+        <!-- Bayonet Locking Lug Seated in Detent -->
+        <circle cx="14" cy="0" r="3.2" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="1"/>
+        <circle cx="14" cy="0" r="1.2" fill="#ffffff"/>
+      </g>
+
+      <!-- Flanking Turquoise and Carnelian Accent Beads on Wire Strands -->
+      <g transform="translate(${midX}, ${y + 64}) scale(${insert})">
+        <!-- Upper Left Turquoise Bead -->
+        <circle cx="-22" cy="-28" r="3.5" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.8"/>
+        <!-- Upper Right Carnelian Bead -->
+        <circle cx="22" cy="-28" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>
+        <!-- Lower Left Carnelian Bead -->
+        <circle cx="-22" cy="28" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>
+        <!-- Lower Right Turquoise Bead -->
+        <circle cx="22" cy="28" r="3.5" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.8"/>
+      </g>
+
+      <!-- Resonant Metallic Ping / Spark Flash when locked -->
+      ${twist > 0.85 ? `
+        <circle cx="${midX}" cy="${y + 64}" r="${(twist - 0.85) * 40}"
+                fill="none" stroke="#ffd4b8" stroke-width="${(1 - twist) * 8}"
+                opacity="${(1 - twist) * 6}" filter="url(#gemGlow)"/>
+      ` : ''}
+    </g>
+  `;
+}
+
+// Render Complete Hardware Layer
+function renderHardware() {
+  const a = model.a, b = model.b, p = model.blend;
+  const isShade = model.shade;
+  const glow = model.busy ? model.light : connectionGlow.socket.value;
+  let shared = '';
+
+  const midX = (a.x + W - 22 + b.x + 22) / 2;
+
+  if (p > 0) {
+    // Seamless Monolithic Copper Wire Frame
+    shared += drawWireCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
+    if (!isShade) {
+      // Connecting wire bridge along seam
+      shared += `
+        <g opacity="${p}">
+          <path d="M ${midX - 40} ${a.y + 10} Q ${midX} ${a.y + 16} ${midX + 40} ${a.y + 10}"
+                fill="none" stroke="url(#copperGrad)" stroke-width="2"/>
+          <path d="M ${midX - 36} ${a.y + 124} Q ${midX} ${a.y + 120} ${midX + 36} ${a.y + 124}"
+                fill="none" stroke="url(#copperGrad)" stroke-width="2"/>
+        </g>
+      `;
+    }
+  }
+
+  // Draw Caged-Bead Bayonet Socket for Option 1
+  if (!isShade && (model.joined || model.bayonetProgress > 0.02 || (glow > 0.25 && !model.joined))) {
+    const prog = model.joined ? 1 : model.bayonetProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
+    const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+    shared += drawCagedBeadJoin(kMidX, a.y, prog, Math.max(p, glow > 0.25 ? 0.95 : prog));
+  }
+
+  if (model.joined && model.design) {
+    shared += `<line x1="${a.x + JOIN_DISTANCE}" y1="${a.y + 8}" x2="${a.x + JOIN_DISTANCE}" y2="${a.y + 122}"
+                     stroke="#f9a979" stroke-dasharray="4 3" stroke-width="1.5"/>`;
+  }
+
+  $('#sharedWireStage').innerHTML = shared;
+
+  // Individual Capsule SVG Shells
+  for (const id of ['a', 'b']) {
+    const isA = id === 'a';
+    const individual = drawWireCasing(0, 0, W, 1, isShade) +
+      drawWireCap(0, 0, false, false, isA ? 0 : model.cap, isShade) +
+      drawWireCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+
+    $('#shell-' + id).innerHTML = `
+      <g opacity="${1 - p}">
+        ${individual}
+        ${drawWireProximityAura(isA ? W - 22 : 22, 0, glow)}
+      </g>
+    `;
+  }
+
+  // Active Proximity Aura
+  if (!isShade && glow > 0.05 && p < 0.98) {
+    $('#wireLightAura').innerHTML = `
+      <g opacity="${glow}">
+        ${drawWireProximityAura(a.x + W - 22, a.y, glow)}
+        ${drawWireProximityAura(b.x + 22, b.y, glow)}
+      </g>
+    `;
+  } else {
+    $('#wireLightAura').innerHTML = '';
+  }
+}
+
+function updateStateButtons() {
+  const isShade = model.shade;
+  const isJoined = model.joined;
+  const isJoining = model.bayonetProgress > 0.1 && model.bayonetProgress < 0.95 && !isJoined;
+  const isSep = !isJoined && !isJoining && !isShade;
+
+  $('#btnStateSeparate').classList.toggle('active', isSep);
+  $('#btnStateSeparate').setAttribute('aria-pressed', String(isSep));
+
+  $('#btnStateJoining').classList.toggle('active', isJoining);
+  $('#btnStateJoining').setAttribute('aria-pressed', String(isJoining));
+
+  $('#btnStateJoined').classList.toggle('active', isJoined && !isShade);
+  $('#btnStateJoined').setAttribute('aria-pressed', String(isJoined && !isShade));
+
+  $('#btnStateShade').classList.toggle('active', isShade);
+  $('#btnStateShade').setAttribute('aria-pressed', String(isShade));
+}
+
+function render() {
+  updateGlowTargets();
+  renderHardware();
+  paintGlowValues();
+  updateStateButtons();
+
+  ['a', 'b'].forEach(id => {
+    const m = model[id], el = $('#' + id);
+    el.style.left = m.x + 'px';
+    el.style.top = m.y + 'px';
+    el.style.zIndex = model.front === id ? '4' : '2';
+    el.classList.toggle('shade', model.shade);
+
+    el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
+    el.querySelectorAll('.wire-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
+
+    const btn = el.querySelector('.run-btn');
+    btn.textContent = m.running ? 'Ⅱ' : '▶';
+    btn.setAttribute('aria-label', (m.running ? 'Pause ' : 'Resume ') + (id === 'a' ? 'Jarvis' : 'GitDiscuss'));
+  });
+
+  $('#runText').innerHTML = model.a.running ? '03 <em>agents running</em>' : '03 <em>agents paused</em>';
+  $('#activityState').textContent = model.a.running ? 'Wire workshop active' : 'Wire workshop paused';
+
+  const bayState = connectionState('bay');
+  $('#amuletBay').dataset.dockState = bayState;
+  const bayLabel = bayState === 'ready' ? 'Release to nest amulet in cradle' :
+                   bayState === 'near' ? 'Near gemstone cradle · slide closer' : 'Gemstone Cradle Bay';
+  $('#bayStatus').textContent = bayLabel;
+
+  const cradle = $('#gemstoneCradle');
+  cradle.style.left = (model.a.x + 36) + 'px';
+  cradle.style.top = (model.a.y + (model.shade ? 40 : 121)) + 'px';
+  cradle.classList.toggle('open', model.cradle);
+  $('#cradleBody').inert = !model.cradle;
+
+  $('#a .cradle-btn').setAttribute('aria-expanded', String(model.cradle));
+  $('#a .cradle-btn').textContent = model.cradle ? '▴ wire cradle' : '▾ wire cradle';
+
+  const meter = $('#checksAmulet');
+  if (model.docked) {
+    if (meter.parentElement !== $('#amuletBay')) $('#amuletBay').append(meter);
+    meter.style.left = '0px';
+    meter.style.top = '0px';
+    meter.style.transform = `translate(${drag?.kind === 'meterLatch' ? drag.deflect.x : 0}px, ${drag?.kind === 'meterLatch' ? drag.deflect.y : 0}px) scale(0.98)`;
+    meter.style.transformOrigin = 'top left';
+    meter.inert = !model.cradle;
+  } else {
+    if (meter.parentElement !== stage) stage.append(meter);
+    meter.style.left = model.meter.x + 'px';
+    meter.style.top = model.meter.y + 'px';
+    meter.style.transform = '';
+    meter.inert = false;
+  }
+
+  $('#emptyAmuletBay').hidden = model.docked;
+  $('#emptyAmuletBay').style.display = model.docked ? 'none' : 'flex';
+  $('#ejectAmulet').hidden = !model.docked;
+
+  stage.classList.toggle('design', model.design);
+  $('#btnDesign').setAttribute('aria-pressed', String(model.design));
+
+  $('#portA').style.left = (model.a.x + W - 30) + 'px';
+  $('#portA').style.top = (model.a.y + 54) + 'px';
+  $('#portB').style.left = (model.b.x + 12) + 'px';
+  $('#portB').style.top = (model.b.y + 54) + 'px';
+
+  $('#btnJoinAnim').disabled = model.joined || model.busy;
+  $('#btnSeparateAnim').disabled = !model.joined || model.busy;
+
+  $('#spindleValue').textContent = model.limit;
+  $('#spindleDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
+
+  const release = $('#wireRelease');
+  release.hidden = !model.joined || model.busy || model.shade;
+  release.style.left = (model.a.x + 338) + 'px';
+  release.style.top = (model.a.y + 44) + 'px';
+  release.style.setProperty('--tension', model.tension);
+
+  if (!model.busy) {
+    if (model.shade) {
+      $('#phase').textContent = 'Shade mode / Wire-wrapped jewelry rod';
+    } else if (model.joined) {
+      $('#phase').textContent = 'Joined / One unified handcrafted instrument';
+    } else if (model.bayonetProgress > 0.1) {
+      $('#phase').textContent = 'Joining / Caged amethyst bead entering bayonet sleeve';
+    } else {
+      $('#phase').textContent = 'Separate / Two handcrafted copper wire armatures';
+    }
+  }
+}
+
+function tween(duration, fn, token) {
+  return new Promise(resolve => {
+    if (motion.matches) {
+      if (token === animationToken) fn(1);
+      resolve(token === animationToken);
+      return;
+    }
+    let start = performance.now();
+    function step(now) {
+      if (token !== animationToken) { resolve(false); return; }
+      let t = Math.min(1, (now - start) / duration);
+      // Springy wire tactile decrescendo curve
+      let e = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+      fn(e);
+      if (t < 1) requestAnimationFrame(step);
+      else resolve(true);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// Option 1 Join Animation: Caged amethyst bead slides into open-coil sleeve, compresses spring, and twists 30 deg to lock
+async function join(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Capsules enter attraction field. Caged amethyst bead aligns with bayonet sleeve.');
+  $('#phase').textContent = 'Amethyst resonance glowing';
+
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 90 : 250, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  $('#phase').textContent = 'Beehive cage advancing';
+  if (!await tween(fromDrag ? 140 : 280, t => {
+    model.cap = t;
+    model.bayonetProgress = t * 0.45; // entering sleeve opening
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.cradle ? 305 : 385, model.a.y));
+
+  $('#phase').textContent = 'Compressing internal wire spring';
+  if (!await tween(fromDrag ? 280 : 500, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.bayonetProgress = 0.45 + 0.35 * t;
+    model.light = 1 - t * 0.7;
+    render();
+  }, token)) return;
+
+  // Final 30-deg rotary twist lock into bayonet detent
+  $('#phase').textContent = 'Twisting 30° into bayonet detent';
+  if (!await tween(fromDrag ? 220 : 420, t => {
+    model.bayonetProgress = 0.8 + 0.2 * t;
+    model.light = (1 - t) * 0.3;
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.bayonetProgress = 1;
+  model.light = 0;
+  render();
+  say('Caged amethyst bead locked in bayonet detent. Pull shepherd\'s hook right to release.');
+}
+
+async function separate() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Unlatching bayonet detent. Wire armatures release.');
+
+  $('#phase').textContent = 'Releasing bayonet lock';
+  if (!await tween(240, t => {
+    model.bayonetProgress = 1 - t * 0.6;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Separating copper armatures';
+  if (!await tween(540, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.5);
+    model.cap = 1 - Math.max(0, (t - 0.3) / 0.7);
+    model.bayonetProgress = (1 - t) * 0.4;
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.bayonetProgress = 0;
+  render();
+  say('Separated. Independent handcrafted wire armatures restored.');
+}
+
+// Preset State Switchers
+async function applyState(stateName) {
+  if (model.busy) return;
+  ++animationToken;
+
+  if (stateName === 'separate') {
+    model.shade = false;
+    if (model.joined) {
+      await separate();
+    } else {
+      model.bayonetProgress = 0;
+      model.cap = 0;
+      model.blend = 0;
+      model.a.x = 140;
+      model.b.x = 680;
+      render();
+      say('State: Separate — Two independent copper wire capsules.');
+    }
+  } else if (stateName === 'joining') {
+    model.shade = false;
+    model.joined = false;
+    model.blend = 0.25;
+    model.cap = 0.6;
+    model.bayonetProgress = 0.55; // caged bead partially inside sleeve
+    model.light = 0.8;
+    model.a.x = 240;
+    model.b.x = 240 + W + 50; // approaching each other
+    render();
+    say('State: Joining — Mid-animation view with caged bead entering sleeve and compressing wire spring.');
+  } else if (stateName === 'joined') {
+    model.shade = false;
+    if (!model.joined) {
+      model.a.x = 220;
+      model.b.x = 220 + JOIN_DISTANCE;
+      model.joined = true;
+      model.blend = 1;
+      model.cap = 1;
+      model.bayonetProgress = 1;
+      model.light = 0;
+      render();
+      say('State: Joined — Monolithic wire armature with locked caged-bead lantern seam.');
+    }
+  } else if (stateName === 'shade') {
+    model.shade = true;
+    render();
+    say('State: Shade — Collapsed to compact wire-wrapped jewelry rod.');
+  }
+}
+
+// Cradle & Amulet Actions
+function toggleCradle(open = !model.cradle) {
+  if (drag) cancelDrag();
+  model.cradle = open;
+  if (open && model.a.y > 310) {
+    const dy = model.a.y - 310;
+    model.a.y = 310;
+    if (model.joined) model.b.y -= dy;
+  }
+  render();
+  say(open ? 'Gemstone cradle open. Place Checks into its wire bay, or use Insert.' : 'Gemstone cradle closed.');
+}
+
+function cradleTarget() {
+  return {
+    x: model.a.x + 36 + 22,
+    y: model.a.y + (model.shade ? 40 : 121) + 38
+  };
+}
+
+async function insertChecks() {
+  if (model.busy || model.docked) return;
+  if (!model.cradle) toggleCradle(true);
+  stopDrag();
+  model.busy = true;
+  model.feel = 'free';
+  model.light = 0;
+  const token = ++animationToken, start = { ...model.meter }, target = cradleTarget();
+  render();
+
+  const dist = Math.hypot(start.x - target.x, start.y - target.y);
+  if (!await tween(dist < 75 ? 160 : 340, t => {
+    model.meter.x = start.x + (target.x - start.x) * t;
+    model.meter.y = start.y + (target.y - start.y) * t;
+    render();
+  }, token)) return;
+
+  model.docked = true;
+  model.busy = false;
+  $('#amuletBay').classList.remove('hot');
+  render();
+  say('Checks Wire Amulet nested in gemstone cradle. Pull smoothly to free, or use Eject.');
+}
+
+function ejectChecks() {
+  if (model.busy) return;
+  stopDrag();
+  model.feel = 'free';
+  model.docked = false;
+  model.meter.x = Math.min(900, model.a.x + 430);
+  model.meter.y = Math.min(510, model.a.y + 190);
+  render();
+  say('Checks Wire Amulet released from cradle.');
+}
+
+function setPage(id, p) { model[id].page = p; render(); }
+
+// Event Wiring
+$('#btnStateSeparate').onclick = () => applyState('separate');
+$('#btnStateJoining').onclick = () => applyState('joining');
+$('#btnStateJoined').onclick = () => applyState('joined');
+$('#btnStateShade').onclick = () => applyState('shade');
+
+$('#btnJoinAnim').onclick = () => join();
+$('#btnSeparateAnim').onclick = () => separate();
+
+$('#btnDesign').onclick = () => {
+  model.design = !model.design;
+  render();
+  say(model.design ? 'Design mode active. Outlines and bay boundaries visible.' : 'Design mode exited.');
+};
+
+$('#btnReset').onclick = () => {
+  if (model.busy) return;
+  stopDrag();
+  ++animationToken;
+  model.joined = false;
+  model.cradle = false;
+  model.docked = false;
+  model.design = false;
+  model.shade = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.bayonetProgress = 0;
+  model.light = 0;
+  model.limit = 3;
+  model.tension = 0;
+  model.feel = 'free';
+  model.a = { x: 140, y: 220, page: 0, running: true };
+  model.b = { x: 680, y: 220, page: 0, running: true };
+  model.meter = { x: 805, y: 510 };
+  render();
+  say('Reset to initial experiment layout.');
+};
+
+$('#optionSelect').onchange = e => {
+  say('Selected option: ' + e.target.options[e.target.selectedIndex].text);
+};
+
+// Dial and Interactive Elements
+$('#spindleDial').onclick = () => {
+  model.limit = (model.limit % 6) + 1;
+  render();
+  say('Tension spindle set to ' + model.limit);
+};
+
+$('#a .run-btn').onclick = () => {
+  model.a.running = !model.a.running;
+  render();
+  say(model.a.running ? 'Jarvis resumed' : 'Jarvis paused');
+};
+$('#b .run-btn').onclick = () => {
+  model.b.running = !model.b.running;
+  render();
+  say(model.b.running ? 'GitDiscuss resumed' : 'GitDiscuss paused');
+};
+
+$('#a .next-btn').onclick = () => setPage('a', (model.a.page + 1) % 3);
+$('#b .next-btn').onclick = () => setPage('b', (model.b.page + 1) % 3);
+
+$('#a .cradle-btn').onclick = () => toggleCradle();
+$('#closeCradle').onclick = () => toggleCradle(false);
+$('#b .cradle-btn').onclick = () => setPage('b', 1);
+
+$('#insertAmulet').onclick = insertChecks;
+$('#ejectAmulet').onclick = ejectChecks;
+
+$('#a').querySelectorAll('.wire-tab').forEach(b => b.onclick = () => setPage('a', Number(b.dataset.page)));
+$('#b').querySelectorAll('.wire-tab').forEach(b => b.onclick = () => setPage('b', Number(b.dataset.page)));
+
+// Spatial Calculations & Dragging Mechanics
+function connectionState(type) {
+  if (type === 'socket') {
+    if (model.joined) return 'joined';
+    const dx = model.b.x - (model.a.x + JOIN_DISTANCE);
+    const dy = model.b.y - model.a.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist <= DOCKING.capture) return 'ready';
+    if (dist <= DOCKING.near) return 'near';
+    return 'free';
+  }
+  if (type === 'bay') {
+    if (model.docked) return 'docked';
+    if (!model.cradle) return 'free';
+    const target = cradleTarget();
+    const dist = Math.hypot(model.meter.x - target.x, model.meter.y - target.y);
+    if (dist <= DOCKING.capture) return 'ready';
+    if (dist <= DOCKING.near) return 'near';
+    return 'free';
+  }
+  return 'free';
+}
+
+function updateGlowTargets() {
+  const socketState = connectionState('socket');
+  if (socketState === 'ready') connectionGlow.socket.target = 1;
+  else if (socketState === 'near') {
+    const dist = Math.hypot(model.b.x - (model.a.x + JOIN_DISTANCE), model.b.y - model.a.y);
+    connectionGlow.socket.target = Math.max(0, 1 - (dist - DOCKING.capture) / (DOCKING.near - DOCKING.capture));
+  } else connectionGlow.socket.target = 0;
+
+  const bayState = connectionState('bay');
+  if (bayState === 'ready') connectionGlow.bay.target = 1;
+  else if (bayState === 'near') {
+    const target = cradleTarget();
+    const dist = Math.hypot(model.meter.x - target.x, model.meter.y - target.y);
+    connectionGlow.bay.target = Math.max(0, 1 - (dist - DOCKING.capture) / (DOCKING.near - DOCKING.capture));
+  } else connectionGlow.bay.target = 0;
+}
+
+function paintGlowValues() {
+  const diffSocket = connectionGlow.socket.target - connectionGlow.socket.value;
+  const diffBay = connectionGlow.bay.target - connectionGlow.bay.value;
+  if (Math.abs(diffSocket) > 0.01) connectionGlow.socket.value += diffSocket * 0.18;
+  else connectionGlow.socket.value = connectionGlow.socket.target;
+
+  if (Math.abs(diffBay) > 0.01) connectionGlow.bay.value += diffBay * 0.18;
+  else connectionGlow.bay.value = connectionGlow.bay.target;
+
+  $('#amuletBay').style.setProperty('--dock-glow', connectionGlow.bay.value.toFixed(3));
+}
+
+function stopDrag() {
+  if (!drag) return;
+  window.removeEventListener('pointermove', onPointerMove);
+  window.removeEventListener('pointerup', onPointerUp);
+  window.removeEventListener('pointercancel', onPointerCancel);
+  drag = null;
+}
+
+function cancelDrag() {
+  if (!drag) return;
+  if (drag.kind === 'module') {
+    model[drag.id].x = drag.startX;
+    model[drag.id].y = drag.startY;
+  } else if (drag.kind === 'joined') {
+    model.a.x = drag.startAX;
+    model.a.y = drag.startAY;
+    model.b.x = drag.startBX;
+    model.b.y = drag.startBY;
+  } else if (drag.kind === 'meter') {
+    model.meter.x = drag.startX;
+    model.meter.y = drag.startY;
+  }
+  stopDrag();
+  render();
+  say('Drag cancelled.');
+}
+
+function onPointerDown(e) {
+  if (model.busy || e.button !== 0) return;
+  const target = e.target.closest('[data-drag]');
+  if (!target) return;
+  const kind = target.dataset.drag;
+
+  if (kind === 'a' || kind === 'b') {
+    model.front = kind;
+    if (model.joined) {
+      drag = {
+        kind: 'joined',
+        pointerId: e.pointerId,
+        startX: e.clientX,
+        startY: e.clientY,
+        startAX: model.a.x,
+        startAY: model.a.y,
+        startBX: model.b.x,
+        startBY: model.b.y
+      };
+    } else {
+      drag = {
+        kind: 'module',
+        id: kind,
+        pointerId: e.pointerId,
+        startX: model[kind].x,
+        startY: model[kind].y,
+        originX: e.clientX,
+        originY: e.clientY
+      };
+    }
+  } else if (kind === 'meter') {
+    if (model.docked) {
+      drag = {
+        kind: 'meterLatch',
+        pointerId: e.pointerId,
+        originX: e.clientX,
+        originY: e.clientY,
+        deflect: { x: 0, y: 0 }
+      };
+    } else {
+      drag = {
+        kind: 'meter',
+        pointerId: e.pointerId,
+        startX: model.meter.x,
+        startY: model.meter.y,
+        originX: e.clientX,
+        originY: e.clientY
+      };
+    }
+  } else if (kind === 'release') {
+    drag = {
+      kind: 'release',
+      pointerId: e.pointerId,
+      originX: e.clientX
+    };
+  }
+
+  if (drag) {
+    e.preventDefault();
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerCancel);
+  }
+}
+
+function onPointerMove(e) {
+  if (!drag || e.pointerId !== drag.pointerId) return;
+
+  if (drag.kind === 'module') {
+    const dx = e.clientX - drag.originX, dy = e.clientY - drag.originY;
+    let nx = Math.max(10, Math.min(1200 - W - 10, drag.startX + dx));
+    let ny = Math.max(40, Math.min(580, drag.startY + dy));
+
+    // Magnetic pull toward mate
+    const otherId = drag.id === 'a' ? 'b' : 'a';
+    const other = model[otherId];
+    const targetX = drag.id === 'a' ? other.x - JOIN_DISTANCE : other.x + JOIN_DISTANCE;
+    const targetY = other.y;
+    const dist = Math.hypot(nx - targetX, ny - targetY);
+
+    if (dist < DOCKING.near) {
+      const pull = Math.max(0, 1 - dist / DOCKING.near) * 0.35;
+      nx += (targetX - nx) * pull;
+      ny += (targetY - ny) * pull;
+      model.feel = dist < DOCKING.capture ? 'captured' : 'near';
+    } else {
+      model.feel = 'free';
+    }
+
+    model[drag.id].x = nx;
+    model[drag.id].y = ny;
+    render();
+
+  } else if (drag.kind === 'joined') {
+    const dx = e.clientX - drag.startX, dy = e.clientY - drag.startY;
+    model.a.x = Math.max(10, Math.min(1200 - (JOIN_DISTANCE + W) - 10, drag.startAX + dx));
+    model.a.y = Math.max(40, Math.min(580, drag.startAY + dy));
+    model.b.x = model.a.x + JOIN_DISTANCE;
+    model.b.y = model.a.y;
+    render();
+
+  } else if (drag.kind === 'meter') {
+    const dx = e.clientX - drag.originX, dy = e.clientY - drag.originY;
+    let nx = Math.max(10, Math.min(1200 - 280, drag.startX + dx));
+    let ny = Math.max(40, Math.min(620, drag.startY + dy));
+
+    if (model.cradle) {
+      const target = cradleTarget();
+      const dist = Math.hypot(nx - target.x, ny - target.y);
+      if (dist < DOCKING.near) {
+        const pull = Math.max(0, 1 - dist / DOCKING.near) * 0.4;
+        nx += (target.x - nx) * pull;
+        ny += (target.y - ny) * pull;
+        $('#amuletBay').classList.toggle('hot', dist < DOCKING.capture);
+      } else {
+        $('#amuletBay').classList.remove('hot');
+      }
+    }
+
+    model.meter.x = nx;
+    model.meter.y = ny;
+    render();
+
+  } else if (drag.kind === 'meterLatch') {
+    const dx = e.clientX - drag.originX, dy = e.clientY - drag.originY;
+    const dist = Math.hypot(dx, dy);
+    if (dist > 35) {
+      // Breakaway from cradle
+      const currentOrigin = cradleTarget();
+      stopDrag();
+      model.docked = false;
+      model.meter.x = currentOrigin.x + dx;
+      model.meter.y = currentOrigin.y + dy;
+      render();
+      say('Checks Amulet unlatched from cradle.');
+    } else {
+      drag.deflect = { x: dx * 0.4, y: dy * 0.4 };
+      render();
+    }
+
+  } else if (drag.kind === 'release') {
+    const dx = Math.max(0, e.clientX - drag.originX);
+    model.tension = Math.min(1, dx / 35);
+    render();
+    if (dx > 35) {
+      stopDrag();
+      separate();
+    }
+  }
+}
+
+function onPointerUp(e) {
+  if (!drag || e.pointerId !== drag.pointerId) return;
+
+  if (drag.kind === 'module') {
+    const state = connectionState('socket');
+    if (state === 'ready') {
+      join(true);
+      return;
+    }
+  } else if (drag.kind === 'meter') {
+    const state = connectionState('bay');
+    if (state === 'ready') {
+      insertChecks();
+      return;
+    }
+  } else if (drag.kind === 'meterLatch') {
+    drag.deflect = { x: 0, y: 0 };
+  } else if (drag.kind === 'release') {
+    model.tension = 0;
+  }
+
+  stopDrag();
+  render();
+}
+
+function onPointerCancel(e) {
+  if (!drag || e.pointerId !== drag.pointerId) return;
+  cancelDrag();
+}
+
+stage.addEventListener('pointerdown', onPointerDown);
+
+// Keyboard Navigation & Shortcuts
+window.addEventListener('keydown', e => {
+  if (e.target.matches('input, select, textarea')) return;
+
+  if (e.key === '1') { applyState('separate'); e.preventDefault(); }
+  else if (e.key === '2') { applyState('joining'); e.preventDefault(); }
+  else if (e.key === '3') { applyState('joined'); e.preventDefault(); }
+  else if (e.key === '4') { applyState('shade'); e.preventDefault(); }
+  else if (e.key === ' ' || e.code === 'Space') {
+    if (model.joined) separate();
+    else join();
+    e.preventDefault();
+  } else if (e.key === 'Escape') {
+    cancelDrag();
+    e.preventDefault();
+  } else if (e.key === 'Enter') {
+    if (model.joined) separate();
+    e.preventDefault();
+  }
+});
+
+// Periodic Glow Loop
+function loop(now) {
+  glowTime = now;
+  paintGlowValues();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+// Initial State Application
+applyState('separate');
+</script>
+</body>
+</html>
