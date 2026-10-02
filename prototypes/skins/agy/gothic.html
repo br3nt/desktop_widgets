@@ -800,6 +800,49 @@ header {
   opacity: calc(0.3 + 0.7 * var(--tension, 0));
 }
 
+/* Flying Buttress Corbel Tie-Pin Release (Option 5) */
+.buttress-release {
+  position: absolute;
+  width: 28px;
+  height: 38px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 160ms ease;
+}
+.buttress-release[hidden] { display: none; }
+.buttress-release::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 28px;
+  border-radius: 3px 3px 6px 6px;
+  background: linear-gradient(180deg, #e8d08d 0%, #a8832a 40%, #2b220d 100%);
+  border: 1.5px solid #141815;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.85), inset 0 1px rgba(255, 255, 255, 0.4);
+  transform: translateX(calc(var(--tension, 0) * 10px));
+  transition: transform 60ms linear;
+}
+.buttress-release:hover::before {
+  border-color: var(--gold-glow);
+  box-shadow: 0 0 10px rgba(230, 180, 71, 0.7);
+}
+.buttress-release::after {
+  content: "✦";
+  position: absolute;
+  font-size: 11px;
+  color: #17130a;
+  text-shadow: 0 1px 1px rgba(255, 235, 170, 0.6);
+  transform: translateX(calc(var(--tension, 0) * 10px));
+  transition: transform 60ms linear;
+}
+
 /* Port Overlay for Design Mode */
 #portOverlay { position: absolute; inset: 0; pointer-events: none; }
 .socket-port {
@@ -864,8 +907,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Gothic Basilica <span>/ nave vaulting, keystone &amp; triptych altar</span></h1>
-    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld · Triptych altar fold</p>
+    <h1>Gothic Basilica <span>/ nave vaulting, keystone, triptych &amp; flying buttress</span></h1>
+    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld · Triptych altar fold · Flying buttress arm swing</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -875,6 +918,7 @@ footer .note-highlight {
         <option value="portcullis">2. Lancet Portcullis Guillotine shade</option>
         <option value="leadcame">3. Lead-Came Solder Weld join</option>
         <option value="triptych">4. Triptych Altar Fold shade</option>
+        <option value="buttress">5. Flying Buttress Arm Swing join</option>
       </select>
     </div>
     <div class="control-group">
@@ -1059,6 +1103,29 @@ footer .note-highlight {
           <stop offset="70%" stop-color="#c96f08"/>
           <stop offset="100%" stop-color="#4a2202"/>
         </radialGradient>
+
+        <!-- Option 5: Flying Buttress Ashlar Limestone Gradient -->
+        <linearGradient id="buttressStoneGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7a8d81"/>
+          <stop offset="25%" stop-color="#4e5c54"/>
+          <stop offset="65%" stop-color="#2a332d"/>
+          <stop offset="100%" stop-color="#18201c"/>
+        </linearGradient>
+
+        <!-- Option 5: Flying Buttress Coping Weather Molding Gradient -->
+        <linearGradient id="buttressCopingGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#9bb0a3"/>
+          <stop offset="50%" stop-color="#64766b"/>
+          <stop offset="100%" stop-color="#323d36"/>
+        </linearGradient>
+
+        <!-- Option 5: Forged Iron Tie Pin Gradient -->
+        <linearGradient id="ironPinGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#141815"/>
+          <stop offset="35%" stop-color="#4a5a50"/>
+          <stop offset="60%" stop-color="#7e9185"/>
+          <stop offset="100%" stop-color="#141815"/>
+        </linearGradient>
       </defs>
 
       <!-- Shared arch, keystone and decorative joints -->
@@ -1227,6 +1294,12 @@ footer .note-highlight {
             title="Pull right to melt solder seam · Enter to separate" hidden>
     </button>
 
+    <!-- Flying Buttress Corbel Tie-Pin Release (Option 5) -->
+    <button id="buttressRelease" class="buttress-release" data-drag="release"
+            aria-label="Release Flying Buttress: pull right or press Enter"
+            title="Pull right to unseat buttress arm · Enter to separate" hidden>
+    </button>
+
     <!-- Socket Overlay for Design Mode -->
     <div id="portOverlay" aria-hidden="true">
       <div class="socket-port" id="portA" data-label="Pointed Arch Springer · A"></div>
@@ -1276,7 +1349,8 @@ const model = {
   portcullisDrop: 0, // 0 = hoisted aloft in clerestory vault, 1 = plunged & spiked shut
   solderProgress: 0, // 0 = cold un-soldered came, 1 = fully soldered with lead came
   triptychFold: 0, // 0 = open wings (full clerestory), 1 = closed stone reliquary shutters
-  option: 'keystone', // 'keystone', 'portcullis', 'leadcame', or 'triptych'
+  buttressSwing: 0, // 0 = stowed along pier pinnacle, 1 = swung 42° and seated in corbel
+  option: 'keystone', // 'keystone', 'portcullis', 'leadcame', 'triptych', or 'buttress'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1574,6 +1648,227 @@ function drawLeadCameEndCap(x, y, isRight, isModuleA, retract = 0, isShade = fal
   }
   // If outer non-docking end (left of A or right of B), retain the cathedral stone voussoir/buttress
   return drawGothicCap(x, y, isRight, retract, isShade);
+}
+
+// Option 5: Flying Buttress End-Cap (Pier & Pinnacle on Module A; Carved Corbel on Module B)
+function drawButtressEndCap(x, y, isRight, isModuleA, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const scaleX = 1 - retract;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  if (isModuleA && isRight) {
+    // Module A (Jarvis) right mating end with outer wall pier & crocketed pinnacle
+    return `
+      <g class="buttress-pier-assembly" opacity="${scaleX}">
+        <!-- Heavy Ashlar Wall Pier Shaft -->
+        <rect x="${x + 306}" y="${y + 16}" width="24" height="104" fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.5"/>
+        <line x1="${x + 308}" y1="${y + 18}" x2="${x + 308}" y2="${y + 118}" stroke="#7e9185" stroke-width="1.2"/>
+        <line x1="${x + 328}" y1="${y + 18}" x2="${x + 328}" y2="${y + 118}" stroke="#141916" stroke-width="1.5"/>
+        
+        <!-- Weathering stringcourses / offsets -->
+        <rect x="${x + 304}" y="${y + 54}" width="28" height="4" rx="1" fill="#3a473f" stroke="#121714" stroke-width="1"/>
+        <rect x="${x + 304}" y="${y + 92}" width="28" height="4" rx="1" fill="#3a473f" stroke="#121714" stroke-width="1"/>
+        
+        <!-- Crocketed Pinnacle rising into sky above roofline -->
+        <polygon points="${x + 308} ${y + 12}, ${x + 318} ${y - 34}, ${x + 328} ${y + 12}"
+                 fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.2"/>
+        <line x1="${x + 318}" y1="${y + 12}" x2="${x + 318}" y2="${y - 34}" stroke="#8ca193" stroke-width="1" opacity="0.75"/>
+        
+        <!-- Crockets along left slope -->
+        <path d="M ${x + 314} ${y} Q ${x + 310} ${y - 4} ${x + 314} ${y - 6} Z" fill="#44524a" stroke="#111614" stroke-width="0.6"/>
+        <path d="M ${x + 316} ${y - 14} Q ${x + 312} ${y - 18} ${x + 316} ${y - 20} Z" fill="#44524a" stroke="#111614" stroke-width="0.6"/>
+        
+        <!-- Crockets along right slope -->
+        <path d="M ${x + 322} ${y} Q ${x + 326} ${y - 4} ${x + 322} ${y - 6} Z" fill="#44524a" stroke="#111614" stroke-width="0.6"/>
+        <path d="M ${x + 320} ${y - 14} Q ${x + 324} ${y - 18} ${x + 320} ${y - 20} Z" fill="#44524a" stroke="#111614" stroke-width="0.6"/>
+        
+        <!-- Fleuron finial cross at pinnacle apex -->
+        <path d="M ${x + 318} ${y - 40} V ${y - 34} M ${x + 315} ${y - 37} H ${x + 321}" stroke="#ffd885" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="${x + 318}" cy="${y - 37}" r="1" fill="#ffffff"/>
+
+        <!-- Grotesque Gargoyle spout projecting rightward -->
+        <path d="M ${x + 326} ${y + 8} Q ${x + 338} ${y + 8} ${x + 336} ${y + 14} L ${x + 326} ${y + 15} Z" fill="#252d27" stroke="#111614" stroke-width="1"/>
+        <circle cx="${x + 332}" cy="${y + 10}" r="0.8" fill="#e6b447"/>
+
+        <!-- Outer voussoir cap to edge of casing -->
+        <path d="M ${x + 330} ${y + 16} L ${x + W - 16} ${y + 16} Q ${x + W - 4} ${y + 64} ${x + W - 16} ${y + 120} L ${x + 330} ${y + 120} Z"
+              fill="none" stroke="#252e28" stroke-width="1.2" opacity="0.5"/>
+      </g>
+    `;
+  } else if (!isModuleA && !isRight) {
+    // Module B (GitDiscuss) left mating end with carved receiving corbel
+    return `
+      <g class="buttress-corbel-assembly" opacity="${scaleX}">
+        <!-- Carved Load-Bearing Corbel Bracket -->
+        <path d="M ${x + 56} ${y + 12} H ${x + 80} V ${y + 24} Q ${x + 78} ${y + 38} ${x + 64} ${y + 48} H ${x + 56} Z"
+              fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.5"/>
+        <!-- Top bevel -->
+        <line x1="${x + 56}" y1="${y + 13}" x2="${x + 80}" y2="${y + 13}" stroke="#8ca193" stroke-width="1"/>
+        
+        <!-- Acanthus leaf relief carvings -->
+        <path d="M ${x + 60} ${y + 24} Q ${x + 74} ${y + 26} ${x + 70} ${y + 38}" fill="none" stroke="#7e9185" stroke-width="1.2"/>
+        <path d="M ${x + 62} ${y + 18} Q ${x + 76} ${y + 20} ${x + 74} ${y + 30}" fill="none" stroke="#526257" stroke-width="1"/>
+
+        <!-- Bronze Strike Plate / Socket -->
+        <rect x="${x + 58}" y="${y + 11}" width="20" height="6" rx="1.5" fill="url(#bronzeGrad)" stroke="#1a1408" stroke-width="0.8"/>
+        <circle cx="${x + 68}" cy="${y + 14}" r="2" fill="#0d110f"/>
+
+        <!-- Colonnette shaft beneath corbel -->
+        <line x1="${x + 60}" y1="${y + 48}" x2="${x + 60}" y2="${y + 118}" stroke="#3d4c42" stroke-width="3"/>
+        <line x1="${x + 60}" y1="${y + 48}" x2="${x + 60}" y2="${y + 118}" stroke="#7e9185" stroke-width="1"/>
+        
+        <!-- Outer left voussoir cap to edge of casing -->
+        <path d="M ${x + 16} ${y + 16} L ${x + 56} ${y + 16} V ${y + 120} L ${x + 16} ${y + 120} Z"
+              fill="none" stroke="#252e28" stroke-width="1.2" opacity="0.5"/>
+      </g>
+    `;
+  }
+  return drawGothicCap(x, y, isRight, retract, isShade);
+}
+
+// Option 5: Architectural Shadow Gap Niche between the two clerestory walls
+function drawButtressShadowGap(midX, y, opacity = 1) {
+  return `
+    <g class="buttress-shadow-gap" opacity="${opacity}">
+      <!-- Deep Recessed Architectural Shadow Niche -->
+      <rect x="${midX - 18}" y="${y + 16}" width="36" height="106" rx="2" fill="#070a09" stroke="#141a16" stroke-width="1.5"/>
+      <path d="M ${midX - 18} ${y + 16} V ${y + 122} M ${midX + 18} ${y + 16} V ${y + 122}" stroke="#000000" stroke-width="2"/>
+      
+      <!-- Flanking Clustered Ashlar Colonnettes -->
+      <line x1="${midX - 14}" y1="${y + 18}" x2="${midX - 14}" y2="${y + 120}" stroke="#3d4c42" stroke-width="3"/>
+      <line x1="${midX - 14}" y1="${y + 18}" x2="${midX - 14}" y2="${y + 120}" stroke="#7e9185" stroke-width="1"/>
+      <line x1="${midX + 14}" y1="${y + 18}" x2="${midX + 14}" y2="${y + 120}" stroke="#3d4c42" stroke-width="3"/>
+      <line x1="${midX + 14}" y1="${y + 18}" x2="${midX + 14}" y2="${y + 120}" stroke="#7e9185" stroke-width="1"/>
+      
+      <!-- Lancet Blind Tracery within the Niche -->
+      <path d="M ${midX - 10} ${y + 56} V ${y + 36} Q ${midX} ${y + 22} ${midX + 10} ${y + 36} V ${y + 56}"
+            fill="none" stroke="#2c3730" stroke-width="1.5"/>
+      <circle cx="${midX}" cy="${y + 36}" r="3" fill="#141a16" stroke="#4a5c50" stroke-width="1"/>
+      <circle cx="${midX}" cy="${y + 36}" r="1.2" fill="#ffd885" opacity="0.75" filter="url(#votiveGlow)"/>
+
+      <!-- Lower Corbel Plinth in Niche -->
+      <rect x="${midX - 12}" y="${y + 94}" width="24" height="6" rx="1" fill="#1e2621" stroke="#0e1310" stroke-width="1"/>
+    </g>
+  `;
+}
+
+// Option 5: The Pivoting Arched Stone Buttress Arm (Arc-Boutant)
+function drawFlyingButtress(ax, ay, bx, by, swingRatio = 0, isJoined = false, opacity = 1, glow = 0) {
+  const currentRatio = isJoined ? 1 : swingRatio;
+  const currentAngle = -42 * (1 - currentRatio);
+  const px = ax + 318;
+  const py = ay + 12;
+  const cx = bx + 68;
+  const cy = by + 14;
+
+  let s = `<g class="flying-buttress-system" opacity="${opacity}">`;
+
+  // 1. Shadow cast onto stage below
+  const shadowOpacity = 0.45 * (0.4 + 0.6 * currentRatio);
+  s += `
+    <g transform="translate(${px}, ${py + 20}) rotate(${currentAngle * 0.7})">
+      <path d="M 0 0 Q 33 -14, 66 2 L 66 10 Q 33 2, 0 8 Z" fill="#000000" opacity="${shadowOpacity}" filter="url(#stoneShadowBlur)"/>
+    </g>
+  `;
+
+  // 2. The Pivoting Arched Stone Buttress Arm (Arc-Boutant)
+  s += `<g transform="translate(${px}, ${py}) rotate(${currentAngle})">`;
+
+  // Heavy Ashlar Limestone Flyer Body
+  s += `
+    <!-- Solid arched stone flyer block -->
+    <path d="M 0 -6 Q 33 -20, 66 -2 L 66 8 Q 33 -6, 0 8 Z"
+          fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.8"/>
+
+    <!-- Weather-molded coping stone extrados ridge -->
+    <path d="M -2 -7 Q 33 -22, 68 -3" fill="none" stroke="url(#buttressCopingGrad)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M -2 -8 Q 33 -23, 68 -4" fill="none" stroke="#8ca193" stroke-width="0.8" opacity="0.8"/>
+
+    <!-- Intrados lower arch rib bevel -->
+    <path d="M 0 8 Q 33 -6, 66 8" fill="none" stroke="#7e9185" stroke-width="1.2"/>
+    <path d="M 0 9 Q 33 -5, 66 9" fill="none" stroke="#161c19" stroke-width="1"/>
+
+    <!-- Carved stone crockets on upper slope (Gothic finials) -->
+    <!-- Crocket 1 -->
+    <path d="M 14 -13 Q 12 -18 16 -19 Q 18 -16 16 -13 Z" fill="#38433d" stroke="#121614" stroke-width="0.8"/>
+    <!-- Crocket 2 -->
+    <path d="M 32 -18 Q 30 -24 35 -25 Q 37 -22 35 -18 Z" fill="#44524a" stroke="#121614" stroke-width="0.8"/>
+    <!-- Crocket 3 -->
+    <path d="M 48 -14 Q 47 -19 51 -20 Q 53 -17 51 -14 Z" fill="#38433d" stroke="#121614" stroke-width="0.8"/>
+
+    <!-- Pierced Openwork Tracery (Trefoils through the spandrel) -->
+    <!-- Left Trefoil Cutout -->
+    <g transform="translate(18, -9)">
+      <circle cx="0" cy="0" r="3.2" fill="#0b0f0d" stroke="#5a6c62" stroke-width="0.8"/>
+      <circle cx="-1.2" cy="-0.8" r="1.3" fill="#0b0f0d" stroke="#3d4941" stroke-width="0.5"/>
+      <circle cx="1.2" cy="-0.8" r="1.3" fill="#0b0f0d" stroke="#3d4941" stroke-width="0.5"/>
+      <circle cx="0" cy="1.3" r="1.3" fill="#0b0f0d" stroke="#3d4941" stroke-width="0.5"/>
+    </g>
+
+    <!-- Center Major Trefoil Cutout -->
+    <g transform="translate(33, -11)">
+      <circle cx="0" cy="0" r="4.2" fill="#0b0f0d" stroke="#7e9185" stroke-width="0.9"/>
+      <circle cx="-1.6" cy="-1" r="1.7" fill="#0b0f0d" stroke="#48564e" stroke-width="0.6"/>
+      <circle cx="1.6" cy="-1" r="1.7" fill="#0b0f0d" stroke="#48564e" stroke-width="0.6"/>
+      <circle cx="0" cy="1.7" r="1.7" fill="#0b0f0d" stroke="#48564e" stroke-width="0.6"/>
+      <circle cx="0" cy="0" r="1" fill="#e6b447" opacity="0.6" filter="url(#votiveGlow)"/>
+    </g>
+
+    <!-- Right Trefoil Cutout -->
+    <g transform="translate(48, -7)">
+      <circle cx="0" cy="0" r="3" fill="#0b0f0d" stroke="#5a6c62" stroke-width="0.8"/>
+      <circle cx="-1" cy="-0.7" r="1.2" fill="#0b0f0d" stroke="#3d4941" stroke-width="0.5"/>
+      <circle cx="1" cy="-0.7" r="1.2" fill="#0b0f0d" stroke="#3d4941" stroke-width="0.5"/>
+      <circle cx="0" cy="1.1" r="1.2" fill="#0b0f0d" stroke="#3d4941" stroke-width="0.5"/>
+    </g>
+
+    <!-- Thrust Foot (Abutment shoe) -->
+    <path d="M 64 -4 L 72 -2 L 72 8 L 64 8 Z" fill="#2d3731" stroke="#111614" stroke-width="1.2"/>
+    <line x1="64" y1="-3" x2="72" y2="-1" stroke="#8ca193" stroke-width="0.8"/>
+    <!-- Bronze shoe reinforcing straps and square bolts -->
+    <rect x="67" y="-1" width="4" height="8" rx="0.5" fill="url(#bronzeGrad)" stroke="#1a1408" stroke-width="0.6"/>
+    <circle cx="69" cy="1" r="0.8" fill="#141815"/>
+    <circle cx="69" cy="5" r="0.8" fill="#141815"/>
+  `;
+
+  // Pivot Hinge Knuckle on Module A
+  s += `
+    <circle cx="0" cy="0" r="6.5" fill="url(#bronzeGrad)" stroke="#111614" stroke-width="1.4"/>
+    <circle cx="0" cy="0" r="3.5" fill="#2d2208" stroke="#d4a337" stroke-width="0.8"/>
+    <circle cx="0" cy="0" r="1.8" fill="#fcebbb"/>
+  `;
+
+  s += `</g>`; // End of rotating arm
+
+  // 3. Forged-Iron Locking Tie-Pin (Drops when seated into corbel)
+  if (currentRatio > 0.8) {
+    const pinProgress = (currentRatio - 0.8) / 0.2; // 0 to 1
+    const pinY = (cy - 20) + pinProgress * 18;
+    s += `
+      <g transform="translate(${cx}, ${pinY})">
+        <!-- Iron pin vertical bolt -->
+        <rect x="-2" y="0" width="4" height="16" rx="1" fill="url(#ironPinGrad)" stroke="#111614" stroke-width="0.8"/>
+        <line x1="0" y1="1" x2="0" y2="15" stroke="#7e9185" stroke-width="0.8" opacity="0.7"/>
+        <!-- Bronze fleur-de-lis ring handle -->
+        <circle cx="0" cy="-2" r="4.5" fill="none" stroke="url(#bronzeGrad)" stroke-width="1.5"/>
+        <circle cx="0" cy="-2" r="2" fill="#221805"/>
+        <path d="M -1 -7 L 1 -7 L 0 -9 Z" fill="#d4a337"/>
+      </g>
+    `;
+
+    // Impact settling flash & dust at corbel socket
+    if (currentRatio > 0.9) {
+      const pFlash = (currentRatio - 0.9) / 0.1;
+      s += `
+        <circle cx="${cx}" cy="${cy}" r="${6 + pFlash * 18}" fill="#ffd885" opacity="${(1 - pFlash) * 0.7}" filter="url(#votiveGlow)"/>
+        <circle cx="${cx - 6}" cy="${cy + 4}" r="${pFlash * 8}" fill="#7e9185" opacity="${(1 - pFlash) * 0.5}" filter="url(#votiveGlow)"/>
+        <circle cx="${cx + 6}" cy="${cy + 4}" r="${pFlash * 8}" fill="#7e9185" opacity="${(1 - pFlash) * 0.5}" filter="url(#votiveGlow)"/>
+      `;
+    }
+  }
+
+  s += `</g>`;
+  return s;
 }
 
 // Option 3: Lead-Came Solder Weld Seam & Stained Glass Clerestory Frieze
@@ -2010,6 +2305,9 @@ function renderHardware() {
       if (model.option === 'leadcame') {
         // Option 3: Lead-came soldered seam with continuous stained glass clerestory frieze
         shared += drawLeadCameWeld(midX, a.y, model.joined ? 1 : model.solderProgress, model.joined, p);
+      } else if (model.option === 'buttress') {
+        // Option 5: Architectural shadow gap recess between clerestory walls
+        shared += drawButtressShadowGap(midX, a.y, p);
       } else {
         // Option 1 & 2: United nave pointed arch ribbing at the seam
         shared += `<g opacity="${p}">
@@ -2023,7 +2321,7 @@ function renderHardware() {
   }
 
   // Draw Keystone for Option 1
-  if (!isShade && model.option !== 'leadcame' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
+  if (!isShade && model.option !== 'leadcame' && model.option !== 'buttress' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
     const drop = model.joined ? 1 : model.keystoneDrop || Math.max(0, (glow - 0.3) / 0.7 * 0.7);
     const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 18 + b.x + 18) / 2;
     shared += drawKeystone(kMidX, a.y, drop, Math.max(p, glow > 0.3 ? 0.9 : drop));
@@ -2033,6 +2331,12 @@ function renderHardware() {
   if (!isShade && model.option === 'leadcame' && !model.joined && (model.solderProgress > 0.02 || glow > 0.25)) {
     const sp = model.solderProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.5);
     shared += drawLeadCameWeld(midX, a.y, sp, false, Math.max(0.85, glow));
+  }
+
+  // Draw Flying Buttress for Option 5
+  if (!isShade && model.option === 'buttress') {
+    const swing = model.joined ? 1 : model.buttressSwing || Math.max(0, (glow - 0.25) / 0.75 * 0.5);
+    shared += drawFlyingButtress(a.x, a.y, b.x, b.y, swing, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow);
   }
 
   if (model.joined && model.design) {
@@ -2049,6 +2353,9 @@ function renderHardware() {
     if (model.option === 'leadcame') {
       capL = drawLeadCameEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
       capR = drawLeadCameEndCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+    } else if (model.option === 'buttress') {
+      capL = drawButtressEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
+      capR = drawButtressEndCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
     } else {
       capL = drawGothicCap(0, 0, false, isA ? 0 : model.cap, isShade);
       capR = drawGothicCap(0, 0, true, isA ? model.cap : 0, isShade);
@@ -2090,7 +2397,7 @@ function renderHardware() {
 function updateStateButtons() {
   const isShade = model.shade;
   const isJoined = model.joined;
-  const isJoining = ((model.option === 'leadcame' ? model.solderProgress > 0.05 && model.solderProgress < 0.95 : model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95)) && !isJoined && !isShade;
+  const isJoining = ((model.option === 'leadcame' ? model.solderProgress > 0.05 && model.solderProgress < 0.95 : model.option === 'buttress' ? model.buttressSwing > 0.05 && model.buttressSwing < 0.95 : model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95)) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -2177,7 +2484,10 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
-  if (model.option === 'leadcame') {
+  if (model.option === 'buttress') {
+    $('#btnJoinAnim').textContent = model.joined ? 'Buttress seated' : 'Swing buttress join';
+    $('#btnSeparateAnim').textContent = 'Unhitch buttress';
+  } else if (model.option === 'leadcame') {
     $('#btnJoinAnim').textContent = model.joined ? 'Seam soldered' : 'Solder lead seam';
     $('#btnSeparateAnim').textContent = 'Melt & separate';
   } else if (model.option === 'portcullis' || model.option === 'triptych') {
@@ -2208,14 +2518,24 @@ function render() {
 
   const release = $('#keystoneRelease');
   const solderRel = $('#solderRelease');
+  const buttressRel = $('#buttressRelease');
   if (model.option === 'leadcame') {
     release.hidden = true;
+    buttressRel.hidden = true;
     solderRel.hidden = !model.joined || model.busy || model.shade;
     solderRel.style.left = (model.a.x + JOIN_DISTANCE - 14) + 'px';
     solderRel.style.top = (model.a.y + 55) + 'px';
     solderRel.style.setProperty('--tension', model.tension);
+  } else if (model.option === 'buttress') {
+    release.hidden = true;
+    solderRel.hidden = true;
+    buttressRel.hidden = !model.joined || model.busy || model.shade;
+    buttressRel.style.left = (model.b.x + 54) + 'px';
+    buttressRel.style.top = (model.b.y + 4) + 'px';
+    buttressRel.style.setProperty('--tension', model.tension);
   } else {
     solderRel.hidden = true;
+    buttressRel.hidden = true;
     release.hidden = !model.joined || model.busy || model.shade;
     release.style.left = (model.a.x + 338) + 'px';
     release.style.top = (model.a.y + 44) + 'px';
@@ -2232,11 +2552,15 @@ function render() {
     } else if (model.joined) {
       if (model.option === 'leadcame') {
         $('#phase').textContent = 'Joined / Lead-came soldered frieze';
+      } else if (model.option === 'buttress') {
+        $('#phase').textContent = 'Joined / Flying buttress bridge seated';
       } else {
         $('#phase').textContent = 'Joined / One monolithic basilica';
       }
     } else if (model.option === 'leadcame' && model.solderProgress > 0.05) {
       $('#phase').textContent = 'Joining / Molten silver solder flowing';
+    } else if (model.option === 'buttress' && model.buttressSwing > 0.05) {
+      $('#phase').textContent = 'Joining / Flying buttress arm swinging across gap';
     } else if (model.keystoneDrop > 0.1) {
       $('#phase').textContent = 'Joining / Keystone poised in descent';
     } else {
@@ -2574,6 +2898,108 @@ async function meltSeparate() {
   say('Separated. Independent cathedral housings with stained glass lead cames restored.');
 }
 
+// Option 5: Flying Buttress Arm Swing Animations
+async function buttressJoin(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Cathedral outer wall pier buttress aligns. Flying buttress arm prepares to swing across the nave divide.');
+  $('#phase').textContent = 'Pivoting flying buttress arm';
+
+  // 1. Proximity sanctuary light glow
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 80 : 200, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  // 2. Align casings flush as inner caps retract
+  $('#phase').textContent = 'Aligning cathedral pier and corbel';
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.undercroft ? 305 : 385, model.a.y));
+
+  if (!await tween(fromDrag ? 240 : 440, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.cap = t;
+    model.buttressSwing = Math.max(model.buttressSwing, t * 0.45);
+    render();
+  }, token)) return;
+
+  // 3. Flying Buttress Arm swings 42° across the gap to seat into corbel
+  $('#phase').textContent = 'Flying buttress arm swinging into corbel';
+  say('Arched stone buttress arm swings gracefully through a 42° arc across the chasm, seating into the load-bearing corbel.');
+  const initialSwing = model.buttressSwing;
+  if (!await tween(fromDrag ? 260 : 480, t => {
+    const swingT = Math.sin(t * Math.PI / 2);
+    model.buttressSwing = initialSwing + (1 - initialSwing) * swingT;
+    renderHardware();
+  }, token)) return;
+
+  // 4. Settling into corbel and iron tie-pin dropping into place
+  $('#phase').textContent = 'Forged-iron tie pin seating';
+  if (!await tween(160, t => {
+    model.light = 1 - t;
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.buttressSwing = 1;
+  model.light = 0;
+  render();
+  say('Flying buttress locked into corbel. Open-air shadow gap archway formed. Pull corbel tie-pin right to unhitch & separate.');
+}
+
+async function buttressSeparate() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Unhitching corbel tie-pin. Flying buttress arm swings aloft.');
+
+  // 1. Lift tie-pin and swing buttress arm back up
+  $('#phase').textContent = 'Hoisting buttress arm aloft';
+  if (!await tween(260, t => {
+    model.buttressSwing = 1 - t;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Separating cathedral housings';
+  if (!await tween(520, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.6);
+    model.cap = 1 - Math.max(0, (t - 0.4) / 0.6);
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.buttressSwing = 0;
+  model.light = 0;
+  render();
+  say('Separated. Independent cathedral pier and corbel housings restored.');
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -2585,11 +3011,13 @@ async function applyState(stateName) {
       else await liftPortcullis();
     }
     if (model.joined) {
-      if (model.option === 'leadcame') await meltSeparate();
+      if (model.option === 'buttress') await buttressSeparate();
+      else if (model.option === 'leadcame') await meltSeparate();
       else await separate();
     } else {
       model.keystoneDrop = 0;
       model.solderProgress = 0;
+      model.buttressSwing = 0;
       model.triptychFold = 0;
       model.cap = 0;
       model.blend = 0;
@@ -2609,14 +3037,22 @@ async function applyState(stateName) {
     model.light = 0.8;
     model.a.x = 240;
     model.b.x = 240 + W + 44; // near each other
-    if (model.option === 'leadcame') {
+    if (model.option === 'buttress') {
+      model.buttressSwing = 0.52; // mid-flight 42-degree swing across gap
+      model.solderProgress = 0;
+      model.keystoneDrop = 0;
+      render();
+      say('State: Joining — Mid-animation view with arched stone buttress arm swinging across the divide toward the corbel.');
+    } else if (model.option === 'leadcame') {
       model.solderProgress = 0.52; // mid-flight solder flow down came channel
       model.keystoneDrop = 0;
+      model.buttressSwing = 0;
       render();
       say('State: Joining — Mid-animation view with molten silver solder flowing down the lead came channel.');
     } else {
       model.keystoneDrop = 0.52; // mid-flight aloft
       model.solderProgress = 0;
+      model.buttressSwing = 0;
       render();
       say('State: Joining — Mid-animation view with keystone descending into the arch apex.');
     }
@@ -2632,14 +3068,22 @@ async function applyState(stateName) {
       model.blend = 1;
       model.cap = 1;
       model.light = 0;
-      if (model.option === 'leadcame') {
+      if (model.option === 'buttress') {
+        model.buttressSwing = 1;
+        model.solderProgress = 0;
+        model.keystoneDrop = 0;
+        render();
+        say('State: Joined — Flying buttress arm firmly seated into corbel, bridging open-air shadow gap.');
+      } else if (model.option === 'leadcame') {
         model.solderProgress = 1;
         model.keystoneDrop = 0;
+        model.buttressSwing = 0;
         render();
         say('State: Joined — Seamless lead-came solder seam with stained glass frieze.');
       } else {
         model.keystoneDrop = 1;
         model.solderProgress = 0;
+        model.buttressSwing = 0;
         render();
         say('State: Joined — Monolithic basilican arch locked by granite keystone.');
       }
@@ -2711,11 +3155,13 @@ $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
 $('#btnJoinAnim').onclick = () => {
-  if (model.option === 'leadcame') solderWeld();
+  if (model.option === 'buttress') buttressJoin();
+  else if (model.option === 'leadcame') solderWeld();
   else join();
 };
 $('#btnSeparateAnim').onclick = () => {
-  if (model.option === 'leadcame') meltSeparate();
+  if (model.option === 'buttress') buttressSeparate();
+  else if (model.option === 'leadcame') meltSeparate();
   else separate();
 };
 $('#btnPortcullisAnim').onclick = () => {
@@ -2745,6 +3191,12 @@ $('#optionSelect').onchange = async e => {
       if (model.triptychFold > 0.05) await unfoldTriptych();
       else await liftPortcullis();
     }
+  } else if (model.option === 'buttress') {
+    say('Option 5: Flying Buttress Arm Swing join selected. Outer wall pier buttress with arched stone flyer swinging into carved corbel.');
+    if (model.shade) {
+      if (model.triptychFold > 0.05) await unfoldTriptych();
+      else await liftPortcullis();
+    }
   } else if (model.option === 'keystone') {
     say('Option 1: Keystone Drop join selected. Ashlar voussoirs & granite key.');
     if (model.shade) {
@@ -2765,7 +3217,7 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, undercroft: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, buttressSwing: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   $('#optionSelect').value = 'keystone';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
@@ -2809,12 +3261,12 @@ function snapshot() {
   return {
     a: { ...model.a }, b: { ...model.b }, meter: { ...model.meter },
     joined: model.joined, docked: model.docked, cap: model.cap, blend: model.blend,
-    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, option: model.option, front: model.front
+    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, buttressSwing: model.buttressSwing, option: model.option, front: model.front
   };
 }
 function restore(s) {
   for (const id of ['a', 'b', 'meter']) Object.assign(model[id], s[id]);
-  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'option', 'front']) model[k] = s[k];
+  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'buttressSwing', 'option', 'front']) model[k] = s[k];
 }
 function cancelDrag() {
   if (!drag) return;
@@ -2892,12 +3344,15 @@ function magneticGoal(raw, target, id) {
   if (id !== 'meter' && p.brightness > 0) {
     if (model.option === 'leadcame') {
       model.solderProgress = p.brightness * 0.45;
+    } else if (model.option === 'buttress') {
+      model.buttressSwing = p.brightness * 0.7; // buttress arm swings downward as you approach!
     } else {
       model.keystoneDrop = p.brightness * 0.7; // keystone hovers downward as you approach!
     }
   } else if (!model.joined) {
     model.keystoneDrop = 0;
     model.solderProgress = 0;
+    model.buttressSwing = 0;
   }
 
   return target ? { x: raw.x + (target.x - raw.x) * strength, y: raw.y + (target.y - raw.y) * strength } : raw;
@@ -2959,6 +3414,13 @@ stage.addEventListener('pointermove', e => {
       if (dx < 60) { render(); return; }
       meltSeparate();
       return;
+    } else if (model.option === 'buttress') {
+      model.tension = clamp(dx / 64, 0, 1);
+      model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
+      model.buttressSwing = 1 - model.tension * 0.6; // buttress arm unseats from corbel!
+      if (dx < 64) { render(); return; }
+      buttressSeparate();
+      return;
     } else {
       model.tension = clamp(dx / 72, 0, 1);
       model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
@@ -3016,6 +3478,7 @@ stage.addEventListener('pointerup', () => {
   $('#cryptBay').classList.remove('hot');
   if (ready) {
     if (d.id === 'meter') insertChecks();
+    else if (model.option === 'buttress') buttressJoin(true);
     else if (model.option === 'leadcame') solderWeld(true);
     else join(true);
     return;
@@ -3027,6 +3490,7 @@ stage.addEventListener('pointerup', () => {
     model.blend = 0;
     model.keystoneDrop = 0;
     model.solderProgress = 0;
+    model.buttressSwing = 0;
   }
   render();
 });
@@ -3034,6 +3498,7 @@ stage.addEventListener('pointerup', () => {
 stage.addEventListener('pointercancel', cancelDrag);
 $('#keystoneRelease').onclick = e => { if (e.detail === 0) separate(); };
 $('#solderRelease').onclick = e => { if (e.detail === 0) meltSeparate(); };
+$('#buttressRelease').onclick = e => { if (e.detail === 0) buttressSeparate(); };
 
 window.addEventListener('keydown', e => {
   if (e.target.matches('input, select, textarea')) return;
@@ -3049,14 +3514,19 @@ window.addEventListener('keydown', e => {
     applyState('shade');
   } else if (e.key === 'j' || e.key === 'J') {
     if (!model.joined) {
-      if (model.option === 'leadcame') solderWeld();
+      if (model.option === 'buttress') buttressJoin();
+      else if (model.option === 'leadcame') solderWeld();
       else join();
     }
   } else if (e.key === 's' || e.key === 'S') {
     if (model.joined) {
-      if (model.option === 'leadcame') meltSeparate();
+      if (model.option === 'buttress') buttressSeparate();
+      else if (model.option === 'leadcame') meltSeparate();
       else separate();
     }
+  } else if (e.key === 'b' || e.key === 'B') {
+    if (!model.joined) buttressJoin();
+    else buttressSeparate();
   } else if (e.key === 'p' || e.key === 'P') {
     if (model.shade) liftPortcullis();
     else dropPortcullis();
@@ -3066,6 +3536,7 @@ window.addEventListener('keydown', e => {
   } else if (e.key === 'Enter') {
     if (document.activeElement === $('#keystoneRelease') && model.joined) separate();
     else if (document.activeElement === $('#solderRelease') && model.joined) meltSeparate();
+    else if (document.activeElement === $('#buttressRelease') && model.joined) buttressSeparate();
   }
 });
 
