@@ -1499,10 +1499,13 @@ function keepTicking(){if(!tickRAF)tickRAF=requestAnimationFrame(()=>{tickRAF=0;
 let angAnim=0;
 // The angled joins (hanging bracket, shell articulation) share this; each has its own range, detent step and remembered angle.
 const angOn=()=>!!J().angled&&model.jt===1;
-function refitPair(){if(!angOn())return;const[lo,hi]=J().fitRange(model.angle,ctx().h/2);model.a.y=model.b.y=clamp(model.a.y,lo,hi)}
+// A raised pair pushed down by the fit keeps its resting height: the push comes off its lift.
+function refitPair(){if(!angOn())return;const[lo,hi]=J().fitRange(model.angle,ctx().h/2),ny=clamp(model.a.y,lo,hi),d=ny-model.a.y;if(d>0)model.lift=Math.max(0,model.lift-d);model.a.y=model.b.y=ny}
 function pairY(){return angOn()?J().fitRange(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
 function animateAngle(to,ms=750){
- const j=J();to=clamp(to,-j.range,j.range);model.angTo=to;const from=model.angle,y0=model.a.y,y1=clamp(y0,...j.fitRange(to,ctx().h/2)),tok=++angAnim,t0=performance.now();
+ // A running lift stops here (it is settled again once the swing ends), and any push down comes off it.
+ stopLift();const j=J();to=clamp(to,-j.range,j.range);model.angTo=to;const from=model.angle,y0=model.a.y,y1=clamp(y0,...j.fitRange(to,ctx().h/2)),tok=++angAnim,t0=performance.now();
+ if(y1>y0)model.lift=Math.max(0,model.lift-(y1-y0));
  (function step(now){if(tok!==angAnim)return;if(!angOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
   model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*Math.PI*t)),-j.range-2,j.range+2);model.a.y=model.b.y=lerp(y0,y1,ease(t));render();
   if(t<1)requestAnimationFrame(step);else model.angTo=undefined})(t0);
@@ -1516,11 +1519,11 @@ function setAngle(v){const j=J();v=Math.round(clamp(v,-j.range,j.range)/j.step)*
 const SIZES=[['sheet','Sheet',0],['folio','Folio',1],['atlas','Atlas',2]];
 const MORPHS={
  unfurl:{label:'Map unfurl',kind:'Unroll',
-  about:'The parchment on Checks is only one corner of a larger map: the rest is rolled up along its bottom edge, tied with red thread, and folded under on the right. <b>Folio:</b> the shell darts down to a longer body with new abdomen segments, the thread slips off the roll, and the map unrolls down in one quick pass, the roll thinning to nothing. A second region is revealed under a dotted coastline: run 418 drawn as a route of fourteen waymarks, twelve inked and two open red rings for the checks still waiting, and the pass rate. Two pins drop into the new corners. <b>Atlas:</b> the shell widens, the fold lifts, and the folded half of the map swings out from behind on its crease in perspective and slaps flat with a puff of paper dust. Its region names the two waiting checks beside matching red rings, with a small compass rose; pins fix its corners and the crease stays. <b>Shrinking</b> rolls the map back up and folds it under. Pick a size, press M to step through them, or scrub the slider. Checks grows from where it stands and only moves to stay on the stage and clear of the pair. Shading a grown Checks rolls it back to a sheet first, and unshading unfurls it again.',
+  about:'The parchment on Checks is only one corner of a larger map: the rest is rolled up along its bottom edge, tied with red thread, and folded under on the right. <b>Folio:</b> the shell darts down to a longer body with new abdomen segments, the thread slips off the roll, and the map unrolls down in one quick pass, the roll thinning to nothing. A second region is revealed under a dotted coastline: run 418 drawn as a route of fourteen waymarks, twelve inked and two open red rings for the checks still waiting, and the pass rate. Two pins drop into the new corners. <b>Atlas:</b> the shell widens, the fold lifts, and the folded half of the map swings out from behind on its crease in perspective and slaps flat with a puff of paper dust. Its region names the two waiting checks beside matching red rings, with a small compass rose; pins fix its corners and the crease stays. <b>Shrinking</b> rolls the map back up and folds it under. Pick a size, press M to step through them, or scrub the slider. Checks grows from where it stands. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks rolls it back to a sheet first, and unshading unfurls it again.',
   sizes:['Sheet','Folio','Atlas'],slider:'Checks size, sheet to atlas',ms:[2000,1500],ax:0,dims:g=>{const G=geo(g);return[G.w,G.h]},
   say:(to,from,n)=>to>from?(to===2?'The folded half of the map swings out: Checks is an atlas.':'The map unrolls: Checks is a folio.'):'The map is rolled back up and folded under: Checks shrinks to a '+n+'.'},
  molt:{label:'Moult',kind:'Shed',
-  about:'Each size of Checks is its own shell, and every resize sheds one. <b>Nymph:</b> the small smooth shell. <b>Instar:</b> a taller shell with two thorns on its back, a spur at its far shoulder and abdomen segments, carrying one larger parchment: run 418 on main, the count, a row of fourteen marks (twelve inked crosses and two open red rings for the checks still waiting) and the pass rate. <b>Imago:</b> a broad shell with three thorns, a long swept horn and a seam down the middle like closed wing cases, with the teal lamp set in the seam between two parchments; the second names deploy-preview and e2e-safari waiting for Brent. <b>The moult:</b> the parchment is taken down and the shell trembles; a white crack runs along the seam under the nameplate, and the plate above it pops up and peels back, throwing off flecks of shell. The new shell swells out of the split, pale and soft, steps out with a small overshoot and settles. The empty husk goes hollow and brittle, lets go and falls into the fog. The iron scroll and its lantern are lifted across onto the new shell, which darkens to navy chitin as it hardens; a glint runs along its back, the pins drop in and the parchment comes back. Shrinking is a moult too: the smaller shell climbs out of the big one, which is shed the same way. Going two sizes sheds two shells. Pick a size, press M to step through them, or scrub the slider. Checks moults where it stands, growing out evenly from the middle of its back, and only moves to stay on the stage and clear of the pair. Shading a grown Checks moults it back to a nymph first, and unshading grows it again.',
+  about:'Each size of Checks is its own shell, and every resize sheds one. <b>Nymph:</b> the small smooth shell. <b>Instar:</b> a taller shell with two thorns on its back, a spur at its far shoulder and abdomen segments, carrying one larger parchment: run 418 on main, the count, a row of fourteen marks (twelve inked crosses and two open red rings for the checks still waiting) and the pass rate. <b>Imago:</b> a broad shell with three thorns, a long swept horn and a seam down the middle like closed wing cases, with the teal lamp set in the seam between two parchments; the second names deploy-preview and e2e-safari waiting for Brent. <b>The moult:</b> the parchment is taken down and the shell trembles; a white crack runs along the seam under the nameplate, and the plate above it pops up and peels back, throwing off flecks of shell. The new shell swells out of the split, pale and soft, steps out with a small overshoot and settles. The empty husk goes hollow and brittle, lets go and falls into the fog. The iron scroll and its lantern are lifted across onto the new shell, which darkens to navy chitin as it hardens; a glint runs along its back, the pins drop in and the parchment comes back. Shrinking is a moult too: the smaller shell climbs out of the big one, which is shed the same way. Going two sizes sheds two shells. Pick a size, press M to step through them, or scrub the slider. Checks moults where it stands, growing out evenly from the middle of its back. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks moults it back to a nymph first, and unshading grows it again.',
   sizes:['Nymph','Instar','Imago'],slider:'Checks size, nymph to imago',ms:[2600,2300],ax:.5,dims:g=>moltDims(g),
   say:(to,from,n)=>to>from?(to-from>1?'Checks sheds two shells: it cracks along its back, steps out as an instar, then again as an imago.':to===2?'The instar cracks along its back and a broad, horned imago steps out; the husk falls into the fog.':'The nymph trembles and cracks along its back; a taller instar steps out and hardens.'):(from-to>1?'Checks sheds two shells, stepping out smaller each time, back to a '+n+'.':'The shell cracks along its back and a smaller '+n+' climbs out; the empty husk falls away.')}
 };
@@ -1683,16 +1686,58 @@ function moult(el,w,h){
  cas.innerHTML=o;
  ov.innerHTML=(O>0&&outOp>0?`<g opacity="${f(outOp)}">${mPins(O,ox,1)}</g>`:'')+(N>0?mPins(N,nx,j=>seg(u,.82+.03*j,.92+.03*j)):'');
 }
-// Where Checks's top-left should land at size `to`: it grows from where it stands (the map from its corner, the moult from the middle of its back), kept on the stage and clear of the pair.
-function morphSpot(to){
- const mo=MO(),[w,h]=mo.dims(to),[w0]=cDims();let x=clamp(model.c.x+mo.ax*(w0-w),30,1170-w),y=clamp(model.c.y,TOP-10,590-h);
- const x0=Math.min(model.a.x,model.b.x)-8,x1=Math.max(model.a.x,model.b.x)+W+8,y0=Math.min(model.a.y,model.b.y)-8,yb=Math.max(model.a.y,model.b.y)+ctx().h+8;
- if(x+w>x0&&x<x1&&y<yb&&y+h>y0){if(yb+h<=590)y=yb;else if(y0-h>=TOP-10)y=y0-h}
- return{x,y};
+// The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
+// On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
+function pairBox(){
+ const L=model.lift,h=ctx().h,j=J();let x0=Math.min(model.a.x,model.b.x),x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(model.a.y,model.b.y),y1=Math.max(model.a.y,model.b.y)+h;
+ const t=j.angled&&model.jt>0&&j.place?j.place(h):null;
+ if(t&&t.t){const M=new DOMMatrix(t.t),[ox,oy]=t.o.split(' ').map(parseFloat);
+  for(const lx of[0,W])for(const ly of[0,h]){const p=M.transformPoint(new DOMPoint(lx-ox,ly-oy)),x=model.b.x+ox+p.x,y=model.b.y+oy+p.y;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}}
+ return{x0:x0-10,x1:x1+10,y0:y0+L-40,y1:y1+L+14};
 }
+// How far the pair has to rise (from where it stood) to clear a w×h Checks at x,y that reaches below it; never past the top of the stage (or of the angled join's fit).
+function clearLift(w,h,x,y){
+ const p=pairBox();
+ if(x+w<=p.x0||x>=p.x1||y>=p.y1||y+h<=p.y1)return 0;
+ return clamp(p.y1-y,0,Math.max(0,Math.min(model.a.y,model.b.y)+model.lift-pairY()[0]));
+}
+// Where Checks's top-left should land at size `to`: it grows from where it stands (the map from its corner, the moult from the middle of its back),
+// kept on the stage and clear of the pair on the nearest side (below, beside or above) with room. A spot on the far side of the pair is left out,
+// so Checks never crawls across it. When no side has room (an atlas or imago beside a pair across the middle of the stage), Checks takes the floor
+// and the pair rises just enough to clear it.
+function morphSpot(to){
+ const mo=MO(),[w,h]=mo.dims(to),[w0]=cDims(),X0=30,X1=1170,Y0=TOP-10,Y1=590;let x=clamp(model.c.x+mo.ax*(w0-w),X0,X1-w),y=clamp(model.c.y,Y0,Y1-h);
+ const p=pairBox();
+ if(x+w>p.x0&&x<p.x1&&y<p.y1&&y+h>p.y0){
+  const mx=(p.x0+p.x1)/2,my=(p.y0+p.y1)/2,cx=x+w/2,cy=y+h/2;
+  const C=[[x,p.y1],[p.x1,y],[p.x0-w,y],[x,p.y0-h]].filter(([u,v])=>u>=X0&&u<=X1-w&&v>=Y0&&v<=Y1-h&&(u+w/2-mx)*(cx-mx)>=0&&(v+h/2-my)*(cy-my)>=0);
+  if(C.length)[x,y]=C.reduce((q,r)=>Math.hypot(r[0]-x,r[1]-y)<Math.hypot(q[0]-x,q[1]-y)?r:q);else y=Y1-h;
+ }
+ return{x,y,lift:clearLift(w,h,x,y)};
+}
+// Eases the pair's lift to L over ms after a delay. The pair moves as one, along with any running join path.
+let liftAnim=0;
+function shiftPair(d){for(const id of['a','b'])model[id].y-=d;const p=model.path;if(p)for(const k of['s','j'])for(const id of['a','b'])p[k][id].y-=d}
+function liftTo(L,ms){
+ const tok=++liftAnim,L0=model.lift;
+ if(Math.abs(L-L0)<.5||reduce.matches||ms<=0){shiftPair(L-L0);model.lift=L;render();return}
+ const t0=performance.now();(function step(now){if(tok!==liftAnim)return;const t=clamp((now-t0)/ms),v=lerp(L0,L,ease(t));shiftPair(v-model.lift);model.lift=v;render();if(t<1)requestAnimationFrame(step)})(t0);
+}
+const stopLift=()=>++liftAnim;
+// The lift Checks needs where it stands now; `keep` only lets the pair down, never raises it (for when Checks is moved by hand).
+// The pair never settles below the bottom of its range. A delayed settle (after a swing) is dropped if a lift or morph has started since.
+function settleLift(ms=450,keep=false,delay=0){
+ const lt=liftAnim,mt=morphAnim;
+ const go=()=>{if(pairHeld()||delay>0&&(lt!==liftAnim||mt!==morphAnim))return;const[w,h]=cDims();let L=clearLift(w,h,model.c.x,model.c.y);if(keep)L=Math.min(model.lift,L);
+  L=Math.max(L,Math.min(model.a.y,model.b.y)+model.lift-pairY()[1]);liftTo(L,ms)};
+ delay>0?setTimeout(go,delay):go();
+}
+// The pair was moved by hand: it stays where it was put, and any lift is forgotten.
+function pairPlaced(){stopLift();model.lift=0;model.placed++}
+const pairHeld=()=>!!(drag&&drag.id&&drag.id!=='c'&&!drag.seam);
 let morphAnim=0;
 function morphTo(id){
- if(drag&&drag.id==='c')cancelDrag();
+ if(drag)cancelDrag();
  const S=SIZES.find(x=>x[0]===id),to=S[2],from=model.g;
  // A shaded Checks comes out of its shade first, then unfurls.
  if(model.st>0&&to>0){model.restore=id;model.size=id;toggleShade(0);render();return Promise.resolve(false)}
@@ -1704,6 +1749,8 @@ function morphTo(id){
  const mo=MO(),ax=mo.ax,tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*mo.ms[to>from?0:1],[w0]=cDims(),p0={x:model.c.x+ax*w0,y:model.c.y},q=morphSpot(to),p1={x:q.x+ax*mo.dims(to)[0],y:q.y},t0=performance.now();
  model.cMoved=false;
  say(mo.say(to,from,name));
+ // Growing: the pair rises out of the way first. Shrinking: it settles back once Checks is smaller (below).
+ const placed=model.placed;if(q.lift>model.lift+.5){liftTo(q.lift,Math.min(700,ms||700));say(mo.say(to,from,name).replace(/\.$/,'; the pair rises to make room.'))}
  return new Promise(res=>{(function step(now){
   if(tok!==morphAnim)return res(false);
   const[wp]=cDims(),t=ms?clamp((now-t0)/ms):1;setG(t<1?lerp(from,to,t):to);
@@ -1711,13 +1758,13 @@ function morphTo(id){
   if(model.cMoved){model.c.x=clamp(model.c.x+ax*(wp-w),30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h)}
   else{const e=ease(t);model.c.x=lerp(p0.x,p1.x,e)-ax*w;model.c.y=lerp(p0.y,p1.y,e)}
   render();
-  if(t<1)requestAnimationFrame(step);else{say('Checks is '+article(name)+'.');res(true)}
+  if(t<1)requestAnimationFrame(step);else{if(model.placed===placed)settleLift();say('Checks is '+article(name)+'.');res(true)}
  })(t0)});
 }
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:700,y:420}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -1752,7 +1799,7 @@ async function doJoin(fixed='a',ms=2600){
  model.ready=false;model.glow=0;
  say(J().text.join);
  const ok=await tween(model.jt,1,ms*(J().slow||1)*(1-model.jt),setJt);
- if(ok){model.poised=false;model.path=null;refitPair();render();say(J().text.joined)}
+ if(ok){model.poised=false;model.path=null;refitPair();render();settleLift();say(J().text.joined)}
 }
 async function doSeparate(){
  if(model.jt===0)return;
@@ -1762,7 +1809,7 @@ async function doSeparate(){
  if(model.jt===1){model.dir=-1;j.releaseStart();model.path={s:separatePose(),j:here()};say(j.text.release)}
  else{if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say(j.text.back)}
  const ms=model.dir<0?(j.msOut||1500)*model.jt:1300*model.jt;
- if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.cut=null;say('Separate. Displays and pages were not touched.')}
+ if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.cut=null;settleLift();say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
  stopAngle();++anim;model.busy=false;model.poised=false;model.glow=0;
@@ -1857,7 +1904,7 @@ function pick(key,id){
  if(key==='morph'&&id!==model.morph&&model.g>0){const keep=model.size||SIZES[Math.max(1,Math.round(model.g))][0];
   morphTo('sheet').then(ok=>{if(ok){model.morph=id;describe();render();morphTo(keep)}});return}
  if(key==='morph')model.morph=id;
- describe();render();
+ describe();render();if(key==='join')settleLift();
 }
 function describe(){
  const j=J(),s=SHADES[model.shade];
@@ -1872,9 +1919,9 @@ SIZES.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size
 $('#grow').oninput=e=>{if(drag&&drag.id==='c')cancelDrag();
  if(model.st>0){toggleShade(0);e.target.value=0;render();return}
  ++morphAnim;model.restore=null;const v=e.target.value/100,[wp]=cDims();setG(v);const S=SIZES.find(x=>x[2]===v);model.size=S?S[0]:null;
- const[w,h]=cDims();model.c.x=clamp(model.c.x+MO().ax*(wp-w),30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h);render()};
+ const[w,h]=cDims();model.c.x=clamp(model.c.x+MO().ax*(wp-w),30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h);render();settleLift(0)};
 $('#grow').onchange=()=>render();
-$('#angle').oninput=e=>{if(drag)cancelDrag();setAngle(+e.target.value)};
+$('#angle').oninput=e=>{if(drag)cancelDrag();setAngle(+e.target.value);settleLift(300,false,760)};
 $('#scrub').oninput=e=>{stopAngle();++anim;model.busy=false;model.poised=false;model.glow=0;
  if(model.dir<0){model.dir=1;model.cut=null}
  if(model.jt===0||model.jt===1||!model.path)model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};
@@ -1906,7 +1953,8 @@ stage.addEventListener('pointerdown',e=>{
  if(id==='b'&&angOn()){drag=Object.assign(J().seamDown(p,null),{fromGrip:true,touch:e.pointerType!=='mouse'});stage.setPointerCapture(e.pointerId);render();return}
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1;model.cut=null}
- drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle',touch:e.pointerType!=='mouse'};
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c},lift:model.lift},group:model.jt===1&&id!=='c',state:'idle',touch:e.pointerType!=='mouse'};
+ if(id!=='c')stopLift();
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
@@ -1927,7 +1975,9 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
- if(d.seam){J().seamUp(d);return}
+ if(d.seam){J().seamUp(d);if(J().angled)settleLift(300,false,760);return}
+ // Checks moved by hand only lets a raised pair down; a pair moved by hand stays where it was put.
+ if(d.id==='c')settleLift(450,true);else if(['a','b'].some(k=>d.saved[k].x!==model[k].x||d.saved[k].y!==model[k].y))pairPlaced();else settleLift();
  // A tap on a cocooned nameplate loosens or retightens its silk (hover does the same with a mouse).
  if(d.touch&&!(d.moved>4)){const el=$('#'+d.id);if(el.classList.contains('cocooned'))el.classList.toggle('loose')}
  if(d.state==='ready'){model.ready=true;model.poised=true;model.path=null;doJoin(d.id==='b'?'a':'b',2100)}
@@ -1937,8 +1987,8 @@ function endDrag(){
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
- if(d.seam){if(J().seamCancel)J().seamCancel(d);render();return}
- const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
+ if(d.seam){if(J().seamCancel)J().seamCancel(d);render();if(J().angled)settleLift(300);return}
+ const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.lift=s.lift;model.glow=0;settleLift();render();say('Move cancelled.');
 }
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
@@ -1948,9 +1998,11 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
  const bottom=600-(model.st>.5?HS:H)-14;
- if(id==='b'&&angOn()&&k[1]){stepAngle(k[1]>0?1:-1);return}
+ if(id==='b'&&angOn()&&k[1]){stepAngle(k[1]>0?1:-1);settleLift(300,false,760);return}
+ const was=[model.a.x,model.a.y,model.b.x,model.b.y]+'';
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
- else{const m=model[id],[cw,chh]=cDims(),w=id==='c'?cw:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-chh-10:bottom);if(id==='c')model.cMoved=true}render();
+ else{const m=model[id],[cw,chh]=cDims(),w=id==='c'?cw:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-chh-10:bottom);if(id==='c')model.cMoved=true}
+ if(id==='c')settleLift(300,true);else if(was!==[model.a.x,model.a.y,model.b.x,model.b.y]+'')pairPlaced();else settleLift();render();
 }));
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
