@@ -29,7 +29,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .topline p{margin:0;color:#c9d1dc;font-size:13px;max-width:760px}
 #phase{font:italic 12px/1.5 Georgia,serif;color:#f0b3ad;white-space:nowrap;letter-spacing:.3px}
 .layer{position:absolute;inset:0;width:1200px;height:600px;overflow:visible;pointer-events:none}
-#over{z-index:6}
+#over{z-index:6}#under{z-index:1}
 .w{position:absolute;width:390px;height:130px;user-select:none;touch-action:none;z-index:2;filter:drop-shadow(0 10px 9px #000b)}
 .w.small{width:276px;height:78px}
 .casing{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .wait span{font:italic 10.5px/1.3 Georgia,serif;color:#5c4a36}
 .rose{position:absolute;right:15px;bottom:9px}
 .mmorph{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
-.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.shellhit{cursor:ns-resize}.hit.platehit{cursor:w-resize}.hit.inkhit{cursor:s-resize}.hit.inkhit .wet{opacity:0}.hit.inkhit:hover .wet,.hit.inkhit:focus-visible .wet{opacity:.5}.hit .pinhit{cursor:pointer}
+.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.shellhit{cursor:ns-resize}.hit.platehit{cursor:w-resize}.hit.inkhit{cursor:s-resize}.hit.inkhit .wet{opacity:0}.hit.inkhit:hover .wet,.hit.inkhit:focus-visible .wet{opacity:.5}.hit .pinhit{cursor:pointer}.hit.lamphit{cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0;pointer-events:none}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
@@ -180,6 +180,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Hollow skin stage">
 <svg class="bg" id="bg" viewBox="0 0 1200 600" aria-hidden="true"></svg>
+<svg id="under" class="layer" viewBox="0 0 1200 600" aria-hidden="true"></svg>
 <div class="topline"><p id="status" role="status" aria-live="polite">Drag a nameplate toward the other shell, or use the state buttons.</p><span id="phase"></span></div>
 
 <section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg>
@@ -239,7 +240,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -838,6 +839,107 @@ const JOINS={
      `<circle class="pinhit" data-part="pin" cx="${f(sp.x)}" cy="${f(sp.y)}" r="11" fill="transparent"><title>Tap the spiracle to release</title></circle></g>`}
    return s;
   }
+ },
+ lamppost:{label:'Lamppost',kind:'Bridge',gap:50,holdAt:.66,msOut:2000,slow:1.2,
+  about:'A wrought-iron lamppost waits in the ground under the gap, out of sight. <b>Near:</b> the top eyelets catch the light and the spike of its finial pokes up out of the fog between the shells. <b>Ready:</b> a chalk ghost of the post, its lantern and its two brackets is drawn in the gap. Joining: the shells close to a post\'s width apart and the lamppost shoots up out of the ground, lantern first, with a puff of fog and grit; it overshoots a hair and settles, and its scrolled feet unfold on the floor. Two curled brackets reach out from the collar under the lantern, one to each shell, and their hooks drop into the top eyelets with a spark and a small tug. Then the lamp kindles: it sputters twice, catches, blooms out over both shells, and a few motes rise from it. Its colour is the pair\'s status: warm amber while both run, cold blue-white if either is paused. The seam stays open, fog showing through, with the post standing in it. <b>Release:</b> tap the lantern (or press Enter), or push it down into the ground. The lamp is snuffed with a curl of smoke, the hooks lift out, the brackets fold back into the collar, the post sinks back into the ground and the shells drift apart. A short push springs back up.',
+  text:{join:'The shells close; a lamppost shoots up between them, hooks a bracket into each and kindles.',joined:'Joined under a lamppost. Drag either nameplate to move the pair; the post follows. Tap the lantern, or push it down, to release.',
+   release:'Snuffed: the brackets unhook and the lamppost sinks back into the ground.',back:'The brackets fold in and the post sinks away.',hold:'Held mid-join: the brackets reaching for the eyelets. Use the scrubber to step through the animation.',
+   ready:'Ready: the lamppost is ghosted in the gap. Release to raise it.',near:'Nearby: a finial pokes up out of the fog. Move closer.',phReady:'Ready · the lamppost is ghosted',phNear:'Nearby · a finial in the fog',phDrag:'Push the lantern down to sink the post'},
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.3?'Joining · closing in ':jt<.56?'Joining · the lamppost rises ':jt<.72?'Joining · brackets reach out ':jt<.8?'Joining · hooked ':'Joining · the lamp kindles '):(r<.12?'Releasing · snuffed ':r<.24?'Releasing · brackets unhook ':r<.45?'Releasing · the post sinks ':'Releasing · parting ')},
+  // A push that sinks the post starts the release from that depth; any other release starts from the top.
+  releaseStart(){this.push0=this.pend||0;this.pend=0;this.spring=0},
+  key(){$('#a .grip').focus();doSeparate()},
+  seamDown(p){this.spring=0;return{seam:true,p0:p,push:0,moved:0}},
+  seamMove(d,p){d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));d.push=clamp(p.y-d.p0.y,0,30);
+   if(d.push>=30){drag=null;this.pend=d.push;$('#a .grip').focus();doSeparate();return}render()},
+  seamUp(d){if(d.moved<5){$('#a .grip').focus();doSeparate();return}
+   if(d.push>2){say('The post springs back up. Push the lantern further down to sink it, or tap it.');
+    const from=d.push,t0=performance.now(),me=this;(function step(now){const t=reduce.matches?1:clamp((now-t0)/380);me.spring=from*(1-backOut(t));render();if(t<1&&model.jt===1&&!drag)requestAnimationFrame(step);else me.spring=0})(t0)}
+   else render()},
+  // The post stands on the floor at FY; Yt is the top of its shaft (the lantern sits on it), 18 above the shells.
+  geo(c){const X=model.a.x+W,Xb=model.b.x,Y=Math.min(model.a.y,model.b.y),h=c.h;
+   return{mx:(X+Xb)/2,Y,FY:588,Yt:Y-18,ea:{x:X-9.5,y:model.a.y+h*.25},eb:{x:Xb+9.5,y:model.b.y+h*.25}}},
+  parts(jt){if(jt>=1)return{rise:1,feet:1,arms:1,hook:1,lit:1};
+   if(model.dir>0)return{rise:seg(jt,.3,.56),feet:seg(jt,.52,.6),arms:seg(jt,.58,.72),hook:seg(jt,.72,.78),lit:seg(jt,.8,1)};
+   const r=1-jt;return{lit:1-seg(r,0,.12),hook:1-seg(r,.1,.14),arms:1-seg(r,.12,.24),feet:1-seg(r,.2,.26),rise:1-seg(r,.22,.45)}},
+  // How far the rigid post sits below its standing height: rising with a hair of overshoot, sinking with an ease-in, or pushed.
+  off(jt,G,k){const L0=G.FY+54-G.Yt;
+   if(jt>=1)return .7*(drag&&drag.seam?drag.push:this.spring||0);
+   if(model.dir>0){const u=k.rise;return (L0-20)*Math.pow(1-u,3)-5*Math.sin(Math.PI*seg(u,.7,1))}
+   return lerp(.7*(this.push0||0),L0,Math.pow(1-k.rise,2.2))},
+  // The flame: two sputters then it catches on the way in; a quick fade with a last flare on the way out.
+  lit(k,jt){const u=k.lit;if(u<=0)return 0;if(jt>=1)return 1;
+   if(model.dir<0)return clamp(u*(1+.6*Math.sin(Math.PI*u)));
+   const K=[[0,0],[.08,.7],[.16,.08],[.3,.85],[.38,.3],[.5,1],[1,1]];let i=1;while(i<K.length-1&&u>K[i][0])i++;
+   return lerp(K[i-1][1],K[i][1],seg(u,K[i-1][0],K[i][0]))},
+  tone(){return model.a.run&&model.b.run?{glass:'#ffd581',core:'#fff6d8',g:'lpW',w:'lpWashW'}:{glass:'#bcd3f0',core:'#f4f8ff',g:'lpC',w:'lpWashC'}},
+  // The lantern on the post top at (x, T): an iron cup, an egg of glass in a ribbed cage, a pointed cap and a spike with a curl.
+  lantern(x,T,lit,tone){const egg=`M${f(x)} ${f(T-3)}C${f(x-12)} ${f(T-6)} ${f(x-11)} ${f(T-26)} ${f(x)} ${f(T-30)}C${f(x+11)} ${f(T-26)} ${f(x+12)} ${f(T-6)} ${f(x)} ${f(T-3)}Z`;
+   let s=`<path d="${egg}" fill="#18202c"/>`;
+   if(lit>0)s+=`<path d="${egg}" fill="${tone.glass}" opacity="${f(lit)}"/><ellipse cx="${f(x)}" cy="${f(T-15)}" rx="3.4" ry="5.4" fill="${tone.core}" opacity="${f(lit)}"/><ellipse cx="${f(x)}" cy="${f(T-15)}" rx="7" ry="9" fill="${tone.core}" opacity="${f(.35*lit)}" filter="url(#blur3)"/>`;
+   s+=`<path d="M${f(x-5.6)} ${f(T-22)}Q${f(x-7.4)} ${f(T-14)} ${f(x-4.6)} ${f(T-7)}" fill="none" stroke="#fff" stroke-width="1.1" stroke-linecap="round" opacity="${f(.25+.4*lit)}"/>`;
+   s+=`<g fill="none" stroke="${INK}" stroke-linecap="round"><path d="${egg}" stroke-width="2"/><path d="M${f(x)} ${f(T-3)}V${f(T-30)}M${f(x-5)} ${f(T-4.4)}C${f(x-8)} ${f(T-12)} ${f(x-7)} ${f(T-24)} ${f(x-2.4)} ${f(T-29)}M${f(x+5)} ${f(T-4.4)}C${f(x+8)} ${f(T-12)} ${f(x+7)} ${f(T-24)} ${f(x+2.4)} ${f(T-29)}" stroke-width="1.2"/><path d="M${f(x-10.6)} ${f(T-16)}Q${f(x)} ${f(T-13)} ${f(x+10.6)} ${f(T-16)}" stroke-width="1.3"/></g>`;
+   s+=`<path d="M${f(x-7)} ${f(T-1)}Q${f(x)} ${f(T+6)} ${f(x+7)} ${f(T-1)}Z" fill="url(#iron)" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>`;
+   s+=`<path d="M${f(x-9.5)} ${f(T-27)}Q${f(x)} ${f(T-38)} ${f(x+9.5)} ${f(T-27)}Q${f(x)} ${f(T-30)} ${f(x-9.5)} ${f(T-27)}Z" fill="url(#iron)" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>`;
+   s+=`<path d="M${f(x-2.6)} ${f(T-34)}L${f(x)} ${f(T-48)}L${f(x+2.6)} ${f(T-34)}Z" fill="#0b0e14" stroke="${INK}" stroke-width=".8"/>`;
+   s+=`<path d="M${f(x+1.6)} ${f(T-40)}${spiral({x:x+1.6,y:T-40},-30,3,1,1.1)}" fill="none" stroke="#0b0e14" stroke-width="1.3" stroke-linecap="round"/>`;
+   return s},
+  // A bracket from the collar at R out to an eyelet at E (s is -1 toward Jarvis, 1 toward GitDiscuss); `drop` lifts the hook above it.
+  armD(R,E,s,drop){const Ey=E.y-drop;
+   return `M${f(R.x+s*2)} ${f(R.y)}C${f(R.x+s*14)} ${f(R.y-15)} ${f(E.x-s*3)} ${f(Math.min(R.y,Ey)-24)} ${f(E.x)} ${f(Ey-8)}L${f(E.x)} ${f(Ey)}Q${f(E.x)} ${f(Ey+5.5)} ${f(E.x+s*4.2)} ${f(Ey+3.4)}`},
+  braceD(R,s){const p={x:R.x+s*13,y:R.y-1};return `M${f(R.x+s*2.5)} ${f(R.y+17)}C${f(R.x+s*15)} ${f(R.y+16)} ${f(R.x+s*19)} ${f(R.y+5)} ${f(p.x)} ${f(p.y)}${spiral(p,s<0?-45:-135,3.6,s<0?-1:1,1.1)}`},
+  under(c){
+   const jt=c.jt,G=this.geo(c),{mx,FY,Yt}=G;
+   let s=`<defs><filter id="lpBlur" x="-150%" y="-150%" width="400%" height="400%"><feGaussianBlur stdDeviation="3"/></filter><clipPath id="lpClip"><rect x="0" y="-200" width="1200" height="${FY+201}"/></clipPath>`+
+    `<radialGradient id="lpW"><stop stop-color="#ffe2a0" stop-opacity=".6"/><stop offset=".4" stop-color="#ffb648" stop-opacity=".2"/><stop offset="1" stop-color="#ffb648" stop-opacity="0"/></radialGradient>`+
+    `<radialGradient id="lpC"><stop stop-color="#e2edfb" stop-opacity=".55"/><stop offset=".4" stop-color="#8fb0dc" stop-opacity=".18"/><stop offset="1" stop-color="#8fb0dc" stop-opacity="0"/></radialGradient>`+
+    `<radialGradient id="lpWashW"><stop stop-color="#ffd98a" stop-opacity=".3"/><stop offset=".55" stop-color="#ffb648" stop-opacity=".08"/><stop offset="1" stop-color="#ffb648" stop-opacity="0"/></radialGradient>`+
+    `<radialGradient id="lpWashC"><stop stop-color="#d8e6f8" stop-opacity=".26"/><stop offset=".55" stop-color="#8fb0dc" stop-opacity=".07"/><stop offset="1" stop-color="#8fb0dc" stop-opacity="0"/></radialGradient></defs>`;
+   // Near: the spike of the finial noses up out of the fog.
+   if(jt===0){const g=c.glow;if(g<=0)return '';const ty=FY+2-16*g;
+    return s+`<g clip-path="url(#lpClip)"><circle cx="${f(mx)}" cy="${f(ty+6)}" r="${f(6+6*g)}" fill="url(#eyeGlow)" opacity="${f(.5*g)}"/><path d="M${f(mx-2.6)} ${f(ty+14)}L${f(mx)} ${f(ty)}L${f(mx+2.6)} ${f(ty+14)}Z" fill="#0b0e14" stroke="${INK}" stroke-width=".8"/><path d="M${f(mx-9.5)} ${f(ty+21)}Q${f(mx)} ${f(ty+10)} ${f(mx+9.5)} ${f(ty+21)}Z" fill="url(#iron)" stroke="${INK}" stroke-width="1.3"/></g>`}
+   const k=this.parts(jt),o=this.off(jt,G,k),T=Yt+o,lit=this.lit(k,jt),tone=this.tone();
+   if(lit>0){const bl=model.dir>0&&jt<1?1+.35*Math.sin(Math.PI*seg(k.lit,.5,.85)):1;s+=`<circle cx="${f(mx)}" cy="${f(T-16)}" r="${f(74*bl)}" fill="url(#${tone.g})" opacity="${f(lit)}"/>`}
+   // The rigid post, slid up out of the floor by o; only what is above the floor shows.
+   const mid=(Yt+FY-30)/2,knop=y=>`<ellipse cx="${f(mx)}" cy="${f(y+o)}" rx="4.8" ry="2.6" fill="url(#iron)" stroke="${INK}" stroke-width="1.1"/>`;
+   let p=iron(`M${f(mx)} ${f(T+2)}L${f(mx)} ${f(FY-30+o)}`,3.6);
+   p+=`<path d="M${f(mx-3.6)} ${f(FY-30+o)}L${f(mx+3.6)} ${f(FY-30+o)}L${f(mx+6.5)} ${f(FY-6+o)}L${f(mx+10)} ${f(FY+o)}H${f(mx-10)}L${f(mx-6.5)} ${f(FY-6+o)}Z" fill="url(#iron)" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round"/><path d="M${f(mx-7)} ${f(FY-6+o)}H${f(mx+7)}" stroke="${INK}" stroke-width="1.2"/><path d="M${f(mx-2)} ${f(FY-27+o)}L${f(mx-4.4)} ${f(FY-7+o)}" stroke="#8b9ab0" stroke-width=".8" opacity=".5"/>`;
+   p+=knop(Yt+20)+knop(mid)+`<path d="M${f(mx)} ${f(mid-7+o)}L${f(mx+3.4)} ${f(mid+o)}L${f(mx)} ${f(mid+7+o)}L${f(mx-3.4)} ${f(mid+o)}Z" fill="#0b0e14" stroke="${INK}" stroke-width=".8"/>`;
+   p+=this.lantern(mx,T,lit,tone);
+   s+=`<g clip-path="url(#lpClip)"><g filter="url(#wobW)" fill="none" stroke-linecap="round">${p}</g></g>`;
+   // Its scrolled feet unfold once it is standing.
+   if(k.feet>0)s+=`<g fill="none" stroke-linecap="round" filter="url(#wobW)">${[-1,1].map(d=>iron(`M${f(mx+d*7)} ${f(FY-2)}Q${f(mx+d*14)} ${f(FY-1)} ${f(mx+d*17)} ${f(FY-6)}${spiral({x:mx+d*17,y:FY-6},d<0?-110:-70,3.4,d<0?1:-1,1)}`,2.2,k.feet)).join('')}</g>`;
+   // A puff of fog and grit where it breaks the ground, rising or sinking.
+   const pu=model.dir>0&&jt<1?seg(jt,.33,.5):model.dir<0&&jt<1?seg(1-jt,.38,.52):0;
+   if(pu>0&&pu<1){const e=ease(pu);
+    for(const d of [-1,1])s+=`<ellipse cx="${f(mx+d*(8+30*e))}" cy="${f(FY-4-4*e)}" rx="${f(12+22*e)}" ry="${f(4+4*e)}" fill="#8ea2bf" opacity="${f(.4*(1-pu))}" filter="url(#lpBlur)"/>`;
+    for(let i=0;i<6;i++){const a=(-160+i*28)*Math.PI/180,v=42+i%3*14;s+=`<circle cx="${f(mx+Math.cos(a)*v*pu)}" cy="${f(FY-3+Math.sin(a)*v*pu+70*pu*pu)}" r="${f(1.6-i%2*.5)}" fill="#0b0e14" opacity="${f(1-pu)}"/>`}}
+   return s},
+  nudge(jt,dir){if(dir>0&&jt>.72&&jt<.8)return 2.4*Math.sin(Math.PI*seg(jt,.72,.8));if(dir<0&&jt<1){const u=seg(1-jt,.1,.16);return u>0&&u<1?-1.6*Math.sin(Math.PI*u):0}return 0},
+  over(c){
+   const jt=c.jt,G=this.geo(c),{mx,FY,Yt,ea,eb}=G,ghost=d=>`<path d="${d}" fill="none" stroke="#e9edf1" stroke-width="1.5" stroke-dasharray="2.5 4" stroke-linecap="round" opacity=".5"/>`;
+   if(jt===0){const g=c.glow;if(g<=0)return '';let s=glints([ea,eb],g);
+    if(g>=1){const R={x:mx,y:Yt+20};s+=ghost(`M${f(mx)} ${f(FY)}V${f(Yt)}`)+ghost(this.armD(R,ea,-1,0))+ghost(this.armD(R,eb,1,0))+
+     ghost(`M${f(mx)} ${f(Yt-3)}C${f(mx-12)} ${f(Yt-6)} ${f(mx-11)} ${f(Yt-26)} ${f(mx)} ${f(Yt-30)}C${f(mx+11)} ${f(Yt-26)} ${f(mx+12)} ${f(Yt-6)} ${f(mx)} ${f(Yt-3)}M${f(mx)} ${f(Yt-34)}V${f(Yt-48)}`)+
+     `<circle cx="${f(mx)}" cy="${f(Yt-15)}" r="16" fill="url(#eyeGlow)" opacity=".35"/>`}
+    return s}
+   const k=this.parts(jt),o=this.off(jt,G,k),T=Yt+o,lit=this.lit(k,jt),tone=this.tone(),R={x:mx,y:Yt+20+o};let s='';
+   // The lamp's light falls on both shells.
+   if(lit>0)s+=`<ellipse cx="${f(mx)}" cy="${f(T+8)}" rx="150" ry="110" fill="url(#${tone.w})" opacity="${f(lit)}"/>`;
+   // The brackets grow out from the collar, then their hooks drop into the eyelets.
+   if(k.arms>0){const dr=model.dir>0&&jt<1?7*(1-backOut(k.hook)):7*(1-k.hook);let a='';
+    for(const[E,sd]of [[ea,-1],[eb,1]])a+=iron(this.braceD(R,sd),2.2,seg(k.arms,.35,1))+iron(this.armD(R,E,sd,dr),3,k.arms);
+    s+=`<g filter="url(#wobW)" fill="none" stroke-linecap="round" stroke-linejoin="round">${a}</g>`+`<ellipse cx="${f(mx)}" cy="${f(R.y)}" rx="4.8" ry="2.6" fill="url(#iron)" stroke="${INK}" stroke-width="1.1"/>`}
+   if(model.dir>0&&jt<1){const u=seg(k.hook,.45,1);if(u>0&&u<1)s+=spark(ea,1-u,4+6*u)+spark(eb,1-u,4+6*u)}
+   if(model.dir<0&&jt<1){const u=seg(1-jt,.1,.16);if(u>0&&u<1)s+=spark(ea,1-u,3+5*u)+spark(eb,1-u,3+5*u)}
+   // Motes rise from the lamp once it catches.
+   if(model.dir>0&&jt<1){const v=seg(jt,.88,1);if(v>0&&v<1)[[-1,0],[1,.25],[.3,.5]].forEach(([d,ph])=>{const w=seg(v,ph*.5,ph*.5+.5);if(w>0&&w<1)s+=`<circle cx="${f(mx+d*(6+8*w)+3*Math.sin(w*9))}" cy="${f(T-24-46*w)}" r="1.4" fill="${tone.core}" opacity="${f(1-w)}"/>`})}
+   // Snuffed: a curl of smoke leaves the spike.
+   if(model.dir<0&&jt<1){const v=seg(1-jt,.04,.3);if(v>0&&v<1){const y=T-48-26*v;s+=`<path d="M${f(mx)} ${f(y+14)}q-5 -6 0 -11t0 -11q4 -4 1 -9" fill="none" stroke="#c9d6e6" stroke-width="${f(2.2-v)}" stroke-linecap="round" opacity="${f(.55*(1-v))}" filter="url(#lpBlur)"/><path d="M${f(mx)} ${f(y+14)}q-5 -6 0 -11t0 -11q4 -4 1 -9" fill="none" stroke="#e9edf1" stroke-width=".8" stroke-linecap="round" opacity="${f(.6*(1-v))}"/>`}}
+   if(jt===1){const x0=mx-17,y0=T-52,ht=model.a.y+c.h-y0;
+    s+=`<g class="hit lamphit" id="seamHit" tabindex="0" role="button" aria-label="Lamppost: tap the lantern, push it down, or press Enter, to separate the widgets"><title>Tap the lantern, or push it down, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="34" height="${f(ht)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="34" height="${f(ht)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -1376,7 +1478,7 @@ function render(){
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
  const focused=document.activeElement&&document.activeElement.id==='seamHit';
- $('#over').innerHTML=j.over(c);
+ $('#under').innerHTML=j.under?j.under(c):'';$('#over').innerHTML=j.over(c);
  if(j.live)keepTicking();
  const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{const ar={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];
   if(e.key==='Enter'||e.key===' '){e.preventDefault();J().key()}else if(ar&&J().arrow){e.preventDefault();J().arrow(ar)}};if(focused)hit.focus()}
