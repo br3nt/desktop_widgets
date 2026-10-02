@@ -106,7 +106,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -130,7 +130,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -171,7 +171,10 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="crTop" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#cfc3a8"/><stop offset="1" stop-color="#eee5d0"/></linearGradient>
  <linearGradient id="crSlab" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#a99b7f"/><stop offset="1" stop-color="#776a54"/></linearGradient>
  <linearGradient id="pshade" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#2a1d10" stop-opacity=".42"/><stop offset=".28" stop-color="#fff8e8" stop-opacity=".3"/><stop offset=".55" stop-color="#fff8e8" stop-opacity="0"/><stop offset="1" stop-color="#2a1d10" stop-opacity=".5"/></linearGradient>
- <linearGradient id="pniche" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0f0a07"/><stop offset=".6" stop-color="#241910"/><stop offset="1" stop-color="#3b2b1c"/></linearGradient>
+ <linearGradient id="rgRoll" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6eed8"/><stop offset=".28" stop-color="#e2d5b6"/><stop offset=".7" stop-color="#ad9d7e"/><stop offset="1" stop-color="#5f5140"/></linearGradient>
+ <linearGradient id="rgPurb" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#23231f"/><stop offset=".2" stop-color="#5f5f53"/><stop offset=".33" stop-color="#a3a18c"/><stop offset=".48" stop-color="#4a4a40"/><stop offset=".85" stop-color="#2b2b25"/><stop offset="1" stop-color="#151512"/></linearGradient>
+ <linearGradient id="rgSide" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#000" stop-opacity=".5"/><stop offset=".32" stop-color="#000" stop-opacity="0"/><stop offset=".62" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
+ <linearGradient id="pniche"x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0f0a07"/><stop offset=".6" stop-color="#241910"/><stop offset="1" stop-color="#3b2b1c"/></linearGradient>
 </defs></svg>
 <header><div><h1>Gothic cathedral <span>/ Claude skin study</span></h1><p>Weathered limestone facades with pinnacles and cresting, lit windows of clear quarry glass in coloured borders, carved bosses. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -257,7 +260,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
-$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg>'));
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -1554,7 +1557,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -1569,7 +1572,10 @@ const SHADES={
   about:'The facade goes down into the crypt. First the display goes dark and a run of ledger slabs rises a course round the foot of the wall, a little wider than the facade, with gilt studs at the joints. Stone tracery is built up in the dark window from the sill, fresh mortar and grit along its edge, dividing it into a row of tall pointed lights, each with a jewel roundel of ruby, blue or green glass in its head. The lights kindle together with a flare: warm amber, or cold blue when Jarvis is paused. Then the whole facade sinks into a slot in the floor with grit squeezed out along it, and settles with a puff. <b>The floor stays where the wall stood:</b> the strip keeps its foot on the same line, so the wall visibly goes down (and on unshading, comes back up). What stays above the floor is the cresting and pinnacles, the frieze with the name and the key value, and the pointed heads of the lights, glowing, with their light leaking up the slot and pooling on the floor in front. Unshading plays it back, and joins still work on the shaded pair.'},
  drum:{label:'Inscription drum',kind:'Turn',ms:2600,h:small=>small?52:62,lowAt:[0,.42],
   on:'Shaded: the wall lowers, a channel opens under the frieze and a carved stone drum spins on its gilt spindles and settles on the current line. Click it to turn it.',off:'Unshaded: the drum spins back into its channel, the channel closes and the wall rises.',
-  about:'The strip is a carved stone drum, like a lettered roller turning in a wall. The wall lowers to its frieze, which keeps the name. Under it a channel opens in the stone, and a pale limestone cylinder on two gilt spindles spins in it, slowing over two turns until it settles with a small rebound on the line the widget was showing. <b>Each face of the drum is one line, cut in capitals,</b> with its number or label picked out in red the way scribes rubricated a heading: Jarvis carries its agent count, its task and its last log entry; GitDiscuss its queue, its thread and its log; Checks its pass count, what is waiting and the run. The lines are the widget\'s own screens, so turning the drum also turns the page that shows when you unshade. Click or tap the drum, or focus it and press Enter or the arrow keys, to turn it one line, with weight; the faces above and below roll over the top and under the bottom of the channel, and three small lozenges at its end mark which line is up. It never turns by itself. Joins still work on the shaded pair.'}
+  about:'The strip is a carved stone drum, like a lettered roller turning in a wall. The wall lowers to its frieze, which keeps the name. Under it a channel opens in the stone, and a pale limestone cylinder on two gilt spindles spins in it, slowing over two turns until it settles with a small rebound on the line the widget was showing. <b>Each face of the drum is one line, cut in capitals,</b> with its number or label picked out in red the way scribes rubricated a heading: Jarvis carries its agent count, its task and its last log entry; GitDiscuss its queue, its thread and its log; Checks its pass count, what is waiting and the run. The lines are the widget\'s own screens, so turning the drum also turns the page that shows when you unshade. Click or tap the drum, or focus it and press Enter or the arrow keys, to turn it one line, with weight; the faces above and below roll over the top and under the bottom of the channel, and three small lozenges at its end mark which line is up. It never turns by itself. Joins still work on the shaded pair.'},
+ rings:{label:'Shaft rings',kind:'Cinch',ms:3200,h:small=>small?46:60,lowAt:[0,.5],
+  on:'Shaded: roll mouldings swell out of the wall and pack together as the wall lowers, then dark marble shaft rings drop on and cinch the sheaf; the middle collar lights with the value.',off:'Unshaded: the collar goes dark, the rings loosen and lift away, and the rolls spread back into a wall.',
+  about:'In Early English churches (Salisbury, Lincoln, the Temple Church) slender shafts were bound to the piers by <i>shaft rings</i>, annulets of dark, polished Purbeck marble that look as if they were tightened round the stone. Here they bind the whole facade. As the wall lowers, its face breaks into round roll mouldings, thin at first and swelling, and because they stay evenly spaced over whatever wall is left, lowering the wall is what packs them: they close up and meet with a jolt and a puff of grit along the beds, a tight sheaf of rolls running between the end piers. Then the rings come down one at a time, left, right, then the collar in the middle: each drops on loose with a small bounce, then tightens, and the sheaf is drawn in under it and bulges between, the way a bundle gathers under a cord. Grit squeezes out at each ring\'s edge and a glint runs round its gilt fillet. The middle collar is wider and holds a pointed pane of quarry glass, which kindles with a flare (warm while the widget runs, cold if it is paused) and shows the key value in dark ink. <b>The strip is the bound sheaf:</b> the name in the frieze, the cinched rolls, two shaft rings and the lit collar. Unshading plays it back, and joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -1802,6 +1808,59 @@ function cornice(id,w,h,k){
  if(c>0){const fs=sm?10.5:12,ls=sm?2.6:3.2,nx=L+15,ny=sm?18:22.4,txt=Z.name.toUpperCase(),nw=textW(txt,`${fs}px Georgia,serif`)+ls*txt.length,xe=nx+nw*c;
   s+=`<defs><clipPath id="cnn-${id}"><rect x="${nx-4}" y="0" width="${f(nw*c+4)}" height="${fb}"/></clipPath></defs><g clip-path="url(#cnn-${id})" font-family="Georgia,serif" font-size="${fs}" letter-spacing="${ls}"><text x="${nx}" y="${f(ny+.9)}" fill="#f6eedc" opacity=".75">${txt}</text><text x="${nx}" y="${ny}" fill="#33281d">${txt}</text></g>`;
   if(c<1){const per=txt.length*c,li=Math.floor(per);s+=JOINS.buttress.dust(xe,ny-4,per-li,4,sm?6:8,li+120)}}
+ return s;
+}
+
+/* Shaft rings: roll mouldings swell out of the wall, spaced evenly over the wall that's left, so lowering the wall packs them;
+   then Purbeck marble annulets drop on and cinch the sheaf, drawing it in under each ring. */
+function rgGeo(id,w,h){const sm=id==='c',s=SK[id],top=sm?5:8,fb=top+2+(sm?14:17),L=s.join==='l'?JP:sm?16:20,Rw=s.join==='r'?JP:sm?16:20;
+ return{sm,xa:L-1,xb:w-Rw+1,n:sm?3:4,d:sm?6:6.5,y0:fb+3,y1:h-4}}
+// Two narrow rings and the wide collar that holds the value pane; s is when each starts in the shade's run.
+function rgRings(id,G){const[,num,val]=tpText(id),fs=G.sm?10:11,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`),sp=G.xb-G.xa,rw=G.sm?8:9.5;
+ return[{x:G.xa+sp*.13,w:rw,s:.5},{x:G.xb-sp*.13,w:rw,s:.58},{x:(G.xa+G.xb)/2,w:tw+(G.sm?26:32),s:.66,collar:true,num,val,fs,tw}]}
+// How far the sheaf is drawn in at x: full under a ring, falling off over 12px beyond its edges.
+const rgPinch=(x,R)=>Math.min(1,R.reduce((a,r)=>{const o=Math.max(0,Math.abs(x-r.x)-r.w/2);return a+r.p*Math.exp(-(o/12)*(o/12))},0));
+const rgRnd=i=>{const v=Math.sin(i*12.9898)*43758.5453;return v-Math.floor(v)};
+function rings(id,w,h,k){
+ const G=rgGeo(id,w,h),{sm,xa,xb,n,d,y0,y1}=G,R=rgRings(id,G),cold=id!=='c'&&!model[id].run,P=.17,dust=JOINS.buttress.dust;
+ R.forEach(r=>{r.t=seg(k,r.s,r.s+.17);r.p=ease(seg(r.t,.45,1))});
+ const sp=Math.max(d,(y1-y0)/n),g=ease(seg(k,.14,.42)),th=d*lerp(.2,1,g),op=seg(k,.12,.22),bump=-1.3*Math.sin(Math.PI*seg(k,.5,.58)),yc=(y0+y1)/2+bump;
+ const xs=[];for(let x=xa;x<xb;x+=4)xs.push(x);xs.push(xb);const pin=xs.map(x=>rgPinch(x,R));
+ const line=pts=>'M'+pts.map(p=>f(p[0])+' '+f(p[1])).join('L');
+ let rolls='',hi='',lo='';
+ for(let i=0;i<n;i++){const yi=y0+bump+sp*(i+.5),T=[],B=[],Hh=[],Lo=[];
+  xs.forEach((x,j)=>{const q=1-P*pin[j],y=yc+(yi-yc)*q,t=th*q/2;T.push([x,y-t]);B.push([x,y+t]);Hh.push([x,y-t*.42]);Lo.push([x,y+t*.82])});
+  rolls+=`<path d="${line(T)}L${line(B.reverse()).slice(1)}Z"/>`;hi+=line(Hh);lo+=line(Lo)}
+ // The recess behind the rolls darkens as they close up, so the joints between them read as deep undercuts.
+ let s=`<rect x="${f(xa)}" y="${f(y0-1)}" width="${f(xb-xa)}" height="${f(y1-y0+2)}" fill="#1f160d" opacity="${f(.9*seg(k,.3,.5))}"/>`;
+ s+=`<g opacity="${f(op)}"><g fill="url(#rgRoll)" filter="url(#st-v)">${rolls}</g><path d="${hi}" fill="none" stroke="#fffaf0" stroke-opacity=".55" stroke-width="${f(.4+.5*g)}"/><path d="${lo}" fill="none" stroke="#2a1d10" stroke-opacity=".45" stroke-width="${f(.4+.4*g)}"/>`+
+  // The rolls die into the end piers, and the frieze throws a shadow down onto them.
+  `<path d="M${f(xa)} ${f(y0-1)}V${f(y1+1)}M${f(xb)} ${f(y0-1)}V${f(y1+1)}" stroke="#2a1d10" stroke-opacity=".5" stroke-width="1.2"/><rect x="${f(xa)}" y="${f(y0-1)}" width="${f(xb-xa)}" height="4" fill="url(#tpShT)" opacity=".35"/></g>`;
+ // Packed: grit squeezes out along the beds.
+ const pk=seg(k,.46,.62);if(pk>0&&pk<1)for(const p of[.2,.5,.8])s+=dust(lerp(xa,xb,p),y1,pk,3,8,40+p*10)+dust(lerp(xa,xb,p+.08),y0,pk,2,6,60+p*10);
+ const half=(y1-y0)/2;
+ for(const r of R){if(r.t<=0)continue;
+  // The ring shows almost at once so its fall reads; loose, it still never hangs past the strip's foot.
+  const yo=-18*(1-backOut(seg(r.t,0,.45))),ro=seg(r.t,0,.05),hh=Math.min(lerp(half+5,half*(1-P)+2.6,r.p),h-1-yc-Math.max(0,yo)),x0=r.x-r.w/2,x1=r.x+r.w/2,yt=yc-hh+yo,yb=yc+hh+yo,rx=r.collar?3:r.w*.36;
+  let o=`<rect x="${f(x1)}" y="${f(yt+2)}" width="3" height="${f(yb-yt-4)}" fill="#000" opacity=".22"/>`;
+  o+=`<rect x="${f(x0)}" y="${f(yt)}" width="${f(r.w)}" height="${f(yb-yt)}" rx="${rx}" fill="url(#rgPurb)" stroke="#11110e" stroke-width=".8"/>`;
+  if(!r.collar)o+=`<rect x="${f(x0)}" y="${f(yt)}" width="${f(r.w)}" height="${f(yb-yt)}" rx="${rx}" fill="url(#rgSide)"/>`;
+  // Shelly flecks in the marble
+  const nf=Math.round(r.w/3.2);for(let i=0;i<nf;i++){const a=rgRnd(i+r.x),b=rgRnd(i*3.1+r.x+7);o+=`<circle cx="${f(x0+1.5+a*(r.w-3))}" cy="${f(yt+2+b*(yb-yt-4))}" r="${f(.35+.35*rgRnd(i+9.3))}" fill="#c9c4a8" opacity=".38"/>`}
+  // Gilt fillets: a bead round the middle of each ring, and at both edges of the collar
+  const gx=r.collar?[x0+2.6,x1-2.6]:[r.x];o+=gx.map(x=>`<path d="M${f(x)} ${f(yt+1.4)}V${f(yb-1.4)}" stroke="url(#gild)" stroke-width="${r.collar?1.3:1.1}"/>`).join('');
+  o+=`<path d="M${f(x0+rx*.6)} ${f(yt+.7)}H${f(x1-rx*.6)}" stroke="#e8e6d4" stroke-opacity=".5" stroke-width=".7"/>`;
+  if(r.collar){const pw=r.tw+(sm?14:18),ph=sm?12:14,px0=r.x-pw/2,px1=r.x+pw/2,pm=yc+yo,pt=pm-ph/2,pb=pm+ph/2,e=ph*.45,
+    pane=`M${f(px0)} ${f(pm)}L${f(px0+e)} ${f(pt)}H${f(px1-e)}L${f(px1)} ${f(pm)}L${f(px1-e)} ${f(pb)}H${f(px0+e)}Z`,l=seg(k,.8,.88),fl=Math.sin(Math.PI*l),tx=seg(k,.86,.96);
+   o+=`<path d="${pane}" fill="#16131f" stroke="#0c0b09" stroke-width="2.4"/>`;
+   if(l>0){o+=`<path d="${pane}" fill="url(#${cold?'cnCold':'cnLit'})" opacity="${f(l)}"/>`;if(fl>.02&&l<1)o+=`<path d="${pane}" fill="#fffbe8" opacity="${f(.8*fl)}"/>`;
+    o+=`<g style="mix-blend-mode:screen" opacity="${f(.5*l)}"><path d="${pane}" fill="${cold?'#9db4ff':'#ffcf6a'}" filter="url(#lglow)"/></g>`}
+   o+=`<path d="${pane}" fill="none" stroke="url(#gild)" stroke-width=".9"/>`;
+   if(tx>0)o+=`<text x="${f(r.x-r.tw/2)}" y="${f(pm+r.fs*.36)}" font-family="Georgia,serif" font-size="${r.fs}" opacity="${f(tx)}"><tspan font-weight="700" font-size="${r.fs+1}" fill="#8e1f2b">${r.num}</tspan><tspan font-style="italic" fill="#3b2c1f"> ${r.val}</tspan></text>`}
+  s+=`<g opacity="${f(ro)}">${o}</g>`;
+  // Tightening: grit squeezes out at the ring's edges, then a glint runs round its fillet.
+  const gt=seg(r.t,.42,.8);if(gt>0&&gt<1)s+=dust(x0-1,yc-hh,gt,2,6,r.x)+dust(x1+1,yc+hh,gt,2,6,r.x+3);
+  const gl=Math.sin(Math.PI*seg(r.t,.8,1));if(gl>.05)s+=`<g opacity="${f(gl)}">${sparkle(gx[0],yt+3+(yb-yt-6)*(1-seg(r.t,.8,1)),gl*5)}</g>`}
  return s;
 }
 
@@ -2542,7 +2601,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -2573,7 +2632,10 @@ function render(){
    else if(n.style.transform){n.style.transform='';n.style.clipPath=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):strip);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);
+  const gs=el.querySelector('.rgsvg'),gkey=rg?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.b.run}`:'';
+  if(gs.dataset.key!==gkey){gs.dataset.key=gkey;gs.setAttribute('width',w);gs.setAttribute('height',h);gs.setAttribute('viewBox',`0 0 ${w} ${h}`);gs.innerHTML=gkey?rings(id,w,h,k):''}
   const ns=el.querySelector('.cnsvg'),nkey=cn?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(ns.dataset.key!==nkey){ns.dataset.key=nkey;ns.setAttribute('width',w);ns.setAttribute('height',h);ns.setAttribute('viewBox',`0 0 ${w} ${h}`);ns.innerHTML=nkey?cornice(id,w,h,k):''}
   const ts=el.querySelector('.tpsvg'),tkey=tp&&model.st>0?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
