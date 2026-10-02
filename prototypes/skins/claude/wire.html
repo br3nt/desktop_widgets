@@ -1318,9 +1318,9 @@ function strandItem(it,x,cy,small){
 // g runs -1 pendant, 0 cabochon, 1 branch with two displays, 2 hoop tree. Every frame is drawn from g alone, so shrinking is growth played backwards.
 const MORPHS={
  tree:{label:'Tree growth',kind:'Grow',sizes:[['pendant','Pendant',-1],['cab','Cabochon',0],['branch','Branch',1],['hoop','Hoop tree',2]],slider:'Checks growth, pendant to hoop tree',
-  about:'Checks grows like a wire tree of life. <b>Cabochon:</b> the pendant\'s frame closes in on its stone, the plate falls away, and the coils wind round the stone from the bottom up, leaving one cabochon hanging from a bail with the name on a slab tag below it. <b>Branch:</b> a twisted trunk grows down into a tumbled amethyst, the stone slides out along a branch to one side, and a second branch reaches the other way. A bezel coils round at its tip and a second stone fills it, so the two values each get a display. <b>Hoop tree:</b> the trunk\'s five wires fan out into roots, a copper hoop draws round from the bottom to meet them, and each root wraps onto it. A third branch grows up to a crown display, then fourteen twigs push out from behind the displays with a bead riding each tip, one per check: malachite for the 12 passed, carnelian for the 2 waiting. Shrinking plays it all backwards: the beads slide home, the branches draw in and the hoop unwinds. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a tree folds it back to its cabochon, which carries the name and the count.'},
+  about:'Checks grows like a wire tree of life. <b>Cabochon:</b> the pendant\'s frame closes in on its stone, the plate falls away, and the coils wind round the stone from the bottom up, leaving one cabochon hanging from a bail with the name on a slab tag below it. <b>Branch:</b> a twisted trunk grows down into a tumbled amethyst, the stone slides out along a branch to one side, and a second branch reaches the other way. A bezel coils round at its tip and a second stone fills it, so the two values each get a display. <b>Hoop tree:</b> the trunk\'s five wires fan out into roots, a copper hoop draws round from the bottom to meet them, and each root wraps onto it. A third branch grows up to a crown display, then fourteen twigs push out from behind the displays with a bead riding each tip, one per check: malachite for the 12 passed, carnelian for the 2 waiting. Shrinking plays it all backwards: the beads slide home, the branches draw in and the hoop unwinds. Pick a size, press M to step through them, or scrub the slider. Checks never grows over the pair: it moves below, beside or above it, whichever has room. When none does (the hoop beside a pair across the middle of the stage), Checks takes the floor and the pair rises just enough to clear it, then settles back as Checks shrinks. Move the pair by hand and it stays where you put it. Shading a tree folds it back to its cabochon, which carries the name and the count.'},
  bezel:{label:'Bezel resize',kind:'Resize',sizes:[['pendant','Pendant',-1],['brooch','Brooch',0],['slab','Slab',1]],slider:'Checks size, pendant to slab',
-  about:'Checks stays one stone in one coiled bezel; only the stone changes size. Each step plays in three beats. <b>Loosen:</b> the tight coil turns spread apart and stand off the stone, so you see the spring\'s back turns and a dark gap all round. <b>Grow:</b> the stone and the copper frame swell together with a small spring, while the old text fades. <b>Tighten:</b> the coils close up onto the new edge, glint where they bite, and the new layout fades in. <b>Brooch:</b> the run number, a large 12 / 14, the 86% and a row of fourteen beads, one per check. <b>Slab:</b> adds the checks themselves, four rows with a stone each (malachite passed, carnelian waiting on Brent), and a tally strand of fourteen beads hangs under the status lens. Shrinking plays the same three beats in reverse. Pick a size, press M or scrub the slider; Checks moves below the pair when it would grow into it. Shading a grown Checks first shrinks it to the pendant, then shades it as usual.'}
+  about:'Checks stays one stone in one coiled bezel; only the stone changes size. Each step plays in three beats. <b>Loosen:</b> the tight coil turns spread apart and stand off the stone, so you see the spring\'s back turns and a dark gap all round. <b>Grow:</b> the stone and the copper frame swell together with a small spring, while the old text fades. <b>Tighten:</b> the coils close up onto the new edge, glint where they bite, and the new layout fades in. <b>Brooch:</b> the run number, a large 12 / 14, the 86% and a row of fourteen beads, one per check. <b>Slab:</b> adds the checks themselves, four rows with a stone each (malachite passed, carnelian waiting on Brent), and a tally strand of fourteen beads hangs under the status lens. Shrinking plays the same three beats in reverse. Pick a size, press M or scrub the slider; Checks never grows over the pair: it moves below, beside or above it, and when none has room it takes the floor and the pair rises to clear it, settling back as Checks shrinks. Shading a grown Checks first shrinks it to the pendant, then shades it as usual.'}
 };
 let SIZES=MORPHS.tree.sizes;
 const TC=[0,-44],TRR=120,FORK=[0,-12],TAG_Y=18;
@@ -1438,13 +1438,41 @@ const gEff=()=>model.morph==='bezel'?model.g:model.g>=0?model.g*(1-shadeK()):mod
 // The hoop is drawn early in its step, so that step's reach is front-loaded.
 function ext(g){if(model.morph==='bezel'){const F=bzAt(g+1).F;return[F[0]-6,F[0]+F[2]+6,F[1]-6,F[1]+F[3]+6]}const i=clamp(Math.floor(g+1),0,2),t=i===2?seg(g-1,0,.5):clamp(g+1-i);return EXT[i].map((v,k)=>lerp(v,EXT[i+1][k],t))}
 function clampC(){const e=ext(gEff());model.c.x=clamp(model.c.x+CW/2,10-e[0],1190-e[1])-CW/2;model.c.y=clamp(model.c.y+CH/2,46-e[2],590-e[3])-CH/2}
-// Where Checks should end up for form g: on the stage, and below the pair when it would grow into it and there is room.
-function morphSpot(to){
- const e=ext(to);let ax=clamp(model.c.x+CW/2,10-e[0],1190-e[1]),ay=clamp(model.c.y+CH/2,46-e[2],590-e[3]);
- const x0=Math.min(model.a.x,model.b.x),x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(model.a.y,model.b.y),yb=Math.max(model.a.y,model.b.y)+ctx().h;
- if(ax+e[1]>x0&&ax+e[0]<x1&&ay+e[2]<yb+10&&ay+e[3]>y0){const y=yb+10-e[2];if(y<=590-e[3])ay=y}
- return{x:ax-CW/2,y:ay-CH/2};
+// The pair's box with a margin, measured where it stood before any lift it was given to make room for Checks.
+// It is measured unshaded (a grown Checks unshades the pair first) and includes GitDiscuss's swing on an angled join.
+function pairBox(){const L=model.lift,s=pivotOn()?pivotSpan(model.angle,H):[0,H],y=Math.min(model.a.y,model.b.y)+L;
+ return{x0:Math.min(model.a.x,model.b.x)-10,x1:Math.max(model.a.x,model.b.x)+W+10,y0:y+s[0]-10,y1:Math.max(model.a.y,model.b.y)+L+s[1]+10}}
+// How far the pair has to rise (from where it stood) to clear Checks in form g centred at cx,cy, when Checks reaches below it; never past the top of the stage.
+function clearLift(g,cx,cy){
+ const e=ext(g),p=pairBox();
+ if(cx+e[1]<=p.x0||cx+e[0]>=p.x1||cy+e[2]>=p.y1||cy+e[3]<=p.y1)return 0;
+ return clamp(p.y1-(cy+e[2]),0,Math.max(0,p.y0+10-46));
 }
+// Where Checks should end up for form g: on the stage and clear of the pair, on the nearest side (below, beside or above) with room.
+// When none has room (a hoop tree beside a pair across the middle of the stage), Checks takes the floor and the pair rises to make way.
+function morphSpot(to){
+ const e=ext(to),{x0,x1,y0,y1}=pairBox();
+ let ax=clamp(model.c.x+CW/2,10-e[0],1190-e[1]),ay=clamp(model.c.y+CH/2,46-e[2],590-e[3]);
+ if(ax+e[1]>x0&&ax+e[0]<x1&&ay+e[2]<y1&&ay+e[3]>y0){
+  const C=[[ax,y1-e[2]],[x1-e[0],ay],[x0-e[1],ay],[ax,y0-e[3]]].filter(([x,y])=>x>=10-e[0]&&x<=1190-e[1]&&y>=46-e[2]&&y<=590-e[3]);
+  if(C.length)[ax,ay]=C.reduce((p,q)=>Math.hypot(q[0]-ax,q[1]-ay)<Math.hypot(p[0]-ax,p[1]-ay)?q:p);else ay=590-e[3];
+ }
+ return{x:ax-CW/2,y:ay-CH/2,lift:clearLift(to,ax,ay)};
+}
+// Eases the pair's lift to L over ms after a delay. The pair moves as one, along with any running join path.
+let liftAnim=0;
+function shiftPair(d){for(const id of ['a','b'])model[id].y-=d;const p=model.path;if(p)for(const k of ['s','j'])for(const id of ['a','b'])p[k][id].y-=d}
+function liftTo(L,ms,delay=0){
+ const tok=++liftAnim,L0=model.lift,t0=performance.now()+delay;
+ if(Math.abs(L-L0)<.5){shiftPair(L-L0);model.lift=L;return}
+ (function step(now){if(tok!==liftAnim)return;const t=reduce.matches||ms<=0?1:clamp((now-t0)/ms),v=lerp(L0,L,ease(t));
+  if(t>0){shiftPair(v-model.lift);model.lift=v;render()}if(t<1)requestAnimationFrame(step)})(performance.now());
+}
+const stopLift=()=>++liftAnim;
+// The lift Checks needs where it stands now; `keep` only lets the pair down, never raises it (for when Checks is moved by hand).
+function settleLift(ms=450,keep=false){const c=model.c,L=clearLift(gEff(),c.x+CW/2,c.y+CH/2);liftTo(keep?Math.min(model.lift,L):L,ms)}
+// The pair was moved by hand: it stays where it was put, and any lift is forgotten.
+function pairPlaced(){stopLift();model.lift=0;model.placed++}
 let morphAnim=0;
 function morphTo(id,then){
  if(drag)cancelDrag();model.cMoved=false;
@@ -1455,7 +1483,10 @@ function morphTo(id,then){
  let wait=0;if(model.st>.5&&(to>-1||from>-1)){toggleShade();if(model.morph==='bezel'&&!reduce.matches)wait=SHADES[model.shade].ms||520}
  const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(model.morph==='bezel'?(to>from?2300:1900):to>from?1900:1250),a0={x:model.c.x,y:model.c.y},a1=morphSpot(to),t0=performance.now()+wait;
  say(to>from?'Checks grows into a '+S[1].toLowerCase()+'.':to<from?'Checks shrinks back to a '+S[1].toLowerCase()+'.':'Checks is already a '+S[1].toLowerCase()+'.');
- (function step(now){if(tok!==morphAnim)return;const t=ms?clamp((now-t0)/ms):1,e=ease(t);model.g=t<1?lerp(from,to,t):to;if(drag&&drag.id==='c'||model.cMoved){model.cMoved=false;a0.x=a1.x=model.c.x;a0.y=a1.y=model.c.y}else{model.c.x=lerp(a0.x,a1.x,e);model.c.y=lerp(a0.y,a1.y,e)}render();if(t<1)requestAnimationFrame(step);else if(then)then()})(performance.now());
+ // Growing: the pair rises out of the way first. Shrinking: it settles back once Checks is smaller (below).
+ const placed=model.placed;if(a1.lift>model.lift){liftTo(a1.lift,Math.min(700,ms||0),wait);if(a1.lift>.5)say('Checks grows into a '+S[1].toLowerCase()+'; the pair rises to make room.')}
+ (function step(now){if(tok!==morphAnim)return;const t=ms?clamp((now-t0)/ms):1,e=ease(t);model.g=t<1?lerp(from,to,t):to;if(drag&&drag.id==='c'||model.cMoved){model.cMoved=false;a0.x=a1.x=model.c.x;a0.y=a1.y=model.c.y}else{model.c.x=lerp(a0.x,a1.x,e);model.c.y=lerp(a0.y,a1.y,e)}render();
+  if(t<1)requestAnimationFrame(step);else{if(model.placed===placed&&!(drag&&!drag.unwind&&drag.id!=='c'&&drag.mode!=='angle'))settleLift();if(then)then()}})(performance.now());
 }
 function treeRender(el,svg){
  const g=gEff(),u=clamp(g+1),out=1-seg(u,0,.35),mini=el.querySelector('.mini'),gr=el.querySelector('.grip');
@@ -1550,7 +1581,7 @@ function bezelRender(el,svg){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -1580,13 +1611,13 @@ async function doJoin(fixed='a',ms=1500){
  if(model.jt===1)return;
  if(!model.path||model.jt===0)model.path={s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose(fixed)};
  const j=J();say(j.sayJoin);
- if(await tween(model.jt,1,ms*(j.slow||1)*(1-model.jt),setJt)){model.path=null;say(j.sayJoined)}
+ if(await tween(model.jt,1,ms*(j.slow||1)*(1-model.jt),setJt)){model.path=null;settleLift();say(j.sayJoined)}
 }
 async function doSeparate(){
  if(model.jt===0)return;
  if(model.jt===1||!model.path)model.path={s:separatePose(),j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}};
  const j=J();say(j.sayRelease);
- if(await tween(model.jt,0,1100*(j.slow||1)*model.jt,setJt)){model.path=null;say('Separate. Displays and pages were not touched.')}
+ if(await tween(model.jt,0,1100*(j.slow||1)*model.jt,setJt)){model.path=null;settleLift();say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
  ++anim;model.busy=false;
@@ -1599,6 +1630,8 @@ function toggleShade(){
  const to=model.st>.5?0:1;const start=model.st;const token=++shadeAnim;
  // Shade runs on its own clock so it can overlap a join.
  const t0=performance.now(),ms=reduce.matches?0:(SHADES[model.shade].ms||520)*Math.abs(to-start);
+ // Unshading regrows a shaded tree from its cabochon, so the pair makes room for it again.
+ if(!to&&model.morph==='tree'&&model.g>0){const c=model.c;liftTo(Math.max(model.lift,clearLift(model.g,c.x+CW/2,c.y+CH/2)),ms)}
  (function step(now){if(token!==shadeAnim)return;const t=ms?clamp((now-t0)/ms):1;model.st=lerp(start,to,t);render();if(t<1)requestAnimationFrame(step)})(t0);
  say(to?(SHADES[model.shade].sayOn||'Shaded: frames close down to a strip with the name and one value.'):'Unshaded.');
 }
@@ -1691,7 +1724,7 @@ options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#m
 $('#grow').oninput=e=>{
  // A shaded bezel unshades before it grows, so the slider hands over to the nearest size.
  if(model.morph==='bezel'&&model.st>.5&&model.g===-1){const v=e.target.value/100;if(v>-1)morphTo(SIZES.reduce((a,b)=>Math.abs(b[2]-v)<Math.abs(a[2]-v)?b:a)[0]);return}
- ++morphAnim;model.g=e.target.value/100;const S=SIZES.find(x=>Math.abs(x[2]-model.g)<.001);model.size=S?S[0]:null;if(model.st>.5&&model.g>-1)toggleShade();render()};
+ ++morphAnim;model.g=e.target.value/100;const S=SIZES.find(x=>Math.abs(x[2]-model.g)<.001);model.size=S?S[0]:null;if(model.st>.5&&model.g>-1)toggleShade();render();settleLift(0)};
 $('#scrub').oninput=e=>{++anim;model.busy=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:{a:{...model.a},b:{...model.b}}}:{s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0)model.path=null;render()};
 $('#angle').oninput=e=>{++settleTok;flashTurning();setAngle(nearestDetent(+e.target.value))};
 $('#detent').onclick=()=>{const ds=[15,30,0];model.detent=ds[(ds.indexOf(model.detent)+1)%ds.length];flashTurning();render();settleAngle();say(model.detent?'Detents every '+model.detent+'°: the pendant clicks into the nearest seed bead.':'Detents off: any angle from −40° to +40° holds.')};
@@ -1734,6 +1767,8 @@ stage.addEventListener('pointerdown',e=>{
   // Swing GitDiscuss about Jarvis's eye loop rather than moving the pair.
   startTurn(drag,p);
  }
+ // The pair is in the hand, so any lift making room for Checks pauses (a swing on the pivot doesn't move the pair).
+ if(id!=='c'&&drag.mode!=='angle')stopLift();
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
@@ -1769,11 +1804,13 @@ function endDrag(){
  if(d.unwind){if(!d.moved||d.deg>.5)doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;say(J().sayJoined)}});return}
  if(d.mode==='angle'){model.turning=false;if(d.tap&&!d.moved){++settleTok;doSeparate();return}if(!d.tap&&!d.moved&&catOn()){catTap(d.id);return}settleAngle();render();say(J().sayJoined);return}
  // Caterpillar shade: a tap on the nameplate pauses or resumes the widget (Checks just looks up).
- if(!d.moved&&catOn()){for(const k of ['a','b','c'])Object.assign(model[k],d.saved[k]);model.glow=model.ghost=0;catTap(d.id);return}
+ if(!d.moved&&catOn()){for(const k of ['a','b','c'])Object.assign(model[k],d.saved[k]);model.glow=model.ghost=0;catTap(d.id);if(d.id!=='c')settleLift();return}
+ // A pair put down somewhere new stays there; one picked up and put back carries on making room. Checks moved away lets the pair back down.
+ if(d.id!=='c'){if(['a','b'].some(k=>d.saved[k].x!==model[k].x||d.saved[k].y!==model[k].y))pairPlaced();else settleLift()}else settleLift(450,true);
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
 }
-function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;if(J().angle)model.angles[model.join]=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
+function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;if(J().angle)model.angles[model.join]=s.angle;model.turning=false;model.glow=model.ghost=0;settleLift();render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('click',e=>{if(e.detail===0&&catOn())catTap(b.dataset.drag)}));
@@ -1782,10 +1819,11 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
  if(id==='b'&&pivotOn()&&k[1]){stepAngle(Math.sign(k[1]));return}
- const bottom=600-(model.st>.5?HS:H)-14;
+ const bottom=600-(model.st>.5?HS:H)-14,was=[model.a.x,model.a.y,model.b.x,model.b.y]+'';
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=pivotOn()?fitY(model.a.y+k[1],model.angle,ctx().h):clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else if(id==='c'){model.c.x+=k[0];model.c.y+=k[1];clampC();model.cMoved=true}
- else{const m=model[id];m.x=clamp(m.x+k[0],10,1200-W-10);m.y=clamp(m.y+k[1],46,bottom)}render();
+ else{const m=model[id];m.x=clamp(m.x+k[0],10,1200-W-10);m.y=clamp(m.y+k[1],46,bottom)}
+ if(id==='c')settleLift(300,true);else if([model.a.x,model.a.y,model.b.x,model.b.y]+''!==was)pairPlaced();render();
 }));
 
 /* Bead meter columns */
