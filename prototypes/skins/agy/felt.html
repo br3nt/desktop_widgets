@@ -782,8 +782,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat &amp; duffel toggle</span></h1>
-    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Braided twisted wool loops</p>
+    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat, duffel toggle &amp; tool-roll</span></h1>
+    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Artist's felt tool-roll</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -791,7 +791,8 @@ footer .note-highlight {
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="entanglement">1. Needle-Felt Fiber Entanglement</option>
         <option value="bellows">2. Accordion Bellows Pleat shade</option>
-        <option value="duffel" selected>3. Duffel Toggle &amp; Braid Cord join</option>
+        <option value="duffel">3. Duffel Toggle &amp; Braid Cord join</option>
+        <option value="toolroll" selected>4. The Artist's Tool-Roll (Felt Scroll) shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -801,9 +802,10 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim" class="primary-btn">Fasten duffel toggles</button>
+    <button id="btnJoinAnim">Fasten duffel toggles</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnBellowsAnim">Fold accordion pleats</button>
+    <button id="btnToolRollAnim" class="primary-btn">Roll tool scroll</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -879,6 +881,38 @@ footer .note-highlight {
           <stop offset="30%" stop-color="#fdfbf5"/>
           <stop offset="70%" stop-color="#e8dec8"/>
           <stop offset="100%" stop-color="#9a856a"/>
+        </linearGradient>
+
+        <!-- Rolled Felt Scroll Gradients for Cylindrical Shading -->
+        <linearGradient id="sageRollGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#4d6556"/>
+          <stop offset="22%" stop-color="#6e8a78"/>
+          <stop offset="55%" stop-color="#3b4e42"/>
+          <stop offset="85%" stop-color="#212d26"/>
+          <stop offset="100%" stop-color="#141c17"/>
+        </linearGradient>
+
+        <linearGradient id="terracottaRollGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#73493b"/>
+          <stop offset="22%" stop-color="#996352"/>
+          <stop offset="55%" stop-color="#5c382d"/>
+          <stop offset="85%" stop-color="#38211a"/>
+          <stop offset="100%" stop-color="#1f110c"/>
+        </linearGradient>
+
+        <linearGradient id="unifiedRollGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#544c3c"/>
+          <stop offset="22%" stop-color="#7a705a"/>
+          <stop offset="55%" stop-color="#3c372f"/>
+          <stop offset="85%" stop-color="#25211b"/>
+          <stop offset="100%" stop-color="#14120e"/>
+        </linearGradient>
+
+        <!-- Spiral Cross-Section Inner Linen Lining Gradient -->
+        <linearGradient id="spiralLiningGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#faf6eb"/>
+          <stop offset="50%" stop-color="#e8dec8"/>
+          <stop offset="100%" stop-color="#a69477"/>
         </linearGradient>
 
         <!-- Subtle Needle Punch Texture Pattern -->
@@ -1069,7 +1103,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Tactile Felt Architecture, Fiber Entanglement Join &amp; Accordion Bellows Shade</h3>
+  <h3>Tactile Felt Architecture, Fiber Entanglement, Accordion Bellows, Duffel Toggle &amp; Tool-Roll</h3>
   <p>
     This skin explores dense compressed wool felt (3mm–5mm thickness) with hand-sewn cotton embroidery stitches and turned boxwood fittings. The casing has pillowy, bevelled contours, diffuse ambient occlusion shadows, and visible needle-punched fiber texture.
   </p>
@@ -1081,6 +1115,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 3 — Duffel Toggle &amp; Braid Cord [Join]:</span> Module A features twin braided twisted-wool loop cords anchored by hand-sewn leather tabs. Module B carries twin hand-turned olive-wood toggle pins mounted on stitched leather patches with cross-stitched sinew. On docking, the braided cords reach across the gap, expand over the tapered toggle heads, and cinch taut into the carved waist grooves with a cushioned, muffled snap—creating a bespoke garment-style junction that holds the two plush felt casings securely together.
+  </p>
+  <p>
+    <span class="note-highlight">Option 4 — The Artist's Tool-Roll (Felt Scroll) [Shade]:</span> Inspired by craftsman brush and needle rolls, the lower display bay and stitched tool organizer pockets curl smoothly upward like a heavy felt canvas scroll. As it rolls, the roll cylinder expands with Archimedean spiral cross-sections on its outer ends and longitudinal hand-sewn seams. At the summit, a bridle leather strap with an elastic twisted-wool cord loop stretches over a turned olive-wood craft button with a satisfying tactile snap, securing the widget into an ultra-compact 44px status strip with glanceable high-contrast text and pips.
   </p>
 </footer>
 
@@ -1104,9 +1141,10 @@ const model = {
   cap: 0,
   entangle: 0, // 0 = wispy free fringes, 1 = fully interwoven & compressed
   bellowsFold: 0, // 0 = expanded full 130px height, 1 = folded flat accordion bellows (44px)
+  toolRoll: 0, // 0 = unrolled flat full height (130px), 1 = rolled tightly into 44px cylinder
   duffelLoop: 0, // 0 = resting relaxed loop, 0.65 = reaching open eyelet, 1 = cinched taut on toggle
   duffelTension: 0, // cord tension
-  option: 'duffel', // 'entanglement', 'bellows', or 'duffel'
+  option: 'toolroll', // 'entanglement', 'bellows', 'duffel', or 'toolroll'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1121,119 +1159,156 @@ const connectionGlow = { socket: { value: 0, target: 0 }, bay: { value: 0, targe
 
 function say(text) { $('#status').textContent = text; }
 
-// Draw Authentic 3D Hand-Crafted Wool Felt Casing with Scalloped Base, Blanket Stitching, Layered Applique, Ribbon Tag, and Accordion Bellows Pleats
-function drawFeltCasing(x, y, width, fillGrad, opacity = 1, bellowsFold = 0) {
+// Draw Authentic 3D Hand-Crafted Wool Felt Casing with Scalloped Base, Blanket Stitching, Layered Applique, Ribbon Tag, Accordion Bellows Pleats & Artist's Tool-Roll
+function drawFeltCasing(x, y, width, fillGrad, opacity = 1, bellowsFold = 0, toolRoll = 0, isToolRollOption = false) {
   const f = Math.max(0, Math.min(1, typeof bellowsFold === 'number' ? bellowsFold : (bellowsFold ? 1 : 0)));
+  const rProg = Math.max(0, Math.min(1, typeof toolRoll === 'number' ? toolRoll : (toolRoll ? 1 : 0)));
   const midX = x + width / 2;
   let s = `<g opacity="${opacity}" class="felt-casing">`;
 
-  if (f <= 0.02) {
-    // === FULL HEIGHT CASING (f = 0): Expanded 130px with Scored Horizontal Pleats ===
+  if (rProg > 0.02) {
+    // === THE ARTIST'S TOOL-ROLL (FELT SCROLL) SHADE (rProg > 0): Rolled Padded Cylinder ===
+    const curH = 130 - 86 * rProg; // from 130 down to 44
+    const rollRadius = 4 + 7.5 * rProg; // from 4px up to 11.5px
+    const cylY = y + curH - rollRadius;
+    const leftX = x + 16;
+    const rightX = x + width - 16;
+    const cylW = rightX - leftX;
+    const headerH = Math.min(curH, 44);
 
-    // 1. Soft pillowy drop shadow beneath thick wool backing
-    s += `<path d="
-      M ${x + 24} ${y + 2}
-      Q ${x + 60} ${y - 10} ${x + 96} ${y + 2}
-      Q ${x + 132} ${y - 10} ${x + 168} ${y + 2}
-      Q ${x + 204} ${y - 10} ${x + 240} ${y + 2}
-      Q ${x + 276} ${y - 10} ${x + 312} ${y + 2}
-      Q ${x + 348} ${y - 10} ${x + width - 24} ${y + 2}
-      Q ${x + width + 8} ${y + 24} ${x + width + 8} ${y + 64}
-      Q ${x + width + 8} ${y + 106} ${x + width - 24} ${y + 128}
-      Q ${x + 348} ${y + 140} ${x + 312} ${y + 128}
-      Q ${x + 276} ${y + 140} ${x + 240} ${y + 128}
-      Q ${x + 204} ${y + 140} ${x + 168} ${y + 128}
-      Q ${x + 132} ${y + 140} ${x + 96} ${y + 128}
-      Q ${x + 60} ${y + 140} ${x + 24} ${y + 128}
-      Q ${x - 8} ${y + 106} ${x - 8} ${y + 64}
-      Q ${x - 8} ${y + 24} ${x + 24} ${y + 2}
-      Z" fill="#060a08" opacity="0.45" filter="url(#woolPillowShadow)"/>`;
+    const rollGrad = fillGrad.includes('terracotta') ? 'url(#terracottaRollGrad)' :
+                     (fillGrad.includes('unified') ? 'url(#unifiedRollGrad)' : 'url(#sageRollGrad)');
 
-    // 2. Thick Outer Scalloped Wool Backing Layer (Deep Heather Base)
-    const scallopedPath = `
-      M ${x + 24} ${y + 2}
-      Q ${x + 60} ${y - 10} ${x + 96} ${y + 2}
-      Q ${x + 132} ${y - 10} ${x + 168} ${y + 2}
-      Q ${x + 204} ${y - 10} ${x + 240} ${y + 2}
-      Q ${x + 276} ${y - 10} ${x + 312} ${y + 2}
-      Q ${x + 348} ${y - 10} ${x + width - 24} ${y + 2}
-      Q ${x + width + 8} ${y + 24} ${x + width + 8} ${y + 64}
-      Q ${x + width + 8} ${y + 106} ${x + width - 24} ${y + 128}
-      Q ${x + 348} ${y + 140} ${x + 312} ${y + 128}
-      Q ${x + 276} ${y + 140} ${x + 240} ${y + 128}
-      Q ${x + 204} ${y + 140} ${x + 168} ${y + 128}
-      Q ${x + 132} ${y + 140} ${x + 96} ${y + 128}
-      Q ${x + 60} ${y + 140} ${x + 24} ${y + 128}
-      Q ${x - 8} ${y + 106} ${x - 8} ${y + 64}
-      Q ${x - 8} ${y + 24} ${x + 24} ${y + 2}
-      Z`;
-    s += `<path d="${scallopedPath}" fill="#16201a" stroke="#0e1511" stroke-width="2.5"/>`;
+    // 1. Soft pillowy drop shadow behind header and roll
+    s += `<rect x="${leftX + 2}" y="${y + 4}" width="${cylW - 4}" height="${curH - 2}" rx="8"
+                fill="#050806" opacity="${0.45 + 0.35 * rProg}" filter="url(#woolPillowShadow)"/>`;
 
-    // Perimeter Blanket Stitching on Scalloped Backing
-    s += `<path d="${scallopedPath}" fill="none" stroke="#faf6eb" stroke-width="1.8" stroke-dasharray="6 6" stroke-linecap="round" opacity="0.8"/>`;
-    // Inward teeth for blanket stitch
+    // 2. Upper Scalloped Wool Backing Layer
+    s += `<path d="M ${x + 24} ${y + 2}
+                    Q ${x + 60} ${y - 10} ${x + 96} ${y + 2}
+                    Q ${x + 132} ${y - 10} ${x + 168} ${y + 2}
+                    Q ${x + 204} ${y - 10} ${x + 240} ${y + 2}
+                    Q ${x + 276} ${y - 10} ${x + 312} ${y + 2}
+                    Q ${x + 348} ${y - 10} ${x + width - 24} ${y + 2}
+                    Q ${x + width + 8} ${y + 14} ${x + width + 8} ${y + headerH / 2}
+                    Q ${x + width + 8} ${y + headerH - 4} ${x + width - 24} ${y + headerH}
+                    H ${x + 24}
+                    Q ${x - 8} ${y + headerH - 4} ${x - 8} ${y + headerH / 2}
+                    Q ${x - 8} ${y + 14} ${x + 24} ${y + 2} Z"
+                  fill="#16201a" stroke="#0e1511" stroke-width="2.5"/>`;
+
+    // Blanket stitches along top scallop
     for (let bx = x + 30; bx <= x + width - 30; bx += 18) {
-      s += `<line x1="${bx}" y1="${y + 1}" x2="${bx}" y2="${y + 7}" stroke="#faf6eb" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>`;
-      s += `<line x1="${bx}" y1="${y + 129}" x2="${bx}" y2="${y + 123}" stroke="#faf6eb" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>`;
+      s += `<line x1="${bx}" y1="${y + 1}" x2="${bx}" y2="${y + 6}" stroke="#faf6eb" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>`;
     }
 
     // 3. Maker's Woven Twill Ribbon Tag at Top Left
-    s += `<g transform="translate(${x + 16}, ${y - 14}) rotate(-8)">
-      <rect x="0" y="0" width="34" height="18" rx="3" fill="#e2b13c" stroke="#875f12" stroke-width="1.2"/>
-      <line x1="4" y1="4" x2="30" y2="4" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="2 2"/>
-      <line x1="4" y1="14" x2="30" y2="14" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="2 2"/>
-      <circle cx="8" cy="9" r="2.5" fill="#38260b" stroke="#f4e5b8" stroke-width="1"/>
-      <text x="14" y="12" fill="#2d1d07" font-size="7" font-family="sans-serif" font-weight="bold">AGY</text>
+    s += `<g transform="translate(${x + 16}, ${y - 12}) rotate(-7)">
+      <rect x="0" y="0" width="30" height="16" rx="3" fill="#e2b13c" stroke="#875f12" stroke-width="1.2"/>
+      <line x1="3" y1="3" x2="27" y2="3" stroke="#faf6eb" stroke-width="1" stroke-dasharray="2 2"/>
+      <circle cx="7" cy="8" r="2.2" fill="#38260b"/>
+      <text x="12" y="11" fill="#2d1d07" font-size="6.5" font-family="sans-serif" font-weight="bold">AGY</text>
     </g>`;
 
-    // 4. Layered Applique Wool Faceplate (Die-cut with rounded pillowy corners)
-    const appliquePath = `
-      M ${x + 20} ${y + 10}
-      H ${x + width - 20}
-      Q ${x + width - 4} ${y + 10} ${x + width - 4} ${y + 26}
-      V ${y + 104}
-      Q ${x + width - 4} ${y + 120} ${x + width - 20} ${y + 120}
-      H ${x + 20}
-      Q ${x + 4} ${y + 120} ${x + 4} ${y + 104}
-      V ${y + 26}
-      Q ${x + 4} ${y + 10} ${x + 20} ${y + 10}
-      Z`;
-    s += `<path d="${appliquePath}" fill="${fillGrad}" stroke="#141c17" stroke-width="2"/>`;
-    s += `<path d="${appliquePath}" fill="url(#needlePunchPat)"/>`;
+    // 4. Header Faceplate
+    s += `<path d="M ${x + 20} ${y + 6} H ${x + width - 20} Q ${x + width - 6} ${y + 6} ${x + width - 6} ${y + 16} V ${y + headerH - 6} H ${x + 6} V ${y + 16} Q ${x + 6} ${y + 6} ${x + 20} ${y + 6} Z"
+                fill="${fillGrad}" stroke="#141c17" stroke-width="2"/>`;
+    s += `<path d="M ${x + 20} ${y + 6} H ${x + width - 20} Q ${x + width - 6} ${y + 6} ${x + width - 6} ${y + 16} V ${y + headerH - 6} H ${x + 6} V ${y + 16} Q ${x + 6} ${y + 6} ${x + 20} ${y + 6} Z"
+                fill="url(#needlePunchPat)"/>`;
 
-    // Scored Horizontal Accordion Pleat Creases (Option 2 Fold Lines in Open State)
-    s += `<line x1="${x + 22}" y1="${y + 36}" x2="${x + width - 22}" y2="${y + 36}" stroke="#0f1612" stroke-width="1.8" stroke-linecap="round"/>`;
-    s += `<line x1="${x + 24}" y1="${y + 36}" x2="${x + width - 24}" y2="${y + 36}" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="5 5" opacity="0.5"/>`;
-    s += `<line x1="${x + 22}" y1="${y + 98}" x2="${x + width - 22}" y2="${y + 98}" stroke="#0f1612" stroke-width="1.8" stroke-linecap="round"/>`;
-    s += `<line x1="${x + 24}" y1="${y + 98}" x2="${x + width - 24}" y2="${y + 98}" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="4 6" opacity="0.5"/>`;
-
-    // Hand-sewn cross-stitches (X X X) along top and bottom applique seams
-    for (let sx = x + 38; sx <= x + width - 38; sx += 22) {
-      s += `<path d="M ${sx - 3} ${y + 15} L ${sx + 3} ${y + 21} M ${sx + 3} ${y + 15} L ${sx - 3} ${y + 21}" stroke="#faf6eb" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>`;
-      s += `<path d="M ${sx - 3} ${y + 109} L ${sx + 3} ${y + 115} M ${sx + 3} ${y + 109} L ${sx - 3} ${y + 115}" stroke="#faf6eb" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>`;
+    // 5. Recessed Dark Pressed Felt Embrasure Frame for the Shade Display
+    if (width > W) {
+      s += `<rect x="${x + 44}" y="${y + 6}" width="288" height="30" rx="6" fill="#0c120f" stroke="#16221b" stroke-width="2"/>`;
+      s += `<rect x="${x + 46}" y="${y + 8}" width="284" height="26" rx="4" fill="none" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.6"/>`;
+      s += `<rect x="${x + width - 332}" y="${y + 6}" width="288" height="30" rx="6" fill="#0c120f" stroke="#16221b" stroke-width="2"/>`;
+      s += `<rect x="${x + width - 330}" y="${y + 8}" width="284" height="26" rx="4" fill="none" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.6"/>`;
+    } else {
+      s += `<rect x="${x + 44}" y="${y + 6}" width="${width - 88}" height="30" rx="6" fill="#0c120f" stroke="#16221b" stroke-width="2"/>`;
+      s += `<rect x="${x + 46}" y="${y + 8}" width="${width - 92}" height="26" rx="4" fill="none" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.6"/>`;
     }
 
-    // 5. Inset Die-Cut Display Window Frame with Running Stitches
-    s += `<rect x="${x + 44}" y="${y + 28}" width="${width - 88}" height="72" rx="10" fill="#0d1410" stroke="#16201a" stroke-width="2.5"/>`;
-    s += `<rect x="${x + 46}" y="${y + 30}" width="${width - 92}" height="68" rx="8" fill="none" stroke="#e2b13c" stroke-width="1.6" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.85"/>`;
+    // 6. Contact Shadow Cast Above the Roll onto Header
+    s += `<rect x="${leftX + 2}" y="${cylY - rollRadius - 4}" width="${cylW - 4}" height="6" fill="rgba(0,0,0,0.6)" filter="url(#feltDiffuseGlow)"/>`;
 
-    // Corner Wooden Craft Buttons with Crossed Thread
-    const buttonPositions = [
-      [x + 24, y + 24],
-      [x + width - 24, y + 24],
-      [x + 24, y + 106],
-      [x + width - 24, y + 106]
-    ];
-    buttonPositions.forEach(([bx, by]) => {
-      s += `<circle cx="${bx}" cy="${by}" r="5.5" fill="url(#toggleWoodGrad)" stroke="#2d1d07" stroke-width="1.2"/>`;
-      s += `<circle cx="${bx - 1.8}" cy="${by - 1.8}" r="0.9" fill="#140a02"/>`;
-      s += `<circle cx="${bx + 1.8}" cy="${by - 1.8}" r="0.9" fill="#140a02"/>`;
-      s += `<circle cx="${bx - 1.8}" cy="${by + 1.8}" r="0.9" fill="#140a02"/>`;
-      s += `<circle cx="${bx + 1.8}" cy="${by + 1.8}" r="0.9" fill="#140a02"/>`;
-      s += `<path d="M ${bx - 2} ${by - 2} L ${bx + 2} ${by + 2} M ${bx + 2} ${by - 2} L ${bx - 2} ${by + 2}" stroke="#faf6eb" stroke-width="1" stroke-linecap="round"/>`;
-    });
+    // 7. Rolled Cylinder Body (The Artist's Tool-Roll)
+    s += `<rect x="${leftX}" y="${cylY - rollRadius}" width="${cylW}" height="${2 * rollRadius}" rx="${rollRadius}"
+                fill="${rollGrad}" stroke="#141c17" stroke-width="2"/>`;
+    s += `<rect x="${leftX}" y="${cylY - rollRadius}" width="${cylW}" height="${2 * rollRadius}" rx="${rollRadius}"
+                fill="url(#needlePunchPat)"/>`;
 
-  } else {
+    // Longitudinal highlights along top crest of cylinder
+    s += `<line x1="${leftX + 8}" y1="${cylY - rollRadius * 0.4}" x2="${rightX - 8}" y2="${cylY - rollRadius * 0.4}"
+                stroke="rgba(255,255,255,0.35)" stroke-width="2" stroke-linecap="round"/>`;
+    // Longitudinal contact shadow along bottom base of cylinder
+    s += `<line x1="${leftX + 6}" y1="${cylY + rollRadius - 1.5}" x2="${rightX - 6}" y2="${cylY + rollRadius - 1.5}"
+                stroke="rgba(0,0,0,0.85)" stroke-width="2.5" stroke-linecap="round"/>`;
+
+    // Spiral rolled felt seams
+    s += `<line x1="${leftX + 12}" y1="${cylY}" x2="${rightX - 12}" y2="${cylY}"
+                stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="5 4" stroke-linecap="round" opacity="0.85"/>`;
+    for (let sx = leftX + 24; sx <= rightX - 24; sx += 24) {
+      s += `<path d="M ${sx - 2.5} ${cylY + rollRadius * 0.5 - 2.5} L ${sx + 2.5} ${cylY + rollRadius * 0.5 + 2.5} M ${sx + 2.5} ${cylY + rollRadius * 0.5 - 2.5} L ${sx - 2.5} ${cylY + rollRadius * 0.5 + 2.5}"
+                  stroke="#e2b13c" stroke-width="1.2" stroke-linecap="round" opacity="0.9"/>`;
+    }
+
+    // 8. Authentic Archimedean Spiral Cross-Sections on Ends
+    const endRx = Math.max(3, rollRadius * 0.65);
+    const endRy = rollRadius;
+
+    // Left spiral end
+    s += `<ellipse cx="${leftX}" cy="${cylY}" rx="${endRx}" ry="${endRy}" fill="#16201a" stroke="#0e1511" stroke-width="1.8"/>`;
+    s += `<path d="M ${leftX} ${cylY + endRy * 0.85}
+                    C ${leftX - endRx * 0.9} ${cylY + endRy * 0.85}, ${leftX - endRx * 0.9} ${cylY - endRy * 0.85}, ${leftX} ${cylY - endRy * 0.85}
+                    C ${leftX + endRx * 0.75} ${cylY - endRy * 0.85}, ${leftX + endRx * 0.75} ${cylY + endRy * 0.5}, ${leftX} ${cylY + endRy * 0.5}
+                    C ${leftX - endRx * 0.5} ${cylY + endRy * 0.5}, ${leftX - endRx * 0.5} ${cylY - endRy * 0.4}, ${leftX} ${cylY - endRy * 0.4}
+                    C ${leftX + endRx * 0.3} ${cylY - endRy * 0.4}, ${leftX + endRx * 0.3} ${cylY + endRy * 0.2}, ${leftX} ${cylY + endRy * 0.2}"
+                  fill="none" stroke="url(#spiralLiningGrad)" stroke-width="1.6" stroke-linecap="round"/>`;
+    s += `<circle cx="${leftX}" cy="${cylY + 0.5}" r="1.5" fill="#38260b"/>`;
+
+    // Right spiral end
+    s += `<ellipse cx="${rightX}" cy="${cylY}" rx="${endRx}" ry="${endRy}" fill="#16201a" stroke="#0e1511" stroke-width="1.8"/>`;
+    s += `<path d="M ${rightX} ${cylY + endRy * 0.85}
+                    C ${rightX + endRx * 0.9} ${cylY + endRy * 0.85}, ${rightX + endRx * 0.9} ${cylY - endRy * 0.85}, ${rightX} ${cylY - endRy * 0.85}
+                    C ${rightX - endRx * 0.75} ${cylY - endRy * 0.85}, ${rightX - endRx * 0.75} ${cylY + endRy * 0.5}, ${rightX} ${cylY + endRy * 0.5}
+                    C ${rightX + endRx * 0.5} ${cylY + endRy * 0.5}, ${rightX + endRx * 0.5} ${cylY - endRy * 0.4}, ${rightX} ${cylY - endRy * 0.4}
+                    C ${rightX - endRx * 0.3} ${cylY - endRy * 0.4}, ${rightX - endRx * 0.3} ${cylY + endRy * 0.2}, ${rightX} ${cylY + endRy * 0.2}"
+                  fill="none" stroke="url(#spiralLiningGrad)" stroke-width="1.6" stroke-linecap="round"/>`;
+    s += `<circle cx="${rightX}" cy="${cylY + 0.5}" r="1.5" fill="#38260b"/>`;
+
+    // 9. Fastening Straps & Turned Olive-Wood Craft Buttons
+    if (rProg > 0.3) {
+      const strapAlpha = Math.min(1, (rProg - 0.3) / 0.5);
+      const centers = width > W ? [x + W / 2, x + width - W / 2] : [midX];
+      centers.forEach(cMid => {
+        s += `
+          <g opacity="${strapAlpha}" transform="translate(${cMid}, 0)">
+            <!-- Bridle Leather Binding Strap -->
+            <path d="M -11 ${cylY - rollRadius - 2} H 11 V ${cylY + rollRadius + 2} H -11 Z"
+                  fill="url(#leatherTabGrad)" stroke="#1a1109" stroke-width="1.3"/>
+            <line x1="-8" y1="${cylY - rollRadius}" x2="-8" y2="${cylY + rollRadius}"
+                  stroke="#faf6eb" stroke-width="0.9" stroke-dasharray="2 1.5" opacity="0.85"/>
+            <line x1="8" y1="${cylY - rollRadius}" x2="8" y2="${cylY + rollRadius}"
+                  stroke="#faf6eb" stroke-width="0.9" stroke-dasharray="2 1.5" opacity="0.85"/>
+            <!-- Turned Olive-Wood Craft Button with 4 Holes -->
+            <circle cx="0" cy="${cylY}" r="6" fill="url(#toggleWoodGrad)" stroke="#2d1d07" stroke-width="1.3"/>
+            <circle cx="-1.8" cy="-1.8" r="0.9" fill="#140a02"/>
+            <circle cx="1.8" cy="-1.8" r="0.9" fill="#140a02"/>
+            <circle cx="-1.8" cy="1.8" r="0.9" fill="#140a02"/>
+            <circle cx="1.8" cy="1.8" r="0.9" fill="#140a02"/>
+            <path d="M -2 -2 L 2 2 M 2 -2 L -2 2" stroke="#faf6eb" stroke-width="1.1" stroke-linecap="round"/>
+            <!-- Braided Twisted-Wool Elastic Cord Loop -->
+            <path d="M -13 ${cylY - 2} C -13 ${cylY - 11 * rProg}, 13 ${cylY - 11 * rProg}, 13 ${cylY - 2}
+                     C 13 ${cylY + 7 * rProg}, -13 ${cylY + 7 * rProg}, -13 ${cylY - 2}"
+                  fill="none" stroke="url(#braidCordGrad)" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M -13 ${cylY - 2} C -13 ${cylY - 11 * rProg}, 13 ${cylY - 11 * rProg}, 13 ${cylY - 2}
+                     C 13 ${cylY + 7 * rProg}, -13 ${cylY + 7 * rProg}, -13 ${cylY - 2}"
+                  fill="none" stroke="#876f4e" stroke-width="1" stroke-dasharray="2.5 2" stroke-linecap="round"/>
+          </g>
+        `;
+      });
+    }
+
+  } else if (f > 0.02) {
     // === ACCORDION BELLOWS PLEAT SHADE (f > 0): Compressed Padded Wool Ribbon ===
     const curH = 130 - 86 * f; // from 130 down to 44
     const yBottom = y + curH;
@@ -1387,6 +1462,151 @@ function drawFeltCasing(x, y, width, fillGrad, opacity = 1, bellowsFold = 0) {
       <circle cx="7" cy="7.5" r="2" fill="#38260b"/>
       <text x="11" y="10" fill="#2d1d07" font-size="6" font-family="sans-serif" font-weight="bold">AGY</text>
     </g>`;
+
+  } else {
+    // === FULL HEIGHT CASING (f = 0, r = 0): Expanded 130px with Scored Horizontal Pleats & Organizer Pockets ===
+
+    // 1. Soft pillowy drop shadow beneath thick wool backing
+    s += `<path d="
+      M ${x + 24} ${y + 2}
+      Q ${x + 60} ${y - 10} ${x + 96} ${y + 2}
+      Q ${x + 132} ${y - 10} ${x + 168} ${y + 2}
+      Q ${x + 204} ${y - 10} ${x + 240} ${y + 2}
+      Q ${x + 276} ${y - 10} ${x + 312} ${y + 2}
+      Q ${x + 348} ${y - 10} ${x + width - 24} ${y + 2}
+      Q ${x + width + 8} ${y + 24} ${x + width + 8} ${y + 64}
+      Q ${x + width + 8} ${y + 106} ${x + width - 24} ${y + 128}
+      Q ${x + 348} ${y + 140} ${x + 312} ${y + 128}
+      Q ${x + 276} ${y + 140} ${x + 240} ${y + 128}
+      Q ${x + 204} ${y + 140} ${x + 168} ${y + 128}
+      Q ${x + 132} ${y + 140} ${x + 96} ${y + 128}
+      Q ${x + 60} ${y + 140} ${x + 24} ${y + 128}
+      Q ${x - 8} ${y + 106} ${x - 8} ${y + 64}
+      Q ${x - 8} ${y + 24} ${x + 24} ${y + 2}
+      Z" fill="#060a08" opacity="0.45" filter="url(#woolPillowShadow)"/>`;
+
+    // 2. Thick Outer Scalloped Wool Backing Layer (Deep Heather Base)
+    const scallopedPath = `
+      M ${x + 24} ${y + 2}
+      Q ${x + 60} ${y - 10} ${x + 96} ${y + 2}
+      Q ${x + 132} ${y - 10} ${x + 168} ${y + 2}
+      Q ${x + 204} ${y - 10} ${x + 240} ${y + 2}
+      Q ${x + 276} ${y - 10} ${x + 312} ${y + 2}
+      Q ${x + 348} ${y - 10} ${x + width - 24} ${y + 2}
+      Q ${x + width + 8} ${y + 24} ${x + width + 8} ${y + 64}
+      Q ${x + width + 8} ${y + 106} ${x + width - 24} ${y + 128}
+      Q ${x + 348} ${y + 140} ${x + 312} ${y + 128}
+      Q ${x + 276} ${y + 140} ${x + 240} ${y + 128}
+      Q ${x + 204} ${y + 140} ${x + 168} ${y + 128}
+      Q ${x + 132} ${y + 140} ${x + 96} ${y + 128}
+      Q ${x + 60} ${y + 140} ${x + 24} ${y + 128}
+      Q ${x - 8} ${y + 106} ${x - 8} ${y + 64}
+      Q ${x - 8} ${y + 24} ${x + 24} ${y + 2}
+      Z`;
+    s += `<path d="${scallopedPath}" fill="#16201a" stroke="#0e1511" stroke-width="2.5"/>`;
+
+    // Perimeter Blanket Stitching on Scalloped Backing
+    s += `<path d="${scallopedPath}" fill="none" stroke="#faf6eb" stroke-width="1.8" stroke-dasharray="6 6" stroke-linecap="round" opacity="0.8"/>`;
+    // Inward teeth for blanket stitch
+    for (let bx = x + 30; bx <= x + width - 30; bx += 18) {
+      s += `<line x1="${bx}" y1="${y + 1}" x2="${bx}" y2="${y + 7}" stroke="#faf6eb" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>`;
+      s += `<line x1="${bx}" y1="${y + 129}" x2="${bx}" y2="${y + 123}" stroke="#faf6eb" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>`;
+    }
+
+    // 3. Maker's Woven Twill Ribbon Tag at Top Left
+    s += `<g transform="translate(${x + 16}, ${y - 14}) rotate(-8)">
+      <rect x="0" y="0" width="34" height="18" rx="3" fill="#e2b13c" stroke="#875f12" stroke-width="1.2"/>
+      <line x1="4" y1="4" x2="30" y2="4" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="2 2"/>
+      <line x1="4" y1="14" x2="30" y2="14" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="2 2"/>
+      <circle cx="8" cy="9" r="2.5" fill="#38260b" stroke="#f4e5b8" stroke-width="1"/>
+      <text x="14" y="12" fill="#2d1d07" font-size="7" font-family="sans-serif" font-weight="bold">AGY</text>
+    </g>`;
+
+    // 4. Layered Applique Wool Faceplate (Die-cut with rounded pillowy corners)
+    const appliquePath = `
+      M ${x + 20} ${y + 10}
+      H ${x + width - 20}
+      Q ${x + width - 4} ${y + 10} ${x + width - 4} ${y + 26}
+      V ${y + 104}
+      Q ${x + width - 4} ${y + 120} ${x + width - 20} ${y + 120}
+      H ${x + 20}
+      Q ${x + 4} ${y + 120} ${x + 4} ${y + 104}
+      V ${y + 26}
+      Q ${x + 4} ${y + 10} ${x + 20} ${y + 10}
+      Z`;
+    s += `<path d="${appliquePath}" fill="${fillGrad}" stroke="#141c17" stroke-width="2"/>`;
+    s += `<path d="${appliquePath}" fill="url(#needlePunchPat)"/>`;
+
+    // Scored Horizontal Accordion Pleat Creases (Option 2 Fold Lines in Open State)
+    s += `<line x1="${x + 22}" y1="${y + 36}" x2="${x + width - 22}" y2="${y + 36}" stroke="#0f1612" stroke-width="1.8" stroke-linecap="round"/>`;
+    s += `<line x1="${x + 24}" y1="${y + 36}" x2="${x + width - 24}" y2="${y + 36}" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="5 5" opacity="0.5"/>`;
+    s += `<line x1="${x + 22}" y1="${y + 98}" x2="${x + width - 22}" y2="${y + 98}" stroke="#0f1612" stroke-width="1.8" stroke-linecap="round"/>`;
+    s += `<line x1="${x + 24}" y1="${y + 98}" x2="${x + width - 24}" y2="${y + 98}" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="4 6" opacity="0.5"/>`;
+
+    // Hand-sewn cross-stitches (X X X) along top and bottom applique seams
+    for (let sx = x + 38; sx <= x + width - 38; sx += 22) {
+      s += `<path d="M ${sx - 3} ${y + 15} L ${sx + 3} ${y + 21} M ${sx + 3} ${y + 15} L ${sx - 3} ${y + 21}" stroke="#faf6eb" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>`;
+      s += `<path d="M ${sx - 3} ${y + 109} L ${sx + 3} ${y + 115} M ${sx + 3} ${y + 109} L ${sx - 3} ${y + 115}" stroke="#faf6eb" stroke-width="1.4" stroke-linecap="round" opacity="0.85"/>`;
+    }
+
+    // 5. Inset Die-Cut Display Window Frame with Running Stitches
+    s += `<rect x="${x + 44}" y="${y + 28}" width="${width - 88}" height="72" rx="10" fill="#0d1410" stroke="#16201a" stroke-width="2.5"/>`;
+    s += `<rect x="${x + 46}" y="${y + 30}" width="${width - 92}" height="68" rx="8" fill="none" stroke="#e2b13c" stroke-width="1.6" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.85"/>`;
+
+    // Corner Wooden Craft Buttons with Crossed Thread
+    const buttonPositions = [
+      [x + 24, y + 24],
+      [x + width - 24, y + 24],
+      [x + 24, y + 106],
+      [x + width - 24, y + 106]
+    ];
+    buttonPositions.forEach(([bx, by]) => {
+      s += `<circle cx="${bx}" cy="${by}" r="5.5" fill="url(#toggleWoodGrad)" stroke="#2d1d07" stroke-width="1.2"/>`;
+      s += `<circle cx="${bx - 1.8}" cy="${by - 1.8}" r="0.9" fill="#140a02"/>`;
+      s += `<circle cx="${bx + 1.8}" cy="${by - 1.8}" r="0.9" fill="#140a02"/>`;
+      s += `<circle cx="${bx - 1.8}" cy="${by + 1.8}" r="0.9" fill="#140a02"/>`;
+      s += `<circle cx="${bx + 1.8}" cy="${by + 1.8}" r="0.9" fill="#140a02"/>`;
+      s += `<path d="M ${bx - 2} ${by - 2} L ${bx + 2} ${by + 2} M ${bx + 2} ${by - 2} L ${bx - 2} ${by + 2}" stroke="#faf6eb" stroke-width="1" stroke-linecap="round"/>`;
+    });
+
+    if (isToolRollOption) {
+      // Stitched Artist's Tool Organizer Pockets along lower half
+      s += `<path d="M ${x + 22} ${y + 86} H ${x + width - 22} V ${y + 120} Q ${x + width - 22} ${y + 122} ${x + width - 26} ${y + 122} H ${x + 26} Q ${x + 22} ${y + 122} ${x + 22} ${y + 120} Z"
+                  fill="rgba(16, 24, 20, 0.45)" stroke="#0e1511" stroke-width="1.5"/>`;
+      s += `<line x1="${x + 22}" y1="${y + 86}" x2="${x + width - 22}" y2="${y + 86}" stroke="#e2b13c" stroke-width="1.8" stroke-linecap="round"/>`;
+      s += `<line x1="${x + 24}" y1="${y + 88}" x2="${x + width - 24}" y2="${y + 88}" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="4 3" opacity="0.8"/>`;
+
+      for (let px = x + 50; px <= x + width - 50; px += 34) {
+        s += `<line x1="${px}" y1="${y + 86}" x2="${px}" y2="${y + 122}" stroke="#0f1612" stroke-width="2"/>`;
+        s += `<line x1="${px}" y1="${y + 87}" x2="${px}" y2="${y + 121}" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.75"/>`;
+        s += `<line x1="${px - 3}" y1="${y + 87}" x2="${px + 3}" y2="${y + 87}" stroke="#e2b13c" stroke-width="1.8" stroke-linecap="round"/>`;
+      }
+
+      // Artisan tools peeking out of pockets
+      s += `<g transform="translate(${x + 36}, ${y + 75})">
+        <path d="M-2.5 0 L2.5 0 L2 14 L-2 14 Z" fill="url(#toggleWoodGrad)" stroke="#1a1208" stroke-width="1"/>
+        <line x1="0" y1="14" x2="0" y2="20" stroke="#d4ded8" stroke-width="1.2"/>
+      </g>`;
+      s += `<g transform="translate(${x + 104}, ${y + 73})">
+        <path d="M-2 0 Q0 -4 2 0 L1.5 16 L-1.5 16 Z" fill="#fdfbf5" stroke="#9a856a" stroke-width="1"/>
+        <circle cx="0" cy="4" r="0.8" fill="#583c1b"/>
+      </g>`;
+
+      // Hanging leather tab and button waiting to roll
+      const centers = width > W ? [x + W / 2, x + width - W / 2] : [midX];
+      centers.forEach(cMid => {
+        s += `
+          <g transform="translate(${cMid}, ${y + 118})">
+            <path d="M -9 0 H 9 V 16 Q 0 20 -9 16 Z" fill="url(#leatherTabGrad)" stroke="#1a1109" stroke-width="1.2"/>
+            <line x1="-6" y1="2" x2="-6" y2="14" stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.8"/>
+            <line x1="6" y1="2" x2="6" y2="14" stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.8"/>
+            <circle cx="0" cy="8" r="4.5" fill="url(#toggleWoodGrad)" stroke="#2d1d07" stroke-width="1.1"/>
+            <path d="M -1.5 6.5 L 1.5 9.5 M 1.5 6.5 L -1.5 9.5" stroke="#faf6eb" stroke-width="0.9"/>
+            <path d="M -8 16 Q 0 26 8 16" fill="none" stroke="url(#braidCordGrad)" stroke-width="2" stroke-linecap="round"/>
+          </g>
+        `;
+      });
+    }
   }
 
   s += `</g>`;
@@ -1394,8 +1614,8 @@ function drawFeltCasing(x, y, width, fillGrad, opacity = 1, bellowsFold = 0) {
 }
 
 // Loose Carded Wool Roving Fringes on the docking collars
-function drawRovingCap(x, y, isRight, isTerracotta = false, retract = 0, bellowsFold = 0) {
-  if (bellowsFold > 0.4) return '';
+function drawRovingCap(x, y, isRight, isTerracotta = false, retract = 0, foldOrRoll = 0) {
+  if (foldOrRoll > 0.4) return '';
   const dir = isRight ? 1 : -1;
   const startX = isRight ? x + W - 12 : x + 12;
   const scaleX = (1 - retract) * dir;
@@ -1504,8 +1724,8 @@ function drawEntangledFeltSeam(midX, y, entangleRatio, opacity = 1) {
 }
 
 // Option 3: Duffel Toggle & Braid Cord Join
-function drawDuffelJoin(a, b, isJoined, duffelLoop, duffelTension, blend, bellowsFold) {
-  if (bellowsFold > 0.4) return '';
+function drawDuffelJoin(a, b, isJoined, duffelLoop, duffelTension, blend, foldOrRoll) {
+  if (foldOrRoll > 0.4) return '';
   let s = `<g id="duffelToggleSeam">`;
 
   // Upper toggle Y offset = 38, Lower toggle Y offset = 90
@@ -1709,7 +1929,8 @@ function drawDuffelJoin(a, b, isJoined, duffelLoop, duffelTension, blend, bellow
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
   const f = model.bellowsFold;
-  const isShade = model.shade || f > 0.5;
+  const r = model.toolRoll;
+  const isShade = model.shade || f > 0.5 || r > 0.5;
   const glow = model.busy ? model.light : connectionGlow.socket.value;
   let shared = '';
 
@@ -1717,14 +1938,14 @@ function renderHardware() {
 
   if (p > 0) {
     // Continuous Monolithic Plush Felt Chassis
-    shared += drawFeltCasing(a.x, a.y, (b.x + W) - a.x, 'url(#unifiedFeltGrad)', p, f);
+    shared += drawFeltCasing(a.x, a.y, (b.x + W) - a.x, 'url(#unifiedFeltGrad)', p, f, r, model.option === 'toolroll');
   }
 
   if (!isShade) {
     if (model.option === 'duffel') {
       // Option 3: Duffel Toggle & Braid Cord Join
       const dLoop = model.joined ? 1 : (model.duffelLoop || (glow > 0.25 ? (glow - 0.25) / 0.75 : 0));
-      shared += drawDuffelJoin(a, b, model.joined, dLoop, model.duffelTension, p, f);
+      shared += drawDuffelJoin(a, b, model.joined, dLoop, model.duffelTension, p, Math.max(f, r));
     } else {
       // Option 1: Entangled Fiber Seam (or default)
       if (model.joined || model.entangle > 0.02 || (glow > 0.3 && !model.joined)) {
@@ -1746,12 +1967,12 @@ function renderHardware() {
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
     const grad = isA ? 'url(#sageWoolGrad)' : 'url(#terracottaWoolGrad)';
-    let individual = drawFeltCasing(0, 0, W, grad, 1, f);
+    let individual = drawFeltCasing(0, 0, W, grad, 1, f, r, model.option === 'toolroll');
 
     // Only draw roving fringe caps if NOT in duffel option
     if (model.option !== 'duffel') {
-      individual += drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, f) +
-                    drawRovingCap(0, 0, true, !isA, isA ? model.cap : 0, f);
+      individual += drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, Math.max(f, r)) +
+                    drawRovingCap(0, 0, true, !isA, isA ? model.cap : 0, Math.max(f, r));
     }
 
     $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawFeltSocketLight(isA ? W - 22 : 22, 0, glow)}</g>`;
@@ -1771,9 +1992,9 @@ function renderHardware() {
 }
 
 function updateStateButtons() {
-  const isShade = model.shade || model.bellowsFold > 0.5;
+  const isShade = model.shade || model.bellowsFold > 0.5 || model.toolRoll > 0.5;
   const isJoined = model.joined;
-  const isJoining = model.entangle > 0.1 && model.entangle < 0.95 && !isJoined && !isShade;
+  const isJoining = ((model.entangle > 0.1 && model.entangle < 0.95) || (model.option === 'duffel' && model.duffelLoop > 0.1 && model.duffelLoop < 0.95) || (model.option === 'toolroll' && model.toolRoll > 0.1 && model.toolRoll < 0.95) || (model.option === 'bellows' && model.bellowsFold > 0.1 && model.bellowsFold < 0.95)) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -1865,8 +2086,18 @@ function render() {
     bellowsBtn.disabled = model.busy;
     const isBellowsOption = model.option === 'bellows';
     bellowsBtn.classList.toggle('primary-btn', isBellowsOption);
-    $('#btnJoinAnim').classList.toggle('primary-btn', !isBellowsOption);
   }
+
+  const toolRollBtn = $('#btnToolRollAnim');
+  if (toolRollBtn) {
+    toolRollBtn.textContent = model.shade ? 'Unroll tool scroll' : 'Roll tool scroll';
+    toolRollBtn.disabled = model.busy;
+    const isToolRollOption = model.option === 'toolroll';
+    toolRollBtn.classList.toggle('primary-btn', isToolRollOption);
+  }
+
+  const isJoinOption = model.option === 'duffel' || model.option === 'entanglement';
+  $('#btnJoinAnim').classList.toggle('primary-btn', isJoinOption);
 
   if (model.option === 'duffel') {
     $('#btnJoinAnim').textContent = 'Fasten duffel toggles';
@@ -1893,7 +2124,9 @@ function render() {
   }
 
   if (!model.busy) {
-    if (model.shade || model.bellowsFold > 0.8) {
+    if (model.shade || model.toolRoll > 0.8) {
+      $('#phase').textContent = 'Shade mode / Felt tool scroll rolled & fastened';
+    } else if (model.shade || model.bellowsFold > 0.8) {
       $('#phase').textContent = 'Shade mode / Accordion bellows folded flat';
     } else if (model.joined) {
       if (model.option === 'duffel') {
@@ -1901,6 +2134,8 @@ function render() {
       } else {
         $('#phase').textContent = 'Joined / Interwoven fiber chassis';
       }
+    } else if (model.option === 'toolroll' && model.toolRoll > 0.05) {
+      $('#phase').textContent = 'Joining / Rolling artist\'s tool scroll';
     } else if (model.option === 'duffel' && model.duffelLoop > 0.05) {
       $('#phase').textContent = 'Joining / Braided loops reaching toward toggles';
     } else if (model.entangle > 0.1) {
@@ -2249,13 +2484,127 @@ async function unfoldBellows() {
   $('#phase').textContent = model.joined ? 'Joined / Interwoven fiber chassis' : 'Separate / Two wool housings';
 }
 
+// Option 4: The Artist's Tool-Roll (Felt Scroll) Shade Animations
+async function rollToolScroll() {
+  if (model.busy || (model.shade && model.toolRoll >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Rolling felt tool scroll! Lower pockets curl upward into a tight, padded cylinder.');
+  $('#phase').textContent = 'Rolling artist\'s tool scroll';
+
+  if (model.pocket) togglePocket(false);
+
+  model.shade = true;
+  render();
+
+  await tween(460, t => {
+    // Textile roll physics: slight initial curl, accelerating roll, cushioned settlement
+    const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    model.toolRoll = ease;
+    renderHardware();
+    ['a', 'b'].forEach(id => {
+      const el = $('#' + id);
+      el.style.height = `${130 - 86 * ease}px`;
+      const screen = el.querySelector('.felt-screen');
+      if (screen) {
+        screen.style.opacity = Math.max(0, 1 - ease * 2.2);
+        screen.style.transform = `translateY(-${12 * ease}px) scaleY(${Math.max(0.1, 1 - ease)})`;
+      }
+      const strip = el.querySelector('.shade-strip');
+      if (strip) {
+        strip.style.display = ease > 0.15 ? 'flex' : 'none';
+        strip.style.opacity = Math.max(0, (ease - 0.15) / 0.85);
+        strip.style.transform = `translateY(${(1 - ease) * 8}px)`;
+      }
+      const grip = el.querySelector('.felt-grip');
+      if (grip) grip.style.opacity = Math.max(0, 1 - ease * 1.8);
+      const tabRow = el.querySelector('.tab-row');
+      if (tabRow) tabRow.style.opacity = Math.max(0, 1 - ease * 2.5);
+      el.querySelectorAll('.felt-btn, .pocket-btn').forEach(b => {
+        b.style.opacity = Math.max(0, 1 - ease * 2.5);
+      });
+    });
+  }, token);
+
+  model.toolRoll = 1;
+  model.busy = false;
+  render();
+  say('Artist\'s tool-roll fastened! Elastic wool cord looped over olive-wood button. Glanceable display active.');
+  $('#phase').textContent = 'Shade mode / Felt tool scroll rolled & fastened';
+}
+
+async function unrollToolScroll() {
+  if (model.busy || (!model.shade && model.toolRoll <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Unfastening elastic cord. Tool scroll unrolling downward with wool resilience.');
+  $('#phase').textContent = 'Unrolling artist\'s tool scroll';
+
+  model.shade = false;
+  render();
+
+  await tween(480, t => {
+    const inv = 1 - t;
+    const ease = inv * inv;
+    model.toolRoll = ease;
+    renderHardware();
+    ['a', 'b'].forEach(id => {
+      const el = $('#' + id);
+      el.style.height = `${130 - 86 * ease}px`;
+      const screen = el.querySelector('.felt-screen');
+      if (screen) {
+        screen.style.opacity = Math.max(0, 1 - ease * 2.2);
+        screen.style.transform = `translateY(-${12 * ease}px) scaleY(${Math.max(0.1, 1 - ease)})`;
+      }
+      const strip = el.querySelector('.shade-strip');
+      if (strip) {
+        strip.style.display = ease > 0.15 ? 'flex' : 'none';
+        strip.style.opacity = Math.max(0, (ease - 0.15) / 0.85);
+        strip.style.transform = `translateY(${(1 - ease) * 8}px)`;
+      }
+      const grip = el.querySelector('.felt-grip');
+      if (grip) grip.style.opacity = Math.max(0, 1 - ease * 1.8);
+      const tabRow = el.querySelector('.tab-row');
+      if (tabRow) tabRow.style.opacity = Math.max(0, 1 - ease * 2.5);
+      el.querySelectorAll('.felt-btn, .pocket-btn').forEach(b => {
+        b.style.opacity = Math.max(0, 1 - ease * 2.5);
+      });
+    });
+  }, token);
+
+  model.toolRoll = 0;
+  model.busy = false;
+  ['a', 'b'].forEach(id => {
+    const el = $('#' + id);
+    el.style.height = '';
+    const screen = el.querySelector('.felt-screen');
+    if (screen) { screen.style.opacity = ''; screen.style.transform = ''; }
+    const strip = el.querySelector('.shade-strip');
+    if (strip) { strip.style.display = ''; strip.style.opacity = ''; strip.style.transform = ''; }
+    const grip = el.querySelector('.felt-grip');
+    if (grip) grip.style.opacity = '';
+    const tabRow = el.querySelector('.tab-row');
+    if (tabRow) tabRow.style.opacity = '';
+    el.querySelectorAll('.felt-btn, .pocket-btn').forEach(b => { b.style.opacity = ''; });
+  });
+  render();
+  say('Tool scroll fully unrolled. Full plush felt casing, tool organizer pockets, and screen controls restored.');
+  $('#phase').textContent = model.joined ? 'Joined / Interwoven fiber chassis' : 'Separate / Two wool housings';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    if (model.shade || model.bellowsFold > 0.05) {
+    if (model.shade || model.toolRoll > 0.05) {
+      await unrollToolScroll();
+    } else if (model.shade || model.bellowsFold > 0.05) {
       await unfoldBellows();
     }
     if (model.joined) {
@@ -2264,6 +2613,8 @@ async function applyState(stateName) {
       model.entangle = 0;
       model.duffelLoop = 0;
       model.duffelTension = 0;
+      model.toolRoll = 0;
+      model.bellowsFold = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -2272,7 +2623,9 @@ async function applyState(stateName) {
       say('State: Separate — Two independent tactile felt capsules.');
     }
   } else if (stateName === 'joining') {
-    if (model.shade || model.bellowsFold > 0.05) {
+    if (model.shade || model.toolRoll > 0.05) {
+      await unrollToolScroll();
+    } else if (model.shade || model.bellowsFold > 0.05) {
       await unfoldBellows();
     }
     model.joined = false;
@@ -2282,22 +2635,44 @@ async function applyState(stateName) {
       model.duffelLoop = 0.65;
       model.duffelTension = 0.3;
       model.entangle = 0;
+      model.toolRoll = 0;
+      model.bellowsFold = 0;
+    } else if (model.option === 'toolroll') {
+      model.toolRoll = 0.52; // mid-flight scroll curled halfway upward
+      model.duffelLoop = 0;
+      model.duffelTension = 0;
+      model.entangle = 0;
+      model.bellowsFold = 0;
+    } else if (model.option === 'bellows') {
+      model.bellowsFold = 0.5;
+      model.duffelLoop = 0;
+      model.duffelTension = 0;
+      model.entangle = 0;
+      model.toolRoll = 0;
     } else {
       model.entangle = 0.55; // mid-flight fibers reaching and crossing
       model.duffelLoop = 0;
       model.duffelTension = 0;
+      model.toolRoll = 0;
+      model.bellowsFold = 0;
     }
     model.light = 0.75;
     model.a.x = 240;
     model.b.x = 240 + W + 50; // near each other
     render();
-    if (model.option === 'duffel') {
+    if (model.option === 'toolroll') {
+      say('State: Joining — Mid-animation view with artist\'s tool scroll curled halfway upward.');
+    } else if (model.option === 'duffel') {
       say('State: Joining — Braided wool loops reaching open toward olive-wood toggles.');
+    } else if (model.option === 'bellows') {
+      say('State: Joining — Mid-animation view with accordion pleats half compressed.');
     } else {
       say('State: Joining — Mid-animation view with roving fibers interweaving.');
     }
   } else if (stateName === 'joined') {
-    if (model.shade || model.bellowsFold > 0.05) {
+    if (model.shade || model.toolRoll > 0.05) {
+      await unrollToolScroll();
+    } else if (model.shade || model.bellowsFold > 0.05) {
       await unfoldBellows();
     }
     if (!model.joined) {
@@ -2306,6 +2681,8 @@ async function applyState(stateName) {
       model.joined = true;
       model.blend = 1;
       model.cap = 1;
+      model.toolRoll = 0;
+      model.bellowsFold = 0;
       if (model.option === 'duffel') {
         model.duffelLoop = 1;
         model.duffelTension = 1;
@@ -2324,10 +2701,12 @@ async function applyState(stateName) {
       }
     }
   } else if (stateName === 'shade') {
-    if (model.shade || model.bellowsFold > 0.5) {
-      await unfoldBellows();
+    if (model.shade || model.toolRoll > 0.5 || model.bellowsFold > 0.5) {
+      if (model.option === 'bellows') await unfoldBellows();
+      else await unrollToolScroll();
     } else {
-      await foldBellows();
+      if (model.option === 'bellows') await foldBellows();
+      else await rollToolScroll();
     }
   }
 }
@@ -2393,6 +2772,10 @@ $('#btnBellowsAnim').onclick = () => {
   if (model.shade || model.bellowsFold > 0.5) unfoldBellows();
   else foldBellows();
 };
+$('#btnToolRollAnim').onclick = () => {
+  if (model.shade || model.toolRoll > 0.5) unrollToolScroll();
+  else rollToolScroll();
+};
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
   render();
@@ -2404,7 +2787,7 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, pocket: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, entangle: 0, bellowsFold: 0, duffelLoop: 0, duffelTension: 0, option: 'duffel', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, entangle: 0, bellowsFold: 0, toolRoll: 0, duffelLoop: 0, duffelTension: 0, option: 'toolroll', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
@@ -2442,7 +2825,9 @@ $('#optionSelect').onchange = (e) => {
     model.duffelTension = 0;
   }
   render();
-  if (model.option === 'duffel') {
+  if (model.option === 'toolroll') {
+    say('Option 4: The Artist\'s Tool-Roll (Felt Scroll) shade selected. Lower sections roll upward like a canvas brush roll held by button.');
+  } else if (model.option === 'duffel') {
     say('Option 3: Duffel Toggle & Braid Cord join selected. Braided wool loops catch over turned olive-wood toggle pegs.');
   } else if (model.option === 'bellows') {
     say('Option 2: Accordion Bellows Pleat shade selected. Scored wool pleats fold flat with lateral cushioning into a padded ribbon.');
@@ -2710,7 +3095,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat shade & Duffel Toggle join.');
+say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat, Duffel Toggle & Artist\'s Tool-Roll.');
 </script>
 </body>
 </html>
