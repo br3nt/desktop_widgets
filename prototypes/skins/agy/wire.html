@@ -981,8 +981,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Wire, Beads &amp; Stones <span>/ insect elytra shade, pop-tab hinge, tree root braid &amp; abacus</span></h1>
-    <p>Raw &amp; oxidized copper wire · Recycled pop-tab insect elytra shade · Stamped pull-tab cotter-pin hinge · Tree of Life root braid · Caged amethyst jewel · Abacus bead compression · Wire hoop accordion</p>
+    <h1>Wire, Beads &amp; Stones <span>/ shepherd's crook clasp, insect elytra, pop-tab hinge &amp; abacus</span></h1>
+    <p>Raw &amp; oxidized copper wire · Hand-bent shepherd's crook &amp; double-spiral eyelet clasp · Recycled pop-tab insect elytra · Stamped cotter-pin hinge · Tree of Life root braid · Caged amethyst jewel · Abacus bead compression</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -993,7 +993,8 @@ footer .note-highlight {
         <option value="tree_root_braid">3. Wire Tree Root Braid onto Hoop join</option>
         <option value="wire_accordion">4. Wire Hoop Folding Accordion shade</option>
         <option value="poptab_hinge">5. Recycled Pop-Tab Cotter-Pin Hinge join</option>
-        <option value="elytra_shade" selected>6. Beaded Pull-Tab Insect Elytra shade</option>
+        <option value="elytra_shade">6. Beaded Pull-Tab Insect Elytra shade</option>
+        <option value="shepherds_crook" selected>7. Shepherd's Crook &amp; Spiral Eyelet join</option>
       </select>
     </div>
     <div class="control-group">
@@ -1408,12 +1409,13 @@ const model = {
   abacusCompress: 0, // 0 = relaxed full abacus, 1 = compressed jeweled rod
   accordionFold: 0,  // Option 4: 0 = relaxed lower hoop, 1 = folded 180° upward against top rim
   elytraProgress: 0, // Option 6: 0 = relaxed open wings, 1 = closed beaded elytra over screen
-  option: 'elytra_shade', // Default to Option 6
+  option: 'shepherds_crook', // Default to Option 7
   blend: 0,
   cap: 0,
   bayonetProgress: 0, // Option 1: 0 = separate, 0.5 = sleeve entry, 1.0 = 30-deg twist locked
   treeRootProgress: 0, // Option 3: 0 = separate, 0.5 = reaching hoop, 1.0 = cinched & locked
   poptabProgress: 0,   // Option 5: 0 = separate, 0.5 = coaxial alignment, 0.85 = pin drop, 1.0 = prongs split & locked
+  crookProgress: 0,    // Option 7: 0 = separate, 0.55 = crook tip deflecting over spiral rim, 0.85 = snapped in cradle, 1.0 = guard locked
   light: 0,
   limit: 3,
   feel: 'free',
@@ -2369,6 +2371,14 @@ function drawWireCap(x, y, isRight, isMaleCage = false, retract = 0, isShade = f
   const scaleX = (1 - retract) * dir;
   if (Math.abs(scaleX) < 0.05) return '';
 
+  if (model.option === 'shepherds_crook') {
+    if (isRight) {
+      return drawShepherdsCrookFlankA(startX, y, scaleX);
+    } else {
+      return drawShepherdsCrookFlankB(startX, y, scaleX);
+    }
+  }
+
   if (model.option === 'poptab_hinge') {
     if (isRight) {
       return drawPopTabFlankA(startX, y, scaleX);
@@ -2908,6 +2918,246 @@ function drawPopTabHingeJoin(midX, y, progress, opacity = 1) {
   return s;
 }
 
+// Option 7 Flank A (Module A - Right): Hand-bent heavy 14-gauge copper shepherd's crook hook, mounting bracket, coiled wraps & gemstone cabochon
+function drawShepherdsCrookFlankA(startX, y, scaleX) {
+  return `
+    <g transform="translate(${startX}, ${y + 64}) scale(${scaleX}, 1)" id="shepherdsCrookFlankA">
+      <!-- Structural Frame Collar -->
+      <path d="M -4 -46 C 8 -44 12 -26 12 0 C 12 26 8 44 -4 46"
+            fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>
+
+      <!-- Coiled Wire Sleeves at Hook Mounting Anchor -->
+      <rect x="0" y="-20" width="8" height="40" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>
+      <line x1="2" y1="-20" x2="2" y2="20" stroke="#ffd4b8" stroke-width="0.8"/>
+      <line x1="5" y1="-20" x2="5" y2="20" stroke="#381406" stroke-width="0.8"/>
+
+      <!-- Flank Accent Beads (Amethyst & Carnelian rondelles) -->
+      <circle cx="4" cy="-28" r="3.2" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="0.8"/>
+      <circle cx="3.2" cy="-28.8" r="0.8" fill="#ffffff" opacity="0.85"/>
+      <circle cx="4" cy="28" r="3.2" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>
+      <circle cx="3.2" cy="27.2" r="0.8" fill="#ffffff" opacity="0.85"/>
+
+      <!-- Central Cabochon Inset at Hook Base (Polished Turquoise) -->
+      <ellipse cx="6" cy="0" rx="4.5" ry="6" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.9"/>
+      <circle cx="4.8" cy="-1.8" r="1.1" fill="#ffffff" opacity="0.9"/>
+
+      <!-- Copper Mounting Bracket Plate -->
+      <path d="M 6 -10 L 15 -10 L 15 10 L 6 10 Z" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="0.8"/>
+      <circle cx="11" cy="0" r="2.2" fill="url(#copperRondelle)"/>
+
+      <!-- Heavy 14-Gauge Hand-Bent Copper Shepherd's Crook Hook -->
+      <!-- Hook Shank extending horizontally -->
+      <line x1="14" y1="0" x2="26" y2="0" stroke="url(#copperGrad)" stroke-width="3.4" stroke-linecap="round"/>
+      <line x1="14" y1="-0.6" x2="26" y2="-0.6" stroke="#ffd4b8" stroke-width="0.9"/>
+
+      <!-- Crook Arch & Bill: Sweeps up into graceful crook arch and curves back down -->
+      <path d="M 26 0 C 34 0 42 -6 42 -18 C 42 -30 30 -34 20 -26 C 14 -20 16 -10 24 -12 C 27 -13 29 -16 28 -19"
+            fill="none" stroke="url(#copperGrad)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 26 -0.6 C 33 -0.6 40 -6 40 -18 C 40 -28 30 -32 21 -25 C 16 -19 17 -11 23 -12.5"
+            fill="none" stroke="#ffd4b8" stroke-width="0.9" stroke-linecap="round"/>
+
+      <!-- Molten Copper Ball / Finial Bead at Bill Terminal -->
+      <circle cx="28" cy="-19" r="2.3" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.6"/>
+
+      <!-- Spring-Wire Safety Keeper poising across hook mouth -->
+      <path d="M 18 3 C 21 0 24 -4 26 -10"
+            fill="none" stroke="url(#copperGrad)" stroke-width="1.3" stroke-linecap="round"/>
+      <path d="M 18 3 C 21 0 24 -4 26 -10"
+            fill="none" stroke="#ffd4b8" stroke-width="0.5" stroke-linecap="round"/>
+      <circle cx="26" cy="-10" r="1.3" fill="url(#copperRondelle)"/>
+    </g>
+  `;
+}
+
+// Option 7 Flank B (Module B - Left): Hand-wound double-spiral copper wire eyelet cradle & flanking gemstone beads
+function drawShepherdsCrookFlankB(startX, y, scaleX) {
+  return `
+    <g transform="translate(${startX}, ${y + 64}) scale(${scaleX}, 1)" id="shepherdsCrookFlankB">
+      <!-- Structural Frame Collar -->
+      <path d="M -4 -46 C 8 -44 12 -26 12 0 C 12 26 8 44 -4 46"
+            fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>
+
+      <!-- Coiled Wire Sleeves at Eyelet Mounting Anchor -->
+      <rect x="0" y="-22" width="8" height="44" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>
+      <line x1="2" y1="-22" x2="2" y2="22" stroke="#ffd4b8" stroke-width="0.8"/>
+      <line x1="5" y1="-22" x2="5" y2="22" stroke="#381406" stroke-width="0.8"/>
+
+      <!-- Flank Accent Gemstone Beads (Faceted Amethyst & Peridot) -->
+      <circle cx="4" cy="-28" r="3.4" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="0.8"/>
+      <circle cx="3.2" cy="-28.8" r="0.8" fill="#ffffff" opacity="0.85"/>
+      <circle cx="4" cy="28" r="3.4" fill="url(#peridotBead)" stroke="#1a3d07" stroke-width="0.8"/>
+      <circle cx="3.2" cy="27.2" r="0.8" fill="#ffffff" opacity="0.85"/>
+
+      <!-- Center Spacer Bead (Translucent Carnelian) -->
+      <circle cx="6" cy="0" r="3.4" fill="url(#carnelianBead)" stroke="#4d1402" stroke-width="0.8"/>
+      <circle cx="5" cy="-1" r="0.9" fill="#ffffff" opacity="0.9"/>
+
+      <!-- Base Mounting Bracket Tabs -->
+      <path d="M 6 -12 L 14 -12 L 14 12 L 6 12 Z" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="0.8"/>
+
+      <!-- Double-Spiral Wire Eyelet / Cradle -->
+      <!-- Upper Wire Shank & Spiral Scroll (Clockwise spiral) -->
+      <path d="M 12 -12 L 20 -14 C 28 -18 36 -16 36 -8 C 36 -1 28 2 22 -2 C 18 -5 20 -11 25 -11 C 28 -11 30 -8 28 -6"
+            fill="none" stroke="url(#copperGrad)" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M 12 -12 L 20 -14 C 28 -18 36 -16 36 -8"
+            fill="none" stroke="#ffd4b8" stroke-width="0.7"/>
+
+      <!-- Lower Wire Shank & Spiral Scroll (Counter-clockwise spiral) -->
+      <path d="M 12 12 L 20 14 C 28 18 36 16 36 8 C 36 1 28 -2 22 2 C 18 5 20 11 25 11 C 28 11 30 8 28 6"
+            fill="none" stroke="url(#copperGrad)" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M 12 12 L 20 14 C 28 18 36 16 36 8"
+            fill="none" stroke="#ffd4b8" stroke-width="0.7"/>
+
+      <!-- Central Open Wire Eyelet / Cradle Throat Opening -->
+      <ellipse cx="28" cy="0" rx="7" ry="5.5" fill="#0b0e10" stroke="#1f282e" stroke-width="0.8"/>
+      <path d="M 18 -6 C 26 -10 38 -8 40 0 C 38 8 26 10 18 6"
+            fill="none" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 18 -6 C 26 -10 38 -8 40 0"
+            fill="none" stroke="#ffd4b8" stroke-width="0.8"/>
+      <!-- Front Guide Lip Wire Bevel -->
+      <circle cx="40" cy="0" r="1.8" fill="url(#copperRondelle)"/>
+    </g>
+  `;
+}
+
+// Option 7 Join: Shepherd's Crook snaps into Double-Spiral Wire Eyelet with elastic deflection, contact spark & spring keeper lock
+function drawShepherdsCrookJoin(midX, y, progress, opacity = 1) {
+  if (progress < 0.04) return '';
+
+  const prog = Math.max(0, Math.min(1, progress));
+  const reach = Math.min(1, prog * 1.8);
+  const lx = midX - 26 * reach;
+  const rx = midX + 26 * reach;
+  const hy = y + 64;
+
+  // Elastic wire deflection as crook tip glides over outer eyelet rim (peaks around prog = 0.55)
+  const deflectFactor = Math.sin(Math.max(0, Math.min(1, (prog - 0.3) / 0.45)) * Math.PI);
+  const deflectY = -7 * deflectFactor;
+
+  // Snap progression into cradle (0.72 -> 0.92)
+  const snapProgress = Math.max(0, Math.min(1, (prog - 0.72) / 0.2));
+  // Spring guard keeper lock progression (0.86 -> 1.0)
+  const guardProgress = Math.max(0, Math.min(1, (prog - 0.86) / 0.14));
+
+  // Release tension interaction
+  const tension = (typeof model !== 'undefined' && model ? model.tension : 0);
+  const liftY = -tension * 16;
+  const guardOpen = Math.min(1, tension * 2.2);
+  const effectiveGuard = Math.max(0, guardProgress - guardOpen);
+
+  let s = `<g id="shepherdsCrookSeam" opacity="${opacity}">`;
+
+  // 1. Ambient Warm Copper & Gemstone Proximity Glow
+  s += `<ellipse cx="${midX}" cy="${hy}" rx="${24 * reach}" ry="44"
+                fill="#ffd4b8" opacity="${0.22 * reach}" filter="url(#gemGlow)"/>`;
+
+  // 2. LAYER: Base Mounting Brackets & Coiled Sleeves on Flanks
+  s += `<g class="crook-base-brackets">`;
+  // Module A Flank Base
+  s += `<rect x="${lx - 8}" y="${hy - 20}" width="8" height="40" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+  s += `<circle cx="${lx - 4}" cy="${hy - 28}" r="3.2" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="0.8"/>`;
+  s += `<circle cx="${lx - 4}" cy="${hy + 28}" r="3.2" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+  s += `<ellipse cx="${lx - 2}" cy="${hy}" rx="4.5" ry="6" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.9"/>`;
+  s += `<path d="M ${lx} ${hy - 10} L ${lx + 8} ${hy - 10} L ${lx + 8} ${hy + 10} L ${lx} ${hy + 10} Z" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="0.8"/>`;
+
+  // Module B Flank Base
+  s += `<rect x="${rx}" y="${hy - 22}" width="8" height="44" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+  s += `<circle cx="${rx + 4}" cy="${hy - 28}" r="3.4" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="0.8"/>`;
+  s += `<circle cx="${rx + 4}" cy="${hy + 28}" r="3.4" fill="url(#peridotBead)" stroke="#1a3d07" stroke-width="0.8"/>`;
+  s += `<circle cx="${rx + 2}" cy="${hy}" r="3.4" fill="url(#carnelianBead)" stroke="#4d1402" stroke-width="0.8"/>`;
+  s += `<path d="M ${rx - 8} ${hy - 12} L ${rx} ${hy - 12} L ${rx} ${hy + 12} L ${rx - 8} ${hy + 12} Z" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="0.8"/>`;
+  s += `</g>`;
+
+  // 3. LAYER: Double-Spiral Eyelet Body (From Module B)
+  const eyeX = rx - 18;
+  s += `<g class="double-spiral-eyelet">`;
+  // Eyelet Throat Cavity Opening (Backing darkness showing depth)
+  s += `<ellipse cx="${eyeX - 10}" cy="${hy}" rx="7.5" ry="6" fill="#090d0f" stroke="#1d262c" stroke-width="0.8"/>`;
+
+  // Upper Spiral Scroll (Clockwise)
+  s += `<path d="M ${rx - 8} ${hy - 12} L ${eyeX} ${hy - 14} C ${eyeX - 8} ${hy - 18} ${eyeX - 16} ${hy - 16} ${eyeX - 16} ${hy - 8} C ${eyeX - 16} ${hy - 1} ${eyeX - 8} ${hy + 2} ${eyeX - 2} ${hy - 2} C ${eyeX + 2} ${hy - 5} ${eyeX} ${hy - 11} ${eyeX - 5} ${hy - 11} C ${eyeX - 8} ${hy - 11} ${eyeX - 10} ${hy - 8} ${eyeX - 8} ${hy - 6}"
+              fill="none" stroke="url(#copperGrad)" stroke-width="2.4" stroke-linecap="round"/>`;
+  s += `<path d="M ${rx - 8} ${hy - 12} L ${eyeX} ${hy - 14} C ${eyeX - 8} ${hy - 18} ${eyeX - 16} ${hy - 16} ${eyeX - 16} ${hy - 8}"
+              fill="none" stroke="#ffd4b8" stroke-width="0.7"/>`;
+
+  // Lower Spiral Scroll (Counter-clockwise)
+  s += `<path d="M ${rx - 8} ${hy + 12} L ${eyeX} ${hy + 14} C ${eyeX - 8} ${hy + 18} ${eyeX - 16} ${hy + 16} ${eyeX - 16} ${hy + 8} C ${eyeX - 16} ${hy + 1} ${eyeX - 8} ${hy - 2} ${eyeX - 2} ${hy + 2} C ${eyeX + 2} ${hy + 5} ${eyeX} ${hy + 11} ${eyeX - 5} ${hy + 11} C ${eyeX - 8} ${hy + 11} ${eyeX - 10} ${hy + 8} ${eyeX - 8} ${hy + 6}"
+              fill="none" stroke="url(#copperGrad)" stroke-width="2.4" stroke-linecap="round"/>`;
+  s += `<path d="M ${rx - 8} ${hy + 12} L ${eyeX} ${hy + 14} C ${eyeX - 8} ${hy + 18} ${eyeX - 16} ${hy + 16} ${eyeX - 16} ${hy + 8}"
+              fill="none" stroke="#ffd4b8" stroke-width="0.7"/>`;
+
+  // Central Eyelet Throat Wire Rim (Loop where hook passes through)
+  s += `<path d="M ${rx - 10} ${hy - 6} C ${eyeX - 6} ${hy - 10} ${eyeX - 18} ${hy - 8} ${eyeX - 20} ${hy} C ${eyeX - 18} ${hy + 8} ${eyeX - 6} ${hy + 10} ${rx - 10} ${hy + 6}"
+              fill="none" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round"/>`;
+  s += `<path d="M ${rx - 10} ${hy - 6} C ${eyeX - 6} ${hy - 10} ${eyeX - 18} ${hy - 8} ${eyeX - 20} ${hy}"
+              fill="none" stroke="#ffd4b8" stroke-width="0.8"/>`;
+  s += `<circle cx="${eyeX - 20}" cy="${hy}" r="1.8" fill="url(#copperRondelle)"/>`;
+  s += `</g>`;
+
+  // 4. LAYER: Hand-Bent Copper Shepherd's Crook (From Module A)
+  const hookBaseX = lx + 8;
+  const hookReachX = hookBaseX + (eyeX - hookBaseX - 4) * reach;
+  const crookTipY = hy - 19 + deflectY + liftY;
+  const crookBillY = hy - 12 + deflectY * 0.7 + liftY;
+
+  s += `<g class="shepherds-crook-hook">`;
+  // Heavy horizontal hook shank
+  s += `<line x1="${hookBaseX}" y1="${hy}" x2="${hookReachX}" y2="${hy}"
+              stroke="url(#copperGrad)" stroke-width="3.4" stroke-linecap="round"/>`;
+  s += `<line x1="${hookBaseX}" y1="${hy - 0.6}" x2="${hookReachX}" y2="${hy - 0.6}"
+              stroke="#ffd4b8" stroke-width="0.9"/>`;
+
+  // The Crook Arch: curves up, back, and around into the cradle
+  const archEndX = hookReachX + 16 * reach;
+  s += `<path d="M ${hookReachX} ${hy}
+                 C ${hookReachX + 8} ${hy} ${archEndX} ${hy - 6} ${archEndX} ${hy - 18 + deflectY * 0.5 + liftY}
+                 C ${archEndX} ${hy - 30 + deflectY * 0.6 + liftY} ${archEndX - 12} ${hy - 34 + deflectY * 0.8 + liftY} ${archEndX - 22} ${hy - 26 + deflectY + liftY}
+                 C ${archEndX - 28} ${hy - 20 + deflectY + liftY} ${archEndX - 26} ${hy - 10 + deflectY * 0.8 + liftY} ${archEndX - 18} ${crookBillY}
+                 C ${archEndX - 15} ${crookBillY - 1} ${archEndX - 13} ${crookTipY + 3} ${archEndX - 14} ${crookTipY}"
+              fill="none" stroke="url(#copperGrad)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  s += `<path d="M ${hookReachX} ${hy - 0.6}
+                 C ${hookReachX + 7} ${hy - 0.6} ${archEndX - 1} ${hy - 6} ${archEndX - 1} ${hy - 18 + deflectY * 0.5 + liftY}
+                 C ${archEndX - 1} ${hy - 28 + deflectY * 0.6 + liftY} ${archEndX - 12} ${hy - 32 + deflectY * 0.8 + liftY} ${archEndX - 21} ${hy - 25 + deflectY + liftY}
+                 C ${archEndX - 26} ${hy - 19 + deflectY + liftY} ${archEndX - 25} ${hy - 11 + deflectY * 0.8 + liftY} ${archEndX - 19} ${crookBillY}"
+              fill="none" stroke="#ffd4b8" stroke-width="0.9" stroke-linecap="round"/>`;
+
+  // Molten Copper Ball / Finial Bead at Bill Terminal
+  s += `<circle cx="${archEndX - 14}" cy="${crookTipY}" r="2.4" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.6"/>`;
+
+  // Spring-Wire Safety Keeper poising across hook mouth
+  if (effectiveGuard > 0.05) {
+    s += `<path d="M ${hookReachX - 4} ${hy + 3} C ${hookReachX} ${hy} ${archEndX - 20} ${hy - 6 + liftY} ${archEndX - 16} ${crookBillY}"
+                fill="none" stroke="url(#copperGrad)" stroke-width="1.6" stroke-linecap="round"/>`;
+    s += `<path d="M ${hookReachX - 4} ${hy + 3} C ${hookReachX} ${hy} ${archEndX - 20} ${hy - 6 + liftY} ${archEndX - 16} ${crookBillY}"
+                fill="none" stroke="#ffd4b8" stroke-width="0.6" stroke-linecap="round"/>`;
+    s += `<circle cx="${archEndX - 16}" cy="${crookBillY}" r="1.4" fill="url(#copperRondelle)"/>`;
+  } else {
+    s += `<path d="M ${hookReachX - 4} ${hy + 3} C ${hookReachX - 1} ${hy + 2} ${hookReachX + 4} ${hy - 4} ${hookReachX + 6} ${hy - 10 + liftY}"
+                fill="none" stroke="url(#copperGrad)" stroke-width="1.4" stroke-linecap="round"/>`;
+    s += `<circle cx="${hookReachX + 6}" cy="${hy - 10 + liftY}" r="1.3" fill="url(#copperRondelle)"/>`;
+  }
+  s += `</g>`;
+
+  // 5. LAYER: Snap Glint Spark Burst (Active when crook clears crest and snaps into cradle)
+  if (snapProgress > 0.1 && snapProgress < 0.95) {
+    const flash = Math.sin(snapProgress * Math.PI);
+    s += `
+      <g class="shepherds-snap-spark">
+        <circle cx="${archEndX - 16}" cy="${hy - 14}" r="${flash * 42}"
+                fill="none" stroke="#ffd4b8" stroke-width="${flash * 4}" opacity="${flash * 0.85}" filter="url(#gemGlow)"/>
+        <circle cx="${archEndX - 16}" cy="${hy - 14}" r="${flash * 20}"
+                fill="none" stroke="#ffffff" stroke-width="${flash * 2.5}" opacity="${flash * 0.95}"/>
+        <circle cx="${eyeX - 16}" cy="${hy - 12}" r="2" fill="#52f0de" opacity="${flash * 0.9}"/>
+        <circle cx="${archEndX}" cy="${hy - 24}" r="2" fill="#e49eff" opacity="${flash * 0.9}"/>
+        <circle cx="${archEndX - 22}" cy="${hy - 4}" r="2" fill="#ff8b54" opacity="${flash * 0.9}"/>
+      </g>
+    `;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -2938,7 +3188,13 @@ function renderHardware() {
 
   // Draw join seam based on active option
   if (!isShade) {
-    if (model.option === 'poptab_hinge') {
+    if (model.option === 'shepherds_crook') {
+      if (model.joined || model.crookProgress > 0.02 || (glow > 0.25 && !model.joined)) {
+        const prog = model.joined ? 1 : model.crookProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+        shared += drawShepherdsCrookJoin(kMidX, a.y, prog, Math.max(p, glow > 0.25 ? 0.95 : prog));
+      }
+    } else if (model.option === 'poptab_hinge') {
       if (model.joined || model.poptabProgress > 0.02 || (glow > 0.25 && !model.joined)) {
         const prog = model.joined ? 1 : model.poptabProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
         const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
@@ -3000,7 +3256,8 @@ function updateStateButtons() {
   const isJoined = model.joined;
   const isJoining = ((model.bayonetProgress > 0.1 && model.bayonetProgress < 0.95) ||
                      (model.treeRootProgress > 0.1 && model.treeRootProgress < 0.95) ||
-                     (model.poptabProgress > 0.1 && model.poptabProgress < 0.95)) && !isJoined;
+                     (model.poptabProgress > 0.1 && model.poptabProgress < 0.95) ||
+                     (model.crookProgress > 0.1 && model.crookProgress < 0.95)) && !isJoined;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -3017,7 +3274,18 @@ function updateStateButtons() {
 }
 
 function updateOptionControls() {
-  if (model.option === 'poptab_hinge') {
+  if (model.option === 'shepherds_crook') {
+    $('#btnJoinAnim').textContent = 'Snap shepherd\'s crook';
+    $('#btnSeparateAnim').textContent = 'Unclasp crook';
+    $('#btnJoinAnim').className = 'primary-btn';
+    $('#btnAccordionAnim').className = '';
+    $('#btnAbacusAnim').className = '';
+    $('#btnElytraAnim').className = '';
+    $('#portA').dataset.label = 'Shepherd\'s Crook · A';
+    $('#portB').dataset.label = 'Spiral Eyelet · B';
+    $('#wireRelease').setAttribute('title', 'Pull right to release shepherd\'s crook · Enter to unclasp');
+    $('#wireRelease').setAttribute('aria-label', 'Release GitDiscuss: pull right to unclasp shepherd\'s crook or press Enter');
+  } else if (model.option === 'poptab_hinge') {
     $('#btnJoinAnim').textContent = 'Lock pop-tab hinge';
     $('#btnSeparateAnim').textContent = 'Pull cotter pin';
     $('#btnJoinAnim').className = 'primary-btn';
@@ -3182,15 +3450,19 @@ function render() {
         $('#phase').textContent = 'Shade mode / Compressed abacus jeweled rod';
       }
     } else if (model.joined) {
-      if (model.option === 'poptab_hinge') {
+      if (model.option === 'shepherds_crook') {
+        $('#phase').textContent = 'Joined / Hand-bent shepherd\'s crook snapped into double-spiral cradle';
+      } else if (model.option === 'poptab_hinge') {
         $('#phase').textContent = 'Joined / Stamped pop-tab knuckle hinge locked by wire cotter pin';
       } else if (model.option === 'tree_root_braid') {
         $('#phase').textContent = 'Joined / Tree roots braided tightly onto silver hoop';
       } else {
         $('#phase').textContent = 'Joined / One unified handcrafted instrument';
       }
-    } else if (model.poptabProgress > 0.1 || model.treeRootProgress > 0.1 || model.bayonetProgress > 0.1) {
-      if (model.option === 'poptab_hinge') {
+    } else if (model.crookProgress > 0.1 || model.poptabProgress > 0.1 || model.treeRootProgress > 0.1 || model.bayonetProgress > 0.1) {
+      if (model.option === 'shepherds_crook') {
+        $('#phase').textContent = 'Joining / Crook tip deflecting past spiral eyelet rim';
+      } else if (model.option === 'poptab_hinge') {
         $('#phase').textContent = 'Joining / Pop-tabs interleaving & cotter pin descending';
       } else if (model.option === 'tree_root_braid') {
         $('#phase').textContent = 'Joining / Copper roots curling around silver hoop';
@@ -3198,7 +3470,9 @@ function render() {
         $('#phase').textContent = 'Joining / Caged amethyst bead entering bayonet sleeve';
       }
     } else {
-      if (model.option === 'elytra_shade') {
+      if (model.option === 'shepherds_crook') {
+        $('#phase').textContent = 'Separate / Hand-bent copper shepherd\'s crook & double-spiral eyelet';
+      } else if (model.option === 'elytra_shade') {
         $('#phase').textContent = 'Separate / Beaded pull-tab insect elytra perched at shoulders';
       } else if (model.option === 'poptab_hinge') {
         $('#phase').textContent = 'Separate / Recycled wire-wrapped pop-tab hinge knuckles';
@@ -3535,14 +3809,113 @@ async function separatePopTab() {
   say('Separated. Independent handcrafted wire armatures restored.');
 }
 
+// Option 7 Join Animation: Crook approaches eyelet, tip deflects past outer wire rim, snaps home with spark, spring keeper clicks shut
+async function joinShepherdsCrook(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Shepherd\'s crook approaches. Hand-bent copper hook aligns with double-spiral eyelet.');
+  $('#phase').textContent = 'Crook approaching spiral eyelet';
+
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 90 : 250, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  $('#phase').textContent = 'Deflecting crook bill over spiral rim';
+  if (!await tween(fromDrag ? 140 : 280, t => {
+    model.cap = t;
+    model.crookProgress = t * 0.55; // Approaching and deflecting over outer rim
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.cradle ? 305 : 385, model.a.y));
+
+  $('#phase').textContent = 'Snapping crook into spiral wire cradle';
+  if (!await tween(fromDrag ? 260 : 460, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.crookProgress = 0.55 + 0.3 * t; // 0.55 -> 0.85 (snapping into cradle)
+    model.light = 1 - t * 0.7;
+    render();
+  }, token)) return;
+
+  // Spring keeper clicks shut across hook throat
+  $('#phase').textContent = 'Springing safety guard closed';
+  if (!await tween(fromDrag ? 180 : 320, t => {
+    model.crookProgress = 0.85 + 0.15 * t; // 0.85 -> 1.0 (guard snaps shut)
+    model.light = (1 - t) * 0.3;
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.crookProgress = 1;
+  model.light = 0;
+  render();
+  say('Shepherd\'s crook snapped into double-spiral cradle! Jewelry clasp locked under spring tension. Pull release clasp right to unclasp.');
+}
+
+async function separateShepherdsCrook() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Releasing safety guard. Shepherd\'s crook unclasps from double-spiral eyelet.');
+
+  $('#phase').textContent = 'Opening safety guard and lifting crook';
+  if (!await tween(240, t => {
+    model.crookProgress = 1 - t * 0.45; // 1.0 -> 0.55
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Separating wire armatures';
+  if (!await tween(520, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.5);
+    model.cap = 1 - Math.max(0, (t - 0.3) / 0.7);
+    model.crookProgress = (1 - t) * 0.55;
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.crookProgress = 0;
+  render();
+  say('Separated. Handcrafted shepherd\'s crook and spiral eyelet disengaged.');
+}
+
 // Unified join & separate dispatches based on active option
 async function join(fromDrag = false) {
+  if (model.option === 'shepherds_crook') return joinShepherdsCrook(fromDrag);
   if (model.option === 'poptab_hinge') return joinPopTab(fromDrag);
   if (model.option === 'tree_root_braid') return joinTreeRoot(fromDrag);
   return joinCagedBead(fromDrag);
 }
 
 async function separate() {
+  if (model.option === 'shepherds_crook') return separateShepherdsCrook();
   if (model.option === 'poptab_hinge') return separatePopTab();
   if (model.option === 'tree_root_braid') return separateTreeRoot();
   return separateCagedBead();
@@ -3747,12 +4120,15 @@ async function applyState(stateName) {
       model.bayonetProgress = 0;
       model.treeRootProgress = 0;
       model.poptabProgress = 0;
+      model.crookProgress = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
       model.b.x = 680;
       render();
-      if (model.option === 'elytra_shade') {
+      if (model.option === 'shepherds_crook') {
+        say('State: Separate — Two independent capsules with hand-bent copper shepherd\'s crook and double-spiral eyelet.');
+      } else if (model.option === 'elytra_shade') {
         say('State: Separate — Two independent capsules with beaded pop-tab insect elytra.');
       } else if (model.option === 'poptab_hinge') {
         say('State: Separate — Two independent capsules with stamped aluminum pop-tab hinge knuckles.');
@@ -3778,20 +4154,29 @@ async function applyState(stateName) {
     model.light = 0.8;
     model.a.x = 240;
     model.b.x = 240 + W + 50; // approaching each other
-    if (model.option === 'poptab_hinge') {
+    if (model.option === 'shepherds_crook') {
+      model.crookProgress = 0.55;
+      model.treeRootProgress = 0;
+      model.bayonetProgress = 0;
+      model.poptabProgress = 0;
+      say('State: Joining — Mid-animation view with crook tip deflecting past spiral eyelet rim under spring tension.');
+    } else if (model.option === 'poptab_hinge') {
       model.poptabProgress = 0.55;
       model.treeRootProgress = 0;
       model.bayonetProgress = 0;
+      model.crookProgress = 0;
       say('State: Joining — Mid-animation view with pop-tabs interleaved in coaxial alignment and cotter pin poised.');
     } else if (model.option === 'tree_root_braid') {
       model.treeRootProgress = 0.55; // roots reaching and coiling halfway around hoop
       model.bayonetProgress = 0;
       model.poptabProgress = 0;
+      model.crookProgress = 0;
       say('State: Joining — Mid-animation view with twisted copper roots reaching and coiling around silver hoop.');
     } else {
       model.bayonetProgress = 0.55;
       model.treeRootProgress = 0;
       model.poptabProgress = 0;
+      model.crookProgress = 0;
       say('State: Joining — Mid-animation view with caged bead entering sleeve and compressing wire spring.');
     }
     render();
@@ -3812,20 +4197,29 @@ async function applyState(stateName) {
       model.blend = 1;
       model.cap = 1;
       model.light = 0;
-      if (model.option === 'poptab_hinge') {
+      if (model.option === 'shepherds_crook') {
+        model.crookProgress = 1;
+        model.treeRootProgress = 0;
+        model.bayonetProgress = 0;
+        model.poptabProgress = 0;
+        say('State: Joined — Handcrafted jewelry clasp locked: copper shepherd\'s crook snapped into double-spiral wire cradle.');
+      } else if (model.option === 'poptab_hinge') {
         model.poptabProgress = 1;
         model.treeRootProgress = 0;
         model.bayonetProgress = 0;
+        model.crookProgress = 0;
         say('State: Joined — Monolithic wire armature locked by pop-tab knuckle hinge and split wire cotter pin.');
       } else if (model.option === 'tree_root_braid') {
         model.treeRootProgress = 1;
         model.bayonetProgress = 0;
         model.poptabProgress = 0;
+        model.crookProgress = 0;
         say('State: Joined — Monolithic wire armature with twisted copper roots tightly coiled around silver hoop.');
       } else {
         model.bayonetProgress = 1;
         model.treeRootProgress = 0;
         model.poptabProgress = 0;
+        model.crookProgress = 0;
         say('State: Joined — Monolithic wire armature with locked caged-bead lantern seam.');
       }
       render();
@@ -3950,7 +4344,8 @@ $('#btnReset').onclick = () => {
   model.abacusCompress = 0;
   model.accordionFold = 0;
   model.elytraProgress = 0;
-  model.option = 'elytra_shade';
+  model.crookProgress = 0;
+  model.option = 'shepherds_crook';
   model.blend = 0;
   model.cap = 0;
   model.bayonetProgress = 0;
@@ -3963,7 +4358,7 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
-  $('#optionSelect').value = 'elytra_shade';
+  $('#optionSelect').value = 'shepherds_crook';
   updateAbacusButtonText();
   updateAccordionButtonText();
   updateElytraButtonText();
@@ -3974,7 +4369,14 @@ $('#btnReset').onclick = () => {
 
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
-  if (model.option === 'poptab_hinge') {
+  if (model.option === 'shepherds_crook') {
+    say('Option 7: Shepherd\'s Crook & Spiral Eyelet join selected. Hand-bent copper crook snaps into double-spiral wire cradle.');
+    if (model.shade) {
+      if (model.accordionFold > 0) await unfoldWireAccordion();
+      else if (model.elytraProgress > 0) await openElytra();
+      else await expandAbacus();
+    }
+  } else if (model.option === 'poptab_hinge') {
     say('Option 5: Recycled Pop-Tab Cotter-Pin Hinge join selected. Stamped can pull-tabs align into coaxial hinge locked by wire cotter pin.');
     if (model.shade) {
       if (model.accordionFold > 0) await unfoldWireAccordion();
@@ -4326,6 +4728,11 @@ window.addEventListener('keydown', e => {
   else if (e.key === 'e' || e.key === 'E') {
     if (model.shade || model.elytraProgress > 0.5) openElytra();
     else closeElytra();
+    e.preventDefault();
+  }
+  else if (e.key === 's' || e.key === 'S') {
+    if (model.joined) separate();
+    else join();
     e.preventDefault();
   }
   else if (e.key === ' ' || e.code === 'Space') {
