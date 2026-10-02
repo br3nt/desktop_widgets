@@ -104,6 +104,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="stateRow"><span>State</span></div>
  <div class="row" id="joinRow"><span>Join</span></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-40" max="40" value="-20" aria-label="Hinge angle in degrees"><output id="angleOut">−20°</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Felt skin stage">
@@ -142,7 +143,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -152,7 +153,8 @@ const f=n=>Math.round(n*10)/10;
 
 /* ---------- Cross-stitch: a 5×7 matrix where every lit cell is an X ---------- */
 const GLYPH={0:'01110100011001110101110011000101110',1:'00100011000010000100001000010001110',2:'01110100010000100010001000100011111',3:'11111000100010000010000011000101110',4:'00010001100101010010111110001000010',
- 5:'11111100001111000001000011000101110',6:'00110010001000011110100011000101110',7:'11111000010001000100010000100001000',8:'01110100011000101110100011000101110',9:'01110100011000101111000010001001100','/':'00001000100001000100010000100010000'};
+ 5:'11111100001111000001000011000101110',6:'00110010001000011110100011000101110',7:'11111000010001000100010000100001000',8:'01110100011000101110100011000101110',9:'01110100011000101111000010001001100','/':'00001000100001000100010000100010000',
+ '+':'00000'+'00100'+'00100'+'11111'+'00100'+'00100'+'00000','-':'00000'.repeat(3)+'11111'+'00000'.repeat(3),'°':'01100'+'10010'+'10010'+'01100'+'00000'.repeat(3)};
 function xCell(cx,cy,c){const m=c*.2;return[`M${f(cx+m)} ${f(cy+c-m)}L${f(cx+c-m)} ${f(cy+m)}`,`M${f(cx+m)} ${f(cy+m)}L${f(cx+c-m)} ${f(cy+c-m)}`]}
 function xsvg(w,h,c,d1,d2){return `<svg width="${f(w)}" height="${f(h)}" viewBox="0 0 ${f(w)} ${f(h)}"><g fill="none" stroke-linecap="round" stroke-width="${f(c*.36)}"><path d="${d1}" style="stroke:var(--x2)"/><path d="${d2}" style="stroke:var(--x1)"/></g></svg>`}
 function xpaths(str,c){
@@ -369,6 +371,51 @@ function scissors(x,y,ang,open,op=1){
  return `<g opacity="${f(op)}" transform="translate(${f(x)} ${f(y)}) rotate(${f(ang)})">${half(open/2,1)}${half(-open/2,-1)}<circle r="1.4" fill="#e8c766" stroke="#5a4416" stroke-width=".5"/></g>`;
 }
 
+/* ---------- Cloth hinge geometry ---------- */
+// A felt strip is sewn across the gap. GitDiscuss turns about the strip's inside corner:
+// the inside closes up a little and bunches into creases, the outside stretches.
+const HG=18,OV=9,HMAX=40,HCOL='#c8b089',HTHREAD='#7a3416';
+const hingeOn=()=>model.join==='hinge'&&model.jt===1;
+// Displayed bend: flat until the strip is sewn on, then a soft felt flop that settles on model.angle.
+function bendAt(jt){
+ if(model.join!=='hinge')return 0;
+ const u=seg(jt,.76,1);if(u<=0)return 0;
+ return model.angle*(1-Math.pow(1-u,2.5)*Math.cos(2.4*Math.PI*u));
+}
+function hingeFrame(th,h){
+ const sg=th<0?-1:1,r=th*Math.PI/180,yi=Math.min(10,h*.2);
+ return{th,sg,yi,shr:12*Math.abs(th)/HMAX,oy:sg>0?h-EDGE-yi:EDGE+yi,cos:Math.cos(r),sin:Math.sin(r)};
+}
+// A GitDiscuss-local point on the stage, given GitDiscuss's unbent top-left (bx,by). Matches its CSS transform.
+const hingePt=(F,bx,by,lx,ly)=>{const dx=lx-EDGE,dy=ly-F.oy;return{x:bx+EDGE-F.shr+dx*F.cos-dy*F.sin,y:by+F.oy+dx*F.sin+dy*F.cos}};
+const V={add:(p,q)=>({x:p.x+q.x,y:p.y+q.y}),sub:(p,q)=>({x:p.x-q.x,y:p.y-q.y}),mul:(p,k)=>({x:p.x*k,y:p.y*k}),mix:(p,q,t)=>({x:lerp(p.x,q.x,t),y:lerp(p.y,q.y,t)})};
+const unit=p=>{const l=Math.hypot(p.x,p.y)||1;return{x:p.x/l,y:p.y/l}},pt=p=>`${f(p.x)} ${f(p.y)}`;
+// Unit normal of the edge p→q that points away from c.
+function outN(p,q,c){const d=unit(V.sub(q,p)),m=V.mix(p,q,.5);let n={x:-d.y,y:d.x};if((m.x-c.x)*n.x+(m.y-c.y)*n.y<0)n={x:d.y,y:-d.x};return n}
+// A pinking-shears edge from p to q: N teeth pointing along n, the whole edge sagging in by `sag` (negative puffs out).
+function pinked(p,q,n,sag,depth,N){let d='';for(let i=1;i<=2*N;i++){const t=i/(2*N);d+='L'+pt(V.add(V.mix(p,q,t),V.mul(n,-sag*Math.sin(Math.PI*t)+(i%2?depth:0))))}return d}
+function hingeGeo(c){
+ const F=hingeFrame(bendAt(c.jt),c.h),a=c.a,b=c.b,h=c.h,P=(lx,ly)=>hingePt(F,b.x,b.y,lx,ly);
+ const xa=a.x+W-EDGE-OV,yT=a.y+EDGE+F.yi,yB=a.y+h-EDGE-F.yi,lt=EDGE+F.yi,lb=h-EDGE-F.yi;
+ const Jt={x:xa,y:yT},Jb={x:xa,y:yB},Gt=P(EDGE+OV,lt),Gb=P(EDGE+OV,lb);
+ const [Jo,Ji,Go,Gi]=F.sg>0?[Jt,Jb,Gt,Gb]:[Jb,Jt,Gb,Gt],[lo,li]=F.sg>0?[lt,lb]:[lb,lt];
+ const C=V.mul(V.add(V.add(Jo,Ji),V.add(Go,Gi)),.25),k=Math.abs(F.th)/HMAX;
+ const no=outN(Jo,Go,C),ni=outN(Gi,Ji,C),bulge=8*k;
+ // Outside: the same eight pinked teeth spread wider and shallower as it stretches. Inside: they crowd and the edge puffs out.
+ const d=`M${pt(Jo)}${pinked(Jo,Go,no,3*k,2.6*(1-.45*k),8)}L${pt(Gi)}${pinked(Gi,Ji,ni,-bulge,2.6,8)}Z`;
+ return{...F,P,xa,yT,yB,lt,lb,lo,li,Jt,Jb,Gt,Gb,Jo,Ji,Go,Gi,C,k,no,ni,bulge,d};
+}
+// Vertical extent of the bent pair relative to Jarvis's top, used to keep it on the desktop.
+function hingeSpan(th,h){
+ const F=hingeFrame(th,h);let lo=0,hi=h;
+ for(const lx of [EDGE,W-EDGE])for(const ly of [EDGE,h-EDGE]){const y=hingePt(F,0,0,lx,ly).y;lo=Math.min(lo,y);hi=Math.max(hi,y)}
+ return[lo,hi];
+}
+const fitHinge=(y,th,h)=>{const[lo,hi]=hingeSpan(th,h);return clamp(y,46-lo,590-hi)};
+// The flop overshoots to about 1.25 times the angle, so a fresh join is fitted for that peak too.
+const peakBend=()=>1.25*model.angle;
+const signed=v=>{v=Math.round(v);return(v>0?'+':v<0?'−':'')+Math.abs(v)+'°'};
+
 const mixHex=(a,b,t)=>'#'+[0,2,4].map(i=>Math.round(lerp(parseInt(a.substr(i+1,2),16),parseInt(b.substr(i+1,2),16),t)).toString(16).padStart(2,'0')).join('');
 
 /* ---------- Options ---------- */
@@ -506,6 +553,80 @@ const JOINS={
    if(jt===1)s+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="French knot: tap or press Enter to snip the thread and separate the widgets"><title>Tap the knot to snip the thread</title><rect x="${f(X-14)}" y="${f(ky-10)}" width="32" height="34" rx="10" fill="transparent"/><g class="snipHint">${scissors(X+18,ky+17,214,24)}</g><rect class="ringfocus" x="${f(X-14)}" y="${f(ky-10)}" width="32" height="34" rx="10" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
    return s;
   }
+ },
+ hinge:{label:'Cloth hinge',kind:'Angle · hinge',gap:HG,ms:2900,msDrag:2500,relMs:2300,moveEnd:.3,hold:.68,
+  ph:[[0,.3,.58,.76,1],[0,.16,.42,.66,1]],
+  about:'Fabric bends, so the joint is just a strip of oatmeal felt sewn across the gap, pinked along its free edges. <b>Near:</b> tailor\'s chalk marks come up on both cushions where the strip will be sewn. <b>Ready:</b> a ghost strip appears in the gap. Joining: the cushions close to a finger\'s width, a roll of felt drops in and unrolls down the gap, a needle tacks it on, one stitch a frame, first to Jarvis and then to GitDiscuss, and GitDiscuss flops over to the set angle and settles. Any angle from −40° to +40° holds, with no detents. As it bends, the inside of the strip bunches: the felt puffs out, its pinked teeth crowd together and creases fan in from the inside edge, more of them the further it bends. The outside stretches: it goes lighter and thinner, the fibres pull out across it and the same eight teeth spread wide and shallow. <b>Set the angle:</b> drag GitDiscuss\'s nameplate up or down (Jarvis\'s nameplate still moves the pair), use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓. While it bends, a chalk arc and a pinned cotton tag show the angle in cross-stitch. The pair shifts up or down to stay on the desktop. <b>Release:</b> tap the strip (or focus it and press Enter). GitDiscuss straightens, the stitches are unpicked, the strip rolls back up and lifts away, and the cushions part.',
+  sayJoin:'A felt strip unrolls down the gap and is tacked on, then GitDiscuss flops over to the set angle.',
+  sayJoined:'Joined on a cloth hinge. Drag GitDiscuss\'s nameplate to bend it; drag Jarvis to move the pair. Tap the strip to unpick it.',
+  sayRelease:'GitDiscuss straightens, the stitches are unpicked and the strip rolls back up.',
+  sayReady:'Ready: release to sew a cloth hinge between them.',sayNear:'Nearby: chalk marks show where the strip will be sewn. Move closer.',
+  sayHold:'Held mid-tack. Use the scrubber to step through it stitch by stitch.',phReady:'Ready · release to sew the hinge',
+  pose:()=>({th:0,ys:0,sq:0}),
+  phase(jt){
+   if(model.dir<0&&model.busy)return jt>.76?'Releasing · straightening':jt>.58?'Releasing · unpicking':jt>.3?'Releasing · rolling the strip up':'Releasing · parting';
+   return jt<.3?'Joining · closing in':jt<.58?'Joining · unrolling the strip':jt<.76?'Joining · tacking it on':'Joining · letting it bend';
+  },
+  // Running stitches along a line, one 4.4 px stitch every 7.6 px.
+  stitches(p0,p1){const L=Math.hypot(p1.x-p0.x,p1.y-p0.y),n=Math.floor((L+3.2)/7.6);return Array.from({length:n},(_,i)=>[V.mix(p0,p1,i*7.6/L),V.mix(p0,p1,Math.min(1,(i*7.6+4.4)/L))])},
+  over(c){
+   const g=hingeGeo(c),jt=c.jt,b=c.b,h=c.h;let s='';
+   // Tailor's chalk down both edges where the strip will be sewn: near, during approach, and rubbing off as it is tacked.
+   const chalk=jt>0?1-seg(jt,.5,.7):c.glow;
+   if(chalk>.01)s+=`<path d="M${f(g.xa+3.8)} ${f(g.yT+2)}V${f(g.yB-2)}M${f(b.x+EDGE+OV-3.8)} ${f(b.y+g.lt+2)}V${f(b.y+g.lb-2)}" stroke="#fff3da" stroke-opacity="${f(chalk*.75)}" stroke-width="1.8" stroke-dasharray="1.6 1.9" stroke-linecap="round"/>`;
+   if(jt===0){
+    if(c.ghost>0){const x0=g.xa,x1=b.x+EDGE+OV;
+     s+=`<rect x="${f(x0-6)}" y="${f(g.yT-6)}" width="${f(x1-x0+12)}" height="${f(g.yB-g.yT+12)}" rx="10" fill="#ffc36a" opacity="${f(c.ghost*.4)}" filter="url(#soft)"/>`+
+      `<rect x="${f(x0)}" y="${f(g.yT)}" width="${f(x1-x0)}" height="${f(g.yB-g.yT)}" rx="2" fill="${HCOL}" fill-opacity=".2" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="4 3"/>`}
+    return s;
+   }
+   if(jt<.28)return s;
+   const drop=seg(jt,.28,.36),lay=ease(seg(jt,.36,.58)),sw=seg(jt,.58,.76),cut=g.yT+lay*(g.yB-g.yT);
+   // Pinch shadow where the inside corners close up.
+   if(g.k>.01){const m=V.add(V.mix(g.Ji,g.Gi,.5),V.mul(g.ni,2));s+=`<ellipse cx="${f(m.x)}" cy="${f(m.y)}" rx="15" ry="10" fill="#000" opacity="${f(.6*g.k)}" filter="url(#soft)"/>`}
+   let band=`<path d="${g.d}" fill="#000" opacity=".38" filter="url(#sh)" transform="translate(1 2)"/><path d="${g.d}" fill="${HCOL}" filter="url(#tagfelt)"/>`;
+   if(g.k>.01){
+    // Stretch: the outside goes pale and thin, and the fibres pull out across it. Bunch: the inside darkens and creases.
+    const mo=V.mix(g.Jo,g.Go,.5),mi=V.mix(g.Ji,g.Gi,.5);
+    band+=`<linearGradient id="hgr" gradientUnits="userSpaceOnUse" x1="${f(mo.x)}" y1="${f(mo.y)}" x2="${f(mi.x)}" y2="${f(mi.y)}"><stop stop-color="#fff7e6" stop-opacity="${f(.42*g.k)}"/><stop offset=".45" stop-color="#fff7e6" stop-opacity="0"/><stop offset=".68" stop-color="#2a1405" stop-opacity="0"/><stop offset="1" stop-color="#2a1405" stop-opacity="${f(.42*g.k)}"/></linearGradient><path d="${g.d}" fill="url(#hgr)"/>`;
+    let fb='';
+    for(let i=1;i<=7;i++){const t=i*.055,p={x:g.xa+OV,y:lerp(g.Jo.y,g.Ji.y,t)},q=g.P(EDGE,lerp(g.lo,g.li,t)),m=V.add(V.mix(p,q,.5),V.mul(g.no,-(1.5+i*.3)*g.k));fb+=`M${pt(p)}Q${pt(m)} ${pt(q)}`}
+    band+=`<path d="${fb}" fill="none" stroke="#fff6e2" stroke-opacity="${f(.5*g.k)}" stroke-width=".7" stroke-dasharray="${f(5+6*g.k)} 1.6"/>`;
+    const n=Math.round(Math.abs(g.th)/8),side=unit(V.sub(g.Ji,g.Gi));let cv='',cr='';
+    for(let i=1;i<=n;i++){const t=i/(n+1),S=V.add(V.mix(g.Gi,g.Ji,t),V.mul(g.ni,g.bulge*Math.sin(Math.PI*t)-1.5)),T=V.mix(g.Go,g.Jo,t);
+     const len=(.24+.2*Math.sin(Math.PI*t))*Math.sqrt(g.k)*(.82+.36*((i*5)%7)/7),E=V.mix(S,T,len),M=V.add(V.mix(S,E,.5),V.mul(side,i%2?2.2:-2.2)),o=V.mul(side,1.8);
+     cr+=`M${pt(V.add(S,o))}Q${pt(V.add(M,o))} ${pt(V.add(E,o))}`;cv+=`M${pt(S)}Q${pt(M)} ${pt(E)}`}
+    band+=`<g fill="none" stroke-linecap="round"><path d="${cr}" stroke="#fff6e2" stroke-opacity=".5" stroke-width="1.5"/><path d="${cv}" stroke="#3a2410" stroke-opacity=".62" stroke-width="1.3"/></g>`;
+   }
+   // Running stitch down both sewn sides, Jarvis's first, then GitDiscuss's; bar tacks once both are done.
+   if(jt>=.58){const jl=this.stitches({x:g.xa+3.8,y:g.yT+3},{x:g.xa+3.8,y:g.yB-3}),gl=this.stitches(g.P(EDGE+OV-3.8,g.lt+3),g.P(EDGE+OV-3.8,g.lb-3));
+    const nj=Math.ceil(jl.length*seg(sw,0,.5)-1e-6),ng=Math.ceil(gl.length*seg(sw,.5,1)-1e-6);let d='';
+    jl.slice(0,nj).concat(gl.slice(0,ng)).forEach(([p,q])=>d+=`M${pt(p)}L${pt(q)}`);
+    if(sw>=1)for(const L of [jl,gl])if(L.length)for(const [p] of [L[0],[L[L.length-1][1]]])d+=`M${f(p.x-2.2)} ${f(p.y-2.2)}l4.4 4.4M${f(p.x+2.2)} ${f(p.y-2.2)}l-4.4 4.4`;
+    band+=`<g fill="none" stroke-linecap="round"><path d="${d}" stroke="#000" stroke-opacity=".28" stroke-width="1.6" transform="translate(.4 .8)"/><path d="${d}" stroke="${HTHREAD}" stroke-width="1.3"/></g>`;
+    if(sw>0&&sw<1){const L=sw<.5?jl:gl,i=Math.min(L.length-1,Math.max(0,(sw<.5?nj:ng)-1)),tip=L[i][1],e=eyeOf(tip.x,tip.y,-80);
+     band+=`<path d="M${f(tip.x)} ${f(tip.y-2)}Q${f(tip.x+2)} ${f(tip.y-12)} ${f(e.x)} ${f(e.y)}q9 -4 6 -15" fill="none" stroke="${HTHREAD}" stroke-width="1.2"/>`+needle(tip.x,tip.y,-80,3)}}
+   s+=jt<.58?`<clipPath id="hcut"><rect x="${f(g.xa-20)}" y="${f(g.yT-14)}" width="${f(g.Gt.x-g.xa+40)}" height="${f(cut-g.yT+16)}"/></clipPath><g clip-path="url(#hcut)">${band}</g>`:band;
+   // The roll: drops in at the top of the gap, then runs down it, thinning as the strip lays out behind it.
+   if(jt<.58){const ry=jt<.36?g.yT-46*(1-ease(drop)):cut,d=lerp(15,6,lay),x0=g.xa-1,x1=g.Gt.x+1,ex=x0+d*.3;
+    s+=`<g opacity="${f(seg(jt,.28,.31))}"><rect x="${f(x0)}" y="${f(ry-d/2)}" width="${f(x1-x0)}" height="${f(d)}" rx="${f(d/2)}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(1 2)"/>`+
+     `<rect x="${f(x0)}" y="${f(ry-d/2)}" width="${f(x1-x0)}" height="${f(d)}" rx="${f(d/2)}" fill="${HCOL}" filter="url(#tagfelt)"/><path d="M${f(x0+d/2)} ${f(ry+d/2-1)}H${f(x1-d/2)}" stroke="#2a1405" stroke-opacity=".3" stroke-width="1.6"/>`+
+     `<ellipse cx="${f(ex)}" cy="${f(ry)}" rx="${f(d*.3)}" ry="${f(d/2-.4)}" fill="#a88f68"/><path d="${spiral(ex,ry,d*.27,d/2-1,1.6+2*(1-lay),ry*.2)}" fill="none" stroke="#5c4730" stroke-width=".6"/></g>`}
+   if(jt===1)s+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Cloth hinge strip: tap or press Enter to unpick it and separate the widgets"><title>Tap the strip to unpick the hinge</title><path d="${g.d}" fill="transparent"/><path class="ringfocus" d="${g.d}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
+   // While bending: a chalk arc from the inside corner with a tick every 10°, and a cotton tag pinned outside with the angle in cross-stitch.
+   if(model.turning&&jt===1){
+    const Pm=V.mix(g.Ji,g.Gi,.5),R=(g.yB-g.yT)*.66,dj=unit(V.sub(g.Jo,g.Ji)),dg=unit(V.sub(g.Go,g.Gi)),a1=Math.atan2(dj.y,dj.x),a2=Math.atan2(dg.y,dg.x);
+    const at=(a,r)=>({x:Pm.x+r*Math.cos(a),y:Pm.y+r*Math.sin(a)});let arc='';
+    for(let i=0;i<=24;i++)arc+=(i?'L':'M')+pt(at(lerp(a1,a2,i/24),R));
+    for(let v=0;v<=Math.abs(g.th)+.01;v+=10){const a=a1+Math.sign(g.th)*v*Math.PI/180;arc+=`M${pt(at(a,R-4))}L${pt(at(a,R+4))}`}
+    s+=`<path d="${arc}" fill="none" stroke="#fff3da" stroke-opacity=".85" stroke-width="1.7" stroke-dasharray="2 2" stroke-linecap="round"/>`;
+    const cx=1.9,xp=xpaths(signed(g.th).replace('−','-'),cx),tw=xp.w+16,th=7*cx+11,mo=V.mix(g.Jo,g.Go,.5),tc=V.add(mo,V.mul(g.no,24));
+    s+=`<g transform="translate(${f(tc.x)} ${f(tc.y)}) rotate(-4)"><rect x="${f(-tw/2)}" y="${f(-th/2)}" width="${f(tw)}" height="${f(th)}" rx="2" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1 1.6)"/>`+
+     `<rect x="${f(-tw/2)}" y="${f(-th/2)}" width="${f(tw)}" height="${f(th)}" rx="2" fill="#f4ead3"/><rect x="${f(-tw/2+2.5)}" y="${f(-th/2+2.5)}" width="${f(tw-5)}" height="${f(th-5)}" rx="1" fill="none" stroke="${HTHREAD}" stroke-opacity=".7" stroke-dasharray="2.4 1.8"/>`+
+     `<g transform="translate(${f(-xp.w/2)} ${f(-3.5*cx)})" fill="none" stroke-linecap="round" stroke-width="${f(cx*.38)}"><path d="${xp.d1}" stroke="#7a2e17"/><path d="${xp.d2}" stroke="#b4492a"/></g>`+
+     `<path d="M${f(-tw/2+5)} ${f(-th/2+3)}L${f(-tw/2-7)} ${f(-th/2-6)}" stroke="url(#metal)" stroke-width="1.1"/><circle cx="${f(-tw/2+5)}" cy="${f(-th/2+3)}" r="2.6" fill="#c4372a" stroke="#5a1209" stroke-width=".5"/><circle cx="${f(-tw/2+4.2)}" cy="${f(-th/2+2.2)}" r=".8" fill="#ffd2c4"/></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -526,15 +647,17 @@ const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.he
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'zipper',shade:'deflate',jt:0,st:0,dir:1,snip:false,path:null,glow:0,ghost:0,busy:false,shDir:1};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'zipper',shade:'deflate',jt:0,angle:-20,turning:false,st:0,dir:1,snip:false,path:null,glow:0,ghost:0,busy:false,shDir:1};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
+const hingeY=y=>fitHinge(fitHinge(y,peakBend(),ctx().h),model.angle,ctx().h);
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,24,1200-2*W-g-SEP-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
 function joinedPose(fixed='a'){
  const g=J().gap;
- if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
- let ax=clamp(model.a.x,24,1200-2*W-g-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+ const hy=y=>model.join==='hinge'?hingeY(y):y;
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24),by=hy(model.b.y);return{a:{x:bx-W-g,y:by},b:{x:bx,y:by}}}
+ let ax=clamp(model.a.x,24,1200-2*W-g-24),ay=hy(model.a.y);return{a:{x:ax,y:ay},b:{x:ax+W+g,y:ay}};
 }
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
@@ -607,7 +730,8 @@ function render(){
   const own=sh.draw&&model.st>0,svg=el.querySelector('.casing'),key=w+'x'+h+(own?`|${model.shade}|${f(model.st*1000)}|${BO}|${m.run}|${model.shDir}`:'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=own?sh.draw(id,w,h,small,model.st):casing(id,w,h)}
   if(!small){const side=id==='a'?1:-1,phi=(side>0?-1:1)*z.th;
-   el.style.transformOrigin=`${side>0?W-EDGE:EDGE}px ${f(z.th>.001?z.ys:h/2)}px`;el.style.transform=z.th>.001?`rotate(${f(phi*100)/100}deg)`:z.sq>.0005?`scaleX(${(1-z.sq).toFixed(4)})`:''}
+   el.style.transformOrigin=`${side>0?W-EDGE:EDGE}px ${f(z.th>.001?z.ys:h/2)}px`;el.style.transform=z.th>.001?`rotate(${f(phi*100)/100}deg)`:z.sq>.0005?`scaleX(${(1-z.sq).toFixed(4)})`:'';
+   if(id==='b'&&model.join==='hinge'){const F=hingeFrame(bendAt(model.jt),h);el.style.transformOrigin=`${EDGE}px ${f(F.oy)}px`;el.style.transform=F.th?`translateX(${f(-F.shr)}px) rotate(${f(F.th*100)/100}deg)`:''}}
   const k=ease(model.st),show=sh.show?sh.show(model.st):1-clamp(k*2.2),strip=sh.ownStrip?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(sh.grip?sh.grip(model.st):1-clamp(k*1.6));
@@ -623,9 +747,10 @@ function render(){
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
+ $('#angleRow').style.display=model.join==='hinge'?'':'none';$('#angle').value=Math.round(model.angle);$('#angleOut').textContent=signed(model.angle);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
- const ph={separate:'Separate · two cushions',joining:j.phase(model.jt),joined:'Joined · '+j.label.toLowerCase()};
- $('#phase').textContent=(drag&&drag.pull?'Unzipping · '+Math.round(model.jt*100)+'%':drag&&drag.state==='ready'?(j.phReady||'Ready · release to zip'):drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
+ const ph={separate:'Separate · two cushions',joining:j.phase(model.jt),joined:'Joined · '+j.label.toLowerCase()+(model.join==='hinge'?' · '+signed(model.angle):'')};
+ $('#phase').textContent=(drag&&drag.pull?'Unzipping · '+Math.round(model.jt*100)+'%':drag&&drag.mode==='angle'?'Bending · '+signed(model.angle):drag&&drag.state==='ready'?(j.phReady||'Ready · release to zip'):drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -636,6 +761,7 @@ function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=doc
 function pick(key,id){
  if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.snip=false;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
+ if(hingeOn())model.a.y=model.b.y=hingeY(model.a.y);
  describe();render();
 }
 function describe(){
@@ -644,6 +770,15 @@ function describe(){
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
+function setAngle(v){
+ model.angle=clamp(Math.round(v*10)/10,-HMAX,HMAX);
+ // During a bend drag the pair stays put under the pointer; it is refitted when the drag ends.
+ if(hingeOn()&&!(drag&&drag.mode==='angle'))model.a.y=model.b.y=hingeY(model.a.y);
+ render();
+}
+let turnTimer=0;
+function flashTurning(){model.turning=true;clearTimeout(turnTimer);turnTimer=setTimeout(()=>{model.turning=false;render()},900)}
+$('#angle').oninput=e=>{flashTurning();setAngle(+e.target.value)};
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.dir=1;model.snip=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
 document.addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -673,7 +808,12 @@ stage.addEventListener('pointerdown',e=>{
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null}
- drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c},angle:model.angle},group:model.jt===1&&id!=='c',state:'idle'};
+ if(id==='b'&&hingeOn()){
+  // Bend GitDiscuss about the strip rather than moving the pair.
+  const C={x:model.a.x+W+HG/2,y:model.a.y+ctx().h/2};Object.assign(drag,{mode:'angle',C,psi0:Math.atan2(p.y-C.y,p.x-C.x),th0:model.angle,group:false});
+  clearTimeout(turnTimer);model.turning=true;say('Bending GitDiscuss on the cloth hinge.');render();
+ }
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
@@ -683,9 +823,10 @@ stage.addEventListener('pointermove',e=>{
   if(Math.abs(dy)>3)drag.moved=true;const z=zipState(1,ctx().h),travel=z.z1-z.z0;
   setJt(dy<=2?.96:clamp(.93-.43*dy/travel,.42,.96));render();return;
  }
+ if(drag.mode==='angle'){let d=(Math.atan2(p.y-drag.C.y,p.x-drag.C.x)-drag.psi0)*180/Math.PI;d=((d+540)%360)-180;setAngle(drag.th0+d);return}
  const s=drag.saved,top=46,bottom=600-lowH(false)-14;
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,10,1200-CW-10);model.c.y=clamp(s.c.y+dy,top,600-CH-10);render();return}
- if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=hingeOn()?hingeY(s.a.y+dy):clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,top,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
  drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
@@ -699,13 +840,14 @@ stage.addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.pull){if(!d.moved||model.jt<.75)doSeparate();else{model.dir=1;tween(model.jt,1,260,setJt).then(ok=>{if(ok){model.path=null;say('Zipped back up.')}})}return}
+ if(d.mode==='angle'){model.turning=false;setAngle(model.angle);say(J().sayJoined);return}
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',true)}else render();
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.pull){++anim;model.busy=false;setJt(1);model.path=null;render();say('Unzip cancelled.');return}
- const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=model.ghost=0;render();say('Move cancelled.');
+ const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.');
 }
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
@@ -713,8 +855,9 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
+ if(id==='b'&&hingeOn()&&k[1]){flashTurning();setAngle((Math.round(model.angle/5)+Math.sign(k[1]))*5);say('GitDiscuss bent to '+signed(model.angle)+'.');return}
  const bottom=600-lowH(false)-14;
- if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=hingeOn()?hingeY(model.a.y+k[1]):clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],10,1200-w-10);m.y=clamp(m.y+k[1],46,id==='c'?600-CH-10:bottom)}render();
 }));
 
