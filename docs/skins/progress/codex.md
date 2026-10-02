@@ -27,7 +27,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Hollow · Join · Shadow dovetail — silhouette fusion — Added selectable shadow-first jagged edges, advancing chalk plates and a pale-rimmed key-notch release; retained all three earlier joins; 96 simulated DOM, geometry, animation and touch checks passed; joint geometry visually inspected, full-page review blocked by sandbox browser launch and denied Chrome access.
 - [x] Gothic · Join · Radial apse joint — rotating attachment — Added a selectable eight-petal rose medallion, closing stone crescent jaws and brass-centre release; preserved all four earlier joins; 95 simulated DOM, animation, touch and regression checks passed; full-page visual review blocked by denied Chrome access.
 - [x] Felt · Join · Blanket-stitch lacing — spanning attachment — Added selectable reinforced moss eyelets, three sequential coral stitches, tightening slack and a final release loop with reverse unlacing; retained all four earlier joins; 92 simulated DOM, animation, touch and regression checks passed; full-page visual review blocked by denied Chrome access.
-- [ ] Elven · Join · Floating moonstone — field attachment
+- [x] Elven · Join · Floating moonstone — field attachment — Added selectable facing silver crescents, a gliding cloudy stone, settling air arcs and stone-target reverse release; retained all four earlier joins; 85 simulated DOM, animation, state, touch and regression checks passed; full-page visual review blocked by denied Chrome access and failed sandbox browser launch.
 - [ ] Wire · Join · Bead-strand toggle — threaded attachment
 - [ ] Hollow · Join · Seed-pod collar — enclosing attachment
 - [ ] Gothic · Join · Frieze dovetail — sliding fusion
