@@ -236,6 +236,16 @@ header {
   z-index: 4;
   overflow: visible;
 }
+.triptych-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+  transition: opacity 160ms ease;
+}
 .module.shade .stone-grip {
   opacity: 0;
   pointer-events: none;
@@ -356,29 +366,36 @@ header {
 .shade-strip {
   position: absolute;
   left: 48px;
-  right: 48px;
-  top: 8px;
-  height: 28px;
+  top: 7px;
+  width: 284px;
+  height: 30px;
   display: none;
   justify-content: space-between;
   align-items: center;
-  padding: 0 12px;
-  font: 700 11px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  letter-spacing: 0.6px;
+  padding: 0 10px;
+  font: 700 12px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: 0.5px;
   color: var(--parchment);
   z-index: 20;
-  background: #0a0f0d;
-  border: 1.5px solid #5a7062;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.98), inset 0 1px 2px rgba(230, 180, 71, 0.4);
+  background: #0d1210;
+  border: 1.5px solid #63786c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.98), inset 0 1px 2px rgba(230, 180, 71, 0.45);
   text-shadow: 0 1px 2px #000;
   cursor: grab;
   border-radius: 4px;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 .shade-strip:active {
   cursor: grabbing;
 }
 .module.shade .shade-strip {
   display: flex;
+}
+/* When joined in shade mode, ensure Module A and B don't overlap */
+#a.joined-shade .shade-strip,
+#b.joined-shade .shade-strip {
+  width: 256px;
 }
 .shade-strip .shade-tag {
   color: #f7f3e8;
@@ -387,6 +404,11 @@ header {
   gap: 6px;
   font-weight: 700;
   white-space: nowrap;
+}
+.shade-strip .shade-tag strong {
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.6px;
 }
 .shade-strip .shade-tag em {
   font-style: normal;
@@ -839,8 +861,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Gothic Basilica <span>/ nave vaulting, keystone &amp; lead came</span></h1>
-    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld</p>
+    <h1>Gothic Basilica <span>/ nave vaulting, keystone &amp; triptych altar</span></h1>
+    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld · Triptych altar fold</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -849,6 +871,7 @@ footer .note-highlight {
         <option value="keystone" selected>1. Keystone Drop (Nave Vault Key)</option>
         <option value="portcullis">2. Lancet Portcullis Guillotine shade</option>
         <option value="leadcame">3. Lead-Came Solder Weld join</option>
+        <option value="triptych">4. Triptych Altar Fold shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -1001,6 +1024,38 @@ footer .note-highlight {
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
+
+        <!-- Option 4: Triptych Wrought Bronze Strap Hinge & Clasp Gradient -->
+        <linearGradient id="bronzeGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#f5e0a3"/>
+          <stop offset="25%" stop-color="#bf9436"/>
+          <stop offset="65%" stop-color="#694e14"/>
+          <stop offset="100%" stop-color="#2a1e05"/>
+        </linearGradient>
+
+        <!-- Option 4: Triptych Left Shutter Stone Gradient -->
+        <linearGradient id="triptychStoneL" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#3b4740"/>
+          <stop offset="40%" stop-color="#2c3631"/>
+          <stop offset="85%" stop-color="#1f2622"/>
+          <stop offset="100%" stop-color="#141916"/>
+        </linearGradient>
+
+        <!-- Option 4: Triptych Right Shutter Stone Gradient -->
+        <linearGradient id="triptychStoneR" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#141916"/>
+          <stop offset="15%" stop-color="#1f2622"/>
+          <stop offset="60%" stop-color="#2c3631"/>
+          <stop offset="100%" stop-color="#3b4740"/>
+        </linearGradient>
+
+        <!-- Option 4: Amber Sanctuary Jewel Cabochon Radial Gradient -->
+        <radialGradient id="amberJewel" cx="35%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#fff8db"/>
+          <stop offset="35%" stop-color="#f7b731"/>
+          <stop offset="70%" stop-color="#c96f08"/>
+          <stop offset="100%" stop-color="#4a2202"/>
+        </radialGradient>
       </defs>
 
       <!-- Shared arch, keystone and decorative joints -->
@@ -1069,7 +1124,7 @@ footer .note-highlight {
 
       <!-- Shade Strip Display (Illuminated Gold Runes on Stone Lintel) -->
       <div class="shade-strip" data-drag="a" title="Drag Jarvis lintel">
-        <span class="shade-tag"><span>✠</span> JARVIS · <em>03 AGENTS</em></span>
+        <span class="shade-tag"><span class="cross-boss">✠</span> <strong>JARVIS</strong> · <em>03 AGENTS</em></span>
         <div class="shade-votives">
           <i class="gold"></i><i class="emerald"></i><i class="gold"></i>
         </div>
@@ -1077,6 +1132,9 @@ footer .note-highlight {
 
       <!-- Portcullis Guillotine Layer -->
       <svg class="portcullis-svg" id="portcullis-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+
+      <!-- Triptych Altar Fold Layer -->
+      <svg class="triptych-svg" id="triptych-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
       <div class="tab-row" role="tablist" aria-label="Jarvis screens">
         <button class="gothic-tab" role="tab" aria-selected="true" data-page="0">Status</button>
@@ -1118,7 +1176,7 @@ footer .note-highlight {
 
       <!-- Shade Strip Display (Illuminated Gold Runes on Stone Lintel) -->
       <div class="shade-strip" data-drag="b" title="Drag GitDiscuss lintel">
-        <span class="shade-tag"><span>✠</span> GITDISCUSS · <em>02 DECISIONS</em></span>
+        <span class="shade-tag"><span class="cross-boss">✠</span> <strong>GITDISCUSS</strong> · <em>02 DECISIONS</em></span>
         <div class="shade-votives">
           <i class="ruby"></i><i class="gold"></i>
         </div>
@@ -1126,6 +1184,9 @@ footer .note-highlight {
 
       <!-- Portcullis Guillotine Layer -->
       <svg class="portcullis-svg" id="portcullis-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+
+      <!-- Triptych Altar Fold Layer -->
+      <svg class="triptych-svg" id="triptych-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
       <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
         <button class="gothic-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
@@ -1172,7 +1233,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade &amp; Lead-Came Solder Weld</h3>
+  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade, Lead-Came Solder Weld &amp; Triptych Altar Fold</h3>
   <p>
     In this aesthetic, modules are carved from dressed ashlar limestone. Pointed lancet arches frame the clerestory displays, supported by fluted colonnettes. When separate, each module's mating end forms one half of a monumental pointed arch (a voussoir springer).
   </p>
@@ -1180,10 +1241,13 @@ footer .note-highlight {
     <span class="note-highlight">Option 1 — Keystone Drop (Nave Vault Key) [Join]:</span> As the two housings meet within the magnetic field, the voussoirs align. A carved granite keystone with an embossed trefoil and gothic cross descends vertically into the apex niche, locking the two independent modules into a continuous, monumental basilican arch. The release grip acts as a forged iron tie-wedge: pulling right unlocks the keystone.
   </p>
   <p>
-    <span class="note-highlight">Option 2 — Lancet Portcullis Guillotine [Shade]:</span> When collapsing to shade mode, a heavy forged-iron portcullis grille with barbed spike shoes drops vertically from behind the carved stone machicolations with gravity acceleration. The lower display bays slide upward behind the frieze, locking the widget into a fortified 44px architectural lintel. The status text and votive jewels remain cleanly visible and readable through the iron grille bars. Raising the portcullis winches the iron gate smoothly upward back into the clerestory vault.
+    <span class="note-highlight">Option 2 — Lancet Portcullis Guillotine [Shade]:</span> When collapsing to shade mode, a heavy forged-iron portcullis grille with barbed spike shoes drops vertically from behind the carved stone machicolations with gravity acceleration. The lower display bays slide upward behind the frieze, locking the widget into a fortified 44px architectural lintel. The status text and votive jewels remain cleanly visible and readable on the stone lintel plaque. Raising the portcullis winches the iron gate smoothly upward back into the clerestory vault.
   </p>
   <p>
     <span class="note-highlight">Option 3 — Lead-Came Solder Weld [Join]:</span> The meeting edges are bordered by authentic dark H-profile lead came channels holding jewel-toned stained glass quarry panes (liturgical ruby and cobalt on Jarvis, emerald and amethyst on GitDiscuss). Upon docking, a bright hot-iron point of light zips down the vertical channel, depositing a glowing molten silver bead that rapidly cools into a satiny pewter-silver soldered seam with three reinforcement rosettes. The stained glass panels unite across the seam into an unbroken narrative clerestory frieze. Pulling the center rosette releases the seam with a brief hot-flux melt glow.
+  </p>
+  <p>
+    <span class="note-highlight">Option 4 — Triptych Altar Fold [Shade]:</span> Two hinged stone-relief side shutters carved with pointed lancet tracery and trefoils swing 90° inward over the clerestory altar face in 3D perspective, meeting at the center with a magnetic latch and glowing amber sanctuary jewel. The widget becomes a sealed stone reliquary casket with the glanceable title and status votives illuminated on its predella base. Unfolding releases the bronze clasp and swings the stone wings wide open, restoring full clerestory access.
   </p>
 </footer>
 
@@ -1208,7 +1272,8 @@ const model = {
   keystoneDrop: 0, // 0 = retracted / aloft, 1 = fully dropped and locked
   portcullisDrop: 0, // 0 = hoisted aloft in clerestory vault, 1 = plunged & spiked shut
   solderProgress: 0, // 0 = cold un-soldered came, 1 = fully soldered with lead came
-  option: 'keystone', // 'keystone', 'portcullis', or 'leadcame'
+  triptychFold: 0, // 0 = open wings (full clerestory), 1 = closed stone reliquary shutters
+  option: 'keystone', // 'keystone', 'portcullis', 'leadcame', or 'triptych'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1758,6 +1823,174 @@ function drawPortcullis(dropRatio = 0, width = 390) {
   return s;
 }
 
+// Option 4: Triptych Altar Fold Shade Mechanism (Hinged Stone-Relief Shutters)
+function drawTriptych(foldRatio = 0, width = 390, isA = true) {
+  if (foldRatio < 0.005) return '';
+  const f = Math.min(1, Math.max(0, foldRatio));
+
+  const x1 = 44, x2 = 336;
+  const midX = 190;
+  const fullW = midX - x1; // 146
+  const y_top = 22, y_bot = 98;
+
+  // Perspective projected width as shutters swing inward
+  const pw = fullW * Math.sin(f * Math.PI / 2);
+  const slope = 3.5 * (1 - f); // 3D perspective vertical foreshortening at swinging edge
+
+  let s = `<g class="triptych-assembly" opacity="${Math.min(1, f * 1.5)}">`;
+
+  // Left Shutter: hinges at x1 (44), swings toward midX (190)
+  const lx_hinge = x1;
+  const lx_edge = x1 + pw;
+
+  // Right Shutter: hinges at x2 (336), swings toward midX (190)
+  const rx_hinge = x2;
+  const rx_edge = x2 - pw;
+
+  // 1. Drop shadow behind swinging shutters onto clerestory screen
+  if (f > 0.05 && f < 0.98) {
+    s += `<polygon points="${lx_hinge} ${y_top+2}, ${lx_edge+6} ${y_top+slope+5}, ${lx_edge+6} ${y_bot-slope+8}, ${lx_hinge} ${y_bot+6}" fill="#000000" opacity="${(1 - f) * 0.5}"/>`;
+    s += `<polygon points="${rx_edge-6} ${y_top+slope+5}, ${rx_hinge} ${y_top+2}, ${rx_hinge} ${y_bot+6}, ${rx_edge-6} ${y_bot-slope+8}" fill="#000000" opacity="${(1 - f) * 0.5}"/>`;
+  }
+
+  // 2. Left Shutter Main Stone Slab
+  s += `<polygon points="${lx_hinge} ${y_top}, ${lx_edge} ${y_top + slope}, ${lx_edge} ${y_bot - slope}, ${lx_hinge} ${y_bot}"
+                 fill="url(#triptychStoneL)" stroke="#111614" stroke-width="1.8"/>`;
+  // Top bevel highlight
+  s += `<line x1="${lx_hinge}" y1="${y_top + 1}" x2="${lx_edge}" y2="${y_top + slope + 1}" stroke="#7e9084" stroke-width="1.2" opacity="0.8"/>`;
+  // Bottom bevel shadow
+  s += `<line x1="${lx_hinge}" y1="${y_bot - 1}" x2="${lx_edge}" y2="${y_bot - slope - 1}" stroke="#141916" stroke-width="1.5"/>`;
+  // Swing edge bevel
+  s += `<line x1="${lx_edge}" y1="${y_top + slope}" x2="${lx_edge}" y2="${y_bot - slope}" stroke="#323f37" stroke-width="1.2"/>`;
+
+  // 3. Right Shutter Main Stone Slab
+  s += `<polygon points="${rx_edge} ${y_top + slope}, ${rx_hinge} ${y_top}, ${rx_hinge} ${y_bot}, ${rx_edge} ${y_bot - slope}"
+                 fill="url(#triptychStoneR)" stroke="#111614" stroke-width="1.8"/>`;
+  // Top bevel highlight
+  s += `<line x1="${rx_edge}" y1="${y_top + slope + 1}" x2="${rx_hinge}" y2="${y_top + 1}" stroke="#7e9084" stroke-width="1.2" opacity="0.8"/>`;
+  // Bottom bevel shadow
+  s += `<line x1="${rx_edge}" y1="${y_bot - slope - 1}" x2="${rx_hinge}" y2="${y_bot - 1}" stroke="#141916" stroke-width="1.5"/>`;
+  // Swing edge bevel
+  s += `<line x1="${rx_edge}" y1="${y_top + slope}" x2="${rx_edge}" y2="${y_bot - slope}" stroke="#323f37" stroke-width="1.2"/>`;
+
+  // 4. Carved Relief Tracery Panels on Left Shutter (visible when pw > 35)
+  if (pw > 35) {
+    const lmargin = Math.max(8, pw * 0.1);
+    const px1 = lx_hinge + lmargin;
+    const px2 = lx_edge - lmargin * 0.7;
+    const lMid = (px1 + px2) / 2;
+
+    s += `<polygon points="${px1} ${y_top + 7}, ${px2} ${y_top + 7 + slope}, ${px2} ${y_bot - 7 - slope}, ${px1} ${y_bot - 7}"
+                   fill="#161c19" stroke="#333f37" stroke-width="1.2"/>`;
+
+    // Pointed lancet arch tracery
+    const archH = y_top + 28 + slope * 0.5;
+    s += `<path d="M ${px1 + 4} ${y_bot - 9} V ${archH} Q ${lMid} ${y_top + 13 + slope * 0.3} ${px2 - 4} ${archH} V ${y_bot - 9}"
+                fill="none" stroke="#5a6d61" stroke-width="1.2"/>`;
+
+    // Trefoil & Rosette Boss
+    const bossY = y_top + 26 + slope * 0.4;
+    s += `<circle cx="${lMid}" cy="${bossY}" r="${Math.min(6, pw * 0.07)}" fill="#222b26" stroke="#e6b447" stroke-width="1"/>`;
+    s += `<path d="M ${lMid - 3} ${bossY} H ${lMid + 3} M ${lMid} ${bossY - 3} V ${bossY + 3}" stroke="#e6b447" stroke-width="0.9"/>`;
+
+    // Vertical stone mullion dividing panel
+    s += `<line x1="${lMid}" y1="${bossY + 6}" x2="${lMid}" y2="${y_bot - 9}" stroke="#415046" stroke-width="1"/>`;
+  }
+
+  // 5. Carved Relief Tracery Panels on Right Shutter (visible when pw > 35)
+  if (pw > 35) {
+    const rmargin = Math.max(8, pw * 0.1);
+    const px1 = rx_edge + rmargin * 0.7;
+    const px2 = rx_hinge - rmargin;
+    const rMid = (px1 + px2) / 2;
+
+    s += `<polygon points="${px1} ${y_top + 7 + slope}, ${px2} ${y_top + 7}, ${px2} ${y_bot - 7}, ${px1} ${y_bot - 7 - slope}"
+                   fill="#161c19" stroke="#333f37" stroke-width="1.2"/>`;
+
+    // Pointed lancet arch tracery
+    const archH = y_top + 28 + slope * 0.5;
+    s += `<path d="M ${px1 + 4} ${y_bot - 9} V ${archH} Q ${rMid} ${y_top + 13 + slope * 0.3} ${px2 - 4} ${archH} V ${y_bot - 9}"
+                fill="none" stroke="#5a6d61" stroke-width="1.2"/>`;
+
+    // Trefoil & Rosette Boss
+    const bossY = y_top + 26 + slope * 0.4;
+    s += `<circle cx="${rMid}" cy="${bossY}" r="${Math.min(6, pw * 0.07)}" fill="#222b26" stroke="#e6b447" stroke-width="1"/>`;
+    s += `<path d="M ${rMid - 3} ${bossY} H ${rMid + 3} M ${rMid} ${bossY - 3} V ${bossY + 3}" stroke="#e6b447" stroke-width="0.9"/>`;
+
+    // Vertical stone mullion dividing panel
+    s += `<line x1="${rMid}" y1="${bossY + 6}" x2="${rMid}" y2="${y_bot - 9}" stroke="#415046" stroke-width="1"/>`;
+  }
+
+  // 6. Heavy Wrought-Bronze Strap Hinges (anchored at outer stone jambs)
+  for (const hy of [36, 84]) {
+    // Left Hinge Knuckle & Strap
+    s += `<rect x="41" y="${hy - 4}" width="5" height="8" rx="1" fill="url(#bronzeGrad)" stroke="#111613" stroke-width="0.8"/>`;
+    s += `<circle cx="43.5" cy="${hy}" r="1" fill="#fcebbb"/>`;
+    const sLenL = Math.min(36, pw * 0.42);
+    if (sLenL > 4) {
+      s += `<path d="M 44 ${hy - 2.5} H ${44 + sLenL} L ${44 + sLenL + 4} ${hy} L ${44 + sLenL} ${hy + 2.5} H 44 Z"
+                  fill="url(#bronzeGrad)" stroke="#141812" stroke-width="0.8"/>`;
+      s += `<circle cx="${44 + sLenL * 0.4}" cy="${hy}" r="1.3" fill="#fcebbb" stroke="#3d2d0c" stroke-width="0.5"/>`;
+      if (sLenL > 16) {
+        s += `<circle cx="${44 + sLenL * 0.8}" cy="${hy}" r="1.3" fill="#fcebbb" stroke="#3d2d0c" stroke-width="0.5"/>`;
+      }
+    }
+
+    // Right Hinge Knuckle & Strap
+    s += `<rect x="334" y="${hy - 4}" width="5" height="8" rx="1" fill="url(#bronzeGrad)" stroke="#111613" stroke-width="0.8"/>`;
+    s += `<circle cx="336.5" cy="${hy}" r="1" fill="#fcebbb"/>`;
+    const sLenR = Math.min(36, pw * 0.42);
+    if (sLenR > 4) {
+      s += `<path d="M 336 ${hy - 2.5} H ${336 - sLenR} L ${336 - sLenR - 4} ${hy} L ${336 - sLenR} ${hy + 2.5} H 336 Z"
+                  fill="url(#bronzeGrad)" stroke="#141812" stroke-width="0.8"/>`;
+      s += `<circle cx="${336 - sLenR * 0.4}" cy="${hy}" r="1.3" fill="#fcebbb" stroke="#3d2d0c" stroke-width="0.5"/>`;
+      if (sLenR > 16) {
+        s += `<circle cx="${336 - sLenR * 0.8}" cy="${hy}" r="1.3" fill="#fcebbb" stroke="#3d2d0c" stroke-width="0.5"/>`;
+      }
+    }
+  }
+
+  // 7. Center Reliquary Clasp & Amber Sanctuary Jewel Lock
+  if (pw > 115) {
+    const claspY = 60;
+
+    // Left shutter: Bronze Hasp Plate with mortise opening
+    s += `<rect x="${lx_edge - 14}" y="${claspY - 9}" width="14" height="18" rx="2" fill="url(#bronzeGrad)" stroke="#1a1408" stroke-width="1"/>`;
+    s += `<circle cx="${lx_edge - 9}" cy="${claspY}" r="3" fill="#141815" stroke="#4a3b18" stroke-width="0.8"/>`;
+    s += `<rect x="${lx_edge - 5}" y="${claspY - 4}" width="3" height="8" rx="0.5" fill="#0d110f" stroke="#3d2e0f" stroke-width="0.6"/>`;
+
+    // Right shutter: Bronze Latch Base & Articulated Clasp Arm
+    s += `<rect x="${rx_edge}" y="${claspY - 9}" width="14" height="18" rx="2" fill="url(#bronzeGrad)" stroke="#1a1408" stroke-width="1"/>`;
+    s += `<circle cx="${rx_edge + 5}" cy="${claspY}" r="2" fill="#fcebbb" stroke="#3d2d0c" stroke-width="0.6"/>`;
+
+    // Articulated Latch Bar swinging across center line
+    const latchAngle = Math.max(0, (1 - f) / 0.15) * -38;
+    s += `<g transform="translate(${rx_edge + 5}, ${claspY}) rotate(${latchAngle})">`;
+    s += `<path d="M 0 -3.5 L -20 -3.5 L -23 0 L -20 3.5 L 0 3.5 Z" fill="url(#bronzeGrad)" stroke="#181308" stroke-width="1"/>`;
+    // Embossed rosette setting
+    s += `<circle cx="-11" cy="0" r="5.5" fill="#2d2208" stroke="#d4a337" stroke-width="1"/>`;
+    // Glowing Amber Sanctuary Jewel Cabochon
+    s += `<circle cx="-11" cy="0" r="4.2" fill="url(#amberJewel)" stroke="#523908" stroke-width="0.8"/>`;
+    s += `<circle cx="-12.2" cy="-1.2" r="1.3" fill="#ffffff" opacity="0.85"/>`;
+    s += `</g>`;
+
+    // Lock Ping & Amber Radiance when fully seated
+    if (f > 0.92) {
+      const pingPulse = (f - 0.92) / 0.08;
+      s += `<circle cx="${midX}" cy="${claspY}" r="${6 + pingPulse * 16}" fill="#ffd885" opacity="${(1 - pingPulse) * 0.7}" filter="url(#votiveGlow)"/>`;
+      s += `<circle cx="${midX}" cy="${claspY}" r="4" fill="#ffffff" opacity="${0.6 + pingPulse * 0.4}"/>`;
+    }
+  }
+
+  // 8. In Shade mode: Predella Lintel Shelf reinforcement
+  if (f > 0.8) {
+    s += `<line x1="${x1 - 2}" y1="${y_bot + 1}" x2="${x2 + 2}" y2="${y_bot + 1}" stroke="#7e9084" stroke-width="1.5" opacity="${f}"/>`;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Render the entire hardware layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -1826,7 +2059,15 @@ function renderHardware() {
   for (const id of ['a', 'b']) {
     const pEl = $('#portcullis-' + id);
     if (pEl) {
-      pEl.innerHTML = drawPortcullis(model.portcullisDrop, W);
+      pEl.innerHTML = (model.option === 'portcullis' || model.portcullisDrop > 0.01) ? drawPortcullis(model.portcullisDrop, W) : '';
+    }
+  }
+
+  // Option 4: Triptych Altar Fold in each module
+  for (const id of ['a', 'b']) {
+    const tEl = $('#triptych-' + id);
+    if (tEl) {
+      tEl.innerHTML = (model.option === 'triptych' || model.triptychFold > 0.01) ? drawTriptych(model.triptychFold, W, id === 'a') : '';
     }
   }
 
@@ -1874,6 +2115,7 @@ function render() {
     el.style.top = m.y + 'px';
     el.style.zIndex = model.front === id ? '4' : '2';
     el.classList.toggle('shade', model.shade);
+    el.classList.toggle('joined-shade', model.joined && model.shade);
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.gothic-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
@@ -1935,7 +2177,7 @@ function render() {
   if (model.option === 'leadcame') {
     $('#btnJoinAnim').textContent = model.joined ? 'Seam soldered' : 'Solder lead seam';
     $('#btnSeparateAnim').textContent = 'Melt & separate';
-  } else if (model.option === 'portcullis') {
+  } else if (model.option === 'portcullis' || model.option === 'triptych') {
     $('#btnJoinAnim').textContent = model.joined ? 'Joined' : 'Join capsules';
     $('#btnSeparateAnim').textContent = 'Separate';
   } else {
@@ -1945,11 +2187,17 @@ function render() {
 
   const portBtn = $('#btnPortcullisAnim');
   if (portBtn) {
-    portBtn.textContent = model.shade ? 'Lift portcullis' : 'Drop portcullis';
+    if (model.option === 'triptych') {
+      portBtn.textContent = model.shade ? 'Unfold triptych' : 'Fold triptych';
+      portBtn.title = model.shade ? 'Unfold triptych stone shutters (T)' : 'Fold triptych stone shutters (T)';
+    } else {
+      portBtn.textContent = model.shade ? 'Lift portcullis' : 'Drop portcullis';
+      portBtn.title = model.shade ? 'Lift portcullis gate (P)' : 'Drop portcullis gate (P)';
+    }
     portBtn.disabled = model.busy;
-    const isPortOption = model.option === 'portcullis';
-    portBtn.classList.toggle('primary-btn', isPortOption);
-    $('#btnJoinAnim').classList.toggle('primary-btn', !isPortOption);
+    const isShadeOption = model.option === 'portcullis' || model.option === 'triptych';
+    portBtn.classList.toggle('primary-btn', isShadeOption);
+    $('#btnJoinAnim').classList.toggle('primary-btn', !isShadeOption);
   }
 
   $('#concurrencyValue').textContent = model.limit;
@@ -1973,7 +2221,11 @@ function render() {
 
   if (!model.busy) {
     if (model.shade) {
-      $('#phase').textContent = 'Shade mode / Portcullis guillotine locked';
+      if (model.option === 'triptych') {
+        $('#phase').textContent = 'Shade mode / Triptych sealed in reliquary';
+      } else {
+        $('#phase').textContent = 'Shade mode / Portcullis guillotine locked';
+      }
     } else if (model.joined) {
       if (model.option === 'leadcame') {
         $('#phase').textContent = 'Joined / Lead-came soldered frieze';
@@ -2161,6 +2413,62 @@ async function liftPortcullis() {
   $('#phase').textContent = model.joined ? 'Joined / One monolithic basilica' : 'Separate / Two stone housings';
 }
 
+// Option 4: Triptych Altar Fold & Unfold Animations
+async function foldTriptych() {
+  if (model.busy || (model.shade && model.triptychFold >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Closing triptych shutters. Carved stone-relief wings swing inward in 3D perspective.');
+  $('#phase').textContent = 'Folding triptych shutters';
+
+  // Mark shade active so module CSS height begins collapsing to 44px
+  model.shade = true;
+  render();
+
+  // Animate 3D swing closure
+  await tween(380, t => {
+    // Smooth decrescendo curve
+    const fold = Math.sin(t * Math.PI / 2);
+    model.triptychFold = fold;
+    renderHardware();
+  }, token);
+
+  model.triptychFold = 1;
+  model.busy = false;
+  render();
+  say('Triptych sealed. Bronze reliquary clasp locked. Predella status strip illuminated.');
+  $('#phase').textContent = 'Shade mode / Triptych sealed';
+}
+
+async function unfoldTriptych() {
+  if (model.busy || (!model.shade && model.triptychFold <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Unlocking bronze reliquary clasp. Stone triptych shutters swing open.');
+  $('#phase').textContent = 'Opening triptych shutters';
+
+  // Unmark shade so CSS height expands back to 130px
+  model.shade = false;
+  render();
+
+  // Animate opening
+  await tween(360, t => {
+    const unfold = 1 - Math.sin(t * Math.PI / 2);
+    model.triptychFold = unfold;
+    renderHardware();
+  }, token);
+
+  model.triptychFold = 0;
+  model.busy = false;
+  render();
+  say('Triptych open. Cathedral clerestory display and controls restored.');
+  $('#phase').textContent = model.joined ? 'Joined / One monolithic basilica' : 'Separate / Two stone housings';
+}
+
 // Option 3: Lead-Came Solder Weld Animations
 async function solderWeld(fromDrag = false) {
   if (model.busy || model.joined) return;
@@ -2270,7 +2578,8 @@ async function applyState(stateName) {
 
   if (stateName === 'separate') {
     if (model.shade) {
-      await liftPortcullis();
+      if (model.option === 'triptych') await unfoldTriptych();
+      else await liftPortcullis();
     }
     if (model.joined) {
       if (model.option === 'leadcame') await meltSeparate();
@@ -2278,6 +2587,7 @@ async function applyState(stateName) {
     } else {
       model.keystoneDrop = 0;
       model.solderProgress = 0;
+      model.triptychFold = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -2287,7 +2597,8 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'joining') {
     if (model.shade) {
-      await liftPortcullis();
+      if (model.option === 'triptych') await unfoldTriptych();
+      else await liftPortcullis();
     }
     model.joined = false;
     model.blend = 0.35;
@@ -2308,7 +2619,8 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'joined') {
     if (model.shade) {
-      await liftPortcullis();
+      if (model.option === 'triptych') await unfoldTriptych();
+      else await liftPortcullis();
     }
     if (!model.joined) {
       model.a.x = 220;
@@ -2331,9 +2643,11 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'shade') {
     if (!model.shade) {
-      await dropPortcullis();
+      if (model.option === 'triptych') await foldTriptych();
+      else await dropPortcullis();
     } else {
-      await liftPortcullis();
+      if (model.option === 'triptych') await unfoldTriptych();
+      else await liftPortcullis();
     }
   }
 }
@@ -2402,8 +2716,13 @@ $('#btnSeparateAnim').onclick = () => {
   else separate();
 };
 $('#btnPortcullisAnim').onclick = () => {
-  if (model.shade) liftPortcullis();
-  else dropPortcullis();
+  if (model.option === 'triptych') {
+    if (model.shade) unfoldTriptych();
+    else foldTriptych();
+  } else {
+    if (model.shade) liftPortcullis();
+    else dropPortcullis();
+  }
 };
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
@@ -2412,15 +2731,22 @@ $('#optionSelect').onchange = async e => {
     if (!model.shade) {
       await dropPortcullis();
     }
+  } else if (model.option === 'triptych') {
+    say('Option 4: Triptych Altar Fold shade selected. Hinged stone-relief shutters & predella reliquary casket.');
+    if (!model.shade) {
+      await foldTriptych();
+    }
   } else if (model.option === 'leadcame') {
     say('Option 3: Lead-Came Solder Weld join selected. Dark lead came channel & stained glass quarries.');
     if (model.shade) {
-      await liftPortcullis();
+      if (model.triptychFold > 0.05) await unfoldTriptych();
+      else await liftPortcullis();
     }
   } else if (model.option === 'keystone') {
     say('Option 1: Keystone Drop join selected. Ashlar voussoirs & granite key.');
     if (model.shade) {
-      await liftPortcullis();
+      if (model.triptychFold > 0.05) await unfoldTriptych();
+      else await liftPortcullis();
     }
   }
   render();
@@ -2436,7 +2762,7 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, undercroft: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   $('#optionSelect').value = 'keystone';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
@@ -2480,12 +2806,12 @@ function snapshot() {
   return {
     a: { ...model.a }, b: { ...model.b }, meter: { ...model.meter },
     joined: model.joined, docked: model.docked, cap: model.cap, blend: model.blend,
-    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, option: model.option, front: model.front
+    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, option: model.option, front: model.front
   };
 }
 function restore(s) {
   for (const id of ['a', 'b', 'meter']) Object.assign(model[id], s[id]);
-  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'option', 'front']) model[k] = s[k];
+  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'option', 'front']) model[k] = s[k];
 }
 function cancelDrag() {
   if (!drag) return;
@@ -2731,6 +3057,9 @@ window.addEventListener('keydown', e => {
   } else if (e.key === 'p' || e.key === 'P') {
     if (model.shade) liftPortcullis();
     else dropPortcullis();
+  } else if (e.key === 't' || e.key === 'T') {
+    if (model.shade) unfoldTriptych();
+    else foldTriptych();
   } else if (e.key === 'Enter') {
     if (document.activeElement === $('#keystoneRelease') && model.joined) separate();
     else if (document.activeElement === $('#solderRelease') && model.joined) meltSeparate();

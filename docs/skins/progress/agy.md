@@ -29,7 +29,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Chitinous Carapace Mandible Interlock join — Serrated stag-beetle shell teeth mesh with insectoid click (Built in prototypes/skins/agy/hollow.html with stepped serrated stag-beetle chitin teeth, insectoid chittering vibration, friction slash glints, locked bone-white zig-zag suture with respiration spiracles and brass cleats, articulated mandible spur release lever, and Option 3 switcher)
 
 ### Cycle 4: Secondary Shades
-- [ ] Gothic: Triptych Altar Fold shade — Hinged stone-relief shutters swing 90° inward over display face
+- [x] Gothic: Triptych Altar Fold shade — Hinged stone-relief shutters swing 90° inward over display face (Built in prototypes/skins/agy/gothic.html with twin lancet-relief shutters, 3D perspective swing, bronze strap hinges, reliquary clasp with amber sanctuary jewel, Option 4 switcher, and fixed unclipped readable shade strips)
 - [ ] Felt: The Artist's Tool-Roll (Felt Scroll) shade — Lower sections roll upward like canvas brush roll held by button
 - [ ] Elven: Sylvan Scabbard Slide shade — Display bay glides upward into overhead repoussé silver canopy
 - [ ] Wire: Wire Hoop Folding Accordion shade — Outer circular wire hoop pivots 180° upward along hinge beads
