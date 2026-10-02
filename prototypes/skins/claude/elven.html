@@ -113,6 +113,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="haloWarm"><stop stop-color="#fff4d8" stop-opacity=".85"/><stop offset=".4" stop-color="#ffd98a" stop-opacity=".25"/><stop offset="1" stop-color="#ffd98a" stop-opacity="0"/></radialGradient>
  <radialGradient id="band"><stop stop-color="#0a0c1c" stop-opacity=".62"/><stop offset=".6" stop-color="#0a0c1c" stop-opacity=".3"/><stop offset="1" stop-color="#0a0c1c" stop-opacity="0"/></radialGradient>
  <linearGradient id="furlG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#47697b"/><stop offset=".3" stop-color="#284559"/><stop offset=".72" stop-color="#15243d"/><stop offset="1" stop-color="#0b1326"/></linearGradient>
+ <linearGradient id="birch" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fdfdff"/><stop offset=".55" stop-color="#e2e7f3"/><stop offset="1" stop-color="#aeb8d2"/></linearGradient>
  <filter id="rollShade" x="-10%" y="-400%" width="120%" height="900%"><feGaussianBlur stdDeviation="2.4"/></filter>
  <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>
 </defs></svg>
@@ -120,6 +121,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <div class="controls" role="group" aria-label="Skin controls">
  <div class="row" id="stateRow"><span>State</span></div>
  <div class="row" id="joinRow"><span>Join</span></div>
+ <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-50" max="50" step=".5" value="-42.5" aria-label="GitDiscuss tilt at the fork, in degrees"><output id="angleOut" style="width:50px">−42.5°</output></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
@@ -357,8 +359,120 @@ const JOINS={
     s+=`<g class="hit lift" id="seamHit" tabindex="0" role="button" aria-label="Leaf brooch: drag it up, click it, or press Enter, to lift it off and separate the widgets" transform="translate(${f(S.x)} ${f(S.y-lift*12)}) rotate(${f(th*180/PI)}) scale(${f(sc*100)/100}) translate(-5 -12)"><title>Lift the brooch off to release</title><rect x="-56" y="-17" width="116" height="36" rx="14" fill="transparent"/><path class="ringfocus" d="${BLADE}" fill="none" stroke="#fff" stroke-width="1.4" stroke-dasharray="3 3" transform="translate(-3 0) scale(1.12)"/></g>`}
    return s;
   }
+ },
+ branch:{label:'Branching',kind:'Angle',angled:true,slow:1.3,msOut:2900,
+  // The stems stand further off the knot as the bend grows, so the casings' inside corners never meet.
+  get gap(){return 2*forkS(model.angle,ctx().h/2)},
+  txt:{join:'The casings close, a silver-birch twig grows from each stem, and the twigs fuse into a fork; the parent branch grows down and GitDiscuss swings to its angle.',
+   joined:'Joined at a fork. Drag GitDiscuss\'s nameplate, use the Angle slider, or press ↑ ↓ to bend it; it leans softly toward growth angles. Click the knot\'s moonstone to release.',
+   release:'GitDiscuss swings level, the moonstone dims, the leaves fold, the parent branch draws back and the twigs part at the knot.',
+   stop:'The twigs stop and draw back into their stems.',
+   hold:'Held mid-join: the twigs are reaching for each other. Use the scrubber to step through the growth.',
+   ready:'Ready: the buds glow and the fork is ghosted. Release to grow it.',near:'Nearby: a bud swells on each stem. Move closer.',
+   readyPh:'Ready · the fork is ghosted',nearPh:'Nearby · buds swell'},
+  phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.48?'Joining · twigs grow ':jt<.58?'Joining · the twigs fuse ':jt<.76?'Joining · the parent branch grows ':jt<.86?'Joining · the moonstone kindles ':'Joining · bending to '+forkName(model.angle).num+' '):(jt>.88?'Releasing · swinging level ':jt>.8?'Releasing · the moonstone dims ':jt>.62?'Releasing · the branch draws back ':jt>.4?'Releasing · the twigs part ':'Releasing · the casings part '),
+  bend(jt){const A=model.angle;if(jt>=1)return A;if(jt<=0)return 0;if(model.dir>0){const u=seg(jt,.86,1);return A*(1-Math.pow(1-u,3)*Math.cos(1.6*PI*u))}return A*(1-ease(seg(1-jt,0,.12)))},
+  about:'An angled join that reads as a fork in a silver-birch branch. Branches fork at every angle, so GitDiscuss can bend anywhere from −50° to +50°; the fork only leans softly toward growth angles. <b>Near:</b> a bud swells on each casing\'s stem. <b>Ready:</b> the buds glow and a dashed ghost of the fork appears in the gap. Joining: the casings close, a white birch twig with dark lenticels grows from each stem, and the twigs meet and fuse into a knot with a glint. The parent branch grows down out of the knot and ends in a curl, and five leaves open along it in phyllotaxis order: each one turned 137.5° round the stem from the last, so they alternate unevenly and the ones on the far side are smaller and dimmer. The moonstone set in the knot kindles as the join light, then GitDiscuss swings on the knot to its angle with one soft overshoot. The knot reforms to the angle: it swells toward each limb, the parent branch always splits the bend evenly, dark bark ridges form in the tighter crotches, and the twigs lengthen as the bend grows so the casings never touch. <b>Soft detents:</b> the fork catches on the golden angle (137.5°, the turn between successive leaves on a stem, at ±42.5°), on 144° (two fifths of a turn, one of the Fibonacci fractions that close in on it, at ±36°) and on a straight bough (180°). Near one the drag turns sticky and the moonstone brightens, but anywhere between is a valid resting place. To bend: drag GitDiscuss\'s nameplate, use the Angle slider, or focus GitDiscuss\'s nameplate or the knot and press ↑ ↓ to step between growth angles (Shift+↑ ↓ for 1°). While it bends, a hairline dial under the knot shows the growth angles as stars (gold for the golden angle), with the parent branch as its needle, and a moonstone tag reads the fork angle; the dial leaves out whatever GitDiscuss's casing covers. The pair refits vertically to stay on the stage; drag Jarvis\'s nameplate to move it. <b>Release:</b> click the knot\'s moonstone, or focus it and press Enter. GitDiscuss swings level, the light dims, the leaves fold, the parent branch draws back, and the twigs part at the knot and shrink into the stems.',
+  over:c=>drawBranch(c)
  }
 };
+/* ---------- Branching drawing ---------- */
+// Tilt detents in degrees: the golden angle (fork 137.5°), two fifths of a turn (144°) and a straight bough.
+const DET=[-42.5,-36,0,36,42.5],DWIN=3,AMAX=50;
+const forkS=(a,hh)=>22+hh*Math.tan(Math.abs(a)*PI/360);
+const signed=a=>(a>0?'+':a<0?'−':'')+Math.abs(Math.round(a*10)/10)+'°';
+function forkName(a){const d=DET.find(x=>Math.abs(a-x)<.3),F=Math.round((180-Math.abs(a))*10)/10;
+ return{num:F+'°',cap:d===undefined?'fork':d===0?'straight bough':Math.abs(d)===36?'⅖ turn':'golden angle',gold:d!==undefined&&Math.abs(d)>40}}
+// Sticky near each detent, free between them.
+function magnet(r){for(const d of DET){const x=r-d;if(Math.abs(x)<DWIN)return d+Math.sign(x)*DWIN*(Math.abs(x)/DWIN)**2}return r}
+// The range of Jarvis's y that keeps both casings, GitDiscuss's crest, the parent branch and its tag on the stage.
+function forkFit(a,hh){const s=forkS(a,hh),t=a*PI/180,ry=(u,v)=>u*Math.sin(t)+v*Math.cos(t),td=(90+a/2)*PI/180;
+ const ys=[-hh-4,hh+6,ry(s,-hh),ry(s,hh),ry(s+W,-hh),ry(s+W,hh),ry(s+W/2,-hh-17),ry(s+W/2,hh+12),Math.sin(td)*(hh>40?156:118)];
+ const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn-hh),hi=592-mx-hh;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+const arcS=pts=>{let a=0;pts.forEach((p,i)=>{if(i)a+=Math.hypot(p.x-pts[i-1].x,p.y-pts[i-1].y);p.s=a});return pts};
+// The grown part of a twig, from its base, with a sharp growing tip.
+function growPts(pts,g,taper=10){if(g<=0)return [];const len=g*pts[pts.length-1].s,out=[];
+ for(let i=0;i<pts.length;i++){const p=pts[i];if(p.s<=len){out.push({...p});continue}const q=pts[i-1],u=(len-q.s)/((p.s-q.s)||1);out.push({x:lerp(q.x,p.x,u),y:lerp(q.y,p.y,u),w:lerp(q.w,p.w,u),s:len});break}
+ if(g<1)out.forEach(p=>p.w*=clamp(.15+.85*(len-p.s)/taper,.15,1));return out}
+// Birch lenticels: short dark dashes across the twig, spaced unevenly.
+function lenticels(pts,seed){let d='',acc=0,next=5;
+ for(let i=1;i<pts.length;i++){const p=pts[i],q=pts[i-1],l=Math.hypot(p.x-q.x,p.y-q.y)||1;acc+=l;if(acc<next||p.w<2.4)continue;next=acc+5+(i*7+seed)%5;
+  const nx=-(p.y-q.y)/l,ny=(p.x-q.x)/l,a=-p.w*(.38-.22*((i*37+seed*11)%10)/10),b=a+p.w*(.28+.3*((i*13+seed)%7)/7);
+  d+=`M${f(p.x+nx*a)} ${f(p.y+ny*a)}L${f(p.x+nx*b)} ${f(p.y+ny*b)}`}
+ return d}
+function bud(p,deg,sc){if(sc<=.02)return '';return `<g transform="translate(${P(p)}) rotate(${deg}) scale(${f(sc*100)/100})"><path d="M-1 0C3 -4 7.5 -3.6 11 0C7.5 3.6 3 4 -1 0Z" fill="url(#birch)" stroke="${NIGHT}" stroke-width=".9"/><path d="M2 -1.2L4 1.1M6 -1.4L7.4 .8" stroke="#2a3148" stroke-width=".8"/></g>`}
+function drawBranch(c){
+ const h=c.h,hh=h/2,jt=c.jt,k=clamp(h/H,.62,1),s=forkS(model.angle,hh),dir=model.dir;
+ const sA={x:model.a.x+W-11.5,y:model.a.y+hh},sB={x:model.b.x+11.5,y:model.b.y+hh};
+ let o='';
+ if(jt===0){const g=c.glow;if(g<=0)return o;
+  o+=[sA,sB].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(8+10*g)}" fill="url(#halo)" opacity="${f(g)}"/>`).join('');
+  if(g>=1){const K0={x:(sA.x+sB.x)/2,y:(sA.y+sB.y)/2},td=(90+model.angle/2)*PI/180,E={x:K0.x+Math.cos(td)*86*k,y:K0.y+Math.sin(td)*86*k};
+   o+=`<path d="M${P(sA)}Q${f(lerp(sA.x,K0.x,.5))} ${f(K0.y+3)} ${P(K0)}Q${f(lerp(sB.x,K0.x,.5))} ${f(K0.y+3)} ${P(sB)}M${P(K0)}L${P(E)}" fill="none" stroke="#dfe8ff" stroke-width="1.2" stroke-dasharray="3 3" opacity=".7"/>`+star(K0.x,K0.y,6,.9)}
+  return o+bud(sA,0,.45+.55*g)+bud(sB,180,.45+.55*g)}
+ const K={x:model.a.x+W+s,y:model.a.y+hh},KB={x:model.b.x-s,y:model.b.y+hh},bd=JOINS.branch.bend(jt),br=bd*PI/180;
+ const RB=(u,v)=>({x:KB.x+u*Math.cos(br)-v*Math.sin(br),y:KB.y+u*Math.sin(br)+v*Math.cos(br)});
+ let lim,kn,glint=0,tr,gl;
+ if(dir>0){lim=seg(jt,.3,.48);kn=back(seg(jt,.47,.58),1.6);glint=Math.sin(PI*seg(jt,.47,.62));tr=seg(jt,.56,.76);gl=ease(seg(jt,.76,.86))}
+ else{lim=seg(jt,.4,.6);kn=ease(seg(jt,.56,.64));tr=seg(jt,.62,.8);gl=ease(seg(jt,.8,.88))}
+ if(dir>0&&jt<.34){const bo=1-seg(jt,.28,.34);o+=bud(sA,0,bo)+bud(sB,180,bo)}
+ // Twigs: from each stem to the knot, sagging a little, thickening toward the fork.
+ const twig=(map,u0)=>arcS([...Array(15)].map((_,i)=>{const t=i/14,q=map(lerp(u0,0,t),1.6*k*Math.sin(PI*t));return{x:q.x,y:q.y,w:lerp(4*k+.6,5.8*k+.8,t)}}));
+ const LA=growPts(twig((u,v)=>({x:K.x+u,y:K.y+v}),-s-11.5),lim),LB=growPts(twig(RB,s+11.5),lim);
+ // The parent branch always splits the bend evenly, and ends in a curl.
+ const td=(90+bd/2)*PI/180,T1=curlPts(K,td-.06,84*k,.14,1,20),e1=T1[20],h1=Math.atan2(e1.y-T1[19].y,e1.x-T1[19].x);
+ const TR=arcS([...T1,...curlPts(e1,h1,24*k,1.75*PI,1,18).slice(1)]);TR.forEach((p,i)=>p.w=i<=20?lerp(8.4*k+.6,3*k+.4,i/20):lerp(3*k+.4,.5,(i-20)/18));
+ const TT=growPts(TR,tr,14),grown=tr*TR[TR.length-1].s;
+ // Leaves in phyllotaxis order: each turned 137.5° round the branch from the last; the far ones are drawn behind, smaller and dimmer.
+ let lb='',lfr='';
+ [.2,.36,.52,.68,.84].forEach((fr,i)=>{const n=Math.round(fr*20),q=TR[n];if(q.s>grown)return;
+  const ph=(i+1)*137.5*PI/180,sn=Math.sin(ph),cs=Math.cos(ph),side=sn>=0?1:-1,a=Math.atan2(TR[n+1].y-q.y,TR[n+1].x-q.x)*180/PI;
+  const kk=dir>0?back(seg(jt,.62+i*.035,.72+i*.035),1.5):ease(seg(jt,.74,.84)),sz=(.5+.5*Math.abs(sn))*(1.08-.35*fr)*k*kk;
+  const L=leaf(q.x,q.y,a+side*58,sz,cs<0?.55:1);if(cs<0)lb+=L;else lfr+=L});
+ const parts=[LA,LB,TT].filter(p=>p.length>1),r0=5.4*k+.6,dirs=[PI,br,td];
+ const blob=()=>{let d='';for(let i=0;i<48;i++){const a=i/48*2*PI;let r=r0;for(const q of dirs){const cc=Math.cos(a-q);if(cc>0)r+=3.4*k*cc**10}d+=(i?'L':'M')+f(K.x+Math.cos(a)*r*kn)+' '+f(K.y+Math.sin(a)*r*kn)}return d+'Z'};
+ o+=lb+parts.map(p=>`<path d="${ribbon(p,1.8)}" fill="${NIGHT}"/>`).join('');
+ const B=kn>.01?blob():'';
+ if(B)o+=`<path d="${B}" fill="${NIGHT}" stroke="${NIGHT}" stroke-width="1.8"/>`;
+ o+=parts.map(p=>`<path d="${ribbon(p)}" fill="url(#birch)"/>`).join('')+(B?`<path d="${B}" fill="url(#birch)"/>`:'');
+ o+=`<path d="${parts.map((p,i)=>lenticels(p,i*5+3)).join('')}" fill="none" stroke="#262c44" stroke-width="1" stroke-linecap="round" opacity=".72"/>`;
+ o+=parts.map(p=>`<polyline points="${p.map(q=>f(q.x-.3)+','+f(q.y-.5)).join(' ')}" fill="none" stroke="#fff" stroke-width=".6" opacity=".6"/>`).join('');
+ // Silver cuffs where the twigs leave the stems.
+ if(lim>0)for(const [p,deg] of [[{x:K.x-s-8,y:K.y},0],[RB(s+8,0),bd]])o+=`<g transform="translate(${P(p)}) rotate(${f(deg)})"><rect x="-1.6" y="${f(-3.6*k-1)}" width="3.2" height="${f(7.2*k+2)}" rx="1.4" fill="url(#silverV)" stroke="${NIGHT}" stroke-width=".7"/></g>`;
+ if(kn>.4){
+  // Bark ridges in the tighter crotches: the knot reforms to the angle.
+  const ang=dirs.map(a=>(a%(2*PI)+2*PI)%(2*PI)).sort((x,y)=>x-y);let rg='';
+  ang.forEach((a,i)=>{const b=i<2?ang[i+1]:ang[0]+2*PI,al=b-a;if(al>2.8)return;const m=a+al/2,L=Math.min(1,(2.8-al)/1.3);
+   rg+=`<path d="${ribbon(widths([0,.5,1].map(t=>({x:K.x+Math.cos(m)*r0*kn*lerp(.62,1.1+.2*L,t),y:K.y+Math.sin(m)*r0*kn*lerp(.62,1.1+.2*L,t)})),.3,1.5*L+.3))}" fill="#262c44" opacity="${f(clamp((kn-.4)*2)*.8)}"/>`});
+  o+=rg}
+ // The moonstone set in the knot: the join light, brighter as the fork nears a growth angle.
+ if(kn>.05){const dc=jt===1?Math.max(0,...DET.map(d=>1-Math.abs(bd-d)/DWIN)):0,gold=dc>.5&&Math.abs(bd)>40,sk=Math.min(kn,1.15);
+  if(gl>0)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f((10+12*gl+10*dc)*k)}" fill="url(#${gold?'haloWarm':'halo'})" opacity="${f(gl)}"/>`;
+  o+=`<g transform="translate(${P(K)}) scale(${f(sk*k*100)/100})"><circle r="4.7" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><circle r="2.9" fill="url(#moonstone)"/><circle r="2.9" fill="${gold?'#fff4d8':'#eef4ff'}" opacity="${f(gl*.75)}"/><circle cx="-.9" cy="-1" r=".8" fill="#fff"/></g>`;
+  if(dc>.75&&gl>0)o+=star(K.x,K.y,(6+5*dc)*k,(dc-.75)*3.2*gl)}
+ o+=lfr;
+ if(glint>0)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(16*glint)}" fill="url(#halo)"/>`+star(K.x,K.y,10*glint,glint);
+ const dop=jt===1?model.dial:dir>0?seg(jt,.84,.9):0;
+ if(dop>0)o+=forkDial(K,bd,k,dop,s,hh);
+ if(jt===1){const n=forkName(model.angle);
+  o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Fork knot: GitDiscuss bent to a ${n.num} fork${n.cap==='fork'?'':', '+n.cap}. Up and down arrows bend it to the next growth angle, Shift with an arrow by one degree; Enter releases the fork and separates the widgets"><title>Click the knot's moonstone to release; drag GitDiscuss's nameplate to bend the fork</title><circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(15*k)}" fill="transparent"/><circle class="ringfocus" cx="${f(K.x)}" cy="${f(K.y)}" r="${f(12*k)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return o}
+// A hairline dial under the knot: the parent branch is its needle, growth angles are stars, and a moonstone tag reads the fork angle.
+function forkDial(K,bd,k,op,s,hh){const RD=112*k,pt=(t,r)=>{const a=(90+t/2)*PI/180;return{x:K.x+Math.cos(a)*r,y:K.y+Math.sin(a)*r}};
+ // Where GitDiscuss bends down across the dial, the part under its casing is left out.
+ const br=bd*PI/180,hid=p=>{const dx=p.x-K.x,dy=p.y-K.y,u=dx*Math.cos(br)+dy*Math.sin(br),v=-dx*Math.sin(br)+dy*Math.cos(br);return u>s-6&&Math.abs(v)<hh+7};
+ let arc='',pen=false;for(let t=-AMAX;t<=AMAX;t+=1){const p=pt(t,RD);if(hid(p)){pen=false;continue}arc+=(pen?'L':'M')+P(p);pen=true}
+ let o=`<g opacity="${f(op*100)/100}" pointer-events="none"><path d="${arc}" fill="none" stroke="#dfe8ff" stroke-width=".9" opacity=".5"/>`;
+ let tk='';for(let t=-AMAX;t<=AMAX;t+=10){const p=pt(t,RD-2.5),q=pt(t,RD+2.5);if(!hid(pt(t,RD)))tk+=`M${P(p)}L${P(q)}`}
+ o+=`<path d="${tk}" stroke="#dfe8ff" stroke-width=".8" opacity=".45"/>`;
+ for(const d of DET){const p=pt(d,RD),gold=Math.abs(d)>40,on=Math.abs(bd-d)<.3;if(hid(p))continue;
+  if(on)o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="9" fill="url(#${gold?'haloWarm':'halo'})"/>`;
+  o+=star(p.x,p.y,(gold?3.6:2.6)*(on?1.35:1),on?1:.7,gold?'#ffe2a0':'#eef2fc')}
+ const m=pt(bd,RD);o+=`<circle cx="${f(m.x)}" cy="${f(m.y)}" r="2.6" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width="1"/>`;
+ const n=forkName(bd),c=pt(bd,RD+25),font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;
+ o+=`<g transform="translate(${P(c)})"><rect x="-45" y="-16" width="90" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-43" y="-14" width="86" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>`+
+  `<text y="0" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${n.num}</text><text y="10" text-anchor="middle" ${font} font-size="8.5" letter-spacing="1.3" fill="${n.gold?'#8a6414':'#5d6584'}">${n.cap.toUpperCase()}</text></g>`;
+ return o+'</g>'}
 /* ---------- Leaf brooch drawing ---------- */
 // Brooch coordinates: the midrib runs along x from the base (-40) to the tip (46); the pin hangs below it on y = 12.
 const BLADE='M-40 0C-30 -10 -8 -13.5 10 -10C26 -7 38 -3 46 0C38 3 26 7 10 10C-8 13.5 -30 10 -40 0Z';
@@ -593,15 +707,43 @@ function flower(x,y,kk,k){const sc=k*.95,op=clamp(kk*1.4);let s=`<circle cx="${f
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,busy:false,angle:-42.5,angTo:undefined,dial:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
 function joinedPose(fixed='a'){
- const g=J().gap;
- if(fixed==='b'){let bx=clamp(model.b.x,W+g+34,1200-W-34);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
- let ax=clamp(model.a.x,34,1200-2*W-g-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+ const g=J().gap;let p;
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+34,1200-W-34);p={a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
+ else{let ax=clamp(model.a.x,34,1200-2*W-g-34);p={a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}}}
+ // A fork settles where its bend will fit on the stage.
+ if(J().angled)p.a.y=p.b.y=clamp(p.a.y,...forkFit(model.angle,ctx().h/2));
+ return p;
 }
+/* ---------- Bending the fork ---------- */
+let angAnim=0,dialTok=0,dialTimer=0;
+const branchOn=()=>!!J().angled&&model.jt===1;
+const forkKnot=()=>{const hh=ctx().h/2;return{x:model.a.x+W+forkS(model.angle,hh),y:model.a.y+hh}};
+function refitPair(){if(!branchOn())return;const[lo,hi]=forkFit(model.angle,ctx().h/2);model.a.y=model.b.y=clamp(model.a.y,lo,hi)}
+function pairY(){return branchOn()?forkFit(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
+function dialOn(){clearTimeout(dialTimer);++dialTok;model.dial=1}
+function dialOff(){clearTimeout(dialTimer);++dialTok;model.dial=0}
+function dialSoon(ms=1500){clearTimeout(dialTimer);dialTimer=setTimeout(()=>{const tok=++dialTok,t0=performance.now();
+ (function st(now){if(tok!==dialTok)return;const t=reduce.matches?1:clamp((now-t0)/450);model.dial=1-t;render();if(t<1)requestAnimationFrame(st)})(t0)},ms)}
+function animateAngle(to,ms=700){
+ to=clamp(to,-AMAX,AMAX);model.angTo=to;dialOn();const from=model.angle,tok=++angAnim,t0=performance.now();
+ (function step(now){if(tok!==angAnim)return;if(!branchOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
+  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*PI*t)),-AMAX-3,AMAX+3);refitPair();render();
+  if(t<1)requestAnimationFrame(step);else{model.angTo=undefined;dialSoon()}})(t0);
+}
+function stopAngle(){++angAnim;if(model.angTo!==undefined){model.angle=model.angTo;model.angTo=undefined;refitPair()}}
+function forkSay(a){const n=forkName(a);return n.cap==='golden angle'?'The fork settles on the golden angle, 137.5°: the turn between one leaf and the next round a stem.':n.cap==='⅖ turn'?'The fork settles at 144°, two fifths of a turn.':n.cap==='straight bough'?'The bough runs straight.':'The fork rests at '+n.num+'. Branches fork at any angle; growth angles only pull softly.'}
+// Arrow keys step to the next growth angle (or the end of the range); with Shift, by one degree.
+function stepAngle(k,fine){const base=model.angTo??model.angle;let to;
+ if(fine)to=clamp(Math.round(base)+k,-AMAX,AMAX);
+ else{const c=[-AMAX,...DET,AMAX];to=k>0?c.find(d=>d>base+.01):c.slice().reverse().find(d=>d<base-.01);if(to===undefined)return}
+ animateAngle(to);say('GitDiscuss bends '+(k>0?'down':'up')+' to '+signed(to)+'. '+forkSay(to))}
+function setForkAngle(v){v=clamp(v,-AMAX,AMAX);const d=DET.find(x=>Math.abs(v-x)<DWIN);if(d!==undefined)v=d;
+ if(branchOn())animateAngle(v,520);else{stopAngle();model.angle=v;if(J().angled&&model.path&&model.jt>0&&model.dir>0)model.path.j=joinedPose('a');if(model.path&&model.jt>0)setJt(model.jt);render()}}
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
  model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,model.dir<0?.55:.3));
@@ -624,26 +766,27 @@ async function doJoin(fixed='a',ms=3200){
  model.dir=1;
  if(model.jt===0){model.path={s:here(),j:joinedPose(fixed)}}
  else if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};
- model.glow=0;model.lift=0;
+ model.glow=0;model.lift=0;if(J().angled)dialOn();
  say(J().txt.join);
- const ok=await tween(model.jt,1,ms*(1-model.jt),setJt);
- if(ok){model.path=null;say(J().txt.joined)}
+ const ok=await tween(model.jt,1,ms*(J().slow||1)*(1-model.jt),setJt);
+ if(ok){model.path=null;refitPair();if(J().angled)dialSoon(1800);render();say(J().txt.joined)}
 }
 async function doSeparate(sPose){
  if(model.jt===0)return;
+ stopAngle();dialOff();
  if(model.jt===1){model.dir=-1;model.path={s:sPose||separatePose(),j:here()};say(J().txt.release)}
  else{if(model.dir>0)model.lift=0;if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say(J().txt.stop)}
- const ms=model.dir<0?2300*model.jt:1400*model.jt;
+ const ms=model.dir<0?(J().msOut||2300)*model.jt:1400*model.jt;
  if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.lift=0;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
- ++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
+ stopAngle();dialOff();++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
  setJt(.55);render();say(J().txt.hold);
 }
 function toggleShade(){
  const sh=SHADES[model.shade],to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||620)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;
- (function step(now){if(token!==shadeAnim)return;const t=reduce.matches||ms<=0?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));render();if(t<1)requestAnimationFrame(step)})(t0);
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches||ms<=0?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));refitPair();render();if(t<1)requestAnimationFrame(step)})(t0);
  say(to?(sh.sayIn||'Shaded: the casing narrows to a slim leaf with its nameplate and one value.'):(sh.sayOut||'Unshaded: the casing opens again.'));
 }
 // A casing pulled a little way from its partner springs back along the vine.
@@ -656,10 +799,13 @@ const draw=s=>{const d=SHADES[model.shade].draw;return d?d(s):ease(s)};
 function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,draw(model.st))),jt:model.jt,glow:model.glow}}
 function render(){
  const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,draw(model.st))),sh=SHADES[model.shade],cn=!!sh.custom,s=model.st;
+ // A joined fork keeps GitDiscuss's stem the bend's distance off the knot.
+ if(branchOn()){model.b.x=model.a.x+W+j.gap;model.b.y=model.a.y}
  $('#a .crun').textContent=$('#a .frun').textContent=model.a.run?'running':'paused';
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
+  if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-forkS(model.angle,h/2))+'px '+f(h/2)+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
   const k=ease(s),show=cn?1-seg(s,0,.16):1-clamp(k*2.2),strip=cn?0:seg(k,.55,1);
@@ -675,15 +821,19 @@ function render(){
  $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
  const focused=document.activeElement&&document.activeElement.id==='seamHit';
  $('#over').innerHTML=j.over(c);
- const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}
+  else if(j.angled&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();stepAngle(e.key==='ArrowDown'?1:-1,e.shiftKey)}};if(focused)hit.focus()}
+ $('#b .grip').setAttribute('aria-label',branchOn()?'Bend GitDiscuss at the fork: drag round the knot, or use the up and down arrows':'Move GitDiscuss');
+ $('#angleRow').style.display=j.angled?'':'none';
+ if(j.angled){const v=model.angTo??model.angle;$('#angle').value=v;$('#angleOut').textContent=signed(v)}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
- const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()};
- $('#phase').textContent=(drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?'Lifting · the brooch rises':drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'');
+ const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+forkName(model.angle).num:'')};
+ $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?'Lifting · the brooch rises':drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -693,7 +843,7 @@ function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k===
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.lift=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='join'&&id!==model.join){stopAngle();dialOff();const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.lift=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  describe();render();
 }
@@ -703,7 +853,8 @@ function describe(){
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
-$('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
+$('#angle').oninput=e=>{if(drag)cancelDrag();setForkAngle(+e.target.value)};
+$('#scrub').oninput=e=>{stopAngle();dialOff();++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
  if(model.jt===0||model.jt===1||!model.path)model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};
  setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
 document.addEventListener('keydown',e=>{
@@ -733,18 +884,23 @@ stage.addEventListener('pointerdown',e=>{
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  // A casing grabbed while springing back settles at its joined place first.
- if(id!=='c'&&((model.jt>0&&model.jt<1)||model.busy)){++anim;model.busy=false;model.lift=0;if(model.jt>0&&model.jt<1){if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0)}model.path=null;model.dir=1;if(model.jt===1){const j=joinedPose('a');Object.assign(model.a,j.a);Object.assign(model.b,j.b)}}
+ if(id!=='c'&&((model.jt>0&&model.jt<1)||model.busy)){++anim;model.busy=false;model.lift=0;if(model.jt>0&&model.jt<1){if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0)}model.path=null;model.dir=1;if(model.jt===1){const j=joinedPose('a');Object.assign(model.a,j.a);Object.assign(model.b,j.b)}if(J().angled){if(model.jt===1)dialSoon(600);else dialOff()}}
+ if(id==='a'&&model.jt===1&&J().angled)stopAngle();
+ // GitDiscuss's nameplate on a joined fork bends it round the knot.
+ if(id==='b'&&model.jt===1&&J().angled){++angAnim;model.angTo=undefined;const K=forkKnot();drag={bend:true,prev:Math.atan2(p.y-K.y,p.x-K.x),raw:model.angle,th0:model.angle,moved:false};dialOn();stage.setPointerCapture(e.pointerId);render();return}
  drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle',strain:0};
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
+ if(drag.bend){const K=forkKnot(),a=Math.atan2(p.y-K.y,p.x-K.x);let dd=(a-drag.prev)*180/PI;dd=((dd+540)%360)-180;drag.prev=a;
+  drag.raw=clamp(drag.raw+dd,-AMAX,AMAX);if(Math.abs(drag.raw-drag.th0)>1)drag.moved=true;model.angle=magnet(drag.raw);refitPair();render();return}
  if(drag.lift){const up=drag.start.y-p.y;drag.moved=Math.max(drag.moved,Math.hypot(p.x-drag.start.x,up));model.lift=clamp(up/40);
   if(model.lift>=1){drag=null;doSeparate();return}
   if(model.lift>0)say('The brooch rises with your finger and its pin starts to open. Keep lifting to take it off.');render();return}
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
- if(drag.group){const g=J().gap,ay=clamp(s.a.y+dy,TOP,bottom),away=drag.id==='a'?-dx:dx;
+ if(drag.group){const g=J().gap,ay=clamp(s.a.y+dy,...pairY()),away=drag.id==='a'?-dx:dx;
   if(away>0&&J().pull){// Pulling away: the partner holds, the held casing gives a little, and the braid strains.
    const st=Math.pow(away,.9)*.62,held=drag.id;drag.strain=st;
    model.a.y=model.b.y=ay;
@@ -765,6 +921,10 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.bend){if(!d.moved){dialSoon(600);render();say(J().txt.joined);return}
+  const dn=DET.find(x=>Math.abs(model.angle-x)<DWIN);
+  if(dn!==undefined)animateAngle(dn,380);else{model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon()}
+  say(forkSay(dn??model.angle));return}
  if(d.lift){if(model.lift>=.5||d.moved<5){doSeparate();return}
   tween(model.lift,0,320,v=>model.lift=v);say('The brooch settles back onto the seam.');return}
  if(d.group&&d.strain>0){springBack(d.id);say('The braid holds and draws the casing back.');return}
@@ -772,6 +932,7 @@ function endDrag(){
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.bend){model.angle=d.th0;refitPair();dialSoon(300);render();return}
  if(d.lift){model.lift=0;render();return}
  const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
 }
@@ -782,7 +943,8 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const id=b.dataset.drag;
  if((model.jt>0&&model.jt<1||model.busy)&&id!=='c')return;
  const bottom=600-(model.st>.5?HS:H)-14;
- if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ if(model.jt===1&&id==='b'&&J().angled&&k[1]){stepAngle(k[1]>0?1:-1,e.shiftKey);return}
+ if(model.jt===1&&id!=='c'){stopAngle();const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-CH-10:bottom)}render();
 }));
 
