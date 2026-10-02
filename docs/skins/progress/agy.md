@@ -43,7 +43,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Nail-Blade Sheath & Bone Peg join — Iron nail-blade slides into bronze scabbard and bone peg snaps down (Built in prototypes/skins/agy/hollow.html with cold-forged iron nail-blade, Pharloom brass scabbard mouth collar, spring-loaded bone locking peg, metallic friction scrape particles, bone peg release lever, and Option 5 switcher)
 
 ### Cycle 6: Tertiary Shades
-- [ ] Gothic: Pillar Telescoping (Capital to Plinth) shade — Fluted side columns compress into molded stone plinths
+- [x] Gothic: Pillar Telescoping (Capital to Plinth) shade — Fluted side columns compress into molded stone plinths (Built in prototypes/skins/agy/gothic.html with three concentric fluted limestone drums, bronze guide sleeves, carved acanthus capitals, molded torus plinths, stone friction dust particles, lateral locking detents, unclipped readable status strip, Option 6 switcher, and 'C' keyboard shortcut)
 - [ ] Felt: Envelope Flap Tuck shade — Lower half folds up on embroidered hinge and tucks into felt clutch slot
 - [ ] Elven: Filigree Harp Compression shade — Tracery ribs flex into parabolic curves drawing rails together
 - [ ] Wire: Beaded Pull-Tab Insect Elytra shade — Pull-tab wing covers with seed-bead mosaic pivot over screen
