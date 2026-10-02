@@ -43,7 +43,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .grip .dots{color:#fbe9cc99;letter-spacing:1px}
 .small .grip{left:24px;right:24px;top:4px;height:19px}
 /* Display: a smooth cotton patch sewn into the felt */
-.screen,.mini,.patch{position:absolute;overflow:hidden;color:#3a2a1e;border-radius:4px;
+.screen,.mini,.patch,.pp{position:absolute;overflow:hidden;color:#3a2a1e;border-radius:4px;
  background:repeating-linear-gradient(0deg,#5a40280b 0 1px,transparent 1px 2.5px),repeating-linear-gradient(90deg,#5a40280b 0 1px,transparent 1px 2.5px),linear-gradient(170deg,#f8efdb,#efe2c6);
  box-shadow:0 1px 1.5px #0006,inset 0 0 0 1px #6b4d3014;outline:1.4px dashed var(--thread);outline-offset:3px}
 .screen{left:45px;top:33px;width:300px;height:62px}
@@ -83,6 +83,17 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .pv li i{width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe2a8,#e0a03a 55%,#8a5512);box-shadow:0 1px 1px #0006}
 .pv li span{margin-left:auto;color:#8c725b;font-size:10px}
 .pv .bars{right:12px;top:9px}
+/* Patches morph: a cotton label on each sewn-on panel */
+.pp{display:none;padding:5px 11px;white-space:nowrap;opacity:0}
+.pp1{left:24px;top:88px;width:228px;height:44px;padding-top:4px;padding-bottom:3px}
+.pp2{left:287px;top:23px;width:130px;height:108px}
+.pp .tiny{font-size:10px;line-height:1.4;color:#8c725b;letter-spacing:.2px}
+.pp .row2{display:flex;align-items:center;gap:9px;margin-top:3px}
+.pp .row2 svg{display:block}
+.pp em{font:italic 400 16px/1 Georgia,serif;color:var(--accent)}
+.pp ul{list-style:none;margin:6px 0 0;padding:4px 0 0;border-top:1.2px dashed #6b4d3055;font-size:11px;line-height:1.75;color:#3a2a1e}
+.pp li{display:flex;align-items:center;gap:7px}
+.pp li i{width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe2a8,#e0a03a 55%,#8a5512);box-shadow:0 1px 1px #0006}
 .strip{position:absolute;left:40px;right:40px;top:6px;height:21px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 8px;pointer-events:none;opacity:0}
 .strip b{font:italic 400 15px/1 Georgia,serif;color:#fff3dc;text-shadow:0 1px 0 #0007}
 .strip span{padding:1px 9px;border-radius:3px;font-size:11px;color:#3a2a1e;background:linear-gradient(170deg,#f8efdb,#ecdcbd);box-shadow:0 1px 1px #0006;outline:1px dashed var(--thread);outline-offset:2px}
@@ -161,6 +172,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
   <div class="pv pv2"><div class="tiny">Checks / main branch · run 418</div><div class="big"><span class="xs" data-x="12 / 14" data-c="3.4"></span><em>passed · 86%</em></div><span class="bars"></span>
    <ul><li><i></i>deploy-preview<span>waiting for Brent</span></li><li><i></i>e2e-safari<span>waiting for Brent</span></li></ul></div>
  </div>
+ <div class="pp pp1" aria-hidden="true"><div class="tiny">main · run 418 · a French knot per check</div><div class="row2"><span class="knots"></span><em>86%</em></div></div>
+ <div class="pp pp2" aria-hidden="true"><div class="tiny">recent runs</div><div class="row2"><span class="bars2"></span><em>steady</em></div><ul><li><i></i>deploy-preview</li><li><i></i>e2e-safari</li></ul></div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
 </section>
 
@@ -191,6 +204,10 @@ function xbars(hs,c){let d1='',d2='';hs.forEach((n,i)=>{for(let r=0;r<n;r++){con
 $$('.xs').forEach(s=>s.innerHTML=xstitch(s.dataset.x,+s.dataset.c));
 $('.bars').innerHTML=xbars([2,4,3,5,3],2.9);
 $('.pv2 .bars').innerHTML=xbars([5,6,6,4,7,6],2.2);
+$('.pp2 .bars2').innerHTML=xbars([4,6,5,6,7,5,6],2.5);
+// A French knot per check for the first patch: 12 passed, 2 waiting.
+$('.pp1 .knots').innerHTML=`<svg width="141" height="11" viewBox="0 0 141 11"><defs><radialGradient id="pk-ok" cx=".36" cy=".3" r=".8"><stop stop-color="#e3f7b9"/><stop offset=".5" stop-color="#8fbf4f"/><stop offset="1" stop-color="#3f6b1c"/></radialGradient><radialGradient id="pk-wait" cx=".36" cy=".3" r=".8"><stop stop-color="#ffe2a8"/><stop offset=".5" stop-color="#e0a03a"/><stop offset="1" stop-color="#8a5512"/></radialGradient></defs>`+
+ Array.from({length:14},(_,n)=>{const x=5+n*10.1;return `<circle cx="${f(x+.4)}" cy="6.3" r="3.9" fill="#000" opacity=".3"/><circle cx="${f(x)}" cy="5.5" r="3.7" fill="url(#pk-${n<12?'ok':'wait'})"/><path d="M${f(x-1.8)} 4.9q1.8 -1.6 3.6 0" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width=".7"/>`}).join('')+'</svg>';
 
 /* ---------- Felt casing ---------- */
 const SKIN={a:{body:'#d0912f',band:'#a1631a',seed:3,r:[20,12,12,17]},b:{body:'#3f807a',band:'#2a5f5a',seed:9,r:[12,19,21,12]},c:{body:'#88506f',band:'#653953',seed:15,r:[15,12,16,13]}};
@@ -1325,8 +1342,17 @@ const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.he
 const SIZES=[['pad','Pad',0],['cushion','Cushion',1],['pillow','Pillow',2]];
 const MORPHS={
  stuffing:{label:'Stuffing',kind:'Inflate',
-  about:'Checks is filled like a cushion. <b>Growing:</b> a stretch of its side seam unpicks into a slit, and wool stuffing is pushed in through it in three tufts. Each gulp swells the felt a frame at a time with a little overshoot, the sides bowing out as the wool goes in. The slit is cross-stitched shut, then the cushion hops and lands with a squash that shakes a few fibres loose. <b>Cushion</b> gives the count a bigger cross-stitched display and sews a row of fourteen French knots under it, one per check (green passed, amber waiting). <b>Pillow</b> adds the run and pass rate, a cross-stitch bar chart of recent runs and the two waiting checks by name, and wool pompoms pop out at its corners. <b>Shrinking:</b> the slit opens and the stuffing sighs out in puffs. The felt sags inward and creases at the corners and along its edges, then the slit is stitched shut and the creases relax as it settles. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a grown Checks lets the stuffing out first, and unshading fills it back up.'}
+  about:'Checks is filled like a cushion. <b>Growing:</b> a stretch of its side seam unpicks into a slit, and wool stuffing is pushed in through it in three tufts. Each gulp swells the felt a frame at a time with a little overshoot, the sides bowing out as the wool goes in. The slit is cross-stitched shut, then the cushion hops and lands with a squash that shakes a few fibres loose. <b>Cushion</b> gives the count a bigger cross-stitched display and sews a row of fourteen French knots under it, one per check (green passed, amber waiting). <b>Pillow</b> adds the run and pass rate, a cross-stitch bar chart of recent runs and the two waiting checks by name, and wool pompoms pop out at its corners. <b>Shrinking:</b> the slit opens and the stuffing sighs out in puffs. The felt sags inward and creases at the corners and along its edges, then the slit is stitched shut and the creases relax as it settles. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a grown Checks lets the stuffing out first, and unshading fills it back up.',
+  sizes:['Pad','Cushion','Pillow'],noun:['a pad','a cushion','a pillow'],up:2800,down:1900,
+  fill:(g,d)=>stuffAt(g,d).fill,box:i=>MD[i],dims:()=>{const q=stuffGeo(stuffAt(model.gq,model.mDir));return[q.w,q.h]},
+  sayUp:n=>'Checks is stuffed into '+n+'.',sayDown:n=>'The stuffing comes out: Checks shrinks to '+n+'.'},
+ patches:{label:'Patches',kind:'Sew on',
+  about:'Checks grows by having new felt panels sewn on, like patchwork. <b>Growing:</b> a hand-cut panel is brought in from off the table, held up so its shadow falls wide, then laid down so its edge tucks under the pad. It lands with a squash that knocks a few fibres loose. Three glass-headed pins go in across the seam one at a time. A needle then whip-stitches the seam in thick wool, one slanted stitch after another over the pad\'s edge, pulling out each pin as it reaches it. A last tug puckers the felt, a gleam runs along the new stitching, and the panel\'s cotton label fades in. <b>Patched</b> adds an olive panel underneath, sewn in cream wool, with the run, a French knot per check (green passed, amber waiting) and the pass rate. <b>Patchwork</b> adds a denim panel down the right side, sewn in orange wool and tucked under both, with a cross-stitch chart of recent runs and the two checks waiting for Brent. <b>Shrinking:</b> the label goes, a seam ripper runs back along the seam and cut stitches curl and drop, then the panel is peeled up and lifted away, and the pad settles. The pad itself never changes, so its display and nameplate stay put the whole time. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a grown Checks unpicks its panels first, and unshading sews them back on. Switching morphs takes Checks back to a pad first.',
+  anchorTL:true,sizes:['Pad','Patched','Patchwork'],noun:['a pad','a patched pad','a patchwork'],up:3600,down:2400,
+  fill:(g,d)=>{const i=Math.min(1,Math.floor(g));return panelAt(g-i,d).fill},box:i=>PT.box[i],dims:()=>patchDims(patchAt(model.gq,model.mDir)),
+  sayUp:n=>'A new panel is pinned and sewn on: Checks becomes '+n+'.',sayDown:n=>'The seam is unpicked and the panel peeled off: Checks shrinks to '+n+'.'}
 };
+const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
 const lerpA=(a,b,t)=>a.map((v,i)=>lerp(v,b[i],t));
 // Creases as [x0,y0,x1,y1,bend] in fractions of the cushion: fans at each corner plus slack folds along the long edges.
@@ -1413,10 +1439,11 @@ function stuffSvg(o,q,fr){
 function morphRender(el){
  const svg=el.querySelector('.casing'),pa=el.querySelector('.patch'),gr=el.querySelector('.grip'),kn=el.querySelector('.knot');
  if(model.g<=0){
-  if(el.dataset.m){delete el.dataset.m;el.style.width=el.style.transform=gr.style.top=kn.style.left=kn.style.top='';pa.style.display='none';svg.dataset.key=''}
+  if(el.dataset.m){delete el.dataset.m;el.style.width=el.style.transform=gr.style.top=gr.style.right=kn.style.left=kn.style.top='';pa.style.display='none';el.querySelectorAll('.pp').forEach(n=>n.style.display='none');svg.dataset.key=''}
   el.setAttribute('aria-label','Checks widget');return false;
  }
- el.dataset.m='1';
+ if(model.morph==='patches')return patchRender(el,svg,gr,kn,pa);
+ el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
  const key=`m|${model.gq}|${model.mDir}|${model.mFr<0?-1:model.mFr%3}`;
@@ -1433,19 +1460,120 @@ function morphRender(el){
  if(model.mDir>=0){v[out]=1-seg(tt,.02,.08);v[inn]=seg(tt,.78,.92)}else{const s=1-tt;v[inn]=1-seg(s,0,.08);v[out]=seg(s,.74,.88)}
  pa.querySelectorAll('.pv').forEach((n,i)=>{n.style.opacity=f(v[i]);n.style.visibility=v[i]<.02?'hidden':'visible'});
  gr.style.opacity=1;gr.style.top=f(4+sag)+'px';el.querySelector('.strip').style.opacity=0;
- const S=SIZES.find(x=>x[2]===model.g);
- el.setAttribute('aria-label','Checks widget, '+(S?S[1].toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval');
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval');
  return true;
 }
-const cDims=()=>{if(model.g<=0)return[CW,CH];const q=stuffGeo(stuffAt(model.gq,model.mDir));return[q.w,q.h]};
+/* ---------- Morph: patches (Checks) ---------- */
+// g runs 0 pad, 1 patched, 2 patchwork; step 0 sews on the olive panel underneath, step 1 the denim panel down the right.
+// Panels lie under the pad (the olive one over the denim one), their edges tucked under; the seam is whip-stitched over the top edge.
+// from/away are [dx,dy,deg] for arriving and being peeled off; runs are the seam lines; n points from the pad into the panel.
+const PT={box:[[CW,CH],[CW,150],[436,150]],
+ panels:[
+  {x:8,y:64,w:262,h:82,r:[6,9,13,11],col:'#9a8b38',lt:'#d8cc7c',yarn:'#f4e2bd',yarnDk:'#2d2608',disp:'.pp1',from:[-56,74,-10],away:[-44,60,-15],
+   runs:[[19,74,254,74]],n:{x:0,y:1},pinAt:[.17,.5,.83],fz:[[22,144],[252,144]]},
+  {x:262,y:8,w:170,h:138,r:[9,14,12,7],col:'#4d6a8e',lt:'#a9c0dc',yarn:'#f2a35f',yarnDk:'#2a1203',disp:'.pp2',from:[92,-28,11],away:[74,46,16],
+   runs:[[272,18,272,56],[270,80,270,134]],n:{x:1,y:0},pinAt:[.2,.6,.88],fz:[[428,14],[428,142]]}]};
+PT.panels.forEach(P=>{P.tan={x:P.n.y,y:P.n.x};const st=[];
+ for(const[x0,y0,x1,y1]of P.runs){const k=Math.max(1,Math.round(Math.hypot(x1-x0,y1-y0)/10));for(let i=0;i<=k;i++)st.push({x:lerp(x0,x1,i/k),y:lerp(y0,y1,i/k)})}
+ st.forEach((s,i)=>s.fq=i/(st.length-1));P.st=st});
+// One panel's step: t is the step's progress, dir +1 sewing on, -1 unpicking.
+function panelAt(t,dir){
+ const o={op:1,dx:0,dy:0,rot:0,sc:1,sy:1,lift:0,pins:null,sf:1,cut:0,stitching:false,gleam:-1,fib:0,box:1,rip:-1,show:1,sq:0,fill:1,dir};
+ if(dir>=0){
+  const e=ease(seg(t,0,.26)),u=1-e;o.box=e;o.op=seg(t,0,.05);o.lift=u;o.pose=u;
+  o.sy=(1-.08*Math.sin(Math.PI*seg(t,.24,.32)))*(1-.035*Math.sin(Math.PI*seg(t,.85,.9)));
+  const fb=seg(t,.26,.42);o.fib=fb>0&&fb<1?fb:0;
+  o.pins=[0,1,2].map(i=>ease(seg(t,.32+i*.045,.37+i*.045)));
+  o.sf=seg(t,.47,.84);o.stitching=t>=.47&&t<.84;
+  o.gleam=t>.86&&t<.97?seg(t,.86,.97):-1;o.show=seg(t,.88,.98);o.fill=.5*e+.5*o.sf;
+ }else{
+  const s=1-t,pe=ease(seg(s,.48,.84));
+  o.show=1-seg(s,0,.06);o.cut=seg(s,.06,.42);o.rip=s>0&&s<.48?s:-1;
+  o.box=1-pe;o.lift=pe;o.pose=pe;o.op=1-seg(s,.76,.86);o.sy=1-.03*Math.sin(Math.PI*seg(s,.42,.5));
+  o.sq=.05*Math.sin(Math.PI*seg(s,.86,.98));o.fill=.5*(1-o.cut)+.5*(1-pe);
+ }
+ return o;
+}
+function patchAt(g,dir){const i=Math.min(1,Math.floor(g)),t=g-i;return{i,p:[panelAt(i?1:t,dir),i?panelAt(t,dir):null]}}
+function patchDims(S){const a=PT.box[S.i],b=PT.box[S.i+1],k=S.p[S.i].box;return[Math.round(lerp(a[0],b[0],k)),Math.round(lerp(a[1],b[1],k))]}
+// Thick wool: a dark under-shadow, the strand, and a dashed highlight for the twist.
+const yarn=(d,c,dk,w=2.3)=>d?`<g fill="none" stroke-linecap="round"><path d="${d}" stroke="${dk}" stroke-opacity=".5" stroke-width="${f(w+1.2)}" transform="translate(.5 .9)"/><path d="${d}" stroke="${c}" stroke-width="${w}"/><path d="${d}" stroke="#fff" stroke-opacity=".45" stroke-width="${f(w*.4)}" stroke-dasharray="1.2 1.9"/></g>`:'';
+// A whip stitch slants over the pad's edge: in on the pad side, out on the panel side.
+const whipEnds=(P,s)=>[{x:s.x-P.n.x*5.5-P.tan.x*2.6,y:s.y-P.n.y*5.5-P.tan.y*2.6},{x:s.x+P.n.x*5.5+P.tan.x*2.6,y:s.y+P.n.y*5.5+P.tan.y*2.6}];
+// Own clip id, so it never picks up the join's needle clip in the overlay.
+const pNeedle=(...a)=>needle(...a).replace('id="ndl"','id="ndlp"').replace('url(#ndl)','url(#ndlp)');
+function panelSvg(P,o){
+ if(!o||o.op<=0)return{under:'',over:''};
+ const [fx,fy,fr]=o.dir>=0?P.from:P.away,k=o.pose,cx=P.x+P.w/2,cy=P.y+P.h/2,L=o.lift,body=rr4(P.x,P.y,P.w,P.h,P.r);
+ let u=`<g opacity="${f(o.op)}" transform="translate(${f(fx*k)} ${f(fy*k)}) translate(${f(cx)} ${f(cy)}) rotate(${f(fr*k)}) scale(${f((1+.1*L)*1000)/1000} ${f((1+.1*L)*o.sy*1000)/1000}) translate(${f(-cx)} ${f(-cy)})">`;
+ u+=`<path d="${body}" fill="#000" opacity="${f(.45-.15*L)}" filter="url(#sh)" transform="translate(${f(1+10*L)} ${f(2+15*L)})"/>`;
+ u+=`<path d="${rr4(P.x-1.5,P.y+2,P.w+3,P.h,P.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-c)"/><path d="${body}" fill="${P.col}" filter="url(#f-c)"/>`;
+ const st=rr4(P.x+7,P.y+7,P.w-14,P.h-14,P.r.map(v=>Math.max(3,v-5)));
+ u+=`<path d="${st}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${st}" fill="none" stroke="#f7e8c9" stroke-opacity=".8" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/></g>`;
+ // Fibres knocked loose when it lands.
+ if(o.fib)for(const[zx,zy]of P.fz)for(const[dx,dy,rot]of FLUFF){const x=zx+dx*18*(.4+o.fib),y=zy+dy*8*(.6+o.fib)+10*o.fib*o.fib;
+  u+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+o.fib*90)})" fill="none" stroke="${P.lt}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-o.fib)}"/>`}
+ // The seam: stitches laid so far, or not yet ripped. Drawn over the pad's edge, so only once the panel has landed.
+ const n=P.st.length,laid=o.sf*n;let v='',d='',holes='';
+ P.st.forEach((s,i)=>{if(o.dir>=0?(o.sf>=1||i<laid):(o.cut<=0||s.fq<1-o.cut)){const[a,b]=whipEnds(P,s);d+=`M${pt(a)}L${pt(b)}`;holes+=`<circle cx="${f(a.x)}" cy="${f(a.y)}" r="1.1"/><circle cx="${f(b.x)}" cy="${f(b.y)}" r="1.1"/>`}});
+ if(holes)v+=`<g fill="#1a0c08" opacity=".45">${holes}</g>`;
+ v+=yarn(d,P.yarn,P.yarnDk);
+ // A gleam runs along the new seam once it is tied off.
+ if(o.gleam>=0){let g='';P.st.forEach(s=>{const e=1-Math.abs(s.fq-o.gleam)/.08;if(e>0){const[a,b]=whipEnds(P,s);g+=`<path d="M${pt(a)}L${pt(b)}" stroke-opacity="${f(.85*e)}"/>`}});v+=`<g fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round">${g}</g>`}
+ // Pins: in one at a time across the seam, each pulled as the needle comes to it.
+ if(o.pins)P.pinAt.forEach((at,i)=>{const ins=o.pins[i],out=seg(o.sf,at-.05,at+.02);if(ins<=0||out>=1)return;
+  const j=Math.min(n-2,Math.round(at*(n-1))),m=V.mix(P.st[j],P.st[j+1],.5),hd=V.add(m,V.mul(P.n,9));
+  v+=dPin(hd.x,hd.y,angOf(-P.n.x,-P.n.y)+(i%2?10:-10),AP.pins[i],1,Math.max(1-ins,Math.min(1,out*1.6)),1-seg(out,.5,1))});
+ // The needle: diving in on the panel side, then popping up on the pad side for the next stitch, trailing its wool.
+ if(o.stitching){const k=Math.min(n-1,Math.floor(laid)),fr=laid-k,[,b]=whipEnds(P,P.st[k]);
+  if(fr<.5){const ang=angOf(-P.n.x,-P.n.y)+38,e=eyeOf(b.x,b.y,ang);v+=yarn(`M${pt(e)}q${f(8+6*fr)} -4 ${f(6+4*fr)} -16`,P.yarn,P.yarnDk,1.8)+pNeedle(b.x,b.y,ang,3)}
+  else if(k+1<n){const[a]=whipEnds(P,P.st[k+1]);v+=pNeedle(a.x,a.y,angOf(P.n.x,P.n.y)-26,0,11)}}
+ // Unpicking: the ripper runs back along the seam; each cut stitch curls and drops.
+ if(o.rip>=0){const s=o.rip;
+  P.st.forEach(st=>{const age=(s-.06-(1-st.fq)*.36)/.1;if(age<=0||age>=1)return;const x=st.x+P.n.x*6+(P.n.x?8:3)*age,y=st.y+P.n.y*6+26*age*age;
+   v+=`<path d="M-2.6 0q1.3-2.8 2.6 0t2.6 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(st.fq*720+age*170)})" fill="none" stroke="${P.yarn}" stroke-width="1.6" stroke-linecap="round" opacity="${f(1-age)}"/>`});
+  const fq=1-Math.min(.999,o.cut),i=Math.min(n-2,Math.floor(fq*(n-1))),T=V.mix(P.st[i],P.st[i+1],fq*(n-1)-i),app=ease(seg(s,0,.06)),away=seg(s,.42,.48);
+  if(away<1)v+=seamRipper(T.x+P.n.x*3+26*(1-app)+18*away,T.y+P.n.y*3-24*(1-app)-24*away,angOf(-P.tan.x,-P.tan.y)-40,Math.min(app*1.5,1-away))}
+ return{under:u,over:v};
+}
+function patchSvg(S,fr){
+ const keep=BO;BO=fr<0?0:(fr%3)*31;
+ // Denim under olive under the pad; seams on top.
+ const p1=panelSvg(PT.panels[0],S.p[0]),p2=panelSvg(PT.panels[1],S.p[1]);
+ const x=p2.under+p1.under+casing('c',CW,CH)+p1.over+p2.over;
+ BO=keep;return x;
+}
+function patchRender(el,svg,gr,kn,pa){
+ el.dataset.m='1';pa.style.display='none';
+ const S=patchAt(model.gq,model.mDir),[w,h]=patchDims(S),os=patchAt(model.g,model.mDir);
+ el.style.width=w+'px';el.style.height=h+'px';
+ const key=`p|${model.gq}|${model.mDir}|${model.mFr<0?-1:model.mFr%3}`;
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=patchSvg(S,model.mFr)}
+ // The pad settles with a small squash once a panel is off.
+ const sq=S.p[S.i]?S.p[S.i].sq:0;el.style.transformOrigin=`${CW/2}px ${CH}px`;el.style.transform=sq?`scale(${(1+sq*.7).toFixed(3)},${(1-sq).toFixed(3)})`:'';
+ // The pad's own display, knot and nameplate never move.
+ const mini=el.querySelector('.mini');mini.style.visibility='visible';mini.style.opacity=1;
+ kn.style.left=kn.style.top='';kn.style.opacity=1;kn.style.visibility='visible';
+ // Each label fades on the smooth timeline, only while its panel is sewn on.
+ PT.panels.forEach((P,k)=>{const n=el.querySelector(P.disp),o=os.p[k],v=o?o.show:0;n.style.display=v>.02?'block':'none';n.style.opacity=f(v)});
+ gr.style.opacity=1;gr.style.top='';gr.style.right=(w-CW+24)+'px';el.querySelector('.strip').style.opacity=0;
+ const i=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(i>=0?sizeLabel(i).toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418, 86% passed':'')+(model.g>=2?'; deploy-preview and e2e-safari waiting for Brent':''));
+ return true;
+}
+const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
 function cCenter(){const[w,h]=cDims();return{x:model.c.x+w/2,y:model.c.y+h/2}}
 function placeC(cx,cy){const[w,h]=cDims();model.c.x=clamp(cx-w/2,10,1190-w);model.c.y=clamp(cy-h/2,46,590-h)}
-// Where Checks's centre should end up at size `to`: on the stage, and clear of the pair when there is room.
+// Stuffing grows about Checks's centre; patches are sewn onto a pad that stays put, so that morph keeps the top-left corner.
+const cAnchor=()=>MM().anchorTL?{x:model.c.x,y:model.c.y}:cCenter();
+function placeAt(x,y){if(!MM().anchorTL)return placeC(x,y);const[w,h]=cDims();model.c.x=clamp(x,10,1190-w);model.c.y=clamp(y,46,590-h)}
+// Where Checks's anchor should end up at size `to`: on the stage, and clear of the pair when there is room.
 function morphSpot(to){
- const[w,h]=MD[to],c=cCenter();let cx=clamp(c.x,10+w/2,1190-w/2),cy=clamp(c.y,46+h/2,590-h/2);
+ const[w,h]=MM().box(to),tl=MM().anchorTL,c=tl?{x:model.c.x+w/2,y:model.c.y+h/2}:cCenter();let cx=clamp(c.x,10+w/2,1190-w/2),cy=clamp(c.y,46+h/2,590-h/2);
  const x0=Math.min(model.a.x,model.b.x)-8,x1=Math.max(model.a.x,model.b.x)+W+8,y0=Math.min(model.a.y,model.b.y)-8,yb=Math.max(model.a.y,model.b.y)+ctx().h+8;
  if(cx+w/2>x0&&cx-w/2<x1&&cy-h/2<yb&&cy+h/2>y0){const below=yb+h/2,above=y0-h/2;if(below<=590-h/2)cy=below;else if(above>=46+h/2)cy=above}
- return{x:cx,y:cy};
+ return tl?{x:cx-w/2,y:cy-h/2}:{x:cx,y:cy};
 }
 let morphAnim=0;
 function morphTo(id){
@@ -1455,15 +1583,16 @@ function morphTo(id){
  if(model.st>0&&to>0){model.restore=id;model.size=id;toggleShade(0);render();return Promise.resolve(false)}
  if(to===0)model.restore=null;
  model.size=id;
- if(to===from){say('Checks is already a '+S[1].toLowerCase()+'.');render();return Promise.resolve(true)}
- // Reversed mid-step: start the other timeline at the point with the same amount of stuffing, so the size doesn't jump.
+ const M=MM(),noun=M.noun[to];
+ if(to===from){say('Checks is already '+noun+'.');render();return Promise.resolve(true)}
+ // Reversed mid-step: start the other timeline at the point with the same amount of stuffing (or sewing), so the size doesn't jump.
  const dir=to>from?1:-1;
- if(dir!==model.mDir&&from%1){const i=Math.floor(from),f0=stuffAt(from,model.mDir).fill;let best=from,err=9;
-  for(let k=0;k<=100;k++){const e=Math.abs(stuffAt(i+k/100,dir).fill-f0);if(e<err){err=e;best=i+k/100}}
+ if(dir!==model.mDir&&from%1){const i=Math.floor(from),f0=M.fill(from,model.mDir);let best=from,err=9;
+  for(let k=0;k<=100;k++){const e=Math.abs(M.fill(i+k/100,dir)-f0);if(e<err){err=e;best=i+k/100}}
   model.mDir=dir;from=model.g=model.gq=best}
  model.mDir=dir;model.cMoved=false;
- const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(to>from?2800:1900),c0=cCenter(),c1=morphSpot(to),t0=performance.now();
- say(to>from?'Checks is stuffed into a '+S[1].toLowerCase()+'.':'The stuffing comes out: Checks shrinks to a '+S[1].toLowerCase()+'.');
+ const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(to>from?M.up:M.down),c0=cAnchor(),c1=morphSpot(to),t0=performance.now();
+ say(to>from?M.sayUp(noun):M.sayDown(noun));
  let last=-1;
  return new Promise(res=>{(function step(now){
   if(tok!==morphAnim)return res(false);
@@ -1471,17 +1600,17 @@ function morphTo(id){
   model.g=t<1?lerp(from,to,t):to;
   if(fr!==last||t>=1){last=fr;
    // Moved mid-morph (pointer or keys), Checks keeps growing about where it was put.
-   const c=cCenter();model.gq=model.g;model.mFr=t<1?fr:-1;
-   if(drag&&drag.id==='c'||model.cMoved)placeC(c.x,c.y);else{const e=ease(t);placeC(lerp(c0.x,c1.x,e),lerp(c0.y,c1.y,e))}}
+   const c=cAnchor();model.gq=model.g;model.mFr=t<1?fr:-1;
+   if(drag&&drag.id==='c'||model.cMoved)placeAt(c.x,c.y);else{const e=ease(t);placeAt(lerp(c0.x,c1.x,e),lerp(c0.y,c1.y,e))}}
   render();
-  if(t<1)requestAnimationFrame(step);else{say('Checks is a '+S[1].toLowerCase()+'.');res(true)}
+  if(t<1)requestAnimationFrame(step);else{say('Checks is '+noun+'.');res(true)}
  })(t0)});
 }
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'zipper',shade:'deflate',morph:'stuffing',size:'pad',g:0,gq:0,mDir:1,mFr:-1,restore:null,jt:0,angle:-20,turning:false,st:0,dir:1,snip:false,path:null,glow:0,ghost:0,busy:false,shDir:1};
-let anim=0,shadeAnim=0,drag=null,togDrag=null;
+let anim=0,shadeAnim=0,morphSwitch=0,drag=null,togDrag=null;
 const J=()=>JOINS[model.join];
 // Each angled join keeps its own angle while another join is picked.
 const ANG={hinge:-20,pin:15};
@@ -1549,7 +1678,7 @@ function holdJoining(){
  setJt(J().hold||.64);render();say(J().sayHold);
 }
 function toggleShade(force){
- togDrag=null;
+ togDrag=null;++morphSwitch;
  const to=force!==undefined?force:model.st>.5?0:1;
  // A grown Checks lets its stuffing out first, and gets it back after unshading.
  if(to===1&&model.g>0){
@@ -1600,7 +1729,7 @@ function render(){
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
  $$('#morphRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.morph)));
  $$('#sizeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===model.size)));
- $('#grow').value=Math.round(model.g*100);$('#growOut').textContent=(SIZES.find(x=>x[2]===model.g)||[0,'…'])[1].toLowerCase();
+ $('#grow').value=Math.round(model.g*100);{const i=SIZES.findIndex(x=>x[2]===model.g);$('#growOut').textContent=i>=0?sizeLabel(i).toLowerCase():'…'}
  $('#angleRow').style.display=j.angled?'':'none';if(j.angled){const r=$('#angle');r.min=-j.amax;r.max=j.amax;r.step=j.det||1;r.setAttribute('aria-label',j.label+' angle in degrees')}$('#angle').value=Math.round(model.angle);$('#angleOut').textContent=signed(model.angle);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const ph={separate:'Separate · two cushions',joining:j.phase(model.jt),joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+signed(model.angle):'')};
@@ -1617,7 +1746,11 @@ function pick(key,id){
  if(togDrag&&key==='shade'){togDrag=null;++shadeAnim;model.st=1}
  if(key==='join'&&id!==model.join){const was=model.jt;++anim;++angAnim;model.busy=false;if(J().angled)ANG[model.join]=J().det?Math.round(model.angle/J().det)*J().det:model.angle;model.join=id;if(J().angled)model.angle=ANG[id];model.path=null;model.jt=0;model.dir=1;model.snip=false;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
- if(key==='morph')model.morph=id;
+ // Any morph pick drops a pending switch, so picking the current one again cancels it.
+ if(key==='morph'){const tok=++morphSwitch;if(id!==model.morph){
+  // A grown Checks goes back to a pad under the old morph first, then the new one takes over.
+  if(model.g>0){say('Checks goes back to a pad before the morph changes.');morphTo('pad').then(ok=>{if(ok&&tok===morphSwitch)pick('morph',id)});return}
+  ++morphAnim;model.morph=id;model.restore=null}}
  if(hingeOn())model.a.y=model.b.y=hingeY(model.a.y);
  describe();render();
 }
@@ -1625,6 +1758,7 @@ function describe(){
  const j=J(),s=SHADES[model.shade];
  $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
+ $$('#sizeRow button').forEach((b,i)=>b.textContent=sizeLabel(i));$('#grow').setAttribute('aria-label','Checks size, '+MM().sizes[0].toLowerCase()+' to '+MM().sizes[2].toLowerCase());
  const m=MORPHS[model.morph];$('#morphAbout').innerHTML=`<h2>${m.label}<small>morph · ${m.kind}</small></h2><p>${m.about}</p>`;
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#morphRow',MORPHS,'morph');
@@ -1636,7 +1770,7 @@ let slideDir=0;
 $('#grow').oninput=e=>{if(drag)cancelDrag();
  if(model.st>0){e.target.value=Math.round(model.g*100);if(model.st>.5)toggleShade(0);return}
  ++morphAnim;model.restore=null;model.cMoved=false;
- const c=cCenter(),v=e.target.value/100;if(!slideDir)slideDir=v>=model.g?1:-1;model.mDir=slideDir;model.g=model.gq=v;model.mFr=-1;const S=SIZES.find(x=>x[2]===v);model.size=S?S[0]:null;placeC(c.x,c.y);render()};
+ const c=cAnchor(),v=e.target.value/100;if(!slideDir)slideDir=v>=model.g?1:-1;model.mDir=slideDir;model.g=model.gq=v;model.mFr=-1;const S=SIZES.find(x=>x[2]===v);model.size=S?S[0]:null;placeAt(c.x,c.y);render()};
 function setAngle(v){
  model.angle=clamp(Math.round(v*10)/10,-J().amax,J().amax);
  // During a bend drag the pair stays put under the pointer; it is refitted when the drag ends.
