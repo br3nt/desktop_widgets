@@ -51,7 +51,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 
 ### Cycle 7: Quaternary Joins
 - [x] Gothic: Bronze Gargoyle Clench join — Hinged cast-bronze grotesque snaps claws shut over iron ring (Built in prototypes/skins/agy/gothic.html with patinated verdigris bronze grotesque, carved limestone corbel perch on Jarvis, relief quatrefoil rosette & forged-iron tether ring on GitDiscuss, articulated dragon wings & lunging claws, metallic friction sparks, coiled tail release lever, Option 7 switcher, and 'G' keyboard shortcut)
-- [ ] Felt: Heavy Brass Press-Stud (Popper) Snap join — Stiffened felt tabs seat brass popper studs into recessed sockets
+- [x] Felt: Heavy Brass Press-Stud (Popper) Snap join — Stiffened felt tabs seat brass popper studs into recessed sockets (Built in prototypes/skins/agy/felt.html with twin stiffened bridle-leather tabs, machined solid brass male studs with knurled rims and domed spring-ball heads, slotted receiving pockets with ivory running stitches and female brass sockets, internal steel split-ring clips, deep radial wool compression dimples, snap impact flash, saddle-stitched reinforcement welt, interactive pull-tab release, Option 7 switcher, and 'P' keyboard shortcut)
 - [ ] Elven: Willow-Blade Bayonet Sheath join — Spring-tempered silver willow leaves glide silently into scabbards
 - [ ] Wire: Shepherd's Crook & Spiral Eyelet join — Hand-bent copper crook snaps into double-spiral wire cradle
 - [ ] Hollow: Pharloom Brass Bell & Clapper Hitch join — Articulated forged iron clapper hooks into cast bell lip
