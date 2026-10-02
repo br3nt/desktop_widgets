@@ -117,6 +117,13 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .flabel>span{font:italic 11.5px/1 Georgia,serif;color:#253042}
 .flabel em{font-style:normal;font-weight:700;color:#8f1c22;margin-right:4px}
 .small .flabel b{font-size:11px;letter-spacing:2.2px}.small .flabel>span{font-size:11px}
+/* Wing cases shade: the parchment pleats like a hind wing and a polished wing case folds down over it; the folded edge peeks out below */
+.pwing{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.wname,.wval{position:absolute;left:0;top:0;height:16px;display:flex;align-items:center;white-space:nowrap;pointer-events:none;opacity:0}
+.wname b{font:400 12px/1 Georgia,serif;letter-spacing:2.8px;text-transform:uppercase;color:var(--chalk);text-shadow:0 1px 1px #000,0 0 3px #05070b,0 0 6px #05070b}
+.wval{font:italic 11.5px/1 Georgia,serif;color:#2e2216}
+.wval em{font-style:normal;font-weight:700;color:#8f1c22;margin-right:4px}
+.small .wname b{font-size:11px;letter-spacing:2.2px}.small .wval{font-size:10px}
 /* Map unfurl morph: Checks' sheet is one corner of a larger map, rolled up along the bottom and folded under on the right */
 .map{position:absolute;left:40px;top:30px;width:368px;height:118px;pointer-events:none;display:none}
 .leaf,.flap{position:absolute;top:0;width:184px;overflow:hidden;color:#4a3b2b;border-radius:3px 6px 2px 5px/5px 2px 6px 3px;
@@ -226,6 +233,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <svg class="hsign" aria-hidden="true"></svg><div class="slabel" aria-hidden="true"><b>Jarvis</b><i>◆</i><span><em>03</em><span class="runText">agents running</span></span></div>
  <svg class="pcurl" aria-hidden="true"></svg><div class="plabel" aria-hidden="true"><b>Jarvis</b><span><em>03</em><span class="runText">agents running</span></span></div>
  <svg class="pfog" aria-hidden="true"></svg><div class="flabel" aria-hidden="true"><b>Jarvis</b><span><em>03</em><span class="runText">agents running</span></span></div>
+ <svg class="pwing" aria-hidden="true"></svg><div class="wname" aria-hidden="true"><b>Jarvis</b></div><div class="wval" aria-hidden="true"><em>03</em><span class="runText">agents running</span></div>
 </section>
 
 <section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg>
@@ -243,6 +251,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <svg class="hsign" aria-hidden="true"></svg><div class="slabel" aria-hidden="true"><b>GitDiscuss</b><i>◆</i><span><em>02</em>need a decision</span></div>
  <svg class="pcurl" aria-hidden="true"></svg><div class="plabel" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em>need a decision</span></div>
  <svg class="pfog" aria-hidden="true"></svg><div class="flabel" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em>need a decision</span></div>
+ <svg class="pwing" aria-hidden="true"></svg><div class="wname" aria-hidden="true"><b>GitDiscuss</b></div><div class="wval" aria-hidden="true"><em>02</em>need a decision</div>
 </section>
 
 <section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
@@ -272,6 +281,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <svg class="hsign" aria-hidden="true"></svg><div class="slabel" aria-hidden="true"><b>Checks</b><i>◆</i><span><em>12 / 14</em>passed</span></div>
  <svg class="pcurl" aria-hidden="true"></svg><div class="plabel" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em>passed</span></div>
  <svg class="pfog" aria-hidden="true"></svg><div class="flabel" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em>passed</span></div>
+ <svg class="pwing" aria-hidden="true"></svg><div class="wname" aria-hidden="true"><b>Checks</b></div><div class="wval" aria-hidden="true"><em>12 / 14</em>passed</div>
 </section>
 
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
@@ -1239,7 +1249,7 @@ const JOINS={
 };
 const SHADES={
  draw:{label:'Plain draw-in',kind:'Page baseline',
-  about:'Not a brainstorm item. The shell draws in until only its dorsal plate, chalk nameplate and a scrap of parchment with one value remain; the iron scroll and lantern stay. It kept the shade state working before the Hollow shade modes (cocoon, map roll, hanging sign, curl, fog sink) were built, and stays for comparison. Shading while joined keeps the lacing, pulled closer.',
+  about:'Not a brainstorm item. The shell draws in until only its dorsal plate, chalk nameplate and a scrap of parchment with one value remain; the iron scroll and lantern stay. It kept the shade state working before the Hollow shade modes (cocoon, map roll, hanging sign, curl, fog sink, wing cases) were built, and stays for comparison. Shading while joined keeps the lacing, pulled closer.',
   sayIn:'Shaded: the shell draws in to its dorsal plate, nameplate and one value.',sayOut:'Unshaded: the shell opens again.'},
  cocoon:{label:'Cocoon',kind:'Cinch',linear:true,msIn:1900,msOut:1100,
   cinch:s=>ease(seg(s,.08,.72)),
@@ -1260,8 +1270,65 @@ const SHADES={
  fog:{label:'Fog sink',kind:'Sink',linear:true,msIn:3000,msOut:1700,foot:true,
   cinch:s=>ease(seg(s,.3,.8)),
   about:'The shell goes down into the fog. The parchment, tabs and studs are put away, and a bank of fog rolls in round the foot of the shell from both ends, billow by billow, until it stands a third of the way up. Thin iron spires sprout from the dorsal ridge, the middle ones tallest, each with a dark lancet slit. Then the whole shell sinks into the bank: the fog heaves up round it as it goes, a few motes rise off the top, and it bobs once and settles. <b>The ground stays where the shell stood:</b> the strip keeps its foot on the same line, so the shell visibly goes down (and on unshading, comes back up). What stays above the fog is the row of spire tips and the curl of the iron scroll, dark against a paler mist behind them, and the lantern, now under the fog, which shows only as a warm glow spreading through it (a faint cold glimmer when the widget is paused). The slits in the spires kindle with a flare as status lights: one per running Jarvis agent and one per GitDiscuss decision, amber while running and cold blue when paused; for Checks, three sea-green and one red for the two waiting. The name and the one key value are written in ink on the densest part of the fog. The eyelet strap stands clear of the bank, so joins still work. Unshading lifts the shell back out and the fog drains away.',
-  sayIn:'Sunk: each shell has gone down into a bank of fog; only its spire tips and the lantern glow show, with the name and value in the fog.',sayOut:'The shells rise out of the fog, and it drains away.'}
+  sayIn:'Sunk: each shell has gone down into a bank of fog; only its spire tips and the lantern glow show, with the name and value in the fog.',sayOut:'The shells rise out of the fog, and it drains away.'},
+ wing:{label:'Wing cases',kind:'Fold',linear:true,msIn:2800,msOut:1600,
+  cinch:s=>ease(seg(s,.42,.6)),
+  about:'The shell folds away like a beetle putting its wings up. The tabs, studs and nameplate are put away, and the dorsal plate turns out to be a separate wing case: it lifts off the back on its hinge, tilting up toward the strap so its paler underside shows. The parchment then folds like a hind wing, pinned along its top edge: it pleats into a concertina, panels tilting alternately light and shadowed, the creases sharpening as it closes up into a narrow folded band. The shell draws in under the raised case and the band comes up with it, then the case swings down over it, slams a hair past shut and clicks onto the strap (on Checks, onto its far end) with a spark. What stays is a polished black case with rows of punctures along it, the folded edge of the map showing beneath it like a wing tip, and its outer panel smoothing flat. The name is chalked on the case, left to right, and the one key value is inked on the folded edge. The brass catch carries a small stone that kindles as the status light: amber while running, cold blue when paused, sea-green for Checks. The iron scroll, lantern and eyelet strap stay, so the folded shells still join. Unshading lifts the case, unfolds the wing and lowers the case back onto the back.',
+  sayIn:'Folded: each shell closes its wing case over a pleated map; the name is chalked on the case and the value inked on the folded edge.',sayOut:'The wing cases lift and the maps unfold.'}
 };
+
+/* ---------- Wing cases: the map pleats like a hind wing and the wing case folds down over it, drawn per frame only while it changes ---------- */
+// Local coordinates keep the joining end on the right (b is mirrored). The case is hinged along the dorsal ridge.
+function wingCase(el,id,w,h,s,tone){
+ const svg=el.querySelector('.pwing'),nm=el.querySelector('.wname'),vl=el.querySelector('.wval'),small=id==='c',sheet=el.querySelector(small?'.mini':'.screen'),on=model.shade==='wing'&&s>0;
+ if(!on){if(svg.dataset.k){svg.innerHTML='';svg.dataset.k='';sheet.style.transform=sheet.style.transformOrigin=''}nm.style.opacity=vl.style.opacity=0;return}
+ const top=small?6:10,X0=small?40:36,Y0=small?30:33,SW=small?184:300,SH=small?34:62,n=small?4:6,BH=small?15:16,YB=small?18:27,x0=4,x1=small?w-4:w-17,hy=top+3;
+ // The map pleats up toward its pins; the real sheet squashes under the pleat shading, then the drawn pleats take over.
+ const p=dart(seg(s,.2,.44)),th=p*Math.acos(BH/SH),co=Math.cos(th),si=Math.sin(th),hp=SH/n*co,k=ease(seg(s,.42,.6)),Y=lerp(Y0,YB-1,k),so=1-seg(p,.72,.9);
+ sheet.style.transformOrigin='50% 0';sheet.style.transform=p>0?`scaleY(${f3(co)})`:'';sheet.style.opacity=f(so);sheet.style.visibility=so<.02?'hidden':'visible';
+ const tw=nm.offsetWidth,vw=vl.offsetWidth,out=model.sdir<0,key=[w,h,f(s*1000),tone,tw,vw,out].join();if(svg.dataset.k===key)return;svg.dataset.k=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const ncx=(x0+x1)/2+(small?0:6);
+ let o='';
+ if(p>0){const base=seg(p,.6,.85),xl=j=>X0+(j%2)*2.4*si,xr=j=>X0+SW-(j%2)*2.4*si,yj=j=>Y+j*hp,J=[...Array(n+1).keys()];
+  const zig='M'+J.map(j=>f(xl(j))+' '+f(yj(j))).join('L')+'L'+J.reverse().map(j=>f(xr(j))+' '+f(yj(j))).join('L')+'Z';
+  let pl='';
+  for(let i=0;i<n;i++){const up=i%2===0,q=`M${f(xl(i))} ${f(yj(i))}H${f(xr(i))}L${f(xr(i+1))} ${f(yj(i+1))}H${f(xl(i+1))}Z`;
+   pl+=`<path d="${q}" fill="${up?'#f3ead3':'#d6c197'}" opacity="${f(base)}"/><path d="${q}" fill="${up?'#fffaf0':'#4a3218'}" opacity="${f((up?.22:.4)*si)}"/>`;
+   if(i)pl+=`<path d="M${f(xl(i))} ${f(yj(i))}H${f(xr(i))}" stroke="${INK}" stroke-width=".7" opacity="${f(.45*si)}"/>`}
+  o+=`<path d="${zig}" fill="${INK}" opacity="${f(.6*base)}" transform="translate(1 1.8)"/>${pl}<path d="${zig}" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round" opacity="${f(base)}"/>`;
+  // The outer panel lies flat over the folds, leaving the zigzag ends showing.
+  const sm=seg(s,.76,.86);if(sm>0)o+=`<rect x="${X0+6}" y="${f(Y+.7)}" width="${SW-12}" height="${f(hp*n-1.4)}" rx="1" fill="url(#slipG)" opacity="${f(sm)}"/>`}
+ // The wing case: it lifts off the back tilting toward the strap, stays up while the shell draws in, then swings down past shut and settles.
+ const ap=seg(s,.03,.08),cx=small?x1-20:x1-9;
+ if(ap>0){const yb=lerp(top+21,YB,k),cl=seg(s,.6,.74),L=12*(dart(seg(s,.06,.2))-(cl>0?backOut(cl):0)),lk=clamp(L/12),ky=1-.4*lk;
+  const body=small?`M${x0+22} ${top+3}C${f(w*.32)} ${top-10} ${f(w*.68)} ${top-10} ${x1-22} ${top+3}C${x1+3} ${top+9} ${x1+3} ${f(yb-5)} ${x1-14} ${f(yb)}Q${f(w/2)} ${f(yb+2)} ${x0+14} ${f(yb)}C${x0-3} ${f(yb-5)} ${x0-3} ${top+9} ${x0+22} ${top+3}Z`
+   :`M${x0+22} ${top+3}C${f(w*.32)} ${top-10} ${f(w*.68)} ${top-10} ${x1} ${top+2}L${x1} ${f(yb-1)}Q${f(w/2)} ${f(yb+2)} ${x0+14} ${f(yb)}C${x0-3} ${f(yb-5)} ${x0-3} ${top+9} ${x0+22} ${top+3}Z`;
+  // Rows of punctures follow the arch, as on a beetle's wing case; they break round the chalked name.
+  const nh=`M-20 -40H${w+20}V${h+20}H-20ZM${f(ncx-tw/2-7)} ${top-12}V${f(yb)}H${f(ncx+tw/2+7)}V${top-12}Z`;
+  let st='';for(const fr of small?[.36,.68]:[.3,.55,.8]){const a=f(lerp(top+3,yb,fr)),b=f(lerp(top-6,yb+1,fr));st+=`M${x0+24} ${a}C${f(w*.32)} ${b} ${f(w*.68)} ${b} ${f(x1-(small?24:8))} ${a}`}
+  const lit=seg(s,.86,.92),flare=Math.sin(Math.PI*seg(s,.86,.96)),tc=FOGTONE[tone],dim=tone==='cold'?.75:1;
+  o+=`<g opacity="${f(ap)}" transform="translate(0 ${f(-L)}) rotate(${f(-3*lk)} ${x0+20} ${hy}) translate(0 ${hy}) scale(1 ${f3(ky)}) translate(0 ${-hy})">`+
+   `<clipPath id="wcl-${id}"><path d="${nh}" clip-rule="evenodd"/></clipPath><path d="${body}" fill="${INK}" opacity=".7" transform="translate(0 1.4)"/><path d="${body}" fill="url(#shell)" filter="url(#chitin)"/><path d="${body}" fill="url(#sheen)"/>`+
+   `<path d="M${x0+36} ${top+2}C${f(w*.32)} ${top-6} ${f(w*.68)} ${top-6} ${x1-(small?28:10)} ${top+2}C${f(w*.68)} ${top-2.4} ${f(w*.32)} ${top-2.4} ${x0+36} ${top+2}Z" fill="#e3eaf2" opacity=".55"/>`+
+   `<g clip-path="url(#wcl-${id})"><path d="${st}" fill="none" stroke="#05070b" stroke-width="1.7" stroke-dasharray="0 4.4" stroke-linecap="round" opacity=".8"/><path d="${st}" fill="none" stroke="#a9bbd3" stroke-width=".7" stroke-dasharray="0 4.4" stroke-linecap="round" opacity=".3" transform="translate(-.4 -.7)"/></g>`+
+   `<path d="M${x0+16} ${f(yb-1.6)}Q${f(w/2)} ${f(yb+.6)} ${x1-6} ${f(yb-2.6)}" fill="none" stroke="#c9d6e6" stroke-width=".9" opacity=".3"/>`+
+   (lk>0?`<path d="${body}" fill="#9fb0c8" opacity="${f(.42*lk)}"/>`:'')+
+   `<path d="${body}" fill="none" stroke="${INK}" stroke-width="2.1" stroke-linejoin="round" filter="url(#wob)"/>`+
+   // The brass catch, with the stone that kindles as the status light.
+   `<rect x="${cx-3.5}" y="${f(yb-5)}" width="7" height="${small?10:11}" rx="2.2" fill="url(#brass)" stroke="${INK}" stroke-width=".9"/><circle cx="${cx}" cy="${f(yb+1.2)}" r="2.3" fill="#262b33" stroke="${INK}" stroke-width=".7"/>`+
+   (lit>0?`<circle cx="${cx}" cy="${f(yb+1.2)}" r="${f(5+5*flare)}" fill="${tc}" opacity="${f(.35*lit*dim+.3*flare)}" filter="url(#blur3)"/><circle cx="${cx}" cy="${f(yb+1.2)}" r="1.9" fill="${tc}" opacity="${f(lit*dim)}"/><circle cx="${cx-.6}" cy="${f(yb+.5)}" r=".6" fill="#fff" opacity="${f(lit*.8)}"/>`:'')+`</g>`;
+  const sk=seg(s,.69,.77);if(sk>0&&sk<1&&!out)o+=spark({x:cx,y:YB+1},Math.sin(Math.PI*sk)*.9,4+7*sk)}
+ let html=id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${o}</g>`:o;
+ // The name is chalked on the case left to right (never mirrored); the value is inked on the folded edge.
+ const nx=(id==='b'?w-ncx:ncx)-tw/2,ny=small?10:16,q=seg(s,.78,.9);
+ nm.style.left=f(nx)+'px';nm.style.top=f(ny-8)+'px';
+ if(out){nm.style.opacity=f(seg(s,.8,.92));nm.style.clipPath=''}
+ else{nm.style.opacity=q>0?1:0;nm.style.clipPath=q>=1?'':`inset(-10px ${f((1-q)*100)}% -10px -10px)`;
+  if(q>0&&q<1){let d='';for(let i=0;i<4;i++){const u=(q*9+i*.27)%1;d+=`<circle cx="${f(nx+q*tw+2+i*1.6)}" cy="${f(ny+3+u*7)}" r="${f(.5+.25*(i%2))}" opacity="${f(1-u)}"/>`}html+=`<g fill="#e9edf1">${d}</g>`}}
+ const vcx=X0+SW/2,vcy=YB-1+BH-(small?7:7.5);vl.style.left=f((id==='b'?w-vcx:vcx)-vw/2)+'px';vl.style.top=f(vcy-8)+'px';vl.style.opacity=f(seg(s,.84,.95));
+ svg.innerHTML=html;
+}
 
 /* ---------- Fog sink: the shell sinks into a fog bank, its spire tips and lantern glow left showing ---------- */
 // Drawn per frame only while it changes. Local coordinates keep the shell's joining end on the right (b is mirrored).
@@ -2092,7 +2159,7 @@ function shiftFeet(d,dc){
 function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,cinch())),jt:model.jt,glow:model.glow}}
 function render(){
  lastRender=performance.now();
- const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,cinch())),coc=model.shade==='cocoon',mr=model.shade==='mroll',sg=model.shade==='sign',cu=model.shade==='curl',fg=model.shade==='fog',s=model.st;
+ const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,cinch())),coc=model.shade==='cocoon',mr=model.shade==='mroll',sg=model.shade==='sign',cu=model.shade==='curl',fg=model.shade==='fog',wc=model.shade==='wing',s=model.st;
  $$('#a .runText').forEach(n=>n.textContent=model.a.run?'agents running':'agents paused');
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',D=small&&model.g!==0?MO().dims(model.g):null,w=small?(D?D[0]:CW):W,h=small?(D?D[1]:ch):c.h,lit=small?true:m.run;
@@ -2105,16 +2172,16 @@ function render(){
   // A moulting Checks draws its own shells (see moult()).
   const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':'')+w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;if(key[0]!=='M'&&key[0]!=='D'){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
-  const k=ease(s),show=coc?1-seg(s,0,.2):mr||cu||fg?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg?0:seg(k,.55,1);
+  const k=ease(s),show=coc?1-seg(s,0,.2):mr||cu||fg||wc?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
-  el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
+  el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
   // In the fog sink the shell and its scroll are drawn sinking in the fog layer; only the strap stays on the casing.
   const fs=fg&&s>=.12,bd=svg.querySelector('.body');if(bd)bd.style.opacity=coc?f(1-seg(s,.42,.74)):sg?f(1-seg(s,.16,.44)):cu?f(1-seg(s,.12,.26)):fs?0:'';
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h)}
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
