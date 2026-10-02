@@ -456,7 +456,7 @@ const JOINS={
    return s;
   }
  },
- branch:{label:'Branching',kind:'Angle',angled:true,slow:1.3,msOut:2900,
+ branch:{label:'Branching',kind:'Angle',angled:true,a0:-42.5,slow:1.3,msOut:2900,
   // The stems stand further off the knot as the bend grows, so the casings' inside corners never meet.
   get gap(){return 2*forkS(model.angle,ctx().h/2)},
   txt:{join:'The casings close, a silver-birch twig grows from each stem, and the twigs fuse into a fork; the parent branch grows down and GitDiscuss swings to its angle.',
@@ -523,6 +523,21 @@ const JOINS={
   phase:(jt,dir)=>dir>0?(jt<.3?'Joining · the stems run liquid ':jt<.42?'Joining · surface tension snaps them together ':jt<.78?'Joining · ripples run through the silver ':jt<.86?'Joining · the rim seals ':'Joining · the moon shows in it '):(jt>.9?'Releasing · the reflection fades ':jt>.66?'Releasing · the silver necks ':jt>.42?'Releasing · it pinches off ':jt>.3?'Releasing · the silver draws back and sets ':'Releasing · the casings part '),
   about:'A fuse of liquid metal. The silver stem at each joining end melts. <b>Near:</b> the stems run liquid: their moonstone knops float on them, and a bead of quicksilver bulges out of each, quivering as you drag and reaching toward the other as you come closer. <b>Ready:</b> the two beads hang a hair apart and a dashed ghost of the sealed rim shows. Joining: the casings close to a narrow gap, the knops sink, and the beads touch. Surface tension snaps them together at one point with a flash, and the join zips up and down the seam with a small overshoot. Four drops splash out and are pulled back in. Ripples ring out through the silver, its edges wobble and settle into one rim with a slight meniscus at the top and bottom, and a glint sweeps down it. Then the moon shows in it: a crescent reflection kindles in the silver as the join light. The liquid is drawn as soft shapes through a blur-and-threshold filter, so anything that comes close merges like a real liquid, with a chrome gradient and a specular highlight lit from the moon behind them. <b>Release:</b> pull either casing away: the rim stretches into a thinning neck, and past a hand-width it pinches off (let go sooner and surface tension draws the casing back). Clicking the rim, or focusing it and pressing Enter, does the same. The reflection fades, the neck thins and pinches off with two drops, each half recoils into its stem with a wobble, the knops resurface and the silver sets. Nothing moves at rest. Drag a nameplate to move the pair.',
   over:c=>drawQuick(c)
+ },
+ moon:{label:'Crescent pivot',kind:'Hinge',angled:true,a0:-30,slow:1.3,msOut:2900,
+  get hooks(){return MOON},
+  get gap(){return 2*MOON.s(0,ctx().h/2)},
+  bend(jt){return JOINS.branch.bend(jt)},
+  txt:{join:'The casings close a span apart, silver straps reach out, and the moon on GitDiscuss\'s strap settles into the crescent on Jarvis\'s; a star falls from the sky to pin them.',
+   joined:'Joined on a crescent pivot: the old moon in the new moon\'s arms. Drag GitDiscuss\'s nameplate round the pin, use the Angle slider, or press ↑ ↓ to turn it; the moon shows the phase. Click the pin to release.',
+   release:'GitDiscuss turns level, the moon dims, the star rises out of the pin, the horns draw in and the straps draw back into the stems.',
+   stop:'The straps draw back into the stems.',
+   hold:'Held mid-join: the moon is settling into the crescent\'s arms. Use the scrubber to step through the pivot forming.',
+   ready:'Ready: a ghost of the crescent and moon hangs between the stems. Release to set the pivot.',near:'Nearby: silver straps peek out of the stems. Move closer.',
+   readyPh:'Ready · the moon is ghosted',nearPh:'Nearby · straps peek out'},
+  phase:(jt,dir)=>dir>0?(jt<.29?'Joining · closing in ':jt<.44?'Joining · the straps reach ':jt<.58?'Joining · the moon settles in the crescent ':jt<.72?'Joining · a star falls ':jt<.86?'Joining · the moon kindles ':'Joining · turning to '+MOON.ph(model.angle)+' '):(jt>.88?'Releasing · turning level ':jt>.78?'Releasing · the moon dims ':jt>.66?'Releasing · the star rises ':jt>.6?'Releasing · the horns draw in ':jt>.55?'Releasing · the straps draw back ':'Releasing · the casings part '),
+  about:'A hinge, the one join kind elven lacked: a pivot that also sets GitDiscuss\'s angle. It is built from the old saying "the old moon in the new moon\'s arms", the full disc you sometimes see faintly held inside a young crescent. <b>Near:</b> the stems glow and a slim silver strap peeks out of each, reaching for the other. <b>Ready:</b> a dashed ghost of the crescent with the moon in it hangs between the stems, with a star. Joining: the casings close to a span apart (wide enough for the full turn, so turning never moves GitDiscuss along). A willow-leaf strap of silver grows from each stem, putting out a pair of opposed scrolls with granules. Jarvis\'s strap ends in a crescent whose horns grow round from a short arc, and GitDiscuss\'s in a moonstone disc in a silver bezel, which swells and settles into the crescent\'s arms. Then a star falls from the moon in the sky behind them, trailing light, and strikes the centre of the disc with a flash. It stays there as the pin, the moonstone kindles as the join light, a glint runs to both horn tips, and GitDiscuss turns to its angle with one soft overshoot. <b>The angle is a moon phase:</b> the moonstone shows a phase shadow that follows GitDiscuss\'s turn. Level is a full moon; raised, it waxes (gibbous at −15°, first quarter at −30°, a crescent at −45°); lowered, it wanes the same way. Those seven phases are soft stops 15° apart, and anywhere between is a valid resting place. The crescent\'s horns are the hard stops: GitDiscuss\'s strap turns between them, to ±50°. To turn: drag GitDiscuss\'s nameplate round the pin, use the Angle slider, or focus GitDiscuss\'s nameplate or the pin and press ↑ ↓ to step between phases (Shift+↑ ↓ for 1°). While it turns, a silver pointer hangs from the moon over an arc of seven small moons, one per stop, and a moonstone tag reads the angle with a moon in its phase. The pair refits vertically to stay on the stage; drag Jarvis\'s nameplate to move it. Shaded, the pivot shrinks with the casings and keeps its angle. <b>Release:</b> click the pin, or focus it and press Enter. GitDiscuss turns level, the moonstone dims, the star rises out of the pin and back into the sky, the horns draw in, the straps draw back into the stems and the casings part.',
+  over:c=>drawMoon(c)
  }
 };
 /* ---------- Weave drawing ---------- */
@@ -774,11 +789,25 @@ const signed=a=>(a>0?'+':a<0?'−':'')+Math.abs(Math.round(a*10)/10)+'°';
 function forkName(a){const d=DET.find(x=>Math.abs(a-x)<.3),F=Math.round((180-Math.abs(a))*10)/10;
  return{num:F+'°',cap:d===undefined?'fork':d===0?'straight bough':Math.abs(d)===36?'⅖ turn':'golden angle',gold:d!==undefined&&Math.abs(d)>40}}
 // Sticky near each detent, free between them.
-function magnet(r){for(const d of DET){const x=r-d;if(Math.abs(x)<DWIN)return d+Math.sign(x)*DWIN*(Math.abs(x)/DWIN)**2}return r}
+function magnet(r){for(const d of AH().det){const x=r-d;if(Math.abs(x)<DWIN)return d+Math.sign(x)*DWIN*(Math.abs(x)/DWIN)**2}return r}
 // The range of Jarvis's y that keeps both casings, GitDiscuss's crest, the parent branch and its tag on the stage.
 function forkFit(a,hh){const s=forkS(a,hh),t=a*PI/180,ry=(u,v)=>u*Math.sin(t)+v*Math.cos(t),td=(90+a/2)*PI/180;
  const ys=[-hh-4,hh+6,ry(s,-hh),ry(s,hh),ry(s+W,-hh),ry(s+W,hh),ry(s+W/2,-hh-17),ry(s+W/2,hh+12),Math.sin(td)*(hh>40?156:118)];
  const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn-hh),hi=592-mx-hh;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+// Each angled join supplies its own pivot offset, stops, names and stage fit; the fork's are the ones above.
+const FORK={s:forkS,det:DET,hang:hh=>hh>40?156:118,fit:forkFit,name:forkName,say:a=>forkSay(a),ph:a=>{const n=forkName(a);return n.num+(n.cap==='fork'?'':' · '+n.cap)}};
+const AH=()=>J().hooks||FORK;
+// Crescent pivot: the pin sits a fixed span off each stem, wide enough for the full ±50° turn, so turning never moves GitDiscuss along.
+// Its stops are moon phases, 15° apart: GitDiscuss raised waxes the moon, lowered wanes it.
+const MDET=[-45,-30,-15,0,15,30,45],MPH={'-45':'waxing crescent','-30':'first quarter','-15':'waxing gibbous','0':'full moon','15':'waning gibbous','30':'last quarter','45':'waning crescent'};
+const moonK=hh=>clamp(2*hh/H,.62,1),moonRD=hh=>52*moonK(hh);
+function moonName(a){const d=MDET.find(x=>Math.abs(a-x)<.3);return{num:signed(a),cap:d!==undefined?MPH[d]:a<0?'waxing':'waning',stop:d!==undefined}}
+function moonFit(a,hh){const s=MOON.s(a,hh),t=a*PI/180,ry=(u,v)=>u*Math.sin(t)+v*Math.cos(t);
+ const ys=[-hh-4,hh+6,ry(s,-hh),ry(s,hh),ry(s+W,-hh),ry(s+W,hh),ry(s+W/2,-hh-17),ry(s+W/2,hh+12),moonRD(hh)+50];
+ const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn-hh),hi=592-mx-hh;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+const MOON={s:(a,hh)=>22+hh*Math.tan(25*PI/180),det:MDET,hang:hh=>moonRD(hh)+50,fit:moonFit,name:moonName,
+ ph:a=>{const n=moonName(a);return n.num+' · '+n.cap},
+ say:a=>{const n=moonName(a);return n.stop?'The moon turns to '+(n.cap==='full moon'?'full':n.cap)+': GitDiscuss rests at '+n.num+'.':'GitDiscuss rests at '+n.num+', the moon '+n.cap+'. It turns freely between the phase stops, and the crescent\'s horns stop it at ±50°.'}};
 const arcS=pts=>{let a=0;pts.forEach((p,i)=>{if(i)a+=Math.hypot(p.x-pts[i-1].x,p.y-pts[i-1].y);p.s=a});return pts};
 // The grown part of a twig, from its base, with a sharp growing tip.
 function growPts(pts,g,taper=10){if(g<=0)return [];const len=g*pts[pts.length-1].s,out=[];
@@ -862,6 +891,88 @@ function forkDial(K,bd,k,op,s,hh){const RD=112*k,pt=(t,r)=>{const a=(90+t/2)*PI/
  const n=forkName(bd),c=pt(bd,RD+25),font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;
  o+=`<g transform="translate(${P(c)})"><rect x="-45" y="-16" width="90" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-43" y="-14" width="86" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>`+
   `<text y="0" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${n.num}</text><text y="10" text-anchor="middle" ${font} font-size="8.5" letter-spacing="1.3" fill="${n.gold?'#8a6414':'#5d6584'}">${n.cap.toUpperCase()}</text></g>`;
+ return o+'</g>'}
+/* ---------- Crescent pivot drawing ---------- */
+// A willow-leaf strap of silver from p toward q, grown to fraction g from p, with two opposed scrolls a little past its middle.
+function moonStrap(p,q,g,k){if(g<=.01)return '';
+ const dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy)||1,ux=dx/L,uy=dy/L,nx=-uy,ny=ux;
+ const pts=arcS([...Array(15)].map((_,i)=>{const t=i/14;return{x:p.x+dx*t,y:p.y+dy*t,w:k*(2.4+4.4*Math.sin(PI*Math.pow(t,.8)))+.5}}));
+ const S=growPts(pts,g,12);if(S.length<2)return '';
+ let o=`<path d="${ribbon(S,1.7)}" fill="${NIGHT}"/><path d="${ribbon(S)}" fill="url(#silver)"/>`;
+ o+=`<path d="M${P(S[0])}L${P(S[S.length-1])}" stroke="${NIGHT}" stroke-width=".6" opacity=".45"/>`;
+ // The scrolls open once the strap has grown past them.
+ const sc=seg(g,.5,.8);
+ if(sc>0){const m={x:p.x+dx*.42,y:p.y+dy*.42},hb=Math.atan2(-uy,-ux);
+  for(const sg of[-1,1]){const h0=Math.atan2(ny*sg,nx*sg),C=widths(curlPts(m,h0,lerp(3,13*k,sc),lerp(.3,1.7*PI,sc),Math.sign(Math.sin(hb-h0))||1,18),1.6*k+.3,.3),e=C[C.length-1];
+   o+=`<path d="${ribbon(C,1.2)}" fill="${NIGHT}" opacity=".8"/><path d="${ribbon(C)}" fill="url(#silver)"/><circle cx="${f(e.x)}" cy="${f(e.y)}" r="${f(1.3*k*sc+.3)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".5"/>`}}
+ return o}
+// Jarvis's crescent round K, opening toward GitDiscuss; span is the half-arc in degrees (the horn tips sit at 180° ± span).
+function moonCrescent(K,k,span,op,dash){const Ro=19*k,T=6.2*k,n=26,out=[],inn=[];
+ for(let i=0;i<=n;i++){const ph=(180-span+2*span*i/n)*PI/180,tp=Math.pow(Math.cos((i/n-.5)*PI),.8),ri=Ro-T*tp;
+  out.push(f(K.x+Math.cos(ph)*Ro)+' '+f(K.y+Math.sin(ph)*Ro));inn.unshift(f(K.x+Math.cos(ph)*ri)+' '+f(K.y+Math.sin(ph)*ri))}
+ const d='M'+out.join('L')+'L'+inn.join('L')+'Z';
+ if(dash)return `<path d="${d}" fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" opacity="${op}"/>`;
+ return `<g opacity="${f(op*100)/100}"><path d="${d}" fill="${NIGHT}" stroke="${NIGHT}" stroke-width="1.8"/><path d="${d}" fill="url(#silver)"/><path d="M${out.slice(4,-4).join('L')}" fill="none" stroke="#fff" stroke-width=".6" opacity=".7"/></g>`}
+// The moonstone disc in its bezel, with the phase shadow for angle a: none at level (full), waxing (lit on the right) when raised, waning when lowered.
+function moonPhaseD(r,a){const q=Math.min(1,Math.abs(a)/60);if(q<.01)return '';const rx=f(r*Math.abs(Math.cos(PI*q)));
+ return `<path d="M0 ${f(-r)}A${f(r)} ${f(r)} 0 0 0 0 ${f(r)}A${rx} ${f(r)} 0 0 ${q<.5?1:0} 0 ${f(-r)}Z"${a>0?' transform="scale(-1 1)"':''}/>`}
+function moonDisc(K,r,a,gl,sc){if(sc<=.01)return '';
+ return `<g transform="translate(${P(K)}) scale(${f(sc*100)/100})"><circle r="${f(r+1.8)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><circle r="${f(r)}" fill="url(#moonstone)"/><circle r="${f(r)}" fill="#f4f8ff" opacity="${f(gl*.6)}"/>`+
+  `<circle cx="${f(r*(a<0?.35:-.35))}" cy="${f(-r*.4)}" r="${f(r*.18)}" fill="#fff" opacity=".8"/><g fill="#1b2352" opacity="${f(.25+.4*gl)}">${moonPhaseD(r,a)}</g></g>`}
+// A star falling from the moon in the sky (u 0 → 1) to K, or rising back out of it.
+function moonStar(K,u,rising){const S0={x:1020,y:112},C={x:lerp(S0.x,K.x,.55),y:Math.min(S0.y,K.y)-50};
+ const at=e=>({x:(1-e)*(1-e)*S0.x+2*(1-e)*e*C.x+e*e*K.x,y:(1-e)*(1-e)*S0.y+2*(1-e)*e*C.y+e*e*K.y});
+ const e=rising?1-Math.pow(1-u,2):u*u,e0=rising?Math.min(1,e+.2):Math.max(0,e-.2),tr=[];
+ for(let i=0;i<=8;i++){const t=lerp(e0,e,i/8),p=at(t);tr.push({x:p.x,y:p.y,w:2.6*i/8})}
+ const H=at(e);return `<path d="${ribbon(tr)}" fill="#eef3ff" opacity=".75"/><circle cx="${f(H.x)}" cy="${f(H.y)}" r="12" fill="url(#halo)"/>`+star(H.x,H.y,6,1)}
+function drawMoon(c){
+ const h=c.h,hh=h/2,jt=c.jt,k=moonK(hh),dir=model.dir,s=MOON.s(0,hh),rd=12*k;
+ const sA={x:model.a.x+W-11.5,y:model.a.y+hh},sB={x:model.b.x+11.5,y:model.b.y+hh};
+ let o='';
+ if(jt===0){const g=c.glow;if(g<=0)return o;
+  o+=[sA,sB].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(8+10*g)}" fill="url(#halo)" opacity="${f(g)}"/>`).join('');
+  const M={x:(sA.x+sB.x)/2,y:(sA.y+sB.y)/2};o+=moonStrap(sA,M,.3*g,k)+moonStrap(sB,M,.3*g,k);
+  if(g>=1)o+=moonCrescent(M,k,120,.7,true)+`<circle cx="${f(M.x)}" cy="${f(M.y)}" r="${f(rd+1.8)}" fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" opacity=".7"/>`+star(M.x,M.y,6,.9);
+  return o}
+ const K={x:model.a.x+W+s,y:model.a.y+hh},bd=JOINS.moon.bend(jt),br=bd*PI/180;
+ const FB=(u,v)=>({x:K.x+u*Math.cos(br)-v*Math.sin(br),y:K.y+u*Math.sin(br)+v*Math.cos(br)});
+ // Phase values: straps (st), horns (cs), disc (ds), the falling star (fs), the pin (pn), the moonstone (gl).
+ let st,cs,ds,fs,pn,gl,flash=0,glint=0;
+ // The straps wait until the casings have closed (the close takes the first 30% of a join and the last 55% of a release).
+ if(dir>0){st=seg(jt,.29,.48);cs=back(seg(jt,.46,.6),1.5);ds=back(seg(jt,.47,.6),1.6);fs=seg(jt,.58,.7);pn=jt>=.7?1:0;flash=Math.sin(PI*seg(jt,.69,.77));gl=ease(seg(jt,.74,.86));glint=Math.sin(PI*seg(jt,.8,.92))}
+ else{st=seg(jt,.55,.63);cs=ease(seg(jt,.6,.66));ds=ease(seg(jt,.58,.64));fs=seg(jt,.66,.78);pn=jt>.78?1:0;gl=ease(seg(jt,.78,.88))}
+ const span=lerp(14,120,Math.max(0,cs)),Ro=19*k;
+ o+=moonStrap(sA,{x:K.x-Ro+3.1*k,y:K.y},st,k)+moonStrap(FB(s+11.5,0),FB(rd,0),st,k);
+ // Silver cuffs where the straps leave the stems.
+ if(st>0)for(const [p,deg] of [[{x:K.x-s-8,y:K.y},0],[FB(s+8,0),bd]])o+=`<g transform="translate(${P(p)}) rotate(${f(deg)})"><rect x="-1.6" y="${f(-3.6*k-1)}" width="3.2" height="${f(7.2*k+2)}" rx="1.4" fill="url(#silverV)" stroke="${NIGHT}" stroke-width=".7"/></g>`;
+ if(gl>0)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f((14+16*gl)*k)}" fill="url(#halo)" opacity="${f(gl)}"/>`;
+ if(cs>0)o+=moonCrescent(K,k,span,clamp(cs*4));
+ o+=moonDisc(K,rd,bd,gl,Math.max(0,ds));
+ // The pin: the fallen star, set in the middle of the moon.
+ if(pn)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(2*k)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".6"/>`+star(K.x,K.y,4.2*k,.95);
+ if(fs>0&&fs<1)o+=moonStar(K,fs,dir<0);
+ if(flash>0)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(28*flash*k)}" fill="url(#halo)"/>`+star(K.x,K.y,15*flash*k,flash);
+ if(glint>0)for(const sg of[-1,1]){const a=(180+sg*span)*PI/180;o+=star(K.x+Math.cos(a)*(Ro-1),K.y+Math.sin(a)*(Ro-1),5*glint*k,glint)}
+ const dop=jt===1?model.dial:dir>0?seg(jt,.84,.9):0;
+ if(dop>0)o+=moonDial(K,bd,k,dop,s,hh,FB);
+ if(jt===1){const n=moonName(model.angle);
+  o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Crescent pivot pin: GitDiscuss turned to ${n.num}, the moon ${n.cap}. Up and down arrows turn it to the next phase, Shift with an arrow by one degree; Enter releases the pivot and separates the widgets"><title>Click the pin to release; drag GitDiscuss's nameplate round it to turn</title><circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(Ro+2)}" fill="transparent"/><circle class="ringfocus" cx="${f(K.x)}" cy="${f(K.y)}" r="${f(Ro+5)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return o}
+// While turning: a pointer hangs from the moon (it turns with GitDiscuss) over an arc of seven small moons, one per stop, and a tag reads the angle.
+function moonDial(K,bd,k,op,s,hh,FB){const RD=moonRD(hh),pt=(t,r)=>{const a=(90+t)*PI/180;return{x:K.x+Math.cos(a)*r,y:K.y+Math.sin(a)*r}};
+ const br=bd*PI/180,hid=p=>{const dx=p.x-K.x,dy=p.y-K.y,u=dx*Math.cos(br)+dy*Math.sin(br),v=-dx*Math.sin(br)+dy*Math.cos(br);return u>s-6&&Math.abs(v)<hh+7};
+ let arc='',pen=false;for(let t=-AMAX;t<=AMAX;t+=1){const p=pt(t,RD);if(hid(p)){pen=false;continue}arc+=(pen?'L':'M')+P(p);pen=true}
+ let o=`<g opacity="${f(op*100)/100}" pointer-events="none"><path d="${arc}" fill="none" stroke="#dfe8ff" stroke-width=".8" opacity=".4"/>`;
+ for(const d of MDET){const p=pt(d,RD),on=Math.abs(bd-d)<.3,r=on?4.2:3.1;if(hid(p))continue;
+  if(on)o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="10" fill="url(#halo)"/>`;
+  o+=`<g transform="translate(${P(p)})"><circle r="${r}" fill="#eef2fc" stroke="${NIGHT}" stroke-width=".7"/><g fill="#1b2352" opacity=".8">${moonPhaseD(r,d)}</g></g>`}
+ // The pointer: a slender silver leaf hanging from the bezel, square to GitDiscuss's strap.
+ const p0=FB(0,19*k+1),p1=FB(0,RD-7),pts=arcS([...Array(9)].map((_,i)=>{const t=i/8;return{x:lerp(p0.x,p1.x,t),y:lerp(p0.y,p1.y,t),w:.6+2.6*Math.sin(PI*Math.pow(t,.7))}}));
+ o+=`<path d="${ribbon(pts,1.4)}" fill="${NIGHT}"/><path d="${ribbon(pts)}" fill="url(#silver)"/>`;
+ // The tag hangs at half the turn and a little further out, so it stays clear of both casings' corners.
+ const n=moonName(bd),c=pt(bd/2,RD+34),font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;
+ o+=`<g transform="translate(${P(c)})"><rect x="-37" y="-13" width="74" height="26" rx="12" fill="${NIGHT}" opacity=".75"/><rect x="-35" y="-11" width="70" height="22" rx="10" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>`+
+  `<g transform="translate(-23 0)"><circle r="6" fill="#f8faff" stroke="#5d6584" stroke-width=".8"/><g fill="#1b2352" opacity=".8">${moonPhaseD(6,bd)}</g></g><text x="-13" y="4.5" text-anchor="start" ${font} font-size="13" font-weight="700" fill="#2f4f86">${n.num}</text></g>`;
  return o+'</g>'}
 /* ---------- Runic seal drawing ---------- */
 // Four invented runes, each split on the seam (x = 0): Jarvis carries the left halves, GitDiscuss the right.
@@ -1729,10 +1840,10 @@ function detail(el){
 function pairBox(){
  const R=model.rise,h=ctx().h,j=J();let x0=Math.min(model.a.x,model.b.x),x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(model.a.y,model.b.y),y1=Math.max(model.a.y,model.b.y)+h;
  const bd=j.angled?j.bend(model.jt)*PI/180:0;
- if(bd){const ox=model.b.x-forkS(model.angle,h/2),oy=model.b.y+h/2,co=Math.cos(bd),si=Math.sin(bd);
+ if(bd){const ox=model.b.x-AH().s(model.angle,h/2),oy=model.b.y+h/2,co=Math.cos(bd),si=Math.sin(bd);
   for(const u of[0,W])for(const v of[0,h]){const dx=model.b.x+u-ox,dy=model.b.y+v-oy,x=ox+dx*co-dy*si,y=oy+dx*si+dy*co;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}}
  // The fork's parent branch hangs from the knot below the casings, with its leaves and curl.
- if(j.angled&&model.jt>0){const L=h/2>40?156:118,td=(90+j.bend(model.jt)/2)*PI/180,kx=model.a.x+W+forkS(model.angle,h/2),ky=model.a.y+h/2,tx=kx+Math.cos(td)*L;
+ if(j.angled&&model.jt>0){const L=AH().hang(h/2),td=(90+j.bend(model.jt)/2)*PI/180,kx=model.a.x+W+AH().s(model.angle,h/2),ky=model.a.y+h/2,tx=kx+Math.cos(td)*L;
   x0=Math.min(x0,tx-20);x1=Math.max(x1,tx+20);y1=Math.max(y1,ky+Math.sin(td)*L)}
  return{x0:x0-8,x1:x1+8,y0:y0+R-22,y1:y1+R+16};
 }
@@ -1804,6 +1915,8 @@ function morphTo(id){
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,sdir:1,busy:false,angle:-42.5,angTo:undefined,dial:0,morph:'growth',size:'bud',g:0,mdir:1,restore:null,cMoved:false,rise:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
+// Each angled join keeps its own angle while another join is picked.
+const ANG={};
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
 function joinedPose(fixed='a'){
@@ -1811,16 +1924,16 @@ function joinedPose(fixed='a'){
  if(fixed==='b'){let bx=clamp(model.b.x,W+g+34,1200-W-34);p={a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
  else{let ax=clamp(model.a.x,34,1200-2*W-g-34);p={a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}}}
  // A fork settles where its bend will fit on the stage.
- if(J().angled)p.a.y=p.b.y=clamp(p.a.y,...forkFit(model.angle,ctx().h/2));
+ if(J().angled)p.a.y=p.b.y=clamp(p.a.y,...AH().fit(model.angle,ctx().h/2));
  return p;
 }
 /* ---------- Bending the fork ---------- */
 let angAnim=0,dialTok=0,dialTimer=0;
 const branchOn=()=>!!J().angled&&model.jt===1;
-const forkKnot=()=>{const hh=ctx().h/2;return{x:model.a.x+W+forkS(model.angle,hh),y:model.a.y+hh}};
+const forkKnot=()=>{const hh=ctx().h/2;return{x:model.a.x+W+AH().s(model.angle,hh),y:model.a.y+hh}};
 // A raised pair pushed down by the fit gives up that much of its rise, so it settles back to where it stood.
-function refitPair(){if(!branchOn())return;const[lo,hi]=forkFit(model.angle,ctx().h/2),ny=clamp(model.a.y,lo,hi),d=ny-model.a.y;if(d>0)model.rise=Math.max(0,model.rise-d);model.a.y=model.b.y=ny}
-function pairY(){return branchOn()?forkFit(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
+function refitPair(){if(!branchOn())return;const[lo,hi]=AH().fit(model.angle,ctx().h/2),ny=clamp(model.a.y,lo,hi),d=ny-model.a.y;if(d>0)model.rise=Math.max(0,model.rise-d);model.a.y=model.b.y=ny}
+function pairY(){return branchOn()?AH().fit(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
 function dialOn(){clearTimeout(dialTimer);++dialTok;model.dial=1}
 function dialOff(){clearTimeout(dialTimer);++dialTok;model.dial=0}
 function dialSoon(ms=1500){clearTimeout(dialTimer);dialTimer=setTimeout(()=>{const tok=++dialTok,t0=performance.now();
@@ -1836,9 +1949,9 @@ function forkSay(a){const n=forkName(a);return n.cap==='golden angle'?'The fork 
 // Arrow keys step to the next growth angle (or the end of the range); with Shift, by one degree.
 function stepAngle(k,fine){const base=model.angTo??model.angle;let to;
  if(fine)to=clamp(Math.round(base)+k,-AMAX,AMAX);
- else{const c=[-AMAX,...DET,AMAX];to=k>0?c.find(d=>d>base+.01):c.slice().reverse().find(d=>d<base-.01);if(to===undefined)return}
- animateAngle(to);say('GitDiscuss bends '+(k>0?'down':'up')+' to '+signed(to)+'. '+forkSay(to))}
-function setForkAngle(v){v=clamp(v,-AMAX,AMAX);const d=DET.find(x=>Math.abs(v-x)<DWIN);if(d!==undefined)v=d;
+ else{const c=[-AMAX,...AH().det,AMAX];to=k>0?c.find(d=>d>base+.01):c.slice().reverse().find(d=>d<base-.01);if(to===undefined)return}
+ animateAngle(to);say('GitDiscuss '+(J().hooks?'turns':'bends')+' '+(k>0?'down':'up')+' to '+signed(to)+'. '+AH().say(to))}
+function setForkAngle(v){v=clamp(v,-AMAX,AMAX);const d=AH().det.find(x=>Math.abs(v-x)<DWIN);if(d!==undefined)v=d;
  if(branchOn())animateAngle(v,520);else{stopAngle();model.angle=v;if(J().angled&&model.path&&model.jt>0&&model.dir>0)model.path.j=joinedPose('a');if(model.path&&model.jt>0)setJt(model.jt);render()}}
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
@@ -1906,7 +2019,7 @@ function render(){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   if(small){const[gw,gh]=cDims();el.style.width=gw+'px';el.style.height=gh+'px';growth(el)}
-  if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-forkS(model.angle,h/2))+'px '+f(h/2)+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
+  if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-AH().s(model.angle,h/2))+'px '+f(h/2)+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
   {const er=svg.querySelector('.endrim');if(er)er.style.opacity=f(rimOp())}
@@ -1927,7 +2040,8 @@ function render(){
  $('#under').innerHTML=j.under?j.under(c):'';$('#over').innerHTML=j.over(c);
  const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}
   else if(j.angled&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();stepAngle(e.key==='ArrowDown'?1:-1,e.shiftKey)}};if(focused)hit.focus()}
- $('#b .grip').setAttribute('aria-label',branchOn()?'Bend GitDiscuss at the fork: drag round the knot, or use the up and down arrows':'Move GitDiscuss');
+ $('#b .grip').setAttribute('aria-label',branchOn()?(j.hooks?'Turn GitDiscuss on the crescent pivot: drag round the pin, or use the up and down arrows':'Bend GitDiscuss at the fork: drag round the knot, or use the up and down arrows'):'Move GitDiscuss');
+ $('#angle').setAttribute('aria-label',j.hooks?'GitDiscuss turn on the crescent pivot, in degrees':'GitDiscuss tilt at the fork, in degrees');
  $('#angleRow').style.display=j.angled?'':'none';
  if(j.angled){const v=model.angTo??model.angle;$('#angle').value=v;$('#angleOut').textContent=signed(v)}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
@@ -1940,8 +2054,8 @@ function render(){
  {const S=SIZES.find(x=>x[2]===model.g);$('#growOut').textContent=S?sizeName(S[2]).toLowerCase():MORPHS[model.morph].busy[model.mdir>0?0:1]}
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
- const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+forkName(model.angle).num:'')};
- $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?(j.txt.strainPh||'Pulling · the braid strains'):drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?MORPHS[model.morph].ph[model.mdir>0?0:1]:'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
+ const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+AH().ph(model.angle):'')};
+ $('#phase').textContent=(drag&&drag.bend?(j.hooks?'Turning · ':'Bending · ')+AH().ph(model.angle):drag&&drag.strain>0?(j.txt.strainPh||'Pulling · the braid strains'):drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?MORPHS[model.morph].ph[model.mdir>0?0:1]:'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
  wakeKick();rsKick();
 }
 
@@ -1952,7 +2066,7 @@ function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k===
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){stopAngle();dialOff();const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.lift=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='join'&&id!==model.join){stopAngle();dialOff();const was=model.jt;++anim;model.busy=false;if(J().angled)ANG[model.join]=model.angle;model.join=id;if(J().angled)model.angle=ANG[id]??J().a0;model.path=null;model.jt=0;model.dir=1;model.lift=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  // A grown Checks goes back to its smallest form, changes morph, then grows to the same size in the new one.
  if(key==='morph'&&id!==model.morph&&model.g>0){const keep=model.size||SIZES[Math.max(1,Math.round(model.g))][0];
@@ -2048,9 +2162,9 @@ stage.addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.bend){if(!d.moved){dialSoon(600);render();say(J().txt.joined);return}
-  const dn=DET.find(x=>Math.abs(model.angle-x)<DWIN);
+  const dn=AH().det.find(x=>Math.abs(model.angle-x)<DWIN);
   if(dn!==undefined)animateAngle(dn,380);else{model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon();settleRise(300)}
-  say(forkSay(dn??model.angle));return}
+  say(AH().say(dn??model.angle));return}
  if(d.lift){if(model.lift>=.5||d.moved<5){doSeparate();return}
   tween(model.lift,0,320,v=>model.lift=v);say(J().txt.settle||'The brooch settles back onto the seam.');return}
  if(d.group&&d.strain>0){if(d.saved.a.y!==model.a.y)pairPlaced();springBack(d.id);say(J().txt.springBack||'The braid holds and draws the casing back.');return}
