@@ -149,7 +149,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -931,7 +931,7 @@ function curlD(x,y,side,up,r,turns){let d='';const n=20,cy=y+(up?-r:r),a0=up?Mat
 /* ---------- Coil wrap geometry ---------- */
 // How far in from a pendant's outer edge its frame wire sits at height y (the frame's corners are rounded).
 // The bead strand and coil band shades squeeze the frame toward the middle, so the frame's height follows the shade.
-function frameH(h){const k=shadeK();return model.shade==='strand'||model.shade==='cat'?(h-10)*(1-seg(k,.35,1)):model.shade==='coil'?lerp(h-10,20,k):model.shade==='fold'?lerp(h-10,6,seg(model.st,.6,.72)):h-10}
+function frameH(h){const k=shadeK();return model.shade==='strand'||model.shade==='cat'||model.shade==='cubes'?(h-10)*(1-seg(k,.35,1)):model.shade==='coil'?lerp(h-10,20,k):model.shade==='fold'?lerp(h-10,6,seg(model.st,.6,.72)):h-10}
 const frameY=(y,h)=>{const fh=frameH(h);return fh<4?h/2:clamp(y,h/2-fh/2+2,h/2+fh/2-2)};
 function frameIn(y,h){const fh=frameH(h),r=Math.min(26,fh/2),dy=Math.max(0,h/2-fh/2+r-y,y-(h/2+fh/2-r));return 5+r-Math.sqrt(Math.max(0,r*r-dy*dy))}
 // Spine extent, turns per band, pitch and band centres for a pendant of height h; shading drops the bands to two turns.
@@ -1059,7 +1059,12 @@ const SHADES={
   about:'The pendant rolls up like a sheet of copper on a jeweller\'s bench, top edge first, like a blind. The display fades, the top edge curls over, and the hammered plate winds onto itself while the bottom edge rises, carrying the empty coiled bezel up into the roll. The roll grows fatter with every lap, the planishing marks run up its face as it turns, its ends show the spiral of the laps, and it shades the plate still hanging below it. When the bottom edge is wound in, the roll turns on a little further, and the outer lap brings the name round from underneath, engraved and darkened into the copper, with the value cabochon set beside it; the sheet\'s edge wire comes to rest just under them. Last, two brass ties wind on near the ends, going on loose and snapping tight with a glint, and a status bead is threaded onto the left one: <b>amber</b> running, <b>labradorite</b> paused, <b>carnelian</b> needs a decision, <b>malachite</b> passing. Unshading unties it and lets the sheet unroll. The roll keeps the frame wire at its ends, so rolled pendants still join.',
   sayOn:'Shaded: the copper sheet rolls up from the top, then turns to show the name and value; brass ties and a status bead hold it.',
   hk:st=>ease(seg(st,.08,.64)),show:st=>1-ease(seg(st,0,.16)),slide:(h,small)=>h-(small?CH:H),
-  draw(id,w,h,small,st){return rolledSheet(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return rolledSheet(id,w,h,small,st)}},
+ cubes:{label:'Letter beads',kind:'Turn',ms:2300,ownStrip:true,
+  about:'The pendant becomes an alphabet bracelet: a row of square brass letter beads on one wire, each with a letter stamped and darkened on three of its four sides and a small star on the fourth. The plate and display fade and the copper frame squeezes flat into the wire. The name slab flips up at the left end, with three seed beads beside it, one per screen. The letter beads then slide on from the right end, star side out, and click into a row. Last they turn on the wire in a cascade, left to right, each landing with a small overshoot, until the row spells the current screen: <i>03 RUNNING</i>, <i>VERIFY SHELL</i>, <i>10:43 WAIT</i> for Jarvis; <i>02 TO DECIDE</i>, <i>4 COMMENTS</i>, <i>FEEDBACK IN</i> for GitDiscuss; <i>12/14 OK</i>, <i>2 WAITING</i>, <i>RUN 418</i> for Checks. The seed bead for the current screen is a stone in the status colour: <b>amber</b> running, <b>labradorite</b> paused, <b>carnelian</b> needs a decision, <b>malachite</b> passing. Tap a strip (or press Enter on its nameplate) to turn its beads one side on to the next screen; from the last screen they roll past the stars back to the first. The widget\'s own screen turns with them, so unshading opens on the screen you turned to. The join ends stay on the wire, so letter-bead strips still join.',
+  sayOn:'Shaded: the frame flattens into a wire, square letter beads slide on, and they turn in a cascade to spell the current screen. Tap a strip to turn it.',
+  hk:st=>ease(seg(st,0,.4)),show:st=>1-ease(seg(st,0,.2)),
+  draw(id,w,h,small,st){return letterBeads(id,w,h,small,st)}}
 };
 
 /* ---------- Rolled sheet pieces ---------- */
@@ -1111,6 +1116,98 @@ function rolledSheet(id,w,h,small,st){
    `<g transform="translate(${xL} ${f(yc)}) scale(${f(sc*100)/100}) translate(${-xL} ${f(-yc)})">${strandItem({k:'bead',r:small?4.4:5,stone:P.stone},xL,yc)}</g>`}
  return s;
 }
+
+/* ---------- Letter beads pieces ---------- */
+// Each letter bead is a cube on the wire. Sides 0-2 carry the three screens, side 3 a star; v counts quarter turns, so the side facing out is v mod 4.
+const LB_TABS={a:['Status','Task','Log'],b:['Queue','Thread','Log'],c:['Passed','Waiting','Run']};
+function lbFaces(id){
+ const m=model[id];
+ if(id==='a')return[m.run?'03 RUNNING':'03 PAUSED','VERIFY SHELL','10:43 WAIT'];
+ if(id==='b')return[m.run?'02 TO DECIDE':'02 PAUSED','4 COMMENTS','FEEDBACK IN'];
+ return['12/14 OK','2 WAITING','RUN 418'];
+}
+// Name slab, three screen seeds, then the row of cubes centred in the room left. Every row is padded to the longest, centred.
+function lbLayout(id,w,small){
+ const F=lbFaces(id),N=Math.max(...F.map(t=>t.length)),name=RIM_NAME[id];
+ const e0=18,e1=w-(small?16:20),tw=Math.ceil(measure(name,NAME_F))+(small?16:20);
+ const dx0=e0+tw+(small?7:9),dp=small?6.5:7.5,cx0=dx0+2*dp+(small?7:9);
+ const pitch=Math.min(small?17:19,(e1-cx0)/N),s=pitch-(small?2:2.5),x0=cx0+((e1-cx0)-N*pitch)/2;
+ const rows=F.map(t=>{const p=Math.floor((N-t.length)/2);return(' '.repeat(p)+t).padEnd(N,' ')});
+ return{N,name,tw,tagX:e0+tw/2,dots:[0,1,2].map(i=>dx0+i*dp),pitch,s,x0,rows,fs:small?11:12};
+}
+// One cube at quarter-turn count v: the two sides facing out, foreshortened, lit from above.
+function lbCube(x,cy,s,v,L,i){
+ let o='';const k0=Math.floor(v);
+ for(const k of [k0,k0+1]){
+  const a=(k-v)*Math.PI/2,c=Math.cos(a);if(c<.03)continue;
+  const sn=Math.sin(a),hh=s*c,yc=cy-s/2*sn,y0=yc-hh/2,side=((k%4)+4)%4,cx=x+s/2,rr=f(Math.min(1.8,hh/3));
+  o+=`<rect x="${f(x)}" y="${f(y0)}" width="${f(s)}" height="${f(hh)}" rx="${rr}" fill="url(#cb-brass)"/>`;
+  o+=`<rect x="${f(x)}" y="${f(y0)}" width="${f(s)}" height="${f(hh)}" rx="${rr}" fill="${sn>0?'#fff4d6':'#1a0d03'}" opacity="${f(sn>0?.3*sn:.62*-sn)}"/>`;
+  let face;
+  if(side===3)face=`<path d="M0 -4.6L1.1 -1.1L4.6 0L1.1 1.1L0 4.6L-1.1 1.1L-4.6 0L-1.1 -1.1Z" transform="translate(${f(cx)} ${f(yc)}) scale(${f(s/18*100)/100})" fill="#5a3a12" opacity=".8"/>`;
+  else{const ch=L.rows[side][i];
+   face=ch===' '?`<circle cx="${f(cx)}" cy="${f(yc)}" r="1.1" fill="#5a3a12" opacity=".7"/>`:
+    `<text x="${f(cx)}" y="${f(yc+1.2)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-weight="bold" font-size="${L.fs}" fill="#fff3c4" opacity=".45">${ch}</text>`+
+    `<text x="${f(cx)}" y="${f(yc+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-weight="bold" font-size="${L.fs}" fill="#2a1606">${ch}</text>`}
+  o+=`<g transform="translate(0 ${f(yc)}) scale(1 ${f(c*1000)/1000}) translate(0 ${f(-yc)})">${face}</g>`;
+  o+=`<rect x="${f(x)}" y="${f(y0)}" width="${f(s)}" height="${f(hh)}" rx="${rr}" fill="none" stroke="#3a2408" stroke-width=".7"/>`;
+  if(c>.5)o+=`<path d="M${f(x+1.6)} ${f(y0+.9)}H${f(x+s-1.6)}" stroke="#fffbe6" stroke-opacity="${f(.6*(c-.5)*2)}" stroke-width=".8"/>`;
+ }
+ return o;
+}
+// Turns finish on their own clock; the page is still again afterwards.
+const lbV=(T,i,now)=>T.from[i]+(T.to-T.from[i])*springOut(clamp((now-T.t0-i*T.d)/T.ms));
+function letterBeads(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const hk=ease(seg(st,0,.4)),cy=h/2,L=lbLayout(id,w,small),m=model[id],page=m.page||0,now=performance.now();
+ let s=`<g opacity="${f(1-seg(hk,.15,.85))}">${casing(w,h,small,true)}</g>`;
+ // The frame squeezes flat into the wire the beads ride on.
+ const fh=Math.max(0,(h-10)*(1-seg(hk,.35,1))),r=Math.min(small?20:26,fh/2);
+ s+=wire(rrect(5,cy-fh/2,w-10,fh,r),'copper',fh<2?2:3.1-1.1*seg(hk,.35,1));
+ if(st<.3)return s;
+ s+=wire(band(13,cy,false,3,7,2.2)+band(w-13,cy,false,3,7,2.2),'brass',1.1,seg(st,.3,.36));
+ // The name slab flips up, then the screen seeds: the current screen's is a stone in the status colour.
+ const tq=seg(st,.34,.48);
+ if(tq>0){const sy=Math.max(.01,springOut(tq));
+  s+=`<g opacity="${f(clamp(tq*4))}" transform="translate(0 ${f(cy)}) scale(1 ${f(sy*1000)/1000}) translate(0 ${f(-cy)})">${strandItem({k:'tag',wd:L.tw,text:L.name},L.tagX,cy,small)}</g>`}
+ const dq=seg(st,.46,.6);
+ if(dq>0){const stone=plaqueData(id).stone;
+  L.dots.forEach((x,i)=>{const lit=i===page,e=Math.max(.01,backOut(seg(dq,i*.2,i*.2+.6)));
+   s+=`<g transform="translate(${f(x)} ${f(cy)}) scale(${f(e*100)/100}) translate(${f(-x)} ${f(-cy)})">`+
+    (lit?`<circle cx="${f(x)}" cy="${f(cy)}" r="7" fill="${RIM_GLOW[stone]}" opacity=".45" filter="url(#soft)"/>`+strandItem({k:'bead',r:small?3.3:3.9,stone},x,cy):strandItem({k:'seed',r:small?2:2.3,stone:'gold'},x,cy))+'</g>'})}
+ // The cubes slide on from the right end, star side out, the first one on going furthest.
+ const T=st>=1?m.lbTurn:null,sh=seg(st,.5,.72);
+ if(sh>0)s+=`<ellipse cx="${f(L.x0+L.N*L.pitch/2+2)}" cy="${f(cy+L.s/2+2.5)}" rx="${f(L.N*L.pitch*.5)}" ry="2.6" fill="#000" opacity="${f(.45*sh)}" filter="url(#soft)"/>`;
+ let glints='';
+ for(let i=0;i<L.N;i++){
+  const tin=seg(st,.4+.02*i,.52+.02*i);if(tin<=0)continue;
+  const xs=L.x0+i*L.pitch+(L.pitch-L.s)/2,x=lerp(w-18-L.s,xs,springOut(tin));
+  // Then they turn in a cascade, left to right, from the star to the current screen; a tap turns them on to the next.
+  let v,u;
+  if(T){u=clamp((now-T.t0-i*T.d)/T.ms);v=lbV(T,i,now)}else{u=seg(st,.74+.012*i,.86+.012*i);v=-1+(page+1)*springOut(u)}
+  s+=`<g opacity="${f(clamp(tin*5))}">${lbCube(x,cy,L.s,v,L,i)}</g>`;
+  const g=u>0&&u<1?Math.sin(Math.PI*seg(u,.62,1)):0;if(g>.05)glints+=sparkle(x+L.s-1,cy-L.s/2+1,g*.45);
+ }
+ return s+glints;
+}
+let lbRaf=0;
+const lbOn=()=>model.shade==='cubes'&&model.st>=1;
+function lbTurn(id){
+ const m=model[id],small=id==='c',L=lbLayout(id,small?CW:W,small),now=performance.now(),T=m.lbTurn,base=m.page||0;
+ const cur=[...Array(L.N)].map((_,i)=>T?lbV(T,i,now):base);
+ // Count from the side last aimed at, kept small; from the last screen the cubes roll past the stars back to the first.
+ let tgt=T?T.to:base;const k=4*Math.floor(tgt/4);tgt-=k;
+ const to=tgt+(tgt===2?2:1);m.page=to%4;
+ const name=L.name,tab=LB_TABS[id][m.page];
+ say(name+': the letter beads turn to '+tab.toLowerCase()+' · '+lbFaces(id)[m.page]+'.');
+ if(reduce.matches){m.lbTurn=null;render();return}
+ m.lbTurn={t0:now,from:cur.map(v=>v-k),to,ms:to-tgt>1?760:520,d:42};
+ if(!lbRaf)(function step(){const t=performance.now();let live=false;
+  for(const q of ['a','b','c']){const Q=model[q].lbTurn;if(Q){if(t-Q.t0>=Q.ms+Q.d*(Q.from.length-1))model[q].lbTurn=null;else live=true}}
+  render();lbRaf=live?requestAnimationFrame(step):0})();
+ else render();
+}
+const stripOn=()=>catOn()||lbOn(),stripTap=id=>lbOn()?lbTurn(id):catTap(id);
 
 /* ---------- Caterpillar pieces ---------- */
 // Segments read from the head back. Checks gets one segment per two checks.
@@ -1925,7 +2022,7 @@ function detailRender(el,svg){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c,page:0},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -2158,9 +2255,9 @@ stage.addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.unwind){if(!d.moved||d.deg>.5)doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;say(J().sayJoined)}});return}
- if(d.mode==='angle'){model.turning=false;if(d.tap&&!d.moved){++settleTok;doSeparate();return}if(!d.tap&&!d.moved&&catOn()){catTap(d.id);return}settleAngle();render();say(J().sayJoined);return}
- // Caterpillar shade: a tap on the nameplate pauses or resumes the widget (Checks just looks up).
- if(!d.moved&&catOn()){for(const k of ['a','b','c'])Object.assign(model[k],d.saved[k]);model.glow=model.ghost=0;catTap(d.id);if(d.id!=='c')settleLift();return}
+ if(d.mode==='angle'){model.turning=false;if(d.tap&&!d.moved){++settleTok;doSeparate();return}if(!d.tap&&!d.moved&&stripOn()){stripTap(d.id);return}settleAngle();render();say(J().sayJoined);return}
+ // Caterpillar shade: a tap on the nameplate pauses or resumes the widget (Checks just looks up). Letter beads: a tap turns the strip to the next screen.
+ if(!d.moved&&stripOn()){for(const k of ['a','b','c'])Object.assign(model[k],d.saved[k]);model.glow=model.ghost=0;stripTap(d.id);if(d.id!=='c')settleLift();return}
  // A pair put down somewhere new stays there; one picked up and put back carries on making room. Checks moved away lets the pair back down.
  if(d.id!=='c'){if(['a','b'].some(k=>d.saved[k].x!==model[k].x||d.saved[k].y!==model[k].y))pairPlaced();else settleLift()}else settleLift(450,true);
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
@@ -2169,7 +2266,7 @@ function endDrag(){
 function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;if(J().angle)model.angles[model.join]=s.angle;model.turning=false;model.glow=model.ghost=0;settleLift();render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
-$$('[data-drag]').forEach(b=>b.addEventListener('click',e=>{if(e.detail===0&&catOn())catTap(b.dataset.drag)}));
+$$('[data-drag]').forEach(b=>b.addEventListener('click',e=>{if(e.detail===0&&stripOn())stripTap(b.dataset.drag)}));
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
