@@ -491,6 +491,20 @@ const JOINS={
   phase:(jt,dir)=>dir>0?(jt<.12?'Joining · closing in ':jt<.3?'Joining · the rims unravel ':jt<.8?'Joining · threads weave over and under ':jt<.88?'Joining · the knot draws tight ':'Joining · the heart-stone kindles '):(jt>.88?'Releasing · the heart-stone dims ':jt>.8?'Releasing · the knot loosens ':jt>.58?'Releasing · the threads unweave ':jt>.5?'Releasing · the rims knit back ':'Releasing · the casings part '),
   about:'A bind made of the casings themselves. The silver rim along each joining end is one thread of the border. <b>Near:</b> the rims fray: a loose silver thread peels off the top corner of Jarvis\'s end and a white-gold one off the bottom corner of GitDiscuss\'s, and they lift and uncurl toward each other. <b>Ready:</b> their tips touch with a glint and a dashed ghost of the knot hangs in the gap. Joining: the casings close to a narrow gap and the end rims unravel. Each thread runs down its own rim, leaves it, and weaves across the gap: it loops once round on itself and passes alternately over and under the other thread (and itself) at every one of the eight crossings, like a carrick bend, the sailor\'s knot for joining two ropes. Each thread is a flat ribbon edged in two hairlines, silver from Jarvis and white gold from GitDiscuss, and it tucks into the far rim, running along it to the corner the other thread left, so each end is rebound by its partner. Then the knot draws tight with a small overshoot, a moonstone heart-stone sets in the open middle and kindles as the join light, and a glint runs along both threads. <b>Release:</b> draw the knot upward: it loosens and rises off its anchors as you pull, and past a short distance it lets go (let go sooner and it draws tight again). Clicking the knot, or focusing it and pressing Enter, does the same. The heart-stone dims, the knot loosens, each thread draws back out of the weave along its own path, the rims knit shut and the casings part. Shaded, the knot keeps its eight crossings in a flatter weave. Drag a nameplate to move the pair.',
   over:c=>drawWeave(c)
+ },
+ quick:{label:'Quicksilver',kind:'Fuse',gap:10,pull:true,slow:1.1,msOut:2500,
+  txt:{join:'The casings close, their silver stems run liquid, and the two beads of silver touch and snap together into one rim.',
+   joined:'Fused: one rim of quicksilver with the moon in it. Drag a nameplate to move the pair; pull one casing away until the silver pinches off, or click the rim, to release.',
+   release:'The moon\'s reflection fades, the silver necks and pinches off, each half draws back into its stem and sets.',
+   stop:'The silver draws back into the stems and sets.',
+   hold:'Held mid-join: the silver is running together across the seam. Use the scrubber to step through the fuse.',
+   ready:'Ready: two beads of silver hang a hair apart. Release to let them touch.',near:'Nearby: the stems run liquid and bulge toward each other. Move closer.',
+   readyPh:'Ready · the beads hang a hair apart',nearPh:'Nearby · the stems run liquid',
+   strain:'The silver stretches into a thinning neck. Pull further to pinch it off, or let go and surface tension draws the casing back.',
+   strainPh:'Pulling · the silver necks',springBack:'Surface tension wins: the silver draws the casing back.'},
+  phase:(jt,dir)=>dir>0?(jt<.3?'Joining · the stems run liquid ':jt<.42?'Joining · surface tension snaps them together ':jt<.78?'Joining · ripples run through the silver ':jt<.86?'Joining · the rim seals ':'Joining · the moon shows in it '):(jt>.9?'Releasing · the reflection fades ':jt>.66?'Releasing · the silver necks ':jt>.42?'Releasing · it pinches off ':jt>.3?'Releasing · the silver draws back and sets ':'Releasing · the casings part '),
+  about:'A fuse of liquid metal. The silver stem at each joining end melts. <b>Near:</b> the stems run liquid: their moonstone knops float on them, and a bead of quicksilver bulges out of each, quivering as you drag and reaching toward the other as you come closer. <b>Ready:</b> the two beads hang a hair apart and a dashed ghost of the sealed rim shows. Joining: the casings close to a narrow gap, the knops sink, and the beads touch. Surface tension snaps them together at one point with a flash, and the join zips up and down the seam with a small overshoot. Four drops splash out and are pulled back in. Ripples ring out through the silver, its edges wobble and settle into one rim with a slight meniscus at the top and bottom, and a glint sweeps down it. Then the moon shows in it: a crescent reflection kindles in the silver as the join light. The liquid is drawn as soft shapes through a blur-and-threshold filter, so anything that comes close merges like a real liquid, with a chrome gradient and a specular highlight lit from the moon behind them. <b>Release:</b> pull either casing away: the rim stretches into a thinning neck, and past a hand-width it pinches off (let go sooner and surface tension draws the casing back). Clicking the rim, or focusing it and pressing Enter, does the same. The reflection fades, the neck thins and pinches off with two drops, each half recoils into its stem with a wobble, the knops resurface and the silver sets. Nothing moves at rest. Drag a nameplate to move the pair.',
+  over:c=>drawQuick(c)
  }
 };
 /* ---------- Weave drawing ---------- */
@@ -582,6 +596,85 @@ function drawWeave(c){
 }
 // How much of each joining end's own rim is still there: the weave unravels it into the threads.
 function rimOp(){if(model.join!=='weave'||model.jt===0)return 1;const jt=model.jt;return model.dir>0?1-seg(jt,.06,.3):1-seg(jt,.5,.6)}
+/* ---------- Quicksilver drawing ---------- */
+// The liquid is plain shapes (melted stem columns, bulges, a bridge, drops) drawn through a goo filter: blurred, then its alpha
+// re-thresholded, so shapes that come close pull together and merge like a liquid. A chrome gradient and a specular light from the moon make it silver.
+const QR=5.4;
+function qsDefs(x,y,w,hh,top,bot){
+ return `<defs><linearGradient id="qsChrome" gradientUnits="userSpaceOnUse" x1="0" y1="${f(top)}" x2="0" y2="${f(bot)}"><stop stop-color="#f6f8ff"/><stop offset=".2" stop-color="#c3cde8"/><stop offset=".43" stop-color="#5a668f"/><stop offset=".52" stop-color="#2c3560"/><stop offset=".62" stop-color="#7887b6"/><stop offset=".84" stop-color="#e2e8f7"/><stop offset="1" stop-color="#8a97c0"/></linearGradient>
+ <filter id="qsGoo" filterUnits="userSpaceOnUse" x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(hh)}" color-interpolation-filters="sRGB">
+  <feGaussianBlur in="SourceGraphic" stdDeviation="2.6" result="b"/>
+  <feColorMatrix in="b" type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 20 -8" result="g"/>
+  <feMorphology in="g" operator="dilate" radius="1" result="d"/><feFlood flood-color="${NIGHT}"/><feComposite in2="d" operator="in" result="o"/>
+  <feGaussianBlur in="g" stdDeviation="1.8" result="bump"/>
+  <feSpecularLighting in="bump" surfaceScale="5" specularConstant="1.15" specularExponent="26" lighting-color="#f4f7ff" result="sp"><fePointLight x="1032" y="104" z="420"/></feSpecularLighting>
+  <feComposite in="sp" in2="g" operator="in" result="spi"/>
+  <feMerge><feMergeNode in="o"/><feMergeNode in="g"/><feMergeNode in="spi"/></feMerge>
+ </filter></defs>`}
+function drawQuick(c){
+ const h=c.h,jt=c.jt,dir=model.dir,a=model.a,b=model.b,k=clamp((h-HS)/(H-HS)),kk=lerp(.7,1,k);
+ const A={x:a.x+W-11.5,y:a.y+h/2},B={x:b.x+11.5,y:b.y+h/2},D=Math.hypot(B.x-A.x,B.y-A.y),th=Math.atan2(B.y-A.y,B.x-A.x);
+ const half=Math.max(0,D/2-QR),capR=20*kk,HB=h/2-6.5,C={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
+ const strain=Math.abs(A.y-B.y)<1?clamp((B.x-A.x-J().gap-23)/SNAP):0;
+ // liq: the liquid's opacity; rA, rB: how far each bead bulges past its column; hb: the bridge's half height; waist: its meniscus;
+ // cone: during a release, how far each pinched-off half still reaches toward the middle (a fraction of the span).
+ let liq=0,rA=0,rB=0,hb=0,waist=0,cone=0,sink=0,gl=0,flash=0,glint=-1,drops=[],rings=[],s='';
+ if(jt===0){const g=c.glow;if(g<=0)return s;
+  // The beads quiver as the distance changes, so they tremble while you drag and hold still when you do.
+  liq=clamp((g-.12)*4);const q=Math.sin(D*.55)*.9*g;
+  const r=g>=1?Math.max(0,half-2.6):Math.min(capR,half)*lerp(.2,.8,g);rA=Math.max(0,r+q);rB=Math.max(0,r-q);
+ }else if(dir>0){
+  // A join started from ready picks up the beads where they hung; one started from a button grows them.
+  const near0=clamp(1-(D-J().gap-23)/NEAR);
+  liq=Math.max(near0,seg(jt,0,.05));sink=seg(jt,.12,.3);
+  if(jt<.3)rA=rB=Math.max(0,Math.min(capR*Math.max(near0,ease(seg(jt,0,.16))),half-lerp(near0>.5?2.6:3,0,seg(jt,.2,.3))));
+  else rA=rB=half*(1-ease(seg(jt,.3,.4)));
+  hb=jt<.3?0:HB*back(seg(jt,.3,.42),1.7);
+  const v=seg(jt,.36,.8);waist=(lerp(5,2.2,ease(seg(jt,.42,.8)))+3*Math.sin(v*PI*5)*(1-v))*kk;
+  flash=Math.sin(PI*seg(jt,.29,.37));
+  if(jt>.3&&jt<.6)[[-100,h/2+8],[-72,h/2-10],[78,h/2-12],[104,h/2+6]].forEach(([deg,amp],i)=>{const u=seg(jt,.3+i*.02,.54+i*.02);if(u>0&&u<1){const d=amp*Math.pow(Math.sin(PI*u),.8),t=deg*PI/180;drops.push({x:C.x+Math.cos(t)*d,y:C.y+Math.sin(t)*d,r:2.9*kk*(1-.3*u)})}});
+  for(const st of [.34,.44,.54]){const u=seg(jt,st,st+.26);if(u>0&&u<1)rings.push(u)}
+  if(jt>.78&&jt<.9)glint=seg(jt,.78,.9);
+  gl=ease(seg(jt,.86,1));
+ }else{
+  liq=seg(jt,.3,.4);sink=seg(jt,.3,.45);gl=ease(seg(jt,.9,1));
+  if(jt>=.66){hb=HB;waist=lerp(2.2*kk,HB-1.5,ease(1-seg(jt,.66,.9)))}
+  else{const v=seg(jt,.46,.66);hb=HB;cone=Math.max(0,.5*v*v*v+.035*Math.sin((1-v)*PI*3)*v*(1-v)*4);
+   for(const sg of [-1,1]){const u=seg(.66-jt,0,.2);if(u>0&&u<1){const E=sg<0?A:B;drops.push({x:lerp(C.x,E.x,u),y:C.y+sg*(h/2-8)*Math.sin(PI*u),r:2.6*kk})}}}
+ }
+ if(hb>0&&strain>0)waist=lerp(waist,HB-1.5,.85*Math.pow(strain,1.2));
+ if(liq<=0)return s;
+ // The liquid itself.
+ const x0=Math.min(A.x,B.x)-QR-46,y0=Math.min(a.y,b.y)-46,fw=Math.abs(B.x-A.x)+2*QR+92,fh=Math.abs(a.y-b.y)+h+92;
+ s+=qsDefs(x0,y0,fw,fh,Math.min(a.y,b.y)+6,Math.max(a.y,b.y)+h-6);
+ const col=(E,y)=>`<rect x="${f(E.x-QR)}" y="${f(y+6.5)}" width="${f(2*QR)}" height="${f(h-13)}" rx="${QR}"/>`;
+ const bead=(E,r,t)=>{if(r<=.3)return '';const ry=Math.min(h/2-9,12+r*1.1)*lerp(.8,1,k);return `<ellipse cx="${f(E.x+Math.cos(t)*r/2)}" cy="${f(E.y+Math.sin(t)*r/2)}" rx="${f(QR+r/2)}" ry="${f(ry)}" transform="rotate(${f(t*180/PI)} ${f(E.x+Math.cos(t)*r/2)} ${f(E.y+Math.sin(t)*r/2)})"/>`};
+ let bridge='',cones='';
+ // Each pinched-off half keeps the necked bridge's own profile, squeezed toward its stem, so the pinch is seamless.
+ if(cone>0)for(const [E,O] of [[A,B],[B,A]]){const T=[],Bt=[];for(let i=0;i<=10;i++){const w=i/10,x=lerp(E.x,O.x,w*cone),d=(HB-1.5)*Math.sin(PI*w*.5);T.push({x,y:E.y-hb+d});Bt.push({x,y:E.y+hb-d})}
+  cones+=`<path d="M${T.map(P).join('L')}L${Bt.reverse().map(P).join('L')}Z"/>`}
+ if(hb>0&&!cone&&!(dir<0&&jt<.66)){const we=clamp(waist,-hb*.5,Math.max(0,hb-1.5)),T=[],Bt=[];for(let i=0;i<=12;i++){const u=i/12,x=lerp(A.x,B.x,u),d=we*Math.sin(PI*u);T.push({x,y:C.y-hb+d});Bt.push({x,y:C.y+hb-d})}
+  bridge=`M${T.map(P).join('L')}L${Bt.reverse().map(P).join('L')}Z`}
+ const shapes=col(A,a.y)+col(B,b.y)+bead(A,rA,th)+bead(B,rB,th+PI)+(bridge?`<path d="${bridge}"/>`:'')+cones+drops.map(d=>`<circle cx="${f(d.x)}" cy="${f(d.y)}" r="${f(d.r)}"/>`).join('');
+ s+=`<g filter="url(#qsGoo)" fill="url(#qsChrome)" opacity="${op(liq)}">${shapes}</g>`;
+ // Ripples and the sealing glint, kept on the silver.
+ if(bridge&&(rings.length||glint>=0)){s+=`<clipPath id="qsClip"><path d="${bridge}"/>${col(A,a.y)}${col(B,b.y)}</clipPath><g clip-path="url(#qsClip)">`;
+  for(const u of rings){const ry=u*(h/2+10),o=1-u;s+=`<ellipse cx="${f(C.x)}" cy="${f(C.y)}" rx="${f(ry*.55)}" ry="${f(ry)}" fill="none" stroke="#f4f7ff" stroke-width="${f(1.3*kk)}" opacity="${op(o*.75)}"/><ellipse cx="${f(C.x)}" cy="${f(C.y)}" rx="${f(Math.max(0,ry-2.5)*.55)}" ry="${f(Math.max(0,ry-2.5))}" fill="none" stroke="#1d2448" stroke-width="${f(1.1*kk)}" opacity="${op(o*.4)}"/>`}
+  if(glint>=0){const y=lerp(C.y-HB,C.y+HB,glint),o=Math.sin(PI*glint);s+=`<rect x="${f(A.x-QR)}" y="${f(y-1.2)}" width="${f(B.x-A.x+2*QR)}" height="2.4" fill="#fff" opacity="${op(o*.85)}"/><rect x="${f(A.x-QR)}" y="${f(y-5)}" width="${f(B.x-A.x+2*QR)}" height="10" fill="#dfe8ff" opacity="${op(o*.2)}"/>`}
+  s+='</g>'}
+ // The moonstone knops float on the melted stems, then sink.
+ if(sink<1)for(const [E,ey] of [[A,a.y],[B,b.y]])for(const y of [ey+16,ey+h-16]){const sc=1-.45*sink;
+  s+=`<g opacity="${op(liq*(1-sink))}" transform="translate(${f(E.x)} ${f(y)}) scale(${f(sc*100)/100})"><circle r="4.6" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><circle r="2.5" fill="url(#moonstone)"/></g>`}
+ if(jt===0&&c.glow>=1){s+=`<rect x="${f(Math.min(A.x,B.x)-QR)}" y="${f(Math.min(a.y,b.y)+6.5)}" width="${f(Math.abs(B.x-A.x)+2*QR)}" height="${f(h-13)}" rx="${QR}" fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" opacity=".55"/>`;
+  s+=`<circle cx="${f(C.x)}" cy="${f(C.y)}" r="12" fill="url(#halo)"/>`+star(C.x,C.y,6,.9)}
+ if(flash>.01)s+=`<circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f(24*flash*kk)}" fill="url(#halo)"/>`+star(C.x,C.y,10*flash*kk,flash);
+ // The join light: the moon's crescent reflected in the silver, stretched by a pull.
+ if(gl>0&&hb>0){const r=5*kk,mx=C.x+2*kk,my=C.y-HB*.36,sx=1+strain*.8,sy=1-strain*.35;
+  s+=`<circle cx="${f(mx)}" cy="${f(my)}" r="${f(16*kk)}" fill="url(#halo)" opacity="${op(gl*(1-strain*.5))}"/><g transform="translate(${f(mx)} ${f(my)}) scale(${f(sx*100)/100} ${f(sy*100)/100})" opacity="${op(gl)}"><path d="M${f(1.5*kk)} ${f(-r*.96)}A${f(r)} ${f(r)} 0 1 0 ${f(1.5*kk)} ${f(r*.96)}A${f(r*.8)} ${f(r*.8)} 0 0 1 ${f(1.5*kk)} ${f(-r*.96)}Z" fill="#f8faff" stroke="#9fb0d8" stroke-width=".4"/></g>`+star(mx+4.5*kk,my-4*kk,2.4*kk,gl*.9)}
+ if(jt===1){const yt=C.y-HB-2,hh2=2*HB+4,wd=B.x-A.x+2*QR+6;
+  s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Quicksilver rim: click it, or press Enter, to pinch the silver apart and separate the widgets; or pull a casing away"><title>Click the rim, or pull a casing away, to pinch it off</title><rect x="${f(A.x-QR-3)}" y="${f(yt)}" width="${f(wd)}" height="${f(hh2)}" rx="${QR+3}" fill="transparent"/><rect class="ringfocus" x="${f(A.x-QR-3)}" y="${f(yt)}" width="${f(wd)}" height="${f(hh2)}" rx="${QR+3}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return s;
+}
 /* ---------- Moonlight bridge drawing ---------- */
 // The rail runs between the upper knops and arches a little; the arch springs from the lower knops and rises to just under the rail's crown.
 function bridgeGeo(h){const k=clamp(h/H,.5,1);
@@ -1616,7 +1709,7 @@ function render(){
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
  const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+forkName(model.angle).num:'')};
- $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?MORPHS[model.morph].ph[model.mdir>0?0:1]:'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
+ $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?(j.txt.strainPh||'Pulling · the braid strains'):drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?MORPHS[model.morph].ph[model.mdir>0?0:1]:'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
  wakeKick();rsKick();
 }
 
@@ -1708,7 +1801,7 @@ stage.addEventListener('pointermove',e=>{
    if(st>=SNAP){const d=drag;drag=null;const pose=here();
     if(held==='a')pose.a.x=clamp(pose.a.x-110,30,1200-W-30);else pose.b.x=clamp(pose.b.x+110,30,1200-W-30);
     doSeparate(pose);return}
-   say('The braid strains. Pull further to make it let go, or release to let it spring back.');render();return}
+   say(J().txt.strain||'The braid strains. Pull further to make it let go, or release to let it spring back.');render();return}
   drag.strain=0;const ax=clamp(s.a.x+dx,30,1200-2*W-g-30);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,30,1200-W-30),y:clamp(s[id].y+dy,TOP,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
@@ -1727,7 +1820,7 @@ function endDrag(){
   say(forkSay(dn??model.angle));return}
  if(d.lift){if(model.lift>=.5||d.moved<5){doSeparate();return}
   tween(model.lift,0,320,v=>model.lift=v);say(J().txt.settle||'The brooch settles back onto the seam.');return}
- if(d.group&&d.strain>0){springBack(d.id);say('The braid holds and draws the casing back.');return}
+ if(d.group&&d.strain>0){springBack(d.id);say(J().txt.springBack||'The braid holds and draws the casing back.');return}
  if(d.state==='ready'){doJoin(d.id==='b'?'a':'b',2700)}else{model.glow=0;render()}
 }
 function cancelDrag(){
