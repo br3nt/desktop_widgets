@@ -39,7 +39,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .grip:active{cursor:grabbing}
 .grip .orn{color:#dfe8ff;font-size:9px;opacity:.75}
 #a .grip,#a .strip{left:46px;right:26px}#b .grip,#b .strip{left:26px;right:46px}
-.small .grip,.small .strip{left:42px;right:42px;top:7px;height:17px}
+.small .grip,.small .strip{left:42px;right:auto;width:192px;top:7px;height:17px}
+.small .fleaf,.small .cstar{width:276px;right:auto}
 .small .grip b,.small .strip b{font-size:15px}
 /* Display: a moonstone pane with pointed ends */
 .screen,.mini{position:absolute;overflow:hidden;color:var(--ink);
@@ -89,6 +90,17 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .cstar>span{position:absolute;right:30px;top:50%;transform:translateY(-50%);font:12.5px/1 var(--sans);color:#d3dbf0;letter-spacing:.4px;white-space:nowrap;text-shadow:0 0 4px #0a0c1c}
 .cstar em,.cstar i{font-style:normal}.cstar em{font:700 14px/1 var(--sans);color:#fff;letter-spacing:.6px}.cstar em+*{margin-left:4px}
 .small .cstar b{left:26px}.small .cstar>span{right:26px}
+/* Growth morph: new leaves hang from a birch branch, each with its own moonstone pane */
+.gmorph{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+#c{pointer-events:none}#c .grip{pointer-events:auto}
+.gpane{position:absolute;width:172px;height:50px;padding:4px 19px 0;overflow:hidden;color:var(--ink);opacity:0;visibility:hidden;
+ background:linear-gradient(112deg,transparent 28%,#9ec3ff2e 44%,#b9a8ff22 56%,transparent 72%),radial-gradient(ellipse 80% 110% at 32% 18%,#fbfcff,#e7ebf4 55%,#cfd6e5)}
+#gp2{left:54px;top:119px}#gp3{left:326px;top:87px}
+.gpane .tiny{font:9px/1.35 var(--sans);color:#5d6584;letter-spacing:1.1px;text-transform:uppercase;white-space:nowrap}
+.gbig{display:flex;align-items:baseline;gap:6px;height:18px;font:italic 12px/1 var(--sans);color:#353b56}.gbig .num{font-size:16px}
+.gpane svg{display:block;margin-top:2px}
+.gw{display:flex;align-items:center;gap:7px;font:11.5px/15px var(--sans);color:#262b42;white-space:nowrap}
+.gw i{width:7px;height:7px;border-radius:50%;border:1.4px solid var(--blue);flex:none}
 .hit{pointer-events:all;cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -114,6 +126,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="band"><stop stop-color="#0a0c1c" stop-opacity=".62"/><stop offset=".6" stop-color="#0a0c1c" stop-opacity=".3"/><stop offset="1" stop-color="#0a0c1c" stop-opacity="0"/></radialGradient>
  <linearGradient id="furlG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#47697b"/><stop offset=".3" stop-color="#284559"/><stop offset=".72" stop-color="#15243d"/><stop offset="1" stop-color="#0b1326"/></linearGradient>
  <linearGradient id="birch" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fdfdff"/><stop offset=".55" stop-color="#e2e7f3"/><stop offset="1" stop-color="#aeb8d2"/></linearGradient>
+ <linearGradient id="autumn" x1="0" y1="0" x2=".4" y2="1"><stop stop-color="#f7dc8f"/><stop offset=".5" stop-color="#d98a3a"/><stop offset="1" stop-color="#7d3320"/></linearGradient>
+ <radialGradient id="paneG" cx=".32" cy=".18" r="1"><stop stop-color="#fbfcff"/><stop offset=".55" stop-color="#e7ebf4"/><stop offset="1" stop-color="#cfd6e5"/></radialGradient>
  <filter id="rollShade" x="-10%" y="-400%" width="120%" height="900%"><feGaussianBlur stdDeviation="2.4"/></filter>
  <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>
 </defs></svg>
@@ -123,6 +137,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="joinRow"><span>Join</span></div>
  <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-50" max="50" step=".5" value="-42.5" aria-label="GitDiscuss tilt at the fork, in degrees"><output id="angleOut" style="width:50px">−42.5°</output></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row" id="morphRow"><span>Morph</span></div>
+ <div class="row" id="sizeRow"><span>Checks</span><input type="range" id="grow" min="0" max="200" value="0" aria-label="Checks size, bud to bough"><output id="growOut">bud</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Elven skin stage">
@@ -158,18 +174,20 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="fleaf" aria-hidden="true"><span><b>GitDiscuss</b><i>to decide</i></span><em>02</em></div>
 </section>
 
-<section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg>
+<section class="w small" id="c" aria-label="Checks widget"><svg class="gmorph" aria-hidden="true"></svg><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg>
  <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="orn" aria-hidden="true">✦</span></button>
  <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="lampdot" aria-hidden="true"></span>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <div class="cstar" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <div class="fleaf" aria-hidden="true"><span><b>Checks</b><i>passed</i></span><em>12 / 14</em></div>
+ <div class="gpane" id="gp2" aria-hidden="true"><div class="tiny">Run 418 · main</div><div class="gbig"><span class="num">86%</span>passed</div><span class="pips"></span></div>
+ <div class="gpane" id="gp3" aria-hidden="true"><div class="tiny">Waiting on Brent</div><div class="gw"><i></i>deploy-preview</div><div class="gw"><i></i>e2e-safari</div></div>
 </section>
 
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
-<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
+<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the bough back to a bud) · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=38,SEP=170,NEAR=120,READY=40,TOP=70,SNAP=46;
@@ -792,8 +810,117 @@ function flower(x,y,kk,k){const sc=k*.95,op=clamp(kk*1.4);let s=`<circle cx="${f
  return s+`<circle r="${f(2*clamp(kk))}" fill="#fff3cf" stroke="#c8b47a" stroke-width=".4"/></g>`}
 
 /* ---------- Model ---------- */
+/* ---------- Morph: growth (Checks) ---------- */
+// g runs 0 bud, 1 sprig, 2 bough. Growing, a birch branch extends and a leaf unfurls with a new display.
+// Shrinking is autumn: the display dims, the leaf turns gold, folds on its midrib and falls, then the branch draws back.
+const SIZES=[['bud','Bud',0],['sprig','Sprig',1],['bough','Bough',2]];
+const MORPHS={
+ growth:{label:'Growth',kind:'Grow',
+  about:'Checks is a bud: one small leaf. <b>Sprig:</b> a birch stem pushes out from under its moonstone drop and a silver tendril curls off it. A bud swells at the node and the new leaf unfurls: it lengthens first, then opens out from its midrib, pale green, and swings down to hang with a little overshoot. It darkens to night glass, and its moonstone pane lights with run 418 on main: 86% passed, with fourteen marks (twelve stars and two open rings for the checks still waiting). <b>Bough:</b> the branch grows on out of the bud\'s far tip, leafing as it goes, and ends in a fiddlehead curl; a third leaf unfurls from a node on it and names the two checks waiting on Brent. <b>Shrinking is autumn:</b> the panes go dark, the leaves turn gold, fold on their midribs, let go and flutter down, and the branch draws back into the bud. Pick a size, press M to step through them, or scrub the slider (scrubbing down is autumn too). Checks grows from where it stands and only moves to stay on the stage and clear of the pair. Shading a grown Checks lets its leaves fall first, and unshading grows them again.'}
+};
+const GD=[[CW,CH],[CW,198],[548,198]],LHW=118,LL=96,N2={x:140,y:99},N3={x:412,y:67};
+const bez=(a,b,c,d,n)=>[...Array(n+1)].map((_,i)=>{const t=i/n,u=1-t;return{x:u*u*u*a.x+3*u*u*t*b.x+3*u*t*t*c.x+t*t*t*d.x,y:u*u*u*a.y+3*u*u*t*b.y+3*u*t*t*c.y+t*t*t*d.y}});
+// The sprig's stem drops from behind the moonstone drop to the new leaf's node; a silver tendril curls off it.
+const STEM=arcS(widths(bez({x:137,y:62},{x:131,y:80},{x:148,y:87},N2,16),5.2,3.6));
+const TEN=arcS(widths(curlPts(STEM[9],PI*.96,30,1.7*PI,1,22),2,.35));
+// The bough leaves the bud's far tip, passes the third leaf's node and ends in a fiddlehead.
+const BOUGH=(()=>{const a=bez({x:250,y:41},{x:300,y:39},{x:352,y:64},N3,22),b=bez(N3,{x:452,y:68},{x:486,y:62},{x:498,y:46},12).slice(1),e=b[b.length-1],q=b[b.length-2];
+ const pts=[...a,...b,...curlPts(e,Math.atan2(e.y-q.y,e.x-q.x),30,1.7*PI,-1,16).slice(1)];
+ pts.forEach((p,i)=>p.w=i<=22?lerp(5.8,3.8,i/22):i<=34?lerp(3.8,2.4,(i-22)/12):lerp(2.4,.5,(i-34)/16));return arcS(pts)})();
+// One step's timings, u from 0 to 1. Growing: size, branch, bud, unfurl, then the pane. Autumn (u falling): pane, gold, fold, fall, branch, size.
+function gphase(u,dir){
+ if(dir>0)return{sz:ease(seg(u,0,.2)),br:ease(seg(u,.08,.42)),bud:seg(u,.3,.5),uf:seg(u,.44,.9),pn:seg(u,.88,1),gl:Math.sin(PI*seg(u,.84,1)),au:0,fo:0,fl:0};
+ const v=1-u;return{sz:1-ease(seg(v,.86,1)),br:1-ease(seg(v,.68,.9)),bud:0,uf:u>0?1:0,pn:1-seg(v,0,.12),gl:0,au:seg(v,.02,.3),fo:seg(v,.22,.44),fl:seg(v,.38,.8)};
+}
+// A broad leaf hanging from its node at the origin, tip down.
+const BL=(()=>{const h=LHW,L=LL;return `M0 2C${f(-h*.55)} 0 ${-h} ${f(L*.14)} ${-h} ${f(L*.42)}C${-h} ${f(L*.7)} ${f(-h*.4)} ${f(L*.86)} 0 ${L}C${f(h*.4)} ${f(L*.86)} ${h} ${f(L*.7)} ${h} ${f(L*.42)}C${h} ${f(L*.14)} ${f(h*.55)} 0 0 2Z`})();
+const PB=paneD(172,50,3.4),PF=paneD(172,50,0),PI1=paneD(172,50,1.1);
+const knop=(N,s)=>s<=.02?'':`<g transform="translate(${P(N)}) scale(${f(s*100)/100})"><circle r="4.4" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><circle r="2.5" fill="url(#moonstone)"/><circle cx="-.8" cy="-.9" r=".7" fill="#fff"/></g>`;
+function twig(p){if(p.length<2)return '';return `<path d="${ribbon(p,1.8)}" fill="${NIGHT}"/><path d="${ribbon(p)}" fill="url(#birch)"/><path d="${lenticels(p,4)}" fill="none" stroke="#262c44" stroke-width="1" stroke-linecap="round" opacity=".72"/><polyline points="${p.map(q=>f(q.x-.3)+','+f(q.y-.6)).join(' ')}" fill="none" stroke="#fff" stroke-width=".6" opacity=".55"/>`}
+// A small leaf on the branch; in autumn it goes gold and drops, spinning.
+function leaflet(p,deg,s,au,fl,side){if(s<=.01||fl>=1)return '';const dx=side*16*fl+6*Math.sin(fl*PI*2),dy=70*fl*fl;
+ return `<g transform="translate(${f(p.x+dx)} ${f(p.y+dy)}) rotate(${f(deg+side*130*fl)}) scale(${f(s*100)/100})" opacity="${f((1-seg(fl,.5,1))*100)/100}"><path d="${leafD}" fill="url(#leafG)" stroke="${NIGHT}" stroke-width=".7"/>${au>0?`<path d="${leafD}" fill="url(#autumn)" opacity="${f(au*100)/100}"/>`:''}<path d="M1.2 0Q7 -.6 13 0" fill="none" stroke="${au>.5?'#6b3518':'#5f8c7a'}" stroke-width=".6"/></g>`}
+// A grown leaf at node N. Unfurling it lengthens, opens from the midrib and swings down from rot0; falling it folds, flutters and drifts to one side.
+function grownLeaf(N,G,rot0,side,dew){
+ if(G.uf<=0||G.fl>=1)return '';
+ let sx,sy,rot,dx=0,dy=0,op=1;
+ if(model.mdir>0){const u=G.uf;sy=lerp(.16,1,ease(seg(u,0,.55)));sx=lerp(.04,1,back(seg(u,.18,1),1.1));rot=rot0*(1-back(seg(u,0,.8),1.7))}
+ else{const fl=G.fl,fo=G.fo;sy=1-.08*fo;sx=(1-.7*fo)*Math.cos(fl*PI*2.4);rot=side*(64*fl+22*Math.sin(fl*PI*2.8));dx=side*40*fl+12*Math.sin(fl*PI*2.2);dy=4*fo+130*fl*fl;op=1-seg(fl,.5,1)}
+ const fresh=model.mdir>0?1-seg(G.uf,.5,1):0,au=G.au,bz=model.mdir>0?seg(G.uf,.55,.95):1,vein=au>.5?'#5a2a14':'#c9d4ee';
+ let o=`<g transform="translate(${f(N.x+dx)} ${f(N.y+dy)}) rotate(${f(rot)}) scale(${f(sx*1000)/1000} ${f(sy*1000)/1000})" opacity="${f(op*100)/100}">`;
+ o+=`<path d="${BL}" fill="none" stroke="#8fb0ff" stroke-width="6" opacity="${f(.16*(1-au)*100)/100}" filter="url(#soft)"/><path d="${BL}" fill="url(#night)"/><path d="${BL}" fill="url(#pearl)" opacity=".14"/>`;
+ if(fresh>0)o+=`<path d="${BL}" fill="url(#leafG)" opacity="${f(fresh*60)/100}"/>`;
+ if(au>0)o+=`<path d="${BL}" fill="url(#autumn)" opacity="${f(au*92)/100}"/>`;
+ o+=`<path d="M0 3V15M0 6Q-12 9 -26 14M0 6Q12 9 26 14M0 75Q1 86 0 ${LL-4}M0 75Q-24 78 -52 86M0 75Q24 78 52 86M0 83Q-14 87 -30 92M0 83Q14 87 30 92" fill="none" stroke="${vein}" stroke-width=".8" opacity=".55"/>`;
+ for(const [x,y] of [[-100,44],[100,60],[12,90]])o+=`<circle cx="${x}" cy="${y}" r=".7" fill="#e6ecff" opacity="${f((1-au)*55)/100}"/>`;
+ o+=`<path d="${BL}" fill="none" stroke="url(#silver)" stroke-width="1.5" opacity="${f((1-au)*100)/100}"/>`+(au>0?`<path d="${BL}" fill="none" stroke="#e9c46a" stroke-width="1.5" opacity="${f(au*100)/100}"/>`:'');
+ if(bz>0)o+=`<g transform="translate(-86 20)" opacity="${f(bz*100)/100}"><path d="${PB}" fill="${NIGHT}" opacity=".7"/><path d="${PF}" fill="url(#paneG)" opacity="${f((1-.6*au)*100)/100}"/>${au>0?`<path d="${PF}" fill="url(#autumn)" opacity="${f(au*35)/100}"/>`:''}<path d="${PB}" fill="none" stroke="${au>.5?'#e9c46a':'url(#silver)'}" stroke-width="1.3"/><path d="${PI1}" fill="none" stroke="${NIGHT}" stroke-width="1"/></g>`;
+ if(dew)o+=`<path d="M0 ${LL+.5}Q3.2 ${LL+5} 0 ${LL+9.5}Q-3.2 ${LL+5} 0 ${LL+.5}Z" fill="url(#moonstone)" stroke="#e8eef8" stroke-width=".6"/>`;
+ return o+'</g>'}
+// A glint catches the bezel's corner as the pane lights.
+const glint=(N,k)=>k<=0?'':`<circle cx="${f(N.x+80)}" cy="${f(N.y+16.6)}" r="${f(20*k)}" fill="url(#halo)" opacity="${f(k)}"/>`+star(N.x+80,N.y+16.6,9*k,k);
+$$('.gpane').forEach(n=>n.style.clipPath=`path('${PF}')`);
+// Twelve stars for the passed checks and two open rings for the waiting ones.
+$('#gp2 .pips').innerHTML=`<svg width="134" height="9" viewBox="0 0 134 9">${[...Array(14)].map((_,i)=>{const x=4.5+i*9.3;return i<12?star(x,4.5,4,1,'#2f4f86'):`<circle cx="${f(x)}" cy="4.5" r="2.9" fill="none" stroke="#2f4f86" stroke-width="1.3"/>`}).join('')}</svg>`;
+function growth(el){
+ const g=model.g,d=model.mdir,svg=el.querySelector('.gmorph'),A=gphase(clamp(g),d),B=gphase(clamp(g-1),d);
+ for(const [id,G,on] of [['#gp2',A,g>0],['#gp3',B,g>1]]){const n=el.querySelector(id),o=on?G.pn:0;n.style.opacity=f(o*100)/100;n.style.visibility=o<.02?'hidden':'visible'}
+ const S=SIZES.find(x=>x[2]===g),lab='Checks widget, '+(S?S[1].toLowerCase():d>0?'growing':'shedding its leaves')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting on Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=f(g*1000)+':'+d;if(svg.dataset.k===key)return;svg.dataset.k=key;
+ if(g<=0){svg.innerHTML='';return}
+ svg.setAttribute('width',GD[2][0]);svg.setAttribute('height',GD[2][1]);svg.setAttribute('viewBox',`0 0 ${GD[2][0]} ${GD[2][1]}`);
+ const grow=d>0,lf=(G,p,deg,fr,i,side,sc)=>leaflet(p,deg,sc*(grow?back(seg(G.br,fr+.05,fr+.32),1.6):G.br>0?1:0),G.au,seg(G.fl,i*.1,.72+i*.1),side);
+ let tw='',lv='',kn='',fr='';
+ // Sprig: the stem and its tendril, a leaflet, the bud at the node, then the leaf.
+ tw+=twig(growPts(STEM,A.br,8));
+ const tn=growPts(TEN,seg(A.br,.45,1),6);if(tn.length>1)tw+=`<path d="${ribbon(tn)}" fill="url(#silver)"/><circle cx="${f(tn[tn.length-1].x)}" cy="${f(tn[tn.length-1].y)}" r=".9" fill="#fff" opacity="${f(seg(A.br,.95,1))}"/>`;
+ fr+=lf(A,STEM[12],-14,.7,0,1,.8);
+ if(grow&&A.bud>0&&A.uf<.3)kn+=bud(N2,62,1.5*back(A.bud,1.4)*(1-seg(A.uf,0,.3)));
+ lv+=grownLeaf(N2,A,-28,-1,true);kn+=knop(N2,grow?back(A.bud,1.4):ease(seg(A.br,.85,1)));fr+=glint(N2,A.gl);
+ // Bough: the branch from the far tip, leaflets as it passes, the third leaf at its node.
+ if(g>1){const T=BOUGH[BOUGH.length-1].s;
+  tw+=twig(growPts(BOUGH,B.br,12));
+  fr+=lf(B,BOUGH[8],-52,BOUGH[8].s/T,0,1,1)+lf(B,BOUGH[28],-96,BOUGH[28].s/T,1,1,.9)+lf(B,BOUGH[16],-30,BOUGH[16].s/T,2,1,.7);
+  if(grow&&B.bud>0&&B.uf<.3)kn+=bud(N3,18,1.5*back(B.bud,1.4)*(1-seg(B.uf,0,.3)));
+  lv+=grownLeaf(N3,B,-72,1,false);kn+=knop(N3,grow?back(B.bud,1.4):ease(seg(B.br,.85,1)));fr+=glint(N3,B.gl)}
+ svg.innerHTML=tw+lv+kn+fr;
+}
+const chNow=()=>Math.round(lerp(CH,CHS,draw(model.st)));
+function cDims(){const g=model.g;if(g<=0)return[CW,chNow()];const A=gphase(clamp(g),model.mdir),B=gphase(clamp(g-1),model.mdir);return[Math.round(lerp(CW,GD[2][0],g>1?B.sz:0)),Math.round(lerp(CH,GD[1][1],A.sz))]}
+// Where Checks's top-left should land at size `to`: it grows from where it stands, kept on the stage and clear of the pair.
+function morphSpot(to){
+ const[w,h]=GD[to];let x=clamp(model.c.x,30,1170-w),y=clamp(model.c.y,TOP-10,590-h);
+ const x0=Math.min(model.a.x,model.b.x)-8,x1=Math.max(model.a.x,model.b.x)+W+8,y0=Math.min(model.a.y,model.b.y)-8,yb=Math.max(model.a.y,model.b.y)+ctx().h+8;
+ if(x+w>x0&&x<x1&&y<yb&&y+h>y0){if(yb+h<=590)y=yb;else if(y0-h>=TOP-10)y=y0-h}
+ return{x,y};
+}
+let morphAnim=0;
+function morphTo(id){
+ if(drag&&drag.id==='c')cancelDrag();
+ const S=SIZES.find(x=>x[0]===id),to=S[2],from=model.g;
+ // A shaded Checks comes out of its shade first, then grows.
+ if(model.st>0&&to>0){model.restore=id;model.size=id;toggleShade(0);render();return Promise.resolve(false)}
+ if(to===0)model.restore=null;
+ model.size=id;
+ if(to===from){say('Checks is already a '+S[1].toLowerCase()+'.');render();return Promise.resolve(true)}
+ model.mdir=to>from?1:-1;
+ const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(to>from?2600:2300),p0={x:model.c.x,y:model.c.y},p1=morphSpot(to),t0=performance.now();
+ model.cMoved=false;
+ say(to>from?(to===2?'The branch grows on from the bud\'s far tip and a third leaf unfurls: Checks is a bough.':'A stem pushes out under the bud and a new leaf unfurls: Checks is a sprig.'):'Autumn: the panes dim, the leaves turn gold and fall, and the branch draws back. Checks shrinks to a '+S[1].toLowerCase()+'.');
+ return new Promise(res=>{(function step(now){
+  if(tok!==morphAnim)return res(false);
+  const t=ms?clamp((now-t0)/ms):1;model.g=t<1?lerp(from,to,t):to;
+  const[w,h]=cDims();
+  if(model.cMoved){model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h)}
+  else{const e=ease(t);model.c.x=lerp(p0.x,p1.x,e);model.c.y=lerp(p0.y,p1.y,e)}
+  render();
+  if(t<1)requestAnimationFrame(step);else{say('Checks is a '+S[1].toLowerCase()+'.');res(true)}
+ })(t0)});
+}
+
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,busy:false,angle:-42.5,angTo:undefined,dial:0};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,busy:false,angle:-42.5,angTo:undefined,dial:0,morph:'growth',size:'bud',g:0,mdir:1,restore:null,cMoved:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -870,9 +997,13 @@ function holdJoining(){
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
  setJt(.55);render();say(J().txt.hold);
 }
-function toggleShade(){
- const sh=SHADES[model.shade],to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||620)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;
- (function step(now){if(token!==shadeAnim)return;const t=reduce.matches||ms<=0?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));refitPair();render();if(t<1)requestAnimationFrame(step)})(t0);
+function toggleShade(force){
+ const sh=SHADES[model.shade],to=force!==undefined?force:model.st>.5?0:1,start=model.st;
+ // A grown Checks lets its leaves fall first, and grows them again once unshaded.
+ if(to===1&&model.g>0){const keep=model.size&&model.size!=='bud'?model.size:SIZES[Math.max(1,Math.round(model.g))][0];++shadeAnim;
+  morphTo('bud').then(ok=>{if(ok){model.restore=keep;toggleShade(1)}});return}
+ const token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||620)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches||ms<=0?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));refitPair();render();if(t<1)requestAnimationFrame(step);else if(to===0&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}})(t0);
  say(to?(sh.sayIn||'Shaded: the casing narrows to a slim leaf with its nameplate and one value.'):(sh.sayOut||'Unshaded: the casing opens again.'));
 }
 // A casing pulled a little way from its partner springs back along the vine.
@@ -891,6 +1022,7 @@ function render(){
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
+  if(small){const[gw,gh]=cDims();el.style.width=gw+'px';el.style.height=gh+'px';growth(el)}
   if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-forkS(model.angle,h/2))+'px '+f(h/2)+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
@@ -916,10 +1048,14 @@ function render(){
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
+ $$('#morphRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.morph)));
+ $$('#sizeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===model.size)));
+ if(document.activeElement!==$('#grow'))$('#grow').value=Math.round(model.g*100);
+ {const S=SIZES.find(x=>x[2]===model.g);$('#growOut').textContent=S?S[1].toLowerCase():model.mdir>0?'growing':'autumn'}
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
  const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+forkName(model.angle).num:'')};
- $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?'Lifting · the brooch rises':drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'');
+ $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?'Lifting · the brooch rises':drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?model.mdir>0?' · Checks grows':' · autumn on Checks':'');
 }
 
 /* ---------- Controls ---------- */
@@ -931,14 +1067,23 @@ function pick(key,id){
  if(drag)cancelDrag();
  if(key==='join'&&id!==model.join){stopAngle();dialOff();const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.lift=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
+ if(key==='morph')model.morph=id;
  describe();render();
 }
 function describe(){
  const j=J(),s=SHADES[model.shade];
  $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
+ const mo=MORPHS[model.morph];$('#morphAbout').innerHTML=`<h2>${mo.label}<small>morph · ${mo.kind}</small></h2><p>${mo.about}</p>`;
 }
-options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
+options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#morphRow',MORPHS,'morph');
+SIZES.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size=id;b.textContent=l;b.onclick=()=>morphTo(id);$('#grow').before(b)});
+// Scrubbing size: up grows, down is autumn. While shaded, the slider unshades first (growing back to any size it had) and ignores the move.
+$('#grow').oninput=e=>{if(drag&&drag.id==='c')cancelDrag();
+ if(model.st>0){toggleShade(0);e.target.value=0;render();return}
+ ++morphAnim;model.restore=null;const v=e.target.value/100;if(v!==model.g)model.mdir=v>model.g?1:-1;model.g=v;const S=SIZES.find(x=>x[2]===v);model.size=S?S[0]:null;
+ const[w,h]=cDims();model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h);render()};
+$('#grow').onchange=()=>render();
 $('#angle').oninput=e=>{if(drag)cancelDrag();setForkAngle(+e.target.value)};
 $('#scrub').oninput=e=>{stopAngle();dialOff();++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
  if(model.jt===0||model.jt===1||!model.path)model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};
@@ -948,6 +1093,7 @@ document.addEventListener('keydown',e=>{
  const key=e.key.toLowerCase();
  if(e.key==='Escape')cancelDrag();
  const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
+ if(key==='m')morphTo((SIZES.find(x=>x[2]>model.g+.001)||SIZES[0])[0]);
  if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
 });
 ['a','b'].forEach(id=>{
@@ -985,7 +1131,7 @@ stage.addEventListener('pointermove',e=>{
   if(model.lift>=1){drag=null;doSeparate();return}
   if(model.lift>0)say('The brooch rises with your finger and its pin starts to open. Keep lifting to take it off.');render();return}
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
- if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
+ if(drag.id==='c'){const[cw,chh]=cDims();model.cMoved=true;model.c.x=clamp(s.c.x+dx,30,1170-cw);model.c.y=clamp(s.c.y+dy,TOP-10,590-chh);render();return}
  if(drag.group){const g=J().gap,ay=clamp(s.a.y+dy,...pairY()),away=drag.id==='a'?-dx:dx;
   if(away>0&&J().pull){// Pulling away: the partner holds, the held casing gives a little, and the braid strains.
    const st=Math.pow(away,.9)*.62,held=drag.id;drag.strain=st;
@@ -1020,7 +1166,8 @@ function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.bend){model.angle=d.th0;refitPair();dialSoon(300);render();return}
  if(d.lift){model.lift=0;render();return}
- const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
+ const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);
+ {const[w,h]=cDims();model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h)}model.glow=0;render();say('Move cancelled.');
 }
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
@@ -1031,10 +1178,11 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const bottom=600-(model.st>.5?HS:H)-14;
  if(model.jt===1&&id==='b'&&J().angled&&k[1]){stepAngle(k[1]>0?1:-1,e.shiftKey);return}
  if(model.jt===1&&id!=='c'){stopAngle();const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
- else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-CH-10:bottom)}render();
+ else if(id==='c'){const[cw,chh]=cDims();model.cMoved=true;model.c.x=clamp(model.c.x+k[0],30,1170-cw);model.c.y=clamp(model.c.y+k[1],TOP-10,590-chh)}
+ else{const m=model[id];m.x=clamp(m.x+k[0],30,1200-W-30);m.y=clamp(m.y+k[1],TOP,bottom)}render();
 }));
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
 addEventListener('resize',fit);fit();describe();render();
-window.elvenSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade};
+window.elvenSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade,morphTo};
 </script></body></html>
