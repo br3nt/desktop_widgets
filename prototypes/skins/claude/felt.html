@@ -91,6 +91,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
+.tog{position:absolute;width:30px;margin-left:-15px;padding:0;border:0;border-radius:9px;background:none;cursor:grab;display:none;touch-action:none;z-index:3}
+.tog:active{cursor:grabbing}.tog:focus-visible{outline-offset:0}
 .snipHint{opacity:0;transition:opacity .2s;pointer-events:none}.hit.tap{cursor:pointer}.hit:hover .snipHint,.hit:focus-visible .snipHint{opacity:.95}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;color:#c4af98;font-size:13px}
 .about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#f5dcc0}.about h2 small{font:11px -apple-system,sans-serif;color:#a8907a;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
@@ -165,7 +167,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the button tab, tug the tab to unbutton it. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the button tab, tug the tab to unbutton it. On the drawstring shade, pull a toggle down to open it. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -365,6 +367,96 @@ function bolsterDraw(id,w,h,small,st){
  const by=bot;
  o+=P.sq?`<g transform="translate(${w/2} ${f(by)}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${f(-by)})">${t}</g>`:t;
  return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${o}</g>`:o;
+}
+
+/* ---------- Drawstring shade ---------- */
+// The name band slides down to the middle as a casing channel, a cord comes out of two eyelets with a wooden toggle,
+// and three tugs gather the cushion onto the cord: the height pulls in and the felt above and below bunches into frills.
+// Opening: pull the toggle down; the gathers let go with a bounce, the cord draws back in and the band climbs home.
+const CORD={a:['#1b2945','#4d6da5','#b2c8ee'],b:['#6a2c0a','#cf7a2e','#f8c788'],c:['#283f19','#69983c','#c4e396']};
+const DS_TUGS=[.38,.5,.62],TOGPULL=60;
+function drawParts(st,small){
+ const H0=small?CH:H,HF=small?40:50,un=model.shDir===0,u=1-st;
+ let m,th,c=0,sq=0,emb,bounce=0,sw=0,fib=0;
+ if(!un){m=ease(seg(st,.08,.26));th=seg(st,.24,.38);
+  for(const a of DS_TUGS){c+=backOut(seg(st,a,a+.1))/3;const p=seg(st,a,a+.2);if(p>0&&p<1)sw+=Math.sin(p*Math.PI*2.5)*(1-p)*3.5}
+  sq=Math.sin(Math.PI*seg(st,.74,.86))*.08;const fb=seg(st,.74,.9);fib=fb>0&&fb<1?fb:0;emb=seg(st,.84,1)}
+ else{emb=1-seg(u,0,.12);c=1-ease(seg(u,.1,.5));const p=seg(u,.08,.6);if(p>0&&p<1)sw=Math.sin(p*Math.PI*3)*(1-p)*4;
+  const k=seg(u,.5,.74);bounce=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.5)*.07:0;th=1-seg(u,.66,.84);m=1-ease(seg(u,.74,.92))}
+ return{H0,HF,un,m,th,c,sq,emb,bounce,sw,fib,h:Math.round(lerp(H0,HF,clamp(c)))};
+}
+// Outward scallops from x0 to x1 along y; returns the path and the pinch points between scallops.
+function scallops(x0,x1,y,A,P,dir){
+ const L=x1-x0,n=Math.max(1,Math.round(Math.abs(L)/P)),pin=[];let d='';
+ for(let i=1;i<=n;i++){const xa=x0+L*(i-1)/n,xb=x0+L*i/n;d+=`Q${f((xa+xb)/2)} ${f(y+dir*2*A)} ${f(xb)} ${f(y)}`;if(i<n)pin.push(xb)}
+ return{d,pin};
+}
+// A rounded rect whose long edges are gathered into scallops and whose short sides pinch in.
+function ruffle(x,y,w,h,rs,A,P,pin){
+ const[a,b,c,d]=rs.map(r=>Math.max(1,Math.min(r,h/2,w/2))),x1=x+w,y1=y+h,T=scallops(x+a,x1-b,y,A,P,-1),B=scallops(x1-c,x+d,y1,A,P,1);
+ return{d:`M${f(x+a)} ${f(y)}${T.d}Q${f(x1)} ${f(y)} ${f(x1)} ${f(y+b)}Q${f(x1-2*pin)} ${f((y+b+y1-c)/2)} ${f(x1)} ${f(y1-c)}Q${f(x1)} ${f(y1)} ${f(x1-c)} ${f(y1)}`+
+  `${B.d}Q${f(x)} ${f(y1)} ${f(x)} ${f(y1-d)}Q${f(x+2*pin)} ${f((y+a+y1-d)/2)} ${f(x)} ${f(y+a)}Q${f(x)} ${f(y)} ${f(x+a)} ${f(y)}Z`,top:T.pin,bot:B.pin};
+}
+function dsGeo(w,h,small,P){
+ const bh0=small?20:22,by0=small?3:5,bx=lerp(small?22:34,small?10:12,P.m),bH=lerp(bh0,small?20:24,P.m),bcy=lerp(by0+bh0/2,h/2,P.m);
+ const E=small?5:6,bb=bcy+bH/2,ey=bb-(small?4.5:5.5),TH=small?12:15,TW=small?9:11;
+ const hang=ey+lerp(small?24:32,small?10:12,clamp(P.c,0,1.08))+TH/2,drop=P.un?P.th:backOut(seg(P.th,.2,1));
+ return{bx,bH,bcy,bt:bcy-bH/2,bb,E,ey,cx:w/2,TH,TW,tx:w/2+P.sw,ty:lerp(ey,hang,drop),tail:lerp(small?5:6,small?14:18,clamp(P.c))*Math.min(1,P.th*1.5)};
+}
+const cordPath=(d,id,wd)=>{const C=CORD[id];return `<g fill="none" stroke-linecap="round"><path d="${d}" stroke="#000" stroke-opacity=".35" stroke-width="${f(wd+1)}" transform="translate(.5 .9)"/><path d="${d}" stroke="${C[0]}" stroke-width="${wd}"/><path d="${d}" stroke="${C[1]}" stroke-width="${f(wd*.66)}"/><path d="${d}" stroke="${C[2]}" stroke-opacity=".75" stroke-width="${f(wd*.36)}" stroke-dasharray="1.2 1.7"/></g>`};
+function drawstringDraw(id,w,h,small,st){
+ const P=drawParts(st,small),s=SKIN[id];
+ if(P.m<=0&&P.c<=0&&P.th<=0)return casing(id,w,h);
+ const G=dsGeo(w,h,small,P),A=P.c*(small?2.4:3.2),pin=clamp(P.c)*(small?3:4),Pd=small?12:13;
+ let t=`<defs>${feltFilters(id,s.seed)}<linearGradient id="wd-${id}" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#4f2f15"/><stop offset=".3" stop-color="#a9733c"/><stop offset=".5" stop-color="#e6c08a"/><stop offset=".72" stop-color="#9b6633"/><stop offset="1" stop-color="#4a2c12"/></linearGradient>`+
+  `<radialGradient id="fb-${id}" cx=".36" cy=".3" r=".8"><stop stop-color="${CORD[id][2]}"/><stop offset=".55" stop-color="${CORD[id][1]}"/><stop offset="1" stop-color="${CORD[id][0]}"/></radialGradient></defs>`;
+ // The gathered body, its under-shadow and a hem stitch that follows the frills.
+ const R=ruffle(EDGE,EDGE,w-2*EDGE,h-2*EDGE,s.r,A,Pd,pin),sh=ruffle(2.5,6,w-5,h-4.5,s.r.map(v=>v+2),A,Pd,pin);
+ t+=`<path d="${sh.d}" fill="#3b291d" filter="url(#g-${id})"/><path d="${R.d}" fill="${s.body}" filter="url(#f-${id})"/>`;
+ const ins=lerp(10,6.5,clamp(P.c)),hem=ruffle(ins,ins,w-2*ins,h-2*ins,s.r.map(v=>Math.max(3,v-6)),A,Pd,pin*.8).d;
+ t+=`<path d="${hem}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${hem}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`;
+ // Gathers: a dark crease from each pinch toward the cord, leaning in toward the eyelets, and a light crest between.
+ if(P.c>.02){const k=clamp(P.c);let dk='',lt='';
+  const fold=(xs,y0,y1)=>{let prev=null;for(const x of xs){const lean=(G.cx-x)*.05;dk+=`M${f(x)} ${f(y0)}Q${f(x+lean*.3)} ${f((y0+y1)/2)} ${f(x+lean)} ${f(y1)}`;
+   if(prev!==null){const mx=(prev+x)/2;lt+=`M${f(mx)} ${f(y0+(y1>y0?2:-2))}L${f(mx+(G.cx-mx)*.04)} ${f(y1)}`}prev=x}};
+  fold(R.top,EDGE+.6,G.bt+1);fold(R.bot,h-EDGE-.6,G.bb-1);
+  t+=`<g fill="none" stroke-linecap="round"><path d="${lt}" stroke="#fff3df" stroke-opacity="${f(.24*k)}" stroke-width="2.6"/><path d="${dk}" stroke="#1d0f06" stroke-opacity="${f(.5*k)}" stroke-width="1.6"/></g>`}
+ // The name band, now the drawstring casing, gathered a little along with the rest.
+ const band=ruffle(G.bx,G.bt,w-2*G.bx,G.bH,[9,8,10,8],A*.3,Pd,0),bin=ruffle(G.bx+3.5,G.bt+3.5,w-2*G.bx-7,G.bH-7,[6,5,7,5],A*.3,Pd,0).d;
+ t+=`<path d="${band.d}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band.d}" fill="${s.band}" filter="url(#g-${id})"/>`;
+ t+=`<path d="${bin}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ if(P.c>.02){let d='';for(const x of band.top)d+=`M${f(x)} ${f(G.bt+2)}V${f(G.bb-2)}`;t+=`<path d="${d}" stroke="#000" stroke-opacity="${f(.2*clamp(P.c))}" stroke-width="1.2"/>`}
+ // Name in satin stitch on the left, value in cross-stitch on the right, sewn on left to right.
+ if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?15:17,c=small?1.8:2.2,wf=small?11:12.5;
+  const x0=G.bx+(small?9:12),x1=w-G.bx-(small?9:12),gap=G.cx+G.E+(small?9:11),xp=xpaths(dt.num,c);
+  const ww=measure(dt.word,`italic ${wf}px Georgia,serif`),word=xp.w+5+ww<=x1-gap,vw=xp.w+(word?5+ww:0),vx=Math.max(gap,x1-vw),vy=G.bcy-3.5*c;
+  t+=`<clipPath id="ds-${id}"><rect x="${f(x0-4)}" y="${f(G.bt-6)}" width="${f((x1-x0+8)*P.emb)}" height="${f(G.bH+12)}"/></clipPath><g clip-path="url(#ds-${id})">`+
+   `<text x="${f(x0)}" y="${f(G.bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="#000" fill-opacity=".4" transform="translate(.5 .9)">${nm}</text>`+
+   `<text x="${f(x0)}" y="${f(G.bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="#fbf0d6">${nm}</text>`+
+   `<text x="${f(x0)}" y="${f(G.bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="url(#satin)">${nm}</text>`+
+   `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".35" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="#cdb48a"/><path d="${xp.d2}" stroke="#fbf0d6"/></g>`+
+   (word?`<text x="${f(vx+xp.w+5)}" y="${f(G.bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="#f6e8cc">${dt.word}</text>`:'')+'</g>'}
+ // Eyelets, the cord hanging through the toggle, and felt-ball ends.
+ if(P.th>0){const k=P.un?P.th:backOut(seg(P.th,0,.35)),{cx,E,ey,tx,ty,TH,TW,tail}=G,tt=ty-TH/2+1,tb=ty+TH/2-1;
+  for(const ex of [cx-E,cx+E])t+=`<g transform="translate(${f(ex)} ${f(ey)}) scale(${f(Math.max(.01,k))})"><circle r="3.4" fill="#000" opacity=".3" transform="translate(.4 .7)"/><circle r="3.2" fill="none" stroke="#f7e8c9" stroke-width="1.5" stroke-dasharray=".9 .75"/><ellipse rx="1.8" ry="1.4" fill="#140a05"/></g>`;
+  if(ty-ey>1.5){const wd=small?2.2:2.6,sl=(1-clamp(P.c))*3,gk=P.un?P.th:seg(P.th,0,.3);
+   // The cord and toggle grow out of the eyelets (and shrink back into them when opening).
+   t+=`<g transform="translate(${f(cx)} ${f(ey)}) scale(${f(Math.max(.01,gk)*1000)/1000}) translate(${f(-cx)} ${f(-ey)})">`;
+   t+=cordPath(`M${f(cx-E)} ${f(ey)}Q${f(cx-E-sl)} ${f((ey+tt)/2)} ${f(tx-1.6)} ${f(tt)}M${f(cx+E)} ${f(ey)}Q${f(cx+E+sl)} ${f((ey+tt)/2)} ${f(tx+1.6)} ${f(tt)}`,id,wd);
+   const b1={x:tx-3.4+P.sw*.5,y:tb+tail},b2={x:tx+3.6+P.sw*.7,y:tb+tail-2.5};
+   if(tail>.5)t+=cordPath(`M${f(tx-1.6)} ${f(tb)}Q${f(tx-2)} ${f(tb+tail*.6)} ${f(b1.x)} ${f(b1.y)}M${f(tx+1.6)} ${f(tb)}Q${f(tx+2)} ${f(tb+tail*.6)} ${f(b2.x)} ${f(b2.y)}`,id,wd);
+   const bw=TW/2,br=small?3:3.6;
+   t+=`<path d="M${f(tx-bw*.82)} ${f(ty-TH/2)}Q${f(tx-bw*1.18)} ${f(ty)} ${f(tx-bw*.82)} ${f(ty+TH/2)}H${f(tx+bw*.82)}Q${f(tx+bw*1.18)} ${f(ty)} ${f(tx+bw*.82)} ${f(ty-TH/2)}Z" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(.8 1.4)"/>`+
+    `<path d="M${f(tx-bw*.82)} ${f(ty-TH/2)}Q${f(tx-bw*1.18)} ${f(ty)} ${f(tx-bw*.82)} ${f(ty+TH/2)}H${f(tx+bw*.82)}Q${f(tx+bw*1.18)} ${f(ty)} ${f(tx+bw*.82)} ${f(ty-TH/2)}Z" fill="url(#wd-${id})" stroke="#3a210c" stroke-width=".6"/>`+
+    `<path d="M${f(tx-bw*.35)} ${f(ty-TH/2+1)}Q${f(tx-bw*.5)} ${f(ty)} ${f(tx-bw*.3)} ${f(ty+TH/2-1)}M${f(tx+bw*.42)} ${f(ty-TH/2+1)}Q${f(tx+bw*.6)} ${f(ty+1)} ${f(tx+bw*.38)} ${f(ty+TH/2-1)}" fill="none" stroke="#3a210c" stroke-opacity=".35" stroke-width=".6"/>`+
+    `<ellipse cx="${f(tx)}" cy="${f(ty-TH/2)}" rx="${f(bw*.82)}" ry="1.3" fill="#7a4d24" stroke="#3a210c" stroke-width=".5"/><ellipse cx="${f(tx)}" cy="${f(ty-TH/2)}" rx="2.4" ry=".8" fill="#1a0d05"/>`;
+   if(tail>.5)t+=`<g filter="url(#tagfelt)"><circle cx="${f(b1.x)}" cy="${f(b1.y+br*.6)}" r="${br}" fill="url(#fb-${id})"/><circle cx="${f(b2.x)}" cy="${f(b2.y+br*.6)}" r="${br}" fill="url(#fb-${id})"/></g>`;
+   t+='</g>'}}
+ // A few fibres shaken loose when the gathered strip lands.
+ if(P.fib)for(const cx of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
+  t+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
+ if(P.sq)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
+ return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${t}</g>`:t;
 }
 
 /* ---------- Zipper geometry ---------- */
@@ -765,9 +857,15 @@ const SHADES={
   about:'The cushion rolls itself up like a sleeping mat. The cotton display is put away, then the foot curls over and the roll climbs the cushion a frame at a time, fattening as it goes, with the felt spiral turning at its end. At the top it drops into a stuffed tube with a squash. Two satin ribbons wrap it from the top down, pinching the stuffing in, and their bows pop out. The name is satin-stitched on in the cushion\'s thread and the key value is cross-stitched beside it. Unshading unties the bows and the ribbons slip off and fall, the roll runs down faster and faster, and the cushion slaps open and bounces before its display comes back. Zipped or stitched pairs stay joined, tube to tube.',
   sayOn:'Shaded: each cushion rolls up into a bolster and the ribbons tie it.',sayOff:'Unshaded: the ribbons slip off and the bolsters unroll with a bounce.',
   height:(st,small)=>bolsterParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,.42,.56),draw:bolsterDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,.42,.56),draw:bolsterDraw},
+ drawstring:{label:'Drawstring',kind:'Cinch',ms:2000,ownStrip:true,
+  about:'The cushion is gathered up on a cord like the mouth of a drawstring bag. The cotton display is put away and the felt name band slides down to the middle, where it becomes the casing the cord runs through. Two buttonhole-stitched eyelets open in it, and a twisted cord drops out of them through a turned wooden toggle, ending in two felt balls. Then the cord is pulled in three tugs, a frame at a time: the toggle jerks up the cord, the ends lengthen below it and swing, and with each tug the cushion pulls in to a strip. The felt above and below the band bunches into frills, with creases leaning in toward the eyelets and a hem stitch following every scallop, and the sides pinch in. It lands with a squash that shakes fibres loose, then the name is satin-stitched on the band and the key value cross-stitched beside it. <b>To open, pull a toggle down</b> (or click it, focus it and press Enter, or use Shade): the gathers let go as the toggle slides, past a third of the way the cord gives and the cushion springs open with a bounce, the cord draws back in and the band climbs home. Let go sooner and it cinches back up. Joined pairs stay joined.',
+  sayOn:'Shaded: each cushion is gathered up on its drawstring.',sayOff:'Unshaded: the drawstrings let go and the cushions spring open.',
+  height:(st,small)=>drawParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:drawstringDraw}
 };
-const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS):small?CH:H};
+// The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
+const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
 
 /* ---------- Morph: stuffing (Checks) ---------- */
 // g runs 0 pad, 1 cushion, 2 pillow. The chrome is drawn from gq, g sampled on the 12 fps frames; display text fades on the smooth g.
@@ -931,7 +1029,7 @@ function morphTo(id){
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'zipper',shade:'deflate',morph:'stuffing',size:'pad',g:0,gq:0,mDir:1,mFr:-1,restore:null,jt:0,angle:-20,turning:false,st:0,dir:1,snip:false,path:null,glow:0,ghost:0,busy:false,shDir:1};
-let anim=0,shadeAnim=0,drag=null;
+let anim=0,shadeAnim=0,drag=null,togDrag=null;
 const J=()=>JOINS[model.join];
 
 const hingeY=y=>fitHinge(fitHinge(y,peakBend(),ctx().h),model.angle,ctx().h);
@@ -996,6 +1094,7 @@ function holdJoining(){
  setJt(J().hold||.64);render();say(J().sayHold);
 }
 function toggleShade(force){
+ togDrag=null;
  const to=force!==undefined?force:model.st>.5?0:1;
  // A grown Checks lets its stuffing out first, and gets it back after unshading.
  if(to===1&&model.g>0){
@@ -1029,6 +1128,10 @@ function render(){
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(sh.grip?sh.grip(model.st):1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
+  // The drawstring toggle is a real button once the cord is drawn up (or while it is being pulled).
+  const tog=el.querySelector('.tog'),togOn=model.shade==='drawstring'&&(model.st===1||togDrag&&togDrag.id===id);
+  tog.style.display=togOn?'block':'none';
+  if(togOn){const G=dsGeo(w,h,small,drawParts(model.st,small));Object.assign(tog.style,{left:f(G.tx)+'px',top:f(G.ty-G.TH/2-5)+'px',height:f(G.TH+G.tail+14)+'px'})}
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
@@ -1056,6 +1159,7 @@ function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k===
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
  if(drag)cancelDrag();
+ if(togDrag&&key==='shade'){togDrag=null;++shadeAnim;model.st=1}
  if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.snip=false;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  if(key==='morph')model.morph=id;
@@ -1091,7 +1195,7 @@ $('#scrub').oninput=e=>{model.fast=false;++anim;model.busy=false;model.dir=1;mod
 document.addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
  const key=e.key.toLowerCase();
- if(e.key==='Escape')cancelDrag();
+ if(e.key==='Escape'){cancelDrag();if(togDrag){toggleShade(1);say('The drawstring cinches back up.')}}
  const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
  if(key==='m')morphTo((SIZES.find(x=>x[2]>model.g+.001)||SIZES[0])[0]);
  if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
@@ -1179,6 +1283,28 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=hingeOn()?hingeY(model.a.y+k[1]):clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{if(id==='c')model.cMoved=true;const m=model[id],[cw,chh]=cDims(),w=id==='c'?cw:W;m.x=clamp(m.x+k[0],10,1200-w-10);m.y=clamp(m.y+k[1],46,id==='c'?600-chh-10:bottom)}render();
 }));
+
+/* ---------- Drawstring toggles: pull one down to open the shade ---------- */
+// Pulling scrubs the opening timeline; past a third of the way the cord gives and it springs open, short of that it cinches back.
+['a','b','c'].forEach(id=>{
+ const el=$('#'+id),name={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],t=document.createElement('button');
+ t.className='tog';t.setAttribute('aria-label',`${name} drawstring toggle: pull it down, click it or press Enter to open the shade`);t.title='Pull the toggle down to open';
+ el.append(t);
+ t.addEventListener('pointerdown',e=>{
+  if(e.button!==0)return;e.preventDefault();e.stopPropagation();if(drag)cancelDrag();
+  ++shadeAnim;model.shDir=0;togDrag={id,y0:local(e).y,moved:false};t.setPointerCapture(e.pointerId);say('Pulling the toggle: the drawstring loosens.');render();
+ });
+ t.addEventListener('pointermove',e=>{
+  if(!togDrag)return;const dy=Math.max(0,local(e).y-togDrag.y0);if(dy>3)togDrag.moved=true;
+  model.st=1-clamp(dy/TOGPULL)*.5;render();
+ });
+ const end=ok=>{if(!togDrag)return;const d=togDrag;togDrag=null;
+  if(ok&&(!d.moved||model.st<.84)){el.querySelector('.grip').focus({preventScroll:true});toggleShade(0)}
+  else{toggleShade(1);say('The drawstring holds. Pull the toggle further to open it.')}};
+ t.addEventListener('pointerup',()=>end(true));t.addEventListener('pointercancel',()=>end(false));t.addEventListener('lostpointercapture',()=>end(false));
+ // Keyboard: Enter or Space opens it.
+ t.addEventListener('click',e=>{if(e.detail===0&&model.st===1){el.querySelector('.grip').focus({preventScroll:true});toggleShade(0)}});
+});
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
 addEventListener('resize',fit);fit();describe();render();
