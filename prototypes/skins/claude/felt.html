@@ -36,7 +36,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 #a{--thread:#6a3f0f;--x1:#b4492a;--x2:#7a2e17;--accent:#a8431f}
 #b{--thread:#163f3b;--x1:#2d6d68;--x2:#1b4542;--accent:#2a6964}
 #c{--thread:#3f1c34;--x1:#7b3a63;--x2:#4b2140;--accent:#7b3a63}
-.casing{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.casing,.face{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 .grip{position:absolute;top:6px;left:40px;right:40px;height:21px;border:0;background:none;color:#fbe9cc;cursor:grab;display:flex;justify-content:space-between;align-items:center;padding:0 8px;font-size:10px;letter-spacing:.6px;text-shadow:0 1px 0 #0007}
 .grip b{font:italic 400 15px/1 Georgia,serif;letter-spacing:.2px;color:#fff3dc;margin-right:7px}
 .grip:active{cursor:grabbing}
@@ -190,7 +190,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -1609,6 +1609,75 @@ const JOINS={
   }
  }
 };
+/* ---------- Mitten friends: the mitten handshake with stitched faces on the cushions' outer ends ---------- */
+// The face lives in the free felt between the outer stitch line and the display (x 10–45), so it never touches text.
+// Felt-bead eyes, thread brows and mouth, appliqué cheeks. It is redrawn only when the expression changes.
+const FACE={thread:'#2a1a12',eye:'#1c1310',mouth:'#5b1a20',tongue:'#d9707a',cheek:'#ea8682',cy:57};
+function faceExpr(id,c){
+ const m=model[id],jt=c.jt,sg=id==='a'?1:-1,r=J().state(c);
+ const e={open:1,happy:0,wink:0,smile:.25,mo:0,brow:0,blush:0,gx:0,gy:0,z:0};
+ const tugging=drag&&drag.tug,tk=model.tug&&(tugging||(model.dir<0&&model.snip))?Math.min(1,Math.hypot(model.tug.x,model.tug.y)/MT.tugMax):0;
+ if(jt===0&&!(model.busy&&model.dir>0)){
+  // Apart: awake while running, asleep when paused. Nearby they look round at each other; ready, they gasp.
+  const g=c.glow,k=c.ghost>0?1:0;
+  if(!m.run&&g<.05){e.open=0;e.smile=.1;e.z=1}
+  else{e.brow=Math.min(1,g*1.3);e.gx=sg*Math.min(1,g*2.5);e.mo=.75*k;e.smile=.25+.35*g*(1-k)}
+ }else if(model.dir<0&&model.snip){
+  // Letting go: surprise, then a goodbye (Jarvis winks), then a glum look as the hands drop and the cushions part.
+  const u=1-jt;
+  if(u<.24){e.mo=.9;e.brow=1;e.gx=sg;e.blush=(1-.6*tk)*(1-seg(u,0,.2));e.smile=0}
+  else if(r.m==='wave'){e.happy=id==='b'?1:0;e.wink=id==='a'?1:0;e.smile=.85}
+  // Glum as the hands drop, easing back to the resting face by the time the cushions are apart.
+  else{const k=ease(seg(u,.5,1));e.smile=lerp(-.6,.25,k);e.brow=lerp(-.85,0,k);e.gx=sg*.6*(1-k);e.gy=.7*(1-k)}
+ }else{
+  // Reaching out eagerly, then eyes squeezed shut in a grin from the clasp on, with felt cheeks sewn on.
+  if(jt<.44){e.brow=.8;e.gx=sg;e.mo=.75*(1-seg(jt,.3,.42));e.smile=.45}
+  else{const hp=seg(jt,.44,.5);e.happy=hp>.5?1:0;e.brow=.8*(1-hp);e.smile=lerp(.45,1,hp);e.blush=backOut(seg(jt,.44,.58));e.gx=sg*(1-hp)}
+  if(tk>0){
+   // A tug: the grin falls into a worried look and both glance at the hand pulling them apart.
+   const L=Math.hypot(model.tug.x,model.tug.y)||1;
+   e.happy=tk>.2?0:e.happy;e.brow=-tk;e.smile=lerp(e.smile,-.7,tk);e.mo=tk>.65?.45:0;e.gx=model.tug.x/L;e.gy=model.tug.y/L;e.blush=Math.min(1,e.blush)*(1-.6*tk);
+  }
+ }
+ return e;
+}
+function faceSvg(id,e,show){
+ if(show<.02)return '';
+ const T=FACE.thread,sg=id==='a'?1:-1,gx=e.gx*1.1,gy=e.gy*.9;
+ let o=`<g opacity="${f(show)}" transform="translate(${id==='a'?26:W-26} ${FACE.cy})">`;
+ if(e.blush>.02){const k=Math.min(1,e.blush),rr=3.4*Math.min(1.25,e.blush);
+  for(const x of [-10,10])o+=`<ellipse cx="${x}" cy="8.2" rx="${f(rr)}" ry="${f(rr*.78)}" fill="${FACE.cheek}" opacity="${f(.85*k)}" filter="url(#tagfelt)"/><ellipse cx="${x}" cy="8.2" rx="${f(rr*.62)}" ry="${f(rr*.46)}" fill="none" stroke="#fff1e0" stroke-opacity="${f(.6*k)}" stroke-width=".6" stroke-dasharray="1.2 1"/>`}
+ [-6.2,6.2].forEach((ex,i)=>{
+  const happy=e.happy>.5||(e.wink&&i===1);
+  if(happy)o+=`<path d="M${f(ex-2.8)} 1.3Q${f(ex)} -2.8 ${f(ex+2.8)} 1.3" fill="none" stroke="${T}" stroke-width="1.5" stroke-linecap="round"/>`;
+  else if(e.open<.5)o+=`<path d="M${f(ex-2.8)} -.3Q${f(ex)} 2.5 ${f(ex+2.8)} -.3" fill="none" stroke="${T}" stroke-width="1.4" stroke-linecap="round"/><path d="M${f(ex-1.6)} 1.4l-.7 1.2M${f(ex+1.6)} 1.4l.7 1.2" stroke="${T}" stroke-width=".8" stroke-linecap="round"/>`;
+  else{const ry=3.1+.7*Math.max(0,e.brow),x=ex+gx,y=gy;
+   o+=`<ellipse cx="${f(x+.4)}" cy="${f(y+.9)}" rx="2.6" ry="${f(ry)}" fill="#000" opacity=".25"/><ellipse cx="${f(x)}" cy="${f(y)}" rx="2.5" ry="${f(ry)}" fill="${FACE.eye}"/><circle cx="${f(x-.8+.3*gx)}" cy="${f(y-1.3)}" r=".95" fill="#fff7e8"/>`}
+  if(Math.abs(e.brow)>.15){const s=i?1:-1,y0=-6.4-1.8*Math.max(0,e.brow),yi=y0-(e.brow<0?2.4*-e.brow:0),ym=Math.min(y0,yi)-1.3*Math.max(0,e.brow)-.5;
+   o+=`<path d="M${f(ex+s*2.7)} ${f(y0)}Q${f(ex)} ${f(ym)} ${f(ex-s*2.7)} ${f(yi)}" fill="none" stroke="${T}" stroke-width="1.1" stroke-linecap="round" opacity="${f(Math.min(1,Math.abs(e.brow)*1.4))}"/>`}
+ });
+ if(e.mo>.3)o+=`<ellipse cx="0" cy="8.6" rx="${f(1.8+.7*e.mo)}" ry="${f(1.3+1.7*e.mo)}" fill="${FACE.mouth}" stroke="${T}" stroke-width=".7"/>`;
+ else if(e.smile>.7&&(e.happy>.5||e.wink)){const b=7+6*e.smile;
+  o+=`<path d="M-4.6 7Q0 ${f(b)} 4.6 7Z" fill="${FACE.mouth}" stroke="${T}" stroke-width=".9" stroke-linejoin="round"/><path d="M-2 ${f(b/2+3.2)}Q0 ${f(b/2+2.1)} 2 ${f(b/2+3.2)}Q0 ${f(b/2+4.9)} -2 ${f(b/2+3.2)}Z" fill="${FACE.tongue}"/>`}
+ else o+=`<path d="M-3.8 8Q0 ${f(8+4.6*e.smile)} 3.8 8" fill="none" stroke="${T}" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="2.1 .8"/>`;
+ // Asleep: two stitched z's drifting off the outer edge.
+ if(e.z)o+=`<g fill="none" stroke="#f7e8c9" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity=".9"><path d="M${f(-sg*9)} -13h4l-4 4h4"/><path d="M${f(-sg*14)} -19h3l-3 3h3"/></g>`;
+ return o+'</g>';
+}
+function drawFace(el,id,c,show){
+ let svg=el.querySelector('.face');
+ const html=J().faces?faceSvg(id,faceExpr(id,c),show):'';
+ if(!svg){if(!html)return;svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','face');svg.setAttribute('aria-hidden','true');svg.setAttribute('width',W);svg.setAttribute('height',H);el.querySelector('.casing').after(svg)}
+ if(svg.dataset.html!==html){svg.dataset.html=html;svg.innerHTML=html}
+}
+JOINS.friends={...JOINS.mittens,label:'Mitten friends',kind:'Grow · character, with faces',faces:true,
+ about:'The mitten handshake with the brainstorm\'s optional face stitches, which turn the two cushions into characters. Each face sits in the plain felt at the cushion\'s outer end, clear of the display: black felt-bead eyes with a white catch-light, thread brows and a backstitched mouth. <b>At rest</b> a running widget is awake with a small smile; pause it and it falls asleep, eyes stitched shut and two z\'s drifting off. <b>Near:</b> the brows go up and both look round at each other. <b>Ready:</b> they gasp, mouths open, as the hands are held out. Joining (12 fps): wide-eyed while they reach, then at the clasp their eyes squeeze shut into a grin and pink felt cheeks are pressed on with an overshoot; they grin through the three shakes and the gold snowflakes. <b>Release:</b> tug the handshake and the grins fall into worried looks that follow your pointer; let go early and they cheer up again. Letting go they look surprised, Jarvis winks while they wave goodbye, and they look glum as the hands drop and the cushions part. Or click the handshake, or focus it and press Enter. Faces fade out under any shade; the mittens still join.',
+ sayJoin:'The cushions brighten, close in and shake hands, grinning.',
+ sayJoined:'Shaking hands and grinning. Drag either nameplate to move the pair. Tug the handshake to let go.',
+ sayRelease:'They let go, wave goodbye (Jarvis winks) and part, a bit glum.',
+ sayReady:'Ready: both gasp and hold out their hands. Release to shake hands.',
+ sayNear:'Nearby: they look round at each other and the arms lift. Move closer.'};
+
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
   about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label) were built, and stays as the plainest point of comparison.'},
@@ -2166,6 +2235,7 @@ function render(){
    if(id==='b'&&j.angled){const F=angFrame(bendAt(model.jt),h);el.style.transformOrigin=`${f(F.ox)}px ${f(F.oy)}px`;el.style.transform=F.th?`translateX(${f(-F.shr)}px) rotate(${f(F.th*100)/100}deg)`:''}}
   const k=ease(model.st),show=sh.show?sh.show(model.st):1-clamp(k*2.2),strip=sh.ownStrip?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
+  if(!small)drawFace(el,id,c,show);
   el.querySelector('.grip').style.opacity=f(sh.grip?sh.grip(model.st):1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
   // The drawstring toggle is a real button once the cord is drawn up (or while it is being pulled).
