@@ -180,7 +180,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -561,6 +561,91 @@ function pleatsDraw(id,w,h,small,st){
  if(P.fib)for(const cx of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
   t+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
  return P.sq>1e-4?`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`:t;
+}
+
+/* ---------- Woven label shade ---------- */
+// The cushion lets its stuffing out to a thin felt band, then a clothing label is woven onto it: warp threads are strung,
+// a shuttle runs the weft back and forth a row at a time and the jacquard name grows with the cloth, the fringed ends fold under
+// and are tacked down, and a sheen crosses the satin. The woven border stripes are the status colour.
+// Unshading unpicks the tacks, unfolds the ends, pulls the weft out from the bottom in one kinked thread, and the cushion refills.
+const LABEL={a:{g:'#f3ead5',ink:'#7a1f18',sub:'#4a2a1a',gap:'#f3ead5',sheen:'#fff'},b:{g:'#1d2c47',ink:'#f0cf7a',sub:'#dfe6f2',gap:'#1d2c47',sheen:'#cfe0ff'},c:{g:'#1f1a1d',ink:'#f3ead5',sub:'#d8c9d2',gap:'#1f1a1d',sheen:'#fff'}};
+const labelStatus=id=>id==='a'?(model.a.run?'amber':'blue'):id==='b'?'red':'green';
+function labelParts(st,small){
+ const H0=small?CH:H,HF=small?40:46,un=model.shDir===0,u=1-st;
+ let dfl,sq=0,fib=0,warp,wv,fold,tack,sheen=0,bounce=0,tail=0;
+ // About four or five stop-motion frames per row, so the shuttle is seen travelling across.
+ if(!un){dfl=ease(seg(st,.06,.26));sq=Math.sin(Math.PI*seg(st,.24,.32))*.08;const fb=seg(st,.24,.38);fib=fb>0&&fb<1?fb:0;
+  warp=seg(st,.28,.37);wv=seg(st,.36,.82);fold=ease(seg(st,.82,.88));tack=seg(st,.87,.94);sheen=seg(st,.93,1)}
+ else{tack=1-seg(u,0,.06);fold=1-ease(seg(u,.05,.12));wv=1-seg(u,.12,.44);tail=seg(u,.12,.5);warp=1-seg(u,.48,.56);
+  dfl=1-ease(seg(u,.54,.8));const k=seg(u,.78,.98);bounce=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.5)*.08:0}
+ return{H0,HF,un,u,dfl,sq,fib,warp,wv,fold,tack,sheen,bounce,tail,rows:small?3:4,h:Math.round(lerp(H0,HF,dfl))};
+}
+// Little woven care symbols: a wash tub, a crossed-out bleach triangle and an iron with one dot.
+function careIcons(x,y,col){
+ return `<g fill="none" stroke="${col}" stroke-width="1" stroke-linejoin="round" stroke-linecap="round" opacity=".85">`+
+  `<path d="M${x} ${y-3}l1.4 6.5h7.2l1.4-6.5M${x+.6} ${y-1}q1.2-1.2 2.4 0t2.4 0t2.4 0"/>`+
+  `<path d="M${x+15} ${y+3.5}l4.5-7l4.5 7zM${x+15.5} ${y-3}l8 6.5"/>`+
+  `<path d="M${x+28} ${y+3.5}h9.5q0-6-5-6h-2.5q-1.6 0-2 2.4z"/><circle cx="${x+33}" cy="${y+.9}" r=".5" fill="${col}"/></g>`;
+}
+function labelDraw(id,w,h,small,st){
+ const P=labelParts(st,small),s=SKIN[id],L=LABEL[id];
+ if(P.dfl<=0)return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${casing(id,w,h)}</g>`:casing(id,w,h);
+ // The felt band: the cushion itself, deflating to the strip height.
+ let t=casing(id,w,h);
+ // The label sits centred on the band. Before folding its ends run longer, with a warp fringe.
+ // It starts at the name band's top edge, so none of the band's ragged felt shows above it.
+ const fr=6*(1-P.fold),x0=(small?11:13)-fr,x1=w-(small?11:13)+fr,ly=5,lh=h-11,lw=x1-x0;
+ const inX0=x0+fr,inX1=x1-fr,iw=inX1-inX0;
+ // How much is woven: whole rows from the top, then the current row from the side the shuttle came in.
+ const n=P.rows,rh=lh/n,done=Math.min(n,Math.floor(P.wv*n+1e-6)),p=P.wv*n-done,dir=done%2?-1:1;
+ const cx=dir>0?lerp(inX0,inX1,p):lerp(inX1,inX0,p);
+ const clip=`<rect x="${f(x0-1)}" y="${ly}" width="${f(lw+2)}" height="${f(done*rh)}"/>`+(done<n&&p>0?`<rect x="${f(dir>0?inX0:cx)}" y="${f(ly+done*rh)}" width="${f(Math.abs(cx-(dir>0?inX0:inX1)))}" height="${f(rh)}"/>`:'');
+ t+=`<defs><clipPath id="wl-${id}">${clip}</clipPath><pattern id="wg-${id}" width="3" height="1.7" patternUnits="userSpaceOnUse"><path d="M0 1.35H3" stroke="${L.gap}" stroke-opacity=".5" stroke-width=".45"/></pattern>`+
+  `<linearGradient id="ws-${id}" x1="0" y1="0" x2="1" y2="0"><stop stop-color="${L.sheen}" stop-opacity="0"/><stop offset=".5" stop-color="${L.sheen}" stop-opacity=".45"/><stop offset="1" stop-color="${L.sheen}" stop-opacity="0"/></linearGradient>`+
+  `<linearGradient id="wsh-${id}" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#4f2f15"/><stop offset=".35" stop-color="#b98146"/><stop offset=".55" stop-color="#e9c48e"/><stop offset="1" stop-color="#5a3518"/></linearGradient></defs>`;
+ // Warp: fine threads strung lengthwise across the band, swept in from the left.
+ if(P.warp>0){const ww=lw*P.warp,o=P.fold>=1?0:.75;let d='';for(let y=ly+.8;y<ly+lh;y+=1.7)d+=`M${f(x0)} ${f(y)}H${f(x0+ww)}`;
+  if(o)t+=`<path d="${d}" stroke="${L.g}" stroke-opacity="${f(o*(P.un?P.warp:1))}" stroke-width=".55"/><path d="M${f(x0)} ${ly}V${ly+lh}M${f(x0+ww)} ${ly}V${ly+lh}" stroke="#1d0f06" stroke-opacity=".35" stroke-width=".8"/>`}
+ // The woven cloth: ground, border stripes in the status colour, the jacquard name and value, care symbols.
+ if(P.wv>0){const sc=PLEAT_C[labelStatus(id)],dt=pocketData(id),nf=`700 ${small?11:12}px 'Avenir Next',Avenir,'Segoe UI',Helvetica,sans-serif`,vf=`600 ${small?10.5:11.5}px 'Avenir Next',Avenir,'Segoe UI',Helvetica,sans-serif`;
+  const ls=1.6,nw=measure(dt.name,nf)+ls*dt.name.length,numW=measure(dt.num,nf),wordW=measure(dt.word,vf),cy=ly+lh/2+.3;
+  const tx0=inX0+(small?9:12),room=inX1-(small?9:12)-tx0,care=nw+14+numW+5+wordW+14+38<=room,vx=tx0+nw+14;
+  // The cloth runs between the fringes; the fringe itself stays loose warp over the felt.
+  let c=`<rect x="${f(inX0)}" y="${ly}" width="${f(iw)}" height="${f(lh)}" fill="${L.g}"/><rect x="${f(inX0)}" y="${ly}" width="${f(iw)}" height="${f(lh)}" fill="url(#woven)"/>`;
+  const sp=`M${f(inX0)} ${f(ly+2.6)}H${f(inX1)}M${f(inX0)} ${f(ly+lh-2.6)}H${f(inX1)}`;
+  c+=`<path d="${sp}" stroke="${sc}" stroke-width="1.7"/><path d="${sp}" stroke="#fff" stroke-opacity=".25" stroke-width=".5" stroke-dasharray="1 1"/>`;
+  const txt=(x,str,font,col,extra='')=>`<text x="${f(x)}" y="${f(cy)}" dominant-baseline="central" style="font:${font}${extra}" fill="${col}">${str}</text><text x="${f(x)}" y="${f(cy)}" dominant-baseline="central" style="font:${font}${extra}" fill="url(#wg-${id})">${str}</text>`;
+  c+=txt(tx0,dt.name,nf,L.ink,`;letter-spacing:${ls}px`);
+  c+=`<path d="M${f(vx-7)} ${f(cy-2.2)}l2.2 2.2l-2.2 2.2l-2.2-2.2z" fill="${sc}"/>`;
+  c+=txt(vx,dt.num,nf,L.ink)+txt(vx+numW+5,dt.word,vf,L.sub);
+  if(care)c+=careIcons(inX1-(small?9:12)-38,cy,L.sub);
+  // A drop shadow under the finished label, so it reads as cloth lying on felt.
+  if(P.wv>=1&&P.fold>0)t+=`<rect x="${f(inX0)}" y="${ly+1.4}" width="${f(iw)}" height="${f(lh)}" fill="#000" opacity="${f(.35*P.fold)}" filter="url(#sh)"/>`;
+  t+=`<g clip-path="url(#wl-${id})">${c}</g>`;
+  // Raw ends: a short fringe of loose warp until they fold under.
+  if(fr>.4){let d='';for(let y=ly+1;y<ly+lh;y+=2.2)d+=`M${f(x0)} ${f(y)}h${f(fr*.9)}M${f(x1)} ${f(y)}h${f(-fr*.9)}`;t+=`<g clip-path="url(#wl-${id})"><path d="${d}" stroke="${L.g}" stroke-width=".8"/></g>`}
+  // The weave front: the beater line, and the shuttle with its weft thread back to the cloth.
+  if(P.wv<1&&done<n){const sl=small?14:17,fy=ly+done*rh+rh/2,sx=clamp(cx+dir*(small?7:9),sl+2,w-sl-2);
+   t+=`<path d="M${f(dir>0?inX0:inX1)} ${f(fy)}H${f(P.tail>0?cx:sx)}" stroke="${L.g}" stroke-width="1" stroke-opacity=".9"/><path d="M${f(x0)} ${f(ly+done*rh)}H${f(x1)}" stroke="#1d0f06" stroke-opacity=".3" stroke-width=".7"/>`;
+   if(!(P.tail>0))t+=`<g transform="translate(${f(sx)} ${f(fy)}) scale(${dir} 1)"><path d="M${-sl} 0Q${-sl*.4} -4.2 0 -3.6Q${sl*.6} -3 ${sl*.9} 0Q${sl*.6} 3 0 3.6Q${-sl*.4} 4.2 ${-sl} 0Z" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.6 1.4)"/>`+
+    `<path d="M${-sl} 0Q${-sl*.4} -4.2 0 -3.6Q${sl*.6} -3 ${sl*.9} 0Q${sl*.6} 3 0 3.6Q${-sl*.4} 4.2 ${-sl} 0Z" fill="url(#wsh-${id})" stroke="#3a210c" stroke-width=".6"/><rect x="${f(-sl*.45)}" y="-1.5" width="${f(sl*.75)}" height="3" rx="1.2" fill="#1a0d05"/><rect x="${f(-sl*.38)}" y="-1" width="${f(sl*.6)}" height="2" rx=".9" fill="${L.g}"/></g>`}
+  // The folded ends: a darker turn-under at each end.
+  if(P.fold>0){const k=clamp(P.fold);t+=`<path d="M${f(inX0)} ${ly}h2.2v${f(lh)}h-2.2zM${f(inX1)} ${ly}h-2.2v${f(lh)}h2.2z" fill="#1d0f06" opacity="${f(.28*k)}"/>`}
+  // Tacked on with straight machine stitch down each end, top to bottom.
+  if(P.tack>0){const yy=ly+1+(lh-2)*P.tack,xs=[inX0+4.2,inX1-4.2];let d='';for(const x of xs)d+=`M${f(x)} ${ly+1}V${f(yy)}`;
+   t+=`<path d="${d}" stroke="#000" stroke-opacity=".35" stroke-width="1.3" stroke-dasharray="2.2 1.3" transform="translate(.4 .5)"/><path d="${d}" stroke="${L.sub}" stroke-width="1" stroke-dasharray="2.2 1.3"/>`}
+  // The satin sheen crossing the label once it is on.
+  if(P.sheen>0&&P.sheen<1){const sw=50,sk=lh*.4,sx=lerp(x0-sw,x1+sk,P.sheen);t+=`<clipPath id="wsc-${id}"><rect x="${f(x0)}" y="${ly}" width="${f(lw)}" height="${f(lh)}"/></clipPath><path d="M${f(sx)} ${ly}h${sw}l${f(-sk)} ${f(lh)}h${-sw}z" fill="url(#ws-${id})" clip-path="url(#wsc-${id})"/>`}}
+ // Unweaving: the pulled weft kinks off over the unwoven warp in one loose thread, and is drawn off the side at the end.
+ if(P.tail>0&&P.tail<1){const live=P.wv>0&&done<n,sg=live?dir:1,fy=live?ly+done*rh+rh/2:ly+rh/2,ex=sg>0?x1+4+12*P.tail:x0-4-12*P.tail;
+  const sx0=live?cx:lerp(inX0,ex,seg(P.u,.44,.5));let d=`M${f(sx0)} ${f(fy)}`;
+  for(let i=1;i<=6;i++){const xx=lerp(sx0,ex,i/6);d+=`Q${f(xx-3*sg)} ${f(fy+(i%2?-4:4)*(1-i/9))} ${f(xx)} ${f(fy+i*1.2)}`}
+  t+=`<path d="${d}" fill="none" stroke="#1d0f06" stroke-opacity=".35" stroke-width=".6" transform="translate(.4 .6)"/><path d="${d}" fill="none" stroke="${L.g}" stroke-width="1.1" stroke-linecap="round"/>`}
+ // Fibres shaken loose when the deflated band lands.
+ if(P.fib)for(const cx of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
+  t+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
+ if(P.sq>1e-4)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
+ return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${t}</g>`:t;
 }
 
 /* ---------- Zipper geometry ---------- */
@@ -1311,7 +1396,7 @@ const JOINS={
 };
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It keeps the shade state working until the felt shade modes (pocket, bolster, drawstring, pleats, woven label) are built and added here.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -1331,7 +1416,12 @@ const SHADES={
   about:'The cushion is pressed into a concertina, like a pleated skirt or a paper fan. The cotton display is put away and the name band widens into the strip\'s face. Below it, a length of dyed felt piping is drawn in from the left along each pleat\'s ridge, one pleat after another. Then the pleats fold up from the bottom a frame at a time, each one tucking in with a small overshoot: the panel above each ridge catches the light, the one below falls into shade, and the sides zigzag out at the ridges and in at the valleys. It lands with a squash that shakes fibres loose, and only the piping is left showing, stacked under the band like the edges of folded cloth. <b>The piping is the status</b>: amber running, blue idle or waiting, red needs you, green passed. Jarvis has three amber (its three agents) and one blue (waiting for your next action), all blue when paused; GitDiscuss has two red (need a decision), one blue (ready to review) and one green (feedback collected); Checks has one pleat per two checks, six green and one red. The name is satin-stitched and the key value cross-stitched on the band. Unshading springs the concertina open: the pleats overshoot past flat so the felt stretches, settle, and the piping is drawn back out to the right. Joined pairs stay joined.',
   sayOn:'Shaded: each cushion folds into pleats; the piping on each fold shows its status.',sayOff:'Unshaded: the pleats spring open and the piping is drawn out.',
   height:(st,small)=>pleatParts(st,small).h,
-  show:st=>1-seg(st,0,.12),grip:st=>1-seg(st,0,.12),draw:pleatsDraw}
+  show:st=>1-seg(st,0,.12),grip:st=>1-seg(st,0,.12),draw:pleatsDraw},
+ label:{label:'Woven label',kind:'Distil',ms:3400,ownStrip:true,
+  about:'The most minimal felt shade: the cushion becomes the thing sewn inside its own collar. The cotton display is put away and the stuffing lets out until the cushion is a thin felt band, landing with a squash that shakes fibres loose. Then a clothing label is woven onto it a frame at a time. Fine warp threads are strung across from the left, and a wooden shuttle runs the weft back and forth, a row per pass, with the beater line moving down as the cloth grows; the name and value come up in the cloth with it, like jacquard. Each label has its own ground: cream with a red name for Jarvis, navy with gold for GitDiscuss, black with ivory for Checks. <b>The two woven border stripes are the status colour</b>: amber running (blue when Jarvis is paused), red for GitDiscuss\'s decisions, green for Checks. The fringed warp ends fold under, a line of machine stitch tacks down each end, and a sheen crosses the satin. Plain sans capitals for the name, the key value beside it, and three tiny woven care symbols at the end. Unshading unpicks the tacks, unfolds the ends, pulls the weft out from the bottom up in one kinked thread, and the cushion refills with a bounce. Joined pairs stay joined.',
+  sayOn:'Shaded: each cushion deflates to a felt band and a name label is woven onto it.',sayOff:'Unshaded: the label is unpicked and unravelled, and the cushions refill.',
+  height:(st,small)=>labelParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:labelDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
