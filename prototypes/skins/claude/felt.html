@@ -190,7 +190,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -907,6 +907,43 @@ function vcLoops(x0,y,h,lift){
 }
 
 /* ---------- Options ---------- */
+/* ---------- Mitten hands: a felt sleeve and a knitted-cuff mitten on each joining end ---------- */
+// Poses are worked out in Jarvis's space (σ=+1) and mirrored for GitDiscuss (σ=−1). s scales the hands down with the shade.
+const MT={gap:56,sh:8,lmax:30,col:{a:'#b5333f',b:'#33447e'},dk:{a:'#5a1118',b:'#141c3c'},cuff:'#efe2c4',gold:'#f2c24e',tugMax:26,
+ body:'M0 -6.5C5 -7.6 12 -8.4 16.5 -6.8C21.5 -5 22 4.8 17 6.9C12 8.6 5 8 0 7Z',
+ thumb:'M-1 -3.2C3 -4.2 7.5 -3.8 9.2 -1.6C10.4 0 9.6 2.6 7.4 3C4.5 3.6 1 3.4 -1 3Z'};
+const mtScale=h=>clamp(.5+.5*(h-HS)/(H-HS),.5,1);
+const mtPsi=(phi,sg)=>sg>0?phi:180-phi;
+// One mitten as two layers (body with cuff and motif, and thumb), so the thumbs can wrap over the other hand.
+function mitt(P,sg,s,id,light,alpha,sqz){
+ const tf=`translate(${f(P.W.x)} ${f(P.W.y)}) rotate(${f(mtPsi(P.phi,sg))}) scale(${f(s*1000)/1000} ${f(s*sg*sqz*1000)/1000})`;
+ const th=`translate(${f(8)} -5.6) rotate(${f(alpha)})`;
+ // The snowflake's five crosses; lit ones are restitched in gold, centre first.
+ const lit=Math.ceil(light*5-1e-6);let x='',xg='';
+ [[0,0],[0,-2.6],[2.6,0],[0,2.6],[-2.6,0]].forEach(([dx,dy],i)=>{const cx=9+dx,cy=.6+dy,d=`M${f(cx-.9)} ${f(cy-.9)}l1.8 1.8M${f(cx+.9)} ${f(cy-.9)}l-1.8 1.8`;if(i<lit)xg+=d;else x+=d});
+ const body=`<g transform="translate(1.4 3)"><g transform="${tf}" fill="#000" opacity=".4" filter="url(#sh)"><path d="${MT.body}"/><rect x="-6" y="-7.6" width="7" height="15.2" rx="2.2"/></g></g>`+
+  `<g transform="${tf}"><path d="${MT.body}" fill="${MT.col[id]}" filter="url(#tagfelt)"/><path d="${MT.body}" fill="none" stroke="${MT.cuff}" stroke-opacity=".7" stroke-width=".7" stroke-dasharray="1.6 1.4" transform="translate(1.7 0) scale(.84)"/>`+
+  (light>.02?`<circle cx="9" cy=".6" r="6" fill="${MT.gold}" opacity="${f(.75*light)}" filter="url(#soft)"/>`:'')+
+  `<path d="${x}" fill="none" stroke="${MT.cuff}" stroke-width=".8" stroke-linecap="round"/>`+(xg?`<path d="${xg}" fill="none" stroke="${MT.gold}" stroke-width=".95" stroke-linecap="round"/>`:'')+
+  `<rect x="-6" y="-7.6" width="7" height="15.2" rx="2.2" fill="${MT.cuff}" filter="url(#tagfelt)"/><path d="M-4.6 -6.4v12.8M-2.8 -6.7v13.4M-1 -6.7v13.4" stroke="#a8936a" stroke-opacity=".8" stroke-width=".7"/></g>`;
+ const thumb=`<g transform="${tf}"><g transform="${th}"><path d="${MT.thumb}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.6 1.4)"/><path d="${MT.thumb}" fill="${MT.col[id]}" filter="url(#tagfelt)"/><path d="M1 -1.6Q5 -2.2 7.6 -.6" fill="none" stroke="${MT.dk[id]}" stroke-opacity=".55" stroke-width=".7" stroke-linecap="round"/></g></g>`;
+ return{body,thumb,tf};
+}
+// The felt sleeve: a soft tube leaving the cushion end level, bending to arrive along the hand.
+function sleeve(S,P,sg,s,col){
+ const Wr=P.W,L=Math.hypot(Wr.x-S.x,Wr.y-S.y),psi=mtPsi(P.phi,sg)*Math.PI/180;
+ const C1={x:S.x+sg*Math.max(3*s,.45*L),y:S.y},C2={x:Wr.x-Math.cos(psi)*.4*L,y:Wr.y-Math.sin(psi)*.4*L};
+ const d=`M${pt(S)}C${pt(C1)} ${pt(C2)} ${pt(Wr)}`,w=f(10.5*s);
+ // A box-stitched patch where the sleeve is sewn to the cushion. The sleeve and patch share one filtered group:
+ // a level sleeve alone has a near-zero bounding box, which would clip its filter region to a sliver.
+ const patch=`<ellipse cx="${f(S.x)}" cy="${f(S.y)}" rx="${f(6*s)}" ry="${f(8.5*s)}"/>`,box=`<rect x="${f(S.x-6*s)}" y="${f(S.y-16*s)}" width="1" height="${f(32*s)}" fill-opacity="0" stroke="none"/>`;
+ return `<g opacity=".4" filter="url(#sh)" transform="translate(1.4 3)">${box}<path d="${d}" fill="none" stroke="#000" stroke-width="${w}" stroke-linecap="round"/></g>`+
+  `<g filter="url(#tagfelt)">${box}<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round"/></g>`+
+  `<path d="${d}" fill="none" stroke="#f7e8c9" stroke-opacity=".5" stroke-width=".8" stroke-dasharray="2.2 2"/>`+
+  `<g fill="#000" opacity=".3" filter="url(#sh)" transform="translate(.6 1.4)">${patch}</g><g fill="${col}" filter="url(#tagfelt)">${patch}</g>`+
+  `<ellipse cx="${f(S.x)}" cy="${f(S.y)}" rx="${f(4*s)}" ry="${f(6.4*s)}" fill="none" stroke="#f7e8c9" stroke-opacity=".8" stroke-width=".9" stroke-dasharray="2 1.7"/>`;
+}
+
 const JOINS={
  zipper:{label:'Zipper',kind:'Interlock',gap:-2*EDGE,ms:1700,msDrag:1300,relMs:1300,moveEnd:.4,hold:.64,pullDrag:true,
   sayJoin:'The teeth stand up, the bottoms meet, and the slider climbs the seam.',
@@ -1490,6 +1527,85 @@ const JOINS={
    }
    if(jt===1)s+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Velcro seam: tap or press Enter to peel the widgets apart"><title>Tap the seam to peel it apart</title><rect x="${f(X-12)}" y="${f(top-4)}" width="24" height="${f(bot-top+8)}" rx="8" fill="transparent"/><rect class="ringfocus" x="${f(X-12)}" y="${f(top-4)}" width="24" height="${f(bot-top+8)}" rx="8" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
    return s;
+  }
+ },
+ mittens:{label:'Mitten hands',kind:'Grow · character',gap:MT.gap,ms:3400,msDrag:3000,relMs:3000,moveEnd:.3,hold:.66,tug:true,snip:true,tugMax:MT.tugMax,
+  ph:[[0,.3,.52,.84,1],[0,.18,.4,.82,1]],
+  about:'Each joining end has a felt sleeve sewn on with a box-stitched patch, and a knitted mitten on the end of it with a cream ribbed cuff and a cross-stitch snowflake on the back: red for Jarvis, indigo for GitDiscuss. At rest the hands hang by the cushions\' sides. <b>Near:</b> the arms lift toward each other and the thumbs come up. <b>Ready:</b> both hands are held out, thumbs up, and a warm ghost of the handshake shows in the gap. Joining (12 fps): the cushions close to a hand\'s reach apart, the mittens slide past each other, both thumbs clamp over (Jarvis\'s over the back of GitDiscuss\'s hand) with a squeeze and a puff of fibres, and they shake three times, the arms bending and the cushions jiggling with each pump. Then both snowflakes are restitched in gold, one stitch at a time, and glow: that is the join light. The handshake is the seam, so the gap stays open. <b>Release:</b> tug the handshake. The arms stretch toward your pointer and the grip slips, and past a hand\'s width they let go; let go sooner and they hold on. Or click it, or focus it and press Enter. The gold goes out, the thumbs open, the hands slide apart and wave goodbye, then drop to their sides with a swing before the cushions part.',
+  sayJoin:'The cushions close and the mittens reach out and shake hands.',
+  sayJoined:'Shaking hands. Drag either nameplate to move the pair. Tug the handshake to let go.',
+  sayRelease:'They let go, wave goodbye and the cushions part.',
+  sayTugHold:'They hold on. Tug the handshake further to make them let go.',
+  sayReady:'Ready: both hands are held out. Release to shake hands.',
+  sayNear:'Nearby: the arms lift and the thumbs come up. Move closer.',
+  sayHold:'Held mid-handshake: the second shake. Use the scrubber to step through it.',
+  phReady:'Ready · hands held out',
+  pose(jt){
+   if(model.dir<0)return{th:0,ys:0,sq:0};
+   const q=seg(jt,.52,.84);
+   return{th:0,ys:0,sq:.012*Math.sin(Math.PI*seg(jt,.44,.52))+.009*Math.sin(6*Math.PI*q)*(1-q)};
+  },
+  phase(jt){
+   if(model.dir<0&&model.snip){const u=1-jt;return u<.24?'Releasing · letting go':u<.5?'Releasing · waving goodbye':u<.7?'Releasing · hands down':'Releasing · parting'}
+   if(model.dir<0&&model.busy)return 'Drawing the hands back';
+   return jt<.3?'Joining · reaching out':jt<.42?'Joining · hands meet':jt<.52?'Joining · clasping':jt<.84?`Joining · shake ${Math.min(3,Math.floor(seg(jt,.52,.84)*3)+1)} of 3`:'Joining · stitching the snowflakes gold';
+  },
+  // Every moving part from join progress: how far the arms reach, how far the hands overlap, thumbs, shake, gold.
+  state(c){
+   const jt=c.jt;
+   if(jt===0&&!(model.busy&&model.dir>0)){const e=Math.pow(c.glow,.85);return{m:'reach',r:.95*e,ov:0,open:e,cl:0,dy:0,light:0,sqz:1}}
+   if(!(model.dir<0&&model.snip)){
+    if(jt<.3){const g0=model.fast?1:0,k=ease(seg(jt,0,.3));return{m:'reach',r:lerp(.95*g0,1,k),ov:0,open:lerp(g0,1,k),cl:0,dy:0,light:0,sqz:1}}
+    const q=seg(jt,.52,.84);
+    return{m:'reach',r:1,ov:backOut(seg(jt,.3,.42)),open:1,cl:seg(jt,.42,.5),dy:-7*Math.sin(6*Math.PI*q)*(1-.45*q),light:seg(jt,.84,.96),sqz:1-.13*Math.sin(Math.PI*seg(jt,.46,.54))};
+   }
+   const u=1-jt;
+   if(u<.24)return{m:'reach',r:1,ov:1-ease(seg(u,.12,.24)),open:1,cl:1-seg(u,.02,.12),dy:0,light:1-seg(u,0,.08),sqz:1};
+   if(u<.5)return{m:'wave',k:seg(u,.24,.5),open:1,cl:0,light:0,sqz:1};
+   if(u<.7)return{m:'drop',k:seg(u,.5,.7),open:1-seg(u,.5,.7),cl:0,light:0,sqz:1};
+   return{m:'reach',r:0,ov:0,open:0,cl:0,dy:0,light:0,sqz:1};
+  },
+  over(c){
+   const a=model.a,b=model.b,jt=c.jt,h=c.h,s=mtScale(h),r=this.state(c);
+   const Sa={x:a.x+W-EDGE-MT.sh,y:a.y+h/2},Sb={x:b.x+EDGE+MT.sh,y:b.y+h/2},C0=V.mix(Sa,Sb,.5);
+   // A tug drags the clasped hands toward the pointer; it fades as they let go.
+   const tugging=drag&&drag.tug,T=model.tug&&(tugging||(model.dir<0&&model.busy))?V.mul(model.tug,tugging?1:1-seg(1-jt,0,.08)):null;
+   // The slip is read from the unfaded tug, so hands that are letting go don't grip again as the drag fades.
+   const tk=model.tug&&(tugging||(model.dir<0&&model.snip))?Math.min(1,Math.hypot(model.tug.x,model.tug.y)/MT.tugMax):0;
+   const C=T?V.add(C0,T):C0;
+   // Arm reach: always enough to make the clasp (small hands in a shade need longer arms), plus a stretch under a tug.
+   const lmax=Math.max(MT.lmax,MT.gap/2+EDGE+MT.sh-15*s+3)+24*tk;
+   const rest=(S,sg)=>({W:{x:S.x+sg*5*s,y:S.y+15*s},phi:78});
+   const reach=(S,sg,ov,dy)=>{let t={x:C.x-sg*(15+9*(1-ov))*s,y:C.y+(dy+sg)*s};const v=V.sub(t,S),L=Math.hypot(v.x,v.y);
+    if(L>lmax)t=V.add(S,V.mul(v,lmax/L));const u=V.sub(t,S);return{W:t,phi:angOf(sg*u.x,u.y)}};
+   const wave=(S,sg,k)=>({W:{x:S.x+sg*11*s,y:S.y-11*s},phi:-62+22*Math.sin(3*Math.PI*k)*(1-.3*k)});
+   const mix=(P,Q,k)=>({W:V.mix(P.W,Q.W,k),phi:lerp(P.phi,Q.phi,k)});
+   const poseOf=(S,sg)=>{
+    if(r.m==='wave'){const k=r.k,R=reach(S,sg,0,0);return mix(R,wave(S,sg,k),ease(seg(k,0,.3)))}
+    if(r.m==='drop'){const P=mix(wave(S,sg,1),rest(S,sg),ease(r.k));P.phi+=26*Math.sin(3*Math.PI*r.k)*(1-r.k);return P}
+    // Rising from the side to the reach, the hand swings up through a small arc.
+    const P=mix(rest(S,sg),reach(S,sg,r.ov*(1-.35*tk),r.dy),r.r);P.W.y-=6*s*Math.sin(Math.PI*r.r);return P;
+   };
+   const Pa=poseOf(Sa,1),Pb=poseOf(Sb,-1);
+   const alpha=r.cl>0?lerp(-80,-4,backOut(r.cl)):lerp(-22,-80,r.open);
+   const light=r.light;
+   let o='';
+   if(c.ghost>0&&jt===0){
+    o+=`<circle cx="${f(C0.x)}" cy="${f(C0.y)}" r="${f(26*s)}" fill="#ffc36a" opacity="${f(c.ghost*.45)}" filter="url(#soft)"/>`;
+    for(const sg of [1,-1]){const tf=`translate(${f(C0.x-sg*15*s)} ${f(C0.y+sg*s)}) rotate(${sg>0?0:180}) scale(${f(s)} ${f(s*sg)})`;
+     o+=`<g transform="${tf}" fill="none" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="3 2.5" stroke-width="${f(1/s)}"><path d="${MT.body}"/><path d="${MT.thumb}" transform="translate(8 -5.6) rotate(-4)"/></g>`}
+   }
+   o+=sleeve(Sb,Pb,-1,s,SKIN.b.band)+sleeve(Sa,Pa,1,s,SKIN.a.band);
+   const A=mitt(Pa,1,s,'a',light,alpha,r.sqz),B=mitt(Pb,-1,s,'b',light,alpha,r.sqz);
+   // Clasped, GitDiscuss's thumb goes round behind Jarvis's hand and Jarvis's wraps over GitDiscuss's.
+   o+=r.cl>0?B.thumb+A.body+B.body+A.thumb:A.body+A.thumb+B.body+B.thumb;
+   // A few fibres puffed out of the squeeze.
+   if(model.dir>0&&jt>.46&&jt<.72){const u=seg(jt,.46,.72),cols=[MT.col.a,MT.col.b,MT.cuff];
+    FLUFF.forEach(([dx,dy,rot],i)=>{const x=C.x+dx*22*(.4+u),y=C.y+dy*14*(.7+u*.6)+18*u*u;
+     o+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+u*90)})" fill="none" stroke="${cols[i%3]}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-u)}"/>`})}
+   if(jt===1){const hy=18*s+4;
+    o+=`<g class="hit" id="pullHit" tabindex="0" role="button" aria-label="Mitten handshake: tug it, click it or press Enter to let go and separate the widgets"><title>Tug the handshake to let go</title><rect x="${f(C0.x-28)}" y="${f(C0.y-hy)}" width="56" height="${f(2*hy)}" rx="12" fill="transparent"/><rect class="ringfocus" x="${f(C0.x-28)}" y="${f(C0.y-hy)}" width="56" height="${f(2*hy)}" rx="12" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+   return o;
   }
  }
 };
