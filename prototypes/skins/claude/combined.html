@@ -541,7 +541,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -3502,6 +3502,107 @@ Object.entries(MV).forEach(([k,o])=>{const b=document.createElement('button');b.
    join:'The leaves close in and the silver vine grows across, in the chosen motion.',
    hold:'Held mid-join. Use the scrubber to step through raw time and see how the motion maps it.',
    mid:(jt,dir)=>FG0.text.mid(mvWarp(jt),dir)}};
+ for(const k of ks.slice(at+1)){const v=MIXES[k];delete MIXES[k];MIXES[k]=v}
+}
+
+/* ---------- Mix: pairwise seam (model D). Wire and Hollow, the one pair that had never met at a seam: jump rings through brass eyelets, and the bell rides one. ---------- */
+// Wire submits its jump ring (a hinge), Hollow its bell and chain (a clasp). Jarvis's copper frame puts out two wrapped eye loops; GitDiscuss's iron strap
+// keeps its brass eyelets. An open oval jump ring swings out of each loop through the eyelet opposite and is twisted shut. The bell hangs from GitDiscuss's
+// top eyelet; once the top ring is through, it slides down the ring like a bead on a wire to hang plumb in the gap, and when the second ring shuts it rings.
+const JB={gap:26,rows:[.25,.75],lx:3.5,lr:4.2,ex:9.5,ring:[[.4,.56],[.6,.76]],slide:[.56,.68],toll:[.78,1]};
+function jbGeo(c){
+ const h=c.h,s=clamp((h-HS)/(H-HS)),ax=model.a.x+W,bx=model.b.x,fr=Math.min(26,(h-10)/2);
+ // Each loop's shank starts on the frame wire, which runs round the corner arc when the casing is short.
+ const fx=JB.rows.map(r=>{const ly=h*r,dy=Math.max(0,5+fr-ly,ly-(h-5-fr));return ax-5-fr+Math.sqrt(Math.max(0,fr*fr-dy*dy))});
+ return{h,s,ax,bx,fx,L:JB.rows.map(r=>({x:ax+JB.lx,y:model.a.y+h*r})),E:JB.rows.map(r=>({x:bx+JB.ex,y:model.b.y+h*r})),rx:(JB.gap+JB.ex-JB.lx)/2,ry:lerp(3.4,6,s),bs:lerp(.58,1,s)}}
+// A ring's pose: turned th degrees about its loop (negative is up), open is the share of its gap still showing at the far end.
+function jbPose(c,i){
+ const jt=c.jt,sg=i?1:-1,[a,b]=JB.ring[i],m=a+(b-a)*.62;
+ // A join started from ready keeps the ready pose on its first frame (glow is already cleared by then).
+ if(jt===0)return model.busy&&model.dir>0&&model.lit0>0?{vis:1,th:sg*38,open:1}:{vis:seg(c.glow,0,.35),th:sg*lerp(78,38,c.glow),open:1};
+ if(jt===1)return{vis:1,th:0,open:0,k:1};
+ const pre=model.dir>0?(model.lit0>0?1:seg(jt,.04,.3)):seg(jt,.12,a),u=seg(jt,a,m),k=seg(jt,m,b);
+ return{vis:Math.max(pre,u>0?1:0),th:sg*lerp(78,38,pre)*(1-backOut(u)),open:1-k,k};
+}
+// A point on the ring: t=PI is at the loop, t=0 at the far end (the eyelet once it lands).
+function jbAt(G,i,P,t){const a=P.th*PI/180,ca=Math.cos(a),sa=Math.sin(a),x=G.rx+G.rx*Math.cos(t),y=G.ry*Math.sin(t),L=G.L[i];return{x:L.x+x*ca-y*sa,y:L.y+x*sa+y*ca}}
+const jbRing=(G,i,P)=>{const g=P.open*.95;return pp(Array.from({length:41},(_,n)=>jbAt(G,i,P,g/2+(2*PI-g)*n/40)))};
+// The bell, hung from its crown loop at the origin: brass under a brush-ink outline, a chalk highlight, a red silk tie, the clapper showing under the lip.
+const JB_BELL='M-2.4 6.2C-6.2 6.4-6.4 10.6-6.5 14.6C-6.6 18.6-7.4 20.3-8.4 21.3Q0 23.1 8.4 21.3C7.4 20.3 6.6 18.6 6.5 14.6C6.4 10.6 6.2 6.4 2.4 6.2Z';
+function jbBell(p,sc,rot,clap,lit,col){
+ let s=`<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(rot)}) scale(${f(sc*1000)/1000})">`;
+ if(lit>.01)s+=`<circle cy="27" r="13" fill="${col}" opacity="${f(.32*lit)}" filter="url(#soft)"/><ellipse cy="22.2" rx="8" ry="2.6" fill="${col}" opacity="${f(.7*lit)}" filter="url(#soft)"/>`;
+ s+=`<circle cy="3.3" r="2.3" fill="none" stroke="${INK}" stroke-width="2.7"/><circle cy="3.3" r="2.3" fill="none" stroke="#c99a3c" stroke-width="1.1"/>`;
+ s+=`<g transform="rotate(${f(clap)} 0 7)"><path d="M0 7V21.6" stroke="${INK}" stroke-width="1.1"/><circle cy="22.4" r="1.9" fill="#2a2016" stroke="${INK}" stroke-width=".8"/></g>`;
+ s+=`<path d="${JB_BELL}" fill="${INK}" transform="translate(.4 1.3)"/><path d="${JB_BELL}" fill="url(#jb-brass)" stroke="${INK}" stroke-width="1.35" stroke-linejoin="round"/>`;
+ s+=`<g fill="none" stroke-linecap="round"><path d="M-5.6 9.8Q0 10.9 5.6 9.8M-7.3 19Q0 20.6 7.3 19" stroke="${INK}" stroke-width=".8" opacity=".75"/><path d="M-3.5 8.4C-4.8 11-4.9 15-5.5 18.2" stroke="#f4ecd8" stroke-width="1.1" opacity=".75"/>`+
+  `<path d="M0 5.6L-2.4 10.4M0 5.6L1.7 10.8" stroke="${RED}" stroke-width=".9"/></g>`;
+ return s+`<path d="M-.3 5.5c-2.6-1-4.7.3-3.5 1.6c1 .9 2.7-.4 3.5-1.6zM.3 5.5c2.6-1 4.7.3 3.5 1.6c-1 .9-2.7-.4-3.5-1.6z" fill="${RED}" stroke="#3a070b" stroke-width=".5"/></g>`}
+// Where the bell's crown loop is, how it swings and how bright its mouth is. It rings three times, each stroke sending a chalk ring out from the bell.
+function jbBellPose(c,G,P0){
+ // It only rings on the way in; on release it simply stills and its light goes out.
+ const jt=c.jt,u=jt===1?1:jt===0?0:ease(seg(jt,...JB.slide)),v=model.dir>0&&jt>0&&jt<1?seg(jt,...JB.toll):0;
+ const p=u>0?jbAt(G,0,P0,PI/2*u):{...G.E[0]},dk=Math.exp(-3*v),sw=Math.sin(4*PI*v);
+ const rot=u>0&&u<1?-7*Math.sin(PI*u):v>0?8*dk*sw:jt===0?5*c.glow*Math.sin(performance.now()/85):0;
+ return{p,rot,clap:v>0?-30*dk*seg(v,0,.06)*Math.sin(4*PI*v-.7):-rot*.6,v,lit:jt===1?1:jt===0?0:seg(jt,.8,.95)}}
+function jbDraw(c){
+ const G=jbGeo(c),jt=c.jt,fwd=model.dir>0&&jt>0&&jt<1,col=model.a.run&&model.b.run?'#ffc861':'#9fb8ff',P=[0,1].map(i=>jbPose(c,i)),B=jbBellPose(c,G,P[0]);
+ let o=`<defs><linearGradient id="jb-brass" x1="0" x2="1"><stop stop-color="#4a3210"/><stop offset=".3" stop-color="#b0812e"/><stop offset=".47" stop-color="#f2d088"/><stop offset=".62" stop-color="#c3953c"/><stop offset="1" stop-color="#4a3210"/></linearGradient></defs>`;
+ const loopUp=L=>`M${f(L.x-JB.lr)} ${f(L.y)}A${JB.lr} ${JB.lr} 0 0 1 ${f(L.x+JB.lr)} ${f(L.y)}`,eyeLow=(E,a=1)=>`<g fill="none" opacity="${f(a)}"><path d="M${f(E.x-3.15)} ${f(E.y)}A3.15 3.15 0 0 0 ${f(E.x+3.15)} ${f(E.y)}" stroke="${INK}" stroke-width="3.6"/><path d="M${f(E.x-3.15)} ${f(E.y)}A3.15 3.15 0 0 0 ${f(E.x+3.15)} ${f(E.y)}" stroke="#c99a3c" stroke-width="2"/></g>`;
+ // Wire's half: two eye loops wrapped onto Jarvis's frame. Near, they run hot; ready, a dashed ghost of both rings and the bell's place.
+ G.L.forEach((L,i)=>{const x0=G.fx[i]-1;o+=wire(`M${f(x0)} ${f(L.y)}H${f(L.x-JB.lr)}`,'copper',1.6)+wire(hpEll(L.x,L.y,JB.lr,JB.lr),'copper',1.4)+wire(band((x0+L.x-JB.lr)/2,L.y,false,3,7,1.9),'copper',1);
+  if(jt===0&&c.glow>0)o+=wire(hpEll(L.x,L.y,JB.lr,JB.lr),'hot',1.4,.8*c.glow)});
+ if(jt===0&&c.glow>0)o+=hoGlints(G.E,c.glow);
+ if(jt===0&&c.glow>=1){const end={x:G.L[0].x+G.rx,y:G.L[0].y+G.ry};
+  o+=`<g fill="none" stroke="#f3c9a3" stroke-width="1.1" stroke-dasharray="4 3" opacity=".6">${G.L.map(L=>`<path d="${hpEll(L.x+G.rx,L.y,G.rx,G.ry)}"/>`).join('')}<path d="${JB_BELL}" transform="translate(${f(end.x)} ${f(end.y)}) scale(${f(G.bs)})"/></g>`}
+ // The rings: open ovals that swing out of the loops; the loop's top crosses over each ring, and the eyelet's lower rim crosses over its far end once it is through.
+ P.forEach((R,i)=>{if(R.vis<=.01)return;
+  o+=`<g opacity="${f(R.vis)}">${wire(jbRing(G,i,R),'copper',1.7)}${wire(loopUp(G.L[i]),'copper',1.4)}</g>`;
+  if(i===1){const q=jbAt(G,1,R,PI/2);o+=hpBead(q.x,q.y,2.9*lerp(.8,1,G.s),'st-garnet',R.vis)}
+  if(Math.abs(R.th)<3&&jt>0)o+=eyeLow(G.E[i],1-seg(Math.abs(R.th),1,3));
+  // Twisted shut inside the eyelet: a glint as the ends meet.
+  if(fwd&&R.k>.55&&R.k<1)o+=sparkle(G.E[i].x,G.E[i].y-1,.55*Math.sin(PI*seg(R.k,.55,1)))});
+ // Hollow's half: the bell, hooked in the top eyelet until the ring is through, then riding down the ring to hang in the gap.
+ o+=jbBell(B.p,G.bs,B.rot,B.clap,B.lit,col);
+ if(jt===0||B.p.x>G.E[0].x-3)o+=eyeLow(G.E[0]);
+ if(B.v>0&&B.v<1){const cx=B.p.x,cy=B.p.y+14*G.bs;
+  for(const t0 of[.1,.34,.6]){const q=seg(B.v,t0,t0+.34);if(q>0&&q<1)o+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f((9+34*q)*G.bs)}" fill="none" stroke="#e9edf1" stroke-width="${f(1.4*(1-q)+.3)}" opacity="${f(.75*(1-q)*Math.exp(-1.6*t0))}"/>`}
+  if(B.v<.22)o+=hoSpark({x:cx,y:cy+9*G.bs},1-B.v/.22,6*G.bs)}
+ if(jt===1){const x0=G.L[0].x-6,y0=G.L[0].y-G.ry-6,w=G.E[0].x-x0+6,h=B.p.y+26*G.bs-y0;
+  o+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="The bell on the jump ring: tap it, pull it, or press Enter, to twist the rings open and separate the widgets"><title>Tap or pull the bell to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(w)}" height="${f(h)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(w)}" height="${f(h)}" rx="6" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
+ return o;
+}
+{const ks=Object.keys(MIXES),at=ks.indexOf('needle');
+ MIXES.bell={label:'Bell on a jump ring',kind:'Pairwise seam',pair:'hoophollow',smooth:true,slow:1.45,sepMs:2300,
+  stack:[['Model','Pairwise seam','wire and Hollow had only ever met in the hoop setting, one holding the other; this is the seam authored for them, using both vocabularies at once'],
+   ['Wire half','Eye loops and jump rings','Jarvis\'s copper frame puts out two wrapped eye loops; it lends the seam its oval jump rings, a garnet seed bead and its springy swing'],
+   ['Hollow half','Eyelet strap and bell','GitDiscuss\'s carapace keeps its iron strap of brass eyelets, and lends the seam its brass bell with a red silk tie and the chalk rings it sends out'],
+   ['The seam','Both at once','the jump rings link loop to eyelet, a hinge in wire\'s terms; the bell rides a ring like a bead on a wire and is the join light, a clasp in Hollow\'s'],
+   ['Motion','Wire, then Hollow','the rings swing through and spring past before settling, as wire does; the bell is quick and precise, a slide, a pause and three strokes'],
+   ['Fallback','Model A','any pair without an authored seam would use a half-coupler; this is a layer on top, never the only model']],
+  about:'Jarvis wears the wire skin (a hammered copper backplate in a double coil-bound frame, a cabochon display in a coiled bezel) and GitDiscuss and Checks the Hollow skin (carapace shells with brush-ink outlines, an iron strap and lantern, pinned parchment). Until now the two met only in the hoop setting, where one holds the other. Here they meet at a seam. On their own pages wire swings a jump ring through two loops and Hollow hangs a bell on a chain between two eyelets. Here the seam is both: copper rings through brass eyelets, with Hollow\'s bell riding one of them.',
+  join:{label:'Jump rings and a bell',kind:'Hinge · clasp',gap:JB.gap,
+   about:'Apart, Jarvis\'s frame shows two wrapped copper eye loops at its joining end, and GitDiscuss\'s iron strap has its brass eyelets, the top one carrying a small brass bell tied with red silk. <b>Near:</b> open jump rings lift out of the loops, the loops run hot, the eyelets catch the light and the bell stirs. <b>Ready:</b> a dashed ghost of both rings and of the bell\'s place shows in the gap. Joining: the casings close to a hand-width apart. The top ring swings down through the top eyelet, springs a little past and settles, and is twisted shut with a glint. The bell slips off the eyelet onto the ring and slides down it like a bead on a wire, lagging and swinging, to hang plumb from the ring\'s lowest point in the gap. The bottom ring, threaded with a garnet seed bead, swings up through the bottom eyelet and is twisted shut. Then the bell rings: three strokes, each sending a chalk ring out across the seam, and its mouth kindles as the join light (amber when both are running, cold blue when either is paused). <b>Release:</b> tap the bell, pull it, or focus it and press Enter. Its light goes out, the bottom ring twists open, the bell slides back up the top ring onto its eyelet, the rings swing back into the loops, and the casings part.'},
+  shade:{label:'Plain tuck and draw-in',kind:'Page baseline',
+   about:'Not a brainstorm item. Jarvis\'s frame tucks to its nameplate strip and the carapaces draw in to their chalk nameplates and parchment slips. The loops, rings and eyelets keep their places in proportion and the bell shrinks with them, still lit, so a shaded pair stays linked.'},
+  casing:(id,w,h)=>id==='a'?wireCasing(w,h,false):id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${hoCasing(w,h)}</g>`:hoCasing(w,h,false),
+  readyPose:{},
+  state:()=>({}),
+  over(c){return jbDraw(c)},
+  grab(p){return{x0:p.x,y0:p.y,deg:0}},
+  pull(d,p){const dist=Math.hypot(p.x-d.x0,p.y-d.y0);if(dist>3)d.moved=true;d.deg=clamp(dist/60);return 1-.4*d.deg},
+  text:{intro:'Jarvis is copper wire with two eye loops at its joining end; GitDiscuss and Checks are Hollow carapace shells, and GitDiscuss carries a bell on its strap. Drag a nameplate toward the other widget, or use the state buttons.',
+   join:'The casings close, a copper jump ring swings through each brass eyelet and is twisted shut, and the bell slides down the top ring and rings.',
+   joined:'Joined: two jump rings link loop to eyelet and the bell hangs between them, lit. Drag either nameplate to move the pair. Tap or pull the bell to release.',
+   sep:'The bell stills, the bottom ring twists open, the bell slides back onto its eyelet, the top ring opens, and the casings part.',
+   hold:'Held mid-join: the top ring is shut, the bell has slid down it, and the bottom ring is swinging through. Use the scrubber to step through the animation.',
+   near:'Nearby: open rings lift out of Jarvis\'s loops, the eyelets catch the light and the bell stirs. Move closer.',
+   ready:'Ready: a ghost of both rings and the bell shows in the gap. Release to link.',
+   back:'The bell drops back; still linked.',cancel:'Pull cancelled.',
+   shadeOn:'Shaded: the frame tucks and the shells draw in; the rings and the bell shrink with them and stay linked.',shadeOff:'Unshaded: the frame and the shells open again.',
+   sepPh:'Separate · copper and shell',nearPh:'Nearby · the rings lift out',readyPh:'Ready · the rings are traced',
+   mid:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.56?'Joining · the top ring swings through ':jt<.68?'Joining · the bell slides down the ring ':jt<.78?'Joining · the bottom ring shuts ':'Joining · the bell rings '):(jt>.78?'Releasing · the bell stills ':jt>.68?'Releasing · the bottom ring twists open ':jt>.55?'Releasing · the bell slides back ':jt>.4?'Releasing · the top ring opens ':'Releasing · parting '),
+   turn:d=>'Pulling the bell · '+Math.round(d.deg*100)+'%'}};
  for(const k of ks.slice(at+1)){const v=MIXES[k];delete MIXES[k];MIXES[k]=v}
 }
 
