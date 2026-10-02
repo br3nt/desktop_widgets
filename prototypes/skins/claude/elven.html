@@ -120,6 +120,18 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .gpane svg{display:block;margin-top:2px}
 .gw{display:flex;align-items:center;gap:7px;font:11.5px/15px var(--sans);color:#262b42;white-space:nowrap}
 .gw i{width:7px;height:7px;border-radius:50%;border:1.4px solid var(--blue);flex:none}
+/* Plant silhouettes morph: one outline flows from seed pod to lobed leaf to a branch of leaflets */
+.pmorph{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.grip i{font-style:normal}.gcap{display:inline-block;overflow:hidden;white-space:nowrap;vertical-align:bottom}
+.ppane{position:absolute;overflow:hidden;color:var(--ink);opacity:0;visibility:hidden;
+ background:linear-gradient(112deg,transparent 28%,#9ec3ff2e 44%,#b9a8ff22 56%,transparent 72%),radial-gradient(ellipse 80% 110% at 32% 18%,#fbfcff,#e7ebf4 55%,#cfd6e5)}
+.ppane .tiny{font:9px/12px var(--sans);color:#5d6584;letter-spacing:1.1px;text-transform:uppercase;white-space:nowrap}
+.ppane .pips{position:absolute}.ppane .pips svg{display:block}
+.ppane small{position:absolute;font:10px/1 var(--sans);color:#454c68;white-space:nowrap}
+#pl{left:58px;top:65px;width:190px;height:70px;padding:6px 20px 0}#pl .pips{left:18px;top:43px}#pl small{left:20px;top:55px}
+#pb1{left:156px;top:30px;width:150px;height:44px;padding:6px 17px 0;transform:rotate(-4.9deg)}#pb1 small{left:17px;top:27px}
+#pb2{left:216px;top:137px;width:150px;height:44px;padding:4px 17px 0;transform:rotate(4.5deg)}#pb2 .pips{left:19px;top:33px}
+#pb3{left:435px;top:83px;width:130px;height:46px;padding:4px 12px 0}#pb3 .tiny{letter-spacing:.7px}#pb3 .gw{font-size:11px;line-height:14px}
 .hit{pointer-events:all;cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -157,7 +169,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-50" max="50" step=".5" value="-42.5" aria-label="GitDiscuss tilt at the fork, in degrees"><output id="angleOut" style="width:50px">−42.5°</output></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
  <div class="row" id="morphRow"><span>Morph</span></div>
- <div class="row" id="sizeRow"><span>Checks</span><input type="range" id="grow" min="0" max="200" value="0" aria-label="Checks size, bud to bough"><output id="growOut">bud</output></div>
+ <div class="row" id="sizeRow"><span>Checks</span><input type="range" id="grow" min="0" max="200" value="0" aria-label="Checks size, bud to bough"><output id="growOut" style="width:64px">bud</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Elven skin stage">
@@ -197,8 +209,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="wfold" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em><i>to decide</i></span></div>
 </section>
 
-<section class="w small" id="c" aria-label="Checks widget"><svg class="gmorph" aria-hidden="true"></svg><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg><svg class="lantern" aria-hidden="true"></svg><svg class="wing" aria-hidden="true"></svg>
- <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="orn" aria-hidden="true">✦</span></button>
+<section class="w small" id="c" aria-label="Checks widget"><svg class="gmorph" aria-hidden="true"></svg><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg><svg class="lantern" aria-hidden="true"></svg><svg class="wing" aria-hidden="true"></svg><svg class="pmorph" aria-hidden="true"></svg>
+ <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b><i class="gcap">independent</i></span><span class="orn" aria-hidden="true">✦</span></button>
  <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="lampdot" aria-hidden="true"></span>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <div class="cstar" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
@@ -207,12 +219,16 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="wfold" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em><i>passed</i></span></div>
  <div class="gpane" id="gp2" aria-hidden="true"><div class="tiny">Run 418 · main</div><div class="gbig"><span class="num">86%</span>passed</div><span class="pips"></span></div>
  <div class="gpane" id="gp3" aria-hidden="true"><div class="tiny">Waiting on Brent</div><div class="gw"><i></i>deploy-preview</div><div class="gw"><i></i>e2e-safari</div></div>
+ <div class="ppane" id="pl" aria-hidden="true"><div class="tiny">Run 418 · main</div><div class="gbig"><span class="num">12 / 14</span>passed · 86%</div><span class="pips"></span><small>2 waiting for approval</small></div>
+ <div class="ppane" id="pb1" aria-hidden="true"><div class="gbig"><span class="num">12 / 14</span>passed</div><small>2 waiting for approval</small></div>
+ <div class="ppane" id="pb2" aria-hidden="true"><div class="tiny">Run 418 · main</div><div class="gbig"><span class="num">86%</span>passed</div><span class="pips"></span></div>
+ <div class="ppane" id="pb3" aria-hidden="true"><div class="tiny">Waiting on Brent</div><div class="gw"><i></i>deploy-preview</div><div class="gw"><i></i>e2e-safari</div></div>
 </section>
 
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the bough back to a bud) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=38,SEP=170,NEAR=120,READY=40,TOP=70,SNAP=46;
@@ -1157,8 +1173,15 @@ function flower(x,y,kk,k){const sc=k*.95,op=clamp(kk*1.4);let s=`<circle cx="${f
 const SIZES=[['bud','Bud',0],['sprig','Sprig',1],['bough','Bough',2]];
 const MORPHS={
  growth:{label:'Growth',kind:'Grow',
-  about:'Checks is a bud: one small leaf. <b>Sprig:</b> a birch stem pushes out from under its moonstone drop and a silver tendril curls off it. A bud swells at the node and the new leaf unfurls: it lengthens first, then opens out from its midrib, pale green, and swings down to hang with a little overshoot. It darkens to night glass, and its moonstone pane lights with run 418 on main: 86% passed, with fourteen marks (twelve stars and two open rings for the checks still waiting). <b>Bough:</b> the branch grows on out of the bud\'s far tip, leafing as it goes, and ends in a fiddlehead curl; a third leaf unfurls from a node on it and names the two checks waiting on Brent. <b>Shrinking is autumn:</b> the panes go dark, the leaves turn gold, fold on their midribs, let go and flutter down, and the branch draws back into the bud. Pick a size, press M to step through them, or scrub the slider (scrubbing down is autumn too). Checks grows from where it stands and only moves to stay on the stage and clear of the pair. Shading a grown Checks lets its leaves fall first, and unshading grows them again.'}
+  about:'Checks is a bud: one small leaf. <b>Sprig:</b> a birch stem pushes out from under its moonstone drop and a silver tendril curls off it. A bud swells at the node and the new leaf unfurls: it lengthens first, then opens out from its midrib, pale green, and swings down to hang with a little overshoot. It darkens to night glass, and its moonstone pane lights with run 418 on main: 86% passed, with fourteen marks (twelve stars and two open rings for the checks still waiting). <b>Bough:</b> the branch grows on out of the bud\'s far tip, leafing as it goes, and ends in a fiddlehead curl; a third leaf unfurls from a node on it and names the two checks waiting on Brent. <b>Shrinking is autumn:</b> the panes go dark, the leaves turn gold, fold on their midribs, let go and flutter down, and the branch draws back into the bud. Pick a size, press M to step through them, or scrub the slider (scrubbing down is autumn too). Checks grows from where it stands and only moves to stay on the stage and clear of the pair. Shading a grown Checks lets its leaves fall first, and unshading grows them again.',
+  sizes:['Bud','Sprig','Bough'],slider:'Checks size, bud to bough',busy:['growing','autumn'],ph:[' · Checks grows',' · autumn on Checks'],
+  say:(to,from,n)=>to>from?(to===2?'The branch grows on from the bud\'s far tip and a third leaf unfurls: Checks is a bough.':'A stem pushes out under the bud and a new leaf unfurls: Checks is a sprig.'):'Autumn: the panes dim, the leaves turn gold and fall, and the branch draws back. Checks shrinks to a '+n+'.'},
+ plants:{label:'Plant silhouettes',kind:'Reshape',
+  about:'The casing itself changes plant form, as one outline that flows point for point. <b>Seed pod:</b> at rest Checks is a night-glass pod with a stitched silver seam along its back, a beak curling off its tip, a calyx of two sepals and a curled stalk, and seven moonstone seeds showing in the scallops of its belly. <b>Leaf:</b> the display goes blank, then the seam lights and the outline swells from the stalk outward into a broad lobed leaf with a fine-toothed edge and a notch in each side, while the silver midrib and veins draw in. The seven seeds lift out of the belly and drift onto the growing pane, and as they land the pane lights with run 418 and its fourteen marks. <b>Branch:</b> the leaf\'s notches cut down to the midrib and widen into slits, so the upper and lower lobes part and stretch into two leaflets on short stalks and the tip lengthens into a third. A white birch stalk grows out along the midrib, and the one pane divides with the leaf into three, tilted to their leaflets: the count, run 418 with its marks, and the two checks waiting on Brent. The nameplate hangs under the stalk. <b>Shrinking</b> plays it backwards: the leaflets draw together and close into one leaf, and the leaf folds back into the pod with its seeds. Shading a pod splits the husk open along its middle so the leaf casing inside can shade; unshading closes it again. A grown Checks folds back to a pod before it shades. Checks reshapes from where it stands and only moves to stay on the stage and clear of the pair.',
+  sizes:['Seed pod','Leaf','Branch'],slider:'Checks form, seed pod to branch',busy:['reshaping','closing'],ph:[' · Checks reshapes',' · Checks closes up'],
+  say:(to,from)=>to>from?(from<1?(to===2?'The pod splits along its seam and opens into a leaf, whose lobes then part into three leaflets on a birch stalk.':'The pod splits along its seam and swells into a lobed leaf; its seeds settle on the new pane as stars.'):'The leaf\'s notches cut down to the midrib and its lobes part into three leaflets on a birch stalk.'):(to===0?(from>1?'The leaflets draw together into one leaf, and the leaf closes back into a seed pod.':'The leaf closes back into a seed pod, its seeds returning to the belly.'):'The leaflets draw back together and close into one leaf.')}
 };
+const sizeName=i=>MORPHS[model.morph].sizes[i];
 const GD=[[CW,CH],[CW,198],[548,198]],LHW=118,LL=96,N2={x:140,y:99},N3={x:412,y:67};
 const bez=(a,b,c,d,n)=>[...Array(n+1)].map((_,i)=>{const t=i/n,u=1-t;return{x:u*u*u*a.x+3*u*u*t*b.x+3*u*t*t*c.x+t*t*t*d.x,y:u*u*u*a.y+3*u*u*t*b.y+3*u*t*t*c.y+t*t*t*d.y}});
 // The sprig's stem drops from behind the moonstone drop to the new leaf's node; a silver tendril curls off it.
@@ -1204,6 +1227,7 @@ $$('.gpane').forEach(n=>n.style.clipPath=`path('${PF}')`);
 // Twelve stars for the passed checks and two open rings for the waiting ones.
 $('#gp2 .pips').innerHTML=`<svg width="134" height="9" viewBox="0 0 134 9">${[...Array(14)].map((_,i)=>{const x=4.5+i*9.3;return i<12?star(x,4.5,4,1,'#2f4f86'):`<circle cx="${f(x)}" cy="4.5" r="2.9" fill="none" stroke="#2f4f86" stroke-width="1.3"/>`}).join('')}</svg>`;
 function growth(el){
+ if(model.morph!=='growth'){const svg=el.querySelector('.gmorph');if(svg.dataset.k){svg.dataset.k='';svg.innerHTML='';el.querySelectorAll('.gpane').forEach(n=>{n.style.opacity=0;n.style.visibility='hidden'})}return}
  const g=model.g,d=model.mdir,svg=el.querySelector('.gmorph'),A=gphase(clamp(g),d),B=gphase(clamp(g-1),d);
  for(const [id,G,on] of [['#gp2',A,g>0],['#gp3',B,g>1]]){const n=el.querySelector(id),o=on?G.pn:0;n.style.opacity=f(o*100)/100;n.style.visibility=o<.02?'hidden':'visible'}
  const S=SIZES.find(x=>x[2]===g),lab='Checks widget, '+(S?S[1].toLowerCase():d>0?'growing':'shedding its leaves')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting on Brent':'');
@@ -1228,10 +1252,120 @@ function growth(el){
  svg.innerHTML=tw+lv+kn+fr;
 }
 const chNow=()=>Math.round(lerp(CH,CHS,draw(model.st)));
-function cDims(){const g=model.g;if(g<=0)return[CW,chNow()];const A=gphase(clamp(g),model.mdir),B=gphase(clamp(g-1),model.mdir);return[Math.round(lerp(CW,GD[2][0],g>1?B.sz:0)),Math.round(lerp(CH,GD[1][1],A.sz))]}
+function cDims(){const g=model.g;if(g<=0)return[CW,chNow()];
+ if(model.morph==='plants'){const i=g>1?1:0,e=ease(seg(g-i,.1,.6));return[0,1].map(k=>Math.round(lerp(PD[i][k],PD[i+1][k],e)))}
+ const A=gphase(clamp(g),model.mdir),B=gphase(clamp(g-1),model.mdir);return[Math.round(lerp(CW,GD[2][0],g>1?B.sz:0)),Math.round(lerp(CH,GD[1][1],A.sz))]}
+
+/* ---------- Morph: plant silhouettes (Checks) ---------- */
+// Seed pod (0), leaf (1), branch (2). Each form is one closed outline of eleven edges with the same number of points per edge,
+// so the silhouette flows point for point. Edges 2-3 and 6-7 (from zero) are the leaf's notches: they cut down to the midrib and open into
+// the slits between the leaflets and the birch stalk.
+const PD=[[CW,CH],[300,200],[600,212]],EN=[6,48,30,22,34,34,22,30,56,6,4],PE=EN.map((_,k)=>EN.slice(0,k).reduce((a,b)=>a+b,0));
+const pLn=(a,b)=>t=>({x:lerp(a.x,b.x,t),y:lerp(a.y,b.y,t)});
+const pCb=(a,b,c,d)=>t=>{const u=1-t;return{x:u*u*u*a.x+3*u*u*t*b.x+3*u*t*t*c.x+t*t*t*d.x,y:u*u*u*a.y+3*u*u*t*b.y+3*u*t*t*c.y+t*t*t*d.y}};
+const pRev=fn=>t=>fn(1-t);
+const pProf=u=>Math.pow(Math.sin(PI*Math.pow(clamp(u),.7)),.85);
+// A blade from base B to tip T, half-width W, broadest a third of the way out. Side −1 is the upper edge, +1 the lower; inset pulls toward the midrib.
+const pBlade=(B,T,W)=>(u,sd,inset=0)=>{const dx=T.x-B.x,dy=T.y-B.y,L=Math.hypot(dx,dy),w=W*pProf(u)-inset;return{x:B.x+dx*u-dy/L*sd*w,y:B.y+dy*u+dx/L*sd*w}};
+// One side of a leaflet: up its short stalk from the rachis at A, then along the blade to the tip.
+const pSide=(A,B,b,sd)=>t=>{const q=.14;if(t>=q)return b((t-q)/(1-q),sd);const s=t/q,dx=B.x-A.x,dy=B.y-A.y,l=Math.hypot(dx,dy),o=3*sd*(1-.6*s);return{x:lerp(A.x,B.x,s)-dy/l*o,y:lerp(A.y,B.y,s)+dx/l*o}};
+// Edge detail, pushed out along the normal: 's' seed bulges, 't' fine teeth (fading out at each end of the edge).
+function pWig(w,t){const fr=(t*w[2])%1;return w[0]==='s'?w[1]*Math.sin(PI*fr):w[1]*Math.pow(1-Math.abs(2*fr-1),1.8)*Math.sqrt(Math.sin(PI*t))}
+function pSample(E){const out=[];E.forEach((e,k)=>{const[fn,w]=typeof e==='function'?[e]:e;
+ for(let i=0;i<EN[k];i++){const t=i/EN[k];let p=fn(t);if(w){const a=fn(Math.max(0,t-.004)),b=fn(Math.min(1,t+.004)),dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1,o=pWig(w,t);p={x:p.x+dy/l*o,y:p.y-dx/l*o}}out.push(p)}});return out}
+const POD_BELLY=pCb({x:244,y:61},{x:236,y:80},{x:12,y:84},{x:12,y:41});
+const POD=pSample([pLn({x:6,y:39},{x:12,y:39}),pCb({x:12,y:39},{x:12,y:4},{x:150,y:2},{x:240,y:5}),pLn({x:240,y:5},{x:250,y:7}),pLn({x:250,y:7},{x:259,y:12}),
+ pCb({x:259,y:12},{x:266,y:15},{x:271,y:20},{x:274,y:26}),pCb({x:274,y:26},{x:271,y:38},{x:264,y:48},{x:256,y:52}),pLn({x:256,y:52},{x:250,y:57}),pLn({x:250,y:57},{x:244,y:61}),
+ [POD_BELLY,['s',3.5,7]],pLn({x:12,y:41},{x:6,y:41}),pLn({x:6,y:41},{x:6,y:39})]);
+// Seven seeds, one in each bulge of the belly.
+const SEEDS=[...Array(7)].map((_,j)=>{const t=(j+.5)/7,p=POD_BELLY(t),q=POD_BELLY(t+.01);return{x:p.x,y:p.y-.6,a:Math.atan2(q.y-p.y,q.x-p.x)*180/PI}});
+const LB=pBlade({x:30,y:100},{x:298,y:100},90);
+const LEAF=pSample([pLn({x:4,y:97},{x:30,y:99}),[t=>LB(.6*t,-1),['t',3,5]],pLn(LB(.6,-1),LB(.62,-1,12)),pLn(LB(.62,-1,12),LB(.64,-1)),[t=>LB(lerp(.64,1,t),-1),['t',2.5,3]],
+ [t=>LB(lerp(1,.66,t),1),['t',2.5,3]],pLn(LB(.66,1),LB(.64,1,12)),pLn(LB(.64,1,12),LB(.62,1)),[t=>LB(.62*(1-t),1),['t',3,5]],pLn({x:30,y:101},{x:4,y:103}),pLn({x:4,y:103},{x:4,y:97})]);
+const A1={x:92,y:103},B1={x:116,y:62},A2={x:150,y:109},B2={x:176,y:150};
+const pb1=pBlade(B1,{x:372,y:40},44),pb2=pBlade(B2,{x:432,y:170},44),pb3=pBlade({x:416,y:106},{x:598,y:106},46);
+const BRANCH=pSample([pLn({x:8,y:102},pSide(A1,B1,pb1,-1)(0)),[pSide(A1,B1,pb1,-1),['t',1.6,6]],[pRev(pSide(A1,B1,pb1,1)),['t',1.6,6]],pLn({x:95,y:102},{x:410,y:102}),
+ [t=>pb3(lerp(.015,1,t),-1),['t',1.4,4]],[t=>pb3(lerp(1,.015,t),1),['t',1.4,4]],pLn({x:410,y:110},{x:154,y:110}),[pSide(A2,B2,pb2,-1),['t',1.6,6]],[pRev(pSide(A2,B2,pb2,1)),['t',1.6,6]],
+ pLn(pSide(A2,B2,pb2,1)(0),{x:8,y:110}),pLn({x:8,y:110},{x:8,y:102})]);
+const PFORMS=[POD,LEAF,BRANCH];
+// Panes (centre, size, tilt): the pod's display, the leaf's one pane, the branch's three. In the pod and leaf the second and third sit under the first.
+const PR=[[{x:134,y:46,w:184,h:36,r:0}],[{x:153,y:100,w:190,h:70,r:0}],[{x:231,y:52,w:150,h:44,r:-4.9},{x:291,y:159,w:150,h:44,r:4.5},{x:500,y:106,w:130,h:46,r:0}]];
+const pRect=(i,n)=>PR[i][n]||PR[i][0];
+// Lobe veins (start on the midrib, two controls); the far end is the lobe's tip on the outline.
+const PV=[[{x:62,y:100},{x:96,y:74},{x:140,y:42},{x:70,y:100},{x:104,y:126},{x:148,y:158}],null,[A1,B1,{x:190,y:56},A2,B2,{x:250,y:156}]];PV[1]=PV[0];
+// The nameplate: on the pod's back, above the leaf's pane, hung under the branch's stalk (name only).
+const PG=[{l:58,t:8,w:176,c:1},{l:56,t:42,w:168,c:1},{l:18,t:114,w:118,c:0}];
+const BSTALK=arcS(widths([0,.25,.5,.75,1].map(u=>({x:lerp(8,418,u),y:106})),5.4,3.4)),BPET1=arcS(widths([A1,B1].map(p=>({...p})),3.2,2.4)),BPET2=arcS(widths([A2,B2].map(p=>({...p})),3.2,2.4));
+const pD=pts=>'M'+pts.map(p=>f(p.x)+' '+f(p.y)).join('L')+'Z';
+function pBezel(R,o){if(o<=.01)return '';const{w,h}=R,m=h/2,fin=x=>`<path d="M${x} ${m}L${x+(x<0?4.5:-4.5)} ${f(m-2.2)}L${x+(x<0?7:-7)} ${m}L${x+(x<0?4.5:-4.5)} ${f(m+2.2)}Z" fill="url(#silver)"/>`;
+ return `<g transform="translate(${f(R.x)} ${f(R.y)}) rotate(${f(R.r)}) translate(${f(-w/2)} ${f(-h/2)})" opacity="${op(o)}"><path d="${paneD(w,h,3.4)}" fill="${NIGHT}" opacity=".7"/><path d="${paneD(w,h,0)}" fill="url(#paneG)"/><path d="${paneD(w,h,3.4)}" fill="none" stroke="url(#silver)" stroke-width="1.3"/><path d="${paneD(w,h,1.1)}" fill="none" stroke="${NIGHT}" stroke-width="1"/>${fin(-10.5)}${fin(w+10.5)}</g>`}
+function pSeed(x,y,a,sc,o){if(o<=.01)return '';return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(a)}) scale(${f(sc*100)/100})" opacity="${op(o)}"><circle r="6" fill="url(#halo)"/><ellipse rx="3.3" ry="2.5" fill="url(#moonstone)" stroke="#e8eef8" stroke-width=".5"/><circle cx="-1" cy="-.8" r=".7" fill="#fff"/></g>`}
+const pGlint=(R,k)=>{if(k<=.01)return '';const a=R.r*PI/180,dx=R.w/2-14,dy=-R.h/2,x=R.x+dx*Math.cos(a)-dy*Math.sin(a),y=R.y+dx*Math.sin(a)+dy*Math.cos(a);return `<circle cx="${f(x)}" cy="${f(y)}" r="${f(18*k)}" fill="url(#halo)" opacity="${op(k)}"/>`+star(x,y,8*k,k)};
+$$('.ppane').forEach(n=>n.style.clipPath=`path('${paneD(n.offsetWidth,n.offsetHeight,0)}')`);
+const pipSvg=`<svg width="112" height="8" viewBox="0 0 112 8">${[...Array(14)].map((_,i)=>{const x=4+i*8;return i<12?star(x,4,3.6,1,'#2f4f86'):`<circle cx="${x}" cy="4" r="2.5" fill="none" stroke="#2f4f86" stroke-width="1.2"/>`}).join('')}</svg>`;
+$$('.ppane .pips').forEach(n=>n.innerHTML=pipSvg);
+// The pod's body and ornaments for one outline; po fades the pod-only parts, lv the leaf veins, br the branch's birch.
+function pBody(pts,po,lv,lb,br,i,E){
+ let o=`<path d="${pD(pts)}" fill="none" stroke="#8fb0ff" stroke-width="6" opacity=".16" filter="url(#soft)"/><path d="${pD(pts)}" fill="url(#night)"/><path d="${pD(pts)}" fill="url(#pearl)" opacity=".14"/><path d="${pD(pts)}" fill="url(#moonlit)"/>`;
+ const S={x:(pts[0].x+pts[PE[10]].x)/2,y:(pts[0].y+pts[PE[10]].y)/2},T=pts[PE[5]];
+ // Pod: a stitched seam just inside its back, and a silver curl off the beak.
+ if(po>.01){let d='',tk='';for(let k=PE[1]+3;k<PE[2]-1;k++){const a=pts[k-1],b=pts[k+1],l=Math.hypot(b.x-a.x,b.y-a.y)||1,nx=-(b.y-a.y)/l,ny=(b.x-a.x)/l,p={x:pts[k].x+nx*5,y:pts[k].y+ny*5};d+=(d?'L':'M')+P(p);if(k%4===0&&(p.x<52||p.x>236))tk+=`M${P(p)}l${f(nx*3)} ${f(ny*3)}`}
+  o+=`<g opacity="${op(po)}"><path d="${d}" fill="none" stroke="#c9d4ee" stroke-width=".8" opacity=".75"/><path d="${tk}" fill="none" stroke="#c9d4ee" stroke-width=".7" opacity=".6"/>`;
+  const c=widths(curlPts(T,-.5,16,1.5*PI,-1,16),1.4,.3);o+=`<path d="${ribbon(c)}" fill="url(#silver)"/><circle cx="${f(c[c.length-1].x)}" cy="${f(c[c.length-1].y)}" r=".9" fill="#fff"/></g>`}
+ // Midrib from the stalk to the tip, and the veins into each lobe.
+ if(lb>.01){const mr=widths([0,.25,.5,.75,1].map(u=>({x:lerp(S.x,T.x,u),y:lerp(S.y,T.y,u)})),1.8,.4);o+=`<path d="${ribbon(mr)}" fill="url(#silver)" opacity="${op(lb*.85)}"/>`;
+  const V=PV[i].map((p,k)=>({x:lerp(p.x,PV[i+1][k].x,E),y:lerp(p.y,PV[i+1][k].y,E)})),P1=pts[PE[2]],P2=pts[PE[8]];
+  o+=`<path d="M${P(V[0])}C${P(V[1])} ${P(V[2])} ${P(P1)}M${P(V[3])}C${P(V[4])} ${P(V[5])} ${P(P2)}" fill="none" stroke="#dfe6f6" stroke-width="1" opacity="${op(lb*.7)}"/>`}
+ if(lv>.01){let d='';for(const k of [PE[1]+12,PE[1]+28,PE[1]+42,PE[4]+14,PE[5]+18,PE[8]+16,PE[8]+32,PE[8]+46]){const q=pts[k],b={x:q.x-24,y:S.y+(T.y-S.y)*clamp((q.x-S.x)/(T.x-S.x||1))};d+=`M${P(b)}Q${f(q.x-6)} ${f(lerp(b.y,q.y,.4))} ${f(lerp(b.x,q.x,.82))} ${f(lerp(b.y,q.y,.82))}`}
+  o+=`<path d="${d}" fill="none" stroke="#c9d4ee" stroke-width=".7" opacity="${op(lv*.5)}"/>`}
+ o+=`<path d="${pD(pts)}" fill="none" stroke="url(#silver)" stroke-width="1.5"/>`;
+ // Branch: a white birch stalk grows out along the midrib, then the leaflets' short stalks.
+ if(br>0){o+=twig(growPts(BSTALK,br,10));const b2=seg(br,.3,1);if(b2>0)o+=twig(growPts(BPET1,b2,4))+twig(growPts(BPET2,b2,4))}
+ // Calyx: two sepals and a curled stalk round a moonstone knop.
+ const cs=widths(curlPts(S,PI*.84,22,1.6*PI,1,20),2.4,.4);
+ o+=`<path d="${ribbon(cs,1.2)}" fill="${NIGHT}"/><path d="${ribbon(cs)}" fill="url(#silver)"/>`+leaf(S.x+2,S.y-1.5,-34,.8)+leaf(S.x+2,S.y+1.5,34,.8)+knop(S,1);
+ return o}
+function plants(el,s){
+ const svg=el.querySelector('.pmorph'),grip=el.querySelector('.grip'),cap=grip.querySelector('.gcap'),panes=['#pl','#pb1','#pb2','#pb3'].map(q=>el.querySelector(q));
+ const show=(n,o)=>{n.style.opacity=op(o);n.style.visibility=o<.02?'hidden':'visible'};
+ if(model.morph!=='plants'){if(svg.dataset.k){svg.dataset.k='';svg.innerHTML='';panes.forEach(n=>show(n,0));grip.style.left=grip.style.top=grip.style.width=cap.style.opacity=cap.style.maxWidth=''}return}
+ const g=model.g,i=g>1?1:0,u=g-i,U=g>0?seg(u,.12,.86):0,E=ease(U);
+ // The pod's display and lamp give way to the drawn pane as soon as it starts to change.
+ if(g>0){const mo=i===0?1-seg(u,0,.12):0;el.querySelectorAll('.mini,.lampdot').forEach(n=>show(n,mo));show(el.querySelector('.pf'),0)}
+ // The casing shows only as the husk opens, so its crest and pendant don't flash past the closed pod.
+ {const cs=el.querySelector('.casing');cs.style.opacity=op((cs.style.opacity===''?1:parseFloat(cs.style.opacity))*(g>0?0:ease(seg(s,0,.3))))}
+ show(panes[0],g>0?(i===0?seg(u,.86,1):1-seg(u,0,.12)):0);for(const n of panes.slice(1))show(n,i===1?seg(u,.86,1):0);
+ // The nameplate rides with the form; shading a pod returns it to the casing's place.
+ let G;if(g>0){const a=PG[i],b=PG[i+1];G={l:lerp(a.l,b.l,E),t:lerp(a.t,b.t,E),w:lerp(a.w,b.w,E),c:lerp(a.c,b.c,E)}}else{const k=seg(s,0,.3),a=PG[0];G={l:lerp(a.l,42,k),t:lerp(a.t,7,k),w:lerp(a.w,192,k),c:1}}
+ // The caption folds away as it fades, so the name and ✦ fit the branch's short plate.
+ grip.style.left=f(G.l)+'px';grip.style.top=f(G.t)+'px';grip.style.width=f(G.w)+'px';cap.style.opacity=op(G.c);cap.style.maxWidth=G.c<1?f(100*G.c)+'px':'';
+ const nm=['a seed pod','a lobed leaf','a branch of three leaflets'][Math.round(g)],lab='Checks widget, '+(g%1?'changing form':nm)+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting on Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=f(g*1000)+':'+f(s*1000);if(svg.dataset.k===key)return;svg.dataset.k=key;
+ svg.setAttribute('width',PD[2][0]);svg.setAttribute('height',PD[2][1]);svg.setAttribute('viewBox',`0 0 ${PD[2][0]} ${PD[2][1]}`);
+ // At rest, and while a shade splits the husk: the pod in two halves hinged at the stalk.
+ if(g<=0){const k=ease(seg(s,0,.3));if(k>=1){svg.innerHTML='';return}
+  const b=pBody(POD,1,0,0,0,0,0)+SEEDS.map(q=>pSeed(q.x,q.y,q.a,1,1)).join('');
+  svg.innerHTML=k<=0?b:`<defs><clipPath id="phT"><rect x="-40" y="-40" width="360" height="81"/></clipPath><clipPath id="phB"><rect x="-40" y="41" width="360" height="80"/></clipPath></defs><g opacity="${op(1-k)}"><g transform="translate(0 ${f(-9*k)}) rotate(${f(-7*k)} 8 40)"><g clip-path="url(#phT)">${b}</g></g><g transform="translate(0 ${f(9*k)}) rotate(${f(7*k)} 8 40)"><g clip-path="url(#phB)">${b}</g></g></g>`;return}
+ // Growth spreads from the stalk: points further out start later and finish together.
+ const A=PFORMS[i],B=PFORMS[i+1],W0=PD[i+1][0];
+ const pts=A.map((p,k)=>{const q=B[k],e=ease(clamp((U-.35*clamp(Math.max(p.x,q.x)/W0))/.65));return{x:lerp(p.x,q.x,e),y:lerp(p.y,q.y,e)}});
+ const po=i===0?1-seg(U,0,.4):0,lb=i===0?seg(U,.45,.9):1,lv=i===0?seg(U,.45,.9):1-seg(U,0,.3),br=i===1?seg(U,.35,1):0;
+ let o=pBody(pts,po,lv,lb,br,i,E);
+ // Panes: the one display reshapes; in the leaf-to-branch step it divides into three, which slide out to their leaflets.
+ // They lag the outline a little, so a pane never pokes out of the swelling silhouette.
+ // Each pane waits for the outline's delay at its own leading edge, plus a little more.
+ const R=n=>{const a=pRect(i,n),b=pRect(i+1,n),d=.35*clamp((b.x+b.w/2+14)/W0)+.05,Ep=ease(clamp((U-d)/(1-d)));return{x:lerp(a.x,b.x,Ep),y:lerp(a.y,b.y,Ep),w:lerp(a.w,b.w,Ep),h:lerp(a.h,b.h,Ep),r:lerp(a.r,b.r,Ep)}};
+ if(i===1)o+=pBezel(R(2),seg(U,0,.2))+pBezel(R(1),seg(U,0,.2));
+ o+=pBezel(R(0),1);
+ // Pod to leaf: the seeds lift out of the belly and settle on the pane as its first stars.
+ if(i===0){const sp=ease(seg(u,.1,.8)),so=1-seg(u,.84,.96);o+=SEEDS.map((q,j)=>{const tx=80+8*Math.round((6-j)*11/6),ty=112;return pSeed(lerp(q.x,tx,sp),lerp(q.y,ty,sp)-34*Math.sin(PI*sp),q.a*(1-sp),1-.25*sp,so)}).join('')}
+ const gl=Math.sin(PI*seg(u,.84,1));for(let n=0;n<(i===1?3:1);n++)o+=pGlint(pRect(i+1,n),gl);
+ svg.innerHTML=o;
+}
 // Where Checks's top-left should land at size `to`: it grows from where it stands, kept on the stage and clear of the pair.
 function morphSpot(to){
- const[w,h]=GD[to];let x=clamp(model.c.x,30,1170-w),y=clamp(model.c.y,TOP-10,590-h);
+ const[w,h]=(model.morph==='plants'?PD:GD)[to];let x=clamp(model.c.x,30,1170-w),y=clamp(model.c.y,TOP-10,590-h);
  const x0=Math.min(model.a.x,model.b.x)-8,x1=Math.max(model.a.x,model.b.x)+W+8,y0=Math.min(model.a.y,model.b.y)-8,yb=Math.max(model.a.y,model.b.y)+ctx().h+8;
  if(x+w>x0&&x<x1&&y<yb&&y+h>y0){if(yb+h<=590)y=yb;else if(y0-h>=TOP-10)y=y0-h}
  return{x,y};
@@ -1244,11 +1378,11 @@ function morphTo(id){
  if(model.st>0&&to>0){model.restore=id;model.size=id;toggleShade(0);render();return Promise.resolve(false)}
  if(to===0)model.restore=null;
  model.size=id;
- if(to===from){say('Checks is already a '+S[1].toLowerCase()+'.');render();return Promise.resolve(true)}
+ if(to===from){say('Checks is already a '+sizeName(to).toLowerCase()+'.');render();return Promise.resolve(true)}
  model.mdir=to>from?1:-1;
  const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(to>from?2600:2300),p0={x:model.c.x,y:model.c.y},p1=morphSpot(to),t0=performance.now();
  model.cMoved=false;
- say(to>from?(to===2?'The branch grows on from the bud\'s far tip and a third leaf unfurls: Checks is a bough.':'A stem pushes out under the bud and a new leaf unfurls: Checks is a sprig.'):'Autumn: the panes dim, the leaves turn gold and fall, and the branch draws back. Checks shrinks to a '+S[1].toLowerCase()+'.');
+ say(MORPHS[model.morph].say(to,from,sizeName(to).toLowerCase()));
  return new Promise(res=>{(function step(now){
   if(tok!==morphAnim)return res(false);
   const t=ms?clamp((now-t0)/ms):1;model.g=t<1?lerp(from,to,t):to;
@@ -1256,7 +1390,7 @@ function morphTo(id){
   if(model.cMoved){model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h)}
   else{const e=ease(t);model.c.x=lerp(p0.x,p1.x,e);model.c.y=lerp(p0.y,p1.y,e)}
   render();
-  if(t<1)requestAnimationFrame(step);else{say('Checks is a '+S[1].toLowerCase()+'.');res(true)}
+  if(t<1)requestAnimationFrame(step);else{say('Checks is a '+sizeName(to).toLowerCase()+'.');res(true)}
  })(t0)});
 }
 
@@ -1374,6 +1508,7 @@ function render(){
   el.querySelector('.strip').style.opacity=f(strip);
   svg.style.opacity=cn?op(Math.max(sh.casingOp(s),model.shade==='lantern'?.55*ease(WK[id])*seg(s,.86,1):0)):'';
   el.style.filter=model.shade==='constellation'&&s>.45?'drop-shadow(0 0 5px #05061299)':'';
+  if(small)plants(el,s);
   constel(el,id,w,h,s);furl(el,id,w,h,s);lantern(el,id,w,h,s);wingFold(el,id,w,h,s);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
@@ -1394,11 +1529,11 @@ function render(){
  $$('#morphRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.morph)));
  $$('#sizeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===model.size)));
  if(document.activeElement!==$('#grow'))$('#grow').value=Math.round(model.g*100);
- {const S=SIZES.find(x=>x[2]===model.g);$('#growOut').textContent=S?S[1].toLowerCase():model.mdir>0?'growing':'autumn'}
+ {const S=SIZES.find(x=>x[2]===model.g);$('#growOut').textContent=S?sizeName(S[2]).toLowerCase():MORPHS[model.morph].busy[model.mdir>0?0:1]}
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
  const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+forkName(model.angle).num:'')};
- $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?model.mdir>0?' · Checks grows':' · autumn on Checks':'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
+ $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?MORPHS[model.morph].ph[model.mdir>0?0:1]:'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
  wakeKick();rsKick();
 }
 
@@ -1411,6 +1546,9 @@ function pick(key,id){
  if(drag)cancelDrag();
  if(key==='join'&&id!==model.join){stopAngle();dialOff();const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.lift=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
+ // A grown Checks goes back to its smallest form, changes morph, then grows to the same size in the new one.
+ if(key==='morph'&&id!==model.morph&&model.g>0){const keep=model.size||SIZES[Math.max(1,Math.round(model.g))][0];
+  morphTo('bud').then(ok=>{if(ok){model.morph=id;describe();render();morphTo(keep)}});return}
  if(key==='morph')model.morph=id;
  describe();render();
 }
@@ -1419,6 +1557,7 @@ function describe(){
  $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
  const mo=MORPHS[model.morph];$('#morphAbout').innerHTML=`<h2>${mo.label}<small>morph · ${mo.kind}</small></h2><p>${mo.about}</p>`;
+ $$('#sizeRow button').forEach((b,i)=>b.textContent=mo.sizes[i]);$('#grow').setAttribute('aria-label',mo.slider);
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#morphRow',MORPHS,'morph');
 SIZES.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size=id;b.textContent=l;b.onclick=()=>morphTo(id);$('#grow').before(b)});
