@@ -306,7 +306,7 @@ function casing(id,w,h){
  const bt=model.join==='buttress'&&!small,PT=12,pw=JP-6;
  // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
  // Frieze procession: square too, so the two friezes along the top meet as one band.
- const dl=(model.join==='dial'||model.join==='apse'||model.join==='fan'||model.join==='chevet'||model.join==='frieze')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
+ const dl=(model.join==='dial'||model.join==='apse'||model.join==='fan'||model.join==='chevet'||model.join==='strap'||model.join==='frieze')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
  // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
  const tooth=x=>{const t=[[x,top]];for(const r of JOINS.pier.rows(h))t.push([x,r.y],[x+r.e*JOINS.pier.TO,r.y],[x+r.e*JOINS.pier.TO,r.yb],[x,r.yb]);t.push([x,h]);return t};
@@ -1514,6 +1514,136 @@ const JOINS={
   grab(p){return{x0:p.x,y0:p.y,amt:0,moved:false}},
   move(d,p){d.amt=clamp((p.y-d.y0)/44);if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;setJt(1-.12*d.amt)},
   letGo:d=>!d.moved||d.amt>.5
+ },
+ strap:{label:'Strap hinge',kind:'Hinge',gap:56,ms:2,sepMs:2700,step:15,max:45,slider:'Strap hinge',
+  say:{join:'The facades close a hand\'s width apart. An iron pintle runs out of Jarvis\'s end and is leaded in, a strap is forged across from GitDiscuss and rolled round the pin, its scrolls curl out red-hot and cool, a gilt cap is struck onto the pin, and GitDiscuss swings to its angle.',
+   joined:'Joined on a strap hinge. Drag the strap, or GitDiscuss\'s nameplate, to swing GitDiscuss; the strap\'s tongue drops onto a rose-headed nail every 15°. Tap the gilt pin cap to release.',
+   sep:'GitDiscuss swings level, the pin cap is knocked off, the scrolls uncurl, the strap draws back into GitDiscuss, the pintle into Jarvis, and the facades part.',
+   hold:'Held mid-join: the strap is forking and its scrolls begin to curl. Use the scrubber to step through the animation.',
+   ready:'Ready: the hinge is chalked across the gap. Release to join.',near:'Nearby: the iron in both ends warms red. Move closer.',readyPh:'Ready · the hinge is marked out',nearPh:'Nearby · the iron warms',
+   tap:'Drag the strap to swing GitDiscuss; tap the gilt pin cap to release.'},
+  stepSay:(from,to)=>to===from?'The tongue is on the last nail: GitDiscuss at '+signed(to)+'.':'The tongue drops onto the next nail; GitDiscuss at '+signed(to)+'.',
+  phase:(jt,dir)=>dir>0?(jt<.36?'Joining · closing in ':jt<.48?'Joining · leading in the pintle ':jt<.6?'Joining · forging the strap ':jt<.73?'Joining · curling the scrolls ':jt<.8?'Joining · striking on the pin cap ':'Joining · swinging to '+signed(model.angle)+' · '):(jt>.82?'Releasing · swinging level ':jt>.72?'Releasing · knocking off the cap ':jt>.47?'Releasing · the scrolls uncurl, the strap draws back ':jt>.36?'Releasing · the pintle withdraws ':'Releasing · parting '),
+  dragPh:()=>'Swinging on the strap hinge · GitDiscuss at '+signed(model.angle),
+  about:'Church doors hang on wrought-iron strap hinges: a flat iron strap nailed across the door, rolled at its end into a knuckle that drops over a pintle, an iron pin leaded into the stone jamb. The smiths split the straps into scrolls, so the hinge doubles as ornament. Here GitDiscuss is the door and Jarvis the jamb, a real pivot rather than a dial. The facades close a hand\'s width apart with square ends. <b>Near:</b> the iron in both ends warms to a dull red. <b>Ready:</b> the whole hinge is chalked across the gap. Joining: a socket is cut in Jarvis\'s end pier, a cranked pintle runs out of it into the gap, and molten lead is run into the socket, glowing and then cooling to grey. Seven rose-headed nails are driven in an arc on Jarvis\'s pier, one for each 15° stop. Then a red-hot strap is forged out of GitDiscuss\'s end and rolled round the pin as a knuckle; it forks up and down the end pier, its ends split into curling tendrils round a spear point, and C-scrolls curl back from the fork, all throwing sparks and cooling from orange to black. A tongue grows back from the knuckle to rest on a nail, and a gilt cap is struck onto the pin with a shower of sparks. The cap\'s glass boss kindles as the join light: amber while both widgets run and cold blue if either is paused. Then GitDiscuss swings on the pin to its angle with a heavy overshoot. <b>The nails are the stops.</b> Angles run from −45° to +45°. Each time the tongue drops onto a nail it clicks with a glint, so the angle reads as nails above or below level. GitDiscuss turns about the knuckle in the middle of the gap, and the gap is wide enough that at full swing its corners never strike Jarvis. To set the angle: drag the strap, drag GitDiscuss\'s nameplate, use the slider, or focus the strap and press the arrow keys. While it turns, a parchment label under the knuckle reads the angle and the nail count. All the ironwork stays on the two end piers and in the gap, clear of the nameplates, the tabs and the glass. Shaded, the hinge scales down with the walls, and the nails and the tongue are left off. <b>Release:</b> tap the gilt pin cap (or focus the strap and press Enter). GitDiscuss swings level, the cap is knocked off, the scrolls uncurl, the strap draws back into GitDiscuss, the nails and the pintle are drawn, and the facades part.',
+  // Level until the cap is lit, then a heavy swing with one small overshoot.
+  bend(jt){const A=model.angle;if(jt>=1)return A;if(model.dir>0){const u=seg(jt,.8,1);return A*(1-Math.pow(1-u,3)*Math.cos(1.6*Math.PI*u))}return A*ease(seg(jt,.82,1))},
+  // The knuckle sits in the middle of the gap; the nails stand on an arc round it on Jarvis's pier (full height only).
+  geo(c){const h=c.h,big=h>=90,k=big?1:.62,P={x:(c.a.x+W+c.b.x)/2,y:(c.a.y+c.b.y)/2+h/2};
+   return{h,big,k,P,Rk:big?11:clamp(h*.13,5.5,8),Rq:big?44:0,So:{x:P.x-(big?58:40),y:P.y+(big?46:h*.3)}}},
+  // GitDiscuss's corners (with pinnacle headroom) swung about the knuckle, plus the angle label under it.
+  range(ang,h){const g=this.gap,th=ang*Math.PI/180,sn=Math.sin(th),cs=Math.cos(th);let lo=-26,hi=h+42;
+   for(const[x,y]of[[0,-26],[W,-26],[0,h],[W,h]]){const ry=h/2+(x+g/2)*sn+(y-h/2)*cs;lo=Math.min(lo,ry);hi=Math.max(hi,ry)}
+   const A=TOP-26-lo,B=600-14-hi;return[A,Math.max(A,B)]},
+  state(c){const jt=c.jt,fwd=model.dir>0;
+   if(jt===0)return{warm:c.glow,pin:0,lead:0,lh:0,nail:0,strap:0,eye:0,br:0,cu:0,tail:0,hs:0,hb:0,cap:0,lit:0,pulse:0};
+   return{warm:fwd?Math.max(model.lit0>0?1:0,c.glow)*(1-seg(jt,.34,.46)):0,pin:ease(seg(jt,.36,.46)),lead:seg(jt,.42,.5),lh:fwd?1-seg(jt,.48,.66):0,nail:seg(jt,.46,.62),
+    strap:ease(seg(jt,.48,.57)),eye:ease(seg(jt,.56,.61)),br:ease(seg(jt,.58,.69)),cu:seg(jt,.64,.75),tail:ease(seg(jt,.62,.69)),
+    hs:fwd?1-seg(jt,.6,.8):0,hb:fwd?1-seg(jt,.72,.88):0,cap:seg(jt,.73,.8),lit:seg(jt,.8,.92),pulse:fwd?Math.sin(Math.PI*seg(jt,.79,.85)):0}},
+  detent(b,jt){if(jt===0){model.lastDet=0;return}const st=this.step,n=Math.round(b/st);if(n!==model.lastDet&&Math.abs(b-n*st)<4){model.lastDet=n;if(!reduce.matches)pawlClick()}},
+  // Iron from black (0) through cherry red to a yellow forging heat (1).
+  HOT:[[0,[40,34,31]],[.3,[122,34,20]],[.62,[222,86,26]],[.86,[255,170,60]],[1,[255,232,160]]],
+  hot(t){t=clamp(t);const Q=this.HOT;let i=1;while(i<Q.length-1&&Q[i][0]<t)i++;const[a,A]=Q[i-1],[b,B]=Q[i];return mixc(A,B,(t-a)/(b-a))},
+  // A spiral that tightens toward its end: heading a (radians), length L, total turn T, dir +1 clockwise on screen.
+  spiral(x,y,a,L,T,dir){const m=26;let d=`M${f(x)} ${f(y)}`,h=a,px=x,py=y;
+   for(let i=1;i<=m;i++){const tm=(i-.5)/m,dt=1/m;h+=dir*T*(.25+2.25*tm*tm)*dt;px+=Math.cos(h)*L*dt;py+=Math.sin(h)*L*dt;d+=`L${f(px)} ${f(py)}`}
+   return{d,x:px,y:py}},
+  // Every piece of the hinge at full growth, in stage coordinates for a knuckle at P, unrotated.
+  paths(P,G){const{h,big,k}=G,hm=h/2,bx=P.x+this.gap/2,by=P.y-hm,PI=Math.PI;
+   const yT=big?16:Math.max(13,h*.2),yB=h-yT,mu=Math.max(yT,hm-14*k),md=Math.min(yB,hm+14*k),xv=30;
+   const X=v=>f(bx+v),Y=v=>f(by+v),pt=(x,y)=>X(x)+' '+Y(y),sp=(x,y,a,L,T,dir)=>this.spiral(bx+x,by+y,a*PI/180,L,T,dir);
+   const tip=(y,o)=>`M${pt(xv-2.6*k,y+o*1.5*k)}L${pt(xv,y-o*6.5*k)}L${pt(xv+2.6*k,y+o*1.5*k)}Z`;
+   return{F:[bx+18,P.y],
+    strap:`M${pt(18,hm)}H${f(P.x+G.Rk*.6)}`,
+    up:`M${pt(18,hm)}C${pt(27,hm)} ${pt(xv,(hm+mu)/2)} ${pt(xv,mu)}V${Y(yT)}`,
+    dn:`M${pt(18,hm)}C${pt(27,hm)} ${pt(xv,(hm+md)/2)} ${pt(xv,md)}V${Y(yB)}`,
+    back:[sp(18,hm,-95,28*k,1.5*PI,-1),sp(18,hm,95,28*k,1.5*PI,1)],
+    curls:[sp(xv,yT,-128,12*k,1.45*PI,-1),sp(xv,yT,-52,12*k,1.45*PI,1),sp(xv,yB,128,12*k,1.45*PI,1),sp(xv,yB,52,12*k,1.45*PI,-1),
+     ...(big?[sp(xv,hm-30,-35,13,1.4*PI,1),sp(xv,hm+30,35,13,1.4*PI,-1)]:[])],
+    tips:tip(yT,1)+tip(yB,-1),
+    eye:`M${f(P.x+G.Rk)} ${f(P.y)}A${f(G.Rk)} ${f(G.Rk)} 0 1 0 ${f(P.x-G.Rk)} ${f(P.y)}A${f(G.Rk)} ${f(G.Rk)} 0 1 0 ${f(P.x+G.Rk)} ${f(P.y)}`,
+    tail:big?`M${f(P.x-G.Rk*.6)} ${f(P.y)}H${f(P.x-G.Rq+6)}`:'',
+    tongue:big?`M${f(P.x-G.Rq+7)} ${f(P.y-2.4)}L${f(P.x-G.Rq+1)} ${f(P.y)}L${f(P.x-G.Rq+7)} ${f(P.y+2.4)}Z`:'',
+    arm:`M${f(G.So.x)} ${f(G.So.y)}H${f(P.x-10*k)}Q${f(P.x)} ${f(G.So.y)} ${f(P.x)} ${f(G.So.y-10*k)}V${f(P.y)}`}},
+  // Round-edged wrought iron, drawn as far as u along its path; hot iron glows.
+  iron(d,w,ht,u=1){if(u<=.005||!d)return '';const da=u<1?` pathLength="1" stroke-dasharray="${f(u*1000)/1000} 2"`:'',body=this.hot(ht*.95),hi=ht>.05?this.hot(Math.min(1,ht+.15)):'#9a8f84';
+   return (ht>.05?`<path d="${d}"${da} stroke="#ff7a22" stroke-width="${f(w*2.6)}" opacity="${f(.5*ht)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`:'')+
+    `<path d="${d}"${da} stroke="#0c0907" stroke-width="${f(w+1.4)}"/><path d="${d}"${da} stroke="${body}" stroke-width="${f(w)}"/><path d="${d}"${da} stroke="${hi}" stroke-width="${f(Math.max(.6,w*.26))}" opacity=".6" transform="translate(-.3 -.5)"/>`},
+  shadow(d,w,u=1){if(u<=.005||!d)return '';return `<path d="${d}"${u<1?` pathLength="1" stroke-dasharray="${f(u*1000)/1000} 2"`:''} stroke="#000" stroke-width="${f(w+1)}"/>`},
+  sparks(x,y,t,n,R,seed){if(t<=0||t>=1)return '';let o='';
+   for(let i=0;i<n;i++){const a=2*Math.PI*rgRnd(i+seed),m=.5+.5*rgRnd(i+seed+40),d=R*m*(1-Math.pow(1-t,2)),e=Math.max(0,d-R*.22),g=6*t*t;
+    o+=`M${f(x+Math.cos(a)*e)} ${f(y+Math.sin(a)*e+g)}L${f(x+Math.cos(a)*d)} ${f(y+Math.sin(a)*d+g)}`}
+   return `<path d="${o}" stroke="#ffcf6a" stroke-width="1.1" stroke-linecap="round" fill="none" opacity="${f(1-t)}"/>`},
+  // A rose-headed nail: a faceted iron dome.
+  nail(x,y,r){return `<circle cx="${f(x+.6)}" cy="${f(y+.9)}" r="${f(r)}" fill="#000" opacity=".35"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="#2c2622" stroke="#0c0907" stroke-width=".7"/>`+
+   `<path d="M${f(x-r*.7)} ${f(y)}H${f(x+r*.7)}M${f(x)} ${f(y-r*.7)}V${f(y+r*.7)}" stroke="#0c0907" stroke-width=".6"/><circle cx="${f(x-r*.35)}" cy="${f(y-r*.35)}" r="${f(r*.3)}" fill="#a39686" opacity=".75"/>`},
+  over(c){
+   const jt=c.jt,fwd=model.dir>0,bend=this.bend(jt),G=this.geo(c),r=this.state(c),{P,Rk,Rq,big,k,h,So}=G,D=Math.PI/180;
+   this.detent(bend,jt);
+   const hop=jt===1||fwd?Math.sin(Math.PI*clamp((performance.now()-model.clickAt)/220)):0;
+   const col=model.a.run&&model.b.run?'#ffc861':'#9fb8ff',nailAt=n=>[P.x+Rq*Math.cos((180+15*n)*D),P.y+Rq*Math.sin((180+15*n)*D)];
+   let s='';
+   // Near: the iron in both ends warms red (where the strap will fork, and where the pintle will be leaded in).
+   if(r.warm>0){const hm=h/2;
+    for(const[x,y]of[[c.b.x+18,c.b.y+hm],[c.a.x+W+this.gap/2-(big?58:40),c.a.y+hm+(big?46:h*.3)]])
+     s+=`<g style="mix-blend-mode:screen" opacity="${f(.85*r.warm)}"><circle cx="${f(x)}" cy="${f(y)}" r="${f(9*k)}" fill="#ff5a1e" opacity=".5" filter="url(#soft)"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(2.4*k)}" fill="#ffb070"/></g>`}
+   // Ready: the whole hinge chalked across the gap, at Jarvis's end.
+   const gho=jt===0?seg(c.glow,.8,1)*.85:0;
+   if(gho>0){const Pg={x:c.a.x+W+this.gap/2,y:c.a.y+h/2},Gg={...G,P:Pg,So:{x:Pg.x-(big?58:40),y:Pg.y+(big?46:h*.3)}},Q=this.paths(Pg,Gg);
+    s+=`<g fill="none" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="3 2.4" opacity="${f(gho)}"><path d="${Q.eye}"/><path d="${Q.strap}${Q.up}${Q.dn}${Q.back.map(b=>b.d).join('')}"/><path d="${Q.arm}" opacity=".7"/>`+
+     (big?[-3,-2,-1,0,1,2,3].map(n=>{const a=(180+15*n)*D;return `<circle cx="${f(Pg.x+Rq*Math.cos(a))}" cy="${f(Pg.y+Rq*Math.sin(a))}" r="2.4"/>`}).join(''):'')+`</g>`}
+   if(jt===0)return s;
+   const Q=this.paths(P,G);
+   // Jarvis's iron: the lead socket, the cranked pintle and the arc of nails.
+   if(r.pin>0){const sw=14*k,sh=12*k,fill=r.lead;
+    s+=`<rect x="${f(So.x-sw/2-1)}" y="${f(So.y-sh/2-1)}" width="${f(sw+2)}" height="${f(sh+2)}" rx="2" fill="#2a1f15" opacity="${f(.75*seg(r.pin,0,.3))}"/>`;
+    if(fill>0){const fh=sh*fill,lc=r.lh>0?heat(.25+.75*r.lh):'#8f8d88';
+     if(r.lh>0)s+=`<circle cx="${f(So.x)}" cy="${f(So.y)}" r="${f(13*k)}" fill="#ff8a2a" opacity="${f(.45*r.lh)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+     s+=`<rect x="${f(So.x-sw/2)}" y="${f(So.y+sh/2-fh)}" width="${f(sw)}" height="${f(fh)}" rx="1.5" fill="${lc}"/><path d="M${f(So.x-sw/2+1.5)} ${f(So.y+sh/2-fh+1)}H${f(So.x+sw/2-1.5)}" stroke="#fff" stroke-opacity=".35" stroke-width=".7"/>`;
+     if(fwd&&r.lead<1)s+=JOINS.buttress.dust(So.x,So.y-sh/2,seg(r.lead,.3,1),5,10*k,421)}
+    s+=`<g fill="none" stroke-linecap="round" stroke-linejoin="round"><g opacity=".35" transform="translate(1.2 1.8)">${this.shadow(Q.arm,6*k,r.pin)}</g>${this.iron(Q.arm,6*k,0,r.pin)}</g>`;
+    if(r.pin>.9)s+=`<circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(Rk*.55)}" fill="#2c2622" stroke="#0c0907" stroke-width=".8" opacity="${f(seg(r.pin,.9,1))}"/>`}
+   if(big&&r.nail>0)[-3,-2,-1,0,1,2,3].forEach((n,i)=>{const t=seg(r.nail,i*.09,i*.09+.4);if(t<=0)return;const[x,y]=nailAt(n),dy=fwd?-7*(1-backOut(t)):-5*(1-t);
+    s+=`<g opacity="${f(seg(t,0,.3))}">${this.nail(x,y+dy,2.9)}</g>`;if(fwd&&t>.6&&t<1)s+=JOINS.buttress.dust(x,y,seg(t,.6,1),3,6,430+i)});
+   // GitDiscuss's iron, turning with it about the knuckle: scrolls, the forked strap, the knuckle and the tongue.
+   const lay=[[Q.back[0].d,3.4*k,r.hb,r.cu],[Q.back[1].d,3.4*k,r.hb,r.cu],...Q.curls.map(q=>[q.d,Math.max(1.6,2.6*k),r.hb,r.cu]),
+    [Q.up,4.4*k,r.hb,r.br],[Q.dn,4.4*k,r.hb,r.br],[Q.strap,7.5*k,r.hs,r.strap],[Q.tail,3.6,r.hs,r.tail],[Q.eye,Rk*.55,r.hs,r.eye]];
+   let g=`<g opacity=".32" transform="translate(1.2 1.8)">${lay.map(([d,w,,u])=>this.shadow(d,w,u)).join('')}</g>`+lay.map(([d,w,ht,u])=>this.iron(d,w,ht,u)).join('');
+   g=`<g fill="none" stroke-linecap="round" stroke-linejoin="round">${g}</g>`;
+   if(r.cu>.15){const o=seg(r.cu,.15,.5),tc=this.hot(r.hb*.95);
+    g+=`<g opacity="${f(o)}"><path d="${Q.tips}" fill="${tc}" stroke="#0c0907" stroke-width=".8"/>${Q.curls.map(q=>`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${f(Math.max(1,1.6*k))}" fill="${tc}" stroke="#0c0907" stroke-width=".6"/>`).join('')}</g>`}
+   if(big&&r.tail>.6)g+=`<path d="${Q.tongue}" fill="${this.hot(r.hs*.95)}" stroke="#0c0907" stroke-width=".8" opacity="${f(seg(r.tail,.6,1))}"/>`;
+   // Sparks fly from the fork while it is forged, and from each tendril as it curls.
+   if(fwd){g+=this.sparks(Q.F[0],Q.F[1],seg(r.br,0,.8),9,16*k,451);for(const[i,q]of Q.curls.slice(0,4).entries())g+=this.sparks(q.x,q.y,seg(r.cu,.4+i*.05,.95),4,9*k,470+i*9)}
+   s+=`<g transform="rotate(${f(bend*100)/100} ${f(P.x)} ${f(P.y)})">${g}</g>`;
+   // The gilt pin cap, struck on; its glass boss is the join light.
+   if(r.cap>0){const dy=fwd?-22*k*(1-backOut(r.cap)):-16*k*(1-r.cap),R=Rk*.8,run=model.a.run&&model.b.run;let qf='';
+    for(let i=0;i<4;i++){const a=(45+90*i)*D;qf+=`<circle cx="${f(Math.cos(a)*R*.5)}" cy="${f(Math.sin(a)*R*.5)}" r="${f(R*.28)}"/>`}
+    s+=`<g transform="translate(${f(P.x)} ${f(P.y+dy)})" opacity="${f(seg(r.cap,0,.3))}">`+
+     (r.lit>0?`<circle r="${f(Rk*2.8)}" fill="${col}" opacity="${f(.36*r.lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`:'')+
+     `<circle cx=".7" cy="1.1" r="${f(R)}" fill="#000" opacity=".35"/><circle r="${f(R)}" fill="url(#gild)" stroke="#5a3a0c" stroke-width=".8"/><g fill="none" stroke="#5a3a0c" stroke-width=".55" opacity=".8">${qf}</g>`+
+     `<circle r="${f(R*.34)}" fill="${r.lit>0?mixc([58,47,28],run?[255,200,97]:[159,184,255],r.lit):'#3a2f1c'}" stroke="#5a3a0c" stroke-width=".6"/>`+
+     (r.lit>0?`<circle cx="${f(-R*.1)}" cy="${f(-R*.12)}" r="${f(R*.1)}" fill="#fffbe8" opacity="${f(r.lit)}"/>`:'')+`</g>`;
+    if(fwd)s+=this.sparks(P.x,P.y,seg(r.cap,.55,1),12,26*k,491)}
+   if(r.pulse>.05)s+=`<g opacity="${f(r.pulse)}">${sparkle(P.x,P.y,r.pulse*13*k)}</g>`;
+   // Each stop clicks with a glint where the tongue meets its nail (on the knuckle when shaded).
+   if(hop>.05&&jt>.8){const[tx,ty]=big?nailAt(Math.round(bend/15)):[P.x,P.y-Rk];s+=`<g opacity="${f(hop)}">${sparkle(tx,ty,7*hop)}</g>`}
+   // While it turns: a parchment label under the knuckle.
+   if(jt===1&&(performance.now()<model.turnUntil||drag&&(drag.dial||drag.mode==='angle'))){
+    const n=Math.round(Math.abs(bend)/15),deg=signed(bend),tail=n?` · ${n} nail${n===1?'':'s'}`:' · level',lw=Math.round(('GitDiscuss '+deg+tail).length*6.3+22),lx=P.x-lw/2,ly=P.y+h/2+14;
+    s+=`<g><rect x="${f(lx-4)}" y="${f(ly-4)}" width="${lw+8}" height="27" fill="#4a3d2c"/><rect x="${f(lx-3)}" y="${f(ly-3)}" width="${lw+6}" height="25" fill="#cbbd9f"/><rect x="${f(lx)}" y="${f(ly)}" width="${lw}" height="19" fill="#f6ead0" stroke="#1d1612" stroke-width="1.5"/>`+
+     `<text x="${f(P.x)}" y="${f(ly+13.5)}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#2c2117">GitDiscuss <tspan font-weight="700" fill="#8e1f2b">${deg}</tspan>${tail}</text></g>`}
+   if(jt===1){const R=big?Rq+7:h/2,hw=big?14:8;
+    s+=`<g class="hit" id="strapHit" tabindex="0" role="slider" aria-label="Strap hinge: GitDiscuss angle. Arrow keys swing it one nail (15°); Enter separates the widgets" aria-valuemin="${-this.max}" aria-valuemax="${this.max}" aria-valuenow="${Math.round(model.angle)}" aria-valuetext="${signed(model.angle)}" style="cursor:grab"><title>Drag the strap to swing GitDiscuss</title>`+
+     `<circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(R)}" fill="transparent"/><rect transform="rotate(${f(bend)} ${f(P.x)} ${f(P.y)})" x="${f(P.x)}" y="${f(P.y-hw)}" width="${f(this.gap/2+48)}" height="${f(2*hw)}" fill="transparent"/><circle class="ringfocus" cx="${f(P.x)}" cy="${f(P.y)}" r="${f(R+2)}" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g>`+
+     `<g class="hit" id="bossHit" role="button" aria-label="Knock off the pin cap to separate the widgets" style="cursor:pointer"><title>Tap the gilt pin cap to release</title><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(Rk+4)}" fill="transparent"/></g>`}
+   return s;
+  },
+  // Drag the strap about the knuckle; GitDiscuss follows one for one.
+  grab(p){const P=this.geo(ctx()).P;return{dial:true,cx:P.x,cy:P.y,prev:Math.atan2(p.y-P.y,p.x-P.x),deg:0,th0:model.angle,moved:false}},
+  move(d,p){const a=Math.atan2(p.y-d.cy,p.x-d.cx);let da=(a-d.prev)*180/Math.PI;da=((da+540)%360)-180;d.prev=a;
+   d.deg=clamp(d.deg+da,-this.max-d.th0,this.max-d.th0);if(Math.abs(d.deg)>1.5)d.moved=true;model.angle=magnet(d.th0+d.deg)},
+  key(e,hit){if(hit.id!=='strapHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
@@ -2603,7 +2733,7 @@ MORPHS.detail={label:'Scale and detail',kind:'Scale',sizes:[['facade','Facade',0
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -2695,7 +2825,8 @@ function render(){
    else if(model.join==='fan'){el.style.transformOrigin=`0px ${JOINS.fan.up(bd)?h:8}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
    // Chevet: GitDiscuss always turns down about the foot it shares with Jarvis, so the chapels rise in the wedge above.
    else if(model.join==='chevet'){el.style.transformOrigin=`0px ${h}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
-   else{el.style.transformOrigin=`${-JOINS.dial.gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}}
+   // Rose dial and strap hinge: GitDiscuss pivots about the middle of the gap (the rose, or the hinge's knuckle).
+   else{el.style.transformOrigin=`${-J().gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}}
   const k=ease(model.st),cnG=cn?cnGeo(id):null,Se=cn?cnSoffit(cnG,k):0;
   const svg=el.querySelector('.casing'),key=cn?`cn|${w}x${h}|${model.join}|${f(Se)}`:cr?`cr|${w}|${model.join}|${crCold(id)}`:w+'x'+h+model.join;
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=cn?cornWall(id,w,h,k):cr?cryptWall(id,w):casing(id,w,h)}
@@ -2838,7 +2969,7 @@ stage.addEventListener('pointerdown',e=>{
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1}
  drag={id,start:p,cb:cBase(),saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
  // On the rose dial, GitDiscuss's nameplate swings it about the rose (Jarvis still moves the pair).
- if(id==='b'&&model.jt===1&&AJ()){stopAngle();const C=model.join==='apse'?JOINS.apse.geo(ctx(),model.angle).M:model.join==='fan'||model.join==='chevet'?J().geo(ctx()).P:JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
+ if(id==='b'&&model.jt===1&&AJ()){stopAngle();const C=model.join==='apse'?JOINS.apse.geo(ctx(),model.angle).M:model.join==='fan'||model.join==='chevet'||model.join==='strap'?J().geo(ctx()).P:JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
  // The pair is in the hand: any lift making room for Checks pauses (turning the dial doesn't move it, so that leaves the lift running).
  if(id!=='c'&&drag.mode!=='angle')stopLift();
  stage.setPointerCapture(e.pointerId);
