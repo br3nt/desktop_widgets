@@ -429,6 +429,9 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 [data-pair=feltbug] :is(#a,#b) .run{left:292px}[data-pair=feltbug] :is(#a,#b) .next{left:320px}
 [data-pair=feltbug] :is(#a,#b) .strip{top:11px;height:22px}[data-pair=feltbug] #c .strip{top:7px;height:22px}
 [data-pair=feltbug] .w{filter:drop-shadow(0 7px 6px #000b)}
+/* Felt caterpillars: the shaded strip's name and value are sewn into the casing (label and leaf), so the plain strip stays hidden. */
+[data-mix=feltCat] .strip{display:none}
+[data-mix=feltCat][data-shaded="1"] .grip:focus-visible>*{visibility:hidden}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -537,7 +540,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -1124,7 +1127,9 @@ function ctCoil(xr,y,s,flare,work){
 // Jarvis and GitDiscuss stand fused as one stone facade; an oriel bay is corbelled out under their shared buttresses.
 // Checks hangs in it 16 px below the group's base: an 11 px cusped lintel, then the stone predella's cresting.
 const OR={gap:16,m:6,j:10,R:175,below:62},PLUM=['#7a2a5e','#4f1f43','#a5528a','#5a2a6e','#8e3f73','#3d1a35','#b4508e'];
-const chOf=()=>Math.round(lerp(CH,CHS,ease(model.st)));
+// How far the casings have tucked: the shade's own progress, unless a mix tucks first and spends the rest of the shade on something else.
+const shk=()=>X().shK?X().shK(model.st):model.st;
+const chOf=()=>Math.round(lerp(CH,CHS,ease(shk())));
 function bayPos(){return{x:model.a.x+W-CW/2,y:model.a.y+ctx().h+OR.gap}}
 function sepSpot(){const p=bayPos();return{x:clamp(p.x+400,14,1200-CW-14),y:clamp(p.y+130,TOP-20,600-CH-10)}}
 // A ragged circle: the front of the ripple. Its wobble creeps as it grows, so the stone seems to spread grain by grain.
@@ -3272,6 +3277,156 @@ function hgFit(){
  if(model.path)for(const k of['s','j'])for(const id of['a','b'])if(model.path[k][id])model.path[k][id].y+=d;
 }
 
+/* ---------- Mix: felt caterpillars. Felt bugs with the wire page's caterpillar shade, made in felt. ----------
+   Shade timeline (model.st): the pendant tucks (0-.2), its frame flattens into one cord (.16-.3), the name label flips up on it (.27-.38),
+   a felt leaf grows at the far end with the value (.32-.5), the caterpillar comes out from behind the label (.4-.52), stands up (.52-.57),
+   inches along to the leaf (.57-.93) and takes a bite (.93-1). Everything is drawn from st, so unshading plays it backwards. */
+const fcCan=document.createElement('canvas').getContext('2d'),fcMeasure=(t,font)=>{fcCan.font=font;return fcCan.measureText(t).width};
+const FC_NAME='italic 15px Georgia,serif',FC_NUM='bold 15px Georgia,serif',FC_WORD='11px -apple-system,BlinkMacSystemFont,sans-serif';
+const FC_NAMES={a:'Jarvis',b:'GitDiscuss',c:'Checks'};
+const FC_WOOL={amber:'#e39a35',paused:'#8193b8',cream:'#e6d8b8',rasp:'#c8355d',green:'#6aa046'};
+const fcSpring=t=>1+2*Math.pow(t-1,3)+Math.pow(t-1,2); // settles with a small overshoot
+// Segments read from the head back: amber per running Jarvis agent and cream for its two queued checks; raspberry per GitDiscuss
+// decision and cream for its four comments; for Checks, one per two checks (raspberry for the pair waiting, green for the rest). Paused is blue-grey.
+function fcStones(id,run=model[id].run){
+ if(id==='a')return[...Array(3).fill(run?'amber':'paused'),'cream','cream'];
+ if(id==='b')return[...Array(2).fill(run?'rasp':'paused'),...Array(4).fill('cream')];
+ return['rasp',...Array(6).fill('green')];
+}
+const fcValue=id=>id==='a'?{num:'03',word:model.a.run?'running':'paused'}:id==='b'?{num:'02',word:model.b.run?'to decide':'paused'}:{num:'12 / 14',word:''};
+function fcLayout(id,w,h){
+ const small=id==='c',cy=h/2,j=FBK[id].join,e0=j==='l'?40:22,e1=j==='r'?w-40:w-22; // clear of the eye-loop neck and the curled cord ends
+ const tw=Math.ceil(fcMeasure(FC_NAMES[id],FC_NAME))+(small?18:22),th=small?18:22,V=fcValue(id);
+ // Sized for the wider of the live and paused words, so pausing doesn't shift the leaf or the caterpillar.
+ const wd=id==='c'?0:Math.max(fcMeasure('paused',FC_WORD),fcMeasure(id==='a'?'running':'to decide',FC_WORD));
+ const lw=Math.ceil(fcMeasure(V.num,FC_NUM)+(wd?wd+5:0))+40,lh=small?22:28,lx1=e1,lx0=lx1-lw;
+ const r=small?4.2:5.2,rh=small?5.4:6.6,pitch=small?7.6:9.4,ph=(r+rh)*.8,stones=fcStones(id),N=stones.length;
+ const tagX0=e0+4,tagR=tagX0+tw,hf=lx0+3-rh,hs=Math.min(hf,tagR+6+ph+(N-1)*pitch+r);
+ return{small,cy,e0,e1,tw,th,tagX0,tagR,V,lw,lh,lx0,lx1,r,rh,pitch,ph,stones,N,hs,hf};
+}
+// A felt leaf: pointed at the tip (x0, toward the caterpillar), fullest past the middle, pointed again at its stalk (x1).
+function fcLeaf(x0,x1,cy,lh){const n=24,up=[],dn=[];
+ for(let i=0;i<=n;i++){const u=i/n,hh=lh/2*Math.pow(Math.sin(PI*Math.pow(u,1.25)),.6),x=lerp(x0,x1,u);up.push(`${f(x)} ${f(cy-hh)}`);dn.unshift(`${f(x)} ${f(cy+hh)}`)}
+ return 'M'+up.concat(dn).join('L')+'Z'}
+const fcLeafTop=(L,u)=>({x:lerp(L.lx0,L.lx1,u),y:L.cy-L.lh/2*Math.pow(Math.sin(PI*Math.pow(u,1.25)),.6)});
+function fcatCasing(id,w,h){
+ const st=model.st;if(model.mix!=='feltCat'||st<=.16)return fbCasing(id,w,h);
+ const s=FBK[id],small=id==='c',L=fcLayout(id,w,h),cy=L.cy,m=model[id],p=ease(seg(st,.16,.3));
+ const r0=Math.min(small?20:26,(h-10)/2),fh=Math.max(0,(h-10)*(1-p)),fr=Math.min(r0,fh/2),ph=(h-13)*(1-p),keep=1-p;
+ let o=`<defs>${feltFilters(id,s.seed)}${fbFilter('fc-'+id,s.seed+3,[-34,-20,w+68,h+40],1)}${fbFilter('fk-'+id,s.seed+5)}${fbFilter('fl-'+id,s.seed+7)}`+
+  `<mask id="fbite-${id}" maskUnits="userSpaceOnUse" x="-10" y="-10" width="${w+20}" height="${h+20}"><rect x="-10" y="-10" width="${w+20}" height="${h+20}" fill="#fff"/>`;
+ // The bite out of the leaf's top edge near its tip, just in front of where the head stops.
+ const bite=seg(st,.945,1),B=fcLeafTop(L,.085);
+ if(bite>0)o+=`<circle cx="${f(B.x)}" cy="${f(B.y-.6)}" r="${f(3*bite)}"/><circle cx="${f(B.x+3.6)}" cy="${f(B.y-1.2)}" r="${f(2.4*bite)}"/>`;
+ o+=`</mask></defs>`;
+ // The plate is squeezed out of the frame as the frame closes on it.
+ if(keep>.02)o+=`<g opacity="${f(keep)}"><path d="${rrect(3,cy-ph/2+1.5,w-6,ph+7,r0+1)}" fill="#1a120f" filter="url(#g-${id})"/><path d="${rrect(6.5,cy-ph/2,w-13,ph,Math.min(r0-1.5,ph/2))}" fill="${s.plate}" filter="url(#f-${id})"/></g>`;
+ // The cord: the frame closes into one stuffed cord along the centre line, and its free ends curl up as it straightens.
+ const sg=s.join==='r'?1:s.join==='l'?-1:0,xl=sg<0?5:13,xr=sg>0?w-5:w-13,cu=seg(p,.55,1),cr=4.6*cu;
+ let cord=fh>1?rrect(5,cy-fh/2,w-10,fh,fr):`M${xl} ${f(cy)}H${xr}`;
+ if(cu>0){if(sg>=0)cord+=spiral(13,cy-cr,cr,1.15*cu,1,PI/2);if(sg<=0)cord+=spiral(w-13,cy-cr,cr,1.15*cu,-1,PI/2)}
+ const old=keep>.02?spiral(small?17:22,small?13:16,6.5*(small?.75:1),1.6,1,PI*.9)+spiral(w-(small?17:22),small?13:16,6.5*(small?.75:1),1.6,-1,PI*.1):'';
+ let loop='',neck='',whip=band(w/2,cy+fh/2,false,small?5:7,9.5);
+ if(sg){const x0=sg>0?w-5:5,lx=sg>0?w+FB.lo:-FB.lo;loop=fbCircle(lx,cy,FB.lr);neck=`M${f(x0)} ${f(cy)}H${f(lx-sg*FB.lr)}`;whip=band((x0+lx-sg*FB.lr)/2,cy,false,3,8,2.3)+(keep>.5?whip:'')}
+ else if(keep<=.5)whip='';
+ // The frame's side wraps, as on the pendant, until the frame has closed.
+ if(keep>.5){const n=hh=>Math.max(2,Math.min(hh,Math.floor((h-(sg?30:26))/2.8)));whip+=sg?band(sg>0?5:w-5,cy,true,n(6),9.5):band(5,cy,true,n(5),9)+band(w-5,cy,true,n(5),9)}
+ o+=fbShadow(cord,6.2)+(loop?fbShadow(loop+neck,3.8):'')+(old?`<g opacity="${f(keep)}">${fbShadow(old,3.2)}</g>`:'');
+ o+=`<g filter="url(#fc-${id})">${fbBody(cord,6.2)}${old?`<g opacity="${f(keep)}">${fbBody(old,3.2)}</g>`:''}${loop?fbBody(neck,4.2)+fbBody(loop,3.8):''}</g>`;
+ o+=fbTwist(cord,6.2)+(old?`<g opacity="${f(keep)}">${fbTwist(old,3.2)}</g>`:'')+(loop?fbTwist(loop,3.8):'')+(whip?fbWhip(whip):'');
+ if(st<.27)return o;
+ // The value leaf grows from its stalk, whip-stitched onto the cord, then its words come up.
+ const lq=seg(st,.32,.44);
+ if(lq>0){const sx=Math.max(.01,fcSpring(lq)),leaf=fcLeaf(L.lx0,L.lx1,cy,L.lh),to=seg(st,.44,.5);
+  const nW=fcMeasure(L.V.num,FC_NUM),tW=nW+(L.V.word?fcMeasure(L.V.word,FC_WORD)+5:0),tx=lerp(L.lx0,L.lx1,.53),t0=tx-tW/2,t1=tx+tW/2;
+  o+=`<g opacity="${f(clamp(lq*4))}" transform="translate(${f(L.lx1)} ${f(cy)}) scale(${f(sx*1000)/1000} ${f(Math.min(1,sx)*1000)/1000}) translate(${f(-L.lx1)} ${f(-cy)})">`+
+   `<g mask="url(#fbite-${id})"><path d="${leaf}" fill="#120a08" opacity=".45" filter="url(#sh)" transform="translate(.8 2)"/><g filter="url(#fl-${id})"><path d="${leaf}" fill="#3d6a27"/></g>`+
+   // Midrib and veins in running stitch, kept clear of the words.
+   stitch(`M${f(L.lx0+5)} ${f(cy)}H${f(t0-5)}`+(L.lx1-4>t1+5?`M${f(t1+5)} ${f(cy)}H${f(L.lx1-4)}`:''),'#e9dcb6',.75,1,'2.6 2')+`</g>`+
+   fbWhip(band(L.lx1+1,cy,false,3,small?8:10,2.3))+
+   `<text x="${f(tx)}" y="${f(cy+.5)}" text-anchor="middle" dominant-baseline="central" opacity="${f(to)}" style="paint-order:stroke" stroke="#1d3311" stroke-width="2.4" stroke-opacity=".55"><tspan font-family="Georgia,serif" font-weight="700" font-size="15" fill="#fff0cc">${L.V.num}</tspan>${L.V.word?`<tspan dx="5" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#eef3dc">${L.V.word}</tspan>`:''}</text></g>`}
+ // The caterpillar: it comes out from behind the label head first, stands up on its legs and inches along with a hump running tail to head.
+ const q=ease(seg(st,.4,.52)),rise=ease(seg(st,.52,.57)),pw=seg(st,.57,.93),{r,rh,pitch,N}=L;
+ const D=L.hf-L.hs,nS=D>1?Math.max(1,Math.round(D/(pitch*2.4))):0,stride=nS?D/nS:0,amp=r*.75;
+ const hx0=lerp(L.tagR-rh,L.hs,q),pS=pw*nS,full=Math.min(Math.floor(pS),nS),frac=pS-full,items=[];
+ for(let j=0;j<=N;j++){const k=N-j,a0=k/N*.45,a=nS&&full<nS?ease(seg(frac,a0,a0+.55)):0;
+  items.push({x:hx0-(j?L.ph+(j-1)*pitch:0)+stride*(full+a),lift:Math.sin(PI*a)*amp*rise})}
+ // A change (pause or resume) runs the new colour down from the head while the head nods twice.
+ let nt=m.fnod?Math.min(1,Math.floor((performance.now()-m.fnod.t0)/FRAME)*FRAME/1300):-1;if(nt>=1)nt=-1;
+ const standY=r+1.6;let legs='',sh='',balls='',pops='';
+ if(q>0){for(let j=N;j>=1;j--){const it=items[j],by=cy-rise*standY-it.lift,rr=j===N?r*.82:r;
+   if(it.x<L.tagR-r*2)continue;
+   if(rise>0){const lf=it.lift/amp||0,end=lerp(by+r*.6,lerp(cy+1.2,by+r+2.6,lf),rise);
+    legs+=`M${f(it.x-r*.45)} ${f(by+r*.5)}L${f(it.x-r*.6)} ${f(end)}M${f(it.x+r*.45)} ${f(by+r*.5)}L${f(it.x+r*.3)} ${f(end)}`}
+   let stone=L.stones[j-1],bump=0;
+   if(nt>=0){const thr=.14+(j-1)*.08,was=m.fnod.old[j-1];if(was&&was!==stone){if(nt<thr)stone=was;bump=Math.max(0,1-Math.abs(nt-thr-.03)/.07)}}
+   const R=rr*(1+.22*bump);sh+=`<circle cx="${f(it.x)}" cy="${f(by)}" r="${f(R)}"/>`;balls+=`<circle cx="${f(it.x)}" cy="${f(by)}" r="${f(R)}" fill="${FC_WOOL[stone]}"/>`;
+   if(bump>.3)pops+=`<path d="M${f(it.x-R*.9)} ${f(by-R-1.5)}l-1.6 -1.8M${f(it.x)} ${f(by-R-2.2)}v-2.2M${f(it.x+R*.9)} ${f(by-R-1.5)}l1.6 -1.8" stroke="#efe0c2" stroke-width="1" stroke-linecap="round" opacity="${f(bump)}"/>`}
+  // The head: a rust felt ball with a button eye, a stitched smile and thread antennae with French-knot tips.
+  const H0=items[0];let head='',hs2='';
+  if(H0.x>L.tagR-rh*2){const hy=cy-rise*(standY+1.5)-H0.lift,hx=H0.x,eye=ease(seg(st,.52,.57));
+   let nod=12*Math.sin(PI*seg(st,.93,1))-9*(rise?H0.lift/amp:0),bob=0;
+   if(nt>=0){nod+=20*Math.abs(Math.sin(nt*2*PI))*(1-nt);bob=14*Math.sin(nt*4*PI-1)*(1-nt)}
+   const nx=hx-rh*.7,ny=hy+rh*.3,an=rise;
+   hs2=`<circle cx="${f(hx)}" cy="${f(hy)}" r="${rh}" transform="rotate(${f(nod)} ${f(nx)} ${f(ny)})"/>`;
+   head=`<g transform="rotate(${f(nod)} ${f(nx)} ${f(ny)})">`;
+   for(const ox of[-.35,.12]){const x0=hx+rh*ox,y0=hy-rh*.8,tip=[hx+rh*(ox+.9*an+.1),hy-rh*(.9+1.15*an)],c=[hx+rh*(ox+.1),hy-rh*(1+1.3*an)];
+    if(an>0)head+=`<g transform="rotate(${f(bob*(ox<0?.7:1))} ${f(x0)} ${f(y0)})" opacity="${f(clamp(an*2))}"><path d="M${f(x0)} ${f(y0)}Q${f(c[0])} ${f(c[1])} ${f(tip[0])} ${f(tip[1])}" fill="none" stroke="#2b1a12" stroke-width="1.1" stroke-linecap="round"/>${fknot(tip[0],tip[1],small?1.3:1.6)}</g>`}
+   head+=`<g filter="url(#fk-${id})"><circle cx="${f(hx)}" cy="${f(hy)}" r="${rh}" fill="#c0442c"/></g>`;
+   const ex=hx+rh*.38,ey=hy-rh*.22;
+   if(eye>.5)head+=`<circle cx="${f(ex)}" cy="${f(ey)}" r="${small?1.5:1.9}" fill="#16100c" stroke="#5a4636" stroke-width=".45"/><circle cx="${f(ex-.55)}" cy="${f(ey)}" r=".36" fill="#8a7764"/><circle cx="${f(ex+.55)}" cy="${f(ey)}" r=".36" fill="#8a7764"/>`;
+   else head+=`<path d="M${f(ex-1.6)} ${f(ey)}q1.6 1.4 3.2 0" fill="none" stroke="#1a100b" stroke-width=".9" stroke-linecap="round"/>`;
+   head+=`<path d="M${f(hx+rh*.25)} ${f(hy+rh*.42)}q${f(rh*.3)} ${f(rh*.25)} ${f(rh*.62)} ${f(-rh*.08)}" fill="none" stroke="#3a140c" stroke-width=".8" stroke-linecap="round" opacity="${f(eye)}"/></g>`}
+  o+=`<g fill="#000" opacity=".38" filter="url(#sh)" transform="translate(1 2.4)">${sh}${hs2}</g>`;
+  if(legs)o+=`<path d="${legs}" stroke="#2b1a12" stroke-width="${small?1.3:1.6}" stroke-linecap="round"/>`;
+  o+=`<g filter="url(#fk-${id})">${balls}</g>${pops}${head}`}
+ // The name label flips up on the cord last in the stack, so the caterpillar comes out from behind it.
+ const tq=seg(st,.27,.38);
+ if(tq>0){const sy=Math.max(.01,fcSpring(tq)),x0=L.tagX0,y0=cy-L.th/2;
+  o+=`<g opacity="${f(clamp(tq*4))}" transform="translate(0 ${f(cy)}) scale(1 ${f(sy*1000)/1000}) translate(0 ${f(-cy)})">`+
+   `<rect x="${f(x0+.8)}" y="${f(y0+2)}" width="${L.tw}" height="${L.th}" rx="4" fill="#120a08" opacity=".45" filter="url(#sh)"/>`+
+   `<rect x="${f(x0)}" y="${f(y0)}" width="${L.tw}" height="${L.th}" rx="4" fill="#efe3c6"/>`+
+   stitch(rrect(x0+2.6,y0+2.6,L.tw-5.2,L.th-5.2,2.4),s.plate,.7,.9,'2.2 1.9')+
+   `<text x="${f(x0+L.tw/2)}" y="${f(cy+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="15" fill="#3a2418">${FC_NAMES[id]}</text></g>`+
+   fbWhip(band(x0-2.5,cy,false,2,8,2.3)+band(L.tagR+2.5,cy,false,2,8,2.3)).replace(/<path /g,`<path opacity="${f(clamp(tq*3))}" `)}
+ return o;
+}
+// Nods run on their own short clock at 12 fps; the page is still again once they finish.
+const fcTok={a:0,b:0,c:0};
+// The colours a caterpillar is showing right now: mid-nod, the balls the new colour hasn't reached yet still show the old one.
+function fcShown(id){const m=model[id],now=fcStones(id);if(!m.fnod)return now;
+ const nt=Math.min(1,(performance.now()-m.fnod.t0)/1300);return now.map((s,i)=>nt<.14+i*.08?(m.fnod.old[i]||s):s)}
+function fcNod(id,old){
+ if(reduce.matches){model[id].fnod=null;render();return}
+ model[id].fnod={t0:performance.now(),old:old||fcStones(id)};const token=++fcTok[id];
+ stepped(1300,t=>{if(t>=1&&fcTok[id]===token)model[id].fnod=null;render()},token,k=>k===fcTok[id]);
+}
+// Placed straight after Felt bugs in the Mix row: the mixes after it are taken out and put back behind it.
+{const ks=Object.keys(MIXES),at=ks.indexOf('feltbugs'),FBM=MIXES.feltbugs;
+ MIXES.feltCat={...FBM,label:'Felt caterpillars',kind:'Layer stack',shadeMs:4400,unshadeMs:2600,
+  stack:[['Structure','Wire','the felt bugs pendants, eye loops and caterpillar ring, plus the wire page\'s caterpillar shade: the frame flattened into one wire, a name slab, a leaf bead holding the value, and a caterpillar walking between them'],
+   ['Material','Felt','the wire is a stuffed wool cord with curled ends, the name slab a cotton label threaded on it, the leaf bead a felt leaf whip-stitched on, and the glass caterpillar a chain of felt balls with a button eye'],
+   ['Ornament','Wire, with a fallback','on the wire page the segments are stones, one per status; felt has no stones, so each is a ball of the wool a jeweller would match to the stone: amber, raspberry for carnelian, green for malachite, cream for pearl, blue-grey for labradorite'],
+   ['Palette','Garden wools','the felt bugs palette, a dark green leaf with cream stitching, a rust head'],
+   ['Motion','Felt','12 fps stop-motion: each inchworm hump, nod and bite lands on a frame, and the fibres shift with it'],
+   ['Display','Felt','shaded, the name is printed on the cotton label and the value in cream on the leaf']],
+  about:'Felt bugs again, with the other half of the brainstorm\'s note: "wire structure (the bead caterpillar shade, jump rings) in felt material: a felt caterpillar with button eyes". The pendants and the caterpillar jump ring are the same as in Felt bugs; the shade is the wire page\'s Caterpillar, rebuilt in felt.',
+  shade:{label:'Felt caterpillar',kind:'Distil · character',
+   about:'Each pendant tucks to a strip, then its plate is squeezed out and the cord frame closes into one stuffed cord along the middle, its free ends curling up. A cotton name label flips up on the cord at the left, and a dark green felt leaf grows from its stalk at the far end with the value in cream (Jarvis 03 running, GitDiscuss 02 to decide, Checks 12 / 14). Then a felt caterpillar pushes out from behind the label head first, stands up on its legs, opens its button eye, and inches along the cord (12 fps, a hump running tail to head on each stride) until it reaches the leaf and takes a bite out of its tip. The segments are the statuses, read from the head back: <b>amber</b> per running Jarvis agent and two <b>cream</b> for its queued checks; <b>raspberry</b> per GitDiscuss decision and four cream for the comments; for Checks one per two checks, raspberry for the pair waiting and <b>green</b> for the rest. Paused widgets go <b>blue-grey</b>. <b>Tap a caterpillar</b> (or press Enter on its nameplate) to pause or resume its widget: the head nods twice and the new colour runs down the body a segment at a time, each ball puffing as it changes; tapping Checks just makes it look up. Unshading walks it back behind its label and plays the rest backwards. The eye loops stay on the cord, so shaded pendants still join.'},
+  shK:st=>seg(st,0,.2),
+  ckey(id){const st=model.st;if(st<=.16)return '';const m=model[id];return '|'+Math.round(st*1000)+(m.run===false?'p':'')+(m.fnod?'n'+Math.floor((performance.now()-m.fnod.t0)/FRAME):'')},
+  casing:fcatCasing,
+  tap(id){
+   if(model.st<.95)return;
+   if(id==='c'){fcNod('c');say('Checks looks up: 12 of 14 passed, 2 waiting for approval.');return}
+   const m=model[id],old=fcShown(id),name=id==='a'?'Jarvis':'GitDiscuss';m.run=!m.run;fcNod(id,old);
+   say(name+(m.run?' resumed':' paused')+': the caterpillar nods and its new colour runs down from the head.')},
+  text:{...FBM.text,intro:'Felt pendants with a felt caterpillar on Jarvis\'s eye loop, as in Felt bugs. Shade them (press 4) to see the felt caterpillars walk.',
+   shadeOn:'Shaded: each frame closes into a felt cord, and a felt caterpillar comes out from behind its name label and inches along to its value leaf. Tap one to pause or resume its widget.',
+   shadeOff:'Unshaded: the caterpillars back away behind their labels and the pendants open out again.'}};
+ for(const k of ks.slice(at+1)){const v=MIXES[k];delete MIXES[k];MIXES[k]=v}
+}
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1};
@@ -3347,12 +3502,12 @@ function toggleShade(){
  // A docked group parked low while shaded rises as it unshades, so the oriel and its ring stay on the stage.
  if(DOCK()&&!to){const y=Math.min(model.a.y,600-10-(H+OR.gap+CH+BELOW()));model.a.y=model.b.y=y}
  // Shade runs on its own stop-motion clock so it can overlap a join.
- stepped(600*Math.abs(to-start),t=>{model.st=lerp(start,to,t);render()},token,k=>k===shadeAnim);
+ stepped(((to?0:X().unshadeMs)||X().shadeMs||600)*Math.abs(to-start),t=>{model.st=lerp(start,to,t);render()},token,k=>k===shadeAnim);
  say(to?T().shadeOn:T().shadeOff);
 }
 
 /* ---------- Rendering ---------- */
-function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,ease(model.st))),ch:chOf(),jt:model.jt,glow:model.glow}}
+function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,ease(shk()))),ch:chOf(),jt:model.jt,glow:model.glow}}
 function render(){
  if(model.jt===1)hgFit();
  const c=ctx(),x=X(),j=x.join,ch=c.ch,sqf=id=>x.squash?x.squash(c,id):0;
@@ -3361,14 +3516,14 @@ function render(){
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
-  const svg=el.querySelector('.casing'),key=model.mix+document.body.dataset.pair+w+'x'+h;
+  const svg=el.querySelector('.casing'),key=model.mix+document.body.dataset.pair+w+'x'+h+(x.ckey?x.ckey(id):'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=x.casing(id,w,h)}
   if(!small||x.dock){el.style.transformOrigin=`${small?CW/2:id==='a'?W:0}px ${h}px`;const sq=sqf(id),ly=x.lift?x.lift(c,id):0;
    el.style.transform=(ly?`translate(0,${f(ly)}px) `:'')+(sq?`scale(${f((1+.025*sq)*1000)/1000},${f((1-.045*sq)*1000)/1000})`:'');
    // A mix with a turning joint swings GitDiscuss about the pin: [degrees, origin x, origin y].
    const tn=x.turn?x.turn(c,id):null;if(tn&&Math.abs(tn[0])>.01){el.style.transformOrigin=`${f(tn[1])}px ${f(tn[2])}px`;el.style.transform+=` rotate(${f(tn[0])}deg)`}}
   else el.style.transform='';
-  const k=ease(model.st),show=1-clamp(k*2.2),strip=seg(k,.55,1);
+  const k=ease(shk()),show=1-clamp(k*2.2),strip=seg(k,.55,1);
   // Tabs and buttons sit lowest, so they go first as the casing shrinks.
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{const o=n.matches('.tabline,.knob')?1-clamp(k*5):show;n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
@@ -3384,6 +3539,7 @@ function render(){
  // On a turning joint the arrow keys set the angle, from the pin or the arm.
  if(x.angle)$$('#joinHit,#angleHit').forEach(n=>{const k0=n.onkeydown;n.onkeydown=e=>{const d={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(d){e.preventDefault();x.angle(hgSet+d*HG.step);return}if(k0)k0(e)}});
  if(focused)($('#'+focused)||$('#a .grip')).focus();
+ document.body.dataset.shaded=model.st>.5?'1':'';
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#expRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.mix)));
@@ -3457,7 +3613,7 @@ stage.addEventListener('pointerdown',e=>{
   e.preventDefault();++anim;model.busy=false;model.dir=-1;model.tsign=1;model.path={s:separatePose(),j:here()};
   drag={turn:true,moved:false,...X().grab(local(e))};stage.setPointerCapture(e.pointerId);render();return;
  }
- const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
+ const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();gripMoved=false;gripAt={x:e.clientX,y:e.clientY};
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  if((id!=='c'||DOCK())&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1;model.glow=0}
@@ -3480,6 +3636,8 @@ stage.addEventListener('pointermove',e=>{
   setJt(t);render();return;
  }
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
+ // A tap is judged in screen pixels, so a finger's wobble on a zoomed-out phone page still counts as a tap.
+ if(gripAt&&Math.hypot(e.clientX-gripAt.x,e.clientY-gripAt.y)>(e.pointerType==='touch'?10:4))gripMoved=true;
  if(drag.id==='c'&&!DOCK()){model.c.x=clamp(s.c.x+dx,14,1200-CW-14);model.c.y=clamp(s.c.y+dy,TOP-20,600-CH-10);render();return}
  if(drag.group&&DOCK()){const ax=clamp(s.a.x+dx,10,1200-2*W-10),ay=clamp(s.a.y+dy,TOP,dockBottom());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W,y:ay});render();return}
  if(DOCK()){
@@ -3506,6 +3664,7 @@ function endDrag(){
  if(d.angle){hgTo(hgCur,560,true);say(T().joined);return}
  if(d.turn){if(!d.moved||model.jt<=.8)doSeparate();else tween(model.jt,1,330,setJt).then(ok=>{if(ok){model.path=null;say(T().back)}});return}
  const ready=d.state==='ready';
+ if(!gripMoved&&d.state==='idle'&&X().tap){model.glow=0;render();X().tap(d.id);return}
  if(ready){startJoinFrom({...X().readyPose},.25);model.ready=true;model.path=null;doJoin(d.id==='b'?'a':'b',1800)}else{model.glow=0;render()}
 }
 function cancelDrag(){
@@ -3514,6 +3673,9 @@ function cancelDrag(){
  if(d.turn){++anim;model.busy=false;setJt(1);model.path=null;boil(-1);render();say(T().cancel);return}
  const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
 }
+// A mix with a tap on its shaded strips (the felt caterpillars) takes a press on a nameplate that doesn't move (see endDrag), or Enter on it.
+let gripMoved=false,gripAt=null;
+$$('.grip').forEach(g=>g.addEventListener('click',e=>{const x=X();if(x.tap&&e.detail===0)x.tap(g.dataset.drag)}));
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
