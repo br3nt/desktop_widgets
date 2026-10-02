@@ -208,7 +208,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -836,7 +836,7 @@ function scissors(x,y,ang,open,op=1){
 // A felt strip is sewn across the gap. GitDiscuss turns about the strip's inside corner:
 // the inside closes up a little and bunches into creases, the outside stretches.
 const HG=18,OV=9,HMAX=40,HCOL='#c8b089',HTHREAD='#7a3416';
-// Angled joins (the cloth hinge and the safety pin) share the angle model, the bend drag and the vertical fit.
+// Angled joins (the cloth hinge, the safety pin and the button joint) share the angle model, the bend drag and the vertical fit.
 const hingeOn=()=>!!J().angled&&model.jt===1;
 // Displayed bend: flat until the joint is made, then a soft felt flop that settles on model.angle.
 function bendAt(jt){
@@ -844,16 +844,16 @@ function bendAt(jt){
  const u=seg(jt,j.swingAt,1);if(u<=0)return 0;
  // The pin's overshoot is capped so GitDiscuss's corner never swings into Jarvis.
  const v=model.angle*(1-Math.pow(1-u,2.5)*Math.cos(2.4*Math.PI*u));
- return j.det?clamp(v,-j.amax-4,j.amax+4):v;
+ return j.det||j.cap?clamp(v,-j.amax-4,j.amax+4):v;
 }
 function hingeFrame(th,h){
  const sg=th<0?-1:1,r=th*Math.PI/180,yi=Math.min(10,h*.2);
  return{th,sg,yi,ox:EDGE,shr:12*Math.abs(th)/HMAX,oy:sg>0?h-EDGE-yi:EDGE+yi,cos:Math.cos(r),sin:Math.sin(r)};
 }
-// The safety pin turns GitDiscuss about the pin itself, in the middle of the gap at mid-height.
+// The safety pin and the button joint turn GitDiscuss about the pin (or button) itself, in the middle of the gap at mid-height.
 function angFrame(th,h){
- if(model.join!=='pin')return hingeFrame(th,h);
- const r=th*Math.PI/180;return{th,ox:-PN.gap/2,oy:h/2,shr:0,cos:Math.cos(r),sin:Math.sin(r)};
+ if(!J().midPivot)return hingeFrame(th,h);
+ const r=th*Math.PI/180;return{th,ox:-J().gap/2,oy:h/2,shr:0,cos:Math.cos(r),sin:Math.sin(r)};
 }
 // A GitDiscuss-local point on the stage, given GitDiscuss's unbent top-left (bx,by). Matches its CSS transform.
 const hingePt=(F,bx,by,lx,ly)=>{const dx=lx-F.ox,dy=ly-F.oy;return{x:bx+F.ox-F.shr+dx*F.cos-dy*F.sin,y:by+F.oy+dx*F.sin+dy*F.cos}};
@@ -983,6 +983,40 @@ function xTag(x,y,txt,cx=1.9){
  return `<g transform="translate(${f(x)} ${f(y)}) rotate(-4)"><rect x="${f(-tw/2)}" y="${f(-th/2)}" width="${f(tw)}" height="${f(th)}" rx="2" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1 1.6)"/>`+
   `<rect x="${f(-tw/2)}" y="${f(-th/2)}" width="${f(tw)}" height="${f(th)}" rx="2" fill="#f4ead3"/><rect x="${f(-tw/2+2.5)}" y="${f(-th/2+2.5)}" width="${f(tw-5)}" height="${f(th-5)}" rx="1" fill="none" stroke="${HTHREAD}" stroke-opacity=".7" stroke-dasharray="2.4 1.8"/>`+
   `<g transform="translate(${f(-xp.w/2)} ${f(-3.5*cx)})" fill="none" stroke-linecap="round" stroke-width="${f(cx*.38)}"><path d="${xp.d1}" stroke="#7a2e17"/><path d="${xp.d2}" stroke="#b4492a"/></g></g>`;
+}
+
+/* ---------- Button joint geometry ---------- */
+// A rag doll's thread joint. Jarvis's ear carries a pinked cream felt washer; GitDiscuss's ear is laid on it, and a long doll
+// needle sews a wooden button through all three in a doubled cross, then winds the thread round under the button into a stiff
+// shank. GitDiscuss turns on the shank and stays wherever it is left (friction, no detents). The pivot is mid-gap, mid-height.
+const BJ={gap:36,rJ:23,rW:17.5,rG:14,rB:9.5,max:30,hole:2.7,
+ // The doubled cross: up through the first hole, down through the second.
+ st:[[0,2],[1,3],[0,2],[1,3]]};
+const bjHoles=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([x,y])=>({x:x*BJ.hole,y:y*BJ.hole}));
+// Where the needle and the button wait at rest, stuck in Jarvis's end below and above its ear (in Jarvis's frame).
+function bjPark(a,h){
+ const k=clamp((h-40)/90);
+ return{B:{x:a.x+W-22,y:a.y+Math.max(9,h/2-30)},N:{x:a.x+W-34,y:a.y+h/2+lerp(6,24,k)},ang:lerp(-25,-62,k)};
+}
+// The needle with the tip s px under the felt at the hole p (s<0: the tip is that far above it), body along ang toward the eye.
+function bjNeedle(p,ang,s){
+ const r=ang*Math.PI/180,d={x:Math.cos(r),y:Math.sin(r)},tip=V.sub(p,V.mul(d,s));
+ return{svg:needle(tip.x,tip.y,ang,Math.max(0,s),26).replace('id="ndl"','id="ndlb"').replace('url(#ndl)','url(#ndlb)'),eye:V.add(tip,V.mul(d,21))};
+}
+// A wooden button: end-grain rings, a bevelled rim, four holes and a burnt notch toward Jarvis that reads the angle.
+function woodButton(r,lift,glint){
+ let s=`<circle r="${r}" fill="#000" opacity="${f(.42+.12*lift)}" filter="url(#sh)" transform="translate(${f(.8+2*lift)} ${f(1.8+3.6*lift)})"/>`+
+  `<circle r="${r}" fill="url(#bjwood)" stroke="#3a1e0a" stroke-width=".9"/>`+
+  `<g fill="none" stroke="#5b3212" stroke-opacity=".38" stroke-width=".55"><ellipse cx="1.6" cy="1" rx="${f(r*.72)}" ry="${f(r*.6)}"/><ellipse cx="2.2" cy="1.4" rx="${f(r*.46)}" ry="${f(r*.36)}"/><path d="M${f(-r*.8)} ${f(-r*.2)}Q${f(-r*.2)} ${f(-r*.55)} ${f(r*.5)} ${f(-r*.7)}"/></g>`+
+  `<circle r="${f(r-1.6)}" fill="none" stroke="#2a1405" stroke-opacity=".3" stroke-width="1"/>`+
+  `<path d="M${f(-r*.78)} ${f(-r*.42)}A${f(r*.9)} ${f(r*.9)} 0 0 1 ${f(r*.2)} ${f(-r*.88)}" fill="none" stroke="#ffe6bf" stroke-opacity="${f(.4+.35*glint)}" stroke-width="1.1" stroke-linecap="round"/>`+
+  `<path d="M${f(-r+.4)} 0h2.6" stroke="#1e0d03" stroke-width="1.6" stroke-linecap="round"/>`;
+ return s+`<g fill="#160902">${bjHoles.map(p=>`<circle cx="${p.x}" cy="${p.y}" r="1.05"/>`).join('')}</g>`;
+}
+// The wound shank peeking out under the rim on the lower right: n wraps, leaning with the twist.
+function bjShank(r,n,tw){
+ let d='';for(let i=0;i<n;i++){const y=r*.1+i*2.1;d+=`M${f(r*.25)} ${f(r+.6+i*.1)}C${f(r*.7+tw)} ${f(r+1.6)} ${f(r+1.6+tw)} ${f(y+3)} ${f(r+.4)} ${f(y-1)}`}
+ return floss(d,1.15);
 }
 
 const mixHex=(a,b,t)=>'#'+[0,2,4].map(i=>Math.round(lerp(parseInt(a.substr(i+1,2),16),parseInt(b.substr(i+1,2),16),t)).toString(16).padStart(2,'0')).join('');
@@ -1467,7 +1501,7 @@ const JOINS={
    return s;
   }
  },
- pin:{label:'Safety pin',kind:'Angle · pivot',gap:PN.gap,ms:3300,msDrag:2900,relMs:2400,moveEnd:.3,hold:.58,angled:true,amax:PN.max,astep:PN.det,det:PN.det,swingAt:.8,
+ pin:{label:'Safety pin',kind:'Angle · pivot',gap:PN.gap,ms:3300,msDrag:2900,relMs:2400,moveEnd:.3,hold:.58,angled:true,midPivot:true,amax:PN.max,astep:PN.det,det:PN.det,swingAt:.8,
   ph:[[0,.3,.5,.8,1],[0,.18,.4,.66,1]],
   about:'A visible pivot. Each joining end has a round felt ear at mid-height: Jarvis\'s is a big brown disc with a stitched tick every 15°, GitDiscuss\'s is a smaller teal one folded back against the cushion, with a red felt pointer. A brass safety pin is pinned through Jarvis\'s ear, clasped shut. <b>Near:</b> GitDiscuss\'s ear unfolds and lifts, and the clasp starts to open. <b>Ready:</b> a ghost ring shows where the ears will meet. Joining (12 fps): the cushions close to a finger\'s width, the clasp swings open and the pin slides out of Jarvis\'s ear. GitDiscuss\'s ear flops down on top, the pin goes back in through both ears (holes pucker round it), and the clasp swings shut with a glint. GitDiscuss then swings round the pin to the set angle with an overshoot, and the pin turns half as far, held by both. <b>Angle:</b> −30° to +30° with a detent every 15°. The pointer reads the ticks and the tick it rests on gets a gold knot. Drag GitDiscuss\'s nameplate round the pin (it catches near each tick and settles onto the nearest when you let go), use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓. A cotton tag shows the angle in cross-stitch while it turns, and the pair shifts to stay on the desktop. Jarvis\'s nameplate still moves the pair. <b>Release:</b> tap the pin (or focus it and press Enter). GitDiscuss swings level, the clasp opens, the pin comes out, the ear folds back, and the pin goes back into Jarvis\'s ear before the cushions part.',
   sayJoin:'The pin comes out of Jarvis\'s ear, GitDiscuss\'s ear is laid on top, and the pin goes back through both.',
@@ -1526,6 +1560,123 @@ const JOINS={
     (tipY<5?pinHole(5,1):'')+(tipY<-5?pinHole(-5,1):'')+`<g filter="url(#pinsh)">${safetyPin(r.open,r.T,r.glint)}</g>`;
    if(jt===1)o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Safety pin: tap or press Enter to unpin it and separate the widgets"><title>Tap the pin to unpin it</title><rect x="-11" y="-36" width="24" height="70" rx="11" fill="transparent"/><rect class="ringfocus" x="-11" y="-36" width="24" height="70" rx="11" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
    o+='</g>';
+   // While it turns: the angle in cross-stitch on a pinned cotton tag, above the pair (or below it near the top of the desktop).
+   if(model.turning&&jt===1){const up=PA.y-h/2-30>50;o+=xTag(PA.x,up?PA.y-h/2-26:PA.y+h/2+26,signed(th).replace('−','-'))}
+   return o;
+  }
+ },
+ bjoint:{label:'Button joint',kind:'Hinge',gap:BJ.gap,ms:5600,msDrag:5100,relMs:3000,moveEnd:.3,hold:.62,angled:true,midPivot:true,cap:true,amax:BJ.max,astep:5,swingAt:.84,snip:true,
+  ph:[[0,.3,.5,.84,1],[0,.12,.26,.82,1]],
+  about:'Rag dolls and teddies are thread-jointed: a long doll needle sews a button on through the limb and the body, then the thread is wound round under the button into a stiff shank, so the limb turns but stays where it is put. Here GitDiscuss is the limb. Each joining end has a round felt ear at mid-height. Jarvis\'s is the larger, with a pinked cream felt washer basted on it and seven straight stitches round its rim, 10° apart. A wooden button waits above it, threaded with red floss to a doll needle stuck in Jarvis\'s felt below. <b>Near:</b> GitDiscuss\'s ear unfolds and lifts, the needle starts to work loose and the button catches the light. <b>Ready:</b> a ghost ring shows where the ears will meet. Joining (12 fps): the cushions close to a thumb\'s width and GitDiscuss\'s ear flops down onto the washer. The button is lifted onto the stack, then the needle pulls free and sews it on in a doubled cross, diving down one hole and coming up the next. It winds the thread three times round under the button, so the button rises a little on its shank, and ties off with a knot and a glint. The needle goes back into Jarvis\'s felt with a short tail, and GitDiscuss turns stiffly to the set angle. <b>Angle:</b> −30° to +30°, held by friction, with no detents. The burnt notch on the button points at Jarvis\'s rim stitches, and the shank\'s wraps lean as it twists. Drag GitDiscuss\'s nameplate round the button, use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓ (5° a press). A cotton tag shows the angle in cross-stitch while it turns. Jarvis\'s nameplate still moves the pair. <b>Release:</b> tap the button (or focus it and press Enter). GitDiscuss turns level, embroidery scissors snip the shank, the stitches are drawn out, the button goes back to its place on Jarvis, the ear folds back and the cushions part.',
+  sayJoin:'GitDiscuss\'s ear is laid on Jarvis\'s washer, and the doll needle sews the wooden button on through both.',
+  sayJoined:'Thread-jointed. Drag GitDiscuss\'s nameplate to turn it stiffly on the button; it stays where you leave it. Drag Jarvis to move the pair. Tap the button to snip the shank.',
+  sayRelease:'GitDiscuss turns level, the scissors snip the shank, the stitches come out and the cushions part.',
+  sayReady:'Ready: release to sew the button joint.',sayNear:'Nearby: GitDiscuss\'s ear unfolds and the needle works loose. Move closer.',
+  sayHold:'Held mid-sew: the needle is putting the doubled cross through the button. Use the scrubber to step through it.',phReady:'Ready · release to sew',
+  sayBend:'Turning GitDiscuss on the button joint.',turnWord:'Turning',
+  pose:()=>({th:0,ys:0,sq:0}),
+  phase(jt){
+   if(model.dir<0&&model.busy&&model.snip)return jt>.84?'Releasing · turning level':jt>.7?'Releasing · snipping the shank':jt>.56?'Releasing · drawing the stitches out':jt>.4?'Releasing · folding the ear back':'Releasing · parting';
+   if(model.dir<0&&model.busy)return 'Releasing · unpicking'+(jt>.52?' the stitches':jt>.3?' the ear':'')+' · parting';
+   return jt<.3?'Joining · closing in':jt<.4?'Joining · laying the ear on the washer':jt<.5?'Joining · setting the button':jt<.72?'Joining · sewing the cross ('+Math.min(4,1+Math.floor(seg(jt,.52,.72)*4))+' of 4)':jt<.8?'Joining · winding the shank':jt<.84?'Joining · tying off':'Joining · turning to the angle';
+  },
+  // Every moving part from join progress. Forward, or (snip) the release: turn level, snip, unpick, fold back, part.
+  state(c){
+   const jt=c.jt,g=c.glow,rel=model.snip&&model.dir<0;
+   const r={e:.42,lift:0,bt:0,bl:0,sp:0,coil:0,knot:0,glint:0,cut:0,out:0,nd:{park:1,s:9-5*g},bg:0,rest:1};
+   if(jt===0&&!(model.busy&&model.dir>0)){r.e=.42+.48*Math.pow(g,.8);r.lift=.7*g;r.bg=g;return r}
+   const g0=model.dir>0&&model.fast?1:0;
+   if(rel){
+    // The joint stays made down to .84 while GitDiscuss turns level, then each step is undone in turn.
+    const q=clamp((.84-jt)/.14),o=clamp((.7-jt)/.14);
+    r.cut=q;r.out=o;r.e=lerp(.42,1,ease(seg(jt,.4,.56)));r.lift=Math.sin(Math.PI*seg(jt,.4,.56))*.8;
+    r.bt=1-ease(o);r.bl=.35*(1-q)+Math.sin(Math.PI*o)*.9;r.sp=4;r.coil=q<.6?1:0;r.knot=q<.6?1:0;
+    r.rest=ease(seg(o,.85,1));r.nd={park:1,s:9,tail:r.rest<.02?1:0};return r;
+   }
+   r.e=jt<.3?lerp(lerp(.42,.9,g0),.92,ease(seg(jt,0,.3))):lerp(.92,1,backOut(seg(jt,.3,.4)));
+   r.lift=jt<.3?lerp(.7*g0,1,ease(seg(jt,0,.3))):1-ease(seg(jt,.3,.39));
+   r.bt=ease(seg(jt,.4,.5));r.bl=Math.sin(Math.PI*seg(jt,.4,.5))+.35*seg(jt,.72,.8);
+   r.sp=4*seg(jt,.52,.72);r.coil=seg(jt,.72,.8);r.knot=seg(jt,.8,.83);r.glint=Math.sin(Math.PI*seg(jt,.8,.87));r.rest=1;r.bg=g0*(1-seg(jt,0,.3));
+   if(jt<.48)r.nd={park:1,s:9-5*g0};
+   else if(jt<.5)r.nd={park:1,s:lerp(9-5*g0,-8,ease(seg(jt,.48,.5)))};
+   else if(jt<.52)r.nd={fly:ease(seg(jt,.5,.52))};
+   else if(jt<.72)r.nd={stitch:r.sp};
+   else if(jt<.8)r.nd={coil:r.coil};
+   else if(jt<.86)r.nd={home:ease(seg(jt,.8,.86))};
+   else r.nd={park:1,s:9,tail:1};
+   if(jt>=.8)r.nd.tail=1;
+   return r;
+  },
+  over(c){
+   const a=c.a,b=c.b,h=c.h,jt=c.jt,s=pinScale(h),r=this.state(c),th=bendAt(jt),K=bjPark(a,h);
+   const PA={x:a.x+W+BJ.gap/2,y:a.y+h/2},PB={x:b.x-BJ.gap/2,y:b.y+h/2},rJ=BJ.rJ*s,rG=BJ.rG*s,rW=BJ.rW*s;
+   const at=(P,deg,rr)=>({x:P.x+rr*Math.cos(deg*Math.PI/180),y:P.y+rr*Math.sin(deg*Math.PI/180)});
+   let o=`<defs><radialGradient id="bjwood" cx=".38" cy=".32" r=".8"><stop stop-color="#e2b479"/><stop offset=".55" stop-color="#b07a3e"/><stop offset="1" stop-color="#6e4219"/></radialGradient></defs>`;
+   if(c.ghost>0&&jt===0)o+=`<circle cx="${f(PA.x)}" cy="${f(PA.y)}" r="${f(rJ+10)}" fill="#ffc36a" opacity="${f(c.ghost*.45)}" filter="url(#soft)"/>`;
+   // Jarvis's ear, with seven straight stitches round the rim facing GitDiscuss, the middle one doubled.
+   const xa=a.x+W-EDGE-10;
+   o+=feltEar(PA,xa,13*s,rJ,SKIN.a.band,0);
+   const box=`M${f(xa+2)} ${f(PA.y-9*s)}h6v${f(18*s)}h-6zM${f(xa+2)} ${f(PA.y-9*s)}l6 ${f(18*s)}M${f(xa+8)} ${f(PA.y-9*s)}l-6 ${f(18*s)}`;
+   let tk='';for(let v=-BJ.max;v<=BJ.max;v+=10){const p0=at(PA,180+v,rW+.8),p1=at(PA,180+v,rJ-(v?2.4:1.4));tk+=`M${pt(p0)}L${pt(p1)}`;if(!v){const q0=at(PA,182.6,rW+.8),q1=at(PA,182.6,rJ-1.4);tk+=`M${pt(q0)}L${pt(q1)}`}}
+   o+=`<g fill="none" stroke-linecap="round"><path d="${box}" stroke="#f7e8c9" stroke-opacity=".75" stroke-width=".9" stroke-dasharray="2.4 2"/><path d="${tk}" stroke="#000" stroke-opacity=".3" stroke-width="1.5" transform="translate(.4 .7)"/><path d="${tk}" stroke="#f7e8c9" stroke-opacity="${model.turning&&jt===1?1:.85}" stroke-width="1.3"/></g>`;
+   // The washer: cream felt cut with pinking shears, basted on with four tacks.
+   let wd='';for(let i=0;i<=40;i++){const p=at(PA,i*9,i%2?rW:rW-1.8);wd+=(i?'L':'M')+pt(p)}
+   let tacks='';for(let i=0;i<4;i++){const p0=at(PA,45+90*i,rW-5),p1=at(PA,45+90*i,rW-2.6);tacks+=`M${pt(p0)}L${pt(p1)}`}
+   o+=`<path d="${wd}Z" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.7 1.4)"/><g filter="url(#tagfelt)"><path d="${wd}Z" fill="#e8d5ad"/></g><path d="${tacks}" stroke="#a8431f" stroke-width="1.1" stroke-linecap="round"/>`;
+   // GitDiscuss's ear: folded back at rest, it unfolds, flops onto the washer and then turns with GitDiscuss.
+   // A straight stitch runs from the button to the rim, ending in a gold French knot that reads Jarvis's rim stitches.
+   const xb=b.x+EDGE+10,col=mixHex('#16302d',SKIN.b.band,clamp((r.e-.4)/.55));
+   let ge=feltEar(PB,xb,10*s,rG,col,r.lift);
+   ge+=`<circle cx="${f(PB.x)}" cy="${f(PB.y)}" r="${f(rG-2.6)}" fill="none" stroke="#f7e8c9" stroke-opacity=".75" stroke-width="1" stroke-dasharray="2.6 2.3"/>`;
+   const fk=at(PB,180,rG+1.2),f0=at(PB,180,BJ.rB*s+1);
+   ge+=`<path d="M${pt(f0)}L${pt(fk)}" fill="none" stroke="#f7e8c9" stroke-width="1.2" stroke-linecap="round"/>`+
+    `<circle cx="${f(fk.x+.3)}" cy="${f(fk.y+.6)}" r="2.3" fill="#000" opacity=".4"/><circle cx="${f(fk.x)}" cy="${f(fk.y)}" r="2.2" fill="#e3b343" stroke="#7a5210" stroke-width=".6"/><path d="M${f(fk.x-1.1)} ${f(fk.y-.4)}a1.2 1.2 0 1 1 1 1.1" fill="none" stroke="#fff3c4" stroke-width=".55"/>`;
+   o+=`<g transform="rotate(${f(th)} ${f(PB.x)} ${f(PB.y)})"><g transform="translate(${f(xb)} 0) scale(${f(r.e*1000)/1000} 1) translate(${f(-xb)} 0)">${ge}</g></g>`;
+   // The button travels from its place on Jarvis to the stack, turning with GitDiscuss once it is on.
+   const Bc=V.mix(K.B,PB,r.bt),rot=th*r.bt,ks=lerp(.82,1,r.bt)*s,cs=Math.cos(rot*Math.PI/180),sn=Math.sin(rot*Math.PI/180);
+   const L=p=>({x:Bc.x+ks*(p.x*cs-p.y*sn),y:Bc.y+ks*(p.x*sn+p.y*cs)});
+   const H=bjHoles.map(L);
+   // Thread work, in stage space so the needle can join it: finished cross strands, the strand being sewn, the shank.
+   const sp=r.sp,done=Math.floor(sp),tOp=1-r.out;let cross='',lead=null;
+   for(let k=0;k<Math.min(done,4);k++){const[i,j]=BJ.st[k],d2=k>1?.55:0,n={x:-(H[j].y-H[i].y),y:H[j].x-H[i].x},u=unit(n);
+    cross+=`M${pt(V.add(H[i],V.mul(u,d2)))}L${pt(V.add(H[j],V.mul(u,d2)))}`}
+   // The needle: parked, flying to the button, sewing, winding or going home.
+   const nd=r.nd,dn=-62+rot,dv={x:Math.cos(dn*Math.PI/180),y:Math.sin(dn*Math.PI/180)};let N=null,under=false;
+   // Where the winding starts and ends, so the last stitch, the shank and the trip home meet without a jump.
+   const coil0={x:Math.cos(.8)*(BJ.rB+3.5),y:Math.sin(.8)*(BJ.rB+3.5)*.55+3},coilDn=dn+Math.sin(.8)*14;
+   if(nd.park){N=bjNeedle(K.N,K.ang,nd.s);if(r.rest>.02&&!nd.tail)lead={from:H[0],eye:N.eye,op:r.rest}}
+   else if(nd.fly!==undefined){const tip=V.mix(V.add(K.N,{x:8*Math.cos(K.ang*Math.PI/180),y:8*Math.sin(K.ang*Math.PI/180)}),V.add(H[0],V.mul(dv,7*ks)),nd.fly);
+    N=bjNeedle(tip,lerp(K.ang,dn,nd.fly),-.01);lead={from:H[0],eye:N.eye,op:1}}
+   else if(nd.stitch!==undefined){const k=Math.min(3,Math.floor(nd.stitch)),u=nd.stitch-k,[i,j]=BJ.st[k],A=H[i],C=H[j];
+    if(u<.5){const v=ease(u/.5),tip=V.add(V.add(V.mix(A,C,v),V.mul(dv,7*ks)),{x:0,y:-4*Math.sin(Math.PI*v)});N=bjNeedle(tip,dn,-.01);lead={from:A,eye:N.eye,op:1}}
+    else if(u<.75){const sv=lerp(-7*ks,22,ease((u-.5)/.25));N=bjNeedle(C,dn,sv);cross+=`M${pt(A)}L${pt(C)}`}
+    else{const nx=BJ.st[Math.min(3,k+1)][0],E=k<3?H[nx]:L(coil0);cross+=`M${pt(A)}L${pt(C)}`;N=bjNeedle(E,k<3?dn:coilDn,lerp(22,-7*ks,ease((u-.75)/.25)));if(k<3)lead={from:E,eye:N.eye,op:seg(u,.85,1)}}}
+   else if(nd.coil!==undefined){const ph=nd.coil*3*2*Math.PI+.8,tip=L({x:Math.cos(ph)*(BJ.rB+3.5),y:Math.sin(ph)*(BJ.rB+3.5)*.55+3});
+    // On the far half of each wrap the needle passes behind the button.
+    under=Math.sin(ph)<0;N=bjNeedle(tip,dn+Math.sin(ph)*14,-.01);lead={from:L({x:BJ.rB*.7,y:BJ.rB*.75}),eye:N.eye,op:1}}
+   else if(nd.home!==undefined){const from=L(coil0);
+    const hv=nd.home,tip=V.add(V.mix(from,K.N,hv),{x:0,y:-10*Math.sin(Math.PI*hv)});N=bjNeedle(tip,lerp(coilDn,K.ang,hv),hv>.8?lerp(-.01,9,(hv-.8)/.2):-.01)}
+   const shank=r.coil>0?Math.min(3,Math.ceil(r.coil*3-.01)):0;
+   // Stitches under the button first (the shank and the strand coming up), then the button, then the cross on top.
+   let bt=under?N.svg:'';
+   const tw=clamp(th*r.bt/12,-2.5,2.5);
+   bt+=`<g transform="translate(${f(Bc.x)} ${f(Bc.y)}) rotate(${f(rot)}) scale(${f(ks*1000)/1000})">`;
+   if(shank&&r.cut<.6)bt+=bjShank(BJ.rB,shank,tw);
+   bt+=woodButton(BJ.rB,r.bl,Math.max(r.glint,.6*r.bg))+'</g>';
+   if(cross)bt+=`<g opacity="${f(tOp)}">${floss(cross,1.15)}</g>`;
+   if(r.knot>0&&r.cut<.6){const kp=L({x:BJ.rB*.78,y:BJ.rB*.62});bt+=`<circle cx="${f(kp.x)}" cy="${f(kp.y)}" r="${f(1.9*r.knot)}" fill="#c4372a" stroke="#4a0d06" stroke-width=".5"/>`;
+    if(r.glint>.02){const gx=kp.x+3,gy=kp.y-7;bt+=`<path d="M${f(gx)} ${f(gy-4)}l1.1 2.9 2.9 1.1-2.9 1.1-1.1 2.9-1.1-2.9-2.9-1.1 2.9-1.1z" fill="#fffbe8" opacity="${f(r.glint)}"/>`}}
+   o+=bt;
+   // The red floss from the last hole to the needle's eye, sagging a little; or, once tied off, a short tail.
+   if(lead){const m=V.add(V.mix(lead.from,lead.eye,.5),{x:0,y:4});o+=`<g opacity="${f(lead.op)}">${floss(`M${pt(lead.from)}Q${pt(m)} ${pt(lead.eye)}`,1.15)}</g>`}
+   if(N){if(nd.tail){const e=N.eye;o+=floss(`M${pt(e)}c3 -2 5 2 4 6c-.6 2.4 1 4 2.6 4.6`,1.1)}if(!under)o+=N.svg}
+   // Release: embroidery scissors come in under the rim and snip the shank; the strands sag as they are drawn out.
+   if(r.cut>0&&r.cut<1){const q=r.cut,S=L({x:BJ.rB+1.5,y:BJ.rB*.7}),inn=ease(seg(q,0,.35)),fl=seg(q,.6,.9);
+    o+=scissors(S.x+22*(1-inn),S.y+16*(1-inn),214,q<.35?36:q<.6?lerp(36,0,(q-.35)/.25):lerp(0,24,(q-.6)/.4),1-seg(q,.8,1));
+    // Two snipped ends of the shank spring away.
+    if(fl>0&&fl<1)o+=`<g opacity="${f(1-fl)}">${floss(`M${f(S.x-1+5*fl)} ${f(S.y+1+9*fl)}l2.4 1.6M${f(S.x+2+8*fl)} ${f(S.y-2+3*fl)}l2.2 -1`,1.1)}</g>`}
+   // The hit area: tap the button to snip the joint.
+   if(jt===1)o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Button joint: tap or press Enter to snip the shank and separate the widgets" transform="translate(${f(Bc.x)} ${f(Bc.y)})"><title>Tap the button to snip the shank</title><circle r="${f(BJ.rB*ks+6)}" fill="transparent"/><circle class="ringfocus" r="${f(BJ.rB*ks+5)}" fill="none" stroke="#ffd08a" stroke-width="1.5"/><g class="snipHint">${scissors(BJ.rB*ks+11,BJ.rB*ks+7,214,22)}</g></g>`;
    // While it turns: the angle in cross-stitch on a pinned cotton tag, above the pair (or below it near the top of the desktop).
    if(model.turning&&jt===1){const up=PA.y-h/2-30>50;o+=xTag(PA.x,up?PA.y-h/2-26:PA.y+h/2+26,signed(th).replace('−','-'))}
    return o;
@@ -2562,7 +2713,7 @@ const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...H
 let anim=0,shadeAnim=0,morphSwitch=0,drag=null,togDrag=null;
 const J=()=>JOINS[model.join];
 // Each angled join keeps its own angle while another join is picked.
-const ANG={hinge:-20,pin:15};
+const ANG={hinge:-20,pin:15,bjoint:-15};
 let angAnim=0;
 
 const hingeY=y=>fitHinge(fitHinge(y,peakBend(),ctx().h),model.angle,ctx().h);
