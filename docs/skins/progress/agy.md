@@ -78,7 +78,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Insect Carapace Unfurling morph — Chitin plates split on organic centerline revealing amber spore chamber (Built in prototypes/skins/agy/hollow.html with 140px lateral chitin plate split along suture teeth, cold-forged iron scissor struts with Pharloom brass pivot pins, golden weaver-silk stays, subterranean slate amber spore chamber with live Soul Reservoir telemetry and floating lumafly embers, neighbor clearance push-and-restore logic, Option 10 switcher, and 'U'/'M' keyboard shortcut)
 
 ### Cycle 11: Angled Connections
-- [ ] Gothic: Masonry Rotunda Crossing Socket angled connection (-45° to +45° with voussoir detents & bronze scales)
+- [x] Gothic: Masonry Rotunda Crossing Socket angled connection (-45° to +45° with voussoir detents & bronze scales) — Cylindrical ashlar rotunda crossing turret, 7 radial stone voussoir detents (-45° to +45°), flexible canopy of 7 overlapping articulated bronze scales with stained-glass lozenges, rotary dial angle dragging, detent presets & keyboard controls (Built in prototypes/skins/agy/gothic.html)
 - [ ] Felt: Stitched Accordion Bellows Gusset angled connection (-45° to +45° with flexible ribbed wool elbow)
 - [ ] Elven: Armillary Sphere Gimbal angled connection (-45° to +45° with jade socket, silver ball and degree arc)
 - [ ] Wire: Gemstone Bead Hinge angled connection (-45° to +45° with drilled spherical bead axle & wire detents)

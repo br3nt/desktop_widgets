@@ -1106,6 +1106,119 @@ header {
   transition: transform 60ms linear;
 }
 
+/* Option 11: Masonry Rotunda Crossing Angle Controls */
+.rotunda-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #171d1a;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #36443c;
+}
+.rotunda-controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #7b9083;
+}
+.rotunda-controls label span {
+  color: var(--gold-glow);
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 12px;
+}
+.rotunda-controls input[type="range"] {
+  width: 95px;
+  height: 5px;
+  accent-color: var(--gold-glow);
+  cursor: ew-resize;
+  background: #232b27;
+  border-radius: 3px;
+}
+.rotunda-controls .detent-buttons {
+  display: flex;
+  gap: 3px;
+}
+.rotunda-controls .detent-btn {
+  padding: 2px 5px;
+  font-size: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", monospace;
+  background: #1e2622;
+  border: 1px solid #36443c;
+  color: #a8bcad;
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1.2;
+  transition: all 100ms ease;
+}
+.rotunda-controls .detent-btn:hover {
+  background: #2e3b33;
+  color: #fcebbb;
+  border-color: #637b6d;
+}
+.rotunda-controls .detent-btn.active {
+  background: linear-gradient(180deg, #4d4223, #2e2612);
+  color: var(--gold-glow);
+  border-color: var(--gold-glow);
+  box-shadow: 0 0 6px rgba(230, 180, 71, 0.4);
+  font-weight: 700;
+}
+
+/* Masonry Rotunda Crossing Acanthus Finial Release (Option 11) */
+.rotunda-release {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  touch-action: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 160ms ease;
+}
+.rotunda-release[hidden] { display: none; }
+.rotunda-release::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff0c2 0%, #d4af37 35%, #6e4f14 70%, #241703 100%);
+  border: 1.5px solid #0d120f;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  transform: scale(calc(1 - var(--tension, 0) * 0.25));
+  transition: transform 60ms linear;
+}
+.rotunda-release:hover::before {
+  border-color: var(--gold-glow);
+  box-shadow: 0 0 12px rgba(230, 180, 71, 0.95), 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+.rotunda-release::after {
+  content: "✢";
+  position: absolute;
+  font-size: 13px;
+  color: #fff8db;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+/* Rotary Dial Hover / Touch Cue */
+.rotunda-rotary-dial {
+  cursor: grab;
+  touch-action: none;
+}
+.rotunda-rotary-dial:active {
+  cursor: grabbing;
+}
+
 /* Port Overlay for Design Mode */
 #portOverlay { position: absolute; inset: 0; pointer-events: none; }
 .socket-port {
@@ -1170,8 +1283,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Gothic Basilica <span>/ cathedral extension morph, keystone, portcullis, pillars &amp; tie-rod</span></h1>
-    <p>Monumental ashlar limestone · Cathedral Extension morph · Sliding cantilever corbels · Stained glass lancets · Stepped crypt stairs · Keystone drop · Lancet portcullis · Lead-came solder · Triptych altar · Flying buttress · Telescoping pillars · Gargoyle clench · Oculus collapse · Mortise tie-rod</p>
+    <h1>Gothic Basilica <span>/ crossing rotunda angled connection, cathedral morph, keystone, portcullis, pillars &amp; tie-rod</span></h1>
+    <p>Monumental ashlar limestone · Masonry Rotunda Crossing Socket angled connection (-45° to +45°) · Cathedral Extension morph · Sliding cantilever corbels · Stained glass lancets · Stepped crypt stairs · Keystone drop · Lancet portcullis · Lead-came solder · Triptych altar · Flying buttress · Telescoping pillars · Gargoyle clench · Oculus collapse · Mortise tie-rod</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -1186,8 +1299,20 @@ footer .note-highlight {
         <option value="gargoyle">7. Bronze Gargoyle Clench join</option>
         <option value="oculus">8. Rose Window Oculus Collapse shade</option>
         <option value="tierod">9. Mortise &amp; Forged Tie-Rod Pin join</option>
-        <option value="extension" selected>10. Cathedral Extension morph (Lateral bay, corbels &amp; crypt steps)</option>
+        <option value="extension">10. Cathedral Extension morph (Lateral bay, corbels &amp; crypt steps)</option>
+        <option value="rotunda" selected>11. Masonry Rotunda Crossing Socket angled connection (-45° to +45° with voussoir detents &amp; bronze scales)</option>
       </select>
+    </div>
+    <div id="rotundaControls" class="control-group rotunda-controls" aria-label="Rotunda angle control">
+      <label for="rotundaAngleSlider">Angle <span id="rotundaAngleReadout">+20°</span></label>
+      <input type="range" id="rotundaAngleSlider" min="-45" max="45" step="5" value="20" aria-label="Rotunda crossing angle">
+      <div class="detent-buttons">
+        <button type="button" class="detent-btn" data-angle="-45">-45°</button>
+        <button type="button" class="detent-btn" data-angle="-30">-30°</button>
+        <button type="button" class="detent-btn" data-angle="0">0°</button>
+        <button type="button" class="detent-btn active" data-angle="20">+20°</button>
+        <button type="button" class="detent-btn" data-angle="45">+45°</button>
+      </div>
     </div>
     <div class="control-group">
       <label>State</label>
@@ -1196,8 +1321,8 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnMorphAnim" class="primary-btn">Extend cathedral</button>
-    <button id="btnJoinAnim">Join capsules</button>
+    <button id="btnMorphAnim">Extend cathedral</button>
+    <button id="btnJoinAnim" class="primary-btn">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnPortcullisAnim">Drop portcullis</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
@@ -1543,6 +1668,34 @@ footer .note-highlight {
           <stop offset="85%" stop-color="#b45309" stop-opacity="0.2"/>
           <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
         </radialGradient>
+
+        <!-- Option 11: Masonry Rotunda Crossing & Articulated Bronze Scales Gradients -->
+        <linearGradient id="bronzeScaleGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffd57a"/>
+          <stop offset="18%" stop-color="#bf973e"/>
+          <stop offset="50%" stop-color="#735720"/>
+          <stop offset="82%" stop-color="#3d5e53"/>
+          <stop offset="100%" stop-color="#19241f"/>
+        </linearGradient>
+        <linearGradient id="voussoirDetentActive" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#fff8db"/>
+          <stop offset="30%" stop-color="#ffd166"/>
+          <stop offset="70%" stop-color="#c98a1e"/>
+          <stop offset="100%" stop-color="#593b08"/>
+        </linearGradient>
+        <radialGradient id="crossingLanternGlow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="25%" stop-color="#ffe699"/>
+          <stop offset="55%" stop-color="#f59e0b" stop-opacity="0.9"/>
+          <stop offset="80%" stop-color="#9a3412" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="rotundaBossGrad" cx="35%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#fff0c2"/>
+          <stop offset="35%" stop-color="#d4af37"/>
+          <stop offset="70%" stop-color="#6e4f14"/>
+          <stop offset="100%" stop-color="#241703"/>
+        </radialGradient>
       </defs>
 
       <!-- Shared arch, keystone and decorative joints -->
@@ -1772,6 +1925,12 @@ footer .note-highlight {
             title="Pull right to withdraw cotter wedge and release tie rod · Enter to separate" hidden>
     </button>
 
+    <!-- Masonry Rotunda Crossing Acanthus Finial Release (Option 11) -->
+    <button id="rotundaRelease" class="rotunda-release" data-drag="release"
+            aria-label="Release Rotunda Crossing Socket: click or pull right, or press Enter"
+            title="Click or pull right to unlock crossing rotunda · Enter to separate" hidden>
+    </button>
+
     <!-- Socket Overlay for Design Mode -->
     <div id="portOverlay" aria-hidden="true">
       <div class="socket-port" id="portA" data-label="Pointed Arch Springer · A"></div>
@@ -1781,7 +1940,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade, Lead-Came Solder, Triptych Altar, Flying Buttress, Telescoping Pillars, Bronze Gargoyle, Rose Window Oculus, Mortise Tie-Rod &amp; Cathedral Extension Morph</h3>
+  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade, Lead-Came Solder, Triptych Altar, Flying Buttress, Telescoping Pillars, Bronze Gargoyle, Rose Window Oculus, Mortise Tie-Rod, Cathedral Extension Morph &amp; Masonry Rotunda Crossing Angled Connection</h3>
   <p>
     In this aesthetic, modules are carved from dressed ashlar limestone. Pointed lancet arches frame the clerestory displays, supported by fluted colonnettes. When separate, each module's mating end forms one half of a monumental pointed arch (a voussoir springer).
   </p>
@@ -1815,6 +1974,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 10 — Cathedral Extension Morph (Lateral Bay, Corbels &amp; Crypt Stairs) [Morph]:</span> When additional nave capacity is demanded, Jarvis expands laterally by 140px. Heavy carved cantilever corbels slide outward along bronze ceiling and foundation runners, with masonry seating dust and contact sparks bursting as they lock into position. The extension reveals an auxiliary chantry telemetry panel and twin pointed-arch stained glass lancets (celestial sapphire and liturgical ruby quarries). Concurrently, the undercroft expands with Romanesque stepped crypt stairs (Narthex, Ambulatory, Sanctum) for multi-tiered depth exploration. In accordance with neighbor clearance principles, lateral growth smoothly nudges adjacent modules aside without overlap, restoring their relative offset upon retraction.
   </p>
+  <p>
+    <span class="note-highlight">Option 11 — Masonry Rotunda Crossing Socket [Angled Connection]:</span> A monumental cylindrical and octagonal crossing lantern rotunda (inspired by the great cathedral crossing towers of Ely and Florence) bridges the nave (Jarvis) and chapter house (GitDiscuss). Sockets accept any angle between -45° and +45°. As GitDiscuss rotates smoothly around the crossing pivot, radial stone voussoirs click through tactile detents (-45°, -30°, -15°, 0°, +15°, +30°, +45°) with glowing candlelight highlights and engraved degree marks, while an articulated canopy hood of 7 overlapping scalloped bronze scales and stained-glass lozenges fans and flexes dynamically to seal the gap. The center acanthus finial pin serves as the tactile release trigger.
+  </p>
 </footer>
 
 <script>
@@ -1846,9 +2008,11 @@ const model = {
   oculusCollapse: 0, // 0 = open rose window, 1 = rotating tracery iris collapsed into jeweled frieze
   tieRodProgress: 0, // 0 = retracted in module A, 1 = fully through bores & cotter wedge locked
   morphProgress: 0, // 0 = standard cathedral nave footprint, 1 = fully extended lateral bay
+  rotundaProgress: 0, // 0 = unseated / separate, 1 = locked in crossing rotunda
+  angle: 20, // Crossing rotunda angle in degrees (-45° to +45°, default +20°)
   extended: false,
   bNudge: 0,
-  option: 'keystone', // 'keystone', 'portcullis', 'leadcame', 'triptych', 'buttress', 'pillar', 'gargoyle', 'oculus', 'tierod', or 'extension'
+  option: 'rotunda', // 'keystone', 'portcullis', 'leadcame', 'triptych', 'buttress', 'pillar', 'gargoyle', 'oculus', 'tierod', 'extension', or 'rotunda'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -2487,6 +2651,89 @@ function drawMortiseEndCap(x, y, isRight, isModuleA, retract = 0, isShade = fals
   return drawGothicCap(x, y, isRight, retract, isShade);
 }
 
+// Option 11: Masonry Rotunda Crossing Socket End-Cap (Concave receiver socket on A, convex trunnion hub on B)
+function drawRotundaEndCap(x, y, isRight, isModuleA, retract = 0, isShade = false) {
+  if (!((isRight && isModuleA) || (!isRight && !isModuleA))) {
+    return drawGothicCap(x, y, isRight, retract, isShade);
+  }
+
+  let s = `<g class="rotunda-endcap" opacity="${(1 - retract * 0.9).toFixed(2)}">`;
+
+  if (isModuleA && isRight) {
+    // Module A Right Flank: Concave Masonry Rotunda Receiver Socket
+    const sockX = x + 388;
+    const cy = y + (isShade ? 22 : 65);
+
+    if (!isShade) {
+      // Concave semicircular stone alcove with carved radial voussoirs and bronze bushing
+      s += `<path d="M ${sockX - 24} ${y + 10}
+                      A 48 48 0 0 0 ${sockX - 24} ${y + 120}
+                      L ${sockX - 4} ${y + 138}
+                      L ${sockX - 4} ${y - 8}
+                      Z"
+                  fill="url(#gothStone)" stroke="#111613" stroke-width="1.5"/>`;
+
+      // Semicircular concave inner reveal
+      s += `<path d="M ${sockX - 20} ${y + 20}
+                      A 42 42 0 0 0 ${sockX - 20} ${y + 110}"
+                  fill="none" stroke="#090c0b" stroke-width="6"/>`;
+
+      // Bronze pivot pin bushing in socket center
+      s += `<circle cx="${sockX - 14}" cy="${cy}" r="11" fill="url(#bronzeGrad)" stroke="#151b18" stroke-width="1.2"/>`;
+      s += `<circle cx="${sockX - 14}" cy="${cy}" r="5" fill="#090c0b"/>`;
+
+      // Degree detent tick marks carved into socket rim
+      for (const d of [-45, -30, -15, 0, 15, 30, 45]) {
+        const rad = (d * Math.PI) / 180;
+        const tx1 = (sockX - 14) + 38 * Math.cos(rad);
+        const ty1 = cy + 38 * Math.sin(rad);
+        const tx2 = (sockX - 14) + 44 * Math.cos(rad);
+        const ty2 = cy + 44 * Math.sin(rad);
+        s += `<line x1="${tx1.toFixed(1)}" y1="${ty1.toFixed(1)}" x2="${tx2.toFixed(1)}" y2="${ty2.toFixed(1)}"
+                    stroke="#ffd166" stroke-width="1" opacity="0.6"/>`;
+      }
+    } else {
+      // Shade mode concave socket
+      s += `<circle cx="${sockX - 12}" cy="${cy}" r="18" fill="url(#gothStone)" stroke="#151b18" stroke-width="1"/>`;
+      s += `<circle cx="${sockX - 12}" cy="${cy}" r="6" fill="url(#bronzeGrad)"/>`;
+    }
+  } else {
+    // Module B Left Flank: Convex Cylindrical Ashlar Trunnion Drum
+    const trunX = x + 37;
+    const cy = y + (isShade ? 22 : 65);
+
+    if (!isShade) {
+      // Convex cylindrical stone drum
+      s += `<path d="M ${trunX} ${y + 16}
+                      A 46 46 0 0 0 ${trunX} ${y + 114}
+                      L ${x + 6} ${y + 130}
+                      L ${x + 6} ${y}
+                      Z"
+                  fill="url(#gothStone)" stroke="#111613" stroke-width="1.5"/>`;
+
+      // Concentric stone relief band
+      s += `<path d="M ${trunX - 4} ${y + 24}
+                      A 40 40 0 0 0 ${trunX - 4} ${y + 106}"
+                  fill="none" stroke="url(#stoneBevel)" stroke-width="2"/>`;
+
+      // Bronze pivot pin trunnion axle
+      s += `<circle cx="${trunX - 8}" cy="${cy}" r="9" fill="url(#bronzeGrad)" stroke="#151b18" stroke-width="1.2"/>`;
+      s += `<circle cx="${trunX - 8}" cy="${cy}" r="3" fill="#ffd166" filter="url(#votiveGlow)"/>`;
+
+      // Degree pointer needle on trunnion face
+      s += `<polygon points="${trunX + 12},${cy} ${trunX - 4},${cy - 4} ${trunX - 4},${cy + 4}"
+                     fill="url(#bronzeGrad)" stroke="#1a1405" stroke-width="0.8"/>`;
+    } else {
+      // Shade mode convex trunnion
+      s += `<circle cx="${trunX}" cy="${cy}" r="18" fill="url(#gothStone)" stroke="#151b18" stroke-width="1"/>`;
+      s += `<circle cx="${trunX}" cy="${cy}" r="5" fill="#ffd166" filter="url(#votiveGlow)"/>`;
+    }
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Option 9: Interlocking Ashlar Seam Blocks
 function drawMortiseSeamBlocks(midX, y, opacity = 1) {
   return `
@@ -3092,6 +3339,223 @@ function drawMortiseTieRodPin(ax, ay, bx, by, tieRodRatio = 0, isJoined = false,
         <line x1="${eyeletX}" y1="${anchorBY}" x2="${eyeletX - 5}" y2="${anchorBY + 6}" stroke="#ffd885" stroke-width="1" opacity="${sparkAlpha}"/>
       `;
     }
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Option 11: Masonry Rotunda Crossing Socket Angled Connection (-45° to +45° with radial voussoirs & articulated bronze scales)
+function drawRotundaCrossingSocket(ax, ay, bx, by, angle = 0, rotundaProgress = 1, isJoined = false, opacity = 1, glow = 0, isShade = false) {
+  const extraW = Math.round((model.morphProgress || 0) * 140);
+  const cx = ax + JOIN_DISTANCE + extraW + 37;
+  const cy = ay + (isShade ? 22 : 65);
+  const progress = isJoined ? 1 : rotundaProgress;
+  const radAngle = (angle * Math.PI) / 180;
+
+  let s = `<g class="rotunda-crossing-turret" opacity="${opacity}" style="transition: opacity 180ms ease;">`;
+
+  if (!isShade) {
+    // 1. Deep architectural drop shadow under crossing rotunda
+    s += `<circle cx="${cx}" cy="${cy + 6}" r="52" fill="#000000" opacity="0.65" filter="url(#stoneShadowBlur)"/>`;
+
+    // 2. Articulated Flexible Bronze Scales (Canopy Hood)
+    // Spanning between Module A (horizontal, angle 0°) and Module B (angle 'angle')
+    s += `<g class="bronze-scales-canopy">`;
+
+    // Upper Canopy Scales (covering the roofline junction from top of A to top of B)
+    const numScales = 7;
+    for (let i = 0; i < numScales; i++) {
+      const frac = i / (numScales - 1);
+      const curScaleAngle = frac * angle;
+      const baseAng = -90 + (frac - 0.5) * 44 + (curScaleAngle * 0.75);
+      const bRad = (baseAng * Math.PI) / 180;
+
+      const r1 = 30;
+      const r2 = 57;
+      const spread = 15 * Math.PI / 180;
+
+      const p1x = cx + r1 * Math.cos(bRad - spread);
+      const p1y = cy + r1 * Math.sin(bRad - spread);
+      const p2x = cx + r2 * Math.cos(bRad - spread * 0.6);
+      const p2y = cy + r2 * Math.sin(bRad - spread * 0.6);
+      const pTipX = cx + (r2 + 7) * Math.cos(bRad);
+      const pTipY = cy + (r2 + 7) * Math.sin(bRad);
+      const p3x = cx + r2 * Math.cos(bRad + spread * 0.6);
+      const p3y = cy + r2 * Math.sin(bRad + spread * 0.6);
+      const p4x = cx + r1 * Math.cos(bRad + spread);
+      const p4y = cy + r1 * Math.sin(bRad + spread);
+
+      s += `<path d="M ${p1x.toFixed(1)} ${p1y.toFixed(1)}
+                      L ${p2x.toFixed(1)} ${p2y.toFixed(1)}
+                      Q ${pTipX.toFixed(1)} ${pTipY.toFixed(1)} ${p3x.toFixed(1)} ${p3y.toFixed(1)}
+                      L ${p4x.toFixed(1)} ${p4y.toFixed(1)}
+                      Z"
+                  fill="url(#bronzeScaleGrad)" stroke="#131916" stroke-width="1.2"
+                  filter="drop-shadow(0 2px 3px rgba(0,0,0,0.6))"/>`;
+
+      // Embossed center rib
+      s += `<line x1="${(cx + r1 * Math.cos(bRad)).toFixed(1)}" y1="${(cy + r1 * Math.sin(bRad)).toFixed(1)}"
+                  x2="${pTipX.toFixed(1)}" y2="${pTipY.toFixed(1)}"
+                  stroke="#ffd166" stroke-width="0.8" opacity="0.6"/>`;
+
+      // Small stained glass jewel lozenge in alternate scales
+      if (i % 2 === 1) {
+        const jx = cx + (r1 + 15) * Math.cos(bRad);
+        const jy = cy + (r1 + 15) * Math.sin(bRad);
+        s += `<polygon points="${jx.toFixed(1)},${(jy - 3).toFixed(1)} ${(jx + 2.5).toFixed(1)},${jy.toFixed(1)} ${jx.toFixed(1)},${(jy + 3).toFixed(1)} ${(jx - 2.5).toFixed(1)},${jy.toFixed(1)}"
+                       fill="${i === 1 ? '#e63946' : i === 3 ? '#e6b447' : '#3a86ff'}"
+                       stroke="#111613" stroke-width="0.6" filter="url(#votiveGlow)"/>`;
+      }
+    }
+
+    // Lower Canopy Scales (covering the plinth/foundation junction from bottom of A to bottom of B)
+    for (let i = 0; i < numScales; i++) {
+      const frac = i / (numScales - 1);
+      const curScaleAngle = frac * angle;
+      const baseAng = 90 + (frac - 0.5) * 44 + (curScaleAngle * 0.75);
+      const bRad = (baseAng * Math.PI) / 180;
+
+      const r1 = 30;
+      const r2 = 57;
+      const spread = 15 * Math.PI / 180;
+
+      const p1x = cx + r1 * Math.cos(bRad - spread);
+      const p1y = cy + r1 * Math.sin(bRad - spread);
+      const p2x = cx + r2 * Math.cos(bRad - spread * 0.6);
+      const p2y = cy + r2 * Math.sin(bRad - spread * 0.6);
+      const pTipX = cx + (r2 + 7) * Math.cos(bRad);
+      const pTipY = cy + (r2 + 7) * Math.sin(bRad);
+      const p3x = cx + r2 * Math.cos(bRad + spread * 0.6);
+      const p3y = cy + r2 * Math.sin(bRad + spread * 0.6);
+      const p4x = cx + r1 * Math.cos(bRad + spread);
+      const p4y = cy + r1 * Math.sin(bRad + spread);
+
+      s += `<path d="M ${p1x.toFixed(1)} ${p1y.toFixed(1)}
+                      L ${p2x.toFixed(1)} ${p2y.toFixed(1)}
+                      Q ${pTipX.toFixed(1)} ${pTipY.toFixed(1)} ${p3x.toFixed(1)} ${p3y.toFixed(1)}
+                      L ${p4x.toFixed(1)} ${p4y.toFixed(1)}
+                      Z"
+                  fill="url(#bronzeScaleGrad)" stroke="#131916" stroke-width="1.2"
+                  filter="drop-shadow(0 2px 3px rgba(0,0,0,0.6))"/>`;
+
+      s += `<line x1="${(cx + r1 * Math.cos(bRad)).toFixed(1)}" y1="${(cy + r1 * Math.sin(bRad)).toFixed(1)}"
+                  x2="${pTipX.toFixed(1)}" y2="${pTipY.toFixed(1)}"
+                  stroke="#ffd166" stroke-width="0.8" opacity="0.6"/>`;
+
+      if (i % 2 === 1) {
+        const jx = cx + (r1 + 15) * Math.cos(bRad);
+        const jy = cy + (r1 + 15) * Math.sin(bRad);
+        s += `<polygon points="${jx.toFixed(1)},${(jy - 3).toFixed(1)} ${(jx + 2.5).toFixed(1)},${jy.toFixed(1)} ${jx.toFixed(1)},${(jy + 3).toFixed(1)} ${(jx - 2.5).toFixed(1)},${jy.toFixed(1)}"
+                       fill="${i === 1 ? '#3a86ff' : i === 3 ? '#2a9d8f' : '#e63946'}"
+                       stroke="#111613" stroke-width="0.6" filter="url(#votiveGlow)"/>`;
+      }
+    }
+    s += `</g>`;
+
+    // 3. Ashlar Masonry Rotunda Turret Drum (Concentric Courses)
+    s += `<circle cx="${cx}" cy="${cy}" r="48" fill="url(#gothStone)" stroke="#151b18" stroke-width="2"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="45" fill="none" stroke="url(#stoneBevel)" stroke-width="1.5"/>`;
+
+    // 4. Radial Stone Voussoirs Arc & Detent Notches
+    const detents = [-45, -30, -15, 0, 15, 30, 45];
+    const rIn = 33, rOut = 46;
+
+    for (let aDeg = -55; aDeg <= 55; aDeg += 10) {
+      const a1 = (aDeg - 4.5) * Math.PI / 180;
+      const a2 = (aDeg + 4.5) * Math.PI / 180;
+      const x1 = cx + rIn * Math.cos(a1), y1 = cy + rIn * Math.sin(a1);
+      const x2 = cx + rOut * Math.cos(a1), y2 = cy + rOut * Math.sin(a1);
+      const x3 = cx + rOut * Math.cos(a2), y3 = cy + rOut * Math.sin(a2);
+      const x4 = cx + rIn * Math.cos(a2), y4 = cy + rIn * Math.sin(a2);
+
+      const isDetent = detents.some(d => Math.abs(d - aDeg) < 3);
+      const isActiveDetent = Math.abs(angle - aDeg) < 4;
+
+      const fill = isActiveDetent ? 'url(#voussoirDetentActive)' : (isDetent ? '#3d4842' : '#28312d');
+      const stroke = isActiveDetent ? '#ffd166' : '#141816';
+
+      s += `<path d="M ${x1.toFixed(1)} ${y1.toFixed(1)}
+                      L ${x2.toFixed(1)} ${y2.toFixed(1)}
+                      A ${rOut} ${rOut} 0 0 1 ${x3.toFixed(1)} ${y3.toFixed(1)}
+                      L ${x4.toFixed(1)} ${y4.toFixed(1)}
+                      A ${rIn} ${rIn} 0 0 0 ${x1.toFixed(1)} ${y1.toFixed(1)}
+                      Z"
+                  fill="${fill}" stroke="${stroke}" stroke-width="${isActiveDetent ? '1.5' : '0.8'}"/>`;
+
+      if (isActiveDetent) {
+        const midX = (x2 + x3) / 2, midY = (y2 + y3) / 2;
+        s += `<circle cx="${midX.toFixed(1)}" cy="${midY.toFixed(1)}" r="2" fill="#ffffff" filter="url(#votiveGlow)"/>`;
+      }
+    }
+
+    // Detent Degree Labels on outer rim
+    for (const d of detents) {
+      if (d === -30 || d === 0 || d === 30 || d === -45 || d === 45) {
+        const dRad = d * Math.PI / 180;
+        const lx = cx + 55 * Math.cos(dRad);
+        const ly = cy + 55 * Math.sin(dRad);
+        const isActive = Math.abs(angle - d) < 4;
+        s += `<text x="${lx.toFixed(1)}" y="${(ly + 3).toFixed(1)}"
+                    font-size="7" font-family="-apple-system, BlinkMacSystemFont, monospace" font-weight="bold"
+                    fill="${isActive ? '#ffd166' : '#8fa194'}" text-anchor="middle"
+                    filter="${isActive ? 'url(#votiveGlow)' : 'none'}">${d > 0 ? '+' : ''}${d}°</text>`;
+      }
+    }
+
+    // 5. Central Lantern Chamber & Pierced Tracery Rose Window
+    s += `<circle cx="${cx}" cy="${cy}" r="32" fill="#090c0b" stroke="#1c231f" stroke-width="2"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="28" fill="url(#crossingLanternGlow)" opacity="${(0.75 + glow * 0.25).toFixed(2)}"/>`;
+
+    // Carved gothic quatrefoil tracery in the crossing lantern
+    s += `<g class="lantern-tracery" stroke="#252f2a" stroke-width="1.8" fill="none">
+            <circle cx="${cx - 8}" cy="${cy}" r="7" fill="#e6b447" fill-opacity="0.3"/>
+            <circle cx="${cx + 8}" cy="${cy}" r="7" fill="#e6b447" fill-opacity="0.3"/>
+            <circle cx="${cx}" cy="${cy - 8}" r="7" fill="#e63946" fill-opacity="0.3"/>
+            <circle cx="${cx}" cy="${cy + 8}" r="7" fill="#3a86ff" fill-opacity="0.3"/>
+            <circle cx="${cx}" cy="${cy}" r="15"/>
+          </g>`;
+
+    // 6. Rotating Pointer Needle (Acanthus Chisel) attached to GitDiscuss
+    const ptrTipX = cx + 47 * Math.cos(radAngle);
+    const ptrTipY = cy + 47 * Math.sin(radAngle);
+    const ptrBase1X = cx + 18 * Math.cos(radAngle - 0.22);
+    const ptrBase1Y = cy + 18 * Math.sin(radAngle - 0.22);
+    const ptrBase2X = cx + 18 * Math.cos(radAngle + 0.22);
+    const ptrBase2Y = cy + 18 * Math.sin(radAngle + 0.22);
+
+    s += `<path d="M ${ptrBase1X.toFixed(1)} ${ptrBase1Y.toFixed(1)}
+                    L ${ptrTipX.toFixed(1)} ${ptrTipY.toFixed(1)}
+                    L ${ptrBase2X.toFixed(1)} ${ptrBase2Y.toFixed(1)}
+                    Z"
+                fill="url(#bronzeGrad)" stroke="#1a1405" stroke-width="1"
+                filter="drop-shadow(0 2px 4px rgba(0,0,0,0.8))"/>`;
+
+    // Center Acanthus Pin Boss (Release point)
+    s += `<circle cx="${cx}" cy="${cy}" r="12" fill="url(#rotundaBossGrad)" stroke="#1a1405" stroke-width="1.5"
+                  filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="4" fill="#ffd166" filter="url(#votiveGlow)"/>`;
+
+    // Direct Rotary Dial Hitbox for dragging
+    s += `<circle cx="${cx}" cy="${cy}" r="38" fill="transparent" class="rotunda-rotary-dial" data-drag="rotundaAngle"
+                  style="cursor: grab; pointer-events: auto;" title="Drag rotunda to rotate angle (-45° to +45°)"/>`;
+
+  } else {
+    // Shade Mode (Compact 44px Medallion)
+    s += `<circle cx="${cx}" cy="${cy}" r="21" fill="url(#gothStone)" stroke="#151b18" stroke-width="1.5"
+                  filter="drop-shadow(0 3px 5px rgba(0,0,0,0.8))"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="18" fill="url(#bronzeGrad)" stroke="#1a1405" stroke-width="1"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="12" fill="#090c0b" stroke="#36443c" stroke-width="1"/>`;
+    s += `<circle cx="${cx}" cy="${cy}" r="6" fill="#ffd166" filter="url(#votiveGlow)"/>`;
+
+    // Miniature pointer needle in shade mode
+    const pX = cx + 18 * Math.cos(radAngle);
+    const pY = cy + 18 * Math.sin(radAngle);
+    s += `<line x1="${cx}" y1="${cy}" x2="${pX.toFixed(1)}" y2="${pY.toFixed(1)}" stroke="#ffffff" stroke-width="2"/>`;
+
+    // Rotary dial hitbox in shade mode
+    s += `<circle cx="${cx}" cy="${cy}" r="21" fill="transparent" class="rotunda-rotary-dial" data-drag="rotundaAngle"
+                  style="cursor: grab; pointer-events: auto;" title="Drag rotunda to rotate angle (-45° to +45°)"/>`;
   }
 
   s += `</g>`;
@@ -3900,7 +4364,7 @@ function renderHardware() {
 
   const midX = (a.x + curWA - 22 + b.x + 22) / 2;
 
-  if (p > 0) {
+  if (p > 0 && model.option !== 'rotunda') {
     // Continuous Monolithic Cathedral Facade
     shared += drawGothicCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
     if (!isShade) {
@@ -3929,7 +4393,7 @@ function renderHardware() {
   }
 
   // Draw Keystone for Option 1
-  if (!isShade && model.option !== 'leadcame' && model.option !== 'buttress' && model.option !== 'gargoyle' && model.option !== 'tierod' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
+  if (!isShade && model.option !== 'leadcame' && model.option !== 'buttress' && model.option !== 'gargoyle' && model.option !== 'tierod' && model.option !== 'rotunda' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
     const drop = model.joined ? 1 : model.keystoneDrop || Math.max(0, (glow - 0.3) / 0.7 * 0.7);
     const kMidX = model.joined ? a.x + JOIN_DISTANCE + extraW : (a.x + curWA - 18 + b.x + 18) / 2;
     shared += drawKeystone(kMidX, a.y, drop, Math.max(p, glow > 0.3 ? 0.9 : drop));
@@ -3959,6 +4423,14 @@ function renderHardware() {
     shared += drawMortiseTieRodPin(a.x, a.y, b.x, b.y, rodRatio, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow);
   }
 
+  // Draw Masonry Rotunda Crossing Socket for Option 11
+  if (model.option === 'rotunda') {
+    const rotProg = model.joined ? 1 : model.rotundaProgress || Math.max(0, (glow - 0.2) / 0.8 * 0.7);
+    if (model.joined || rotProg > 0.02 || glow > 0.15) {
+      shared += drawRotundaCrossingSocket(a.x, a.y, b.x, b.y, model.angle, rotProg, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow, isShade);
+    }
+  }
+
   if (model.joined && model.design) {
     shared += `<line x1="${a.x + JOIN_DISTANCE + extraW}" y1="${a.y + 10}" x2="${a.x + JOIN_DISTANCE + extraW}" y2="${a.y + 120}"
                      stroke="#e6b447" stroke-dasharray="4 3" stroke-width="1.5"/>`;
@@ -3972,7 +4444,10 @@ function renderHardware() {
     const capWidth = isA ? curWA : W;
     const rightOffset = isA ? extraW : 0;
     let capL, capR;
-    if (model.option === 'leadcame') {
+    if (model.option === 'rotunda') {
+      capL = drawRotundaEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
+      capR = drawRotundaEndCap(rightOffset, 0, true, isA, isA ? model.cap : 0, isShade);
+    } else if (model.option === 'leadcame') {
       capL = drawLeadCameEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
       capR = drawLeadCameEndCap(rightOffset, 0, true, isA, isA ? model.cap : 0, isShade);
     } else if (model.option === 'buttress') {
@@ -3990,8 +4465,9 @@ function renderHardware() {
     }
     const extSvg = isA ? drawCathedralExtension(extraW, morph, isShade) : '';
     const individual = drawGothicCasing(0, 0, capWidth, 1, isShade) + extSvg + capL + capR;
+    const shellOpacity = model.option === 'rotunda' ? 1 : (1 - p);
 
-    $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawGothicSocketLight(isA ? curWA - 22 : 22, 0, glow)}</g>`;
+    $('#shell-' + id).innerHTML = `<g opacity="${shellOpacity}">${individual}${drawGothicSocketLight(isA ? curWA - 22 : 22, 0, glow)}</g>`;
   }
 
   // Portcullis Guillotine in each module
@@ -4121,6 +4597,15 @@ function render() {
     el.classList.toggle('joined-shade', model.joined && model.shade);
     el.classList.toggle('option-oculus', model.option === 'oculus');
 
+    if (id === 'b' && model.option === 'rotunda' && (model.joined || model.rotundaProgress > 0)) {
+      const activeAngle = model.angle * (model.joined ? 1 : model.rotundaProgress);
+      el.style.transformOrigin = `37px ${model.shade ? 22 : 65}px`;
+      el.style.transform = `rotate(${activeAngle}deg)`;
+    } else if (id === 'b') {
+      el.style.transformOrigin = '';
+      el.style.transform = '';
+    }
+
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.gothic-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
 
@@ -4178,7 +4663,10 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
-  if (model.option === 'gargoyle') {
+  if (model.option === 'rotunda') {
+    $('#btnJoinAnim').textContent = model.joined ? 'Crossing locked' : 'Lock rotunda crossing';
+    $('#btnSeparateAnim').textContent = 'Unlock crossing';
+  } else if (model.option === 'gargoyle') {
     $('#btnJoinAnim').textContent = model.joined ? 'Gargoyle clenched' : 'Spring gargoyle join';
     $('#btnSeparateAnim').textContent = 'Unclench gargoyle';
   } else if (model.option === 'buttress') {
@@ -4193,6 +4681,18 @@ function render() {
   } else {
     $('#btnJoinAnim').textContent = model.joined ? 'Vault locked' : 'Drop keystone join';
     $('#btnSeparateAnim').textContent = 'Lift keystone';
+  }
+
+  const rotControls = $('#rotundaControls');
+  if (rotControls) {
+    rotControls.style.display = model.option === 'rotunda' ? 'flex' : 'none';
+    const slider = $('#rotundaAngleSlider');
+    if (slider) slider.value = model.angle;
+    const readout = $('#rotundaAngleReadout');
+    if (readout) readout.textContent = (model.angle >= 0 ? '+' : '') + model.angle + '°';
+    $$('.detent-btn').forEach(btn => {
+      btn.classList.toggle('active', +btn.dataset.angle === model.angle);
+    });
   }
 
   const portBtn = $('#btnPortcullisAnim');
@@ -4232,7 +4732,21 @@ function render() {
   const buttressRel = $('#buttressRelease');
   const gargoyleRel = $('#gargoyleRelease');
   const tierodRel = $('#tierodRelease');
-  if (model.option === 'tierod') {
+  const rotundaRel = $('#rotundaRelease');
+  if (model.option === 'rotunda') {
+    release.hidden = true;
+    solderRel.hidden = true;
+    buttressRel.hidden = true;
+    gargoyleRel.hidden = true;
+    tierodRel.hidden = true;
+    rotundaRel.hidden = !model.joined || model.busy || model.shade;
+    const pivotX = model.a.x + JOIN_DISTANCE + extraW + 37;
+    const pivotY = model.a.y + (model.shade ? 22 : 65);
+    rotundaRel.style.left = (pivotX - 16) + 'px';
+    rotundaRel.style.top = (pivotY - 16) + 'px';
+    rotundaRel.style.setProperty('--tension', model.tension);
+  } else if (model.option === 'tierod') {
+    rotundaRel.hidden = true;
     release.hidden = true;
     solderRel.hidden = true;
     buttressRel.hidden = true;
@@ -4242,6 +4756,7 @@ function render() {
     tierodRel.style.top = (model.b.y + 44) + 'px';
     tierodRel.style.setProperty('--tension', model.tension);
   } else if (model.option === 'gargoyle') {
+    rotundaRel.hidden = true;
     tierodRel.hidden = true;
     release.hidden = true;
     solderRel.hidden = true;
@@ -4251,6 +4766,7 @@ function render() {
     gargoyleRel.style.top = (model.a.y + 10) + 'px';
     gargoyleRel.style.setProperty('--tension', model.tension);
   } else if (model.option === 'leadcame') {
+    rotundaRel.hidden = true;
     tierodRel.hidden = true;
     release.hidden = true;
     buttressRel.hidden = true;
@@ -4260,6 +4776,7 @@ function render() {
     solderRel.style.top = (model.a.y + 55) + 'px';
     solderRel.style.setProperty('--tension', model.tension);
   } else if (model.option === 'buttress') {
+    rotundaRel.hidden = true;
     tierodRel.hidden = true;
     release.hidden = true;
     solderRel.hidden = true;
@@ -4269,6 +4786,7 @@ function render() {
     buttressRel.style.top = (model.b.y + 4) + 'px';
     buttressRel.style.setProperty('--tension', model.tension);
   } else {
+    rotundaRel.hidden = true;
     tierodRel.hidden = true;
     solderRel.hidden = true;
     buttressRel.hidden = true;
@@ -4293,7 +4811,9 @@ function render() {
         $('#phase').textContent = 'Shade mode / Portcullis guillotine locked';
       }
     } else if (model.joined) {
-      if (model.option === 'leadcame') {
+      if (model.option === 'rotunda') {
+        $('#phase').textContent = `Joined / Crossing rotunda at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
+      } else if (model.option === 'leadcame') {
         $('#phase').textContent = 'Joined / Lead-came soldered frieze';
       } else if (model.option === 'buttress') {
         $('#phase').textContent = 'Joined / Flying buttress bridge seated';
@@ -4306,6 +4826,8 @@ function render() {
       } else {
         $('#phase').textContent = 'Joined / One monolithic basilica';
       }
+    } else if (model.option === 'rotunda' && model.rotundaProgress > 0.05) {
+      $('#phase').textContent = `Joining / Aligning trunnion into crossing rotunda at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
     } else if (model.option === 'leadcame' && model.solderProgress > 0.05) {
       $('#phase').textContent = 'Joining / Molten silver solder flowing';
     } else if (model.option === 'buttress' && model.buttressSwing > 0.05) {
@@ -5167,6 +5689,125 @@ function toggleCathedralExtension() {
   else morphCathedralExtension();
 }
 
+// Option 11: Masonry Rotunda Crossing Socket Angled Connection Functions
+function setRotundaAngle(deg, announce = true) {
+  deg = Math.max(-45, Math.min(45, deg));
+  model.angle = deg;
+  const slider = $('#rotundaAngleSlider');
+  if (slider) slider.value = deg;
+  const readout = $('#rotundaAngleReadout');
+  if (readout) readout.textContent = (deg >= 0 ? '+' : '') + deg + '°';
+
+  $$('.detent-btn').forEach(btn => {
+    btn.classList.toggle('active', +btn.dataset.angle === deg);
+  });
+
+  render();
+
+  if (announce) {
+    const detents = {
+      '-45': 'North Transept Extreme',
+      '-30': 'North-East Ambulatory',
+      '-15': 'Chantry Gallery North',
+      '0': 'Direct Monolithic Axis',
+      '15': 'Chantry Gallery South',
+      '20': 'South-East Ambulatory',
+      '30': 'South-East Chapter Chapel',
+      '45': 'South Transept Extreme'
+    };
+    const name = detents[String(deg)] || 'Pier Detent';
+    say(`Rotunda crossing angle set to ${(deg >= 0 ? '+' : '')}${deg}° (${name}). Overlapping bronze scales flexed.`);
+  }
+}
+
+async function rotundaJoin(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say(`Guiding trunnion into masonry rotunda crossing socket at ${model.angle >= 0 ? '+' : ''}${model.angle}°...`);
+  $('#phase').textContent = 'Seating trunnion into crossing rotunda';
+
+  const extraW = Math.round((model.morphProgress || 0) * 140);
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + extraW + W) - 30, model.a.x));
+  const targetY = Math.max(130, Math.min(model.undercroft ? 280 : 360, model.a.y));
+
+  // 1. Approach and dock
+  if (!await tween(fromDrag ? 240 : 440, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE + extraW - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.cap = t;
+    model.rotundaProgress = Math.max(model.rotundaProgress, t * 0.7);
+    render();
+  }, token)) return;
+
+  // 2. Seating into crossing rotunda & locking voussoir detent
+  $('#phase').textContent = 'Locking voussoir detent & fanning bronze scales';
+  if (!await tween(320, t => {
+    const ease = 1 - Math.pow(1 - t, 3);
+    model.rotundaProgress = 0.7 + ease * 0.3;
+    render();
+  }, token)) return;
+
+  model.joined = true;
+  model.rotundaProgress = 1;
+  model.blend = 1;
+  model.cap = 1;
+  model.light = 0;
+  model.busy = false;
+  render();
+  say(`Masonry rotunda crossing locked at ${model.angle >= 0 ? '+' : ''}${model.angle}°! Voussoir detent engaged & bronze canopy flexed.`);
+  $('#phase').textContent = `Joined / Crossing rotunda at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
+}
+
+async function rotundaSeparate() {
+  if (!model.joined || model.busy) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Releasing rotunda acanthus finial pin and unlocking voussoirs...');
+  $('#phase').textContent = 'Unlocking crossing rotunda';
+
+  // 1. Unseat rotunda lock
+  if (!await tween(220, t => {
+    model.rotundaProgress = 1 - t * 0.6;
+    render();
+  }, token)) return;
+
+  // 2. Separate housings
+  const curWA = W + Math.round((model.morphProgress || 0) * 140);
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + curWA + 130);
+
+  $('#phase').textContent = 'Separating cathedral housings';
+  if (!await tween(480, t => {
+    const ease = 1 - Math.pow(1 - t, 3);
+    model.a.x = startA.x + (targetA - startA.x) * ease;
+    model.b.x = startB.x + (targetB - startB.x) * ease;
+    model.rotundaProgress = Math.max(0, (1 - ease) * 0.4);
+    model.blend = Math.max(0, 1 - ease * 2);
+    model.cap = Math.max(0, 1 - ease);
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.rotundaProgress = 0;
+  model.blend = 0;
+  model.cap = 0;
+  model.tension = 0;
+  model.busy = false;
+  render();
+  say('Rotunda crossing disengaged. Independent stone housings restored.');
+  $('#phase').textContent = 'Separate / Two stone housings';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -5183,12 +5824,14 @@ async function applyState(stateName) {
       await retractCathedralExtension();
     }
     if (model.joined) {
-      if (model.option === 'tierod') await tieRodSeparate();
+      if (model.option === 'rotunda') await rotundaSeparate();
+      else if (model.option === 'tierod') await tieRodSeparate();
       else if (model.option === 'gargoyle') await gargoyleSeparate();
       else if (model.option === 'buttress') await buttressSeparate();
       else if (model.option === 'leadcame') await meltSeparate();
       else await separate();
     } else {
+      model.rotundaProgress = 0;
       model.keystoneDrop = 0;
       model.solderProgress = 0;
       model.buttressSwing = 0;
@@ -5221,7 +5864,16 @@ async function applyState(stateName) {
     const curExtra = Math.round((model.morphProgress || 0) * 140);
     model.a.x = 240;
     model.b.x = 240 + W + curExtra + 44; // near each other
-    if (model.option === 'extension') {
+    if (model.option === 'rotunda') {
+      model.rotundaProgress = 0.52;
+      model.keystoneDrop = 0;
+      model.solderProgress = 0;
+      model.buttressSwing = 0;
+      model.gargoyleSpring = 0;
+      model.tieRodProgress = 0;
+      render();
+      say(`State: Joining — Mid-animation view with trunnion hub seating into rotunda crossing at ${model.angle >= 0 ? '+' : ''}${model.angle}° and bronze scales fanning.`);
+    } else if (model.option === 'extension') {
       model.morphProgress = 0.52;
       model.extended = false;
       model.keystoneDrop = 0;
@@ -5287,7 +5939,16 @@ async function applyState(stateName) {
       model.blend = 1;
       model.cap = 1;
       model.light = 0;
-      if (model.option === 'extension') {
+      if (model.option === 'rotunda') {
+        model.rotundaProgress = 1;
+        model.keystoneDrop = 0;
+        model.solderProgress = 0;
+        model.buttressSwing = 0;
+        model.gargoyleSpring = 0;
+        model.tieRodProgress = 0;
+        render();
+        say(`State: Joined — Masonry rotunda crossing socket locked at ${model.angle >= 0 ? '+' : ''}${model.angle}° with radial voussoir detents and articulated bronze scales.`);
+      } else if (model.option === 'extension') {
         model.keystoneDrop = 1;
         model.gargoyleSpring = 0;
         model.solderProgress = 0;
@@ -5451,7 +6112,15 @@ $$('.crypt-step').forEach(step => {
 
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
-  if (model.option === 'extension') {
+  if (model.option === 'rotunda') {
+    say('Option 11: Masonry Rotunda Crossing Socket angled connection (-45° to +45°) selected. Cylindrical crossing lantern with radial stone voussoir detents and flexible bronze scales.');
+    if (model.shade) {
+      if (model.oculusCollapse > 0.05) await expandOculus();
+      else if (model.pillarTelescope > 0.05) await extendPillars();
+      else if (model.triptychFold > 0.05) await unfoldTriptych();
+      else await liftPortcullis();
+    }
+  } else if (model.option === 'extension') {
     say('Option 10: Cathedral Extension morph selected. Lateral chantry bay, cantilever corbels, secondary stained-glass lancets, and stepped crypt stairs.');
     if (!model.extended) {
       await morphCathedralExtension();
@@ -5535,9 +6204,9 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, undercroft: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, buttressSwing: 0, pillarTelescope: 0, gargoyleSpring: 0, oculusCollapse: 0, tieRodProgress: 0, morphProgress: 0, extended: false, bNudge: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, buttressSwing: 0, pillarTelescope: 0, gargoyleSpring: 0, oculusCollapse: 0, tieRodProgress: 0, morphProgress: 0, rotundaProgress: 0, angle: 20, extended: false, bNudge: 0, option: 'rotunda', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
-  $('#optionSelect').value = 'keystone';
+  $('#optionSelect').value = 'rotunda';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
@@ -5566,6 +6235,11 @@ $('#concurrencyDial').onclick = () => {
   say('Concurrency tithe set to: ' + model.limit);
 };
 
+// Option 11: Angle slider and detent button wiring
+const rotSlider = $('#rotundaAngleSlider');
+if (rotSlider) rotSlider.oninput = e => setRotundaAngle(+e.target.value);
+$$('.detent-btn').forEach(btn => btn.onclick = () => setRotundaAngle(+btn.dataset.angle));
+
 // Drag & Drop Mechanics
 function local(e) {
   const r = stage.getBoundingClientRect();
@@ -5579,12 +6253,12 @@ function snapshot() {
   return {
     a: { ...model.a }, b: { ...model.b }, meter: { ...model.meter },
     joined: model.joined, docked: model.docked, cap: model.cap, blend: model.blend,
-    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, buttressSwing: model.buttressSwing, pillarTelescope: model.pillarTelescope, gargoyleSpring: model.gargoyleSpring, oculusCollapse: model.oculusCollapse, tieRodProgress: model.tieRodProgress, morphProgress: model.morphProgress, extended: model.extended, bNudge: model.bNudge, option: model.option, front: model.front
+    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, buttressSwing: model.buttressSwing, pillarTelescope: model.pillarTelescope, gargoyleSpring: model.gargoyleSpring, oculusCollapse: model.oculusCollapse, tieRodProgress: model.tieRodProgress, morphProgress: model.morphProgress, rotundaProgress: model.rotundaProgress, angle: model.angle, extended: model.extended, bNudge: model.bNudge, option: model.option, front: model.front
   };
 }
 function restore(s) {
   for (const id of ['a', 'b', 'meter']) Object.assign(model[id], s[id]);
-  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'buttressSwing', 'pillarTelescope', 'gargoyleSpring', 'oculusCollapse', 'tieRodProgress', 'morphProgress', 'extended', 'bNudge', 'option', 'front']) model[k] = s[k];
+  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'buttressSwing', 'pillarTelescope', 'gargoyleSpring', 'oculusCollapse', 'tieRodProgress', 'morphProgress', 'rotundaProgress', 'angle', 'extended', 'bNudge', 'option', 'front']) model[k] = s[k];
 }
 function cancelDrag() {
   if (!drag) return;
@@ -5662,7 +6336,9 @@ function magneticGoal(raw, target, id) {
   model.light = id === 'meter' ? 0 : p.brightness;
 
   if (id !== 'meter' && p.brightness > 0) {
-    if (model.option === 'leadcame') {
+    if (model.option === 'rotunda') {
+      model.rotundaProgress = p.brightness * 0.7; // rotunda socket glows and scales reach across!
+    } else if (model.option === 'leadcame') {
       model.solderProgress = p.brightness * 0.45;
     } else if (model.option === 'buttress') {
       model.buttressSwing = p.brightness * 0.7; // buttress arm swings downward as you approach!
@@ -5679,6 +6355,7 @@ function magneticGoal(raw, target, id) {
     model.buttressSwing = 0;
     model.gargoyleSpring = 0;
     model.tieRodProgress = 0;
+    model.rotundaProgress = 0;
   }
 
   return target ? { x: raw.x + (target.x - raw.x) * strength, y: raw.y + (target.y - raw.y) * strength } : raw;
@@ -5712,7 +6389,8 @@ stage.addEventListener('pointerdown', e => {
   if (!target || e.button !== 0 || model.busy) return;
   e.preventDefault();
   const id = target.dataset.drag, saved = snapshot(), p = local(e);
-  const kind = id === 'release' ? 'shellLatch' :
+  const kind = id === 'rotundaAngle' ? 'rotundaAngle' :
+               id === 'release' ? 'shellLatch' :
                id === 'meter' && model.docked ? 'meterLatch' :
                model.joined && id !== 'meter' ? 'group' : 'move';
   if (id === 'release' && !model.joined) return;
@@ -5732,8 +6410,29 @@ stage.addEventListener('pointermove', e => {
   const d = drag, p = local(e), dx = p.x - d.start.x, dy = p.y - d.start.y;
   if (Math.abs(dx) + Math.abs(dy) > 3) d.moved = true;
 
+  if (d.kind === 'rotundaAngle') {
+    const extraW = Math.round((model.morphProgress || 0) * 140);
+    const pivotX = model.a.x + JOIN_DISTANCE + extraW + 37;
+    const pivotY = model.a.y + (model.shade ? 22 : 65);
+    const rad = Math.atan2(p.y - pivotY, p.x - pivotX);
+    let deg = Math.round(rad * (180 / Math.PI));
+    deg = clamp(deg, -45, 45);
+    const detents = [-45, -30, -15, 0, 15, 30, 45];
+    for (const det of detents) {
+      if (Math.abs(deg - det) <= 3) { deg = det; break; }
+    }
+    setRotundaAngle(deg, false);
+    return;
+  }
+
   if (d.kind === 'shellLatch') {
-    if (model.option === 'tierod') {
+    if (model.option === 'rotunda') {
+      model.tension = clamp(Math.hypot(dx, dy) / 44, 0, 1);
+      model.rotundaProgress = 1 - model.tension * 0.4;
+      if (Math.hypot(dx, dy) < 44) { render(); return; }
+      rotundaSeparate();
+      return;
+    } else if (model.option === 'tierod') {
       model.tension = clamp(dx / 60, 0, 1);
       model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
       model.tieRodProgress = 1 - model.tension * 0.4;
@@ -5820,6 +6519,7 @@ stage.addEventListener('pointerup', () => {
   $('#cryptBay').classList.remove('hot');
   if (ready) {
     if (d.id === 'meter') insertChecks();
+    else if (model.option === 'rotunda') rotundaJoin(true);
     else if (model.option === 'tierod') tieRodJoin(true);
     else if (model.option === 'gargoyle') gargoyleJoin(true);
     else if (model.option === 'buttress') buttressJoin(true);
@@ -5837,6 +6537,7 @@ stage.addEventListener('pointerup', () => {
     model.buttressSwing = 0;
     model.gargoyleSpring = 0;
     model.tieRodProgress = 0;
+    model.rotundaProgress = 0;
   }
   render();
 });
@@ -5847,6 +6548,24 @@ $('#solderRelease').onclick = e => { if (e.detail === 0) meltSeparate(); };
 $('#buttressRelease').onclick = e => { if (e.detail === 0) buttressSeparate(); };
 $('#gargoyleRelease').onclick = e => { if (e.detail === 0) gargoyleSeparate(); };
 $('#tierodRelease').onclick = e => { if (e.detail === 0) tieRodSeparate(); };
+$('#rotundaRelease').onclick = e => { if (e.detail === 0) rotundaSeparate(); };
+
+$('#btnJoinAnim').onclick = () => {
+  if (model.option === 'rotunda') rotundaJoin();
+  else if (model.option === 'tierod') tieRodJoin();
+  else if (model.option === 'gargoyle') gargoyleJoin();
+  else if (model.option === 'buttress') buttressJoin();
+  else if (model.option === 'leadcame') solderWeld();
+  else join();
+};
+$('#btnSeparateAnim').onclick = () => {
+  if (model.option === 'rotunda') rotundaSeparate();
+  else if (model.option === 'tierod') tieRodSeparate();
+  else if (model.option === 'gargoyle') gargoyleSeparate();
+  else if (model.option === 'buttress') buttressSeparate();
+  else if (model.option === 'leadcame') meltSeparate();
+  else separate();
+};
 
 window.addEventListener('keydown', e => {
   if (e.target.matches('input, select, textarea')) return;
@@ -5862,7 +6581,8 @@ window.addEventListener('keydown', e => {
     applyState('shade');
   } else if (e.key === 'j' || e.key === 'J') {
     if (!model.joined) {
-      if (model.option === 'tierod') tieRodJoin();
+      if (model.option === 'rotunda') rotundaJoin();
+      else if (model.option === 'tierod') tieRodJoin();
       else if (model.option === 'gargoyle') gargoyleJoin();
       else if (model.option === 'buttress') buttressJoin();
       else if (model.option === 'leadcame') solderWeld();
@@ -5870,11 +6590,29 @@ window.addEventListener('keydown', e => {
     }
   } else if (e.key === 's' || e.key === 'S') {
     if (model.joined) {
-      if (model.option === 'tierod') tieRodSeparate();
+      if (model.option === 'rotunda') rotundaSeparate();
+      else if (model.option === 'tierod') tieRodSeparate();
       else if (model.option === 'gargoyle') gargoyleSeparate();
       else if (model.option === 'buttress') buttressSeparate();
       else if (model.option === 'leadcame') meltSeparate();
       else separate();
+    }
+  } else if (e.key === 'a' || e.key === 'A') {
+    if (model.option === 'rotunda') {
+      const detents = [-45, -30, -15, 0, 15, 30, 45];
+      let idx = detents.indexOf(model.angle);
+      idx = (idx + 1) % detents.length;
+      setRotundaAngle(detents[idx]);
+    }
+  } else if (e.key === '[' || e.key === 'ArrowUp') {
+    if (model.option === 'rotunda') {
+      e.preventDefault();
+      setRotundaAngle(model.angle - 5);
+    }
+  } else if (e.key === ']' || e.key === 'ArrowDown') {
+    if (model.option === 'rotunda') {
+      e.preventDefault();
+      setRotundaAngle(model.angle + 5);
     }
   } else if (e.key === 'm' || e.key === 'M') {
     if (!model.joined) tieRodJoin();
@@ -5900,7 +6638,8 @@ window.addEventListener('keydown', e => {
   } else if (e.key === 'x' || e.key === 'X' || e.key === 'e' || e.key === 'E') {
     toggleCathedralExtension();
   } else if (e.key === 'Enter') {
-    if (document.activeElement === $('#keystoneRelease') && model.joined) separate();
+    if (document.activeElement === $('#rotundaRelease') && model.joined) rotundaSeparate();
+    else if (document.activeElement === $('#keystoneRelease') && model.joined) separate();
     else if (document.activeElement === $('#solderRelease') && model.joined) meltSeparate();
     else if (document.activeElement === $('#buttressRelease') && model.joined) buttressSeparate();
     else if (document.activeElement === $('#gargoyleRelease') && model.joined) gargoyleSeparate();
