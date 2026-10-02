@@ -388,6 +388,76 @@ header {
 .module.shade .shade-rod {
   display: flex;
 }
+.module.shade[data-shade-mode="accordion"] .abacus-shade-strip {
+  display: none !important;
+}
+.module.shade[data-shade-mode="accordion"] .accordion-shade-strip {
+  display: flex !important;
+}
+.module.shade[data-shade-mode="abacus"] .accordion-shade-strip {
+  display: none !important;
+}
+.module.shade[data-shade-mode="abacus"] .abacus-shade-strip {
+  display: flex !important;
+}
+.accordion-shade-strip {
+  background: linear-gradient(180deg, #2b150b 0%, #160a04 50%, #0c0402 100%);
+  border-color: var(--copper-light);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.95), inset 0 1px 2px rgba(255, 212, 184, 0.45);
+}
+.accordion-shade-strip .shade-title {
+  font-size: 11px;
+}
+.accordion-shade-strip .shade-title em {
+  font-style: normal;
+  color: var(--turquoise-bright);
+}
+.accordion-clasp {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  background: rgba(36, 17, 9, 0.85);
+  border: 1px solid var(--copper-mid);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 2px rgba(255, 212, 184, 0.3), 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.accordion-clasp .clasp-wire {
+  width: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #df7a47, #ffd4b8, #df7a47);
+  box-shadow: 0 0 3px rgba(249, 169, 121, 0.5);
+}
+.accordion-clasp .clasp-gem {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid #381406;
+}
+.accordion-clasp .clasp-gem.amethyst {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--amethyst-bright) 50%, var(--amethyst-deep) 90%);
+  box-shadow: 0 0 5px rgba(228, 158, 255, 0.6);
+}
+.accordion-clasp .clasp-gem.turquoise {
+  background: radial-gradient(circle at 35% 30%, #ffffff, var(--turquoise-bright) 50%, var(--turquoise-deep) 90%);
+  box-shadow: 0 0 5px rgba(82, 240, 222, 0.6);
+}
+.shade-metrics {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.shade-metric-tag {
+  font: bold 10px/1 "Courier New", monospace;
+  color: var(--copper-hot);
+  background: #1e0f08;
+  border: 1px solid #572511;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.5);
+}
 .shade-title {
   font: bold 11px/1 "Courier New", monospace;
   color: var(--copper-hot);
@@ -838,8 +908,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Wire, Beads &amp; Stones <span>/ tree root braid, caged-bead bayonet &amp; abacus shade</span></h1>
-    <p>Raw and oxidized copper wire · Tree of Life root braid onto silver hoop · Caged amethyst jewel · Abacus bead compression shade</p>
+    <h1>Wire, Beads &amp; Stones <span>/ tree root braid, abacus shade &amp; folding hoop accordion</span></h1>
+    <p>Raw &amp; oxidized copper wire · Tree of Life root braid onto silver hoop · Caged amethyst jewel · Abacus bead compression · Wire hoop folding accordion shade</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -847,7 +917,8 @@ footer .note-highlight {
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="caged_bead">1. Caged-Bead Bayonet Socket (Spiral Copper Cage &amp; Amethyst)</option>
         <option value="abacus_compression">2. Abacus Bead-Strand Compression shade</option>
-        <option value="tree_root_braid" selected>3. Wire Tree Root Braid onto Hoop join</option>
+        <option value="tree_root_braid">3. Wire Tree Root Braid onto Hoop join</option>
+        <option value="wire_accordion" selected>4. Wire Hoop Folding Accordion shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -857,9 +928,10 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim">Braid roots onto hoop</button>
-    <button id="btnSeparateAnim" disabled>Unbraid roots</button>
-    <button id="btnAbacusAnim" class="primary-btn">Compress abacus</button>
+    <button id="btnJoinAnim">Join capsules</button>
+    <button id="btnSeparateAnim" disabled>Separate</button>
+    <button id="btnAbacusAnim">Compress abacus</button>
+    <button id="btnAccordionAnim" class="primary-btn">Fold wire hoop</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -1046,11 +1118,25 @@ footer .note-highlight {
         </div>
       </div>
 
-      <!-- Compact Rod Strip for Shade Mode -->
-      <div class="shade-rod" data-drag="a" title="Drag Jarvis jeweled rod">
+      <!-- Compact Rod Strip for Shade Mode (Option 2: Abacus Compression) -->
+      <div class="shade-rod abacus-shade-strip" data-drag="a" title="Drag Jarvis jeweled rod">
         <span class="shade-title"><span>✦</span> JARVIS · 03 AGENTS</span>
         <div class="shade-beads">
           <i class="amethyst"></i><i class="turquoise"></i><i class="carnelian"></i>
+        </div>
+      </div>
+
+      <!-- Folded Wire Hoop Strip for Shade Mode (Option 4: Wire Hoop Accordion) -->
+      <div class="shade-rod accordion-shade-strip" data-drag="a" title="Drag Jarvis folded basket rod">
+        <span class="shade-title"><span style="color:var(--amethyst-bright)">✦</span> JARVIS · <em class="shade-agent-state">03 AGENTS</em></span>
+        <div class="accordion-clasp" title="Wire basket spring latch">
+          <i class="clasp-wire"></i><i class="clasp-gem amethyst"></i>
+        </div>
+        <div class="shade-metrics">
+          <span class="shade-metric-tag">12 PASS</span>
+          <div class="shade-beads">
+            <i class="turquoise"></i><i class="carnelian"></i>
+          </div>
         </div>
       </div>
 
@@ -1093,11 +1179,25 @@ footer .note-highlight {
         </div>
       </div>
 
-      <!-- Compact Rod Strip for Shade Mode -->
-      <div class="shade-rod" data-drag="b" title="Drag GitDiscuss jeweled rod">
+      <!-- Compact Rod Strip for Shade Mode (Option 2: Abacus Compression) -->
+      <div class="shade-rod abacus-shade-strip" data-drag="b" title="Drag GitDiscuss jeweled rod">
         <span class="shade-title"><span>✦</span> GITDISCUSS · 02 DECISIONS</span>
         <div class="shade-beads">
           <i class="carnelian"></i><i class="turquoise"></i><i class="pearl"></i>
+        </div>
+      </div>
+
+      <!-- Folded Wire Hoop Strip for Shade Mode (Option 4: Wire Hoop Accordion) -->
+      <div class="shade-rod accordion-shade-strip" data-drag="b" title="Drag GitDiscuss folded basket rod">
+        <span class="shade-title"><span style="color:var(--turquoise-bright)">✦</span> GITDISCUSS · <em class="shade-agent-state">02 DECISIONS</em></span>
+        <div class="accordion-clasp" title="Wire basket spring latch">
+          <i class="clasp-wire"></i><i class="clasp-gem turquoise"></i>
+        </div>
+        <div class="shade-metrics">
+          <span class="shade-metric-tag">READY</span>
+          <div class="shade-beads">
+            <i class="amethyst"></i><i class="pearl"></i>
+          </div>
         </div>
       </div>
 
@@ -1141,7 +1241,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Wire, Beads &amp; Stones Architecture · Tree Root Braid, Caged-Bead Bayonet Socket &amp; Abacus Bead Compression</h3>
+  <h3>Wire, Beads &amp; Stones Architecture · Tree Root Braid, Caged-Bead Bayonet Socket, Abacus Bead Compression &amp; Wire Hoop Folding Accordion</h3>
   <p>
     Formed from heavy 12-gauge bent copper wire frames, wrapped with tight 20-gauge copper coils, sterling silver craft wire details, and natural gemstones (faceted amethyst, polished turquoise, carnelian, peridot, and freshwater pearls). The displays sit recessed in oxidized copper bezels, isolated from wire ornamentation to guarantee complete legibility.
   </p>
@@ -1153,6 +1253,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 3 — Wire Tree Root Braid onto Hoop Join:</span> Inspired directly by handcrafted wire gem trees and Tree of Life medallions in a hoop (refs 3 &amp; 4). Module A features a sculpted trunk of twisted 20-gauge copper wire that branches into 6 organic root strands with nestled natural gemstone chips (green peridot, violet amethyst, and orange carnelian). Module B is anchored by a heavy 10-gauge sterling silver craft-wire hoop ring wrapped in fine copper coils and turquoise spacers, with an inner silver filigree tree web holding a freshwater pearl. As the modules dock, the individual copper root strands uncurl, reach across the gap, and wrap tightly around the heavy silver hoop rim in unison, locking the assembly with springy copper wire tension and a metallic resonant glint. Pulling the copper root release clasp right uncoils the roots and smoothly separates the capsules.
+  </p>
+  <p>
+    <span class="note-highlight">Option 4 — Wire Hoop Folding Accordion Shade:</span> Inspired by antique folding wire baskets and collapsible cloches. The outer 12-gauge bent copper wire frame is hinged along its horizontal mid-axis on twin coiled copper wire axles holding drilled spherical turquoise and faceted amethyst hinge beads. Triggering shade pivots the lower semi-oval wire hoop upward through a 180° perspective arc along the hinge beads. As it folds, the bottom rail with its corner wire wrap coils and beaded turquoise-carnelian garland swings outward toward the viewer and flips flat against the upper structural wire hoop. At 180° closure, a spring-tempered copper wire basket latch snaps shut over the doubled wire hoop rim with a sharp metallic spark. The widget collapses into a compact 44px folded-basket status strip displaying high-contrast, unclipped metrics (agents, decisions, and checks), framed by the double-wire basket rim and prominent side hinge bosses.
   </p>
 </footer>
 
@@ -1173,7 +1276,8 @@ const model = {
   design: false,
   shade: false,
   abacusCompress: 0, // 0 = relaxed full abacus, 1 = compressed jeweled rod
-  option: 'tree_root_braid',
+  accordionFold: 0,  // Option 4: 0 = relaxed lower hoop, 1 = folded 180° upward against top rim
+  option: 'wire_accordion', // Default to Option 4
   blend: 0,
   cap: 0,
   bayonetProgress: 0, // Option 1: 0 = separate, 0.5 = sleeve entry, 1.0 = 30-deg twist locked
@@ -1356,12 +1460,14 @@ function drawAbacusBeads(x, y, width, compress = 0) {
 }
 
 // Draw Handcrafted Wire & Beads Casing
-function drawWireCasing(x, y, width, opacity = 1, isShade = false, compress = (typeof model !== 'undefined' && model ? model.abacusCompress : 0)) {
+function drawWireCasing(x, y, width, opacity = 1, isShade = false, compress = (typeof model !== 'undefined' && model ? model.abacusCompress : 0), fold = (typeof model !== 'undefined' && model ? model.accordionFold : 0)) {
   const midX = x + width / 2;
   const c = Math.max(0, Math.min(1, compress));
+  const f = Math.max(0, Math.min(1, fold));
+  const isAccordion = (typeof model !== 'undefined' && model && model.option === 'wire_accordion');
   let s = `<g opacity="${opacity}" class="wire-casing">`;
 
-  if (!isShade) {
+  if (!isShade && (!isAccordion || f < 0.98)) {
     // 1. Heavy Wire Outer Frame Drop Shadow
     s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="118" rx="20"
                 fill="#000000" opacity="0.65" filter="url(#wireShadow)"/>`;
@@ -1370,123 +1476,305 @@ function drawWireCasing(x, y, width, opacity = 1, isShade = false, compress = (t
     s += `<rect x="${x + 8}" y="${y + 8}" width="${width - 16}" height="114" rx="18"
                 fill="#180e09" stroke="#3b1d10" stroke-width="2"/>`;
 
-    // 3. Heavy 12-Gauge Bent Structural Copper Wire Armature (Outer Perimeter Hoop)
-    s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="118" rx="18"
-                fill="none" stroke="url(#copperGrad)" stroke-width="4.5" stroke-linecap="round"/>`;
+    if (isAccordion) {
+      // OPTION 4: Wire Hoop Folding Accordion Armature
+      // Upper Static Structural Wire Hoop (from left hinge up around top to right hinge)
+      s += `<path d="M ${x + 6} ${y + 64} L ${x + 6} ${y + 24} Q ${x + 6} ${y + 6} ${x + 24} ${y + 6} L ${x + width - 24} ${y + 6} Q ${x + width - 6} ${y + 6} ${x + width - 6} ${y + 24} L ${x + width - 6} ${y + 64}"
+                  fill="none" stroke="url(#copperGrad)" stroke-width="4.5" stroke-linecap="round"/>`;
+      s += `<path d="M ${x + 7} ${y + 64} L ${x + 7} ${y + 24} Q ${x + 7} ${y + 7} ${x + 24} ${y + 7} L ${x + width - 24} ${y + 7} Q ${x + width - 7} ${y + 7} ${x + width - 7} ${y + 24} L ${x + width - 7} ${y + 64}"
+                  fill="none" stroke="#ffd4b8" stroke-width="1.2" opacity="0.65"/>`;
 
-    // Inner wire highlight for 3D metallic tube sheen
-    s += `<rect x="${x + 7}" y="${y + 7}" width="${width - 14}" height="116" rx="17"
-                fill="none" stroke="#ffd4b8" stroke-width="1.2" opacity="0.65"/>`;
-
-    // 4. Coiled Wire Sleeves at Corners and Structural Anchors (20-gauge copper coils)
-    const coilAnchors = [
-      [x + 14, y + 8, 22, 7],
-      [x + width - 36, y + 8, 22, 7],
-      [x + 14, y + 115, 22, 7],
-      [x + width - 36, y + 115, 22, 7],
-      [x + 6, y + 54, 7, 22],
-      [x + width - 13, y + 54, 7, 22]
-    ];
-    coilAnchors.forEach(([cx, cy, cw, ch]) => {
-      s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2"
-                  fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
-      if (cw > ch) {
+      // Top corner coiled wire sleeves
+      const topCoils = [
+        [x + 14, y + 8, 22, 7],
+        [x + width - 36, y + 8, 22, 7]
+      ];
+      topCoils.forEach(([cx, cy, cw, ch]) => {
+        s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
         for (let ix = cx + 2; ix < cx + cw - 2; ix += 3) {
           s += `<line x1="${ix}" y1="${cy}" x2="${ix}" y2="${cy + ch}" stroke="#ffd4b8" stroke-width="0.8"/>`;
         }
-      } else {
-        for (let iy = cy + 2; iy < cy + ch - 2; iy += 3) {
-          s += `<line x1="${cx}" y1="${iy}" x2="${cx + cw}" y2="${iy}" stroke="#ffd4b8" stroke-width="0.8"/>`;
-        }
-      }
-    });
+      });
 
-    // 5. Tree of Life / Branched Wire Crest at Top Center (Inspired by ref 3 & 4)
-    s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
-      <path d="M ${midX - 18} ${y + 6} Q ${midX - 10} ${y - 8} ${midX} ${y - 14} Q ${midX + 10} ${y - 8} ${midX + 18} ${y + 6}" stroke-width="2.5"/>
-      <path d="M ${midX - 8} ${y + 6} Q ${midX} ${y - 12} ${midX + 8} ${y + 6}" stroke-width="1.8"/>
-      <path d="M ${midX} ${y - 14} Q ${midX - 22} ${y - 20} ${midX - 36} ${y - 12}" stroke-width="1.6"/>
-      <path d="M ${midX} ${y - 14} Q ${midX + 22} ${y - 20} ${midX + 36} ${y - 12}" stroke-width="1.6"/>
-      <path d="M ${midX - 18} ${y - 18} Q ${midX - 24} ${y - 28} ${midX - 14} ${y - 26}" stroke-width="1.2"/>
-      <path d="M ${midX + 18} ${y - 18} Q ${midX + 24} ${y - 28} ${midX + 14} ${y - 26}" stroke-width="1.2"/>
-    </g>`;
-
-    s += `<circle cx="${midX - 36}" cy="${y - 12}" r="3.2" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
-    s += `<circle cx="${midX + 36}" cy="${y - 12}" r="3.2" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
-    s += `<circle cx="${midX - 14}" cy="${y - 26}" r="3" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8"/>`;
-    s += `<circle cx="${midX + 14}" cy="${y - 26}" r="3" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
-    s += `<circle cx="${midX}" cy="${y - 16}" r="3.8" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="1" filter="url(#gemGlow)"/>`;
-
-    // 6. Recessed Display Window Frame with 4 Wire Claw Prongs
-    s += `<rect x="${x + 44}" y="${y + 28}" width="${width - 88}" height="72" rx="10"
-                fill="#090e0c" stroke="#3d2115" stroke-width="2.5"/>`;
-    s += `<rect x="${x + 46}" y="${y + 30}" width="${width - 92}" height="68" rx="8"
-                fill="none" stroke="#66331a" stroke-width="1.2"/>`;
-
-    // 4 Corner Bent-Wire Claw Prongs holding the screen
-    const prongs = [
-      [x + 47, y + 33, -45],
-      [x + width - 47, y + 33, 45],
-      [x + 47, y + 95, -135],
-      [x + width - 47, y + 95, 135]
-    ];
-    prongs.forEach(([px, py, rot]) => {
-      s += `<g transform="translate(${px}, ${py}) rotate(${rot})">
-        <path d="M 0 0 L 8 0 Q 11 0 11 3 L 8 4 L 0 0 Z" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="0.8"/>
-        <circle cx="3" cy="0" r="1.2" fill="#ffd4b8"/>
+      // Tree of Life / Branched Wire Crest at Top Center
+      s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
+        <path d="M ${midX - 18} ${y + 6} Q ${midX - 10} ${y - 8} ${midX} ${y - 14} Q ${midX + 10} ${y - 8} ${midX + 18} ${y + 6}" stroke-width="2.5"/>
+        <path d="M ${midX - 8} ${y + 6} Q ${midX} ${y - 12} ${midX + 8} ${y + 6}" stroke-width="1.8"/>
+        <path d="M ${midX} ${y - 14} Q ${midX - 22} ${y - 20} ${midX - 36} ${y - 12}" stroke-width="1.6"/>
+        <path d="M ${midX} ${y - 14} Q ${midX + 22} ${y - 20} ${midX + 36} ${y - 12}" stroke-width="1.6"/>
+        <path d="M ${midX - 18} ${y - 18} Q ${midX - 24} ${y - 28} ${midX - 14} ${y - 26}" stroke-width="1.2"/>
+        <path d="M ${midX + 18} ${y - 18} Q ${midX + 24} ${y - 28} ${midX + 14} ${y - 26}" stroke-width="1.2"/>
       </g>`;
-    });
+      s += `<circle cx="${midX - 36}" cy="${y - 12}" r="3.2" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX + 36}" cy="${y - 12}" r="3.2" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX - 14}" cy="${y - 26}" r="3" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX + 14}" cy="${y - 26}" r="3" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX}" cy="${y - 16}" r="3.8" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="1" filter="url(#gemGlow)"/>`;
 
-    // 7. Draw Abacus Bead Strands on Parallel Copper Guide Rods
-    s += drawAbacusBeads(x, y, width, c);
+      // Recessed Display Window Frame with 4 Wire Claw Prongs
+      s += `<rect x="${x + 44}" y="${y + 28}" width="${width - 88}" height="72" rx="10" fill="#090e0c" stroke="#3d2115" stroke-width="2.5"/>`;
+      s += `<rect x="${x + 46}" y="${y + 30}" width="${width - 92}" height="68" rx="8" fill="none" stroke="#66331a" stroke-width="1.2"/>`;
+      const prongs = [
+        [x + 47, y + 33, -45],
+        [x + width - 47, y + 33, 45],
+        [x + 47, y + 95, -135],
+        [x + width - 47, y + 95, 135]
+      ];
+      prongs.forEach(([px, py, rot]) => {
+        s += `<g transform="translate(${px}, ${py}) rotate(${rot})">
+          <path d="M 0 0 L 8 0 Q 11 0 11 3 L 8 4 L 0 0 Z" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="0.8"/>
+          <circle cx="3" cy="0" r="1.2" fill="#ffd4b8"/>
+        </g>`;
+      });
 
-    // 8. Beaded Wire Garland along Bottom Rail (visible when relaxed)
-    if (c < 0.2) {
-      s += `<path d="M ${x + 50} ${y + 124} Q ${midX} ${y + 130} ${x + width - 50} ${y + 124}"
+      // Twin Horizontal Pivot Hinge Beads on flanks
+      // Left hinge bead (turquoise)
+      s += `<rect x="${x + 2}" y="${y + 58}" width="8" height="12" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+      s += `<circle cx="${x + 6}" cy="${y + 64}" r="5.2" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="1"/>`;
+      s += `<circle cx="${x + 4.5}" cy="${y + 62.5}" r="1.5" fill="#ffffff" opacity="0.85"/>`;
+      s += `<circle cx="${x + 6}" cy="${y + 64}" r="2" fill="url(#silverCraftWire)" stroke="#2b353d" stroke-width="0.6"/>`;
+      if (f > 0.05) {
+        const rotL = f * 360;
+        s += `<line x1="${x + 6 - Math.cos(rotL * Math.PI / 180) * 4}" y1="${y + 64 - Math.sin(rotL * Math.PI / 180) * 4}"
+                    x2="${x + 6 + Math.cos(rotL * Math.PI / 180) * 4}" y2="${y + 64 + Math.sin(rotL * Math.PI / 180) * 4}"
+                    stroke="#ffffff" stroke-width="0.9" opacity="0.8"/>`;
+      }
+
+      // Right hinge bead (faceted amethyst)
+      s += `<rect x="${x + width - 10}" y="${y + 58}" width="8" height="12" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+      s += `<circle cx="${x + width - 6}" cy="${y + 64}" r="5.2" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="1" filter="url(#gemGlow)"/>`;
+      s += `<circle cx="${x + width - 7.5}" cy="${y + 62.5}" r="1.5" fill="#ffffff" opacity="0.85"/>`;
+      s += `<circle cx="${x + width - 6}" cy="${y + 64}" r="2" fill="url(#silverCraftWire)" stroke="#2b353d" stroke-width="0.6"/>`;
+      if (f > 0.05) {
+        const rotR = f * 360;
+        s += `<line x1="${x + width - 6 - Math.cos(rotR * Math.PI / 180) * 4}" y1="${y + 64 - Math.sin(rotR * Math.PI / 180) * 4}"
+                    x2="${x + width - 6 + Math.cos(rotR * Math.PI / 180) * 4}" y2="${y + 64 + Math.sin(rotR * Math.PI / 180) * 4}"
+                    stroke="#ffffff" stroke-width="0.9" opacity="0.8"/>`;
+      }
+
+      // Lower Folding Wire Hoop: 3D perspective trigonometric pivot around Y = y + 64
+      const theta = f * Math.PI;
+      const cosT = Math.cos(theta);
+      const sinT = Math.sin(theta);
+      const pers = 1 + 0.16 * sinT;
+
+      const yRail = (y + 64) + 60 * cosT * pers;
+      const yCorner = (y + 64) + 54 * cosT * pers;
+      const xCornL = midX - (midX - (x + 24)) * pers;
+      const xCornR = midX + ((x + width - 24) - midX) * pers;
+      const xMidL = midX - (midX - (x + 6)) * pers;
+      const xMidR = midX + ((x + width - 6) - midX) * pers;
+
+      // Lower hoop path
+      s += `<g class="folding-accordion-hoop">`;
+      s += `<path d="M ${x + 6} ${y + 64} Q ${xMidL} ${yCorner} ${xCornL} ${yRail} L ${xCornR} ${yRail} Q ${xMidR} ${yCorner} ${x + width - 6} ${y + 64}"
+                  fill="none" stroke="url(#copperGrad)" stroke-width="${4.5 * pers}" stroke-linecap="round"/>`;
+      s += `<path d="M ${x + 7} ${y + 64} Q ${xMidL} ${yCorner - 0.5 * cosT} ${xCornL} ${yRail - 1 * cosT} L ${xCornR} ${yRail - 1 * cosT} Q ${xMidR} ${yCorner - 0.5 * cosT} ${x + width - 7} ${y + 64}"
+                  fill="none" stroke="#ffd4b8" stroke-width="${1.2 * pers}" opacity="0.75"/>`;
+
+      // Corner coiled wire sleeves moving with lower hoop
+      const cornerCoilW = 20 * pers, cornerCoilH = 7 * pers;
+      s += `<rect x="${xCornL - 8}" y="${yRail - 4 * (cosT >= 0 ? 1 : -1)}" width="${cornerCoilW}" height="${cornerCoilH}" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+      s += `<rect x="${xCornR - 12}" y="${yRail - 4 * (cosT >= 0 ? 1 : -1)}" width="${cornerCoilW}" height="${cornerCoilH}" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+
+      // Beaded Wire Garland along the lower hoop
+      s += `<path d="M ${xCornL + 24} ${yRail} Q ${midX} ${yRail + 7 * cosT} ${xCornR - 24} ${yRail}"
                   fill="none" stroke="url(#copperGrad)" stroke-width="2" stroke-linecap="round"/>`;
-      s += `<circle cx="${midX - 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
-      s += `<circle cx="${midX}" cy="${y + 127}" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
-      s += `<circle cx="${midX + 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX - 28 * pers}" cy="${yRail + 3 * cosT}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX}" cy="${yRail + 4.5 * cosT}" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX + 28 * pers}" cy="${yRail + 3 * cosT}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+
+      // Spring-wire basket latch closure spark at completion
+      if (f > 0.85) {
+        const latchSpark = (f - 0.85) / 0.15;
+        s += `
+          <g class="basket-latch-spark">
+            <circle cx="${midX}" cy="${y + 6}" r="${latchSpark * 36}" fill="none" stroke="#ffd4b8" stroke-width="${(1 - latchSpark) * 5}" opacity="${(1 - latchSpark) * 5}" filter="url(#gemGlow)"/>
+            <circle cx="${midX}" cy="${y + 6}" r="${latchSpark * 18}" fill="none" stroke="#ffffff" stroke-width="${(1 - latchSpark) * 3}" opacity="${(1 - latchSpark) * 7}"/>
+          </g>
+        `;
+      }
+      s += `</g>`;
+
+    } else {
+      // Standard static hoop for Option 1, 2, and 3
+      s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="118" rx="18"
+                  fill="none" stroke="url(#copperGrad)" stroke-width="4.5" stroke-linecap="round"/>`;
+      s += `<rect x="${x + 7}" y="${y + 7}" width="${width - 14}" height="116" rx="17"
+                  fill="none" stroke="#ffd4b8" stroke-width="1.2" opacity="0.65"/>`;
+
+      // Coiled Wire Sleeves at Corners and Structural Anchors
+      const coilAnchors = [
+        [x + 14, y + 8, 22, 7],
+        [x + width - 36, y + 8, 22, 7],
+        [x + 14, y + 115, 22, 7],
+        [x + width - 36, y + 115, 22, 7],
+        [x + 6, y + 54, 7, 22],
+        [x + width - 13, y + 54, 7, 22]
+      ];
+      coilAnchors.forEach(([cx, cy, cw, ch]) => {
+        s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2"
+                    fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+        if (cw > ch) {
+          for (let ix = cx + 2; ix < cx + cw - 2; ix += 3) {
+            s += `<line x1="${ix}" y1="${cy}" x2="${ix}" y2="${cy + ch}" stroke="#ffd4b8" stroke-width="0.8"/>`;
+          }
+        } else {
+          for (let iy = cy + 2; iy < cy + ch - 2; iy += 3) {
+            s += `<line x1="${cx}" y1="${iy}" x2="${cx + cw}" y2="${iy}" stroke="#ffd4b8" stroke-width="0.8"/>`;
+          }
+        }
+      });
+
+      // Tree of Life / Branched Wire Crest at Top Center
+      s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
+        <path d="M ${midX - 18} ${y + 6} Q ${midX - 10} ${y - 8} ${midX} ${y - 14} Q ${midX + 10} ${y - 8} ${midX + 18} ${y + 6}" stroke-width="2.5"/>
+        <path d="M ${midX - 8} ${y + 6} Q ${midX} ${y - 12} ${midX + 8} ${y + 6}" stroke-width="1.8"/>
+        <path d="M ${midX} ${y - 14} Q ${midX - 22} ${y - 20} ${midX - 36} ${y - 12}" stroke-width="1.6"/>
+        <path d="M ${midX} ${y - 14} Q ${midX + 22} ${y - 20} ${midX + 36} ${y - 12}" stroke-width="1.6"/>
+        <path d="M ${midX - 18} ${y - 18} Q ${midX - 24} ${y - 28} ${midX - 14} ${y - 26}" stroke-width="1.2"/>
+        <path d="M ${midX + 18} ${y - 18} Q ${midX + 24} ${y - 28} ${midX + 14} ${y - 26}" stroke-width="1.2"/>
+      </g>`;
+      s += `<circle cx="${midX - 36}" cy="${y - 12}" r="3.2" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX + 36}" cy="${y - 12}" r="3.2" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX - 14}" cy="${y - 26}" r="3" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX + 14}" cy="${y - 26}" r="3" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+      s += `<circle cx="${midX}" cy="${y - 16}" r="3.8" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="1" filter="url(#gemGlow)"/>`;
+
+      // Recessed Display Window Frame with 4 Wire Claw Prongs
+      s += `<rect x="${x + 44}" y="${y + 28}" width="${width - 88}" height="72" rx="10"
+                  fill="#090e0c" stroke="#3d2115" stroke-width="2.5"/>`;
+      s += `<rect x="${x + 46}" y="${y + 30}" width="${width - 92}" height="68" rx="8"
+                  fill="none" stroke="#66331a" stroke-width="1.2"/>`;
+      const prongs = [
+        [x + 47, y + 33, -45],
+        [x + width - 47, y + 33, 45],
+        [x + 47, y + 95, -135],
+        [x + width - 47, y + 95, 135]
+      ];
+      prongs.forEach(([px, py, rot]) => {
+        s += `<g transform="translate(${px}, ${py}) rotate(${rot})">
+          <path d="M 0 0 L 8 0 Q 11 0 11 3 L 8 4 L 0 0 Z" fill="url(#copperGrad)" stroke="#2b0e03" stroke-width="0.8"/>
+          <circle cx="3" cy="0" r="1.2" fill="#ffd4b8"/>
+        </g>`;
+      });
+
+      // Draw Abacus Bead Strands on Parallel Copper Guide Rods
+      s += drawAbacusBeads(x, y, width, c);
+
+      // Beaded Wire Garland along Bottom Rail (visible when relaxed)
+      if (c < 0.2) {
+        s += `<path d="M ${x + 50} ${y + 124} Q ${midX} ${y + 130} ${x + width - 50} ${y + 124}"
+                    fill="none" stroke="url(#copperGrad)" stroke-width="2" stroke-linecap="round"/>`;
+        s += `<circle cx="${midX - 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+        s += `<circle cx="${midX}" cy="${y + 127}" r="3.5" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.8"/>`;
+        s += `<circle cx="${midX + 28}" cy="${y + 126}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>`;
+      }
     }
 
   } else {
-    // Shade Mode: Compressed Jeweled Abacus Rod (height 44px)
-    s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="32" rx="10"
-                fill="#000000" opacity="0.65" filter="url(#wireShadow)"/>`;
-    s += `<rect x="${x + 8}" y="${y + 7}" width="${width - 16}" height="30" rx="9"
-                fill="#180e09" stroke="#3b1d10" stroke-width="1.8"/>`;
-    s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="32" rx="10"
-                fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>`;
-    s += `<rect x="${x + 7}" y="${y + 7}" width="${width - 14}" height="30" rx="9"
-                fill="none" stroke="#ffd4b8" stroke-width="1" opacity="0.65"/>`;
+    // Shade Mode: (height 44px)
+    if (isAccordion) {
+      // Option 4: Folded Wire Basket Rim with Twin Hoops and Spring Latch
+      s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="32" rx="10" fill="#000000" opacity="0.65" filter="url(#wireShadow)"/>`;
+      s += `<rect x="${x + 8}" y="${y + 7}" width="${width - 16}" height="30" rx="9" fill="#180e09" stroke="#3b1d10" stroke-width="1.8"/>`;
 
-    // Corner wire sleeves
-    const shadeCoils = [
-      [x + 10, y + 7, 16, 6],
-      [x + width - 26, y + 7, 16, 6],
-      [x + 10, y + 31, 16, 6],
-      [x + width - 26, y + 31, 16, 6]
-    ];
-    shadeCoils.forEach(([cx, cy, cw, ch]) => {
-      s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2"
-                  fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
-      for (let ix = cx + 2; ix < cx + cw - 2; ix += 3) {
-        s += `<line x1="${ix}" y1="${cy}" x2="${ix}" y2="${cy + ch}" stroke="#ffd4b8" stroke-width="0.8"/>`;
-      }
-    });
+      // Upper hoop
+      s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="32" rx="10" fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>`;
+      s += `<rect x="${x + 7}" y="${y + 7}" width="${width - 14}" height="30" rx="9" fill="none" stroke="#ffd4b8" stroke-width="1" opacity="0.65"/>`;
 
-    // Tree of Life Crest crowning top hoop of shade rod
-    s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
-      <path d="M ${midX - 14} ${y + 6} Q ${midX} ${y - 6} ${midX + 14} ${y + 6}" stroke-width="2"/>
-      <path d="M ${midX} ${y - 6} Q ${midX - 16} ${y - 12} ${midX - 26} ${y - 6}" stroke-width="1.4"/>
-      <path d="M ${midX} ${y - 6} Q ${midX + 16} ${y - 12} ${midX + 26} ${y - 6}" stroke-width="1.4"/>
-    </g>`;
-    s += `<circle cx="${midX - 26}" cy="${y - 6}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.7"/>`;
-    s += `<circle cx="${midX + 26}" cy="${y - 6}" r="2.8" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.7"/>`;
-    s += `<circle cx="${midX}" cy="${y - 8}" r="3.2" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8" filter="url(#gemGlow)"/>`;
+      // Folded lower hoop nested inside upper hoop (sandwiching together)
+      s += `<rect x="${x + 10}" y="${y + 10}" width="${width - 20}" height="24" rx="7" fill="none" stroke="url(#copperGrad)" stroke-width="2.6" stroke-linecap="round"/>`;
+      s += `<rect x="${x + 11}" y="${y + 11}" width="${width - 22}" height="22" rx="6" fill="none" stroke="#ffd4b8" stroke-width="0.8" opacity="0.75"/>`;
 
-    // Draw full compressed abacus bead columns (c = 1)
-    s += drawAbacusBeads(x, y, width, 1);
+      // Corner coiled wire spacer sleeves clamping the twin hoops together
+      const shadeCoils = [
+        [x + 12, y + 8, 16, 6],
+        [x + width - 28, y + 8, 16, 6],
+        [x + 12, y + 30, 16, 6],
+        [x + width - 28, y + 30, 16, 6]
+      ];
+      shadeCoils.forEach(([cx, cy, cw, ch]) => {
+        s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+        for (let ix = cx + 2; ix < cx + cw - 2; ix += 3) {
+          s += `<line x1="${ix}" y1="${cy}" x2="${ix}" y2="${cy + ch}" stroke="#ffd4b8" stroke-width="0.8"/>`;
+        }
+      });
+
+      // Flank Hinge Beads (centered at y + 22)
+      // Left flank (turquoise)
+      s += `<rect x="${x + 2}" y="${y + 16}" width="8" height="12" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+      s += `<circle cx="${x + 6}" cy="${y + 22}" r="5" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="1"/>`;
+      s += `<circle cx="${x + 4.5}" cy="${y + 20.5}" r="1.5" fill="#ffffff" opacity="0.85"/>`;
+      s += `<circle cx="${x + 6}" cy="${y + 22}" r="2" fill="url(#silverCraftWire)" stroke="#2b353d" stroke-width="0.6"/>`;
+
+      // Right flank (faceted amethyst)
+      s += `<rect x="${x + width - 10}" y="${y + 16}" width="8" height="12" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+      s += `<circle cx="${x + width - 6}" cy="${y + 22}" r="5" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="1" filter="url(#gemGlow)"/>`;
+      s += `<circle cx="${x + width - 7.5}" cy="${y + 20.5}" r="1.5" fill="#ffffff" opacity="0.85"/>`;
+      s += `<circle cx="${x + width - 6}" cy="${y + 22}" r="2" fill="url(#silverCraftWire)" stroke="#2b353d" stroke-width="0.6"/>`;
+
+      // Center Spring-Wire Basket Latch Clasp hooked over folded rim
+      s += `
+        <g class="basket-folded-latch">
+          <path d="M ${midX - 9} ${y + 4} Q ${midX} ${y - 3} ${midX + 9} ${y + 4} L ${midX + 8} ${y + 20} Q ${midX} ${y + 24} ${midX - 8} ${y + 20} Z"
+                fill="url(#copperGrad)" stroke="#381406" stroke-width="1"/>
+          <circle cx="${midX}" cy="${y + 12}" r="3.5" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.8"/>
+          <circle cx="${midX - 1}" cy="${y + 11}" r="1" fill="#ffffff" opacity="0.9"/>
+          <path d="M ${midX - 14} ${y + 8} Q ${midX - 20} ${y + 4} ${midX - 14} ${y}" fill="none" stroke="#ffd4b8" stroke-width="1.2" stroke-linecap="round"/>
+          <path d="M ${midX + 14} ${y + 8} Q ${midX + 20} ${y + 4} ${midX + 14} ${y}" fill="none" stroke="#ffd4b8" stroke-width="1.2" stroke-linecap="round"/>
+        </g>
+      `;
+
+      // Tree of Life Crest crowning top
+      s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
+        <path d="M ${midX - 14} ${y + 6} Q ${midX} ${y - 6} ${midX + 14} ${y + 6}" stroke-width="2"/>
+        <path d="M ${midX} ${y - 6} Q ${midX - 16} ${y - 12} ${midX - 26} ${y - 6}" stroke-width="1.4"/>
+        <path d="M ${midX} ${y - 6} Q ${midX + 16} ${y - 12} ${midX + 26} ${y - 6}" stroke-width="1.4"/>
+      </g>`;
+      s += `<circle cx="${midX - 26}" cy="${y - 6}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.7"/>`;
+      s += `<circle cx="${midX + 26}" cy="${y - 6}" r="2.8" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.7"/>`;
+      s += `<circle cx="${midX}" cy="${y - 8}" r="3.2" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8" filter="url(#gemGlow)"/>`;
+
+    } else {
+      // Option 2: Compressed Jeweled Abacus Rod (height 44px)
+      s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="32" rx="10"
+                  fill="#000000" opacity="0.65" filter="url(#wireShadow)"/>`;
+      s += `<rect x="${x + 8}" y="${y + 7}" width="${width - 16}" height="30" rx="9"
+                  fill="#180e09" stroke="#3b1d10" stroke-width="1.8"/>`;
+      s += `<rect x="${x + 6}" y="${y + 6}" width="${width - 12}" height="32" rx="10"
+                  fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>`;
+      s += `<rect x="${x + 7}" y="${y + 7}" width="${width - 14}" height="30" rx="9"
+                  fill="none" stroke="#ffd4b8" stroke-width="1" opacity="0.65"/>`;
+
+      // Corner wire sleeves
+      const shadeCoils = [
+        [x + 10, y + 7, 16, 6],
+        [x + width - 26, y + 7, 16, 6],
+        [x + 10, y + 31, 16, 6],
+        [x + width - 26, y + 31, 16, 6]
+      ];
+      shadeCoils.forEach(([cx, cy, cw, ch]) => {
+        s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" rx="2"
+                    fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>`;
+        for (let ix = cx + 2; ix < cx + cw - 2; ix += 3) {
+          s += `<line x1="${ix}" y1="${cy}" x2="${ix}" y2="${cy + ch}" stroke="#ffd4b8" stroke-width="0.8"/>`;
+        }
+      });
+
+      // Tree of Life Crest crowning top hoop of shade rod
+      s += `<g stroke="url(#copperGrad)" fill="none" stroke-linecap="round">
+        <path d="M ${midX - 14} ${y + 6} Q ${midX} ${y - 6} ${midX + 14} ${y + 6}" stroke-width="2"/>
+        <path d="M ${midX} ${y - 6} Q ${midX - 16} ${y - 12} ${midX - 26} ${y - 6}" stroke-width="1.4"/>
+        <path d="M ${midX} ${y - 6} Q ${midX + 16} ${y - 12} ${midX + 26} ${y - 6}" stroke-width="1.4"/>
+      </g>`;
+      s += `<circle cx="${midX - 26}" cy="${y - 6}" r="2.8" fill="url(#turquoiseBead)" stroke="#093832" stroke-width="0.7"/>`;
+      s += `<circle cx="${midX + 26}" cy="${y - 6}" r="2.8" fill="url(#carnelianBead)" stroke="#421203" stroke-width="0.7"/>`;
+      s += `<circle cx="${midX}" cy="${y - 8}" r="3.2" fill="url(#facetedAmethyst)" stroke="#300742" stroke-width="0.8" filter="url(#gemGlow)"/>`;
+
+      // Draw full compressed abacus bead columns (c = 1)
+      s += drawAbacusBeads(x, y, width, 1);
+    }
   }
 
   s += `</g>`;
@@ -1969,7 +2257,8 @@ function drawTreeRootBraidJoin(midX, y, progress, opacity = 1) {
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
   const isShade = model.shade;
-  const compress = model.abacusCompress || (model.shade ? 1 : 0);
+  const compress = model.abacusCompress || (model.shade && model.option === 'abacus_compression' ? 1 : 0);
+  const fold = model.accordionFold || (model.shade && model.option === 'wire_accordion' ? 1 : 0);
   const glow = model.busy ? model.light : connectionGlow.socket.value;
   let shared = '';
 
@@ -1977,7 +2266,7 @@ function renderHardware() {
 
   if (p > 0) {
     // Seamless Monolithic Copper Wire Frame
-    shared += drawWireCasing(a.x, a.y, (b.x + W) - a.x, p, isShade, compress);
+    shared += drawWireCasing(a.x, a.y, (b.x + W) - a.x, p, isShade, compress, fold);
     if (!isShade) {
       // Connecting wire bridge along seam
       shared += `
@@ -2019,7 +2308,7 @@ function renderHardware() {
   // Individual Capsule SVG Shells
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
-    const individual = drawWireCasing(0, 0, W, 1, isShade, compress) +
+    const individual = drawWireCasing(0, 0, W, 1, isShade, compress, fold) +
       drawWireCap(0, 0, false, false, isA ? 0 : model.cap, isShade) +
       drawWireCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
 
@@ -2068,6 +2357,9 @@ function updateOptionControls() {
   if (model.option === 'tree_root_braid') {
     $('#btnJoinAnim').textContent = 'Braid roots onto hoop';
     $('#btnSeparateAnim').textContent = 'Unbraid roots';
+    $('#btnJoinAnim').className = 'primary-btn';
+    $('#btnAccordionAnim').className = '';
+    $('#btnAbacusAnim').className = '';
     $('#portA').dataset.label = 'Tree Roots · A';
     $('#portB').dataset.label = 'Silver Hoop · B';
     $('#wireRelease').setAttribute('title', 'Pull right to unbraid tree roots · Enter to separate');
@@ -2075,6 +2367,9 @@ function updateOptionControls() {
   } else if (model.option === 'caged_bead') {
     $('#btnJoinAnim').textContent = 'Lock bayonet cage';
     $('#btnSeparateAnim').textContent = 'Unlock bayonet';
+    $('#btnJoinAnim').className = 'primary-btn';
+    $('#btnAccordionAnim').className = '';
+    $('#btnAbacusAnim').className = '';
     $('#portA').dataset.label = 'Bayonet Cage · A';
     $('#portB').dataset.label = 'Bayonet Sleeve · B';
     $('#wireRelease').setAttribute('title', 'Pull right to disengage bayonet lock · Enter to separate');
@@ -2082,9 +2377,22 @@ function updateOptionControls() {
   } else if (model.option === 'abacus_compression') {
     $('#btnJoinAnim').textContent = 'Join capsules';
     $('#btnSeparateAnim').textContent = 'Separate';
+    $('#btnJoinAnim').className = '';
+    $('#btnAbacusAnim').className = 'primary-btn';
+    $('#btnAccordionAnim').className = '';
     $('#portA').dataset.label = 'Bayonet Cage · A';
     $('#portB').dataset.label = 'Bayonet Sleeve · B';
+  } else if (model.option === 'wire_accordion') {
+    $('#btnJoinAnim').textContent = 'Join capsules';
+    $('#btnSeparateAnim').textContent = 'Separate';
+    $('#btnJoinAnim').className = '';
+    $('#btnAbacusAnim').className = '';
+    $('#btnAccordionAnim').className = 'primary-btn';
+    $('#portA').dataset.label = 'Hinged Hoop · A';
+    $('#portB').dataset.label = 'Hinged Hoop · B';
   }
+  updateAbacusButtonText();
+  updateAccordionButtonText();
 }
 
 function render() {
@@ -2100,6 +2408,7 @@ function render() {
     el.style.top = m.y + 'px';
     el.style.zIndex = model.front === id ? '4' : '2';
     el.classList.toggle('shade', model.shade);
+    el.dataset.shadeMode = (model.option === 'wire_accordion') ? 'accordion' : 'abacus';
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.wire-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
@@ -2107,6 +2416,15 @@ function render() {
     const btn = el.querySelector('.run-btn');
     btn.textContent = m.running ? 'Ⅱ' : '▶';
     btn.setAttribute('aria-label', (m.running ? 'Pause ' : 'Resume ') + (id === 'a' ? 'Jarvis' : 'GitDiscuss'));
+
+    const shadeAgentState = el.querySelector('.shade-agent-state');
+    if (shadeAgentState) {
+      if (id === 'a') {
+        shadeAgentState.textContent = m.running ? '03 AGENTS' : 'PAUSED';
+      } else {
+        shadeAgentState.textContent = '02 DECISIONS';
+      }
+    }
   });
 
   $('#runText').innerHTML = model.a.running ? '03 <em>agents running</em>' : '03 <em>agents paused</em>';
@@ -2169,7 +2487,11 @@ function render() {
 
   if (!model.busy) {
     if (model.shade) {
-      $('#phase').textContent = 'Shade mode / Compressed abacus jeweled rod';
+      if (model.option === 'wire_accordion') {
+        $('#phase').textContent = 'Shade mode / Wire hoop folded accordion';
+      } else {
+        $('#phase').textContent = 'Shade mode / Compressed abacus jeweled rod';
+      }
     } else if (model.joined) {
       if (model.option === 'tree_root_braid') {
         $('#phase').textContent = 'Joined / Tree roots braided tightly onto silver hoop';
@@ -2185,6 +2507,8 @@ function render() {
     } else {
       if (model.option === 'tree_root_braid') {
         $('#phase').textContent = 'Separate / Copper root cluster & sterling silver hoop';
+      } else if (model.option === 'wire_accordion') {
+        $('#phase').textContent = 'Separate / Hinged wire hoops & gemstone pivot beads';
       } else {
         $('#phase').textContent = 'Separate / Two handcrafted copper wire armatures';
       }
@@ -2477,14 +2801,78 @@ function updateAbacusButtonText() {
   }
 }
 
+// Option 4: Wire Hoop Folding Accordion Shade Animations
+async function foldWireAccordion() {
+  if (model.busy || (model.shade && model.accordionFold >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Folding wire hoop accordion. Lower 12-gauge bent copper hoop pivots 180° upward along hinge beads.');
+  $('#phase').textContent = 'Folding wire hoop 180°';
+
+  model.shade = true;
+  render();
+
+  await tween(440, t => {
+    const fold = Math.sin(t * Math.PI / 2);
+    model.accordionFold = fold;
+    renderHardware();
+  }, token);
+
+  model.accordionFold = 1;
+  model.busy = false;
+  render();
+  say('Wire hoop folded flat against upper rim! Basket spring-wire clasp locked. Compact 44px shade active.');
+  $('#phase').textContent = 'Shade mode / Wire hoop folded accordion';
+  updateAccordionButtonText();
+}
+
+async function unfoldWireAccordion() {
+  if (model.busy || (!model.shade && model.accordionFold <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Unlatching wire basket clasp. Lower copper hoop pivots 180° downward along hinge beads.');
+  $('#phase').textContent = 'Unfolding wire hoop downward';
+
+  model.shade = false;
+  render();
+
+  await tween(400, t => {
+    const unfold = 1 - Math.sin(t * Math.PI / 2);
+    model.accordionFold = unfold;
+    renderHardware();
+  }, token);
+
+  model.accordionFold = 0;
+  model.busy = false;
+  render();
+  say('Wire hoop unfolded. Full 12-gauge structural frame and digital displays restored.');
+  $('#phase').textContent = model.joined ? 'Joined / One unified handcrafted instrument' : 'Separate / Two handcrafted copper wire armatures';
+  updateAccordionButtonText();
+}
+
+function updateAccordionButtonText() {
+  const btn = $('#btnAccordionAnim');
+  if (btn) {
+    btn.textContent = (model.shade || model.accordionFold > 0.5) ? 'Unfold wire hoop' : 'Fold wire hoop';
+  }
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    if (model.shade || model.abacusCompress > 0) {
-      await expandAbacus();
+    if (model.shade || model.abacusCompress > 0 || model.accordionFold > 0) {
+      if (model.option === 'wire_accordion' || model.accordionFold > 0) {
+        await unfoldWireAccordion();
+      } else {
+        await expandAbacus();
+      }
     }
     if (model.joined) {
       await separate();
@@ -2496,11 +2884,19 @@ async function applyState(stateName) {
       model.a.x = 140;
       model.b.x = 680;
       render();
-      say('State: Separate — Two independent copper wire capsules.');
+      if (model.option === 'wire_accordion') {
+        say('State: Separate — Two independent hinged copper wire capsules.');
+      } else {
+        say('State: Separate — Two independent copper wire capsules.');
+      }
     }
   } else if (stateName === 'joining') {
-    if (model.shade || model.abacusCompress > 0) {
-      await expandAbacus();
+    if (model.shade || model.abacusCompress > 0 || model.accordionFold > 0) {
+      if (model.option === 'wire_accordion' || model.accordionFold > 0) {
+        await unfoldWireAccordion();
+      } else {
+        await expandAbacus();
+      }
     }
     model.joined = false;
     model.blend = 0.25;
@@ -2519,8 +2915,12 @@ async function applyState(stateName) {
     }
     render();
   } else if (stateName === 'joined') {
-    if (model.shade || model.abacusCompress > 0) {
-      await expandAbacus();
+    if (model.shade || model.abacusCompress > 0 || model.accordionFold > 0) {
+      if (model.option === 'wire_accordion' || model.accordionFold > 0) {
+        await unfoldWireAccordion();
+      } else {
+        await expandAbacus();
+      }
     }
     if (!model.joined) {
       model.a.x = 220;
@@ -2541,13 +2941,22 @@ async function applyState(stateName) {
       render();
     }
   } else if (stateName === 'shade') {
-    if (model.shade || model.abacusCompress > 0.5) {
-      await expandAbacus();
+    if (!model.shade) {
+      if (model.option === 'wire_accordion') {
+        await foldWireAccordion();
+      } else {
+        await compressAbacus();
+      }
     } else {
-      await compressAbacus();
+      if (model.option === 'wire_accordion') {
+        await unfoldWireAccordion();
+      } else {
+        await expandAbacus();
+      }
     }
   }
   updateAbacusButtonText();
+  updateAccordionButtonText();
 }
 
 // Cradle & Amulet Actions
@@ -2619,6 +3028,10 @@ $('#btnAbacusAnim').onclick = () => {
   if (model.shade || model.abacusCompress > 0.5) expandAbacus();
   else compressAbacus();
 };
+$('#btnAccordionAnim').onclick = () => {
+  if (model.shade || model.accordionFold > 0.5) unfoldWireAccordion();
+  else foldWireAccordion();
+};
 
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
@@ -2636,7 +3049,8 @@ $('#btnReset').onclick = () => {
   model.design = false;
   model.shade = false;
   model.abacusCompress = 0;
-  model.option = 'tree_root_braid';
+  model.accordionFold = 0;
+  model.option = 'wire_accordion';
   model.blend = 0;
   model.cap = 0;
   model.bayonetProgress = 0;
@@ -2648,8 +3062,9 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
-  $('#optionSelect').value = 'tree_root_braid';
+  $('#optionSelect').value = 'wire_accordion';
   updateAbacusButtonText();
+  updateAccordionButtonText();
   updateOptionControls();
   render();
   say('Reset to initial experiment layout.');
@@ -2660,17 +3075,26 @@ $('#optionSelect').onchange = async e => {
   if (model.option === 'tree_root_braid') {
     say('Option 3: Wire Tree Root Braid onto Hoop join selected.');
     if (model.shade) {
-      await expandAbacus();
+      if (model.accordionFold > 0) await unfoldWireAccordion();
+      else await expandAbacus();
     }
   } else if (model.option === 'abacus_compression') {
     say('Option 2: Abacus Bead-Strand Compression shade selected.');
+    if (model.accordionFold > 0) await unfoldWireAccordion();
     if (!model.shade) {
       await compressAbacus();
     }
   } else if (model.option === 'caged_bead') {
     say('Option 1: Caged-Bead Bayonet Socket join selected.');
     if (model.shade) {
-      await expandAbacus();
+      if (model.accordionFold > 0) await unfoldWireAccordion();
+      else await expandAbacus();
+    }
+  } else if (model.option === 'wire_accordion') {
+    say('Option 4: Wire Hoop Folding Accordion shade selected. Lower wire hoop pivots 180° upward along hinge beads.');
+    if (model.abacusCompress > 0) await expandAbacus();
+    if (!model.shade) {
+      await foldWireAccordion();
     }
   }
   updateOptionControls();
