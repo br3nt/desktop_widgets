@@ -1644,7 +1644,9 @@ const MORPHS={
  bezel:{label:'Bezel resize',kind:'Resize',sizes:[['pendant','Pendant',-1],['brooch','Brooch',0],['slab','Slab',1]],slider:'Checks size, pendant to slab',
   about:'Checks stays one stone in one coiled bezel; only the stone changes size. Each step plays in three beats. <b>Loosen:</b> the tight coil turns spread apart and stand off the stone, so you see the spring\'s back turns and a dark gap all round. <b>Grow:</b> the stone and the copper frame swell together with a small spring, while the old text fades. <b>Tighten:</b> the coils close up onto the new edge, glint where they bite, and the new layout fades in. <b>Brooch:</b> the run number, a large 12 / 14, the 86% and a row of fourteen beads, one per check. <b>Slab:</b> adds the checks themselves, four rows with a stone each (malachite passed, carnelian waiting on Brent), and a tally strand of fourteen beads hangs under the status lens. Shrinking plays the same three beats in reverse. Pick a size, press M or scrub the slider; Checks never grows over the pair: it moves below, beside or above it, and when none has room it takes the floor and the pair rises to clear it, settling back as Checks shrinks. Shading a grown Checks first shrinks it to the pendant, then shades it as usual.'},
  detail:{label:'Scale and detail',kind:'Level of detail',sizes:[['pendant','Pendant',-1],['charm','Charm',0],['amulet','Amulet',1],['talisman','Talisman',2]],slider:'Checks size and detail, pendant to talisman',
-  about:'Checks is one stone in one wire frame at every size, carrying only as much wirework as that size can hold. The wire keeps its gauge and every ornament keeps its pixel size, so a smaller form drops pieces rather than shrinking them into grey fuzz. <b>Charm</b> (smaller than the pendant): the plate, inner wire, scrolls and coiled bezel fall away and the frame closes in to one heavy wire round a small oval stone, with the name, 12/14 and 2 waiting. A bail rises and loops shut over the top, and the status lens drops to hang underneath. <b>Amulet:</b> the frame grows with a small spring, then coils wind round the stone from the bail both ways, two side scrolls curl out, and a fine wire is strung across the stone with fourteen check beads sliding on one at a time. <b>Talisman:</b> a twisted brass wire winds on outside the copper and is bound to it, three corner scrolls curl out, a nest of fine wire tangles round the fourth corner and an amethyst settles into it, and a fringe of fourteen drops hangs from the bottom, one per check: malachite for the 12 passed, with the two carnelians that are waiting on Brent at the middle. Its stone lists the checks. Shrinking sheds the finest level first. Pick a size, press M or scrub the slider. Checks never grows over the pair: it moves below, beside or above it, and when none has room it takes the floor and the pair rises to clear it, settling back as Checks shrinks. Shading first shrinks Checks to the pendant.'}
+  about:'Checks is one stone in one wire frame at every size, carrying only as much wirework as that size can hold. The wire keeps its gauge and every ornament keeps its pixel size, so a smaller form drops pieces rather than shrinking them into grey fuzz. <b>Charm</b> (smaller than the pendant): the plate, inner wire, scrolls and coiled bezel fall away and the frame closes in to one heavy wire round a small oval stone, with the name, 12/14 and 2 waiting. A bail rises and loops shut over the top, and the status lens drops to hang underneath. <b>Amulet:</b> the frame grows with a small spring, then coils wind round the stone from the bail both ways, two side scrolls curl out, and a fine wire is strung across the stone with fourteen check beads sliding on one at a time. <b>Talisman:</b> a twisted brass wire winds on outside the copper and is bound to it, three corner scrolls curl out, a nest of fine wire tangles round the fourth corner and an amethyst settles into it, and a fringe of fourteen drops hangs from the bottom, one per check: malachite for the 12 passed, with the two carnelians that are waiting on Brent at the middle. Its stone lists the checks. Shrinking sheds the finest level first. Pick a size, press M or scrub the slider. Checks never grows over the pair: it moves below, beside or above it, and when none has room it takes the floor and the pair rises to clear it, settling back as Checks shrinks. Shading first shrinks Checks to the pendant.'},
+ festoon:{label:'Festoon',kind:'Drape',sizes:[['pendant','Pendant',-1],['lavalier','Lavalier',0],['festoon','Festoon',1]],slider:'Checks drape, pendant to festoon',
+  about:'Checks stops lying flat and hangs, the way a necklace does, and everything that hangs swings and settles. <b>Lavalier:</b> the plate and scrolls fade and the frame stands up on end into a tall drop. A bail rises from its top and a loop closes, then wire-wrapped links run out from the bail both ways, pearl and gold beads riding the wire tips, and the ends curl over. That gives a stretch of neckline with the drop hanging from it. The status lens leaves its margin and swings down onto a headpin under the drop. The coiled bezel winds back on round the tall stone, which reads Checks, 12 / 14, passed · 86% and 2 waiting. <b>Festoon:</b> the end curls open, five more links run out each way and the ends curl over again. Two side drops are hooked on with brass jump rings, drawn round with copper and their stones coiled in, one reading 12 passed and one 02 waiting on Brent, each with a tip bead. Then a fine wire swag is strung from the centre drop to each side drop, and the fourteen check beads slide out along them, outermost first: malachite for the 12 passed, with the two carnelians at the waiting side. The side drops sway as the swags take their weight and settle. The centre stone now shows run 418 at 86%. Shrinking unhooks it all in reverse. Pick a size, press M or scrub the slider. Checks never grows over the pair: it moves below, beside or above it, and when none has room it takes the floor and the pair rises to clear it. Shading first shrinks Checks to the pendant.'}
 };
 let SIZES=MORPHS.tree.sizes;
 const TC=[0,-44],TRR=120,FORK=[0,-12],TAG_Y=18;
@@ -1848,7 +1850,7 @@ const gEff=()=>model.morph!=='tree'||rimHoop()?model.g:model.g>=0?model.g*(1-sha
 const shadeMs=()=>rimHoop()?2600:SHADES[model.shade].ms||520;
 // The hoop is drawn early in its step, so that step's reach is front-loaded.
 // k is how far a hoop tree has gone into its rim strip (the Hoop rim · tree shade).
-function ext(g,k=g>1.999?rimK():0){if(model.morph==='detail')return dtAt(g+1).X;if(model.morph==='bezel'){const F=bzAt(g+1).F;return[F[0]-6,F[0]+F[2]+6,F[1]-6,F[1]+F[3]+6]}if(k>0&&g>1.999)return EXT[3].map((v,j)=>lerp(v,RIMX[j],k));const i=clamp(Math.floor(g+1),0,2),t=i===2?seg(g-1,0,.5):clamp(g+1-i);return EXT[i].map((v,j)=>lerp(v,EXT[i+1][j],t))}
+function ext(g,k=g>1.999?rimK():0){if(model.morph==='detail')return dtAt(g+1).X;if(model.morph==='festoon')return fsAt(g+1).X;if(model.morph==='bezel'){const F=bzAt(g+1).F;return[F[0]-6,F[0]+F[2]+6,F[1]-6,F[1]+F[3]+6]}if(k>0&&g>1.999)return EXT[3].map((v,j)=>lerp(v,RIMX[j],k));const i=clamp(Math.floor(g+1),0,2),t=i===2?seg(g-1,0,.5):clamp(g+1-i);return EXT[i].map((v,j)=>lerp(v,EXT[i+1][j],t))}
 function clampC(){const e=ext(gEff());model.c.x=clamp(model.c.x+CW/2,10-e[0],1190-e[1])-CW/2;model.c.y=clamp(model.c.y+CH/2,46-e[2],590-e[3])-CH/2}
 // The pair's box with a margin, measured where it stood before any lift it was given to make room for Checks.
 // It is measured unshaded (a grown Checks unshades the pair first) and includes GitDiscuss's swing on an angled join.
@@ -2114,6 +2116,116 @@ function detailRender(el,svg){
  const S=SIZES.find(x=>x[0]===model.size);el.setAttribute('aria-label','Checks widget, '+(S?S[1].toLowerCase():'resizing')+': 12 of 14 checks passed, 2 waiting for approval'+(u>=2.5?'; run 418 on main, deploy-preview and e2e-safari waiting on Brent':''));
 }
 
+/* ---------- Morph: festoon (Checks) ---------- */
+// u = g+1 runs 0 pendant, 1 lavalier, 2 festoon. Checks stops lying flat and hangs: a tall drop on a bail, threaded on a neckline of wire-wrapped pearl links,
+// then a festoon, with two side drops on the neckline and bead swags between them. Everything that hangs swings and settles.
+// Frame F and stone S as [x,y,w,h,r] round Checks's centre (pendant, lavalier); X is the reach [left, right, top, bottom] of each form.
+const FS={F:[[-133,-34,266,68,20],[-54,-62,108,132,54]],S:[[-124,-17,220,44,9],[-47,-55,94,118,47]],X:[[-138,138,-39,39],[-120,120,-106,104],[-238,238,-148,104]]};
+// The neckline: a shallow curve through the bail loop, with a wrapped link between each pair of nodes. The lavalier carries links 0-3, the festoon 0-8; the side drops hang from node 6.
+const nkY=x=>-80-.0011*x*x,NX=[0,25,50,75,100,125,150,175,197,217];
+const swingDeg=(p,A,n)=>p<=0||p>=1?0:A*(1-p)*Math.exp(-3.6*p)*Math.sin(Math.PI*2*n*p);
+const rotPt=(x,y,px,py,deg)=>{const a=deg*Math.PI/180,c=Math.cos(a),s=Math.sin(a);return[px+(x-px)*c-(y-py)*s,py+(x-px)*s+(y-py)*c]};
+function fsAt(u){
+ u=clamp(u,0,2);const i=Math.min(1,Math.floor(u)),p=u-i,e=ease(seg(p,.15,.6));
+ // A reach that grows is taken early in the step, one that shrinks late, so nothing ever pokes past the box Checks is kept inside.
+ const X=FS.X[i].map((v,j)=>{const w=FS.X[i+1][j];return lerp(v,w,Math.abs(w)>Math.abs(v)?seg(p,0,.3):ease(seg(p,.5,.95)))});
+ return{i,p,F:i?FS.F[1]:lerpR(FS.F[0],FS.F[1],e),S:i?FS.S[1]:lerpR(FS.S[0],FS.S[1],e),X};
+}
+function fsLines(cx,o,L){
+ if(o<.02)return '';
+ return `<g opacity="${f(o)}" text-anchor="middle">`+L.map(([y,t,sz,fam,fill,more])=>`<text x="${f(cx)}" y="${f(y)}" font-size="${sz}" font-family="${fam==='g'?'Georgia,serif':BZF}" fill="${fill}"${more||''}>${t}</text>`).join('')+'</g>';
+}
+// One wrapped link from node a to node b, grown to t: the wire runs out with a pearl riding its tip to the middle, and the far loop closes last.
+function fsLink(a,b,t,k){
+ if(t<=0)return '';const e=[lerp(a[0],b[0],t),lerp(a[1],b[1],t)],m=Math.min(t,.5),bp=[lerp(a[0],b[0],m),lerp(a[1],b[1],m)];
+ let s=wire(`M${f(a[0])} ${f(a[1])}L${f(e[0])} ${f(e[1])}`,'copper',.9);
+ // Wrap turns either side of the pearl.
+ const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),ux=dx/L,uy=dy/L;
+ if(t>.5){let d='';for(const o of [-6.2,-5,5,6.2]){const c=[bp[0]+ux*o,bp[1]+uy*o];d+=`M${f(c[0]-uy*1.9)} ${f(c[1]+ux*1.9)}L${f(c[0]+uy*1.9)} ${f(c[1]-ux*1.9)}`}s+=wire(d,'copper',.6,f(seg(t,.5,.7)))}
+ s+=strandItem({k:'bead',r:3.4,stone:k%3===1?'gold':'pearl'},bp[0],bp[1]);
+ if(t>.88)s+=wire(circ(b[0],b[1],2.3),'copper',.85,f(seg(t,.88,1)));
+ return s;
+}
+function fsCurl(sd,x,sc){
+ if(sc<=.01)return '';const y=nkY(x);
+ return `<g transform="translate(${f(x)} ${f(y)}) scale(${f(sd*sc)} ${f(sc)})">${wire('M0 0L5 -3'+spiral(10,-6,5.5,1.5,-1,Math.PI*.8).replace('M','L'),'copper',1.3)}</g>`;
+}
+function fsStone([x,y,w,h,r],tint){
+ return `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${f(r)}" fill="url(#tr-glass)"/><ellipse cx="${f(x+w*.72)}" cy="${f(y+h*.2)}" rx="${f(w*.14)}" ry="${f(h*.1)}" fill="#4fa5ae" opacity=".13"/>`+
+  (tint?`<path d="${rrect(x+3,y+3,w-6,h-6,r-3)}" fill="none" stroke="${tint}" stroke-opacity=".3" stroke-width="1.4"/>`:'')+
+  `<path d="${rrect(x+1.5,y+1.5,w-3,h-3,r-1.5)}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="3"/><path d="${rrect(x,y,w,h,r)}" fill="none" stroke="#120906" stroke-width="2.4"/>`;
+}
+// A side drop on node 6: a jump ring, an oval frame drawn on from it both ways, a coiled stone, its words, and a small tip bead underneath.
+function fsSide(sd,u,deg){
+ const draw=seg(u,1.26,1.4);if(draw<=0)return '';
+ const cx=sd*NX[6],py=nkY(NX[6]),F=[cx-44,-93,88,96,44],S=[cx-38,-87,76,84,38],fill=seg(u,1.34,1.46),co=seg(u,1.4,1.56),tx=seg(u,1.74,1.9);
+ let s=`<g transform="rotate(${f(deg)} ${f(cx)} ${f(py)})">`+wire(circ(cx,py+5,4.4),'brass',1.5,f(clamp(draw*4)));
+ if(fill>0)s+=`<g opacity="${f(fill)}"><path d="${rrect(...F)}" fill="url(#plate)"/><path d="${rrect(...F)}" fill="url(#hammer)"/>${fsStone(S,sd<0?'#3fae6a':'#e2582c')}</g>`;
+ s+=wireOn(rrTop(...F),'copper',2.4,draw,true);
+ if(co>0)s+=maskOn('fs-co'+(sd<0?'l':'r'),rrTop(...S),co,10,bzCoils(S,0));
+ s+=sd<0?fsLines(cx,tx,[[-60,'PASSED',8.5,'s','#9fbcb8',' letter-spacing="1.2"'],[-35,'12',26,'g','#f2f5ef'],[-19,'all green',9.5,'s','#c9d6d1']])
+        :fsLines(cx,tx,[[-60,'WAITING',8.5,'s','#9fbcb8',' letter-spacing="1.2"'],[-35,'02',26,'g','#f2b866'],[-19,'on Brent',9.5,'s','#f2b866',' font-style="italic"']]);
+ const tb=seg(u,1.46,1.6);
+ if(tb>0)s+=wireOn(`M${cx} 3V11`,'copper',1.1,tb)+`<g opacity="${f(clamp(tb*4))}">${strandItem({k:'bead',r:4.4,stone:sd<0?'mal':'carn'},cx,lerp(3,15.5,backOut(tb)))}</g>`;
+ const gl=Math.sin(Math.PI*seg(u,1.48,1.6));if(gl>.03)s+=sparkle(cx+26,-80,gl*.7);
+ return s+'</g>';
+}
+function festoonSvg(u){
+ u=clamp(u,0,2);const D=fsAt(u),F=D.F,S=D.S,[fx,fy,fw,fh,fr]=F,fb=fy+fh;let s='';
+ // Pendant to lavalier: the plate, inner wire and scrolls fade while the frame stands up on end into a tall drop.
+ const po=1-seg(u,0,.45);
+ s+=`<path d="${rrect(...F)}" fill="url(#plate)"/><path d="${rrect(...F)}" fill="url(#hammer)"/><path d="${rrect(fx+3,fy+3,fw-6,fh-6,fr-3)}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="3"/>`;
+ if(po>0)s+=`<g transform="translate(${-CW/2} ${-CH/2})" opacity="${f(po)}">${casing(CW,CH,true,true,true)}</g>`;
+ // The neckline: links run out from the bail both ways; at the festoon step the end curls open, more links run out, and the curls close again further along.
+ const curl1=u<1?backOut(seg(u,.9,1)):1-ease(seg(u,1,1.06)),curl2=backOut(seg(u,1.38,1.48)),nodes=NX.map(x=>[x,nkY(x)]);
+ let chain='';
+ for(const sd of [-1,1])for(let k=0;k<9;k++){const t=k<4?seg(u,.6+k*.075,.7+k*.075):seg(u,1.05+(k-4)*.065,1.14+(k-4)*.065);if(t<=0)continue;
+  const a=nodes[k],b=nodes[k+1];chain+=fsLink([sd*a[0],a[1]],[sd*b[0],b[1]],t,k)}
+ s+=chain;
+ for(const sd of [-1,1])s+=fsCurl(sd,sd*NX[4],curl1)+fsCurl(sd,sd*NX[9],curl2);
+ // Side drops (festoon): hung on node 6, they swing as the swags take their weight and settle.
+ const sw=swingDeg(seg(u,1.6,1.98),9,1.7);
+ const sideL=fsSide(-1,u,sw),sideR=fsSide(1,u,-sw*.8);
+ // Swags: a fine wire from the lavalier's side to each side drop's inner edge, then the fourteen tally beads slide out along them, outermost first.
+ let swag='';
+ if(u>1.5)for(const sd of [-1,1]){const deg=sd<0?sw:-sw*.8,px=sd*NX[6],py=nkY(NX[6]),A=[sd*54,4],B=rotPt(sd*106,-45,px,py,deg),C=[(A[0]+B[0])/2,Math.max(A[1],B[1])+52],w=seg(u,1.5,1.62);
+  swag+=wire(circ(A[0]+sd*2,A[1],2),'copper',.8,f(clamp(w*4)))+wireOn(quadD(A,C,B),'copper',.85,w);
+  if(w>=1)swag+=wire(circ(B[0]-sd*2,B[1],2),'copper',.8);
+  for(let k=6;k>=0;k--){const t=seg(u,1.6+(6-k)*.032,1.7+(6-k)*.032);if(t<=0)continue;const q=quad(A,C,B,lerp(0,(k+1)/8,ease(t)));
+   swag+=strandItem({k:'bead',r:3.6,stone:sd>0&&k>4?'carn':'mal'},q[0],q[1]);if(t>.8&&t<1)swag+=sparkle(q[0]+2,q[1]-3,Math.sin(Math.PI*seg(t,.8,1))*.45)}}
+ s+=swag+sideL+sideR;
+ // The centre drop: frame, stone, and the coiled bezel unwinding off the pendant's stone and winding back on round the tall one.
+ s+=wire(rrTop(...F),'copper',3.1)+fsStone(S);
+ if(po>0)s+=`<g opacity="${f(po)}">${bzCoils(S,0)}</g>`;
+ const co=seg(u,.74,.9);if(co>0)s+=maskOn('fs-co',rrTop(...S),co,10,bzCoils(S,0));
+ // Words: the name stays; the lavalier's count gives way to the run's pass rate once the side drops carry the counts.
+ const cx=S[0]+S[2]/2,lv=seg(u,.82,.97)*(1-seg(u,1.7,1.8)),fe=seg(u,1.82,1.96);
+ s+=fsLines(cx,seg(u,.82,.97),[[-27,'Checks',13,'g','#f6d2ac',' font-style="italic"']]);
+ s+=fsLines(cx,lv,[[3,'12 / 14',23,'g','#f2f5ef'],[21,'passed · 86%',10,'s','#9fbcb8'],[40,'2 waiting',10.5,'s','#f2b866']]);
+ s+=fsLines(cx,fe,[[-8,'RUN 418',9,'s','#9fbcb8',' letter-spacing="1.3"'],[22,'86%',27,'g','#f2f5ef'],[39,'12 of 14 green',10,'s','#c9d6d1']]);
+ // The bail: a stem rises from the top of the drop and a loop closes round the neckline.
+ const bl=seg(u,.5,.8);
+ if(bl>0)s+=wireOn(`M0 ${f(fy)}V${f(fy-9)}`,'copper',2,seg(bl,0,.35))+wireOn(circ(0,-80,5.5),'copper',2,seg(bl,.3,.8))+(bl>.75?wire(band(0,fy-4,true,2,8,2.2),'brass',1.1,f(seg(bl,.75,1))):'');
+ // The pendant's status lens leaves its margin and drops to hang on a headpin under the drop, swinging until it settles.
+ let lx=0,ly=fb+18,lr=7.5,ldeg=swingDeg(seg(u,.8,1),16,2)+swingDeg(seg(u,1.6,1.98),5,1.7);
+ if(u<1){const p=ease(seg(u,.3,.8));lx=lerp(113.5,0,p);ly=lerp(3.5,FS.F[1][1]+FS.F[1][3]+18,p)+22*Math.sin(Math.PI*p);lr=lerp(8.5,7.5,p)}
+ const st=seg(u,.72,.84);
+ s+=`<g transform="rotate(${f(ldeg)} 0 ${f(fb)})">`+(st>0?wireOn(`M0 ${f(fb)}V${f(fb+10)}`,'copper',1.3,st)+wire(band(0,fb+4.5,true,2,6.5,2.2),'brass',1.1,f(st)):'')+strandItem({k:'bead',r:f(lr),stone:'mal'},lx,ly)+'</g>';
+ // A glint where each step's last wire bites home.
+ const gl=Math.sin(Math.PI*seg(D.p,.86,.98));if(gl>.03)s+=sparkle(S[0]+S[2]-S[4]*.35,S[1]+S[4]*.35,gl*.8)+(D.i?sparkle(-NX[9],nkY(NX[9]),gl*.5)+sparkle(NX[9],nkY(NX[9]),gl*.5):sparkle(-NX[4],nkY(NX[4]),gl*.45)+sparkle(NX[4],nkY(NX[4]),gl*.45));
+ return s;
+}
+function festoonRender(el,svg){
+ const u=clamp(model.g+1,0,2),mini=el.querySelector('.mini'),gr=el.querySelector('.grip');
+ svg.innerHTML=`<g transform="translate(${CW/2} ${CH/2})">${festoonSvg(u)}</g>`;
+ const out=1-seg(u,0,.35);mini.style.opacity=f(out);mini.style.visibility=out<.02?'hidden':'visible';mini.style.transform='';
+ el.querySelector('.lens').style.visibility='hidden';el.querySelector('.strip').style.opacity=0;
+ // From the lavalier on, the nameplate's hit box sits over the name at the top of the drop.
+ const sm=u>=.5;el.classList.toggle('tree',sm);gr.style.width=gr.style.right='';
+ if(sm){gr.style.opacity=1;gr.style.left=f(CW/2-36)+'px';gr.style.top=f(CH/2-46)+'px'}else{gr.style.opacity=f(1-seg(u,0,.3));gr.style.left=gr.style.top=''}
+ const S=SIZES.find(x=>x[0]===model.size);el.setAttribute('aria-label','Checks widget, '+(S?S[1].toLowerCase():'changing')+': 12 of 14 checks passed, 2 waiting for approval'+(u>=1.5?'; run 418 is 86% green':''));
+}
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c,page:0},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0};
@@ -2189,7 +2301,7 @@ function render(){
    el.style.transformOrigin=`-${A.x0}px ${f(h/2)}px`;el.style.transform=th?`translate(${f(A.ring*Math.cos(ph)-A.ring)}px,${f(A.ring*Math.sin(ph))}px) rotate(${f(th)}deg)`:'';
   }
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
-  if(small&&model.g>-1){({bezel:bezelRender,detail:detailRender}[model.morph]||treeRender)(el,svg);continue}
+  if(small&&model.g>-1){({bezel:bezelRender,detail:detailRender,festoon:festoonRender}[model.morph]||treeRender)(el,svg);continue}
   if(small){el.classList.remove('tree');const gr=el.querySelector('.grip');gr.style.left=gr.style.top=gr.style.width=gr.style.right='';el.setAttribute('aria-label','Checks widget')}
   let s=sh.draw?sh.draw(id,w,h,small,model.st):casing(w,h,small);
   if(id==='a')s+=j.end(1,lit,h);if(id==='b')s+=j.end(-1,lit,h);
