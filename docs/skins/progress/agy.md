@@ -36,7 +36,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Silk Cocoon Wrap shade — Silk threads wind rapidly around lower body into compact bundle (Built in prototypes/skins/agy/hollow.html with spinning Pharloom brass weaver spools, criss-crossing golden silk winding filaments, vertically contracting lozenge cocoon pod, transverse brass buckles with glowing lumafly resin drops, cinch impact flash, and Option 4 switcher)
 
 ### Cycle 5: Tertiary Joins
-- [ ] Gothic: Flying Buttress Arm Swing join — Arched stone buttress pivots 45° from shoulder to seat on corbel
+- [x] Gothic: Flying Buttress Arm Swing join — Arched stone buttress pivots 42° from pier shoulder to seat into carved corbel with iron tie-pin lock and open-air shadow gap (Built in prototypes/skins/agy/gothic.html with crocketed pier pinnacle, gargoyle spout, openwork trefoil flyer, acanthus corbel, tie-pin release bar, and Option 5 switcher)
 - [ ] Felt: Running Cross-Stitch Zipper join — Contrasting embroidery floss laces through eyelets in X-stitches
 - [ ] Elven: Liquid Ithildin Meniscus (Quicksilver Bridge) join — Liquid star-silver droplets snap by surface tension
 - [ ] Wire: Recycled Pop-Tab Cotter-Pin Hinge join — Stamped can pull-tabs align and lock with looped wire cotter pin
