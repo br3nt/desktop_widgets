@@ -262,6 +262,9 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 [data-pair=hollowfelt] #a .strip span em{color:#8f1c22}
 [data-pair=hollowfelt] #b .tab{color:#fff2dcc0;text-shadow:0 1px 0 #0008}
 [data-pair=hollowfelt] #b .tab[aria-selected=true]{color:#fff8ea}
+/* Pocketed: Jarvis is a felt cushion that owns the pocket; GitDiscuss and Checks keep the wire rules above. GitDiscuss's tabs and beads drop a couple of px so they clear the pocket's cuff and show through its slot and buttonholes */
+[data-pair=feltwire] #b .tabline{top:105px}
+[data-pair=feltwire] #b .knob{top:103px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -983,6 +986,59 @@ function ntProg(G,jt){
 const ntDimple=(p,pk)=>`<ellipse cx="${f(p.x+.6)}" cy="${f(p.y)}" rx="${f(2.2+.8*pk)}" ry="${f(1.3+.5*pk)}" fill="#163a36" opacity=".6"/><path d="M${f(p.x-2.4)} ${f(p.y+2)}q${f(3)} ${f(1.4+pk)} ${f(6)} 0" fill="none" stroke="#a9dacd" stroke-width=".8" opacity=".5"/>`+
  (pk>.05?`<path d="M${f(p.x-1)} ${f(p.y-3)}q-3 -2 -7 -2.4M${f(p.x-1)} ${f(p.y+3)}q-3 2 -7 2.4" fill="none" stroke="#163a36" stroke-width=".8" opacity="${f(.45*pk)}"/>`:'');
 
+/* ---------- Mix 9: containment (model E). Felt Jarvis carries a pocket; wire GitDiscuss drops into it and its tag goes over the edge. ---------- */
+// The pocket is anchored to Jarvis. GitDiscuss rests 22 px off Jarvis: a 12 px felt gusset, then a 10 px margin of pocket round the frame.
+// The lip runs just under GitDiscuss's display, so the display stays clear and only the frame's foot goes in.
+const PK={gap:22,m:10,drop:70,felt:'#9b3328',back:'#5e1a14',cuff:'#d8c29a',strap:'#6e2420',tx:236};
+// A join released from ready starts from the ready pose (pocket a little open, bead warm) and hands over to the timeline, so nothing snaps back.
+const pkReady=jt=>model.dir>0?4*model.lit0*(1-seg(jt,.06,.16)):0;
+function pkJarvis(w,h){
+ const k=clamp((H-h)/(H-HS)),show=1-clamp(k*2.2),r=[16,13,12,16];
+ let o=`<defs>${feltFilters('a',3)}</defs>`;
+ o+=`<path d="${rr4(2.5,6,w-5,h-4.5,r.map(v=>v+2))}" fill="#2e211b" filter="url(#g-a)"/>`;
+ o+=`<path d="${rr4(4,4,w-8,h-8,r)}" fill="#c9b28b" filter="url(#f-a)"/>`;
+ o+=stitch(rr4(10,10,w-20,h-20,r.map(v=>Math.max(3,v-6))),'#f7e8c9',.9,1.3,'4.4 3.2');
+ // The nameplate: a dark red frieze of felt under the cream lettering.
+ const band=rr4(20,7,320,23,[9,8,10,8]);
+ o+=`<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band}" fill="${PK.strap}" filter="url(#g-a)"/>`;
+ o+=`<path d="${rr4(23.5,10.5,313,16,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ // The cotton patch sits in a surround of the pocket's brick felt, so the pocket reads as Jarvis's own cloth.
+ if(show>.01){const sur=rr4(22,28,316,75,[8,7,8,7]);
+  o+=`<g opacity="${f(show)}"><path d="${sur}" fill="${PK.felt}" filter="url(#g-a)"/>${stitch(rr4(25.5,31.5,309,68,[5,5,5,5]),'#f7e8c9',.6,.9,'2.4 2.2')}</g>`}
+ return o+stitch(`M14 ${h-5}H${w-14}`,'#f7e8c9',.55,1,'4 3');
+}
+function pkGeo(c){const A=model.a,h=c.h,s=clamp((h-HS)/(H-HS)),aR=A.x+W,bx=aR+PK.gap,lip=A.y+h-lerp(12,33,s);
+ return{A,h,s,aR,bx,y:A.y,lip,bot:A.y+h+lerp(6,10,s),x0:bx-PK.m,x1:bx+W+PK.m,horn:lerp(8,26,s)}}
+// Build order: the pocket unfolds out of Jarvis's end, GitDiscuss is carried over and dropped in, the felt squashes, the tag is laid over the lip, the bead kindles.
+const pkParts=jt=>({open:ease(seg(jt,.12,.38)),drop:seg(jt,.42,.56),land:Math.sin(Math.PI*seg(jt,.56,.68)),lay:seg(jt,.64,.78),swing:seg(jt,.74,.96),lit:seg(jt,.86,.98)});
+// The pocket front at unfold u (0 is a concertina folded against Jarvis's end). Its mouth is scooped: the corners ride up over the frame's sides only.
+function pkFront(G,u){const L=lerp(G.aR-12,G.x0,u),R=lerp(G.aR+6,G.x1,u),yc=G.lip-G.horn,lip=G.lip,bot=G.bot,cw=Math.min(14,(R-L)/4),cv=Math.min(34,(R-L)/4);
+ const mouth=`H${f(L+cw)}C${f(L+cw+cv*.5)} ${f(yc)} ${f(L+cw+cv*.5)} ${f(lip)} ${f(L+cw+cv)} ${f(lip)}H${f(R-cw-cv)}C${f(R-cw-cv*.5)} ${f(lip)} ${f(R-cw-cv*.5)} ${f(yc)} ${f(R-cw)} ${f(yc)}`;
+ return{L,R,yc,lip,bot,cw,cv,d:`M${f(L)} ${f(yc+5)}Q${f(L)} ${f(yc)} ${f(L+5)} ${f(yc)}${mouth}H${f(R-5)}Q${f(R)} ${f(yc)} ${f(R)} ${f(yc+5)}V${f(bot-9)}Q${f(R)} ${f(bot)} ${f(R-9)} ${f(bot)}H${f(L+9)}Q${f(L)} ${f(bot)} ${f(L)} ${f(bot-9)}Z`,
+  edge:`M${f(L+3)} ${f(yc)}${mouth}H${f(R-3)}`}}
+// Where GitDiscuss's tabs and bead buttons are, so the pocket can leave a slot and two buttonholes for them.
+function pkHoles(G){const b=$('#b'),tl=b.querySelector('.tabline'),out=[];
+ out.push({slot:true,x:G.bx+tl.offsetLeft-7,y:G.y+tl.offsetTop-3,w:tl.offsetWidth+14,h:tl.offsetHeight+6});
+ b.querySelectorAll('.knob').forEach(k=>out.push({cx:G.bx+k.offsetLeft+k.offsetWidth/2,cy:G.y+k.offsetTop+k.offsetHeight/2,r:k.offsetWidth/2+3.2}));
+ return out}
+const pkHolePath=H=>H.map(o=>o.slot?rr4(o.x,o.y,o.w,o.h,[7,7,7,7]):`M${f(o.cx-o.r)} ${f(o.cy)}a${f(o.r)} ${f(o.r)} 0 1 0 ${f(2*o.r)} 0a${f(o.r)} ${f(o.r)} 0 1 0 ${f(-2*o.r)} 0Z`).join('');
+const pkHoleRim=(H,g)=>H.map(o=>o.slot?rr4(o.x-g,o.y-g,o.w+2*g,o.h+2*g,[7+g,7+g,7+g,7+g]):`M${f(o.cx-o.r-g)} ${f(o.cy)}a${f(o.r+g)} ${f(o.r+g)} 0 1 0 ${f(2*(o.r+g))} 0a${f(o.r+g)} ${f(o.r+g)} 0 1 0 ${f(-2*(o.r+g))} 0Z`).join('');
+// GitDiscuss's copper luggage tag on a jump ring. sy folds it about the ring (negative shows its back), th swings it.
+function pkTag(ax,ay,th,sy,s,lit){
+ const pw=lerp(30,88,s),ph=lerp(18,30,s),top=lerp(6,8,s),tx=seg(s,.6,1),plate=rrect(-pw/2,top,pw,ph,6),bx=lerp(0,-pw/2+9,tx),by=top+ph/2;
+ let g=`<path d="${plate}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(1.2 2.4)"/><path d="${plate}" fill="url(#plate)"/><path d="${plate}" fill="url(#hammer)"/>`+wire(plate,'copper',1.5)+wire(`M0 -1V${f(top+1)}`,'copper',1.3);
+ if(sy>=0){
+  if(lit>.01)g+=`<circle cx="${f(bx)}" cy="${f(by)}" r="10" fill="#ffb648" opacity="${f(.55*lit)}" filter="url(#soft)"/>`;
+  g+=`<circle cx="${f(bx)}" cy="${f(by)}" r="5.3" fill="#120906"/>`+wire(coilsAlong(`M${f(bx-5.4)} ${f(by)}a5.4 5.4 0 1 0 10.8 0a5.4 5.4 0 1 0 -10.8 0`,2.2,1.6),'copper',.9)+
+   `<circle cx="${f(bx)}" cy="${f(by)}" r="3.9" fill="url(#st-amber)"/><circle cx="${f(bx)}" cy="${f(by)}" r="3.9" fill="#2a1406" opacity="${f(.6*(1-lit))}"/>`;
+  if(tx>.01)g+=`<g opacity="${f(tx)}"><text x="${f(-pw/2+18)}" y="${f(top+13)}" font-family="Georgia,serif" font-style="italic" font-size="12" fill="#f3c9a3">GitDiscuss</text>`+
+   `<text x="${f(-pw/2+18)}" y="${f(top+25)}" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="10" fill="#e9efe9"><tspan fill="#f2b866" font-weight="700">02</tspan> to decide</text></g>`}
+ // The back: plain hammered copper with a stamped maker's mark.
+ else g+=`<path d="M0 ${f(by-4)}L1.2 ${f(by-1.2)}L4 ${f(by)}L1.2 ${f(by+1.2)}L0 ${f(by+4)}L-1.2 ${f(by+1.2)}L-4 ${f(by)}L-1.2 ${f(by-1.2)}Z" fill="#c98656" opacity=".7"/>`;
+ return `<g transform="translate(${f(ax)} ${f(ay)}) rotate(${f(th)})"><g transform="scale(1 ${f(Math.sign(sy||1)*Math.max(.04,Math.abs(sy))*1000)/1000})">${g}</g></g>`+
+  wire(`M${f(ax-4.2)} ${f(ay)}a4.2 4.2 0 1 0 8.4 0a4.2 4.2 0 1 0 -8.4 0`,'copper',1.4);
+}
+
 const MIXES={
  feltCathedral:{label:'Felt cathedral',kind:'Layer stack',
   stack:[['Structure','Gothic','silhouette, half-gables at the joining ends, pinnacles, cresting, blind lancets, the half-rose join'],
@@ -1601,6 +1657,96 @@ const MIXES={
    sepPh:'Separate · shell and felt',nearPh:'Nearby · the eyelets catch the light',readyPh:'Ready · the needle is poised',
    mid:(jt,dir)=>dir>0?(jt<NT.t0?'Joining · closing in ':jt<NT.t1?'Joining · the needle sews ':'Joining · pulling taut '):(jt>.5?'Releasing · pulling the thread out ':jt>.4?'Releasing · unpicked ':'Releasing · parting '),
    turn:d=>'Pulling the thread · '+Math.round(d.deg*100)+'%'}
+ },
+ pocket:{label:'Pocketed',kind:'Containment',pair:'feltwire',
+  stack:[['Model','Containment','one widget holds the other; the felt never has to meet the copper edge to edge'],
+   ['Container','Felt','Jarvis owns the pocket: brick-red felt with an oatmeal cuff, blanket-stitched edges and French-knot bar tacks, hung from Jarvis on two felt straps; at rest it is folded flat against Jarvis\'s end like a concertina'],
+   ['Contents','Wire','GitDiscuss stands in the pocket exactly as it is on the wire page; only the foot of its frame goes in, under the display'],
+   ['Openings','Felt','a blanket-stitched slot and two buttonholes in the pocket front let the tabs and bead buttons through, so they still work'],
+   ['The tag','Wire','GitDiscuss\'s copper luggage tag hangs on a jump ring hooked into its bezel; pocketed, it is laid over the edge and carries the name, the value and the amber bead that is the join light'],
+   ['Motion','Felt sets the pace','12 fps stop-motion with shifting fibres; the copper keeps its weight, swinging and settling on the same steps']],
+  about:'The other containment mix (the reliquary bay) is stone holding felt behind glass. This is the reverse kind: soft holding hard. Felt Jarvis has a patch pocket, and wire GitDiscuss stands in it the way a pocket watch or a folded handkerchief does, with its display above the lip. Since a pocket covers what it holds, the pocket is cut to the contents: the mouth runs just under the display and the corners rise only over the frame\'s sides. The slot and buttonholes are where the controls come through. The tag hanging outside is the old way to say what is in a pocket.',
+  join:{label:'Dropped in, tag over the edge',kind:'Containment',gap:PK.gap,
+   about:'Apart, the pocket is folded flat against Jarvis\'s right end, and GitDiscuss\'s copper tag hangs from its bezel on a jump ring. <b>Near:</b> the folded pocket starts to open, a dashed thread outline shows where it will hang and the tag\'s amber bead warms. <b>Ready:</b> the outline fills faintly and tacking stitches run along the mouth. Joining: the pocket unfolds out of Jarvis\'s end in stop-motion, its pleats spreading and flattening. GitDiscuss is lifted across with its tag trailing, hangs over the mouth and drops in. The lip catches the tag and folds it up onto the display, and the felt squashes and puffs out a little fluff. Then the tag is laid over the edge onto the pocket front, swings and settles, and the bead kindles as the join light. <b>Release:</b> pull the tag up (drag it, or click it, or focus it and press Enter). The tag flips back up, the bead goes out, GitDiscuss is lifted out by it and the pocket folds away.'},
+  shade:{label:'Plain tuck, pocketed',kind:'Page baseline',
+   about:'Not a brainstorm item. The felt lets out its stuffing to the nameplate band and the wire frames tuck to their nameplate strips. The pocket shrinks with its contents: the mouth drops to just under GitDiscuss\'s strip, the slot and buttonholes close up, and the tag shrinks to a small copper tag holding only the bead, so a shaded GitDiscuss stays pocketed and lit.'},
+  casing:(id,w,h)=>id==='a'?pkJarvis(w,h):wireCasing(w,h,id==='c'),
+  readyPose:{},
+  state:()=>({}),
+  // GitDiscuss is lifted clear while it is carried across, hangs over the mouth, drops in under gravity and sinks a little into the felt.
+  lift(c,id){if(id!=='b'||c.jt<=0||c.jt>=1)return 0;const dn=seg(c.jt,.42,.56);
+   return -PK.drop*ease(seg(c.jt,.04,.2))*(1-dn*dn)+(model.dir>0?3*Math.sin(Math.PI*seg(c.jt,.56,.66)):0)},
+  tag(c,G,ly){const jt=c.jt,P=pkParts(jt),top=lerp(6,8,G.s),ph=lerp(18,30,G.s);
+   if(jt===0)return{th:0,sy:1,lit:.3*c.glow};
+   if(jt===1)return{th:0,sy:1,lit:1};
+   // Trailing as it is carried; caught and folded up by the lip as GitDiscuss drops; then laid over the edge, where it swings and settles.
+   let th=-16*Math.sin(Math.PI*seg(jt,.04,.42)),sy;const caught=clamp((1-top)/ph,-1,1);
+   if(jt<.42)sy=1;
+   else if(jt<.56)sy=clamp((1-ly-top)/ph,-1,1);
+   else if(jt<.64)sy=lerp(caught,-1,ease(seg(jt,.56,.62)));
+   else sy=Math.min(1,-1+2*backOut(P.lay));
+   if(P.swing>0)th=13*Math.exp(-3.5*P.swing)*Math.sin(3*Math.PI*P.swing);
+   return{th,sy,lit:Math.max(P.lit,.3*pkReady(jt))}},
+  under(c){
+   const G=pkGeo(c),u=c.jt===0?.1*c.glow:Math.max(pkParts(c.jt).open,.1*pkReady(c.jt));if(u<.02)return '';
+   const F=pkFront(G,u),bt=F.yc-12,L=G.aR-8,back=rr4(L,bt,F.R-L,F.bot-bt,[10,10,10,10]);
+   return `<path d="${back}" fill="${PK.back}" filter="url(#g-a)"/>`+stitch(`M${f(L+6)} ${f(bt+4)}H${f(F.R-6)}`,'#f7e8c9',.5,1,'3.4 2.6');
+  },
+  over(c){
+   const G=pkGeo(c),P=pkParts(c.jt),jt=c.jt,fwd=model.dir>0,u=jt===0?.1*c.glow:Math.max(P.open,.1*pkReady(jt)),land=fwd&&jt<1?P.land:0;
+   let o='';
+   // Near and ready: a dashed thread outline of the open pocket; ready fills it faintly and tacks the mouth.
+   if(jt===0&&c.glow>0){const Fg=pkFront(G,1),ga=.2+.55*c.glow;
+    o+=`<path d="${Fg.d}" fill="${c.glow>=1?'#c9483a':'none'}" fill-opacity=".14" stroke="#f7e8c9" stroke-opacity="${f(ga)}" stroke-width="1.3" stroke-dasharray="4 3"/>`;
+    if(c.glow>=1)o+=`<g transform="translate(0 3)">${stitch(Fg.edge,'#fffaf0',.9,1.2,'3 2.2')}</g>`}
+   const F=pkFront(G,u),holes=u>=.999&&1-clamp(ease(model.st)*5)>.02?pkHoles(G):[],hp=pkHolePath(holes),mx=(F.L+F.R)/2;
+   // The felt squashes as GitDiscuss lands in it.
+   o+=`<g transform="translate(${f(mx)} ${f(F.bot)}) scale(${f((1+.03*land)*1000)/1000} ${f((1-.07*land)*1000)/1000}) translate(${f(-mx)} ${f(-F.bot)})">`;
+   o+=`<path d="${F.d}${hp}" fill="#000" fill-rule="evenodd" opacity=".38" filter="url(#sh)" transform="translate(1 3)"/>`;
+   o+=`<g filter="url(#f-a)"><path d="${F.d}${hp}" fill="${PK.felt}" fill-rule="evenodd"/></g>`;
+   // Folded: concertina creases that spread and flatten as it opens.
+   if(u<1){let pl='';for(let i=1;i<7;i++){const x=F.L+(F.R-F.L)*i/7;pl+=`M${f(x)} ${f(F.yc+6)}V${f(F.bot-4)}`}
+    o+=`<path d="${pl}" stroke="#3a0f0b" stroke-opacity="${f(.6*(1-u))}" stroke-width="1.5"/><path d="${pl}" stroke="#e98a70" stroke-opacity="${f(.4*(1-u))}" stroke-width="1" transform="translate(1.4 0)"/>`}
+   // The slot and buttonholes: a dark cut edge and a blanket stitch round each.
+   if(holes.length)o+=`<path d="${pkHoleRim(holes,0)}" fill="none" stroke="#1a0806" stroke-opacity=".7" stroke-width="2"/><g fill="none">${stitch(pkHoleRim(holes,3),'#f7e8c9',.85,1.1,'1.4 1.6')}</g>`;
+   // The cuff: a turned-down band of oatmeal felt along the mouth, with a red running stitch.
+   o+=`<path d="${F.edge}" fill="none" stroke="#1a0806" stroke-opacity=".5" stroke-width="1.6"/><path d="${F.edge}" fill="none" stroke="${PK.cuff}" stroke-width="6" stroke-linecap="round" transform="translate(0 2.6)" filter="url(#g-a)"/>`+
+    `<g transform="translate(0 3.2)">${stitch(F.edge,'#7a2018',.85,1,'3 2.4')}</g>`;
+   if(F.R-F.L>40)o+=stitch(`M${f(F.L+4.5)} ${f(F.yc+10)}V${f(F.bot-8.5)}Q${f(F.L+4.5)} ${f(F.bot-4.5)} ${f(F.L+8.5)} ${f(F.bot-4.5)}H${f(F.R-8.5)}Q${f(F.R-4.5)} ${f(F.bot-4.5)} ${f(F.R-4.5)} ${f(F.bot-8.5)}V${f(F.yc+10)}`,'#f7e8c9',.8,1.1,'4 3');
+   if(u>.5)o+=`<g opacity="${f(seg(u,.5,1))}">${fknot(F.L+F.cw+F.cv,F.lip+4,2.4)+fknot(F.R-F.cw-F.cv,F.lip+4,2.4)}</g>`;
+   o+='</g>';
+   // Two felt straps hang the pocket from Jarvis's end, box-stitched at both ends.
+   const xs=G.aR-18,xe=F.L+16;
+   for(const sy of G.s>.5?[F.yc+3,F.bot-21]:[(F.yc+F.bot)/2-6]){const st=rr4(xs,sy,xe-xs,12,[4,4,4,4]);
+    o+=`<path d="${st}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.5 1.6)"/><path d="${st}" fill="${PK.strap}" filter="url(#g-a)"/>`;
+    const box=x=>rr4(x,sy+2.5,9,7,[2,2,2,2])+`M${f(x+1)} ${f(sy+3.5)}L${f(x+8)} ${f(sy+8.5)}M${f(x+8)} ${f(sy+3.5)}L${f(x+1)} ${f(sy+8.5)}`;
+    o+=stitch(box(xs+3)+(xe-xs>34?box(xe-12):''),'#f7e8c9',.8,.9,'2 1.6')}
+   // A few fibres puffed out of the mouth as it lands.
+   if(fwd&&jt>.56&&jt<.8){const v=seg(jt,.56,.8);for(const[i,[dx,dy,rot]]of FLUFF.entries()){const x=(i%2?F.R-F.cw-F.cv:F.L+F.cw+F.cv)+dx*30*(.4+v),y=F.lip-4+dy*10*(.6+v)-14*v+22*v*v;
+    o+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+v*90)})" fill="none" stroke="${i%3?PK.cuff:'#d9634e'}" stroke-width="1.3" stroke-linecap="round" opacity="${f(1-v)}"/>`}}
+   // The tag, on its jump ring hooked into GitDiscuss's bezel, just above the lip.
+   const ly=this.lift(c,'b'),T=this.tag(c,G,ly),ax=model.b.x+PK.tx,ay=model.b.y+ly+c.h-lerp(12,33,G.s)-1+lerp(3,0,G.s);
+   o+=pkTag(ax,ay,T.th,T.sy,G.s,T.lit);
+   if(jt>.88&&jt<1&&fwd){const g=Math.sin(Math.PI*seg(jt,.88,1));o+=sparkle(ax+lerp(0,-35,seg(G.s,.6,1))-3,ay+lerp(6,8,G.s)+lerp(9,15,G.s)-4,g*.8)}
+   if(jt===1){const pw=lerp(30,88,G.s),ph=lerp(18,30,G.s)+lerp(6,8,G.s);
+    o+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="GitDiscuss's copper tag: pull it up, or press Enter, to lift GitDiscuss out of the pocket"><title>Pull the tag up to lift GitDiscuss out</title><rect x="${f(ax-pw/2-6)}" y="${f(ay-4)}" width="${f(pw+12)}" height="${f(ph+8)}" fill="transparent"/><rect class="ringfocus" x="${f(ax-pw/2-6)}" y="${f(ay-4)}" width="${f(pw+12)}" height="${f(ph+8)}" rx="6" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+   return o;
+  },
+  // Releasing by hand: pull the tag up; 50 px lifts it off the pocket front.
+  grab(p){return{y0:p.y,deg:0}},
+  pull(d,p){const up=d.y0-p.y;if(Math.abs(up)>3)d.moved=true;d.deg=clamp(up/50);return 1-.4*d.deg},
+  text:{intro:'Jarvis is felt with a pocket folded at its right end; GitDiscuss and Checks are copper wire. Drag GitDiscuss toward Jarvis, or use the state buttons.',
+   join:'The pocket unfolds out of Jarvis\'s end, GitDiscuss is dropped in and its tag is laid over the edge.',
+   joined:'Pocketed: GitDiscuss stands in Jarvis\'s felt pocket with its tag over the edge, and its tabs and buttons still work through the slot. Drag either nameplate to move them together. Pull the tag up to release.',
+   sep:'The tag is pulled up, GitDiscuss is lifted out by it and the pocket folds away.',
+   hold:'Held mid-join: GitDiscuss has dropped in and its tag is being laid over the edge. Use the scrubber to step through the animation.',
+   near:'Nearby: the folded pocket starts to open and the tag\'s bead warms. Move closer.',
+   ready:'Ready: the pocket\'s outline is tacked in place. Release to drop GitDiscuss in.',
+   back:'The tag drops back over the edge; still pocketed.',cancel:'Pull cancelled.',
+   shadeOn:'Shaded: the felt lets out its stuffing and the wire tucks; the pocket shrinks with them and keeps its tag and bead.',shadeOff:'Unshaded: the stuffing comes back, the frame opens and the pocket grows with it.',
+   sepPh:'Separate · a folded pocket',nearPh:'Nearby · the pocket opens a little',readyPh:'Ready · outline tacked',
+   mid:(jt,dir)=>dir>0?(jt<.4?'Joining · the pocket unfolds ':jt<.56?'Joining · dropping in ':jt<.84?'Joining · tag over the edge ':'Joining · the bead kindles '):(jt>.86?'Releasing · the bead goes out ':jt>.6?'Releasing · pulling the tag up ':jt>.42?'Releasing · lifting it out ':'Releasing · the pocket folds away '),
+   turn:d=>'Pulling the tag · '+Math.round(d.deg*100)+'%'}
  }
 };
 
