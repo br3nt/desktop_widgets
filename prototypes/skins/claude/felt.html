@@ -167,7 +167,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the drawstring shade, pull a toggle down to open it. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -457,6 +457,93 @@ function drawstringDraw(id,w,h,small,st){
   t+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
  if(P.sq)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
  return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${t}</g>`:t;
+}
+
+/* ---------- Pleats shade ---------- */
+// Below the name band the cushion is pressed into pleats: each pleat is a lit panel facing up, a ridge bound in dyed felt piping,
+// and a shaded panel facing down. The pleats fold up from the bottom into a concertina until only the piping shows, stacked.
+// Piping colours are status: amber running, blue idle or waiting, red needs you, green passed. Checks has one pleat per two checks.
+const PLEAT_C={amber:'#f0b43c',blue:'#4d7fc4',red:'#cf3b30',green:'#74b04a'};
+function pleatColours(id){
+ if(id==='a')return model.a.run?['amber','amber','amber','blue']:['blue','blue','blue','blue'];
+ if(id==='b')return['red','red','blue','green'];
+ return['green','green','green','green','green','green','red'];
+}
+// Spring for the opening: overshoots past flat (the felt stretches) and settles.
+const pleatSpring=t=>1-Math.cos(t*Math.PI*2.5)*Math.pow(1-t,3);
+function pleatParts(st,small){
+ const H0=small?CH:H,k=small?7:4,yT=small?24:28,P=(H0-EDGE-yT)/(2*k),s=small?2.4:5,s0=small?2:3,un=model.shDir===0,u=1-st;
+ let m,pipe,sq=0,emb,fib=0;const a=[];
+ if(!un){m=ease(seg(st,.06,.2));pipe=seg(st,.08,.3);
+  // The bottom pleat folds first and the fold runs up, each one tucking in with a small overshoot.
+  for(let j=0;j<k;j++){const t0=.28+.24*(k-1-j)/(k-1);a.push(backOut(seg(st,t0,t0+.24)))}
+  sq=Math.sin(Math.PI*seg(st,.76,.86))*.08;const fb=seg(st,.76,.92);fib=fb>0&&fb<1?fb:0;emb=seg(st,.84,1)}
+ else{emb=1-seg(u,0,.12);
+  for(let j=0;j<k;j++){const t0=.1+.06*j/(k-1);a.push(1-pleatSpring(seg(u,t0,t0+.5)))}
+  pipe=1-seg(u,.66,.84);m=1-ease(seg(u,.8,.96))}
+ // Each pleat's height and its piping's thickness; a<0 (the opening spring) stretches the pleat past flat.
+ let y=yT;const pl=a.map(v=>{const c=clamp(v),th=lerp(s0,s,c),hp=Math.max(th+.6,lerp(2*P,s+(small?1:1.5),v)),lit=(hp-th)/2,o={y0:y,yM:y+lit+th/2,y1:y+hp,th,c,a:v};y+=hp;return o});
+ return{H0,k,yT,P,s,un,m,pipe,sq,emb,fib,pl,h:Math.round(y+EDGE)};
+}
+function pleatsDraw(id,w,h,small,st){
+ const P=pleatParts(st,small),s=SKIN[id];
+ if(P.m<=0&&P.pipe<=0)return casing(id,w,h);
+ const cols=pleatColours(id),R=w-EDGE,L=EDGE,yB=h-EDGE,out=1.6,pin=2.2;
+ // The outline: rounded top, then the sides zigzag out at each ridge and in at each valley, and a rounded foot.
+ const last=P.pl[P.k-1];
+ // The shadow uses the same outline grown by g and dropped to the casing's shadow offsets, so the hand-over from casing() doesn't jump.
+ const outline=(L,R,T,yB,g)=>{const r0=s.r[0]+g,r1=s.r[1]+g,r2=Math.max(1,Math.min(s.r[2]+g,yB-last.yM-1)),r3=Math.max(1,Math.min(s.r[3]+g,yB-last.yM-1)),dy=T-EDGE;
+  let rs=`M${f(L+r0)} ${f(T)}H${f(R-r1)}Q${f(R)} ${f(T)} ${f(R)} ${f(T+r1)}L${f(R)} ${f(P.yT+dy)}`,ls='';
+  P.pl.forEach((p,j)=>{rs+=`L${f(R+out*p.c)} ${f(p.yM+dy)}`;if(j<P.k-1)rs+=`L${f(R-pin*p.c)} ${f(p.y1+dy)}`});
+  // Back up the left side from the foot: each valley, then its ridge.
+  for(let j=P.k-1;j>=0;j--){const p=P.pl[j];if(j<P.k-1)ls+=`L${f(L+pin*p.c)} ${f(p.y1+dy)}`;ls+=`L${f(L-out*p.c)} ${f(p.yM+dy)}`}
+  rs+=`L${f(R)} ${f(yB-r2)}Q${f(R)} ${f(yB)} ${f(R-r2)} ${f(yB)}H${f(L+r3)}Q${f(L)} ${f(yB)} ${f(L)} ${f(yB-r3)}`;
+  return rs+ls+`L${f(L)} ${f(P.yT+dy)}L${f(L)} ${f(T+r0)}Q${f(L)} ${f(T)} ${f(L+r0)} ${f(T)}Z`};
+ const body=outline(L,R,L,yB,0),shadow=outline(2.5,w-2.5,6,h+1.5,2);
+ let t=`<defs>${feltFilters(id,s.seed)}<linearGradient id="plL-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff3df" stop-opacity=".04"/><stop offset="1" stop-color="#fff3df" stop-opacity=".3"/></linearGradient>`+
+  `<linearGradient id="plD-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1d0f06" stop-opacity=".5"/><stop offset="1" stop-color="#1d0f06" stop-opacity=".22"/></linearGradient></defs>`;
+ t+=`<clipPath id="plb-${id}"><path d="${body}"/></clipPath><path d="${shadow}" fill="#3b291d" filter="url(#g-${id})"/><path d="${body}" fill="${s.body}" filter="url(#f-${id})"/>`;
+ // The cushion's own running stitch: the run along the top stays, the rest fades as the pleats are pressed.
+ const fold=Math.max(...P.pl.map(p=>p.c)),st0=rr4(10,10,w-20,Math.max(P.H0,h)-20,s.r.map(v=>Math.max(3,v-6)));
+ const run=(d,op)=>`<path d="${d}" fill="none" stroke="#000" stroke-opacity="${f(.28*op)}" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${d}" fill="none" stroke="#f7e8c9" stroke-opacity="${f(.9*op)}" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`;
+ t+=`<clipPath id="plt-${id}"><rect x="-10" y="-10" width="${w+20}" height="${P.yT+10}"/></clipPath><g clip-path="url(#plt-${id})">${run(st0,1)}</g>`;
+ if(fold<.3)t+=`<clipPath id="plc-${id}"><rect x="-10" y="${P.yT}" width="${w+20}" height="${f(Math.max(0,h-8-P.yT))}"/></clipPath><g clip-path="url(#plc-${id})">${run(st0,1-fold/.3)}</g>`;
+ // Panels: lit above each ridge, shaded below it, with a crease line at each valley.
+ let sh='',vl='';
+ P.pl.forEach((p,j)=>{const c=Math.max(0,p.c),pc=j?P.pl[j-1].c:0,xt=j?pin*pc:0;
+  if(c<=.01)return;
+  sh+=`<path d="M${f(L+xt)} ${f(p.y0)}H${f(R-xt)}L${f(R+out*c)} ${f(p.yM)}H${f(L-out*c)}Z" fill="url(#plL-${id})" opacity="${f(c)}"/>`;
+  const xb=j<P.k-1?pin*c:0;sh+=`<path d="M${f(L-out*c)} ${f(p.yM)}H${f(R+out*c)}L${f(R-xb)} ${f(p.y1)}H${f(L+xb)}Z" fill="url(#plD-${id})" opacity="${f(c)}"/>`;
+  if(j<P.k-1)vl+=`M${f(L+xb+1)} ${f(p.y1)}H${f(R-xb-1)}`;
+ });
+ t+=`<g clip-path="url(#plb-${id})">${sh}</g>`;if(vl)t+=`<path d="${vl}" stroke="#1d0f06" stroke-opacity="${f(.55*fold)}" stroke-width="1.2"/>`;
+ // Piping along each ridge, drawn in from the left one pleat after another (and back out to the right when opening).
+ P.pl.forEach((p,j)=>{
+  const sw=P.un?seg(P.pipe,0,1):seg(P.pipe,j*.4/P.k,j*.4/P.k+.6);if(sw<=0)return;
+  const c=Math.max(0,p.c),x0=L-out*c+1.2,x1=R+out*c-1.2,full=x1-x0,wd=Math.max(p.th,full*sw),xs=P.un?x1-wd:x0,y=p.yM-p.th/2,col=PLEAT_C[cols[j]];
+  t+=`<rect x="${f(xs)}" y="${f(y+1)}" width="${f(wd)}" height="${f(p.th)}" rx="${f(p.th/2)}" fill="#000" opacity=".4" filter="url(#sh)"/>`+
+   `<rect x="${f(xs)}" y="${f(y)}" width="${f(wd)}" height="${f(p.th)}" rx="${f(p.th/2)}" fill="${col}" stroke="#1d0f06" stroke-opacity=".45" stroke-width=".6"/>`+
+   `<path d="M${f(xs+p.th/2)} ${f(y+p.th*.3)}H${f(xs+wd-p.th/2)}" stroke="#fff" stroke-opacity=".38" stroke-width="${f(Math.max(.5,p.th*.16))}" stroke-linecap="round"/>`;
+  if(p.th>=4)t+=`<path d="M${f(xs+4)} ${f(p.yM+.3)}H${f(xs+wd-4)}" stroke="#fbf0d6" stroke-opacity=".75" stroke-width=".8" stroke-dasharray="2.4 2.2"/>`;
+ });
+ // The name band widens into the strip's face.
+ const bx=lerp(small?22:34,small?10:12,P.m),by=small?3:5,bh=small?20:22,bcy=by+bh/2,band=rr4(bx,by,w-2*bx,bh,[9,8,10,8]);
+ t+=`<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band}" fill="${s.band}" filter="url(#g-${id})"/>`+
+  `<path d="${rr4(bx+3.5,by+3.5,w-2*bx-7,bh-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ // Name in satin stitch on the left, value in cross-stitch on the right, sewn on left to right.
+ if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?15:17,c=small?1.8:2.2,wf=small?11:12.5;
+  const x0=bx+(small?9:12),x1=w-bx-(small?9:12),xp=xpaths(dt.num,c),nw=measure(nm,`italic ${nf}px Georgia,serif`);
+  const ww=measure(dt.word,`italic ${wf}px Georgia,serif`),word=nw+14+xp.w+5+ww<=x1-x0,vw=xp.w+(word?5+ww:0),vx=x1-vw,vy=bcy-3.5*c;
+  t+=`<clipPath id="pe-${id}"><rect x="${f(x0-4)}" y="${f(by-6)}" width="${f((x1-x0+8)*P.emb)}" height="${f(bh+12)}"/></clipPath><g clip-path="url(#pe-${id})">`+
+   `<text x="${f(x0)}" y="${f(bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="#000" fill-opacity=".4" transform="translate(.5 .9)">${nm}</text>`+
+   `<text x="${f(x0)}" y="${f(bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="#fbf0d6">${nm}</text>`+
+   `<text x="${f(x0)}" y="${f(bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="url(#satin)">${nm}</text>`+
+   `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".35" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="#cdb48a"/><path d="${xp.d2}" stroke="#fbf0d6"/></g>`+
+   (word?`<text x="${f(vx+xp.w+5)}" y="${f(bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="#f6e8cc">${dt.word}</text>`:'')+'</g>'}
+ // A few fibres shaken loose when the folded strip lands.
+ if(P.fib)for(const cx of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
+  t+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
+ return P.sq>1e-4?`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`:t;
 }
 
 /* ---------- Zipper geometry ---------- */
@@ -1100,7 +1187,12 @@ const SHADES={
   about:'The cushion is gathered up on a cord like the mouth of a drawstring bag. The cotton display is put away and the felt name band slides down to the middle, where it becomes the casing the cord runs through. Two buttonhole-stitched eyelets open in it, and a twisted cord drops out of them through a turned wooden toggle, ending in two felt balls. Then the cord is pulled in three tugs, a frame at a time: the toggle jerks up the cord, the ends lengthen below it and swing, and with each tug the cushion pulls in to a strip. The felt above and below the band bunches into frills, with creases leaning in toward the eyelets and a hem stitch following every scallop, and the sides pinch in. It lands with a squash that shakes fibres loose, then the name is satin-stitched on the band and the key value cross-stitched beside it. <b>To open, pull a toggle down</b> (or click it, focus it and press Enter, or use Shade): the gathers let go as the toggle slides, past a third of the way the cord gives and the cushion springs open with a bounce, the cord draws back in and the band climbs home. Let go sooner and it cinches back up. Joined pairs stay joined.',
   sayOn:'Shaded: each cushion is gathered up on its drawstring.',sayOff:'Unshaded: the drawstrings let go and the cushions spring open.',
   height:(st,small)=>drawParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:drawstringDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:drawstringDraw},
+ pleats:{label:'Pleats',kind:'Fold',ms:1900,ownStrip:true,
+  about:'The cushion is pressed into a concertina, like a pleated skirt or a paper fan. The cotton display is put away and the name band widens into the strip\'s face. Below it, a length of dyed felt piping is drawn in from the left along each pleat\'s ridge, one pleat after another. Then the pleats fold up from the bottom a frame at a time, each one tucking in with a small overshoot: the panel above each ridge catches the light, the one below falls into shade, and the sides zigzag out at the ridges and in at the valleys. It lands with a squash that shakes fibres loose, and only the piping is left showing, stacked under the band like the edges of folded cloth. <b>The piping is the status</b>: amber running, blue idle or waiting, red needs you, green passed. Jarvis has three amber (its three agents) and one blue (waiting for your next action), all blue when paused; GitDiscuss has two red (need a decision), one blue (ready to review) and one green (feedback collected); Checks has one pleat per two checks, six green and one red. The name is satin-stitched and the key value cross-stitched on the band. Unshading springs the concertina open: the pleats overshoot past flat so the felt stretches, settle, and the piping is drawn back out to the right. Joined pairs stay joined.',
+  sayOn:'Shaded: each cushion folds into pleats; the piping on each fold shows its status.',sayOff:'Unshaded: the pleats spring open and the piping is drawn out.',
+  height:(st,small)=>pleatParts(st,small).h,
+  show:st=>1-seg(st,0,.12),grip:st=>1-seg(st,0,.12),draw:pleatsDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
