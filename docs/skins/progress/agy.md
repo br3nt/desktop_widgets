@@ -32,7 +32,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Gothic: Triptych Altar Fold shade — Hinged stone-relief shutters swing 90° inward over display face (Built in prototypes/skins/agy/gothic.html with twin lancet-relief shutters, 3D perspective swing, bronze strap hinges, reliquary clasp with amber sanctuary jewel, Option 4 switcher, and fixed unclipped readable shade strips)
 - [x] Felt: The Artist's Tool-Roll (Felt Scroll) shade — Lower sections roll upward like canvas brush roll held by button (Built in prototypes/skins/agy/felt.html with sewn tool organizer pockets, Archimedean spiral cross-section ends, longitudinal roll seams, turned olive-wood craft button with braided cord loop, glanceable unclipped shade strip, and Option 4 switcher)
 - [x] Elven: Sylvan Scabbard Slide shade — Display bay glides upward into overhead repoussé silver canopy (Built in prototypes/skins/agy/elven.html with overhead repoussé star-silver canopy, mother-of-pearl guide rails, spring bayonet catches, 22px mother-of-pearl chape rim with high-contrast unclipped status strip, quicksilver starlight shimmer, and Option 4 switcher)
-- [ ] Wire: Wire Hoop Folding Accordion shade — Outer circular wire hoop pivots 180° upward along hinge beads
+- [x] Wire: Wire Hoop Folding Accordion shade — Outer circular wire hoop pivots 180° upward along hinge beads (Built in prototypes/skins/agy/wire.html with horizontal turquoise & amethyst hinge beads, 180° upward 3D perspective pivot animation, spring-wire basket clasp, dual-wire folded rim, unclipped high-contrast status strip, and Option 4 switcher)
 - [ ] Hollow: Silk Cocoon Wrap shade — Silk threads wind rapidly around lower body into compact bundle
 
 ### Cycle 5: Tertiary Joins
