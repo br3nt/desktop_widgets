@@ -206,7 +206,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -1693,6 +1693,138 @@ JOINS.friends={...JOINS.mittens,label:'Mitten friends',kind:'Grow · character, 
  sayRelease:'They let go, wave goodbye (Jarvis winks) and part, a bit glum.',
  sayReady:'Ready: both gasp and hold out their hands. Release to shake hands.',
  sayNear:'Nearby: they look round at each other and the arms lift. Move closer.'};
+
+/* ---------- Bunting: a felt garland strung across an open gap (Bridge) ---------- */
+// A twisted cream yarn hangs from felt loops at the cushions' top corners. Pennants are threaded on along it,
+// pompoms sit between them, and the cream middle pennant gets a cross-stitched star: its glow is the join light.
+const BU={gap:132,ay:16,sag:26,tugMax:34,
+ slot:[.17,.335,.5,.665,.83],pomAt:[.2525,.4175,.5825,.7475],
+ col:['#b3364f','#e0a63a','#efe2c4','#5f8fbf','#6f8f3e'],dk:['#5c1424','#7a5212','#8f7a55','#24405e','#33461a'],
+ pom:['#f3e6c8','#d9707a','#f3e6c8','#d9707a'],loop:'#7b4a2a',cord:'#efe2c4'};
+// Point and tangent angle on a quadratic Bézier.
+const quadAt=(P,C,Q,t)=>{const u=1-t;return{x:u*u*P.x+2*u*t*C.x+t*t*Q.x,y:u*u*P.y+2*u*t*C.y+t*t*Q.y}};
+const quadAng=(P,C,Q,t)=>{const u=1-t;return angOf(2*u*(C.x-P.x)+2*t*(Q.x-C.x),2*u*(C.y-P.y)+2*t*(Q.y-C.y))};
+// One hand-cut pennant hanging from the cord at the origin: bowed sides, a running-stitch inset, a hem folded over the cord.
+function buPennant(i,s,fold,star,light,lit){
+ const big=i===2,w=(big?22:18)*s,d=(big?30:24)*s*lerp(.12,1,fold);
+ const P=`M${f(-w/2)} 0L${f(w/2)} 0Q${f(w/4)} ${f(d/2)} 0 ${f(d)}Q${f(-w/4)} ${f(d/2)} ${f(-w/2)} 0Z`;
+ let o=`<path d="${P}" fill="#000" opacity=".38" filter="url(#sh)" transform="translate(1.2 2.4)"/><path d="${P}" fill="${BU.col[i]}" filter="url(#tagfelt)"/>`;
+ if(fold>.6){const k=.66,I=`M${f(-w/2*k)} ${f(2.6*s)}L${f(w/2*k)} ${f(2.6*s)}Q${f(w/4*k)} ${f(d*.45)} 0 ${f(d*.8)}Q${f(-w/4*k)} ${f(d*.45)} ${f(-w/2*k)} ${f(2.6*s)}Z`;
+  o+=`<path d="${I}" fill="none" stroke="${big?'#8f6a3a':'#f7e8c9'}" stroke-opacity="${f(.85*seg(fold,.6,1))}" stroke-width="${f(Math.max(.7,.9*s))}" stroke-dasharray="2 1.7" stroke-linecap="round"/>`}
+ // The middle pennant's star: five crosses, stitched one by one, then lit (gold while both run, cold blue if one is paused).
+ if(big&&star>0&&fold>.95){const n=Math.ceil(star*5-1e-6),cy=d*.4,u=2.7*s,col=lit?'#f2c24e':'#9cc2ea';let x='';
+  if(light>.02)o+=`<circle cy="${f(cy)}" r="${f(9*s)}" fill="${col}" opacity="${f(.7*light)}" filter="url(#soft)"/>`;
+  [[0,0],[0,-u],[u,0],[0,u],[-u,0]].slice(0,n).forEach(([dx,dy])=>{const c=.95*s;x+=`M${f(dx-c)} ${f(cy+dy-c)}l${f(2*c)} ${f(2*c)}M${f(dx+c)} ${f(cy+dy-c)}l${f(-2*c)} ${f(2*c)}`});
+  o+=`<path d="${x}" fill="none" stroke="${col}" stroke-width="${f(Math.max(.8,1.05*s))}" stroke-linecap="round"/>`}
+ // The hem: the pennant's top is folded over the cord and stitched down.
+ o+=`<rect x="${f(-w/2)}" y="${f(-2.4*s)}" width="${f(w)}" height="${f(3.6*s)}" rx="${f(1.2*s)}" fill="${BU.dk[i]}" filter="url(#tagfelt)"/><path d="M${f(-w/2+1.5)} ${f(.6*s)}H${f(w/2-1.5)}" stroke="#f7e8c9" stroke-opacity=".7" stroke-width=".7" stroke-dasharray="1.6 1.4"/>`;
+ return o;
+}
+const buPom=(x,y,r,col)=>`<circle cx="${f(x+.6)}" cy="${f(y+1.3)}" r="${f(r)}" fill="#000" opacity=".3" filter="url(#sh)"/><g filter="url(#tagfelt)"><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="${col}"/><circle cx="${f(x-r*.3)}" cy="${f(y-r*.35)}" r="${f(r*.45)}" fill="#fff8ec" opacity=".45"/></g>`;
+// A felt hanging loop sewn on at a top corner, sticking out over the gap by `out`; side +1 points right.
+function buLoop(P,side,s,lift){
+ const ang=-side*28*lift,tf=`translate(${f(P.x)} ${f(P.y)}) rotate(${f(ang)}) scale(${side} 1)`;
+ const L=`M${f(-8*s)} ${f(-3.6*s)}H${f(1*s)}A${f(4.4*s)} ${f(4.4*s)} 0 0 1 ${f(1*s)} ${f(3.6*s)}H${f(-8*s)}Z`;
+ return `<g transform="${tf}"><path d="${L}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.6 1.4)"/><path d="${L}" fill="${BU.loop}" filter="url(#tagfelt)"/><circle cx="${f(1.2*s)}" r="${f(1.8*s)}" fill="#1d0f08"/><path d="M${f(-6.5*s)} ${f(-2.2*s)}v${f(4.4*s)}" stroke="#f7e8c9" stroke-opacity=".8" stroke-width=".8" stroke-dasharray="1.4 1.1"/></g>`;
+}
+JOINS.bunting={label:'Bunting',kind:'Bridge',gap:BU.gap,ms:3800,msDrag:3400,relMs:3000,moveEnd:.28,hold:.7,tug:true,snip:true,tugMax:BU.tugMax,
+ ph:[[0,.28,.46,.56,.86,1],[0,.16,.32,.4,.78,1]],
+ about:'The only felt join that leaves the cushions apart: an open span with the desktop showing through, hung with a garland. Each joining end has a brown felt hanging loop sewn on at its top corner. Jarvis\'s loop holds the bunting rolled up in a bundle, its free end a mustard pompom dangling on a short tail. <b>Near:</b> the pompom swings out toward GitDiscuss and GitDiscuss\'s loop tips up to meet it. <b>Ready:</b> a dashed ghost of the garland hangs in the gap. Joining (12 fps): the cushions settle a hand\'s width apart, the pompom is tossed across in an arc trailing the cream yarn, drops through GitDiscuss\'s loop and catches with a bounce that jolts both cushions and shakes fibres loose. Then the felt pennants slide off the bundle one at a time, folded flat, run along the cord to their places (the farthest first) and flip open with a swing: raspberry, mustard, a cream middle pennant, sky and moss, with small pompoms popping on between them. Last, a star is cross-stitched on the middle pennant one cross at a time and glows: gold while both agents run, cold blue if either is paused. That is the join light. <b>Release:</b> tug the garland: the cord bows toward your pointer and GitDiscuss\'s loop strains; let go early and it holds, pull far enough and the end slips out. Or click it, or focus it and press Enter. The end hops off the loop, the garland swings down and hangs off Jarvis like a dropped streamer, the pennants fold and run back into the bundle nearest first, and only then do the cushions part. It scales down with any shade strip, still hung between the ends.',
+ sayJoin:'The cushions settle a hand\'s width apart and the bunting is tossed across.',
+ sayJoined:'Bunting strung. Drag either nameplate to move the pair. Tug the garland to unhook it.',
+ sayRelease:'The end slips off the loop, the garland swings down and is rolled back up, and the cushions part.',
+ sayUnpick:'The pennants run back to the bundle and the cushions part.',
+ sayTugHold:'The loop holds. Tug the garland further to unhook it.',
+ sayReady:'Ready: a ghost of the garland hangs in the gap. Release to string the bunting.',
+ sayNear:'Nearby: the pompom swings out and GitDiscuss\'s loop tips up. Move closer.',
+ sayHold:'Held mid-join: the pennants are running along the cord. Use the scrubber to step through them one by one.',
+ phReady:'Ready · garland ghosted in the gap',
+ pose(jt){return{th:0,ys:0,sq:model.dir>0?.01*Math.sin(Math.PI*seg(jt,.46,.52)):0}},
+ phase(jt){
+  if(model.dir<0&&model.snip){const u=1-jt;return u<.12?'Releasing · unhooking':u<.42?'Releasing · the garland swings down':u<.7?'Releasing · rolling it up':'Releasing · parting'}
+  if(model.dir<0&&model.busy)return 'Taking the bunting back';
+  if(jt<.28)return 'Joining · settling apart';if(jt<.46)return 'Joining · tossing the cord';if(jt<.56)return 'Joining · caught';
+  if(jt<.86)return `Joining · pennant ${Math.min(5,Math.floor(seg(jt,.56,.86)*5)+1)} of 5`;return 'Joining · stitching the star';
+ },
+ // Every moving part from join progress: the cord's free end E and its sag, each pennant's place, fold and swing, the pompoms and the star.
+ state(c){
+  const jt=c.jt,h=c.h,s=mtScale(h),a=model.a,b=model.b;
+  const A={x:a.x+W-EDGE+5*s,y:a.y+BU.ay*s},B={x:b.x+EDGE-5*s,y:b.y+BU.ay*s};
+  // The free end hanging off the bundle, swung out toward GitDiscuss by k (0 straight down, 1 at 55°).
+  const dangle=k=>{const t=55*k*Math.PI/180,L=11*s;return{x:A.x+Math.sin(t)*L,y:A.y+Math.cos(t)*L}};
+  const none=()=>BU.slot.map(()=>({p:0,fold:0,sw:0}));
+  const r={A,B,s,E:dangle(0),sag:4*s,hooked:false,pen:none(),pom:[0,0,0,0],star:0,light:0,lift:0,lean:1};
+  if(jt===0&&!(model.busy&&model.dir>0)){const e=Math.pow(c.glow,.85);r.E=dangle(e);r.lift=e;return r}
+  if(!(model.dir<0&&model.snip)){
+   const g0=model.fast?1:0;r.lift=1;
+   if(jt<.28){const e=ease(seg(jt,0,.28));r.E=dangle(lerp(g0,1,e));r.lift=lerp(g0,1,e);return r}
+   if(jt<.46){const k=seg(jt,.28,.46),e=ease(k),D=dangle(1);r.E={x:lerp(D.x,B.x,e),y:lerp(D.y,B.y,e)-46*s*Math.sin(Math.PI*k)};r.sag=lerp(4,44.2,k)*s;return r}
+   // Caught, the tail eases from leaning out to hanging straight under the loop.
+   r.hooked=true;r.E=B;r.lean=1-seg(jt,.46,.5);
+   const q=seg(jt,.46,.6);r.sag=BU.sag*s*(1+.7*Math.cos(3*Math.PI*q)*(1-q));
+   // Farthest pennant first, so none passes another on the cord.
+   r.pen=BU.slot.map((t,i)=>{const t0=.56+(4-i)*.05,k=seg(jt,t0,t0+.1),sl=ease(seg(k,0,.7)),fl=k<.7?0:backOut(seg(k,.7,1)),w=seg(jt,t0+.1,t0+.2);
+    return{p:lerp(.03,t,sl),fold:fl,sw:k>=1?16*Math.sin(3*Math.PI*w)*(1-w):0}});
+   r.pom=BU.pomAt.map((t,j)=>backOut(seg(jt,.56+(4-j)*.05+.1,.56+(4-j)*.05+.16)));
+   r.star=seg(jt,.86,.96);r.light=seg(jt,.92,1);
+   return r;
+  }
+  // Releasing a finished garland: unhook, swing down to hang off Jarvis, roll up nearest first, then the cushions part.
+  const u=1-jt,full=BU.slot.map(t=>({p:t,fold:1,sw:0}));r.lift=1-seg(u,.42,.7);
+  if(u<.12){const k=seg(u,0,.12);r.E={x:B.x-6*s*k,y:B.y-14*s*Math.sin(Math.PI*k)};r.sag=lerp(BU.sag,34,k)*s;r.pen=full;r.pom=[1,1,1,1];r.light=1-seg(u,0,.06);r.star=1;r.hooked=k<.3;r.lean=k;return r}
+  const Hg={x:A.x+10*s,y:A.y+74*s},dx=B.x-6*s-A.x,r1=Math.hypot(dx,B.y-A.y),th1=Math.atan2(B.y-A.y,dx),thH=Math.atan2(Hg.y-A.y,Hg.x-A.x);
+  if(u<.42){const k=seg(u,.12,.42),e=ease(k),th=lerp(th1,thH,e)+.22*Math.sin(2.5*Math.PI*k)*(1-k)*k*2,rr=lerp(r1,Math.hypot(Hg.x-A.x,Hg.y-A.y),e);
+   r.E={x:A.x+Math.cos(th)*rr,y:A.y+Math.sin(th)*rr};r.sag=lerp(34,6,e)*s;r.pen=full.map(P=>({...P,sw:-12*Math.sin(2*Math.PI*k)*(1-k)}));r.pom=[1,1,1,1];r.star=1;return r}
+  const k=seg(u,.42,.7),D=dangle(0),m=ease(seg(k,.55,1));
+  r.E={x:lerp(Hg.x,D.x,m),y:lerp(Hg.y,D.y,m)};r.sag=lerp(6,4,m)*s;
+  r.pen=BU.slot.map((t,i)=>{const kk=seg(k,i*.1,i*.1+.5);return{p:lerp(t,.03,ease(seg(kk,.3,1))),fold:1-ease(seg(kk,0,.35)),sw:0}});
+  r.pom=BU.pomAt.map(()=>1-seg(k,0,.15));r.star=1-seg(k,0,.1);
+  return r;
+ },
+ over(c){
+  const r=this.state(c),{A,B,s}=r,jt=c.jt;
+  const tugging=drag&&drag.tug,T=model.tug&&(tugging||(model.dir<0&&model.busy))?V.mul(model.tug,tugging?1:1-seg(1-jt,0,.08)):null;
+  const tk=model.tug&&(tugging||(model.dir<0&&model.snip))?Math.min(1,Math.hypot(model.tug.x,model.tug.y)/BU.tugMax):0;
+  const E=r.E,M=V.mix(A,E,.5);let C={x:M.x,y:M.y+2*r.sag};if(T)C=V.add(C,V.mul(T,2));
+  const lit=model.a.run&&model.b.run;
+  let o='';
+  if(c.ghost>0&&jt===0){const G={x:(A.x+B.x)/2,y:(A.y+B.y)/2+2*BU.sag*s};
+   o+=`<circle cx="${f((A.x+B.x)/2)}" cy="${f(A.y+BU.sag*s+10*s)}" r="${f(30*s)}" fill="#ffc36a" opacity="${f(c.ghost*.4)}" filter="url(#soft)"/>`;
+   let d=`M${pt(A)}Q${pt(G)} ${pt(B)}`;
+   BU.slot.forEach((t,i)=>{const p=quadAt(A,G,B,t),w=(i===2?22:18)*s/2,dd=(i===2?30:24)*s,an=quadAng(A,G,B,t)*Math.PI/180,cs=Math.cos(an),sn=Math.sin(an);
+    const R=(x,y)=>`${f(p.x+x*cs-y*sn)} ${f(p.y+x*sn+y*cs)}`;d+=`M${R(-w,0)}L${R(0,dd)}L${R(w,0)}`});
+   o+=`<path d="${d}" fill="none" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="3 2.5" stroke-width="1.1"/>`}
+  // GitDiscuss's loop strains toward a tug.
+  const Bl=tk>0&&r.hooked?V.add(B,V.mul(unit(V.sub(C,B)),3*tk)):B;
+  o+=buLoop(Bl,-1,s,r.lift)+buLoop(A,1,s,0);
+  // The cord: shadow, cream twisted yarn.
+  const cd=`M${pt(A)}Q${pt(C)} ${pt(E)}`,cw=f(Math.max(1.4,2.3*s));
+  o+=`<g fill="none" stroke-linecap="round"><path d="${cd}" stroke="#000" stroke-opacity=".35" stroke-width="${cw}" transform="translate(.8 2)"/><path d="${cd}" stroke="${BU.cord}" stroke-width="${cw}"/><path d="${cd}" stroke="#a8936a" stroke-width="${f(Math.max(.7,1.1*s))}" stroke-dasharray="${f(1.6*s+.4)} ${f(1.6*s+.4)}"/></g>`;
+  // Pompoms between the pennants.
+  BU.pomAt.forEach((t,j)=>{if(r.pom[j]>.01){const p=quadAt(A,C,E,t);o+=buPom(p.x,p.y+1.6*s,3.3*s*r.pom[j],BU.pom[j])}});
+  // Pennants, drawn back to front from the bundle out, each hanging straight-ish from its place.
+  r.pen.forEach((P,i)=>{if(P.p<.035&&P.fold<.05)return;const p=quadAt(A,C,E,P.p),an=clamp(quadAng(A,C,E,P.p),-45,45)+P.sw+(T?-T.x*.25:0);
+   o+=`<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(an)})">${buPennant(i,s,P.fold,i===2?r.star:0,r.light,lit)}</g>`});
+  // The bundle: the pennants still rolled up on Jarvis's loop, smaller as they leave it.
+  const inB=r.pen.filter(P=>P.p<.035&&P.fold<.05).length;
+  if(inB){const k=lerp(.5,1,inB/5),bx=A.x+4*s,by=A.y+4*s,bw=9*s*k,bh=13*s*k;let st='';
+   for(let i=0;i<inB;i++){const y=by-bh/2+(i+.5)*bh/inB;st+=`<path d="M${f(bx-bw/2+1)} ${f(y)}H${f(bx+bw/2-1)}" stroke="${BU.col[i]}" stroke-width="${f(bh/inB*.8)}"/>`}
+   o+=`<rect x="${f(bx-bw/2+.8)}" y="${f(by-bh/2+1.6)}" width="${f(bw)}" height="${f(bh)}" rx="${f(bw/2.4)}" fill="#000" opacity=".35" filter="url(#sh)"/><g filter="url(#tagfelt)"><rect x="${f(bx-bw/2)}" y="${f(by-bh/2)}" width="${f(bw)}" height="${f(bh)}" rx="${f(bw/2.4)}" fill="${BU.col[4]}"/>${st}</g>`+
+    `<path d="M${f(bx-bw/2-.5)} ${f(by)}H${f(bx+bw/2+.5)}" stroke="${BU.cord}" stroke-width="1.2"/>`}
+  // The free end: a short tail with the mustard pompom, hanging under GitDiscuss's loop once caught.
+  const sw=clamp((E.x-A.x)/(60*s),-1,1)*.4*r.lean,tail={x:E.x+Math.sin(sw)*8*s,y:E.y+Math.cos(sw)*8*s};
+  o+=`<path d="M${pt(E)}L${pt(tail)}" stroke="${BU.cord}" stroke-width="${f(Math.max(1.1,1.6*s))}" stroke-linecap="round"/>`+buPom(tail.x,tail.y+3*s,4.6*s,'#e0a63a');
+  o+=`<circle cx="${f(A.x)}" cy="${f(A.y)}" r="${f(1.9*s)}" fill="${BU.cord}" stroke="#a8936a" stroke-width=".6"/>`;
+  if(r.hooked)o+=`<circle cx="${f(Bl.x)}" cy="${f(Bl.y)}" r="${f(2.1*s)}" fill="${BU.cord}" stroke="#a8936a" stroke-width=".6"/>`;
+  // Fibres shaken loose by the catch.
+  if(model.dir>0&&jt>.46&&jt<.62){const u=seg(jt,.46,.62);
+   FLUFF.forEach(([dx,dy,rot],i)=>{const x=B.x+dx*18*(.4+u),y=B.y+dy*12*(.7+u*.6)+16*u*u;
+    o+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+u*90)})" fill="none" stroke="${i%2?'#e0a63a':BU.cord}" stroke-width="1.1" stroke-linecap="round" opacity="${f(1-u)}"/>`})}
+  if(jt===1){const p=quadAt(A,{x:M.x,y:M.y+2*r.sag},E,.5),hw=56,hh=Math.max(22,22*s+14);
+   o+=`<g class="hit" id="pullHit" tabindex="0" role="button" aria-label="Felt bunting: tug the garland, click it or press Enter to unhook it and separate the widgets"><title>Tug the garland to unhook it</title><rect x="${f(p.x-hw)}" y="${f(p.y-hh*.6)}" width="${2*hw}" height="${f(hh*1.9)}" rx="12" fill="transparent"/><rect class="ringfocus" x="${f(p.x-hw)}" y="${f(p.y-hh*.6)}" width="${2*hw}" height="${f(hh*1.9)}" rx="12" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+  return o;
+ }
+};
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
