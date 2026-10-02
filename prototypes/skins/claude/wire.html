@@ -87,6 +87,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="st-mal" cx=".38" cy=".32" r=".75"><stop stop-color="#dcffe6"/><stop offset=".35" stop-color="#3fae6a"/><stop offset=".8" stop-color="#145a33"/><stop offset="1" stop-color="#0a321c"/></radialGradient>
  <linearGradient id="st-flash" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5fe0ff" stop-opacity="0"/><stop offset=".5" stop-color="#5fe0ff" stop-opacity=".7"/><stop offset=".75" stop-color="#9dff9a" stop-opacity=".35"/><stop offset="1" stop-color="#9dff9a" stop-opacity="0"/></linearGradient>
  <linearGradient id="st-gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff2b8"/><stop offset=".45" stop-color="#d4a640"/><stop offset="1" stop-color="#5c3f0c"/></linearGradient>
+ <radialGradient id="st-lapis" cx=".38" cy=".3" r=".8"><stop stop-color="#9fb4ff"/><stop offset=".3" stop-color="#2f4fc4"/><stop offset=".75" stop-color="#14256e"/><stop offset="1" stop-color="#0a1238"/></radialGradient>
  <radialGradient id="st-amet" cx=".4" cy=".3" r=".8"><stop stop-color="#e6c8f2"/><stop offset=".35" stop-color="#8a55a6"/><stop offset=".8" stop-color="#3e1f52"/><stop offset="1" stop-color="#22102e"/></radialGradient>
  <linearGradient id="tr-glass" x1="0" y1="0" x2=".4" y2="1"><stop stop-color="#16303a"/><stop offset=".55" stop-color="#0b171b"/><stop offset="1" stop-color="#071013"/></linearGradient>
  <radialGradient id="st-pearl" cx=".36" cy=".3" r=".8"><stop stop-color="#fffdf6"/><stop offset=".3" stop-color="#efe3d6"/><stop offset=".7" stop-color="#c7b3b4"/><stop offset="1" stop-color="#6e5d63"/></radialGradient>
@@ -145,7 +146,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the wire nest, tap the stone to pull the nest apart. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -572,8 +573,90 @@ const JOINS={
    if(jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Caged ball joint: drag round the bead or press the arrow keys to turn GitDiscuss; tap it or press Enter to open the cage"><title>Turn the bead to set the angle; tap it to open the cage</title><circle cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(R+8)}" fill="transparent" style="cursor:grab;touch-action:none"/><circle class="ringfocus" cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(R+5)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
    return s;
   }
+ },
+ nest:{label:'Wire nest',kind:'Grow',gap:64,slow:1.9,rel:false,lastJt:0,
+  about:'A wild nest of fine dark wire round a small lapis cabochon. Each joinable end carries a tuft of seven fine wire ends bound into its frame: copper on Jarvis, brass on GitDiscuss. <b>Near:</b> the tufts bristle and warm. <b>Ready:</b> a dashed ghost of the nest and its stone appears in the gap. Joining: the fine wires grow out from both edges one after another, hot at the tips, each looping wildly round the middle of the gap so the two sides tangle into each other, some reaching all the way to hook the far frame. The tangle draws in tighter, a lapis cabochon flecked with pyrite drops into the middle and bounces, a fine brass coil winds round it to hold it, and a curl unwinds below the nest. The stone is the join light: its halo is warm while either widget is running. <b>Release:</b> tap the stone, or focus it and press Enter. The coil unwinds and the stone lifts out, the loops pull straight and hum with tension as the pendants part, then the wires snap mid-gap with a spark and whip back to their own frames with a twang.',
+  sayJoin:'Fine wires grow from both edges and tangle into a nest; a lapis cabochon drops in and a coil winds round it.',
+  sayJoined:'Joined by a wire nest. Drag either nameplate to move the pair. Tap the stone to pull the nest apart.',
+  sayRelease:'The stone lifts out, the wires pull taut and hum, then snap and whip home with a twang.',
+  sayReady:'Ready: release to grow a nest between them.',sayNear:'Nearby: the wire tufts bristle. Move closer.',
+  end(side,lit,h){
+   const x=side>0?W-5:5,sc=nestSc(h);let s='',d='';
+   if(lit>0)s+=`<circle cx="${x+side*6}" cy="${f(h/2)}" r="${f(18*sc+6)}" fill="#ffb15e" opacity="${f(lit*.45)}" filter="url(#soft)"/>`;
+   NEST.forEach(n=>{if(n.side!==side)return;const y=h/2+n.y0*h,L=4+3*n.w+5*lit,cu=(n.turns>0?1:-1)*(2+2*lit);
+    d+=`M${x} ${f(y)}q${f(side*L*.6)} ${f(-cu*.4)} ${f(side*L)} ${f(cu*.2)}q${f(side*2.2)} ${f(cu*.6)} ${f(-side*.8)} ${f(cu)}`});
+   s+=fine(d,lit>.5?'hot':side>0?'copper':'brass',.9);
+   return s+wire(band(x+side*1.5,h/2,true,Math.max(2,Math.round(5*sc)),7,2.4),'copper',1.1);
+  },
+  // Joining runs forward; a falling jt that starts from joined is the release, which plays its own snap-and-twang rather than ungrowing.
+  phase(jt){const l=this.lastJt;if(jt<l&&(this.rel||l===1&&l-jt<.2))this.rel=true;else if(jt>l||jt<=0||jt>=1)this.rel=false;this.lastJt=jt;return this.rel},
+  under(){return ''},
+  over(c){
+   const jt=c.jt,rel=this.phase(jt),r=rel?1-jt:0,sc=nestSc(c.h),on=model.a.run||model.b.run;
+   const ax=c.a.x+W-5,bx=c.b.x+5,ya=c.a.y+c.h/2,yb=c.b.y+c.h/2,mid={x:(ax+bx)/2,y:(ya+yb)/2},RX=Math.min(24,(bx-ax)*.36),RY=30*sc,SR=lerp(6.5,10.5,clamp((c.h-HS)/(H-HS)));
+   let s='';
+   if(c.ghost>0&&jt===0)s+=`<g fill="none" stroke="#f3c96a" stroke-width="1.1" stroke-dasharray="2 2.2" opacity="${f(c.ghost*.85)}"><ellipse cx="${f(mid.x)}" cy="${f(mid.y)}" rx="${f(RX+3)}" ry="${f(RY+3)}"/><ellipse cx="${f(mid.x)}" cy="${f(mid.y)}" rx="${f(SR)}" ry="${f(SR*.86)}" stroke-opacity=".7"/></g>`;
+   if(jt<=0)return s;
+   // Loop tightness: loose while growing, drawn in, a small settle; on release the loops pull straight.
+   const tau=rel?1-ease(seg(r,.18,.6)):1.22-.22*ease(seg(jt,.5,.82))+.07*Math.sin(Math.PI*seg(jt,.86,1));
+   const hum=rel?1.5*sc*seg(r,.2,.6)*(r<.62?1:0):0,snap=rel&&r>=.62,q=rel?seg(r,.62,1):0;
+   const pt=(n,u)=>{const own=n.side>0,A={x:own?ax:bx,y:(own?ya:yb)+n.y0*c.h},F={x:own?bx:ax,y:(own?yb:ya)+n.y1*c.h},v=1-u;
+    const bx_=v*v*A.x+2*v*u*mid.x+u*u*F.x,by_=v*v*A.y+2*v*u*mid.y+u*u*F.y,env=Math.pow(Math.sin(Math.PI*u),.8)*n.R*tau,th=n.th+n.turns*2*Math.PI*u;
+    return[bx_+RX*env*Math.cos(th),by_+RY*env*Math.sin(th)+(n.wob*tau*sc+hum)*Math.sin(n.wf*u+n.ph+r*140)*Math.sin(Math.PI*u)]};
+   const back={copper:'',brass:''},tips=[];let sparks='';
+   NEST.forEach((n,i)=>{
+    const m=n.side>0?'copper':'brass';
+    if(!snap){
+     const g=rel?1:ease(seg(jt,.1+.12*n.st,.58+.12*n.st)),u1=g*n.end;if(u1<=0)return;
+     const N=Math.max(2,Math.ceil(48*u1)),P=[];for(let k=0;k<=N;k++)P.push(pt(n,u1*k/N));
+     back[m]+=poly(P);if(g<1)tips.push(P[N]);return}
+    // Snapped: each piece whips back to the frame it is still hooked to, its free end ringing like a plucked string.
+    // Hooked strands break mid-gap; free-ended ones have nothing to snap against, so the whole strand whips home.
+    const hooked=n.end>.93,B=pt(n,hooked?n.brk:n.end),pieces=[pt(n,0)];if(hooked)pieces.push(pt(n,1));
+    if(hooked&&q<.12)sparks+=sparkle(B[0],B[1],(1-q/.12)*.55);
+    pieces.forEach((P0,j)=>{const Q=B,dx=Q[0]-P0[0],dy=Q[1]-P0[1],L0=Math.hypot(dx,dy)||1,len=Math.exp(-5*q)*(1-q),nx=-dy/L0,ny=dx/L0,amp=11*sc*Math.exp(-3.5*q)*Math.sin((24+8*n.w)*q)*(j?-1:1);
+     if(len<.02)return;const P=[];for(let k=0;k<=10;k++){const t=k/10,w=amp*Math.sin(Math.PI*t*.5)*t;P.push([P0[0]+dx*len*t+nx*w,P0[1]+dy*len*t+ny*w])}
+     back[m]+=poly(P)});
+   });
+   if(back.copper||back.brass)s+=`<path d="${back.copper+back.brass}" transform="translate(1.5 4)" fill="none" stroke="#000" stroke-opacity=".22" stroke-width="2"/>`+fine(back.copper,'copper',.85)+fine(back.brass,'brass',.85);
+   tips.forEach(p=>s+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="1.6" fill="#fff0c8"/><circle cx="${f(p[0])}" cy="${f(p[1])}" r="4" fill="#ffb15e" opacity=".5" filter="url(#soft)"/>`);
+   s+=sparks;
+   // The curl that hangs below the nest (ref 8), unrolling as it grows.
+   const cg=rel?1-seg(r,0,.2):ease(seg(jt,.8,.94));
+   if(cg>0){const x0=mid.x+3,y0=mid.y+RY*.7,cx=x0+9*sc+3,cy=y0+8*sc+4,R=6*sc+2.5,n=Math.ceil(30*cg),P=[[x0,y0]];
+    for(let k=0;k<=n;k++){const t=k/30,a=Math.PI*(1-2.6*t),rr=R*(1-.75*t);P.push([cx+rr*Math.cos(a),cy-rr*Math.sin(a)])}
+    s+=wire(poly(P),'brass',1.1,clamp(cg*3))}
+   // The lapis cabochon drops in and bounces, then a fine coil winds round it.
+   const drop=rel?1:seg(jt,.58,.78);
+   if(drop>0){
+    const lift=rel?26*ease(seg(r,.08,.3)):0,op=rel?1-seg(r,.14,.3):clamp(drop*5),
+     y=mid.y-lift-(rel?0:56*Math.pow(1-clamp(drop/.6),2)+(drop>.6?6*Math.sin(Math.PI*seg(drop,.6,.84))+1.5*Math.sin(Math.PI*seg(drop,.84,1)):0)),
+     x=mid.x,rx=SR,ry=SR*.86,glow=rel?1-seg(r,0,.15):seg(jt,.86,1);
+    if(op>0){
+     if(glow>0)s+=`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx+9)}" ry="${f(ry+9)}" fill="${on?'#ffb15e':'#7f9cff'}" opacity="${f(.45*glow)}" filter="url(#soft)"/>`;
+     s+=`<g opacity="${f(op)}"><ellipse cx="${f(x+1.5)}" cy="${f(y+3)}" rx="${f(rx)}" ry="${f(ry)}" fill="#000" opacity=".35"/><ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" fill="url(#st-lapis)" stroke="#0a0f2a" stroke-width=".8"/>`+
+      [[-.35,.2,.09],[.3,-.1,.07],[.1,.45,.06],[-.05,-.4,.05]].map(([u,v,k])=>`<circle cx="${f(x+u*rx)}" cy="${f(y+v*ry)}" r="${f(Math.max(.6,k*rx))}" fill="#f5d77a" opacity=".85"/>`).join('')+
+      `<ellipse cx="${f(x-rx*.35)}" cy="${f(y-ry*.45)}" rx="${f(rx*.38)}" ry="${f(ry*.2)}" fill="#fff" opacity=".7" transform="rotate(-18 ${f(x-rx*.35)} ${f(y-ry*.45)})"/></g>`;
+     const cp=rel?1-seg(r,0,.14):seg(jt,.72,.9);
+     if(cp>0){const e=`M${f(x-rx-1.2)} ${f(y)}a${f(rx+1.2)} ${f(ry+1.2)} 0 1 0 ${f(2*rx+2.4)} 0a${f(rx+1.2)} ${f(ry+1.2)} 0 1 0 ${f(-2*rx-2.4)} 0`;
+      s+=wire(coilsAlong(e,2.2,1.9,0,cp),cp<1?'hot':'brass',.8,op)}
+     const sp=rel?0:Math.sin(Math.PI*seg(jt,.88,.98));if(sp>.03)s+=sparkle(x+rx*.5,y-ry*.6,sp*.6);
+    }
+   }
+   if(jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Wire nest: tap the stone, or press Enter, to pull the nest apart and separate the widgets"><title>Tap the stone to pull the nest apart</title><circle cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(SR+10)}" fill="transparent"/><circle class="ringfocus" cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(SR+6)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+   return s;
+  }
  }
 };
+/* ---------- Wire nest geometry ---------- */
+// Seeded so the tangle is the same on every load. Even strands grow from Jarvis, odd ones from GitDiscuss.
+const NEST=(()=>{let a=0x2f6e2b1;const rnd=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+ const S=[];for(let i=0;i<14;i++)S.push({side:i%2?-1:1,y0:lerp(-.28,.28,rnd()),y1:lerp(-.28,.28,rnd()),R:lerp(.55,1,rnd()),turns:lerp(.9,1.9,rnd())*(rnd()<.5?-1:1),th:rnd()*6.283,
+  wob:lerp(1,3,rnd()),wf:lerp(9,18,rnd()),ph:rnd()*6.283,end:rnd()<.45?1:lerp(.72,.9,rnd()),brk:lerp(.4,.6,rnd()),st:(i>>1)/6,w:rnd()});
+ return S})();
+const nestSc=h=>lerp(.42,1,clamp((h-HS)/(H-HS)));
+// Fine wire: a thin dark outline and a coloured core, no highlight, for the nest's tangle.
+function fine(d,m,w=.85,op=1){const c=METAL[m];return d?`<g opacity="${op}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="${c[0]}" stroke-width="${f(w+1.1)}"/><path d="${d}" stroke="${c[1]}" stroke-width="${w}"/></g>`:''}
 /* ---------- Caged bead geometry ---------- */
 // The cage radius shrinks with the casing so it fits the shaded strip.
 const cageR=h=>lerp(10,14,clamp((h-HS)/(H-HS)));
@@ -1354,6 +1437,7 @@ function holdJoining(){
  ++anim;model.busy=false;
  if(model.jt===0||!model.path){const s=model.jt===1?separatePose():{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}};
   if(model.jt===0){model.path={s,j:joinedPose('a')}}else{model.path={s,j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}}}}
+ const hj=J();if(hj.phase){hj.rel=false;hj.lastJt=.55}
  setJt(.55);render();say('Held mid-join. Use the scrubber to step through the animation frame by frame.');
 }
 function toggleShade(){
@@ -1427,7 +1511,7 @@ function options(row,set,key,aboutEl){
 }
 function pick(key,id){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}if(JOINS[id].phase){JOINS[id].rel=false;JOINS[id].lastJt=model.jt}}
  if(key==='shade')model.shade=id;
  if(key==='morph'&&id!==model.morph){
   // A grown Checks shrinks back to the pendant in its old morph before the new one takes over.
