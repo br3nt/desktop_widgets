@@ -875,6 +875,27 @@ function seamRipper(x,y,ang,op=1){
   `<path d="M17 -2.4Q26 -3.6 36 -2.6Q37.6 0 36 2.6Q26 3.6 17 2.4Z" fill="#9a6235" stroke="#3d220c" stroke-width=".5"/><path d="M19 -1.5Q27 -2.4 34.5 -1.6" fill="none" stroke="#f0c48e" stroke-opacity=".6" stroke-width=".9" stroke-linecap="round"/></g>`;
 }
 
+/* ---------- Velcro: hook tape on Jarvis, loop tape on GitDiscuss ---------- */
+const vh=i=>{const v=Math.sin(i*12.9898+4.1)*43758.5453;return v-Math.floor(v)};
+// creep: gap the fibres hold across (px); snap: share of the release spent creeping; th: the gap at which each fibre snaps.
+const VC={creep:34,snap:.55,th:Array.from({length:16},(_,i)=>7+26*vh(i+3))};
+// Hook tape, its right edge at x1: stiff charcoal nylon, rows of tiny J hooks that stand up with lift.
+function vcHooks(x1,y,h,lift){
+ const x0=x1-9;let hk='';
+ for(let r=0,yy=y+2.6;yy<y+h-1.5;yy+=3.4,r++)for(let cI=0;cI<3;cI++){const x=x0+1.6+cI*2.7+(r%2)*1.2,t=1.3+1.4*lift+(cI===2?lift*1.6:0);hk+=`M${f(x)} ${f(yy+.8)}l${f(t*.55)} ${f(-t*.8)}q.9 -.9 1.4 .2`}
+ return `<rect x="${f(x0+.6)}" y="${f(y+1.2)}" width="9" height="${f(h)}" rx="2" fill="#000" opacity=".4" filter="url(#sh)"/><rect x="${f(x0)}" y="${f(y)}" width="9" height="${f(h)}" rx="2" fill="#24262c"/><rect x="${f(x0)}" y="${f(y)}" width="9" height="${f(h)}" rx="2" fill="url(#weave)"/>`+
+  `<path d="${hk}" fill="none" stroke="#9aa1ad" stroke-opacity="${f(.55+.35*lift)}" stroke-width=".6" stroke-linecap="round"/><path d="M${f(x0+1)} ${f(y+2)}V${f(y+h-2)}" stroke="#f3e2c2" stroke-opacity=".75" stroke-width="1" stroke-dasharray="3 2.4"/>`;
+}
+// Loop tape, its left edge at x0: soft warm-grey pile of tiny loops, a fuzz of them reaching out from the free edge with lift.
+function vcLoops(x0,y,h,lift){
+ let lp='',fz='';
+ for(let r=0,yy=y+1.8;yy<y+h-1;yy+=2.6,r++){
+  for(let cI=0;cI<3;cI++){const x=x0+1.8+cI*2.4+vh(r*3+cI)*.9;lp+=`M${f(x)} ${f(yy)}a1.1 1.1 0 1 1 .1 0`}
+  const L=1.2+(1.6+1.6*vh(r+40))*lift;fz+=`M${f(x0+.6)} ${f(yy-.9)}q${f(-L)} ${f(-.4)} ${f(-L*.6)} .9t.6 .9`}
+ return `<rect x="${f(x0+.6)}" y="${f(y+1.2)}" width="9" height="${f(h)}" rx="2" fill="#000" opacity=".35" filter="url(#sh)"/><rect x="${f(x0)}" y="${f(y)}" width="9" height="${f(h)}" rx="2" fill="#3d3a37" filter="url(#tagfelt)"/>`+
+  `<path d="${lp}" fill="none" stroke="#bdb4a7" stroke-opacity=".55" stroke-width=".55"/><path d="${fz}" fill="none" stroke="#cfc6b8" stroke-opacity="${f(.35+.5*lift)}" stroke-width=".6" stroke-linecap="round"/><path d="M${f(x0+8)} ${f(y+2)}V${f(y+h-2)}" stroke="#f3e2c2" stroke-opacity=".75" stroke-width="1" stroke-dasharray="3 2.4"/>`;
+}
+
 /* ---------- Options ---------- */
 const JOINS={
  zipper:{label:'Zipper',kind:'Interlock',gap:-2*EDGE,ms:1700,msDrag:1300,relMs:1300,moveEnd:.4,hold:.64,pullDrag:true,
@@ -1392,6 +1413,74 @@ const JOINS={
    if(jt===1)o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Appliqué patch: tap or press Enter to unpick it and separate the widgets" transform="translate(${f(C.x)} ${f(C.y)}) rotate(-2)"><title>Tap the patch to unpick it</title><path d="${P}" fill="transparent"/><g class="snipHint">${seamRipper(AP.rx*s*.7,AP.ry*s*.8,-40)}</g><path class="ringfocus" d="${P}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
    return o;
   }
+ },
+ velcro:{label:'Velcro',kind:'Fuse',gap:-2*EDGE,ms:1900,msDrag:1500,relMs:3000,hold:.46,snip:true,
+  ph:[[0,.36,.56,1],[0,.3,.5,1]],
+  about:'Hook-and-loop tape is sewn down each joining edge: stiff charcoal hook tape on Jarvis, soft grey loop tape on GitDiscuss. <b>Near:</b> the hooks bristle up and the loops fluff out toward each other. <b>Ready:</b> a warm glow shows where the seam will close. Joining: the cushions close in and press together hard, both squash, a puff of fibres spits out of each end of the seam, then they spring back and settle with the loops matted into the hooks. <b>Release:</b> tap the seam (or focus it and press Enter). The cushions pull apart slowly and stretch while the fibres cling across the widening gap, thinning and tenting the loop tape; they snap one by one, each with a little flick, and when the last lets go the cushions jolt apart and the loose loops curl back.',
+  sayJoin:'The cushions press together and the hooks bite into the loops.',
+  sayJoined:'Stuck. Drag either nameplate to move the pair. Tap the seam to peel them apart.',
+  sayRelease:'Peeling: the fibres stretch across the gap and snap one by one.',
+  sayReady:'Ready: the hooks and loops line up. Release to press them together.',
+  sayNear:'Nearby: the hooks bristle and the loops fluff out. Move closer.',
+  sayHold:'Held mid-press. Use the scrubber to step through the squash.',
+  phReady:'Ready · release to press together',
+  // Release: a slow creep while the fibres hold (about 34 px of gap), then a jolt once the last one snaps.
+  moveEase(jt){
+   if(!(model.dir<0&&model.snip))return ease(seg(jt,0,.36));
+   const r=1-seg(jt,0,.9),c=VC.creep/SEP;
+   return 1-(r<VC.snap?c*Math.pow(r/VC.snap,1.3):c+(1-c)*(1-Math.pow(1-(r-VC.snap)/(1-VC.snap),2.2)));
+  },
+  pose(jt){
+   if(model.dir<0&&model.snip){const r=1-seg(jt,0,.9);return{th:0,ys:0,sq:r<VC.snap?-.022*Math.pow(r/VC.snap,1.5):.03*Math.sin(Math.PI*seg(r,VC.snap,VC.snap+.15))}}
+   return{th:0,ys:0,sq:.06*Math.sin(Math.PI*seg(jt,.36,.52))-.018*Math.sin(Math.PI*seg(jt,.52,.68))+.006*Math.sin(Math.PI*seg(jt,.68,.8))};
+  },
+  gapNow:()=>model.b.x+EDGE-(model.a.x+W-EDGE),
+  phase(jt){
+   if(model.dir<0&&model.snip){const d=this.gapNow(),n=VC.th.filter(t=>d<t).length;return d<.5?'Releasing · gripping':n?`Releasing · fibres stretching · ${n} holding`:'Releasing · snap · parting'}
+   return jt<.36?'Joining · closing in':jt<.56?'Joining · pressing together':'Joining · settling';
+  },
+  over(c){
+   const a=model.a,b=model.b,jt=c.jt,h=c.h,y0=Math.min(16,Math.round(h*.22)),rel=model.dir<0&&model.snip,d=this.gapNow();
+   const xa=a.x+W-EDGE+1,xb=b.x+EDGE-1;
+   // Bristle: the hooks stand up and the loops fluff out as they close in; pressing flattens them.
+   const lift=jt===0?c.glow:rel?(d>.5?.7:.4):jt<.36?1:jt<.5?1-seg(jt,.36,.5):0;
+   let s='';
+   if(c.ghost>0&&jt===0){const mx=(xa+xb)/2,top=Math.min(a.y,b.y)+y0;s+=`<rect x="${f(mx-13)}" y="${f(top-8)}" width="26" height="${f(h-2*y0+16)}" rx="10" fill="#ffc36a" opacity="${f(c.ghost*.5)}" filter="url(#soft)"/>`}
+   s+=vcHooks(xa,a.y+y0,h-2*y0,lift)+vcLoops(xb,b.y+y0,h-2*y0,lift);
+   const X=(xa+xb)/2,top=a.y+y0,bot=a.y+h-y0;
+   if(rel?d<.5:jt>=.36){
+    // Matted: loop fuzz caught over the hook tape all down the seam.
+    const k=rel?1:seg(jt,.36,.46);let m='';
+    for(let y=top+2,i=0;y<bot-1;y+=3.2,i++){const o=(vh(i)-.5)*1.6;m+=`M${f(X+3.2)} ${f(y+o)}q-2.4 -1.6 -4.2 .2t-3 .4`}
+    s+=`<path d="M${f(X)} ${f(top)}V${f(bot)}" stroke="#14110e" stroke-opacity=".55" stroke-width="1.6"/><path d="${m}" fill="none" stroke="#bdb4a7" stroke-opacity="${f(.6*k)}" stroke-width=".7" stroke-linecap="round"/>`;
+   }
+   if(!rel&&jt>.36&&jt<.52){
+    // Impact: stop-motion strike marks fanning out from both ends of the seam.
+    const k=Math.sin(Math.PI*seg(jt,.36,.52));let d2='';
+    for(const sy of [-1,1]){const y=sy<0?top-3:bot+3;for(const[dx,dy]of [[-.64,.77],[0,1],[.64,.77]])d2+=`M${f(X+dx*4)} ${f(y+sy*dy*4)}l${f(dx*7*k)} ${f(sy*dy*7*k)}`}
+    s+=`<path d="${d2}" stroke="#fff3da" stroke-width="1.6" stroke-linecap="round" opacity="${f(.9*k)}"/>`;
+   }
+   if(!rel&&jt>.4&&jt<.82){
+    // Fibres spat out of each end of the seam by the squash.
+    const u=seg(jt,.4,.82),cols=['#cfc6b8',SKIN.a.body,SKIN.b.body];
+    FLUFF.forEach(([dx,dy,rot],i)=>{for(const sy of [-1,1]){const x=X+dx*20*(.3+u),y=(sy<0?top-2:bot+2)+sy*Math.abs(dy)*14*(.3+u)+16*u*u;
+     s+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*70+u*120*sy)})" fill="none" stroke="${cols[(i+(sy>0?1:0))%3]}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-u)}"/>`}});
+   }
+   if(rel&&d>.3){
+    // Peeling: each fibre clings across the gap, thinning as it stretches, tents the loop tape, then snaps and curls back.
+    let held='',tent='',curl='',ping='';const n=VC.th.length;
+    VC.th.forEach((th,i)=>{const y=top+3+(bot-top-6)*(i+.5)/n,yb=b.y+y0+3+(bot-top-6)*(i+.5)/n+(vh(i+9)-.5)*2.4;
+     if(d<th){const k=d/th,mx=(xa+xb)/2,sag=(1-k)*2.2*(i%2?1:-1);
+      held+=`<path d="M${f(xa)} ${f(y)}Q${f(mx)} ${f((y+yb)/2+sag)} ${f(xb)} ${f(yb)}" stroke-width="${f(lerp(1.3,.45,k))}"/>`;
+      const tl=Math.min(4,d*.22);tent+=`M${f(xb+.5)} ${f(yb-1.8)}L${f(xb-tl)} ${f(yb)}L${f(xb+.5)} ${f(yb+1.8)}Z`}
+     else{const k=seg(d-th,0,18);if(k<1){const L=7*(1-k),w=Math.sin(k*9+i)*2.5*(1-k);curl+=`M${f(xb)} ${f(yb)}q${f(-L*.5)} ${f(w)} ${f(-L)} ${f(-w*.3)}t${f(-L*.4)} ${f(w*.6)}`;
+       if(d-th<5){const px=xa+(xb-xa)*.5,py=(y+yb)/2;ping+=`M${f(px-3)} ${f(py-3)}l-2.4 -2.4M${f(px+3)} ${f(py-3)}l2.4 -2.4M${f(px)} ${f(py+3.5)}v3`}}}
+    });
+    s+=`<g fill="none" stroke="#d6cdbf" stroke-linecap="round">${held}</g><path d="${tent}" fill="#3d3a37" stroke="#bdb4a7" stroke-width=".5"/><path d="${curl}" fill="none" stroke="#cfc6b8" stroke-width=".9" stroke-linecap="round"/><path d="${ping}" stroke="#fff3da" stroke-width="1.2" stroke-linecap="round"/>`;
+   }
+   if(jt===1)s+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Velcro seam: tap or press Enter to peel the widgets apart"><title>Tap the seam to peel it apart</title><rect x="${f(X-12)}" y="${f(top-4)}" width="24" height="${f(bot-top+8)}" rx="8" fill="transparent"/><rect class="ringfocus" x="${f(X-12)}" y="${f(top-4)}" width="24" height="${f(bot-top+8)}" rx="8" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
+   return s;
+  }
  }
 };
 const SHADES={
@@ -1716,7 +1805,7 @@ function joinedPose(fixed='a'){
 }
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
- model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,J().moveEnd||.4));
+ model.jt=t;const p=model.path;if(!p)return;const e=J().moveEase?J().moveEase(t):ease(seg(t,0,J().moveEnd||.4));
  for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
 }
 // Stop-motion clock: the chrome is redrawn on 12 fps frames only, and the fibres boil once per frame.
@@ -1745,6 +1834,8 @@ async function doJoin(fixed='a',fast=false){
  if(model.jt===1)return;
  const j=J(),[pj,pt]=j.ph||[PH_JT,PH_T];
  // fast marks a join released from the ready pose, so the button tab carries on from where it was reaching.
+ // A join with its own release curve (velcro) restarts from where the peel got to, rather than jumping.
+ if(model.snip&&j.moveEase){model.path={s:here(),j:joinedPose(fixed)};model.jt=0}
  if(model.jt===0)model.fast=fast;
  model.dir=1;model.snip=false;model.tug=null;
  if(!model.path||model.jt===0)model.path={s:here(),j:joinedPose(fixed)};
@@ -1796,7 +1887,7 @@ function render(){
   const own=sh.draw&&model.st>0,svg=el.querySelector('.casing'),key=w+'x'+h+(own?`|${model.shade}|${f(model.st*1000)}|${BO}|${m.run}|${model.shDir}`:'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=own?sh.draw(id,w,h,small,model.st):casing(id,w,h)}
   if(!small){const side=id==='a'?1:-1,phi=(side>0?-1:1)*z.th;
-   el.style.transformOrigin=`${side>0?W-EDGE:EDGE}px ${f(z.th>.001?z.ys:h/2)}px`;el.style.transform=z.th>.001?`rotate(${f(phi*100)/100}deg)`:z.sq>.0005?`scaleX(${(1-z.sq).toFixed(4)})`:'';
+   el.style.transformOrigin=`${side>0?W-EDGE:EDGE}px ${f(z.th>.001?z.ys:h/2)}px`;el.style.transform=z.th>.001?`rotate(${f(phi*100)/100}deg)`:Math.abs(z.sq)>.0005?`scaleX(${(1-z.sq).toFixed(4)})`:'';
    if(id==='b'&&j.angled){const F=angFrame(bendAt(model.jt),h);el.style.transformOrigin=`${f(F.ox)}px ${f(F.oy)}px`;el.style.transform=F.th?`translateX(${f(-F.shr)}px) rotate(${f(F.th*100)/100}deg)`:''}}
   const k=ease(model.st),show=sh.show?sh.show(model.st):1-clamp(k*2.2),strip=sh.ownStrip?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
