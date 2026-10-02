@@ -182,8 +182,8 @@ function spiral(cx,cy,r,turns,dir=1,start=0){let d='';const n=48;for(let i=0;i<=
 
 /* Casing: hammered backplate, double wire frame bound by coil bands, scroll curls, coiled stone bezel. */
 const casingCache={};
-function casing(w,h,small,noFrame){
- const key=w+'x'+Math.round(h)+(noFrame?'n':'');if(casingCache[key])return casingCache[key];
+function casing(w,h,small,noFrame,noBezel){
+ const key=w+'x'+Math.round(h)+(noFrame?'n':'')+(noBezel?'b':'');if(casingCache[key])return casingCache[key];
  const full=small?CH:H,flat=small?CHS:HS,k=clamp((full-h)/(full-flat));
  const r=Math.min(small?20:26,(h-10)/2),outer=rrect(5,5,w-10,h-10,r),inner=rrect(10.5,10.5,w-21,h-21,Math.max(2,r-5.5));
  let s=`<path d="${outer}" fill="url(#plate)"/><path d="${outer}" fill="url(#hammer)"/><path d="${rrect(8,8,w-16,h-16,r-3)}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="3"/>`;
@@ -193,12 +193,13 @@ function casing(w,h,small,noFrame){
  s+=wire(spiral(small?17:22,sy,6.5*sc,1.6,1,Math.PI*.9),'copper',1.9)+wire(spiral(w-(small?17:22),sy,6.5*sc,1.6,-1,Math.PI*.1),'copper',1.9);
  const n=Math.max(2,Math.min(7,Math.floor((h-26)/2.6)));
  s+=wire(band(7.8,h/2,true,n,10)+band(w-7.8,h/2,true,n,10)+band(w/2,h-7.8,false,small?5:7,10),'copper',1.25);
- if(k<1){
+ if(k<1&&!noBezel){
   const st=small?[14,22,220,44,9]:[43,29,304,68,10];
   const bez=rrect(st[0],st[1],st[2],st[3],st[4]);
   s+=`<g opacity="${f(clamp(1-k*1.5))}"><path d="${bez}" fill="none" stroke="#120906" stroke-width="5"/>${wire(coilsAlong(bez,2.35,2.4),'copper',1.15)}</g>`;
  }
- return casingCache[key]=s;
+ // Frames drawn mid-morph come in every size, so only the resting ones are kept.
+ return noBezel?s:casingCache[key]=s;
 }
 
 /* ---------- Options ---------- */
@@ -957,11 +958,13 @@ function strandItem(it,x,cy,small){
 
 /* ---------- Morph: tree growth (Checks) ---------- */
 // g runs -1 pendant, 0 cabochon, 1 branch with two displays, 2 hoop tree. Every frame is drawn from g alone, so shrinking is growth played backwards.
-const SIZES=[['pendant','Pendant',-1],['cab','Cabochon',0],['branch','Branch',1],['hoop','Hoop tree',2]];
 const MORPHS={
- tree:{label:'Tree growth',kind:'Grow',
-  about:'Checks grows like a wire tree of life. <b>Cabochon:</b> the pendant\'s frame closes in on its stone, the plate falls away, and the coils wind round the stone from the bottom up, leaving one cabochon hanging from a bail with the name on a slab tag below it. <b>Branch:</b> a twisted trunk grows down into a tumbled amethyst, the stone slides out along a branch to one side, and a second branch reaches the other way. A bezel coils round at its tip and a second stone fills it, so the two values each get a display. <b>Hoop tree:</b> the trunk\'s five wires fan out into roots, a copper hoop draws round from the bottom to meet them, and each root wraps onto it. A third branch grows up to a crown display, then fourteen twigs push out from behind the displays with a bead riding each tip, one per check: malachite for the 12 passed, carnelian for the 2 waiting. Shrinking plays it all backwards: the beads slide home, the branches draw in and the hoop unwinds. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a tree folds it back to its cabochon, which carries the name and the count.'}
+ tree:{label:'Tree growth',kind:'Grow',sizes:[['pendant','Pendant',-1],['cab','Cabochon',0],['branch','Branch',1],['hoop','Hoop tree',2]],slider:'Checks growth, pendant to hoop tree',
+  about:'Checks grows like a wire tree of life. <b>Cabochon:</b> the pendant\'s frame closes in on its stone, the plate falls away, and the coils wind round the stone from the bottom up, leaving one cabochon hanging from a bail with the name on a slab tag below it. <b>Branch:</b> a twisted trunk grows down into a tumbled amethyst, the stone slides out along a branch to one side, and a second branch reaches the other way. A bezel coils round at its tip and a second stone fills it, so the two values each get a display. <b>Hoop tree:</b> the trunk\'s five wires fan out into roots, a copper hoop draws round from the bottom to meet them, and each root wraps onto it. A third branch grows up to a crown display, then fourteen twigs push out from behind the displays with a bead riding each tip, one per check: malachite for the 12 passed, carnelian for the 2 waiting. Shrinking plays it all backwards: the beads slide home, the branches draw in and the hoop unwinds. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a tree folds it back to its cabochon, which carries the name and the count.'},
+ bezel:{label:'Bezel resize',kind:'Resize',sizes:[['pendant','Pendant',-1],['brooch','Brooch',0],['slab','Slab',1]],slider:'Checks size, pendant to slab',
+  about:'Checks stays one stone in one coiled bezel; only the stone changes size. Each step plays in three beats. <b>Loosen:</b> the tight coil turns spread apart and stand off the stone, so you see the spring\'s back turns and a dark gap all round. <b>Grow:</b> the stone and the copper frame swell together with a small spring, while the old text fades. <b>Tighten:</b> the coils close up onto the new edge, glint where they bite, and the new layout fades in. <b>Brooch:</b> the run number, a large 12 / 14, the 86% and a row of fourteen beads, one per check. <b>Slab:</b> adds the checks themselves, four rows with a stone each (malachite passed, carnelian waiting on Brent), and a tally strand of fourteen beads hangs under the status lens. Shrinking plays the same three beats in reverse. Pick a size, press M or scrub the slider; Checks moves below the pair when it would grow into it. Shading a grown Checks first shrinks it to the pendant, then shades it as usual.'}
 };
+let SIZES=MORPHS.tree.sizes;
 const TC=[0,-44],TRR=120,FORK=[0,-12],TAG_Y=18;
 // Rects as [x,y,w,h,r] round Checks's centre: the pendant frame and screen, the cabochon's frame and stone, and the left, right and crown displays.
 const RC={pend:[-133,-34,266,68,20],mini:[-124,-17,220,44,9],cabF:[-76,-64,152,68,34],cab:[-70,-58,140,56,28],L:[-105,-63,98,46,23],R:[7,-63,98,46,23],T:[-60,-132,120,44,22]};
@@ -1072,9 +1075,10 @@ function treeSvg(g){
  const cb=seg(v,.85,1);if(cb>0){s+=`<g transform="translate(15 -6) scale(${f(backOut(cb))})">${strandItem({k:'bead',r:5,stone:'carn'},0,0)}</g>`;if(cb<1)s+=sparkle(17,-9,Math.sin(Math.PI*cb)*.5)}
  return s+tTag(tagY(g),g<0?seg(u,.55,.7):1);
 }
-const gEff=()=>model.g>=0?model.g*(1-shadeK()):model.g;
+// A shaded tree shows its cabochon; the bezel always shrinks to the pendant before it shades.
+const gEff=()=>model.morph==='bezel'?model.g:model.g>=0?model.g*(1-shadeK()):model.g;
 // The hoop is drawn early in its step, so that step's reach is front-loaded.
-function ext(g){const i=clamp(Math.floor(g+1),0,2),t=i===2?seg(g-1,0,.5):clamp(g+1-i);return EXT[i].map((v,k)=>lerp(v,EXT[i+1][k],t))}
+function ext(g){if(model.morph==='bezel'){const F=bzAt(g+1).F;return[F[0]-6,F[0]+F[2]+6,F[1]-6,F[1]+F[3]+6]}const i=clamp(Math.floor(g+1),0,2),t=i===2?seg(g-1,0,.5):clamp(g+1-i);return EXT[i].map((v,k)=>lerp(v,EXT[i+1][k],t))}
 function clampC(){const e=ext(gEff());model.c.x=clamp(model.c.x+CW/2,10-e[0],1190-e[1])-CW/2;model.c.y=clamp(model.c.y+CH/2,46-e[2],590-e[3])-CH/2}
 // Where Checks should end up for form g: on the stage, and below the pair when it would grow into it and there is room.
 function morphSpot(to){
@@ -1084,15 +1088,16 @@ function morphSpot(to){
  return{x:ax-CW/2,y:ay-CH/2};
 }
 let morphAnim=0;
-function morphTo(id){
+function morphTo(id,then){
  if(drag)cancelDrag();model.cMoved=false;
  // A shaded tree is showing its cabochon, so start from that rather than regrowing while it unshades.
  if(model.st>.5&&model.g>-1)model.g=gEff();
  const S=SIZES.find(x=>x[0]===id),to=S[2],from=model.g;model.size=id;
- if(model.st>.5&&(to>-1||from>-1))toggleShade();
- const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(to>from?1900:1250),a0={x:model.c.x,y:model.c.y},a1=morphSpot(to),t0=performance.now();
+ // The bezel unshades fully before it starts to grow.
+ let wait=0;if(model.st>.5&&(to>-1||from>-1)){toggleShade();if(model.morph==='bezel'&&!reduce.matches)wait=SHADES[model.shade].ms||520}
+ const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(model.morph==='bezel'?(to>from?2300:1900):to>from?1900:1250),a0={x:model.c.x,y:model.c.y},a1=morphSpot(to),t0=performance.now()+wait;
  say(to>from?'Checks grows into a '+S[1].toLowerCase()+'.':to<from?'Checks shrinks back to a '+S[1].toLowerCase()+'.':'Checks is already a '+S[1].toLowerCase()+'.');
- (function step(now){if(tok!==morphAnim)return;const t=ms?clamp((now-t0)/ms):1,e=ease(t);model.g=t<1?lerp(from,to,t):to;if(drag&&drag.id==='c'||model.cMoved){model.cMoved=false;a0.x=a1.x=model.c.x;a0.y=a1.y=model.c.y}else{model.c.x=lerp(a0.x,a1.x,e);model.c.y=lerp(a0.y,a1.y,e)}render();if(t<1)requestAnimationFrame(step)})(t0);
+ (function step(now){if(tok!==morphAnim)return;const t=ms?clamp((now-t0)/ms):1,e=ease(t);model.g=t<1?lerp(from,to,t):to;if(drag&&drag.id==='c'||model.cMoved){model.cMoved=false;a0.x=a1.x=model.c.x;a0.y=a1.y=model.c.y}else{model.c.x=lerp(a0.x,a1.x,e);model.c.y=lerp(a0.y,a1.y,e)}render();if(t<1)requestAnimationFrame(step);else if(then)then()})(performance.now());
 }
 function treeRender(el,svg){
  const g=gEff(),u=clamp(g+1),out=1-seg(u,0,.35),mini=el.querySelector('.mini'),gr=el.querySelector('.grip');
@@ -1102,6 +1107,87 @@ function treeRender(el,svg){
  const tree=u>=.5;el.classList.toggle('tree',tree);
  if(tree){gr.style.opacity=1;gr.style.left=f(CW/2-36)+'px';gr.style.top=f(CH/2+tagY(g)-13)+'px'}else{gr.style.opacity=f(1-seg(u,0,.3));gr.style.left=gr.style.top=''}
  const S=SIZES.find(x=>x[0]===model.size);el.setAttribute('aria-label','Checks widget, '+(S?S[1].toLowerCase():'growing')+': 12 of 14 checks passed, 2 waiting for approval');
+}
+
+/* ---------- Morph: bezel resize (Checks) ---------- */
+// u = g+1 runs 0 pendant, 1 brooch, 2 slab. Each step: the coils loosen and stand off the stone, stone and frame grow, the coils tighten onto the new edge.
+// Frame F and stone S as [x,y,w,h(,r)] round Checks's centre. The stone sits left of centre with the status lens in the right margin, as on the pendant.
+const BZ=[{F:[-133,-34,266,68],S:[-124,-17,220,44,9]},{F:[-152,-62,304,124],S:[-140,-42,250,94,14]},{F:[-170,-94,340,188],S:[-158,-73,282,156,16]}];
+const BZF='-apple-system,BlinkMacSystemFont,sans-serif';
+const BZROWS=[['mal','unit · lint · types · build','10 passed'],['mal','e2e-chrome · a11y','2 passed'],['carn','deploy-preview','waiting on Brent'],['carn','e2e-safari','waiting on Brent']];
+function bzAt(u){
+ u=clamp(u,0,2);const i=Math.min(1,Math.floor(u)),p=u-i,e=springOut(seg(p,.24,.76));
+ return{i,p,F:lerpR(BZ[i].F,BZ[i+1].F,e),S:lerpR(BZ[i].S,BZ[i+1].S,e),lo:ease(seg(p,0,.26))*(1-ease(seg(p,.74,1)))};
+}
+// Point, clockwise tangent and outward normal at length s round a rounded rect, starting at the top edge's left end.
+function rrAt(R,s){
+ const [x,y,w,h]=R,r=Math.min(R[4],w/2,h/2),a=w-2*r,b=h-2*r,q=Math.PI*r/2;
+ const E=[[x+r,y,1,0],[x+w,y+r,0,1],[x+w-r,y+h,-1,0],[x,y+h-r,0,-1]],C=[[x+w-r,y+r],[x+w-r,y+h-r],[x+r,y+h-r],[x+r,y+r]];
+ for(let j=0;j<4;j++){
+  const L=j%2?b:a;if(s<=L){const e=E[j];return{x:e[0]+e[2]*s,y:e[1]+e[3]*s,tx:e[2],ty:e[3],nx:e[3],ny:-e[2]}}s-=L;
+  if(s<=q||j===3){const th=-Math.PI/2+j*Math.PI/2+Math.min(s,q)/r,c=Math.cos(th),n=Math.sin(th);return{x:C[j][0]+r*c,y:C[j][1]+r*n,tx:-n,ty:c,nx:c,ny:n}}s-=q;
+ }
+}
+// The bezel spring. Tight: dense front turns over a dark core. Loose: the turns spread, lean and stand off the stone, showing their back halves.
+function bzCoils(S,lo){
+ const gap=3.5*lo,R=[S[0]-gap,S[1]-gap,S[2]+2*gap,S[3]+2*gap,S[4]+gap],r=Math.min(R[4],R[2]/2,R[3]/2),a=R[2]-2*r,b=R[3]-2*r,P=2*a+2*b+2*Math.PI*r;
+ const n=Math.max(12,Math.round(P/lerp(2.35,7.5,lo))),st=P/n,half=lerp(2.4,3.6,lo),lean=lerp(.7,2.6,lo),s0=a+b+Math.PI*r+a/2;
+ let fr='',bk='',prev=null;
+ for(let i=0;i<=n;i++){
+  const p=rrAt(R,(s0+i*st)%P),A=[p.x-p.nx*half-p.tx*lean,p.y-p.ny*half-p.ty*lean],B=[p.x+p.nx*half-p.tx*lean,p.y+p.ny*half-p.ty*lean];
+  if(prev&&lo>.04)bk+=`M${f(prev[0])} ${f(prev[1])}Q${f(p.x-p.tx*st*.5)} ${f(p.y-p.ty*st*.5)} ${f(A[0])} ${f(A[1])}`;
+  if(i<n)fr+=`M${f(A[0])} ${f(A[1])}Q${f(p.x+p.tx*(.9+lo*1.2))} ${f(p.y+p.ty*(.9+lo*1.2))} ${f(B[0])} ${f(B[1])}`;
+  prev=B;
+ }
+ const core=rrect(...R);
+ return `<path d="${core}" fill="none" stroke="#120906" stroke-width="5" opacity="${f(1-lo)}"/>`+(lo>.04?wire(bk,'dim',.85,f(seg(lo,.04,.4)))+wire(core,'copper',1.1,f(seg(lo,.04,.3))):'')+wire(fr,'copper',1.15);
+}
+function bzBrooch(S,o){
+ if(o<.02)return '';const [x,y,w]=S;
+ let s=`<g opacity="${f(o)}" font-family="${BZF}"><text x="${f(x+14)}" y="${f(y+18)}" font-size="9.5" letter-spacing="1.3" fill="#9fbcb8">CHECKS · RUN 418</text>`+
+  `<text x="${f(x+14)}" y="${f(y+52)}" font-family="Georgia,serif" font-size="30" fill="#f2f5ef">12 / 14<tspan dx="6" font-size="12" font-style="italic" fill="#f2b866">passed</tspan></text>`+
+  `<text x="${f(x+w-14)}" y="${f(y+52)}" text-anchor="end" font-family="Georgia,serif" font-size="15" fill="#f2b866">86%</text>`+
+  `<text x="${f(x+14)}" y="${f(y+70)}" font-size="10.5" fill="#c9d6d1">2 waiting for approval</text>`;
+ for(let i=0;i<14;i++)s+=strandItem({k:'bead',r:3,stone:i<12?'mal':'carn'},x+18+i*8.6,y+83);
+ return s+'</g>';
+}
+function bzSlab(S,o){
+ if(o<.02)return '';const [x,y,w]=S;
+ let s=`<g opacity="${f(o)}" font-family="${BZF}"><text x="${f(x+14)}" y="${f(y+18)}" font-size="9.5" letter-spacing="1.3" fill="#9fbcb8">CHECKS · RUN 418 ON MAIN</text>`+
+  `<text x="${f(x+14)}" y="${f(y+52)}" font-family="Georgia,serif" font-size="30" fill="#f2f5ef">12 / 14<tspan dx="6" font-size="12" font-style="italic" fill="#f2b866">passed</tspan></text>`+
+  `<text x="${f(x+w-14)}" y="${f(y+51)}" text-anchor="end" font-family="Georgia,serif" font-size="18" fill="#f2b866">86%</text>`+
+  `<path d="M${f(x+14)} ${f(y+63)}H${f(x+w-14)}" stroke="#4fa5ae" stroke-opacity=".28" stroke-width=".8"/>`;
+ BZROWS.forEach(([st,name,word],i)=>{const ry=y+81+i*19,wait=st==='carn';
+  s+=strandItem({k:'bead',r:3.6,stone:st},x+21,ry-3.5)+`<text x="${f(x+31)}" y="${f(ry)}" font-size="11" fill="#d9e4df">${name}</text>`+
+   `<text x="${f(x+w-14)}" y="${f(ry)}" text-anchor="end" font-size="11"${wait?' font-style="italic" fill="#f2b866"':' fill="#9fbcb8"'}>${word}</text>`});
+ return s+'</g>';
+}
+function bezelSvg(u){
+ u=clamp(u,0,2);const B=bzAt(u),F=B.F,[x,y,w,h,r]=B.S;
+ let s=`<g transform="translate(${f(F[0]-5)} ${f(F[1]-5)})">${casing(Math.round(F[2]+10),Math.round(F[3]+10),true,false,true)}</g>`;
+ // The stone, with its sheen kept to one corner, clear of the text.
+ s+=`<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${f(r)}" fill="url(#tr-glass)"/><ellipse cx="${f(x+w*.84)}" cy="${f(y+h*.22)}" rx="${f(w*.12)}" ry="${f(h*.16)}" fill="#4fa5ae" opacity=".13"/>`+
+  `<path d="${rrect(x+1.5,y+1.5,w-3,h-3,r-1.5)}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="3"/>`;
+ s+=bzBrooch(B.S,u<=1?seg(u,.7,.95):1-seg(u-1,.05,.25))+bzSlab(B.S,seg(u-1,.7,.95));
+ s+=bzCoils(B.S,B.lo);
+ // Status lens in the right margin; on the slab a tally strand of the fourteen checks hangs under it.
+ const lx=(x+w+F[0]+F[2])/2-1,ly=y+Math.min(h/2-1.5,24),to=seg(u-1,.7,.95);
+ if(to>.02){const y0=ly+14,y1=F[1]+F[3]-12,sp=(y1-y0)/13;s+=`<g opacity="${f(to)}">`+wire(`M${f(lx)} ${f(ly+8)}V${f(y1+4)}`,'copper',1)+wire(band(lx,y1+6,true,2,6,2),'brass',1);
+  for(let i=0;i<14;i++)s+=strandItem({k:'bead',r:2.9,stone:i<12?'mal':'carn'},lx,y0+i*sp);s+='</g>'}
+ s+=strandItem({k:'bead',r:8.5,stone:'mal'},lx,ly);
+ // A glint where the tightened coils bite.
+ const gl=Math.sin(Math.PI*seg(B.p,.84,.98));if(gl>.03)s+=sparkle(x+w-r*.3,y+r*.3,gl*.8)+sparkle(x+r*.3,y+h-r*.3,gl*.6)+sparkle(x+w*.5,y-1,gl*.45);
+ return s;
+}
+function bezelRender(el,svg){
+ const u=clamp(model.g+1,0,2),B=bzAt(u),F=B.F,mini=el.querySelector('.mini'),gr=el.querySelector('.grip');
+ svg.innerHTML=`<g transform="translate(${CW/2} ${CH/2})">${bezelSvg(u)}</g>`;
+ // The pendant's own text stays on top of the stone until the coils loosen.
+ const mo=u<1?1-seg(u,.05,.25):0;mini.style.opacity=f(mo);mini.style.visibility=mo<.02?'hidden':'visible';mini.style.transform='';
+ el.querySelector('.lens').style.visibility='hidden';el.querySelector('.strip').style.opacity=0;el.classList.remove('tree');
+ // The nameplate rides the top of the growing frame.
+ gr.style.opacity=1;gr.style.left=f(CW/2+F[0]+21)+'px';gr.style.top=f(CH/2+F[1]-3)+'px';gr.style.width=f(F[2]-42)+'px';gr.style.right='auto';
+ const S=SIZES.find(x=>x[0]===model.size);el.setAttribute('aria-label','Checks widget, '+(S?S[1].toLowerCase():'resizing')+': 12 of 14 checks passed, 2 waiting for approval'+(u>=1.5?'; run 418 on main, deploy-preview and e2e-safari waiting on Brent':''));
 }
 
 /* ---------- Model ---------- */
@@ -1174,8 +1260,8 @@ function render(){
    el.style.transformOrigin=`-${A.x0}px ${f(h/2)}px`;el.style.transform=th?`translate(${f(A.ring*Math.cos(ph)-A.ring)}px,${f(A.ring*Math.sin(ph))}px) rotate(${f(th)}deg)`:'';
   }
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
-  if(small&&model.g>-1){treeRender(el,svg);continue}
-  if(small){el.classList.remove('tree');const gr=el.querySelector('.grip');gr.style.left=gr.style.top='';el.setAttribute('aria-label','Checks widget')}
+  if(small&&model.g>-1){(model.morph==='bezel'?bezelRender:treeRender)(el,svg);continue}
+  if(small){el.classList.remove('tree');const gr=el.querySelector('.grip');gr.style.left=gr.style.top=gr.style.width=gr.style.right='';el.setAttribute('aria-label','Checks widget')}
   let s=sh.draw?sh.draw(id,w,h,small,model.st):casing(w,h,small);
   if(id==='a')s+=j.end(1,lit,h);if(id==='b')s+=j.end(-1,lit,h);
   svg.innerHTML=s;
@@ -1207,13 +1293,15 @@ function render(){
  $('#grow').value=Math.round(model.g*100);$('#growOut').textContent=(model.g>=0?'+':'')+model.g.toFixed(2);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angle?' · '+$('#angleOut').textContent:'')};
- $('#phase').textContent=(drag&&drag.unwind?(model.join==='trunk'?'Untwisting · ':'Unwinding · ')+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'')+(model.g>-1?' · Checks: '+(SIZES.find(x=>x[0]===model.size)||[0,'growing'])[1].toLowerCase():'');
+ $('#phase').textContent=(drag&&drag.unwind?(model.join==='trunk'?'Untwisting · ':'Unwinding · ')+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'')+(model.g>-1?' · Checks: '+(SIZES.find(x=>x[0]===model.size)||[0,model.morph==='bezel'?'resizing':'growing'])[1].toLowerCase():'');
 }
 
 /* ---------- Controls ---------- */
 const STATES=[['separate','Separate','1'],['joining','Joining','2'],['joined','Joined','3'],['shade','Shade','4']];
 STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.state=k;b.innerHTML=`<kbd>${key}</kbd>${l}`;b.onclick=()=>act(k);$('#stateRow').append(b)});
-function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
+function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else if(model.morph!=='bezel')toggleShade();
+ // The bezel shrinks to its pendant before it shades; a grow still waiting on an unshade is called off.
+ else if(model.g>-1&&model.st<.5)morphTo('pendant',toggleShade);else{if(model.g===-1){++morphAnim;model.size='pendant'}toggleShade()}}
 function options(row,set,key,aboutEl){
  Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)});
 }
@@ -1221,7 +1309,17 @@ function pick(key,id){
  if(drag)cancelDrag();
  if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
- if(key==='morph')model.morph=id;
+ if(key==='morph'&&id!==model.morph){
+  // A grown Checks shrinks back to the pendant in its old morph before the new one takes over.
+  if(model.g>-1){morphTo('pendant',()=>setMorph(id));return}
+  setMorph(id);return}
+ describe();render();
+}
+function setMorph(id){
+ ++morphAnim;model.morph=id;SIZES=MORPHS[id].sizes;model.size='pendant';model.g=-1;
+ $$('#sizeRow button').forEach(b=>b.remove());
+ SIZES.forEach(([sid,l])=>{const b=document.createElement('button');b.dataset.size=sid;b.textContent=l;b.onclick=()=>morphTo(sid);$('#grow').before(b)});
+ const g=$('#grow');g.max=Math.round(SIZES[SIZES.length-1][2]*100);g.setAttribute('aria-label',MORPHS[id].slider);
  describe();render();
 }
 function describe(){
@@ -1231,8 +1329,10 @@ function describe(){
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#morphRow',MORPHS,'morph');
-SIZES.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size=id;b.textContent=l;b.onclick=()=>morphTo(id);$('#grow').before(b)});
-$('#grow').oninput=e=>{++morphAnim;model.g=e.target.value/100;const S=SIZES.find(x=>Math.abs(x[2]-model.g)<.001);model.size=S?S[0]:null;if(model.st>.5&&model.g>-1)toggleShade();render()};
+$('#grow').oninput=e=>{
+ // A shaded bezel unshades before it grows, so the slider hands over to the nearest size.
+ if(model.morph==='bezel'&&model.st>.5&&model.g===-1){const v=e.target.value/100;if(v>-1)morphTo(SIZES.reduce((a,b)=>Math.abs(b[2]-v)<Math.abs(a[2]-v)?b:a)[0]);return}
+ ++morphAnim;model.g=e.target.value/100;const S=SIZES.find(x=>Math.abs(x[2]-model.g)<.001);model.size=S?S[0]:null;if(model.st>.5&&model.g>-1)toggleShade();render()};
 $('#scrub').oninput=e=>{++anim;model.busy=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:{a:{...model.a},b:{...model.b}}}:{s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0)model.path=null;render()};
 $('#angle').oninput=e=>{++settleTok;flashTurning();setAngle(nearestDetent(+e.target.value))};
 $('#detent').onclick=()=>{const ds=[15,30,0];model.detent=ds[(ds.indexOf(model.detent)+1)%ds.length];flashTurning();render();settleAngle();say(model.detent?'Detents every '+model.detent+'°: the pendant clicks into the nearest seed bead.':'Detents off: any angle from −40° to +40° holds.')};
@@ -1328,6 +1428,6 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
 /* Bead meter columns */
 $$('.beads i').forEach(i=>{i.innerHTML='<b></b>'.repeat(+i.dataset.n)});
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
-addEventListener('resize',fit);fit();describe();render();
+addEventListener('resize',fit);fit();setMorph(model.morph);
 window.wireSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade,morphTo};
 </script></body></html>
