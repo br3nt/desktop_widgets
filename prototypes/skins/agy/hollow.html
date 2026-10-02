@@ -426,6 +426,21 @@ header {
   overflow: visible;
 }
 
+/* Silk Cocoon Wrap SVG Overlay */
+.cocoon-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  pointer-events: none;
+  z-index: 4;
+  overflow: visible;
+}
+.module.shade.cocoon-mode .shade-strip {
+  border-color: var(--silk-gold);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 14px rgba(252, 192, 66, 0.45);
+}
+
 /* Tabs & Interactive Controls */
 .tab-row {
   position: absolute;
@@ -882,8 +897,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Hollow Knight &amp; Silksong <span>/ silk lash, elytra shield &amp; mandible interlock</span></h1>
-    <p>Bleached chitin shell silhouette · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Pharloom brass &amp; lumaflies</p>
+    <h1>Hollow Knight &amp; Silksong <span>/ silk lash, elytra shield, mandible interlock &amp; silk cocoon</span></h1>
+    <p>Bleached chitin shell silhouette · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Silk cocoon wrap · Pharloom brass &amp; lumaflies</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -891,7 +906,8 @@ footer .note-highlight {
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="silk_lash">1. Weaver's Silk Lash (Tension Twang &amp; Golden Silk)</option>
         <option value="elytra_shield">2. Elytra Wing-Case Shield shade (Folding Beetle Wings)</option>
-        <option value="mandible_interlock" selected>3. Chitinous Carapace Mandible Interlock join (Serrated Stag-Beetle Shell Teeth)</option>
+        <option value="mandible_interlock">3. Chitinous Carapace Mandible Interlock join (Serrated Stag-Beetle Shell Teeth)</option>
+        <option value="cocoon_wrap" selected>4. Silk Cocoon Wrap shade (Rapid Thread Winding &amp; Bundled Silk)</option>
       </select>
     </div>
     <div class="control-group">
@@ -901,9 +917,10 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim" class="primary-btn">Interlock mandibles</button>
+    <button id="btnJoinAnim">Interlock mandibles</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnElytraAnim">Fold elytra</button>
+    <button id="btnCocoonAnim" class="primary-btn">Wrap cocoon</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -978,6 +995,23 @@ footer .note-highlight {
         <filter id="chitinShadow" x="-20%" y="-20%" width="140%" height="140%">
           <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.85"/>
         </filter>
+
+        <!-- Golden Weaver-Silk Cocoon Bundle Gradient -->
+        <linearGradient id="cocoonGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fffde6"/>
+          <stop offset="18%" stop-color="#fcc042"/>
+          <stop offset="48%" stop-color="#c97610"/>
+          <stop offset="80%" stop-color="#703603"/>
+          <stop offset="100%" stop-color="#241201"/>
+        </linearGradient>
+
+        <linearGradient id="cocoonWrapStripe" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#e08316"/>
+          <stop offset="30%" stop-color="#fcc042"/>
+          <stop offset="50%" stop-color="#ffffff"/>
+          <stop offset="70%" stop-color="#fcc042"/>
+          <stop offset="100%" stop-color="#7a3f05"/>
+        </linearGradient>
       </defs>
 
       <g id="sharedHollowStage"></g>
@@ -1057,6 +1091,9 @@ footer .note-highlight {
       <!-- Elytra Wing-Case Shield Layer -->
       <svg class="elytra-svg" id="elytra-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
+      <!-- Silk Cocoon Wrap Layer -->
+      <svg class="cocoon-svg" id="cocoon-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+
       <div class="tab-row" role="tablist" aria-label="Jarvis screens">
         <button class="hollow-tab" role="tab" aria-selected="true" data-page="0">Status</button>
         <button class="hollow-tab" role="tab" aria-selected="false" data-page="1">Task</button>
@@ -1106,6 +1143,9 @@ footer .note-highlight {
 
       <!-- Elytra Wing-Case Shield Layer -->
       <svg class="elytra-svg" id="elytra-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+
+      <!-- Silk Cocoon Wrap Layer -->
+      <svg class="cocoon-svg" id="cocoon-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
       <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
         <button class="hollow-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
@@ -1160,6 +1200,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 3 — Chitinous Carapace Mandible Interlock join:</span> Stepped, serrated teeth carved from bleached stag-beetle shell with sharp insectoid cusps, spine carinae, and dark respiration spiracles. On approach or selecting Joining state, the complementary chitin jaws slide into engagement with a rapid insectoid chittering vibration and white chalk slash glints. Once docked, the teeth seat flush into a crisp, hand-drawn zig-zag suture line in bone white, pinned by three Pharloom brass carapace cleats. Pulling the stag-beetle mandible spur lever disengages the chitin teeth with an insectoid recoil.
   </p>
+  <p>
+    <span class="note-highlight">Option 4 — Silk Cocoon Wrap shade:</span> Spools of golden weaver-silk at the upper corners spin rapidly, releasing shimmering threads that whip diagonally around the lower display in helical figure-8 passes. The lower casing contracts under high silken tension, compressing vertically into a sleek, tightly bundled silk cocoon pod sealed with three Pharloom brass weaver buckles and glowing lumafly resin drops directly beneath the bleached chitin horn-crest diadem. The widget title and status remain crystal-clear on the illuminated diadem plaque. Unwrapping releases the golden silk tension with a resonant twang, expanding the lower body back to its full instrument height.
+  </p>
 </footer>
 
 <script>
@@ -1185,7 +1228,8 @@ const model = {
   elytraGlide: 0,      // 0 = spread aloft, 1.0 = folded shut over screen
   mandibleProgress: 0, // 0 = separate, 0.5 = teeth sliding together, 1.0 = interlocked flush
   mandibleChitter: 0,  // high-frequency insectoid vibration
-  option: 'mandible_interlock',
+  cocoonProgress: 0,   // 0 = unwrapped full, 1.0 = tightly wound golden silk cocoon pod
+  option: 'cocoon_wrap',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1745,6 +1789,196 @@ function drawElytraShield(glideRatio = 0, width = W) {
   return s;
 }
 
+// Option 4: Silk Cocoon Wrap shade (Rapid Thread Winding & Bundled Silk Pod)
+function drawSilkCocoonWrap(progress = 0, width = W) {
+  if (progress <= 0.01) return '';
+  const p = Math.min(1, Math.max(0, progress));
+  const midX = width / 2;
+
+  let s = `<g class="cocoon-wrap-assembly" opacity="${Math.min(1, p * 1.6)}">`;
+
+  // 1. Pharloom Brass Weaver Spools / Bobbins at Upper Horn Shoulders (x = 34, x = width - 34)
+  const spools = [34, width - 34];
+  const spoolRot = p * 1080; // Rapid spinning animation
+  spools.forEach((sx, idx) => {
+    const dir = idx === 0 ? 1 : -1;
+    s += `<g transform="translate(${sx}, 22) rotate(${spoolRot * dir})">
+      <!-- Brass Bobbin Rim -->
+      <circle cx="0" cy="0" r="8" fill="url(#brassGrad)" stroke="#241703" stroke-width="1.2"/>
+      <circle cx="0" cy="0" r="5" fill="#5c4314" stroke="#241703" stroke-width="0.8"/>
+      <!-- Wound Golden Silk Thread Layer on Spool -->
+      <circle cx="0" cy="0" r="3.8" fill="url(#silkGrad)"/>
+      <!-- Spool Flange Spokes -->
+      <line x1="-7" y1="0" x2="7" y2="0" stroke="#fffde6" stroke-width="0.9" opacity="0.8"/>
+      <line x1="0" y1="-7" x2="0" y2="7" stroke="#fffde6" stroke-width="0.9" opacity="0.8"/>
+      <!-- Center Axle Pin -->
+      <circle cx="0" cy="0" r="1.5" fill="#ffff94"/>
+    </g>`;
+  });
+
+  // 2. Dynamic Winding Golden Silk Filaments (Criss-crossing diagonal threads)
+  if (p < 0.98) {
+    const threadAlpha = p < 0.35 ? p / 0.35 : Math.max(0, (0.98 - p) / 0.63);
+    const spread = (1 - p) * 36;
+    const waveY = Math.sin(p * Math.PI * 6) * 4;
+
+    s += `<g class="winding-filaments" opacity="${threadAlpha}">`;
+
+    // Thread 1: Left Bobbin down to lower right, curving back
+    s += `<path d="M 34 22 Q ${midX - 30} ${70 + spread + waveY} ${width - 44} ${95 - spread * 0.5}"
+                fill="none" stroke="url(#silkGrad)" stroke-width="2.6" filter="url(#silkBoom)"/>
+          <path d="M 34 22 Q ${midX - 30} ${70 + spread + waveY} ${width - 44} ${95 - spread * 0.5}"
+                fill="none" stroke="#fffde6" stroke-width="1.2"/>`;
+
+    // Thread 2: Right Bobbin down to lower left, curving back
+    s += `<path d="M ${width - 34} 22 Q ${midX + 30} ${70 + spread - waveY} 44 ${95 - spread * 0.5}"
+                fill="none" stroke="url(#silkGrad)" stroke-width="2.6" filter="url(#silkBoom)"/>
+          <path d="M ${width - 34} 22 Q ${midX + 30} ${70 + spread - waveY} 44 ${95 - spread * 0.5}"
+                fill="none" stroke="#fffde6" stroke-width="1.2"/>`;
+
+    // Thread 3: Figure-8 loop across center embrasure
+    s += `<path d="M 48 ${45 + spread * 0.8} Q ${midX} ${85 + waveY} ${width - 48} ${45 + spread * 0.8}
+                   Q ${midX} ${30 - spread * 0.4} 48 ${75 + spread * 0.5}"
+                fill="none" stroke="url(#silkGrad)" stroke-width="2" filter="url(#silkBoom)"/>
+          <path d="M 48 ${45 + spread * 0.8} Q ${midX} ${85 + waveY} ${width - 48} ${45 + spread * 0.8}
+                   Q ${midX} ${30 - spread * 0.4} 48 ${75 + spread * 0.5}"
+                fill="none" stroke="#ffffff" stroke-width="0.9" opacity="0.8"/>`;
+
+    // Thread 4: Steep criss-cross diagonals
+    s += `<line x1="60" y1="${34 + spread * 0.3}" x2="${width - 60}" y2="${105 - spread * 0.7}"
+                stroke="url(#silkGrad)" stroke-width="2.2" filter="url(#silkBoom)"/>
+          <line x1="60" y1="${34 + spread * 0.3}" x2="${width - 60}" y2="${105 - spread * 0.7}"
+                stroke="#fffde6" stroke-width="1"/>
+          <line x1="${width - 60}" y1="${34 + spread * 0.3}" x2="60" y2="${105 - spread * 0.7}"
+                stroke="url(#silkGrad)" stroke-width="2.2" filter="url(#silkBoom)"/>
+          <line x1="${width - 60}" y1="${34 + spread * 0.3}" x2="60" y2="${105 - spread * 0.7}"
+                stroke="#fffde6" stroke-width="1"/>`;
+
+    // Thread 5: Lower casing belly wrap
+    s += `<path d="M 42 ${110 - spread * 0.8} Q ${midX} ${124 - spread} ${width - 42} ${110 - spread * 0.8}"
+                fill="none" stroke="url(#silkGrad)" stroke-width="3" filter="url(#silkBoom)"/>
+          <path d="M 42 ${110 - spread * 0.8} Q ${midX} ${124 - spread} ${width - 42} ${110 - spread * 0.8}"
+                fill="none" stroke="#fffde6" stroke-width="1.4"/>`;
+
+    // Lumafly spore sparkles at winding crossover points
+    const sparkles = [
+      [midX, 60 + waveY],
+      [midX - 55, 75 - waveY],
+      [midX + 55, 75 + waveY],
+      [110, 50 + spread * 0.4],
+      [width - 110, 50 - spread * 0.4]
+    ];
+    sparkles.forEach(([sx, sy]) => {
+      s += `<circle cx="${sx}" cy="${sy}" r="${2 + Math.sin(p * Math.PI * 8) * 1.5}"
+                    fill="#ffff94" filter="url(#lumaflyGlow)"/>
+            <circle cx="${sx}" cy="${sy}" r="1" fill="#ffffff"/>`;
+    });
+
+    s += `</g>`;
+  }
+
+  // 3. Dense Compressed Golden Silk Cocoon Bundle
+  if (p > 0.2) {
+    const bundleAlpha = Math.min(1, (p - 0.2) / 0.5);
+    // Vertical contraction: lower edge draws upward from 116px to 50px
+    const bTop = 30 + (1 - p) * 6;
+    const bBot = 50 + (1 - p) * 66;
+    const bMid = (bTop + bBot) / 2;
+
+    s += `<g class="cocoon-pod" opacity="${bundleAlpha}">`;
+
+    // Heavy subterranean drop shadow beneath the cocoon pod
+    s += `<path d="M 42 ${bMid} Q 42 ${bTop - 2} ${midX} ${bTop - 2} Q ${width - 42} ${bTop - 2} ${width - 42} ${bMid}
+                   Q ${width - 42} ${bBot + 5} ${midX} ${bBot + 5} Q 42 ${bBot + 5} 42 ${bMid} Z"
+                fill="#000000" opacity="0.75" filter="url(#chitinShadow)"/>`;
+
+    // Main Golden Silk Pod Body
+    s += `<path d="M 42 ${bMid} Q 42 ${bTop} ${midX} ${bTop} Q ${width - 42} ${bTop} ${width - 42} ${bMid}
+                   Q ${width - 42} ${bBot} ${midX} ${bBot} Q 42 ${bBot} 42 ${bMid} Z"
+                fill="url(#cocoonGrad)" stroke="#3d2105" stroke-width="2.2" stroke-linejoin="round"/>`;
+
+    // Dense Helical Golden Silk Wrappings
+    const step = 18;
+    for (let bx = 56; bx <= width - 56; bx += step) {
+      // Sweeping diagonal thread wrap across the pod
+      s += `<path d="M ${bx - 14} ${bTop} Q ${bx} ${bMid} ${bx + 14} ${bBot}"
+                  fill="none" stroke="#e08316" stroke-width="3" stroke-linecap="round"/>`;
+      s += `<path d="M ${bx - 14} ${bTop} Q ${bx} ${bMid} ${bx + 14} ${bBot}"
+                  fill="none" stroke="#fcc042" stroke-width="1.8" stroke-linecap="round"/>`;
+      s += `<path d="M ${bx - 13} ${bTop} Q ${bx + 1} ${bMid} ${bx + 15} ${bBot}"
+                  fill="none" stroke="#fffde6" stroke-width="0.8" opacity="0.85"/>`;
+
+      // Counter-diagonal shadow thread for woven depth
+      if (bx % (step * 2) === 0) {
+        s += `<path d="M ${bx + 14} ${bTop} Q ${bx} ${bMid} ${bx - 14} ${bBot}"
+                    fill="none" stroke="#7a3f05" stroke-width="1.4" opacity="0.7"/>`;
+      }
+    }
+
+    // Top and bottom longitudinal edge sheen highlight
+    s += `<path d="M 50 ${bTop + 2} Q ${midX} ${bTop + 4} ${width - 50} ${bTop + 2}"
+                fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.85"/>`;
+    s += `<path d="M 50 ${bBot - 2} Q ${midX} ${bBot - 3} ${width - 50} ${bBot - 2}"
+                fill="none" stroke="#fcc042" stroke-width="1.2" opacity="0.7"/>`;
+
+    // 4. Three Transverse Pharloom Brass Buckle Clasps with Captive Lumafly Amber Drops
+    const buckleXs = [midX - 74, midX, midX + 74];
+    buckleXs.forEach(bx => {
+      // Twin vertical binding silk bands tying bundle to horn crest
+      s += `<line x1="${bx}" y1="8" x2="${bx}" y2="${bBot + 1}"
+                  stroke="#7a3f05" stroke-width="4.5" stroke-linecap="round"/>`;
+      s += `<line x1="${bx}" y1="8" x2="${bx}" y2="${bBot + 1}"
+                  stroke="url(#silkGrad)" stroke-width="3" stroke-linecap="round"/>`;
+      s += `<line x1="${bx}" y1="8" x2="${bx}" y2="${bBot + 1}"
+                  stroke="#fffde6" stroke-width="1.2"/>`;
+
+      // Cast Pharloom brass buckle ring
+      s += `<circle cx="${bx}" cy="${bMid}" r="6.8" fill="url(#brassGrad)" stroke="#241703" stroke-width="1.2"/>`;
+      // Captive glowing lumafly resin droplet
+      s += `<circle cx="${bx}" cy="${bMid}" r="4.2" fill="#ffff94" filter="url(#lumaflyGlow)"/>`;
+      s += `<circle cx="${bx}" cy="${bMid}" r="2" fill="#ffffff"/>`;
+    });
+
+    // 5. Shoulder Suspension Cords linking pod to upper horn studs (x = 44, x = width - 44)
+    [44, width - 44].forEach(sx => {
+      s += `<line x1="${sx}" y1="8" x2="${sx}" y2="${bTop + 4}" stroke="#fcc042" stroke-width="2.5" stroke-linecap="round"/>`;
+      s += `<line x1="${sx}" y1="8" x2="${sx}" y2="${bTop + 4}" stroke="#fffde6" stroke-width="1"/>`;
+      s += `<circle cx="${sx}" cy="8" r="2.5" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>`;
+    });
+
+    // 6. Center Silken Knot & Trailing Tassel at Pod Base
+    s += `<g transform="translate(${midX}, ${bBot})">
+      <!-- Bone toggle knot -->
+      <polygon points="-7 0, 7 0, 5 7, -5 7" fill="url(#chitinGrad)" stroke="#241703" stroke-width="1"/>
+      <circle cx="0" cy="3.5" r="1.5" fill="#fcc042"/>
+      <!-- Trailing golden silk filaments -->
+      <path d="M -4 7 Q -6 16 -8 24 M 0 7 L 0 26 M 4 7 Q 6 16 8 24"
+            fill="none" stroke="#fcc042" stroke-width="1.3" opacity="0.85" filter="url(#silkBoom)"/>
+      <path d="M -4 7 Q -6 16 -8 24 M 0 7 L 0 26 M 4 7 Q 6 16 8 24"
+            fill="none" stroke="#fffde6" stroke-width="0.7"/>
+    </g>`;
+
+    s += `</g>`;
+  }
+
+  // 7. Cinch Impact Flash on Full Lock
+  if (p > 0.88) {
+    const flashScale = (p - 0.88) / 0.12;
+    const sparkR = flashScale * 38;
+    const sparkAlpha = (1 - flashScale) * 6;
+    s += `<g opacity="${sparkAlpha}">
+      <circle cx="${midX}" cy="42" r="${sparkR}" fill="none" stroke="#fffde6" stroke-width="2.5" filter="url(#silkBoom)"/>
+      <circle cx="${midX}" cy="42" r="${sparkR * 0.6}" fill="none" stroke="#fcc042" stroke-width="3"/>
+      <!-- Four cardinal golden slash sparks -->
+      <line x1="${midX - sparkR}" y1="42" x2="${midX + sparkR}" y2="42" stroke="#ffff94" stroke-width="1.8"/>
+      <line x1="${midX}" y1="${42 - sparkR}" x2="${midX}" y2="${42 + sparkR}" stroke="#ffff94" stroke-width="1.8"/>
+    </g>`;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -1819,6 +2053,12 @@ function renderHardware() {
     if (el) {
       el.innerHTML = drawElytraShield(model.elytraGlide, W);
     }
+
+    // Render Silk Cocoon Wrap Layer
+    const coc = $('#cocoon-' + id);
+    if (coc) {
+      coc.innerHTML = drawSilkCocoonWrap(model.cocoonProgress, W);
+    }
   }
 
   // Active Proximity Lumafly Bioluminescence Aura
@@ -1865,6 +2105,7 @@ function render() {
     el.style.top = m.y + 'px';
     el.style.zIndex = model.front === id ? '4' : '2';
     el.classList.toggle('shade', model.shade);
+    el.classList.toggle('cocoon-mode', model.shade && model.option === 'cocoon_wrap');
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.hollow-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
@@ -1952,6 +2193,14 @@ function render() {
     elytraBtn.classList.toggle('primary-btn', isElytraOption);
   }
 
+  const cocoonBtn = $('#btnCocoonAnim');
+  if (cocoonBtn) {
+    cocoonBtn.textContent = model.shade ? 'Unwrap cocoon' : 'Wrap cocoon';
+    cocoonBtn.disabled = model.busy;
+    const isCocoonOption = model.option === 'cocoon_wrap';
+    cocoonBtn.classList.toggle('primary-btn', isCocoonOption);
+  }
+
   $('#spoolValue').textContent = model.limit;
   $('#spoolDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
 
@@ -1971,7 +2220,11 @@ function render() {
 
   if (!model.busy) {
     if (model.shade) {
-      $('#phase').textContent = 'Shade mode / Bleached chitin horn-crest diadem';
+      if (model.option === 'cocoon_wrap') {
+        $('#phase').textContent = 'Shade mode / Golden silk cocoon bundle locked';
+      } else {
+        $('#phase').textContent = 'Shade mode / Bleached chitin horn-crest diadem';
+      }
     } else if (model.joined) {
       if (model.option === 'mandible_interlock') {
         $('#phase').textContent = 'Joined / Monolithic chitin carapace with mandible interlock';
@@ -2267,6 +2520,58 @@ async function spreadElytra() {
   $('#phase').textContent = model.joined ? 'Joined / Monolithic chitin carapace' : 'Separate / Two independent chitin instruments';
 }
 
+// Option 4: Silk Cocoon Wrap & Unwrap Animations
+async function wrapCocoon() {
+  if (model.busy || (model.shade && model.cocoonProgress >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Spools spin rapidly. Golden weaver-silk threads wind around the lower display into a compact cocoon bundle.');
+  $('#phase').textContent = 'Silk threads winding around lower body';
+
+  await tween(380, t => {
+    const p = t === 1 ? 1 : 1 - Math.pow(2, -8 * t);
+    model.cocoonProgress = p;
+    if (t >= 0.45 && !model.shade) {
+      model.shade = true;
+    }
+    renderHardware();
+  }, token);
+
+  model.cocoonProgress = 1;
+  model.shade = true;
+  model.busy = false;
+  render();
+  say('Silk cocoon wrap locked. Lower casing bundled in golden silk flush beneath horn-crest diadem.');
+  $('#phase').textContent = 'Shade mode / Golden silk cocoon bundle locked';
+}
+
+async function unwrapCocoon() {
+  if (model.busy || (!model.shade && model.cocoonProgress <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Weaver silk tension releases with a twang. Golden cocoon threads unwind and retract into upper spools.');
+  $('#phase').textContent = 'Silk cocoon unwinding & expanding';
+
+  model.shade = false;
+  render();
+
+  await tween(340, t => {
+    const unwrap = 1 - (t === 1 ? 1 : 1 - Math.pow(2, -8 * t));
+    model.cocoonProgress = unwrap;
+    renderHardware();
+  }, token);
+
+  model.cocoonProgress = 0;
+  model.busy = false;
+  render();
+  say('Cocoon unwrapped. Full subterranean slate displays and controls restored.');
+  $('#phase').textContent = model.joined ? 'Joined / Monolithic chitin carapace' : 'Separate / Two independent chitin instruments';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -2274,7 +2579,8 @@ async function applyState(stateName) {
 
   if (stateName === 'separate') {
     if (model.shade) {
-      await spreadElytra();
+      if (model.cocoonProgress > 0) await unwrapCocoon();
+      else await spreadElytra();
     }
     if (model.joined) {
       await separate();
@@ -2292,7 +2598,8 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'joining') {
     if (model.shade) {
-      await spreadElytra();
+      if (model.cocoonProgress > 0) await unwrapCocoon();
+      else await spreadElytra();
     }
     model.joined = false;
     model.blend = 0.25;
@@ -2318,7 +2625,8 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'joined') {
     if (model.shade) {
-      await spreadElytra();
+      if (model.cocoonProgress > 0) await unwrapCocoon();
+      else await spreadElytra();
     }
     if (!model.joined) {
       model.a.x = 220;
@@ -2346,9 +2654,17 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'shade') {
     if (!model.shade) {
-      await foldElytra();
+      if (model.option === 'cocoon_wrap') {
+        await wrapCocoon();
+      } else {
+        await foldElytra();
+      }
     } else {
-      await spreadElytra();
+      if (model.option === 'cocoon_wrap') {
+        await unwrapCocoon();
+      } else {
+        await spreadElytra();
+      }
     }
   }
 }
@@ -2422,6 +2738,10 @@ $('#btnElytraAnim').onclick = () => {
   if (model.shade) spreadElytra();
   else foldElytra();
 };
+$('#btnCocoonAnim').onclick = () => {
+  if (model.shade) unwrapCocoon();
+  else wrapCocoon();
+};
 
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
@@ -2445,7 +2765,8 @@ $('#btnReset').onclick = () => {
   model.elytraGlide = 0;
   model.mandibleProgress = 0;
   model.mandibleChitter = 0;
-  model.option = 'mandible_interlock';
+  model.cocoonProgress = 0;
+  model.option = 'cocoon_wrap';
   model.light = 0;
   model.limit = 3;
   model.tension = 0;
@@ -2453,7 +2774,7 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
-  $('#optionSelect').value = 'mandible_interlock';
+  $('#optionSelect').value = 'cocoon_wrap';
   render();
   say('Reset to initial experiment layout.');
 };
@@ -2461,18 +2782,32 @@ $('#btnReset').onclick = () => {
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
   say('Selected option: ' + e.target.options[e.target.selectedIndex].text);
-  if (model.option === 'elytra_shield') {
+  if (model.option === 'cocoon_wrap') {
+    if (model.elytraGlide > 0) {
+      await spreadElytra();
+    }
+    if (!model.shade) {
+      await wrapCocoon();
+    }
+    say('Option 4: Silk Cocoon Wrap shade selected. Rapid golden weaver-silk winding & bundled lower casing.');
+  } else if (model.option === 'elytra_shield') {
+    if (model.cocoonProgress > 0) {
+      await unwrapCocoon();
+    }
     if (!model.shade) {
       await foldElytra();
     }
+    say('Option 2: Elytra Wing-Case Shield shade selected. Folding beetle wing-cases & lumafly clasp.');
   } else if (model.option === 'mandible_interlock') {
     if (model.shade) {
-      await spreadElytra();
+      if (model.cocoonProgress > 0) await unwrapCocoon();
+      else await spreadElytra();
     }
     say('Option 3: Chitinous Carapace Mandible Interlock join selected. Serrated stag-beetle shell teeth & zig-zag suture.');
   } else if (model.option === 'silk_lash') {
     if (model.shade) {
-      await spreadElytra();
+      if (model.cocoonProgress > 0) await unwrapCocoon();
+      else await spreadElytra();
     }
     say('Option 1: Weaver\'s Silk Lash join selected. Golden silk thread rigging & tension twang.');
   }
@@ -2799,9 +3134,17 @@ window.addEventListener('keydown', e => {
     applyState('joined');
   } else if (e.key === '4') {
     applyState('shade');
+  } else if (e.key === 'c' || e.key === 'C') {
+    if (model.shade) unwrapCocoon();
+    else wrapCocoon();
   } else if (e.key === 'e' || e.key === 'E') {
-    if (model.shade) spreadElytra();
-    else foldElytra();
+    if (model.option === 'cocoon_wrap') {
+      if (model.shade) unwrapCocoon();
+      else wrapCocoon();
+    } else {
+      if (model.shade) spreadElytra();
+      else foldElytra();
+    }
   } else if (e.key === 'j' || e.key === 'J') {
     if (!model.joined) join();
   } else if (e.key === 's' || e.key === 'S') {
