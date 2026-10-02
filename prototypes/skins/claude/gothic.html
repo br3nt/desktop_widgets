@@ -243,7 +243,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -296,7 +296,8 @@ function casing(id,w,h){
  // Flying buttress: the joining end is a tall pier with its own pinnacle instead of a half-gable; the corbel springs from it in the overlay.
  const bt=model.join==='buttress'&&!small,PT=12,pw=JP-6;
  // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
- const dl=(model.join==='dial'||model.join==='apse')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
+ // Frieze procession: square too, so the two friezes along the top meet as one band.
+ const dl=(model.join==='dial'||model.join==='apse'||model.join==='frieze')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
  // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
  const tooth=x=>{const t=[[x,top]];for(const r of JOINS.pier.rows(h))t.push([x,r.y],[x+r.e*JOINS.pier.TO,r.y],[x+r.e*JOINS.pier.TO,r.yb],[x,r.yb]);t.push([x,h]);return t};
@@ -1077,6 +1078,109 @@ const JOINS={
    return s},
   grab(p){return{lift:true,x0:p.x,y0:p.y,amt:0,moved:false}},
   move(d,p){d.amt=clamp((d.y0-p.y)/50);if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;setJt(1-.25*d.amt)},
+  letGo:d=>!d.moved||d.amt>.5
+ },
+ frieze:{label:'Frieze procession',kind:'Fuse · decorative',gap:0,ms:2.8,sepMs:4400,S:36,
+  // Leader first: the cross-bearer stands nearest Jarvis's joining end, the acolyte last.
+  FIG:['cross','censer','banner','king','book','lantern','pilgrim','candle'],
+  say:{join:'The facades meet, the end blocks of the two friezes sink away and a carved boss is set on the seam. The figures in Jarvis\'s frieze wake, walk across the seam and turn back to stone in the niches beyond.',
+   joined:'Joined: one frieze runs across both facades, the procession standing in lit niches either side of the boss. Drag either nameplate to move the pair. Drag the procession back toward Jarvis to release.',
+   sep:'The figures wake, turn, walk home into Jarvis\'s frieze and turn to stone; the boss is lifted, the end blocks rise and the facades part.',hold:'Held mid-join: the procession is crossing the seam. Use the scrubber to step through the animation.',
+   ready:'Ready: each figure\'s place is chalked in GitDiscuss\'s empty niches. Release to join.',near:'Nearby: the figures stir in their niches. Move closer.',readyPh:'Ready · the niches are marked',nearPh:'Nearby · the figures stir',
+   back:'The procession walks back to its niches beyond the seam; still joined.'},
+  phase:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.5?'Joining · setting the boss ':jt<.86?'Joining · the procession crosses ':'Joining · turning back to stone '):(jt>.9?'Releasing · the figures wake and turn ':jt>.52?'Releasing · walking home ':jt>.4?'Releasing · lifting the boss ':'Releasing · parting '),
+  dragPh:d=>'Leading the procession home · '+Math.round(100*(d.amt||0))+'%',
+  about:'A frieze of carved figures runs along the top of each facade, above the nameplate, in a band of pointed niches under its own cresting. Eight small figures stand in Jarvis\'s niches facing GitDiscuss: a cross-bearer leading, then a censer-bearer, a banner, a crowned king with an orb, a monk with a book, a lantern-bearer, a pilgrim with a crook and an acolyte with a candle. GitDiscuss\'s niches stand empty, and each frieze ends in a gabled block at its joining end. <b>Near:</b> the figures stir and the empty niches nearest the seam warm. <b>Ready:</b> each figure\'s place is chalked in GitDiscuss\'s four nearest niches. Joining: the facades meet, the end blocks sink away so the two friezes become one band, and a carved boss drops onto the seam with a puff of grit, with a roll moulding run down the joint beneath it. The figures wake from the front, warming and shedding dust, and walk across the seam in single file: robes swaying, the censer swinging, the banner trailing, the lantern and the candle lit. Each steps into its niche and turns back to stone in a puff of grit, leader first, four on each side of the boss. Then the niches behind them light: that is the join light, amber while both widgets run and cold blue when either is paused. After that nothing moves. <b>Release:</b> drag the procession back toward Jarvis (past halfway it goes home), or click it, or focus it and press Enter. The figures wake, turn round, walk home, turn to face the seam again and freeze; the boss is lifted, the end blocks rise and the facades part.',
+  // Walking pace: picks up, holds steady, slows into the niche.
+  walk(u){const a=.16,k=1/(1-a);return u<a?k*u*u/(2*a):u<1-a?k*(u-a/2):1-k*(1-u)*(1-u)/(2*a)},
+  // Each figure's walk, facing, life (0 stone, 1 awake) and gait. dx is how far it has walked from its home niche in Jarvis's frieze.
+  st(c){const jt=c.jt,N=8,D=4*this.S,q=1-jt,o={figs:[]},gait=(u,dx)=>({v:clamp(Math.min(u,1-u)*7),ph:dx*Math.PI/7});
+   if(jt===0){o.caps=o.boss=o.roll=o.lit=0;const t=performance.now()/90;
+    for(let i=0;i<N;i++)o.figs.push({dx:.5*c.glow*Math.sin(t+i*1.7),face:1,alive:.32*c.glow,v:0,ph:0,wk:0,fz:0});return o}
+   if(model.dir>0){o.fwd=true;o.caps=seg(jt,.3,.42);o.boss=seg(jt,.4,.5);o.roll=seg(jt,.44,.54);o.lit=seg(jt,.93,1);
+    for(let i=0;i<N;i++){const wk=seg(jt,.46+.008*i,.5+.008*i),u=seg(jt,.5+.012*i,.84+.012*i),fz=seg(jt,.846+.012*i,.876+.012*i),dx=D*this.walk(u);
+     o.figs.push({dx,face:1,alive:Math.max(wk,.32*c.glow)*(1-fz),...gait(u,dx),wk,fz})}}
+   // Going home the rear of the line leads: each wakes, turns, walks back, turns to face the seam again and freezes.
+   else{o.lit=1-seg(q,0,.05);o.boss=1-seg(q,.5,.56);o.roll=1-seg(q,.48,.56);o.caps=1-seg(q,.54,.6);
+    for(let i=0;i<N;i++){const j=N-1-i,wk=seg(q,.006*j,.05+.006*j),t1=seg(q,.04+.006*j,.09+.006*j),u=seg(q,.1+.008*j,.38+.008*j),t2=seg(q,.385+.008*j,.425+.008*j),fz=seg(q,.43+.008*j,.47+.008*j),dx=D*(1-this.walk(u));
+     o.figs.push({dx,face:Math.cos(Math.PI*(t1-t2)),alive:wk*(1-fz),...gait(u,dx),wk,fz})}}
+   return o},
+  // Niche centres along a frieze, counted from the joining end; o = +1 for Jarvis (joining end on the right), −1 for GitDiscuss.
+  nc(o,k){return o>0?W-this.S/2-k*this.S:this.S/2+k*this.S},
+  niche:c=>`M${f(c-15.5)} 5V-3Q${f(c-15.5)} -8.6 ${f(c)} -11.6Q${f(c+15.5)} -8.6 ${f(c+15.5)} -3V5Z`,
+  // One facade's frieze, in its own frame: a band of pointed niches on colonnettes over a ledge, under cresting. Figures stand on the ledge at y 5.5.
+  band(o){const S=this.S,x0=o>0?15:0,x1=o>0?W:W-15;let cr='',ni='',co='',sp='';
+   for(let x=x0+5;x<=x1-4;x+=9)cr+=`<path d="M${f(x-2.6)} -13.5L${f(x)} -18L${f(x+2.6)} -13.5Z"/><circle cx="${f(x)}" cy="-19" r="1.3"/>`;
+   for(let k=0;k<10;k++)ni+=this.niche(this.nc(o,k));
+   for(let k=0;k<=10;k++){const b=o>0?W-k*S:k*S;co+=`<rect x="${f(b-1.3)}" y="-3.4" width="2.6" height="8.6"/><rect x="${f(b-2.3)}" y="-4.8" width="4.6" height="1.6"/>`;if(k)sp+=`<circle cx="${f(b)}" cy="-9.6" r="1.5"/>`}
+   return `<rect x="${x0}" y="9" width="${x1-x0}" height="3" fill="url(#tpShT)" opacity=".3"/><g fill="url(#lime)" filter="url(#st-v)"><rect x="${x0}" y="-14" width="${x1-x0}" height="23"/>${cr}</g>`+
+    `<path d="${ni}" fill="#24180d" opacity=".42"/><path d="${ni}" fill="none" stroke="#2a1d10" stroke-opacity=".55" stroke-width=".7"/><path d="${ni}" fill="none" stroke="#fff6e2" stroke-opacity=".3" stroke-width=".6" transform="translate(-.7 .7)"/>`+
+    `<g fill="#d6c9ab" stroke="#3a2c1c" stroke-opacity=".5" stroke-width=".5">${co}</g><g fill="#24180d" opacity=".34">${sp}</g>`+
+    `<path d="M${x0} -13.6H${x1}M${x0} 5.3H${x1}" stroke="#fff6e2" stroke-opacity=".55" stroke-width=".8"/><path d="M${x0} -12.4H${x1}M${x0} 8.6H${x1}" stroke="#3a2c1c" stroke-opacity=".42" stroke-width=".8"/><path d="M${o>0?x0+.4:x1-.4} -14V9" stroke="#3a2c1c" stroke-opacity=".35"/>`},
+  // The gabled block closing a frieze at its joining end; it sinks into the wall as the friezes meet.
+  cap(o,t){if(t>=1)return '';const e=ease(t),w=6.3,x=o>0?W-6:-.3,xc=x+w/2;
+   return `<g transform="translate(0 ${f(9*e)})" opacity="${f(1-e)}"><g fill="url(#lime)" filter="url(#st-v)"><path d="M${f(x)} 9V-16L${f(xc)} -20L${f(x+w)} -16V9Z"/><circle cx="${f(xc)}" cy="-21.3" r="1.4"/></g>`+
+    `<path d="M${f(x)} -16L${f(xc)} -20L${f(x+w)} -16M${f(o>0?x:x+w)} -15.6V8.6" fill="none" stroke="#3a2c1c" stroke-opacity=".5" stroke-width=".7"/><circle cx="${f(xc)}" cy="-4" r="1.5" fill="#24180d" opacity=".4"/></g>`},
+  // A carved figure, feet at x,y, facing right when face is 1. Stone when alive is 0; awake it warms, and its lantern or candle burns.
+  fig(t,x,y,face,alive,v,ph,col){
+   const sw=v*Math.sin(ph),bob=-.75*v*Math.abs(Math.sin(ph)),k=t==='candle'?1:1.15,fc=Math.sign(face||1)*Math.max(.06,Math.abs(face)),king=t==='king';
+   const fill=mixc([208,196,166],[240,227,194],alive);
+   let P=`<path d="M-3.4 0C-3.6 -3.8 -2.9 -7.6 -2.1 -9.4L2.3 -9.4C3 -7.6 3.5 -3.8 3.5 0Z"/><path d="${king?'M-1.7 -9.2C-2.2 -10.8 -1.4 -12.6 .4 -12.6C2 -12.6 2.6 -10.9 2.1 -9.2Q.2 -8.6 -1.7 -9.2Z':'M-2.6 -8.8C-3.1 -11.2 -1.6 -13.4 .3 -13.5C2.1 -13.4 2.9 -11.4 2.5 -9Q0 -8 -2.6 -8.8Z'}"/>`,L='',X='';
+   if(t==='cross')L='M3.9 -.4V-17M2.3 -15H5.5';
+   else if(t==='banner'){L='M3.9 -.4V-17.6M2.2 -17.2H5.6';P+=`<path d="M2.4 -17.2H5.4V-11.6L3.9 -13L2.4 -11.6Z" transform="rotate(${f(7*v+3*sw)} 3.9 -17.2)"/>`}
+   else if(t==='censer'){const a=18*Math.sin(ph*.5)*v*Math.PI/180,cx=3.7+4.4*Math.sin(a),cy=-6.2+4.4*Math.cos(a);L=`M3.7 -6.2L${f(cx)} ${f(cy-1.2)}`;P+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="1.25"/><path d="M${f(cx-1.1)} ${f(cy-.5)}L${f(cx)} ${f(cy-2.1)}L${f(cx+1.1)} ${f(cy-.5)}Z"/>`}
+   else if(t==='book'){P+='<path d="M1.5 -8.7H5.1V-6.1H1.5Z"/>';X+='<path d="M3.3 -8.7V-6.1" stroke="#3a2c1c" stroke-width=".4"/>'}
+   else if(king){P+='<path d="M-1.9 -12.2L-2 -14.9L-1 -13.6L.3 -15.3L1.6 -13.6L2.6 -14.9L2.5 -12.2Z"/><circle cx="4.3" cy="-7" r="1.3"/>';L='M4.3 -8.3V-10.2M3.5 -9.4H5.1';
+    if(alive>0)X+=`<path d="M-1.9 -12.2L-2 -14.9L-1 -13.6L.3 -15.3L1.6 -13.6L2.6 -14.9L2.5 -12.2Z" fill="url(#gild)" opacity="${f(.85*alive)}"/>`}
+   else if(t==='lantern'){L='M3.2 -6.8L6.4 -11.8';P+='<path d="M5.1 -10.4L6.4 -11.8L7.7 -10.4Z"/><path d="M5.4 -10.4H7.4V-7.4H5.4Z"/>';
+    X+=`<path d="M5.8 -10H7V-7.8H5.8Z" fill="${mixc([60,48,36],[255,232,160],alive)}"/>`;if(alive>0)X+=`<circle cx="6.4" cy="-8.9" r="4.2" fill="${col}" opacity="${f(.6*alive)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`}
+   else if(t==='pilgrim'){L='M4.2 -.3V-13.8Q4.2 -16.2 6 -16Q7.4 -15.6 6.8 -14.2';P+='<ellipse cx=".2" cy="-12.4" rx="3.9" ry=".95"/>'}
+   else if(t==='candle'){P+='<path d="M3 -9.8H4.3V-6.3H3Z"/>';if(alive>0)X+=`<g opacity="${f(alive)}"><circle cx="3.65" cy="-11" r="3.2" fill="${col}" opacity=".6" filter="url(#lglow)" style="mix-blend-mode:screen"/><path d="M3.65 -12.8Q4.4 -11.3 3.65 -10.1Q2.9 -11.3 3.65 -12.8Z" fill="#fff1c4"/></g>`}
+   P+='<path d="M-.4 -8.8L3.3 -7.4Q4.1 -6.8 3.5 -6L-.4 -6.8Z"/>';
+   // Hooded and faceless; folds down the robe, the back in shade, the front catching the light.
+   X=`<ellipse cx="1.3" cy="${king?-10.8:-11}" rx=".85" ry="1.3" fill="#1d140c" opacity=".72"/><path d="M-3.4 0C-3.6 -3.8 -2.9 -7.6 -2.1 -9.4L-.6 -9.4C-1 -6 -1 -3 -.8 0Z" fill="#2a1d10" opacity=".16"/>`+
+    `<path d="M-1.3 -8.2L-1.9 -.6M1 -8.2L1.5 -.6" stroke="#3a2c1c" stroke-opacity=".42" stroke-width=".4"/><path d="M2.3 -9.2C3 -7.4 3.4 -3.8 3.4 -.3" fill="none" stroke="#fff6e2" stroke-opacity=".5" stroke-width=".4"/>`+X;
+   const feet=v>.02?`<ellipse cx="${f(1+2.4*sw)}" cy="-.2" rx="1.35" ry=".6"/><ellipse cx="${f(1-2.4*sw)}" cy="-.2" rx="1.35" ry=".6"/>`:'';
+   const tr=(dx,dy)=>`transform="translate(${f(x+dx)} ${f(y+bob+dy)}) scale(${f(fc*k*1000)/1000} ${k}) rotate(${f(2*sw)})"`,ln=L?`<path d="${L}"/>`:'';
+   return (alive>0?`<ellipse cx="${f(x)}" cy="${f(y-8*k)}" rx="6" ry="10" fill="#ffe3a0" opacity="${f(.28*alive)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`:'')+
+    `<g ${tr(1.1,.7)} opacity=".32"><g fill="#1d140c">${P}</g><g fill="none" stroke="#1d140c" stroke-width="1.1">${ln}</g></g>`+
+    `<g ${tr(0,0)}><g fill="none" stroke="#3a2c1c" stroke-opacity=".75" stroke-width="1.9" stroke-linecap="round">${ln}</g><g fill="${fill}" stroke="#3a2c1c" stroke-opacity=".7" stroke-width=".45">${feet}${P}</g>${X}<g fill="none" stroke="${fill}" stroke-width="1.05" stroke-linecap="round">${ln}</g></g>`},
+  over(c){
+   const S=this.S,r=this.st(c),jt=c.jt,col=model.a.run&&model.b.run?'#ffc861':'#9fb8ff',T=(x,y)=>`translate(${f(x)} ${f(y)})`,dust=JOINS.buttress.dust,A=model.a,B=model.b,sx=A.x+W;
+   let s=`<defs><radialGradient id="frzL" cx=".5" cy=".72" r=".7"><stop stop-color="${col}" stop-opacity=".95"/><stop offset=".55" stop-color="${col}" stop-opacity=".35"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></radialGradient></defs>`,fx='';
+   const four=o=>[0,1,2,3].map(k=>this.niche(this.nc(o,k))).join('');
+   // Both friezes; their end blocks stand at the joining ends until the friezes meet. Lit, the procession's niches glow behind the figures.
+   for(const[o,m]of[[1,A],[-1,B]]){let b=this.band(o)+this.cap(o,r.caps);
+    if(r.lit>0)b+=`<path d="${four(o)}" fill="url(#frzL)" opacity="${f(r.lit)}" style="mix-blend-mode:screen"/>`;
+    s+=`<g transform="${T(m.x,m.y)}">${b}</g>`}
+   // Near: the empty niches waiting for the procession warm. Ready: each figure's place is chalked in them.
+   const warm=c.glow*(1-seg(jt,.3,.5));
+   if(warm>0)s+=`<g transform="${T(B.x,B.y)}" opacity="${f(warm)}" fill="none"><path d="${four(-1)}" stroke="#ffc861" stroke-width="3" opacity=".45" filter="url(#lglow)" style="mix-blend-mode:screen"/><path d="${four(-1)}" stroke="#ffe3a0" stroke-width=".9"/></g>`;
+   const gh=jt===0?seg(c.glow,.8,1)*.85:model.dir>0?Math.max(.85*c.glow,.7*seg(jt,0,.12))*(1-seg(jt,.5,.72)):0;
+   if(gh>0){let g='';for(let k=0;k<4;k++)g+=`<g transform="translate(${f(this.nc(-1,k))} 5.5) scale(1.15)"><path d="M-3.4 0C-3.6 -3.8 -2.9 -7.6 -2.1 -9.4L2.3 -9.4C3 -7.6 3.5 -3.8 3.5 0ZM-2.6 -8.8C-3.1 -11.2 -1.6 -13.4 .3 -13.5C2.1 -13.4 2.9 -11.4 2.5 -9Q0 -8 -2.6 -8.8Z" vector-effect="non-scaling-stroke"/></g>`;
+    s+=`<g transform="${T(B.x,B.y)}" fill="#f3d48a" fill-opacity=".08" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="2.4 1.8" opacity="${f(gh)}">${g}</g>`}
+   // The boss on the seam and the roll moulding run down the joint beneath it.
+   if(r.roll>0){const len=Math.max(0,(c.h-27)*ease(r.roll)),y0=A.y+15;
+    s+=`<g><rect x="${f(sx-1.6)}" y="${f(y0+1)}" width="5.2" height="${f(len)}" fill="#000" opacity=".3"/><rect x="${f(sx-2.6)}" y="${f(y0)}" width="5.2" height="${f(len)}" fill="url(#lime)"/><rect x="${f(sx-2.6)}" y="${f(y0)}" width="5.2" height="${f(len)}" fill="url(#pshade)"/>`+
+     (r.roll>=1?`<rect x="${f(sx-3.8)}" y="${f(y0+len-2.6)}" width="7.6" height="2.6" fill="#cbbd9f" stroke="#3a2c1c" stroke-opacity=".5" stroke-width=".5"/>`:'')+`</g>`}
+   if(r.boss>0){const fall=t=>t<.78?Math.pow(t/.78,2):1-.07*Math.sin(Math.PI*(t-.78)/.22),yb=A.y+10-(r.fwd&&jt<1?22*(1-fall(r.boss)):14*ease(1-r.boss)),op=seg(r.boss,0,.25);
+    let lobes='',veins='';for(let i=0;i<6;i++){const a=i*Math.PI/3+.3,cx=3.9*Math.cos(a),cy=3.9*Math.sin(a);lobes+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="2.6"/>`;veins+=`M${f(cx*.55)} ${f(cy*.55)}L${f(cx*1.35)} ${f(cy*1.35)}`}
+    s+=`<g transform="${T(sx,yb)}" opacity="${f(op)}"><circle r="6.8" fill="#000" opacity=".35" transform="translate(1 1.3)"/><g fill="url(#lime)" filter="url(#st-v)">${lobes}<circle r="4.4"/></g><path d="${veins}" stroke="#3a2c1c" stroke-opacity=".5" stroke-width=".6"/>`+
+     `<circle r="2.2" fill="url(#gild)" stroke="#3a2c1c" stroke-opacity=".6" stroke-width=".5"/>`+(r.lit>0?`<circle r="6" fill="${col}" opacity="${f(.55*r.lit)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`:'')+`</g>`;
+    if(r.fwd&&r.boss>.78&&r.boss<1)fx+=dust(sx,A.y+15,seg(r.boss,.78,1),6,14,41)}
+   // The procession, rear first so the leader walks in front.
+   for(let i=7;i>=0;i--){const p=r.figs[i],x=A.x+this.nc(1,i)+p.dx,y=A.y+5.5;
+    s+=this.fig(this.FIG[i],x,y,p.face,p.alive,p.v,p.ph,col);
+    if(p.wk>0&&p.wk<1){fx+=dust(x,y-9,p.wk,4,7,i+200);const g=Math.sin(Math.PI*p.wk);if(g>.05)fx+=`<g opacity="${f(g)}">${sparkle(x+1,y-15,3.6*g)}</g>`}
+    if(p.fz>0&&p.fz<1)fx+=dust(x,y-1,p.fz,5,9,i+220)}
+   s+=fx;
+   if(jt===1){const x0=sx-4*S,y0=A.y-21;
+    s+=`<g class="hit" id="friezeHit" tabindex="0" role="button" aria-label="Frieze procession: drag it back toward Jarvis, or press Enter, to separate the widgets"><title>Drag the procession back toward Jarvis to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${8*S}" height="30" fill="transparent"/><rect class="ringfocus" x="${f(x0-2)}" y="${f(y0-2)}" width="${8*S+4}" height="34" rx="3" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g>`}
+   return s},
+  // Lead the procession home: drag it back toward Jarvis. Past halfway the figures keep walking; let go sooner and they return to their niches.
+  grab(p){return{x0:p.x,y0:p.y,amt:0,moved:false}},
+  // The first few pixels wake and turn them; after that they walk step for step with the pointer.
+  move(d,p){const dx=d.x0-p.x,q=dx<12?.1*clamp(dx/12):.1+.34*clamp((dx-12)/(4*this.S));d.amt=q/.44;if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;setJt(1-q)},
   letGo:d=>!d.moved||d.amt>.5
  }
 };
