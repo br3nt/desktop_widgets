@@ -1649,6 +1649,49 @@ function fbDraw(c,S){
  return o;
 }
 
+/* ---------- Mix: material bleed (stone turns to felt across the seam) ---------- */
+// One field decides the material in a zone Z either side of the seam: R = .7·(position across the zone) + .9·noise − .3.
+// Felt shows where R > tf and stone where R < ts; both thresholds close on T, so the two materials meet on one ragged line.
+// Everything is drawn in a frame anchored on the seam, so the noise travels with the pair instead of swimming.
+const BL={Z:46,K:16,KS:34,T:.46,felt:'#3f807a'};
+function blMask(id,h,t,stone){
+ const Z=BL.Z,y0=-14,hh=h+20,a=stone?-BL.KS:BL.K,o=stone?BL.KS*t:-BL.K*t;
+ return `<filter id="${id}-x" filterUnits="userSpaceOnUse" x="${-Z}" y="${y0}" width="${2*Z}" height="${hh}" color-interpolation-filters="sRGB">`+
+  `<feTurbulence type="fractalNoise" baseFrequency=".065 .085" numOctaves="3" seed="11" result="n"/>`+
+  `<feColorMatrix in="n" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0 1" result="no"/>`+
+  `<feComposite in="SourceGraphic" in2="no" operator="arithmetic" k2=".7" k3=".9" k4="-.3"/>`+
+  `<feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  ${a} 0 0 0 ${f(o*1000)/1000}"/></filter>`+
+  `<mask id="${id}" maskUnits="userSpaceOnUse" x="${-Z}" y="${y0}" width="${2*Z}" height="${hh}"><rect x="${-Z}" y="${y0}" width="${2*Z}" height="${hh}" fill="url(#bl-g)" filter="url(#${id}-x)"/></mask>`;
+}
+// The zone drawn at the seam (local x 0 is Jarvis's end, y 0 its top): felt grows over the stone buttress like moss,
+// stone crusts over the felt like frost, and a bridge strip fills the notch between the two casings as they merge.
+function blZone(h,tf,ts){
+ const Z=BL.Z,top=8,bridge=`M-2 3H14V${h-4}H-2Z`;
+ const stoneSide=`M${-Z} ${top}H-42V2L-38 -3H-4L0 2V${h-11}H2V${h}H${-Z}Z`+bridge;
+ const feltSide=rr4(4,4,Z+24,h-8,[12,0,0,12])+bridge;
+ let s=`<defs><linearGradient id="bl-g" gradientUnits="userSpaceOnUse" x1="${-Z}" x2="${Z}" y1="0" y2="0"><stop stop-color="#000"/><stop offset="1" stop-color="#fff"/></linearGradient>`+
+  blMask('bl-fm',h,tf,false)+blMask('bl-sm',h,ts,true)+feltFilters('bl',9)+stoneFilter('bl',4)+
+  `<clipPath id="bl-fc"><path d="${stoneSide}"/></clipPath><clipPath id="bl-sc"><path d="${feltSide}"/></clipPath></defs>`;
+ const R=`x="${-Z}" y="-14" width="${2*Z}" height="${h+20}"`;
+ // Felt over stone: a soft shadow, the puffed wool, and the cushion's edge stitch carried on wherever the felt has reached.
+ const st=stitch(`M${-Z} 10H10M${-Z} ${h-10}H10`,'#f7e8c9',.85,1.3,'4.4 3.2');
+ s+=`<g clip-path="url(#bl-fc)"><g transform="translate(.6 1.6)" opacity=".32" filter="url(#sh)"><rect ${R} fill="#000" mask="url(#bl-fm)"/></g>`+
+  `<g filter="url(#f-bl)"><rect ${R} fill="${BL.felt}" mask="url(#bl-fm)"/></g><g mask="url(#bl-fm)">${st}</g></g>`;
+ // Stone over felt: a raised crust with a lit upper edge and a cast shadow, and Jarvis's ashlar joints running on through it.
+ let jd='';const y0=top+22,y1=h-(h>=90?29:9);
+ for(let y=y0,r=0;y<y1;y+=14,r++){jd+=`M${-Z} ${y}H${Z}`;for(let x=((r%2?17:0)+6-W)%34-34;x<Z;x+=34)jd+=`M${x} ${y}V${Math.min(y+14,y1)}`}
+ s+=`<g clip-path="url(#bl-sc)"><g transform="translate(1 2)" opacity=".5" filter="url(#sh)"><rect ${R} fill="#120c08" mask="url(#bl-sm)"/></g>`+
+  `<rect ${R} fill="#fff6e2" opacity=".55" mask="url(#bl-sm)" transform="translate(-.6 -.9)"/>`+
+  `<g filter="url(#st-bl)"><rect ${R} fill="url(#lime)" mask="url(#bl-sm)"/></g>`+
+  `<g mask="url(#bl-sm)" fill="none" stroke-width=".8"><path d="${jd}" stroke="#4a3b2a" stroke-opacity=".32"/><path d="${jd}" stroke="#fff7e6" stroke-opacity=".22" transform="translate(0 .9)"/>`+
+  `<path d="M${-Z} ${h-11}H${Z}" stroke="#3a2c1c" stroke-opacity=".35"/>${h>=90?`<path d="M${-Z} ${h-29}H${Z}" stroke="#3a2c1c" stroke-opacity=".35"/><path d="M${-Z} ${h-27.8}H${Z}" stroke="#fff6e2" stroke-opacity=".45"/>`:''}</g></g>`;
+ return s;
+}
+const blWisp=(x,y,deg,s,col,op)=>`<path d="M0 0q-3 -2.2 -6 -.4t-6 -.6" transform="translate(${f(x)} ${f(y)}) rotate(${f(deg)}) scale(${f(s*100)/100})" fill="none" stroke="${col}" stroke-width="1.3" stroke-linecap="round" opacity="${f(op)}"/>`;
+const blChip=(x,y,deg,s,op)=>`<path d="M-2 -1.4L1.6 -2L2.4 1L-.6 2.2Z" transform="translate(${f(x)} ${f(y)}) rotate(${f(deg)}) scale(${f(s*100)/100})" fill="#cdbf9f" stroke="#5b4b36" stroke-width=".5" opacity="${f(op)}"/>`;
+// What falls when the seam is torn: [x across the zone, height down the casing, felt 0 or stone 1, spin].
+const BLD=[[-.5,.2,0,.3],[.3,.35,1,-.8],[-.2,.55,1,.6],[.6,.7,0,-.4],[-.7,.8,1,1.1],[.1,.15,0,.9],[.45,.5,1,-1.2],[-.35,.9,0,.2],[.2,.82,0,-.9],[-.05,.4,1,.5]];
+
 const MIXES={
  feltCathedral:{label:'Felt cathedral',kind:'Layer stack',
   stack:[['Structure','Gothic','silhouette, half-gables at the joining ends, pinnacles, cresting, blind lancets, the half-rose join'],
@@ -2659,6 +2702,68 @@ const MIXES={
    sepPh:'Separate · a caterpillar asleep',nearPh:'Nearby · it wakes',readyPh:'Ready · reared up',
    mid:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.62?'Joining · through the loop ':jt<.72?'Joining · biting its tail ':'Joining · spots on '):(jt>.8?'Releasing · letting go ':jt>.6?'Releasing · out of the loop ':jt>.4?'Releasing · reared up ':'Releasing · curling up to sleep '),
    turn:d=>'Pulling its head · '+Math.round(d.deg*100)+'%'}
+ },
+ bleed:{label:'Material bleed',kind:'Material bleed',pair:'stonefelt',smooth:true,slow:1.3,sepMs:2100,
+  stack:[['Model','Material bleed','the two casings fuse, and across a short zone at the seam one material turns into the other'],
+   ['Field','Noise and distance','one value per point: how far across the zone, plus fractal noise; above a threshold it is felt, below it stone'],
+   ['Zone','46 px each side','it stops short of both displays and nameplates, so nothing readable is ever overgrown'],
+   ['Felt into stone','Moss','teal felt pads puff up on the buttress, with the cushion\'s edge stitch running on through them'],
+   ['Stone into felt','Frost','a raised limestone crust with lit edges and a cast shadow, carrying Jarvis\'s ashlar joints on into the felt'],
+   ['Motion','Creep','the materials creep toward each other and close on one ragged line; felt fibres still shift at 12 fps']],
+  about:'The one experiment the brainstorm allowed for its riskiest idea. Jarvis is carved stone and GitDiscuss and Checks are felt, as on the coupler mix, but here there is no hardware at all: the casings butt together and the seam is a zone where stone becomes felt. To read as deliberate rather than as a rendering fault, each material keeps its own rules where it trespasses (felt still puffs and is stitched, stone still has a lit edge, a shadow and coursed joints), the boundary is one ragged line with no third material in between, and the zone never reaches a display.',
+  join:{label:'Moss and frost',kind:'Fuse',gap:0,
+   about:'<b>Near:</b> fibres lift off GitDiscuss\'s felt edge and reach for the stone, and grit drifts off Jarvis\'s buttress. <b>Ready:</b> a faint ghost of the bleed shows across the seam. Joining: the casings butt with a soft squash of the felt and a puff of fibres and grit. Then teal felt starts in colonies on the buttress and spreads like moss, while a limestone crust creeps out over the felt like frost, until the two meet on one ragged line and the notch between the casings is filled. Three gold French knots set on the seam are the join light. <b>Release:</b> pull the seam (drag it any way, or click it, or focus it and press Enter): the knots go, each material draws back to its own side with fibres and chips falling away, then the casings part.'},
+  shade:{label:'Plain lower, stone and felt',kind:'Page baseline',
+   about:'Not a brainstorm item. The stone wall lowers to its carved frieze and the felt lets out its stuffing to the nameplate band, each with one value. The bleed zone shrinks with them and keeps its ragged line, with one knot on the seam.'},
+  casing:(id,w,h)=>id==='a'?stoneCasing(id,w,h,false):feltCushion(id,w,h),
+  readyPose:{},
+  state(c){
+   const jt=c.jt,T=BL.T;
+   if(jt===0)return{p:0,tf:9,ts:-9,press:0,knot:0};
+   // Felt starts fast and slows as it spreads, as moss does; releasing draws both back evenly.
+   const p=model.dir>0?1-Math.pow(1-seg(jt,.42,.9),2.2):ease(seg(jt,.5,1));
+   return{p,tf:lerp(.8,T,p),ts:lerp(.16,T+.02,p),press:model.dir>0?Math.sin(PI*seg(jt,.38,.52)):0,knot:model.dir>0?backOut(seg(jt,.88,1)):ease(seg(jt,.9,1))};
+  },
+  over(c){
+   const r=this.state(c),h=c.h,A=model.a,B=model.b,S=A.x+W,Z=BL.Z;let s='';
+   // Near: fibres lift off the felt edge toward the stone, and grit drifts off the buttress toward the felt.
+   if(c.jt===0&&c.glow>0){const g=c.glow,n=h>=90?7:3;
+    for(let i=0;i<n;i++){const y=B.y+16+(h-32)*(i+.5)/n,j=(i*37%11)/11-.5;
+     s+=blWisp(B.x+5,y,j*40,.45+.75*g,i%2?'#efe0c2':'#6fb0a8',.35+.6*g);
+     s+=blChip(S+3+14*g*(.6+(i*53%7)/7),A.y+18+(h-30)*((i*29%13)/13),i*70,.7+.3*g,.8*g)}
+    // Ready: a ghost of the bleed where the seam will be.
+    if(g>=1)s+=`<g transform="translate(${f(S)} ${f(A.y)})" opacity=".42">${blZone(h,.6,.3)}</g>`}
+   if(c.jt>=.4)s+=`<g transform="translate(${f(S)} ${f(A.y)})">${blZone(h,r.tf,r.ts)}</g>`;
+   // Contact: a puff of fibres and grit from the seam.
+   if(model.dir>0&&c.jt>.4&&c.jt<.62){const u=seg(c.jt,.4,.62);
+    for(const[i,[dx,dy,rot]]of FLUFF.entries()){const x=S+dx*26*(.4+u),y=A.y+h/2+dy*(h/2)*(.95+u*.4)+22*u*u;
+     s+=i%2?blChip(x,y,rot*90+u*200,1,1-u):`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+u*90)})" fill="none" stroke="#efe0c2" stroke-width="1.3" stroke-linecap="round" opacity="${f(1-u)}"/>`}}
+   // Tearing: each material lets go of the other's ground; fibres and chips fall away.
+   if(model.dir<0&&c.jt>.45&&c.jt<1){const u=seg(1-c.jt,0,.5);
+    for(const[i,[dx,dy,k,rot]]of BLD.entries()){const x=S+dx*Z*.7+rot*10*u,y=A.y+8+(h-14)*dy+(60+i*4)*u*u,op=(1-u)*clamp(u*8);
+     s+=k?blChip(x,y,rot*300*u,1.1,op):blWisp(x,y,rot*80+u*140,.8,i%3?'#6fb0a8':'#efe0c2',op)}}
+   // The join light: gold French knots set on the seam.
+   if(r.knot>.01){const ys=h>=90?[.28,.5,.72]:[.5];
+    for(const k of ys)s+=`<g transform="translate(${f(S+1)} ${f(A.y+h*k)}) scale(${f(r.knot*100)/100})">${fknot(0,0,3.2)}</g>`}
+   if(c.jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="The bled seam between stone and felt: pull it, or press Enter, to separate the widgets"><title>Pull the seam to tear the materials apart</title><rect x="${f(S-Z*.6)}" y="${f(A.y)}" width="${f(Z*1.2)}" height="${h}" fill="transparent"/><rect class="ringfocus" x="${f(S-Z*.6)}" y="${f(A.y-2)}" width="${f(Z*1.2)}" height="${h+4}" rx="6" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
+   return s;
+  },
+  // Only the felt gives at the moment of contact; stone does not.
+  squash(c,id){const p=id==='b'?this.state(c).press:0;return p>.01?p*.7:0},
+  grab(p){return{x0:p.x,y0:p.y,deg:0}},
+  pull(d,p){const dist=Math.hypot(p.x-d.x0,p.y-d.y0);if(dist>3)d.moved=true;d.deg=clamp(dist/60);return 1-.45*d.deg},
+  text:{intro:'Jarvis is carved stone; GitDiscuss and Checks are felt. Here the seam is not hardware: the two materials bleed into each other. Drag a nameplate toward the other widget, or use the state buttons.',
+   join:'The casings butt together; felt creeps over the stone like moss and stone crusts over the felt like frost.',
+   joined:'Joined: stone and felt meet on one ragged line, and gold knots are set on the seam. Drag either nameplate to move the pair. Pull the seam to tear them apart.',
+   sep:'The knots go, each material draws back to its own side, fibres and chips fall, and the casings part.',
+   hold:'Held mid-join: the felt is spreading over the buttress and the stone crust is creeping out onto the felt. Use the scrubber to step through the animation.',
+   near:'Nearby: fibres lift off the felt toward the stone, and grit drifts off the buttress. Move closer.',
+   ready:'Ready: a ghost of the bleed shows across the seam. Release to join.',
+   back:'The materials grow back together; still joined.',cancel:'Pull cancelled.',
+   shadeOn:'Shaded: the wall lowers, the felt lets out its stuffing, and the bleed shrinks with them.',shadeOff:'Unshaded: the wall rises and the stuffing comes back.',
+   sepPh:'Separate · stone and felt',nearPh:'Nearby · fibres reach out',readyPh:'Ready · a ghost of the bleed',
+   mid:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.5?'Joining · butting together ':jt<.88?'Joining · moss and frost creep ':'Joining · knots set '):(jt>.9?'Releasing · knots out ':jt>.5?'Releasing · the materials draw back ':'Releasing · parting '),
+   turn:d=>'Pulling the seam · '+Math.round(d.deg*100)+'%'}
  }
 };
 
