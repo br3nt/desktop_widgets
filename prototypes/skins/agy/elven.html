@@ -263,6 +263,19 @@ header {
 .module.shade .scabbard-overlay {
   height: 44px;
 }
+.harp-overlay {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+  transition: height 260ms cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+.module.shade .harp-overlay {
+  height: 44px;
+}
 
 /* Star-Silver Grip: Curved Filigree Bow with Carved Jade Accents */
 .elven-grip {
@@ -398,7 +411,7 @@ header {
   z-index: 4;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(123, 242, 198, 0.2);
 }
-.module.shade:not(.scabbard-active) .shade-diadem {
+.module.shade:not(.scabbard-active):not(.harp-active) .shade-diadem {
   display: flex;
 }
 .shade-title {
@@ -492,6 +505,74 @@ header {
 }
 .scabbard-gems i.jade { background: var(--nephrite-jade-bright); color: var(--nephrite-jade-bright); }
 .scabbard-gems i.moon { background: var(--moonstone-blue); color: var(--moonstone-blue); }
+
+/* Option 6: Filigree Harp Compression Strip */
+.harp-strip {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  top: 10px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: linear-gradient(90deg, #101c24 0%, #1e3240 30%, #294456 50%, #1e3240 70%, #101c24 100%);
+  border: 1.5px solid #8ebddc;
+  border-radius: 6px;
+  z-index: 5;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.75),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(123, 242, 198, 0.35);
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+.module.shade.harp-active .harp-strip {
+  display: flex;
+}
+.harp-title {
+  font: 10px/1 "Courier New", monospace;
+  color: var(--star-silver-bright);
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.harp-title .harp-icon {
+  color: var(--nephrite-jade-bright);
+  font-size: 13px;
+  text-shadow: 0 0 6px var(--nephrite-jade-bright);
+}
+.harp-title .harp-sep {
+  color: #648da5;
+}
+.harp-title .harp-metric {
+  color: #7bf2c6;
+  font-weight: bold;
+}
+.harp-pips {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.harp-pin {
+  width: 3px;
+  height: 12px;
+  background: linear-gradient(180deg, #ffffff, #d8ba66);
+  border-radius: 1px;
+  margin-right: 2px;
+  box-shadow: 0 0 4px #7bf2c6;
+}
+.harp-pips i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px currentColor;
+}
+.harp-pips i.jade { background: var(--nephrite-jade-bright); color: var(--nephrite-jade-bright); }
+.harp-pips i.moon { background: var(--moonstone-blue); color: var(--moonstone-blue); }
+.harp-pips i.gold { background: var(--electrum-gold); color: var(--electrum-gold); }
 
 /* Tabs & Interactive Controls */
 .tab-row {
@@ -993,8 +1074,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Elven &amp; Intricate <span>/ tendril braid, lotus, crystal, scabbard &amp; liquid ithildin</span></h1>
-    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Quicksilver meniscus bridge · Sylvan scabbard slide</p>
+    <h1>Elven &amp; Intricate <span>/ tendril braid, lotus, crystal, scabbard, quicksilver &amp; harp</span></h1>
+    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Quicksilver meniscus bridge · Sylvan scabbard slide · Filigree harp compression</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -1004,7 +1085,8 @@ footer .note-highlight {
         <option value="lotus_petals">2. Lotus Petal Nocturne shade</option>
         <option value="crystal_cleavage">3. Crystalline Cleavage &amp; Harmonic Chime join</option>
         <option value="scabbard_slide">4. Sylvan Scabbard Slide shade</option>
-        <option value="liquid_ithildin" selected>5. Liquid Ithildin Meniscus (Quicksilver Bridge) join</option>
+        <option value="liquid_ithildin">5. Liquid Ithildin Meniscus (Quicksilver Bridge) join</option>
+        <option value="harp_compression" selected>6. Filigree Harp Compression shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -1014,11 +1096,12 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim" class="primary-btn">Snap quicksilver meniscus</button>
+    <button id="btnHarpAnim" class="primary-btn">Compress harp ribs</button>
+    <button id="btnJoinAnim">Join capsules</button>
     <button id="btnScabbardAnim">Slide into scabbard</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnLotusAnim">Close lotus petals</button>
-    <button id="btnChimeAnim" title="Agitate quicksilver meniscus to trigger fluid surface tension ripple">Agitate meniscus</button>
+    <button id="btnChimeAnim" title="Strum harmonic starlight harp strings">Strum harp strings</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -1216,6 +1299,23 @@ footer .note-highlight {
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
+
+        <!-- Option 6: Filigree Harp Compression Gradients -->
+        <linearGradient id="harpStringGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="25%" stop-color="#d6f7ee"/>
+          <stop offset="50%" stop-color="#7bf2c6"/>
+          <stop offset="75%" stop-color="#a5d8ff"/>
+          <stop offset="100%" stop-color="#ffffff"/>
+        </linearGradient>
+
+        <linearGradient id="harpRibGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="20%" stop-color="#e2eff7"/>
+          <stop offset="50%" stop-color="#91b5cc"/>
+          <stop offset="80%" stop-color="#4a6d85"/>
+          <stop offset="100%" stop-color="#1e3444"/>
+        </linearGradient>
       </defs>
 
       <!-- Shared Hull & Intertwined Tendril Weave -->
@@ -1255,6 +1355,7 @@ footer .note-highlight {
       <svg class="module-svg" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="lotus-overlay" id="lotus-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="scabbard-overlay" id="scabbard-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <svg class="harp-overlay" id="harp-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <button class="elven-grip" data-drag="a" aria-label="Move Jarvis capsule">
         <span><span class="rune-mark">✧</span> Jarvis / Sylvan Regent</span>
         <span>⋮⋮</span>
@@ -1301,6 +1402,18 @@ footer .note-highlight {
         </div>
       </div>
 
+      <!-- Compact Filigree Harp Strip for Option 6 Shade Mode -->
+      <div class="harp-strip" aria-label="Jarvis harp shade summary">
+        <span class="harp-title"><span class="harp-icon">𝄞</span> JARVIS <span class="harp-sep">·</span> <strong class="harp-metric">03 AGENTS</strong></span>
+        <div class="harp-pips">
+          <span class="harp-pin" title="Harmonic tuning pin"></span>
+          <i class="pip jade" title="Jade harmonic"></i>
+          <i class="pip moon" title="Moonstone harmonic"></i>
+          <i class="pip gold" title="Electrum harmonic"></i>
+          <i class="pip jade" title="Jade harmonic"></i>
+        </div>
+      </div>
+
       <div class="tab-row" role="tablist" aria-label="Jarvis screens">
         <button class="elven-tab" role="tab" aria-selected="true" data-page="0">Status</button>
         <button class="elven-tab" role="tab" aria-selected="false" data-page="1">Task</button>
@@ -1317,6 +1430,7 @@ footer .note-highlight {
       <svg class="module-svg" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="lotus-overlay" id="lotus-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="scabbard-overlay" id="scabbard-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <svg class="harp-overlay" id="harp-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <button class="elven-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
         <span><span class="rune-mark">✧</span> GitDiscuss / Archive Weaver</span>
         <span>⋮⋮</span>
@@ -1356,6 +1470,17 @@ footer .note-highlight {
         <div class="scabbard-gems">
           <span class="scabbard-latch-pin" title="Bayonet catch pin"></span>
           <i class="moon"></i><i class="jade"></i>
+        </div>
+      </div>
+
+      <!-- Compact Filigree Harp Strip for Option 6 Shade Mode -->
+      <div class="harp-strip" aria-label="GitDiscuss harp shade summary">
+        <span class="harp-title"><span class="harp-icon">𝄞</span> GITDISCUSS <span class="harp-sep">·</span> <strong class="harp-metric">02 QUEUED</strong></span>
+        <div class="harp-pips">
+          <span class="harp-pin" title="Harmonic tuning pin"></span>
+          <i class="pip moon" title="Moonstone harmonic"></i>
+          <i class="pip jade" title="Jade harmonic"></i>
+          <i class="pip gold" title="Electrum harmonic"></i>
         </div>
       </div>
 
@@ -1399,7 +1524,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade, Crystalline Cleavage Join, Sylvan Scabbard Slide Shade &amp; Liquid Ithildin Meniscus Join</h3>
+  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade, Crystalline Cleavage Join, Sylvan Scabbard Slide Shade, Liquid Ithildin Meniscus Join &amp; Filigree Harp Compression Shade</h3>
   <p>
     Forged from spun star-silver (Ithildin), white birchwood inlays, and mother-of-pearl bezels. Contours follow swept aerodynamic swan-wing curves and delicate botanical filigree crowns, preserving high contrast and uncompromised display readability.
   </p>
@@ -1417,6 +1542,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 5 — Liquid Ithildin Meniscus (Quicksilver Bridge) join:</span> Semicircular polished nephrite jade cups carved into the star-silver mating rims hold droplets of living liquid Ithildin (quicksilver). As the capsules approach within capture distance, electrostatic attraction draws the liquid metal across the threshold, forming an elastic hourglass neck (catenoid liquid bridge). Upon docking, surface tension snaps the liquid into a seamless, gleaming quicksilver bead resting inside a unified jade chalice, with concentric caustic ripples and damped fluid wobble settling into stillness. The meniscus flexes organically as joined modules move. Pulling the quicksilver capillary needle right breaks surface tension and releases the assembly.
+  </p>
+  <p>
+    <span class="note-highlight">Option 6 — Filigree Harp Compression shade:</span> Vertical star-silver tracery ribs supporting the casing flex dynamically outward into dramatic parabolic curves, drawing the upper bridge rail and lower soundbox keel together like a closing celestial concert harp. Under compression, four luminous starlight harp strings bow into resonant parabolic waves, vibrating with harmonic starlight pulses. The instrument collapses into a sleek 44px star-silver wand with an unclipped, high-contrast status strip displaying the widget name and live metric, flanked by electrum tuning pins and sweeping Art Nouveau recurve leaf wings.
   </p>
 </footer>
 
@@ -1446,7 +1574,9 @@ const model = {
   scabbardFlash: 0,   // 0 to 1 = insertion starlight quicksilver shimmer
   meniscusProgress: 0, // 0 = resting droplets in jade cups, 0.5 = hourglass neck, 1 = snapped quicksilver meniscus
   meniscusSnap: 0,     // 0 to 1 = surface tension snap & damped fluid oscillation wavefront
-  option: 'liquid_ithildin',
+  harpCompression: 0,  // 0 = uncompressed upright harp tracery ribs, 1 = flexed parabolic curves drawing rails together
+  harpShimmer: 0,      // 0 to 1 = starlight harmonic shimmer wavefront
+  option: 'harp_compression',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -2328,6 +2458,190 @@ function drawScabbardOverlay(f, width = W) {
   return s;
 }
 
+// Option 6: Filigree Harp Compression Shade Mode (Tracery ribs flex into parabolic curves drawing rails together)
+function drawHarpOverlay(f, width = W, shimmer = 0) {
+  if (model.option !== 'harp_compression' && f <= 0.001) return '';
+  const midX = width / 2;
+  // Rails draw together: top rail descends, bottom keel ascends
+  const yTop = 14 + f * 6; // y = 14 down to 20
+  const yBot = 116 - f * 82; // y = 116 up to 34
+  const yMid = (yTop + yBot) / 2;
+  const heightSpan = yBot - yTop;
+
+  let s = `<g class="sylvan-harp-overlay">`;
+
+  // Draw Left & Right Harp Pillars, Parabolic Flexing Ribs, and Starlight Strings
+  [-1, 1].forEach(side => {
+    const isLeft = side === -1;
+    // Pillar anchor center
+    const xPillar = isLeft ? 32 : width - 32;
+    // Parabolic bow outward under compression (bows left for left, right for right)
+    const bow = f * 24 * -side;
+
+    // 1. Outer Art Nouveau Filigree Rib (flaring into sweeping recurve wing tip)
+    const outerX = xPillar - side * 12;
+    const outerMidX = outerX + bow * 1.15;
+    s += `
+      <path d="M ${outerX} ${yTop - 2}
+               Q ${outerMidX} ${yMid} ${outerX} ${yBot + 2}"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M ${outerX + side * 1} ${yTop}
+               Q ${outerMidX - side * 1} ${yMid} ${outerX + side * 1} ${yBot}"
+            fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.85"/>
+    `;
+
+    // 2. Main Fluted Star-Silver Harp Pillar
+    const mainMidX = xPillar + bow;
+    s += `
+      <path d="M ${xPillar} ${yTop}
+               Q ${mainMidX} ${yMid} ${xPillar} ${yBot}"
+            fill="none" stroke="url(#harpRibGrad)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M ${xPillar - side * 1} ${yTop + 1}
+               Q ${mainMidX - side * 1} ${yMid} ${xPillar - side * 1} ${yBot - 1}"
+            fill="none" stroke="url(#silverHighlight)" stroke-width="1.2" opacity="0.9"/>
+    `;
+
+    // 3. Inner Openwork Leaf Rib
+    const innerX = xPillar + side * 10;
+    const innerMidX = innerX + bow * 0.8;
+    s += `
+      <path d="M ${innerX} ${yTop + 2}
+               Q ${innerMidX} ${yMid} ${innerX} ${yBot - 2}"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.6" stroke-linecap="round"/>
+    `;
+
+    // 4. Flexing Trefoil Filigree Cross-Struts with Nephrite Jade Nodes (3 tiers)
+    [0.25, 0.5, 0.75].forEach((frac, idx) => {
+      const sy = yTop + heightSpan * frac;
+      const ox = outerX + (outerMidX - outerX) * (1 - 4 * Math.pow(frac - 0.5, 2));
+      const mx = xPillar + (mainMidX - xPillar) * (1 - 4 * Math.pow(frac - 0.5, 2));
+      const ix = innerX + (innerMidX - innerX) * (1 - 4 * Math.pow(frac - 0.5, 2));
+      s += `
+        <path d="M ${ox} ${sy} Q ${(ox + mx)/2} ${sy - 2} ${mx} ${sy}"
+              fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.2"/>
+        <path d="M ${mx} ${sy} Q ${(mx + ix)/2} ${sy + 2} ${ix} ${sy}"
+              fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.2"/>
+        <circle cx="${mx}" cy="${sy}" r="${Math.max(1.2, 1.8 - f * 0.3)}" fill="url(#nephriteJadeGrad)"/>
+      `;
+    });
+
+    // 5. Four Harmonic Starlight Harp Strings (Vibrating & bowing under tension)
+    for (let sIdx = 0; sIdx < 4; sIdx++) {
+      const strFrac = (sIdx + 0.5) / 4;
+      const strTopX = innerX + side * (6 + sIdx * 5);
+      const strBotX = strTopX;
+      // Starlight string bows into catenary curve during compression, with vibration
+      const vib = (shimmer > 0 || (f > 0.05 && f < 0.95))
+        ? Math.sin((shimmer * 20 + f * 30) + sIdx * 1.6) * (3 * (1 - f * 0.5) + shimmer * 4)
+        : 0;
+      const strMidX = strTopX + bow * (0.35 + strFrac * 0.25) + vib;
+
+      s += `
+        <!-- Starlight String Glow Aura -->
+        <path d="M ${strTopX} ${yTop + 3}
+                 Q ${strMidX} ${yMid} ${strBotX} ${yBot - 3}"
+              fill="none" stroke="#7bf2c6" stroke-width="1.8" opacity="${0.4 + shimmer * 0.4}"
+              filter="url(#crystalOpticalGlow)"/>
+        <!-- Core Luminescent String Filament -->
+        <path d="M ${strTopX} ${yTop + 3}
+                 Q ${strMidX} ${yMid} ${strBotX} ${yBot - 3}"
+              fill="none" stroke="url(#harpStringGrad)" stroke-width="1" opacity="0.95"/>
+      `;
+
+      // Top Tuning Peg eyelet
+      s += `<circle cx="${strTopX}" cy="${yTop + 3}" r="1.5" fill="url(#electrumSettingGrad)"/>`;
+      // Bottom Bridge Hitch pin
+      s += `<circle cx="${strBotX}" cy="${yBot - 3}" r="1.5" fill="url(#moonstoneGrad)"/>`;
+    }
+
+    // 6. Pillar Head Capital Brooch (Tuning Arch Socket)
+    s += `
+      <g transform="translate(${xPillar}, ${yTop - 2})">
+        <path d="M ${-side * 8} -6 Q 0 -12 ${side * 8} -6 L ${side * 6} 4 Q 0 8 ${-side * 6} 4 Z"
+              fill="url(#starSilverGrad)" stroke="#162732" stroke-width="1"/>
+        <circle cx="0" cy="-2" r="3.2" fill="url(#nephriteJadeGrad)" stroke="#162732" stroke-width="0.7"/>
+        <circle cx="0" cy="-2" r="1.2" fill="#ffffff"/>
+      </g>
+    `;
+
+    // 7. Pillar Base Plinth / Soundbox Shoe
+    s += `
+      <g transform="translate(${xPillar}, ${yBot + 2})">
+        <path d="M ${-side * 8} -4 Q 0 -8 ${side * 8} -4 L ${side * 8} 6 Q 0 10 ${-side * 8} 6 Z"
+              fill="url(#starSilverGrad)" stroke="#162732" stroke-width="1"/>
+        <circle cx="0" cy="2" r="2.8" fill="url(#moonstoneGrad)" stroke="#162732" stroke-width="0.7"/>
+      </g>
+    `;
+  });
+
+  // 8. Horizontal Upper Harp Bridge Rail (Carrying Central Electrum Tuning Pins)
+  s += `
+    <g class="harp-upper-bridge">
+      <path d="M 44 ${yTop} H ${width - 44}"
+            stroke="url(#harpRibGrad)" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M 46 ${yTop - 1} H ${width - 46}"
+            stroke="#ffffff" stroke-width="0.8" opacity="0.85"/>
+  `;
+  // Central Tuning Pins along upper bridge
+  [76, 112, 148, width - 148, width - 112, width - 76].forEach(px => {
+    s += `
+      <g transform="translate(${px}, ${yTop - 1})">
+        <rect x="-1.5" y="-5" width="3" height="6" rx="1" fill="url(#electrumSettingGrad)" stroke="#162532" stroke-width="0.6"/>
+        <circle cx="0" cy="-5" r="2" fill="url(#nephriteJadeGrad)"/>
+      </g>
+    `;
+  });
+  s += `</g>`;
+
+  // 9. Horizontal Lower Keel / Soundbox Rail (with Acoustic Leaf Sound-Holes)
+  s += `
+    <g class="harp-lower-soundbox">
+      <path d="M 44 ${yBot} H ${width - 44}"
+            stroke="url(#harpRibGrad)" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M 46 ${yBot + 1} H ${width - 46}"
+            stroke="#162732" stroke-width="0.8"/>
+  `;
+  // Acoustic Leaf Sound-Holes
+  [midX - 70, midX, midX + 70].forEach(sx => {
+    s += `
+      <g transform="translate(${sx}, ${yBot})">
+        <path d="M -8 0 Q 0 -3 8 0 Q 0 3 -8 0 Z" fill="#060c10" stroke="#3b5568" stroke-width="0.7"/>
+        <circle cx="0" cy="0" r="1.3" fill="url(#nephriteJadeGrad)"/>
+      </g>
+    `;
+  });
+  s += `</g>`;
+
+  // 10. Starlight Harmonic Shimmer Wavefront (Pulse on lock or strum)
+  if (f > 0.75 || shimmer > 0) {
+    const pulseIntensity = shimmer > 0 ? shimmer : (f - 0.75) / 0.25;
+    s += `
+      <!-- Harmonic Shimmer Beam across seated wand -->
+      <rect x="44" y="${yTop - 1}" width="${width - 88}" height="${Math.max(6, yBot - yTop + 2)}" rx="4"
+            fill="url(#quicksilverBeamGrad)" opacity="${pulseIntensity * 0.85}" filter="url(#moonlitCausticGlow)"/>
+      <line x1="46" y1="${yMid}" x2="${width - 46}" y2="${yMid}"
+            stroke="#ffffff" stroke-width="${2.5 * pulseIntensity + 0.8}" opacity="${pulseIntensity}"/>
+    `;
+
+    // Concentric Harmonic Chime Ring Waves radiating from left and right capitals
+    [-1, 1].forEach(side => {
+      const cx = side === -1 ? 32 : width - 32;
+      s += `
+        <ellipse cx="${cx}" cy="${yMid}" rx="${16 + pulseIntensity * 38}" ry="${12 + pulseIntensity * 28}"
+                 fill="none" stroke="#7bf2c6" stroke-width="${Math.max(0.6, (1 - pulseIntensity) * 2.5)}"
+                 opacity="${(1 - pulseIntensity * 0.3) * pulseIntensity}" filter="url(#crystalOpticalGlow)"/>
+        <g transform="translate(${cx}, ${yTop - 4}) scale(${0.8 + pulseIntensity * 0.4})">
+          <path d="M 0 -8 L 3 0 L 0 8 L -3 0 Z" fill="#ffffff" filter="url(#crystalOpticalGlow)"/>
+          <circle cx="0" cy="0" r="1.5" fill="#7bf2c6"/>
+        </g>
+      `;
+    });
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Option 5: Shared Liquid Ithildin Meniscus (Quicksilver Bridge) Join
 function drawLiquidIthildinJoin(a, b, progress, isJoined, light, snapWave, isShade = false, tension = 0) {
   if (isShade) return '';
@@ -2635,6 +2949,14 @@ function renderHardware() {
     }
   }
 
+  // Filigree Harp Compression in each module
+  for (const id of ['a', 'b']) {
+    const hEl = $('#harp-' + id);
+    if (hEl) {
+      hEl.innerHTML = drawHarpOverlay(model.harpCompression, W, model.harpShimmer);
+    }
+  }
+
   // Active Proximity Aura (for Tendril Braid)
   if (model.option !== 'crystal_cleavage' && model.option !== 'liquid_ithildin' && !isShade && glow > 0.05 && p < 0.98) {
     $('#elvenLightAura').innerHTML = `
@@ -2649,7 +2971,7 @@ function renderHardware() {
 }
 
 function updateStateButtons() {
-  const isShade = model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5;
+  const isShade = model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5;
   const isJoined = model.joined;
   const isJoining = ((model.option === 'crystal_cleavage'
     ? (model.crystalGlide > 0.1 && model.crystalGlide < 0.95)
@@ -2684,6 +3006,7 @@ function render() {
     el.style.zIndex = model.front === id ? '4' : '2';
     el.classList.toggle('shade', model.shade);
     el.classList.toggle('scabbard-active', (model.option === 'scabbard_slide' || model.scabbardSlide > 0.5) && (model.shade || model.scabbardSlide > 0.5));
+    el.classList.toggle('harp-active', (model.option === 'harp_compression' || model.harpCompression > 0.5) && (model.shade || model.harpCompression > 0.5));
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.elven-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
@@ -2692,10 +3015,35 @@ function render() {
     const tabRow = el.querySelector('.tab-row');
     const canopyBtn = el.querySelector('.canopy-btn');
     const jewelBtns = el.querySelectorAll('.sylvan-jewel-btn');
+    const harp = model.harpCompression;
+    const isHarp = model.option === 'harp_compression' || harp > 0.001;
     const slide = model.scabbardSlide;
     const isScabbard = model.option === 'scabbard_slide' || slide > 0.001;
 
-    if (isScabbard && slide > 0.001) {
+    if (isHarp && harp > 0.001) {
+      const dy = -harp * 84;
+      const opacity = Math.max(0, 1 - harp * 1.5);
+      if (screenEl) {
+        screenEl.style.transform = `translateY(${dy}px)`;
+        screenEl.style.opacity = String(opacity);
+        screenEl.style.pointerEvents = harp > 0.2 ? 'none' : 'auto';
+      }
+      if (tabRow) {
+        tabRow.style.transform = `translateY(${dy}px)`;
+        tabRow.style.opacity = String(opacity);
+        tabRow.style.pointerEvents = harp > 0.2 ? 'none' : 'auto';
+      }
+      if (canopyBtn) {
+        canopyBtn.style.transform = `translateY(${dy}px)`;
+        canopyBtn.style.opacity = String(opacity);
+        canopyBtn.style.pointerEvents = harp > 0.2 ? 'none' : 'auto';
+      }
+      jewelBtns.forEach(b => {
+        b.style.transform = `translateY(${dy}px)`;
+        b.style.opacity = String(opacity);
+        b.style.pointerEvents = harp > 0.2 ? 'none' : 'auto';
+      });
+    } else if (isScabbard && slide > 0.001) {
       const dy = -slide * 84;
       const opacity = Math.max(0, 1 - slide * 1.5);
       if (screenEl) {
@@ -2797,6 +3145,12 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
+  const btnHarp = $('#btnHarpAnim');
+  if (btnHarp) {
+    btnHarp.textContent = (model.shade || model.harpCompression > 0.5) ? 'Open harp frame' : 'Compress harp ribs';
+    btnHarp.disabled = model.busy;
+  }
+
   const btnLotus = $('#btnLotusAnim');
   if (btnLotus) {
     btnLotus.textContent = (model.shade || model.petalFold > 0.5) ? 'Bloom lotus petals' : 'Close lotus petals';
@@ -2839,8 +3193,10 @@ function render() {
   }
 
   if (!model.busy) {
-    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5) {
-      if (model.option === 'scabbard_slide' || model.scabbardSlide > 0.5) {
+    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5) {
+      if (model.option === 'harp_compression' || model.harpCompression > 0.5) {
+        $('#phase').textContent = 'Shade mode / Filigree Harp Compression (44px wand)';
+      } else if (model.option === 'scabbard_slide' || model.scabbardSlide > 0.5) {
         $('#phase').textContent = 'Shade mode / Sylvan Scabbard Slide (22px rim)';
       } else {
         $('#phase').textContent = 'Shade mode / Lotus Petal Nocturne diadem wand';
@@ -3308,14 +3664,84 @@ async function drawScabbardBlade() {
     : 'Separate / Two sylvan star-silver hulls';
 }
 
+// Option 6: Filigree Harp Compression Shade Mode Animations
+async function compressHarpFrame() {
+  if (model.busy || (model.shade && model.harpCompression >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Compressing filigree harp frame: Tracery ribs flex into parabolic curves, drawing rails together into a slim silver wand.');
+  $('#phase').textContent = 'Flexing harp ribs into parabolic curves';
+
+  model.shade = true;
+  render();
+
+  await tween(460, t => {
+    const comp = t === 1 ? 1 : 1 - Math.pow(1 - t, 2.6);
+    model.harpCompression = comp;
+    if (t > 0.75) {
+      model.harpShimmer = (t - 0.75) / 0.25;
+    }
+    render();
+  }, token);
+
+  model.harpCompression = 1;
+  model.harpShimmer = 0;
+  model.busy = false;
+  render();
+  say('Harp frame fully compressed. Tracery ribs locked in parabolic leaf arches. Slim star-silver wand status strip illuminated.');
+  $('#phase').textContent = 'Shade mode / Filigree Harp Compression';
+}
+
+async function openHarpFrame() {
+  if (model.busy || (!model.shade && model.harpCompression <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Expanding harp frame: Parabolic silver ribs release tension and return to upright tracery pillars.');
+  $('#phase').textContent = 'Expanding harp frame';
+
+  model.shade = false;
+  render();
+
+  await tween(440, t => {
+    const decomp = 1 - (t === 1 ? 1 : 1 - Math.pow(1 - t, 2.4));
+    model.harpCompression = decomp;
+    render();
+  }, token);
+
+  model.harpCompression = 0;
+  model.busy = false;
+  render();
+  say('Harp frame fully expanded. Full crystalline obsidian screen and sylvan controls restored.');
+  $('#phase').textContent = model.joined
+    ? (model.option === 'crystal_cleavage' ? 'Joined / Monolithic moonstone prism' : (model.option === 'liquid_ithildin' ? 'Joined / Quicksilver meniscus in jade chalice' : 'Joined / One unified sylvan instrument'))
+    : 'Separate / Two sylvan star-silver hulls';
+}
+
+async function strumHarpStrings() {
+  if (model.busy) return;
+  const token = ++animationToken;
+  say('Strumming celestial harp strings: Harmonic starlight caustics ripple across the parabolic filigree frame.');
+  await tween(580, t => {
+    model.harpShimmer = Math.sin(t * Math.PI);
+    renderHardware();
+  }, token);
+  model.harpShimmer = 0;
+  renderHardware();
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05) {
+      if (model.harpCompression > 0.05) await openHarpFrame();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else await bloomLotusPetals();
     }
     if (model.joined) {
@@ -3335,8 +3761,9 @@ async function applyState(stateName) {
       say('State: Separate — Two independent star-silver capsules with exposed mating collars.');
     }
   } else if (stateName === 'joining') {
-    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05) {
+      if (model.harpCompression > 0.05) await openHarpFrame();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else await bloomLotusPetals();
     }
     model.joined = false;
@@ -3372,8 +3799,9 @@ async function applyState(stateName) {
       say('State: Joining — Mid-animation view with silver tendrils uncoiling across the chasm.');
     }
   } else if (stateName === 'joined') {
-    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05) {
+      if (model.harpCompression > 0.05) await openHarpFrame();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else await bloomLotusPetals();
     }
     if (!model.joined) {
@@ -3407,11 +3835,13 @@ async function applyState(stateName) {
       }
     }
   } else if (stateName === 'shade') {
-    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5) {
-      if (model.scabbardSlide > 0.5) await drawScabbardBlade();
+    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5) {
+      if (model.harpCompression > 0.5) await openHarpFrame();
+      else if (model.scabbardSlide > 0.5) await drawScabbardBlade();
       else await bloomLotusPetals();
     } else {
-      if (model.option === 'scabbard_slide') await slideScabbardBlade();
+      if (model.option === 'harp_compression') await compressHarpFrame();
+      else if (model.option === 'scabbard_slide') await slideScabbardBlade();
       else await closeLotusPetals();
     }
   }
@@ -3472,6 +3902,10 @@ $('#btnStateSeparate').onclick = () => applyState('separate');
 $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState('shade');
+$('#btnHarpAnim').onclick = () => {
+  if (model.shade || model.harpCompression > 0.5) openHarpFrame();
+  else compressHarpFrame();
+};
 $('#btnJoinAnim').onclick = () => {
   if (model.option === 'crystal_cleavage') joinCrystal();
   else if (model.option === 'liquid_ithildin') joinMeniscus();
@@ -3491,7 +3925,8 @@ $('#btnScabbardAnim').onclick = () => {
   else slideScabbardBlade();
 };
 $('#btnChimeAnim').onclick = () => {
-  if (model.option === 'liquid_ithildin') triggerMeniscusRipple();
+  if (model.option === 'harp_compression') strumHarpStrings();
+  else if (model.option === 'liquid_ithildin') triggerMeniscusRipple();
   else triggerHarmonicChime();
 };
 $('#btnDesign').onclick = () => {
@@ -3507,84 +3942,82 @@ $('#btnReset').onclick = () => {
     joined: false, busy: false, canopy: false, docked: false, design: false, shade: false,
     blend: 0, cap: 0, tendrilProgress: 0, petalFold: 0, crystalGlide: 0, chimeWave: 0,
     scabbardSlide: 0, scabbardFlash: 0, meniscusProgress: 0, meniscusSnap: 0,
-    option: 'liquid_ithildin', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    harpCompression: 0, harpShimmer: 0,
+    option: 'harp_compression', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
-  $('#btnJoinAnim').textContent = 'Snap quicksilver meniscus';
-  $('#btnJoinAnim').classList.add('primary-btn');
+  $('#btnHarpAnim').textContent = 'Compress harp ribs';
+  $('#btnHarpAnim').classList.add('primary-btn');
+  $('#btnJoinAnim').classList.remove('primary-btn');
   $('#btnLotusAnim').classList.remove('primary-btn');
   $('#btnScabbardAnim').classList.remove('primary-btn');
   if ($('#btnChimeAnim')) {
-    $('#btnChimeAnim').textContent = 'Agitate meniscus';
-    $('#btnChimeAnim').setAttribute('title', 'Agitate quicksilver meniscus to trigger fluid surface tension ripple');
+    $('#btnChimeAnim').textContent = 'Strum harp strings';
+    $('#btnChimeAnim').setAttribute('title', 'Strum harmonic starlight harp strings');
   }
-  $('#optionSelect').value = 'liquid_ithildin';
+  $('#optionSelect').value = 'harp_compression';
   render();
-  say('Reset to initial Elven study configuration with Liquid Ithildin Meniscus join.');
+  say('Reset to initial Elven study configuration with Filigree Harp Compression shade.');
 };
 
 $('#optionSelect').onchange = async (e) => {
   model.option = e.target.value;
-  if (model.option === 'liquid_ithildin') {
+  if (model.option === 'harp_compression') {
+    say('Option 6: Filigree Harp Compression shade selected. Tracery ribs flex into parabolic curves, drawing rails together.');
+    $('#btnHarpAnim').classList.add('primary-btn');
+    $('#btnJoinAnim').classList.remove('primary-btn');
+    $('#btnLotusAnim').classList.remove('primary-btn');
+    $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Strum harp strings';
+      $('#btnChimeAnim').setAttribute('title', 'Strum harmonic starlight harp strings');
+    }
+    if (model.shade) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else if (model.petalFold > 0.05) await bloomLotusPetals();
+      await compressHarpFrame();
+    } else {
+      await compressHarpFrame();
+    }
+  } else if (model.option === 'liquid_ithildin') {
     say('Option 5: Liquid Ithildin Meniscus (Quicksilver Bridge) join selected. Liquid star-silver droplets snap by surface tension.');
     $('#btnJoinAnim').textContent = 'Snap quicksilver meniscus';
     $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
     if ($('#btnChimeAnim')) {
       $('#btnChimeAnim').textContent = 'Agitate meniscus';
       $('#btnChimeAnim').setAttribute('title', 'Agitate quicksilver meniscus to trigger fluid surface tension ripple');
     }
-    if (model.shade && model.scabbardSlide > 0.05) {
-      await drawScabbardBlade();
+    if (model.shade) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
     }
   } else if (model.option === 'scabbard_slide') {
     say('Option 4: Sylvan Scabbard Slide shade selected. Display bay glides upward into overhead repoussé star-silver canopy.');
     $('#btnScabbardAnim').classList.add('primary-btn');
+    $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     if ($('#btnChimeAnim')) {
       $('#btnChimeAnim').textContent = 'Chime resonance';
       $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
     }
-    if (model.shade && model.petalFold > 0.05) {
-      await bloomLotusPetals();
+    if (model.shade) {
+      if (model.petalFold > 0.05) await bloomLotusPetals();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
+      await slideScabbardBlade();
+    } else {
       await slideScabbardBlade();
     }
   } else if (model.option === 'crystal_cleavage') {
     say('Option 3: Crystalline Cleavage & Harmonic Chime join selected. 30° moonstone prism planes glide flush.');
     $('#btnJoinAnim').textContent = 'Seat crystal prisms';
     $('#btnJoinAnim').classList.add('primary-btn');
-    $('#btnLotusAnim').classList.remove('primary-btn');
-    $('#btnScabbardAnim').classList.remove('primary-btn');
-    if ($('#btnChimeAnim')) {
-      $('#btnChimeAnim').textContent = 'Chime resonance';
-      $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
-    }
-    if (model.shade && model.scabbardSlide > 0.05) {
-      await drawScabbardBlade();
-    }
-  } else if (model.option === 'lotus_petals') {
-    say('Option 2: Lotus Petal Nocturne shade selected. Curved filigree plates fold upward across the screen.');
-    $('#btnLotusAnim').classList.add('primary-btn');
-    $('#btnJoinAnim').classList.remove('primary-btn');
-    $('#btnScabbardAnim').classList.remove('primary-btn');
-    if ($('#btnChimeAnim')) {
-      $('#btnChimeAnim').textContent = 'Chime resonance';
-      $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
-    }
-    if (model.shade && model.scabbardSlide > 0.05) {
-      await drawScabbardBlade();
-      await closeLotusPetals();
-    } else if (!model.shade) {
-      await closeLotusPetals();
-    }
-  } else if (model.option === 'tendril_braid') {
-    say('Option 1: Living Tendril Braid (Sylvan Weave) join selected. Tendrils reach and intertwine across the gap.');
-    $('#btnJoinAnim').textContent = 'Weave silver tendrils';
-    $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
     if ($('#btnChimeAnim')) {
@@ -3593,6 +4026,39 @@ $('#optionSelect').onchange = async (e) => {
     }
     if (model.shade) {
       if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
+    }
+  } else if (model.option === 'lotus_petals') {
+    say('Option 2: Lotus Petal Nocturne shade selected. Curved filigree plates fold upward across the screen.');
+    $('#btnLotusAnim').classList.add('primary-btn');
+    $('#btnHarpAnim').classList.remove('primary-btn');
+    $('#btnJoinAnim').classList.remove('primary-btn');
+    $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Chime resonance';
+      $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
+    }
+    if (model.shade) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
+      await closeLotusPetals();
+    } else {
+      await closeLotusPetals();
+    }
+  } else if (model.option === 'tendril_braid') {
+    say('Option 1: Living Tendril Braid (Sylvan Weave) join selected. Tendrils reach and intertwine across the gap.');
+    $('#btnJoinAnim').textContent = 'Weave silver tendrils';
+    $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnHarpAnim').classList.remove('primary-btn');
+    $('#btnLotusAnim').classList.remove('primary-btn');
+    $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Chime resonance';
+      $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
+    }
+    if (model.shade) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
       else await bloomLotusPetals();
     }
   }
@@ -3835,7 +4301,16 @@ window.addEventListener('pointermove', onPointerMove);
 window.addEventListener('pointerup', onPointerUp);
 window.addEventListener('pointercancel', onPointerUp);
 window.addEventListener('keydown', e => {
+  if (e.target.matches('input, select, textarea')) return;
   if (e.key === 'Escape') cancelDrag();
+  if (e.key === '1') applyState('separate');
+  if (e.key === '2') applyState('joining');
+  if (e.key === '3') applyState('joined');
+  if (e.key === '4') applyState('shade');
+  if (e.key === 'h' || e.key === 'H') {
+    if (model.shade || model.harpCompression > 0.5) openHarpFrame();
+    else compressHarpFrame();
+  }
   if (e.key === 'Enter' && document.activeElement === $('#sylvanRelease')) {
     if (model.option === 'crystal_cleavage') separateCrystal();
     else if (model.option === 'liquid_ithildin') separateMeniscus();
@@ -3860,7 +4335,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Elven & Intricate skin loaded: Spun star-silver with Liquid Ithildin Meniscus join.');
+say('Elven & Intricate skin loaded: Spun star-silver with Filigree Harp Compression shade.');
 </script>
 </body>
 </html>
