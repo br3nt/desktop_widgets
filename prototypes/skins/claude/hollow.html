@@ -127,7 +127,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .wait span{font:italic 10.5px/1.3 Georgia,serif;color:#5c4a36}
 .rose{position:absolute;right:15px;bottom:9px}
 .mmorph{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
-.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.platehit{cursor:w-resize}.hit .pinhit{cursor:pointer}
+.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.platehit{cursor:w-resize}.hit.inkhit{cursor:s-resize}.hit.inkhit .wet{opacity:0}.hit.inkhit:hover .wet,.hit.inkhit:focus-visible .wet{opacity:.5}.hit .pinhit{cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0;pointer-events:none}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
@@ -226,7 +226,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the ink bleed, pull the fused seam down to wet the ink and part it. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -601,6 +601,130 @@ const JOINS={
    if(jt===1){const x0=Ma-48,y0=ay-14,wd=90,ht=h+22;
     s+=`<g class="hit platehit" id="seamHit" tabindex="0" role="button" aria-label="Carapace overlap: push the plates back toward Jarvis, tap, or press Enter, to separate the widgets"><title>Push the plates back toward Jarvis, or tap, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${wd}" height="${f(ht)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${wd}" height="${f(ht)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
    return s;
+  }
+ },
+ ink:{label:'Ink bleed',kind:'Fuse',gap:20,holdAt:.56,msOut:1700,slow:1.15,
+  about:'The two shells fuse into one, drawn in a single ink line. <b>Near:</b> wet ink beads up along each iron strap, and fine ink threads start to reach from the top and bottom corners. <b>Ready:</b> the threads touch across the gap, and a dotted ghost shows the shared outline. Joining: the shells close to a finger\'s width apart, and the top and bottom outlines run across from both sides to meet. The gap floods with ink from the top and bottom at once. Where the two floods meet the ink <b>splashes</b>: drops flick out above and below the seam and hang for a beat on fine strands, then surface tension pulls every drop back in. The wobbling pool then pulls itself into a clean shape and dries to shell: raised shoulders over the old straps, one belly plate under them, the plate seam running straight on, and a thorn rising from the ink where the gap was. Last, a chalk highlight runs along the new ridge from Jarvis to GitDiscuss. The two shells now read as one creature with one outline. <b>Release:</b> pull the seam down. The shell goes wet again as you pull, the belly sags and a drop gathers under it; let go early and it draws back up and dries. Past the drip point, the ink pinches in the middle and parts, two drops fall, each half draws back into its own outline and strap, and the shells part. A tap on the seam, or Enter on it, does the same. In the cocoon and hanging-sign shades, where the shells fade, a short brush stroke of ink keeps the two straps joined.',
+  text:{join:'The shells close; their outlines touch, the ink runs together, splashes, and draws back into one clean outline.',joined:'Joined: one shell in one ink outline, with a thorn over the old gap. Drag either nameplate to move the pair. Pull the seam down, or tap it, to release.',
+   release:'Wet again: the ink sags, pinches apart and draws back into each outline.',back:'The ink draws back into each outline.',hold:'Held mid-join: the splash at its height, just before it is pulled back. Use the scrubber to step through the animation.',
+   ready:'Ready: the ink outlines touch across the gap. Release to fuse.',near:'Nearby: wet ink beads up on the joining ends. Move closer.',phReady:'Ready · the outlines touch',phNear:'Nearby · the ink beads up',get phDrag(){return drag&&drag.pull>18?'The ink is running · pull further':'Pull the seam down to wet the ink'}},
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.3?'Joining · closing in ':jt<.47?'Joining · the ink runs together ':jt<.62?'Joining · splash ':jt<.72?'Joining · the splash draws back ':jt<.86?'Joining · drying to shell ':'Joining · one outline '):(r<.12?'Releasing · the ink wets ':r<.28?'Releasing · pinching apart ':r<.45?'Releasing · drawing back ':'Releasing · parting ')},
+  // Where the floods meet, surface tension tugs the shells together for a moment.
+  nudge(jt,dir){if(dir<=0||jt>=1)return 0;const u=seg(jt,.47,.62);return u>0&&u<1?2.2*Math.sin(Math.PI*u)*(1-u):0},
+  // Splash drops: angle, distance, radius, and where on the seam they leave from (0 top, 1 bottom). None reaches a display.
+  SPLASH:[[-100,46,3.1,.06],[-72,36,2.1,.1],[-126,32,1.8,.14],[-88,64,1.4,.08],[-60,22,1.2,.2],[96,40,2.9,.94],[63,30,2,.9],[121,34,1.7,.9],[84,56,1.3,.96],[-14,22,1.6,.4],[190,22,1.8,.56],[10,18,1.2,.72]],
+  // A pulled-through release starts from the pull's sag; any other release starts dry.
+  releaseStart(){this.sag0=this.pend||0;this.pend=0},
+  key(){$('#a .grip').focus();doSeparate()},
+  seamDown(p){this.spring=0;return{seam:true,p0:p,pull:0,moved:0}},
+  seamMove(d,p){d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));d.pull=clamp(p.y-d.p0.y,0,40);
+   if(d.pull>=34){drag=null;this.pend=d.pull;$('#a .grip').focus();doSeparate();return}render()},
+  seamUp(d){if(d.moved<5){$('#a .grip').focus();doSeparate();return}
+   if(d.pull>2){say('The ink draws back up and dries. Pull further down to wet it through, or tap the seam.');
+    const from=d.pull,t0=performance.now(),me=this;(function step(now){const t=reduce.matches?1:clamp((now-t0)/320);me.spring=from*(1-ease(t));render();if(t<1&&model.jt===1&&!drag)requestAnimationFrame(step);else me.spring=0})(t0)}
+   else render()},
+  geo(c){const X=model.a.x+W,Xb=model.b.x,Y=model.a.y,Yb=model.b.y;return{X,Xb,Y,Yb,mid:(X+Xb)/2,Ym:(Y+Yb)/2,h:c.h}},
+  // The fused waist: raised shoulders over both straps, a low roof between them, one belly plate under.
+  // pinch draws the middle in (top and bottom meet at 1); sag drops the belly like a drip.
+  roofD(g,ph=0){const{X,Xb,Y,Yb,mid,Ym}=g;return `M${f(X-24)} ${f(Y+9.4)}C${f(X-17)} ${f(Y+9)} ${f(X-15)} ${f(Y-3)} ${f(X-8)} ${f(Y-3.5)}Q${f(mid)} ${f(Ym-6+ph*2)} ${f(Xb+8)} ${f(Yb-3.5)}C${f(Xb+15)} ${f(Yb-3)} ${f(Xb+17)} ${f(Yb+9)} ${f(Xb+24)} ${f(Yb+9.4)}`},
+  bellyD(g,ph=0,sag=0){const{X,Xb,Y,Yb,mid,Ym,h}=g;return `M${f(Xb+12)} ${f(Yb+h-4)}Q${f(mid)} ${f(Ym+h+3.6+sag-ph*2)} ${f(X-12)} ${f(Y+h-4)}`},
+  waistD(g,pinch=0,sag=0){const{X,Xb,Y,Yb,h}=g,ph=pinch*(g.h/2+2.2+sag/4);
+   return this.roofD(g,ph)+`L${f(Xb+24)} ${f(Yb+h-5)}L${f(Xb+12)} ${f(Yb+h-4)}`+this.bellyD(g,ph,sag).replace(/^M[^Q]+/,'')+`L${f(X-24)} ${f(Y+h-5)}Z`},
+  // One half of the ink after it parts, its inner edge rounded at xi; d is 1 for Jarvis, -1 for GitDiscuss.
+  halfD(g,d,xi){const X=d>0?g.X:g.Xb,Y=d>0?g.Y:g.Yb,h=g.h,q=h*.16;
+   return `M${f(X-24*d)} ${f(Y+9.4)}C${f(X-17*d)} ${f(Y+9)} ${f(X-15*d)} ${f(Y-3)} ${f(X-8*d)} ${f(Y-3.5)}Q${f(xi-2*d)} ${f(Y+q-3)} ${f(xi)} ${f(Y+h/2)}Q${f(xi-2*d)} ${f(Y+h-q)} ${f(X-12*d)} ${f(Y+h-4)}L${f(X-24*d)} ${f(Y+h-8)}Z`},
+  chalkD(g){const{X,Xb,Y,Yb,mid,Ym}=g;return `M${f(X-22)} ${f(Y+12.6)}C${f(X-16)} ${f(Y+12)} ${f(X-14.5)} ${f(Y+.4)} ${f(X-8)} ${f(Y-.1)}Q${f(mid)} ${f(Ym-2.6)} ${f(Xb+8)} ${f(Yb-.1)}C${f(Xb+14.5)} ${f(Yb+.4)} ${f(Xb+16)} ${f(Yb+12)} ${f(Xb+22)} ${f(Yb+12.6)}`},
+  defs(g,wet){const{X,Xb,Y,h}=g,w=Xb-X+48,e=f(6/w*1000)/1000;
+   return `<defs><linearGradient id="inkShellG" gradientUnits="userSpaceOnUse" x1="0" y1="${f(Y+3)}" x2="0" y2="${f(Y+h+3)}"><stop stop-color="#4a5c78"/><stop offset=".22" stop-color="#2f3d54"/><stop offset=".7" stop-color="#1c2535"/><stop offset="1" stop-color="#121822"/></linearGradient>`+
+    `<linearGradient id="inkFade" gradientUnits="userSpaceOnUse" x1="${f(X-24)}" y1="0" x2="${f(Xb+24)}" y2="0"><stop stop-color="#fff" stop-opacity="0"/><stop offset="${e}" stop-color="#fff"/><stop offset="${f((1-e)*1000)/1000}" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>`+
+    `<mask id="inkMask" maskUnits="userSpaceOnUse" x="${f(X-30)}" y="${f(Y-40)}" width="${f(w+12)}" height="${f(h+90)}"><rect x="${f(X-24)}" y="${f(Y-40)}" width="${f(w)}" height="${f(h+90)}" fill="url(#inkFade)"/></mask>`+
+    `<filter id="inkWob" x="-20%" y="-40%" width="140%" height="180%"><feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="${f(wet)}" xChannelSelector="R" yChannelSelector="G"/></filter></defs>`},
+  // The dried shell over the gap, with its thorn (crest 0..1) and the chalk highlight drawn in to chalk 0..1.
+  shell(g,op,crest,chalk){if(op<=0)return '';const{X,Xb,Y,Yb,mid,Ym,h}=g,D=this.waistD(g);
+   let s=`<g opacity="${f(op*100)/100}"><g mask="url(#inkMask)"><path d="${D}" fill="${INK}" transform="translate(0 2.6)"/><path d="${D}" fill="url(#inkShellG)" filter="url(#chitin)"/></g>`;
+   s+=`<g fill="none" stroke-linecap="round"><path d="M${f(X-24)} ${f(Y+31)}Q${f(mid)} ${f(Ym+28.6)} ${f(Xb+24)} ${f(Yb+31)}" stroke="${INK}" stroke-width="1.5" opacity=".8"/><path d="M${f(X-24)} ${f(Y+32.4)}Q${f(mid)} ${f(Ym+30)} ${f(Xb+24)} ${f(Yb+32.4)}" stroke="#c9d6e6" stroke-width=".8" opacity=".28"/>`+
+    `<path d="M${f(X-9)} ${f(Y+h-7.5)}Q${f(mid)} ${f(Ym+h-1.6)} ${f(Xb+9)} ${f(Yb+h-7.5)}" stroke="#c9d6e6" stroke-width=".9" opacity=".22"/>`;
+   if(chalk>0)s+=`<path d="${this.chalkD(g)}" pathLength="1" stroke-dasharray="${f(chalk*1000)/1000} 2" stroke="#e3eaf2" stroke-width="1.8" opacity=".55"/>`;
+   s+=`</g><path d="${this.roofD(g)}" fill="none" stroke="${INK}" stroke-width="2.3" stroke-linecap="round" filter="url(#wobW)"/><path d="${this.bellyD(g)}" fill="none" stroke="${INK}" stroke-width="2.3" stroke-linecap="round" filter="url(#wobW)"/>`;
+   // A thorn where the gap was, leaning back toward Jarvis like the ones on the carapace plates.
+   if(crest>0)s+=`<g transform="translate(${f(mid)} ${f(Ym-4.2)}) scale(${f(crest*100)/100})"><path d="M5.6 1.6C3 -4 .2 -10 -3.2 -18.5C-1.4 -10 -3 -4 -5.6 1.6Z" fill="#0b0e14" stroke="${INK}" stroke-width=".9" stroke-linejoin="round"/><path d="M-2.4 -14C-1.2 -9 -2 -4 -3.6 .4" fill="none" stroke="#9fb0c6" stroke-width=".7" opacity=".55"/></g>`;
+   return s+'</g>'},
+  // Wet ink: a glossy black shape, its edge wobbling while wet.
+  wetInk(d,op,g,gloss=1){if(op<=0)return '';return `<g opacity="${f(op*100)/100}"><path d="${d}" fill="${INK}" filter="url(#inkWob)"/>${gloss>0?`<path d="${this.chalkD(g)}" fill="none" stroke="#9fb3cf" stroke-width="1.1" stroke-linecap="round" opacity="${f(.42*gloss)}" filter="url(#inkWob)"/>`:''}</g>`},
+  // Ink beads welling out of each strap's outer edge, and threads reaching from the top and bottom corners (reach 1: they meet).
+  beads(g,k,reach){if(k<=0&&reach<=0)return '';const{X,Xb,Y,Yb,h}=g;let s='';
+   const E=[{x:X-3,y:Y,d:1},{x:Xb+3,y:Yb,d:-1}];
+   for(const e of E){const r=.8+2.6*k;
+    if(k>0)for(const fr of [.375,.625]){const cx=e.x+e.d*r*.6,cy=e.y+h*fr;
+     s+=`<path d="M${f(e.x)} ${f(cy-r)}Q${f(cx+e.d*r*1.1)} ${f(cy-r)} ${f(cx+e.d*r*.4)} ${f(cy+r*.6)}Q${f(cx)} ${f(cy+r+2.6*k)} ${f(e.x)} ${f(cy+r*.9)}Z" fill="${INK}"/><circle cx="${f(cx-e.d*r*.1)}" cy="${f(cy-r*.4)}" r="${f(r*.28)}" fill="#cfdcec" opacity="${f(.7*k)}"/>`}
+    if(reach>0){const o=E.find(q=>q!==e);
+     for(const[y0,y1,bow]of [[e.y+13,o.y+13,-1],[e.y+h-3,o.y+h-3,1]]){const n=9,pts=[],tx=lerp(e.x,o.x,reach*.5),ty=lerp(y0,y1,reach*.5);
+      for(let i=0;i<=n;i++){const t=i/n;pts.push([lerp(e.x,tx,t),lerp(y0,ty,t)+bow*3*Math.sin(Math.PI*t)*(1-reach*.6)+1.6*Math.sin(t*7+e.d)*(1-reach)])}
+      s+=`<path d="${taper(pts,3.4,.9)}" fill="${INK}"/>`;
+      if(reach>=1)s+=`<ellipse cx="${f(tx)}" cy="${f(ty)}" rx="3.2" ry="2.2" fill="${INK}"/>`}}}
+   return s},
+  drops(g,out,back){const{mid,Ym,h}=g;let s='';
+   for(const[a,dist,r,fr]of this.SPLASH){const ra=a*Math.PI/180,c=Math.cos(ra),sn=Math.sin(ra),o={x:mid+c*5,y:Ym+fr*h};
+    const k=(1-Math.pow(1-out,3))*(1-back*back),p={x:o.x+c*dist*k,y:o.y+sn*dist*k+7*out*out*(1-back)};
+    if(k<=.02)continue;
+    const st=1+(out<1?1.6*Math.pow(1-out,2):0)+(back>0&&back<1?1.2*back:0),ang=Math.atan2(p.y-o.y,p.x-o.x)*180/Math.PI;
+    if(out>=.6&&back<1)s+=`<path d="M${P(o)}Q${f((o.x+p.x)/2)} ${f((o.y+p.y)/2+3)} ${P(p)}" fill="none" stroke="${INK}" stroke-width="${f(.5+.6*(1-back))}" opacity="${f(.9*seg(out,.6,1))}"/>`;
+    s+=`<ellipse cx="${f(p.x)}" cy="${f(p.y)}" rx="${f(r*st)}" ry="${f(r/Math.sqrt(st))}" transform="rotate(${f(ang)} ${f(p.x)} ${f(p.y)})" fill="${INK}" stroke="#6d7f99" stroke-width=".6" stroke-opacity=".55"/><circle cx="${f(p.x-r*.3)}" cy="${f(p.y-r*.35)}" r="${f(r*.3)}" fill="#cfdcec" opacity=".7"/>`}
+   return s},
+  // Glint at the head of the chalk stroke, following the ridge.
+  ridgeAt(g,u){const{X,Xb,Y,Yb,mid,Ym}=g,K=[[X-22,Y+12.6],[X-14,Y+3],[X-8,Y-.1],[mid,Ym-1.4],[Xb+8,Yb-.1],[Xb+14,Yb+3],[Xb+22,Yb+12.6]],x=lerp(X-22,Xb+22,u);
+   let i=0;while(i<K.length-2&&K[i+1][0]<x)i++;const t=clamp((x-K[i][0])/(K[i+1][0]-K[i][0]));return{x,y:lerp(K[i][1],K[i+1][1],t)}},
+  over(c){
+   const jt=c.jt,g=this.geo(c),{X,Xb,Y,Yb,mid,Ym,h}=g;
+   // In the cocoon and hanging-sign shades the shells fade; a brush stroke of ink keeps the straps joined.
+   const sh=model.shade,st=model.st,bo=sh==='cocoon'?1-seg(st,.42,.74):sh==='sign'?1-seg(st,.16,.44):1;
+   if(jt===0){this.sag0=0;const gl=c.glow;if(gl<=0)return '';
+    let s=this.beads(g,gl,seg(gl,.3,1));
+    if(gl>=1)s+=`<g fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="2.5 4" stroke-linecap="round" opacity=".55"><path d="${this.roofD(g)}"/><path d="${this.bellyD(g)}"/></g>`;
+    return s}
+   let s=this.defs(g,0),body='';
+   if(model.dir>0&&jt<1){
+    const pk=model.poised?1:seg(jt,0,.2),reach=model.poised?1:seg(jt,.05,.3);
+    // Closing in, then the outlines run across from both ends and the gap floods from top and bottom.
+    const runU=seg(jt,.3,.42),flood=ease(seg(jt,.36,.5)),wet=jt<.66?5:5*(1-seg(jt,.66,.86));
+    s=this.defs(g,wet);
+    if(jt<.36)body+=this.beads(g,pk*(1-seg(jt,.3,.36)),reach*(1-seg(jt,.3,.36)));
+    if(runU>0&&jt<.88){const a=runU/2,op=1-seg(jt,.72,.86);
+     body+=`<g fill="none" stroke="${INK}" stroke-width="2.6" stroke-linecap="round" filter="url(#inkWob)" opacity="${f(op)}"><path d="${this.roofD(g)}" pathLength="1" stroke-dasharray="${f(a*1000)/1000} ${f((1-runU)*1000)/1000} ${f(a*1000)/1000}"/><path d="${this.bellyD(g)}" pathLength="1" stroke-dasharray="${f(a*1000)/1000} ${f((1-runU)*1000)/1000} ${f(a*1000)/1000}"/></g>`}
+    if(flood>0){const ft=Y+lerp(-8,h/2+4,flood),fb=Y+lerp(h+6,h/2-4,flood);let top='',bot='';
+     // Both flood fronts are built right to left so each clip region closes cleanly.
+     for(let x=X-30;x<=Xb+31;x+=6){top=`L${f(x)} ${f(ft+2.4*Math.sin(x*.27+flood*7))}`+top;bot=`L${f(x)} ${f(fb+2.4*Math.sin(x*.31-flood*6))}`+bot}
+     const clip=jt<.5;
+     // Two separate paths, so the clip is their union whatever their winding.
+     if(clip)s+=`<clipPath id="inkFlood"><path d="M${f(X-30)} ${f(Y-40)}H${f(Xb+40)}V${f(ft)}${top}L${f(X-30)} ${f(ft)}Z"/><path d="M${f(X-30)} ${f(Y+h+50)}H${f(Xb+40)}V${f(fb)}${bot}L${f(X-30)} ${f(fb)}Z"/></clipPath>`;
+     // The dried shell sits under the wet ink, which thins away over it.
+     body+=this.shell(g,seg(jt,.68,.86),backOut(seg(jt,.74,.86)),seg(jt,.86,.98))+`<g${clip?' clip-path="url(#inkFlood)"':''}>${this.wetInk(this.waistD(g),1-seg(jt,.72,.88),g)}</g>`}
+    // The splash: drops flick out, hang on fine strands, and are drawn back in.
+    if(jt>.47&&jt<.74)body+=this.drops(g,seg(jt,.47,.58),ease(seg(jt,.62,.73)));
+    const gu=seg(jt,.86,.98);if(gu>0&&gu<1){const p=this.ridgeAt(g,ease(gu)),a=Math.sin(Math.PI*gu);body+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="9" fill="url(#silkGlow)" opacity="${f(a)}"/>`+spark(p,a,3+3*a)}
+   }else if(jt<1){
+    // Releasing: wet again, sag and pinch in the middle, part, and draw back into each strap.
+    const r=1-jt,sag0=this.sag0||0,wet=Math.max(seg(r,0,.1),clamp(sag0/40)*.85),sag=lerp(sag0*.8,16,seg(r,0,.14)),pinch=ease(seg(r,.1,.28));
+    s=this.defs(g,2+4*wet);
+    if(r<.28){body+=this.shell(g,1-seg(r,0,.1),1-seg(r,0,.1),1-seg(r,0,.1))+this.wetInk(this.waistD(g,Math.min(pinch,.97),sag),wet,g,1-pinch);
+     if(wet>0)body+=`<circle cx="${f(mid)}" cy="${f(Ym+h-.2+sag/2+2+2*wet)}" r="${f(.6+3.8*wet)}" fill="${INK}"/>`}
+    else{const u=ease(seg(r,.28,.44)),op=1-seg(r,.4,.47);
+     if(op>0)body+=`<g opacity="${f(op)}" filter="url(#inkWob)"><path d="${this.halfD(g,1,lerp(mid-2,X-3,u))}" fill="${INK}"/><path d="${this.halfD(g,-1,lerp(mid+2,Xb+3,u))}" fill="${INK}"/></g>`;
+     // The drip lets go as the ink parts: two drops fall from where it hung.
+     const v=seg(r,.28,.5),y0=Ym+h+12;if(v<1)for(const dx of [-3,4])body+=`<ellipse cx="${f(mid+dx)}" cy="${f(y0+(dx>0?-8:0)+150*v*v)}" rx="${f(2.2-.4*v)}" ry="${f(2.6+2*v)}" fill="${INK}" opacity="${f(1-v)}"/>`;
+     body+=this.beads(g,seg(r,.28,.36)*(1-seg(r,.4,.55)),0)}
+   }else{
+    // Joined. Pulling the seam down wets the ink and drops a sag under the belly.
+    const pull=drag&&drag.seam?drag.pull:Math.max(0,this.spring||0),wet=clamp(pull/40)*.85,sag=pull*.8;
+    s=this.defs(g,1+4*wet);
+    body+=this.shell(g,1,1,1);
+    if(wet>0)body+=this.wetInk(this.waistD(g,0,sag),wet,g)+`<circle cx="${f(mid)}" cy="${f(Ym+h-.2+sag/2+2+2*wet)}" r="${f(.6+3.8*wet)}" fill="${INK}"/>`;
+    if(bo<1){const yA=Y+h/2,yB=Yb+h/2,L=[],R=[];for(let i=0;i<=6;i++){const t=i/6;L.push([lerp(X-3,mid,t),lerp(yA,(yA+yB)/2,t)-2*Math.sin(Math.PI*t/2)]);R.push([lerp(Xb+3,mid,t),lerp(yB,(yA+yB)/2,t)-2*Math.sin(Math.PI*t/2)])}
+     s+=`<g opacity="${f(1-bo)}" filter="url(#wobW)"><path d="${taper(L,6,2.4)}" fill="${INK}"/><path d="${taper(R,6,2.4)}" fill="${INK}"/><circle cx="${f(mid)}" cy="${f((yA+yB)/2-2)}" r="2.6" fill="${INK}"/></g>`}
+    const x0=X-26,y0=Math.min(Y,Yb)-20,wd=Xb-X+52,ht=h+30;
+    body+=`<g class="hit inkhit" id="seamHit" tabindex="0" role="button" aria-label="Ink bleed seam: pull it down, tap, or press Enter, to separate the widgets"><title>Pull the seam down, or tap, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" fill="transparent"/><path class="wet" d="${this.chalkD(g)}" fill="none" stroke="#dfe8f3" stroke-width="2.2" stroke-linecap="round"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`;
+   }
+   return s+(bo<1?`<g opacity="${f(bo)}">${body}</g>`:body);
   }
  }
 };
