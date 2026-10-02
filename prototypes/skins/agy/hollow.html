@@ -471,6 +471,36 @@ header {
   margin-right: 8px;
 }
 
+/* Bone Needle Guide Retraction SVG Overlay (Option 8) */
+.needle-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  pointer-events: none;
+  z-index: 6;
+  overflow: visible;
+}
+.module.shade.needle-mode .shade-strip {
+  background: linear-gradient(180deg, #161e22 0%, #0a0e10 100%);
+  border-color: #f5f6ee;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 14px rgba(245, 246, 238, 0.35), 0 3px 8px rgba(0, 0, 0, 0.85);
+}
+.module.shade.needle-mode .shade-strip .shade-title em {
+  color: #ffff94;
+}
+.module.shade.needle-mode .shade-strip .shade-eyes::before {
+  content: "🪡 BONE NEEDLES";
+  font: 700 9px/1 "Courier New", monospace;
+  color: #f5f6ee;
+  background: rgba(22, 30, 34, 0.95);
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid #7d8b80;
+  letter-spacing: 0.5px;
+  margin-right: 8px;
+}
+
 /* Tabs & Interactive Controls */
 .tab-row {
   position: absolute;
@@ -989,8 +1019,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Hollow Knight &amp; Silksong <span>/ silk lash, elytra shield, mandible interlock, silk cocoon, nail-blade sheath, shale slabs &amp; brass bell hitch</span></h1>
-    <p>Bleached chitin shell silhouette · Cast Pharloom brass bell &amp; articulated iron clapper · Cold-forged iron nail-blade &amp; bone peg · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Silk cocoon wrap · Layered shale slabs</p>
+    <h1>Hollow Knight &amp; Silksong <span>/ silk lash, elytra shield, mandible interlock, silk cocoon, nail-blade sheath, shale slabs, brass bell &amp; bone needles</span></h1>
+    <p>Bleached chitin shell silhouette · Polished bone needle guide retraction · Cast Pharloom brass bell &amp; iron clapper · Cold-forged iron nail-blade &amp; bone peg · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Silk cocoon wrap · Layered shale slabs</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -1002,7 +1032,8 @@ footer .note-highlight {
         <option value="cocoon_wrap">4. Silk Cocoon Wrap shade (Rapid Thread Winding &amp; Bundled Silk)</option>
         <option value="nail_blade">5. Nail-Blade Sheath &amp; Bone Peg join (Cold-Forged Blade &amp; Bronze Scabbard)</option>
         <option value="shale_slabs">6. Layered Shale Slabs (Roof Shingle Retraction shade)</option>
-        <option value="bell_hitch" selected>7. Pharloom Brass Bell &amp; Clapper Hitch join (Cast Bell &amp; Articulated Iron Clapper)</option>
+        <option value="bell_hitch">7. Pharloom Brass Bell &amp; Clapper Hitch join (Cast Bell &amp; Articulated Iron Clapper)</option>
+        <option value="bone_needles" selected>8. Bone Needle Guide Retraction shade (Polished Bone Needles &amp; Insectoid Click)</option>
       </select>
     </div>
     <div class="control-group">
@@ -1017,7 +1048,8 @@ footer .note-highlight {
     <button id="btnElytraAnim">Fold elytra</button>
     <button id="btnCocoonAnim">Wrap cocoon</button>
     <button id="btnShaleAnim">Retract shale slabs</button>
-    <button id="btnBellAnim" class="primary-btn">Hitch brass bell</button>
+    <button id="btnBellAnim">Hitch brass bell</button>
+    <button id="btnNeedleAnim" class="primary-btn">Retract along bone needles</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -1182,6 +1214,15 @@ footer .note-highlight {
           <stop offset="85%" stop-color="#261b0a"/>
           <stop offset="100%" stop-color="#4d330b"/>
         </radialGradient>
+
+        <!-- Polished Bone Guide Needle Gradients (Option 8) -->
+        <linearGradient id="boneNeedleGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="22%" stop-color="#f8f9f2"/>
+          <stop offset="48%" stop-color="#e3e5d3"/>
+          <stop offset="78%" stop-color="#abb09d"/>
+          <stop offset="100%" stop-color="#55584b"/>
+        </linearGradient>
       </defs>
 
       <g id="sharedHollowStage"></g>
@@ -1267,6 +1308,9 @@ footer .note-highlight {
       <!-- Layered Shale Slabs Retraction Layer -->
       <svg class="shale-svg" id="shale-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
+      <!-- Bone Needle Guide Retraction Layer (Option 8) -->
+      <svg class="needle-svg" id="needle-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+
       <div class="tab-row" role="tablist" aria-label="Jarvis screens">
         <button class="hollow-tab" role="tab" aria-selected="true" data-page="0">Status</button>
         <button class="hollow-tab" role="tab" aria-selected="false" data-page="1">Task</button>
@@ -1322,6 +1366,9 @@ footer .note-highlight {
 
       <!-- Layered Shale Slabs Retraction Layer -->
       <svg class="shale-svg" id="shale-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+
+      <!-- Bone Needle Guide Retraction Layer (Option 8) -->
+      <svg class="needle-svg" id="needle-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
       <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
         <button class="hollow-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
@@ -1388,6 +1435,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 7 — Pharloom Brass Bell &amp; Clapper Hitch join:</span> Module A carries a miniature cast Pharloom brass bell suspended on an arched bone-and-brass gantry bracket, with flared sound bow, concentric inscription rings, and a captive lumafly ember. Module B carries an articulated cold-forged iron clapper arm mounted on a dark slate foundation boss with a brass pivot knuckle. On docking or selecting Joining state, the brass bell tilts forward while the articulated iron clapper swings gracefully across the divide, accompanied by concentric golden acoustic resonance rings and lumafly sparks. Once docked, the clapper hook clamps decisively over the bell lip with an acoustic copper toll wavefront shockwave, locking the capsules into a unified architectural suspension bridge. Pulling the articulated clapper release lever right lifts the hook from the bell lip with a metallic clink and disengages the modules.
   </p>
+  <p>
+    <span class="note-highlight">Option 8 — Bone Needle Guide Retraction shade:</span> Inspired by Hallownest nail-smithing and Hornet's graceful weaver needles. Two polished, tapered bone guide needles with oval eyelet heads flank the display embrasure, anchored into the upper horn-crest frame by Pharloom brass brackets and threaded with golden silk stay lines. On selecting Shade state, the lower display frame and mandible plate glide smoothly upward along the twin bone needles on cold-forged iron runner sleeves. Upon reaching the upper crossbeam, spring-loaded bone pawls snap decisively over the runner sleeves and needle detent notches with a sharp insectoid click and spark wavefront. The widget collapses into an ultra-compact 44px bleached chitin diadem bar framed by the gleaming needle eyelets and brass guide collars, with 100% unclipped, crystal-clear status metrics.
+  </p>
 </footer>
 
 <script>
@@ -1421,7 +1471,10 @@ const model = {
   shaleDust: 0,           // chalk spore puff intensity
   bellProgress: 0,        // 0 = separate, 0.5 = clapper swinging & bell tilting, 1.0 = hitched into bell lip
   bellTollVibe: 0,        // acoustic toll vibration and shockwave
-  option: 'bell_hitch',
+  needleProgress: 0,      // Option 8: 0 = extended full casing, 1.0 = retracted along bone needles
+  needleClickSpark: 0,    // impact spark shockwave on detent lock
+  needleVibe: 0,          // needle slide friction jitter
+  option: 'bone_needles',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -2876,6 +2929,153 @@ function drawShaleSlabs(progress = 0, width = W) {
   return s;
 }
 
+// Option 8: Bone Needle Guide Retraction shade (Polished Bone Needles & Insectoid Click)
+function drawBoneNeedles(progress = 0, width = W, isShade = false) {
+  const p = Math.min(1, Math.max(0, progress));
+  if (model.option !== 'bone_needles' && p <= 0.01 && !isShade) return '';
+
+  const midX = width / 2;
+  const vibeX = (p > 0.05 && p < 0.92) ? Math.sin(p * Math.PI * 16) * 1.2 : 0;
+
+  // Motion curve: lower display frame slides upward along the twin polished bone needles
+  const easeP = p < 1 ? 1 - Math.pow(1 - p, 2.8) : 1;
+  const runnerY = 104 - 80 * easeP;
+
+  // Needle X positions flanking the central display cavity
+  const nL = 36 + vibeX;
+  const nR = width - 36 + vibeX;
+
+  let s = `<g class="bone-needles-assembly" opacity="${Math.min(1, Math.max(0.7, p * 1.5))}">`;
+
+  // 1. Dual Polished Bone Guide Needles (Left & Right Flanks)
+  [nL, nR].forEach((nx, idx) => {
+    const isLeft = idx === 0;
+    const silkDir = isLeft ? -1 : 1;
+
+    // Subterranean Shadow cast by bone needle
+    s += `<line x1="${nx}" y1="12" x2="${nx}" y2="122" stroke="#000000" stroke-width="6" opacity="0.65" filter="url(#chitinShadow)"/>`;
+
+    // Upper Crossbeam Anchor: Cast Pharloom Brass Head Bracket
+    s += `<rect x="${nx - 6}" y="10" width="12" height="6" rx="1.5"
+                fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>`;
+    s += `<circle cx="${nx}" cy="13" r="1.4" fill="#ffffff" opacity="0.85"/>`;
+
+    // Bone Needle Eyelet Head (oval ring with central hole for golden silk thread)
+    s += `<ellipse cx="${nx}" cy="20" rx="5" ry="7"
+                   fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="1.4"/>`;
+    s += `<ellipse cx="${nx}" cy="20" rx="2" ry="3.5"
+                   fill="#090d0f" stroke="#1d252a" stroke-width="0.8"/>`;
+    // Eyelet Specular Polish Bevel
+    s += `<path d="M ${nx - 3} 16 Q ${nx} 13.5 ${nx + 3} 16"
+                fill="none" stroke="#ffffff" stroke-width="1" opacity="0.9"/>`;
+
+    // Weaver's Silk Stay Line threaded through needle eyelet
+    s += `<path d="M ${nx + silkDir * 12} 7 Q ${nx + silkDir * 4} 14 ${nx} 20"
+                fill="none" stroke="url(#silkGrad)" stroke-width="2" filter="url(#silkBoom)"/>`;
+    s += `<path d="M ${nx + silkDir * 12} 7 Q ${nx + silkDir * 4} 14 ${nx} 20"
+                fill="none" stroke="#fffde6" stroke-width="1"/>`;
+
+    // Polished Bone Needle Shaft (y = 26 down to y = 114)
+    s += `<path d="M ${nx - 2.2} 26 L ${nx + 2.2} 26 L ${nx + 1.8} 112 Q ${nx} 119 ${nx - 1.8} 112 Z"
+                fill="url(#boneNeedleGrad)" stroke="#2d3029" stroke-width="1.2" stroke-linejoin="round"/>`;
+    // Brilliant Long Specular Highlight line down bone shaft
+    s += `<line x1="${nx - 0.7}" y1="27" x2="${nx - 0.5}" y2="110"
+                stroke="#ffffff" stroke-width="1.1" opacity="0.9"/>`;
+
+    // Carved Insectoid Detent Notches along bone shaft
+    [46, 76, 102].forEach(detY => {
+      s += `<line x1="${nx - 2.2}" y1="${detY}" x2="${nx}" y2="${detY}" stroke="#33372c" stroke-width="0.9"/>`;
+      s += `<circle cx="${nx + 1}" cy="${detY}" r="0.8" fill="#1b201a"/>`;
+    });
+
+    // Lower Needle Point & Base Stop: Pharloom Brass Ferrule Collar & Captive Lumafly Amber
+    s += `<path d="M ${nx - 5} 114 L ${nx + 5} 114 L ${nx + 3} 122 L ${nx - 3} 122 Z"
+                fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>`;
+    s += `<circle cx="${nx}" cy="118" r="1.6" fill="#ffff94" filter="url(#lumaflyGlow)"/>`;
+    s += `<circle cx="${nx}" cy="118" r="0.8" fill="#ffffff"/>`;
+  });
+
+  // 2. Sliding Cold-Forged Iron Runner Sleeves (moving along the needles)
+  [nL, nR].forEach((nx, idx) => {
+    const isLeft = idx === 0;
+    const pawlDir = isLeft ? 1 : -1;
+
+    s += `<g class="runner-sleeve">`;
+    // Sleeve Shadow
+    s += `<rect x="${nx - 7}" y="${runnerY - 6}" width="14" height="12" rx="2" fill="#000000" opacity="0.6" filter="url(#chitinShadow)"/>`;
+    // Cold-Forged Iron Outer Sleeve Body
+    s += `<rect x="${nx - 6.5}" y="${runnerY - 6}" width="13" height="12" rx="2"
+                fill="url(#ironNailGrad)" stroke="#161e22" stroke-width="1.2"/>`;
+    // Center Needle Slot
+    s += `<rect x="${nx - 2.8}" y="${runnerY - 5}" width="5.6" height="10" rx="1" fill="#12181c" stroke="#2a353c" stroke-width="0.6"/>`;
+    // Pharloom Brass Reinforcement Flange & Rivets
+    s += `<rect x="${nx - 6.5}" y="${runnerY - 1}" width="13" height="2.5" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.5"/>`;
+    s += `<circle cx="${nx - 4}" cy="${runnerY - 3.5}" r="0.9" fill="#ffffff" opacity="0.9"/>`;
+    s += `<circle cx="${nx + 4}" cy="${runnerY - 3.5}" r="0.9" fill="#ffffff" opacity="0.9"/>`;
+
+    // Sinuous Silk Guide Cord connecting Runner Sleeve to Mandible Frame
+    s += `<path d="M ${nx} ${runnerY + 6} Q ${nx + pawlDir * 10} ${runnerY + 12} ${nx + pawlDir * 18} ${runnerY + 8}"
+                fill="none" stroke="url(#silkGrad)" stroke-width="1.2" opacity="0.85"/>`;
+
+    // Spring-Loaded Bone Locking Pawl (at upper crossbeam catch: y = 24)
+    const pawlAngle = p > 0.8 ? (p - 0.8) / 0.2 * (pawlDir * 32) : 0;
+    s += `<g transform="translate(${nx - pawlDir * 8}, 22) rotate(${pawlAngle})">
+      <path d="M 0 0 L ${pawlDir * 8} -2 L ${pawlDir * 9} 5 L ${pawlDir * 2} 4 Z"
+            fill="url(#chitinGrad)" stroke="#222820" stroke-width="0.9"/>
+      <circle cx="0" cy="0" r="1.5" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.5"/>
+    </g>`;
+
+    s += `</g>`;
+  });
+
+  // 3. Transverse Retraction Stay Beam & Slate Under-Sill (bridges nL to nR)
+  if (p > 0.05) {
+    const beamAlpha = Math.min(1, p * 1.5);
+    s += `<g class="retraction-crossbeam" opacity="${beamAlpha}">`;
+    s += `<path d="M ${nL + 6} ${runnerY - 4}
+                 L ${nR - 6} ${runnerY - 4}
+                 L ${nR - 6} ${runnerY + 6}
+                 L ${midX + 60} ${runnerY + 6}
+                 L ${midX + 50} ${runnerY + 8}
+                 L ${midX - 50} ${runnerY + 8}
+                 L ${midX - 60} ${runnerY + 6}
+                 L ${nL + 6} ${runnerY + 6} Z"
+                fill="url(#slateGrad)" stroke="#161e22" stroke-width="1.4" stroke-linejoin="round"/>`;
+    s += `<line x1="${nL + 8}" y1="${runnerY - 2.5}" x2="${nR - 8}" y2="${runnerY - 2.5}" stroke="#ffffff" stroke-width="1" opacity="0.7"/>`;
+
+    [-70, 0, 70].forEach(ox => {
+      s += `<rect x="${midX + ox - 6}" y="${runnerY - 1}" width="12" height="5" rx="1.2" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.6"/>`;
+      s += `<circle cx="${midX + ox}" cy="${runnerY + 1.5}" r="1.2" fill="#ffff94" filter="url(#lumaflyGlow)"/>`;
+    });
+    s += `</g>`;
+  }
+
+  // 4. Insectoid Click Impact Shockwave & Spark Burst on Full Detent Lock
+  if (p > 0.88) {
+    const flashScale = (p - 0.88) / 0.12;
+    const sparkR = flashScale * 30;
+    const sparkAlpha = (1 - flashScale) * 5;
+
+    [nL, nR].forEach(nx => {
+      s += `<g opacity="${sparkAlpha}">`;
+      s += `<circle cx="${nx}" cy="24" r="${sparkR}" fill="none" stroke="#fffde6" stroke-width="1.8" filter="url(#silkBoom)"/>`;
+      s += `<circle cx="${nx}" cy="24" r="${sparkR * 0.5}" fill="none" stroke="#fcc042" stroke-width="2.4"/>`;
+      for (let a = 0; a < 360; a += 45) {
+        const rad = a * Math.PI / 180;
+        const x1 = nx + Math.cos(rad) * (sparkR * 0.4);
+        const y1 = 24 + Math.sin(rad) * (sparkR * 0.4);
+        const x2 = nx + Math.cos(rad) * (sparkR * 1.1);
+        const y2 = 24 + Math.sin(rad) * (sparkR * 1.1);
+        s += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#ffff94" stroke-width="1.2" stroke-linecap="round"/>`;
+      }
+      s += `</g>`;
+    });
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -2980,6 +3180,12 @@ function renderHardware() {
     if (sha) {
       sha.innerHTML = drawShaleSlabs(model.shaleProgress, W);
     }
+
+    // Render Bone Needle Guide Retraction Layer
+    const nee = $('#needle-' + id);
+    if (nee) {
+      nee.innerHTML = drawBoneNeedles(model.needleProgress, W, isShade);
+    }
   }
 
   // Active Proximity Lumafly Bioluminescence Aura
@@ -3028,6 +3234,7 @@ function render() {
     el.classList.toggle('shade', model.shade);
     el.classList.toggle('cocoon-mode', model.shade && model.option === 'cocoon_wrap');
     el.classList.toggle('shale-mode', model.shade && model.option === 'shale_slabs');
+    el.classList.toggle('needle-mode', model.shade && model.option === 'bone_needles');
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.hollow-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
@@ -3149,6 +3356,14 @@ function render() {
     bellBtn.disabled = model.busy;
     const isBellOption = model.option === 'bell_hitch';
     bellBtn.classList.toggle('primary-btn', isBellOption);
+  }
+
+  const needleBtn = $('#btnNeedleAnim');
+  if (needleBtn) {
+    needleBtn.textContent = model.shade ? 'Extend along needles' : 'Retract along needles';
+    needleBtn.disabled = model.busy;
+    const isNeedleOption = model.option === 'bone_needles';
+    needleBtn.classList.toggle('primary-btn', isNeedleOption);
   }
 
   $('#spoolValue').textContent = model.limit;
@@ -3789,6 +4004,70 @@ async function extendShale() {
   $('#phase').textContent = model.joined ? 'Joined / Monolithic chitin carapace' : 'Separate / Two independent chitin instruments';
 }
 
+// Option 8: Bone Needle Guide Retraction shade Animations
+async function retractNeedles() {
+  if (model.busy || (model.shade && model.needleProgress >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Display frame glides upward along polished bone needles. Spring-loaded bone pawls snap locked with an insectoid click.');
+  $('#phase').textContent = 'Retracting upward along polished bone needles';
+
+  await tween(420, t => {
+    const p = t === 1 ? 1 : 1 - Math.pow(2, -9 * t);
+    model.needleProgress = p;
+    model.needleVibe = (p > 0.08 && p < 0.9) ? Math.sin(p * Math.PI * 14) * 1.3 : 0;
+    if (p > 0.9) {
+      model.needleClickSpark = (p - 0.9) / 0.1;
+    } else {
+      model.needleClickSpark = 0;
+    }
+    if (t >= 0.45 && !model.shade) {
+      model.shade = true;
+    }
+    renderHardware();
+  }, token);
+
+  model.needleProgress = 1;
+  model.needleVibe = 0;
+  model.needleClickSpark = 1;
+  model.shade = true;
+  model.busy = false;
+  render();
+  say('Bone needle retraction locked. Lower display bay secured against upper crossbeam with twin bone pawls.');
+  $('#phase').textContent = 'Shade mode / Bone needle guide retraction locked';
+}
+
+async function extendNeedles() {
+  if (model.busy || (!model.shade && model.needleProgress <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Bone pawls disengage with a sharp click. Display frame glides downward along polished bone needles.');
+  $('#phase').textContent = 'Extending downward along bone guide needles';
+
+  model.shade = false;
+  render();
+
+  await tween(380, t => {
+    const extend = 1 - (t === 1 ? 1 : 1 - Math.pow(2, -8 * t));
+    model.needleProgress = extend;
+    model.needleVibe = (extend > 0.08 && extend < 0.9) ? Math.sin(extend * Math.PI * 14) * 1.1 : 0;
+    model.needleClickSpark = 0;
+    renderHardware();
+  }, token);
+
+  model.needleProgress = 0;
+  model.needleVibe = 0;
+  model.needleClickSpark = 0;
+  model.busy = false;
+  render();
+  say('Bone needle guides extended. Full subterranean slate displays and controls restored.');
+  $('#phase').textContent = model.joined ? 'Joined / Monolithic chitin carapace' : 'Separate / Two independent chitin instruments';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -3796,7 +4075,8 @@ async function applyState(stateName) {
 
   if (stateName === 'separate') {
     if (model.shade) {
-      if (model.shaleProgress > 0) await extendShale();
+      if (model.needleProgress > 0) await extendNeedles();
+      else if (model.shaleProgress > 0) await extendShale();
       else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
@@ -3814,6 +4094,9 @@ async function applyState(stateName) {
       model.shaleDust = 0;
       model.bellProgress = 0;
       model.bellTollVibe = 0;
+      model.needleProgress = 0;
+      model.needleClickSpark = 0;
+      model.needleVibe = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -3823,7 +4106,8 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'joining') {
     if (model.shade) {
-      if (model.shaleProgress > 0) await extendShale();
+      if (model.needleProgress > 0) await extendNeedles();
+      else if (model.shaleProgress > 0) await extendShale();
       else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
@@ -3875,7 +4159,8 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'joined') {
     if (model.shade) {
-      if (model.shaleProgress > 0) await extendShale();
+      if (model.needleProgress > 0) await extendNeedles();
+      else if (model.shaleProgress > 0) await extendShale();
       else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
@@ -3929,7 +4214,9 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'shade') {
     if (!model.shade) {
-      if (model.option === 'shale_slabs') {
+      if (model.option === 'bone_needles') {
+        await retractNeedles();
+      } else if (model.option === 'shale_slabs') {
         await retractShale();
       } else if (model.option === 'cocoon_wrap') {
         await wrapCocoon();
@@ -3937,7 +4224,9 @@ async function applyState(stateName) {
         await foldElytra();
       }
     } else {
-      if (model.option === 'shale_slabs') {
+      if (model.option === 'bone_needles') {
+        await extendNeedles();
+      } else if (model.option === 'shale_slabs') {
         await extendShale();
       } else if (model.option === 'cocoon_wrap') {
         await unwrapCocoon();
@@ -4029,6 +4318,10 @@ $('#btnBellAnim').onclick = () => {
   if (model.joined) separate();
   else join();
 };
+$('#btnNeedleAnim').onclick = () => {
+  if (model.shade) extendNeedles();
+  else retractNeedles();
+};
 
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
@@ -4060,7 +4353,10 @@ $('#btnReset').onclick = () => {
   model.shaleDust = 0;
   model.bellProgress = 0;
   model.bellTollVibe = 0;
-  model.option = 'bell_hitch';
+  model.needleProgress = 0;
+  model.needleClickSpark = 0;
+  model.needleVibe = 0;
+  model.option = 'bone_needles';
   model.light = 0;
   model.limit = 3;
   model.tension = 0;
@@ -4068,7 +4364,7 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
-  $('#optionSelect').value = 'bell_hitch';
+  $('#optionSelect').value = 'bone_needles';
   render();
   say('Reset to initial experiment layout.');
 };
@@ -4076,45 +4372,58 @@ $('#btnReset').onclick = () => {
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
   say('Selected option: ' + e.target.options[e.target.selectedIndex].text);
-  if (model.option === 'bell_hitch') {
+  if (model.option === 'bone_needles') {
+    if (model.shaleProgress > 0) await extendShale();
+    if (model.cocoonProgress > 0) await unwrapCocoon();
+    if (model.elytraGlide > 0) await spreadElytra();
+    if (!model.shade) await retractNeedles();
+    say('Option 8: Bone Needle Guide Retraction shade selected. Display frame retracts along polished bone needles with insectoid click.');
+  } else if (model.option === 'bell_hitch') {
     if (model.shade) {
-      if (model.shaleProgress > 0) await extendShale();
+      if (model.needleProgress > 0) await extendNeedles();
+      else if (model.shaleProgress > 0) await extendShale();
       else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     say('Option 7: Pharloom Brass Bell & Clapper Hitch join selected. Cast brass bell, articulated forged iron clapper, and resonant copper toll.');
   } else if (model.option === 'shale_slabs') {
+    if (model.needleProgress > 0) await extendNeedles();
     if (model.elytraGlide > 0) await spreadElytra();
     if (model.cocoonProgress > 0) await unwrapCocoon();
     if (!model.shade) await retractShale();
     say('Option 6: Layered Shale Slabs (Roof Shingle Retraction) shade selected. Stepped slate slabs slide upward behind primary mask plate.');
   } else if (model.option === 'nail_blade') {
     if (model.shade) {
-      if (model.shaleProgress > 0) await extendShale();
+      if (model.needleProgress > 0) await extendNeedles();
+      else if (model.shaleProgress > 0) await extendShale();
       else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     say('Option 5: Nail-Blade Sheath & Bone Peg join selected. Cold-forged iron nail-blade, bronze scabbard, and spring-loaded bone locking peg.');
   } else if (model.option === 'cocoon_wrap') {
+    if (model.needleProgress > 0) await extendNeedles();
     if (model.shaleProgress > 0) await extendShale();
     if (model.elytraGlide > 0) await spreadElytra();
     if (!model.shade) await wrapCocoon();
     say('Option 4: Silk Cocoon Wrap shade selected. Rapid golden weaver-silk winding & bundled lower casing.');
   } else if (model.option === 'elytra_shield') {
+    if (model.needleProgress > 0) await extendNeedles();
     if (model.shaleProgress > 0) await extendShale();
     if (model.cocoonProgress > 0) await unwrapCocoon();
     if (!model.shade) await foldElytra();
     say('Option 2: Elytra Wing-Case Shield shade selected. Folding beetle wing-cases & lumafly clasp.');
   } else if (model.option === 'mandible_interlock') {
     if (model.shade) {
-      if (model.shaleProgress > 0) await extendShale();
+      if (model.needleProgress > 0) await extendNeedles();
+      else if (model.shaleProgress > 0) await extendShale();
       else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     say('Option 3: Chitinous Carapace Mandible Interlock join selected. Serrated stag-beetle shell teeth & zig-zag suture.');
   } else if (model.option === 'silk_lash') {
     if (model.shade) {
-      if (model.shaleProgress > 0) await extendShale();
+      if (model.needleProgress > 0) await extendNeedles();
+      else if (model.shaleProgress > 0) await extendShale();
       else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
@@ -4443,6 +4752,14 @@ window.addEventListener('keydown', e => {
     applyState('joined');
   } else if (e.key === '4') {
     applyState('shade');
+  } else if (e.key === 'n' || e.key === 'N') {
+    if (model.option !== 'bone_needles') {
+      $('#optionSelect').value = 'bone_needles';
+      $('#optionSelect').dispatchEvent(new Event('change'));
+    } else {
+      if (model.shade) extendNeedles();
+      else retractNeedles();
+    }
   } else if (e.key === 'r' || e.key === 'R') {
     if (model.shade) extendShale();
     else retractShale();
@@ -4450,7 +4767,10 @@ window.addEventListener('keydown', e => {
     if (model.shade) unwrapCocoon();
     else wrapCocoon();
   } else if (e.key === 'e' || e.key === 'E') {
-    if (model.option === 'shale_slabs') {
+    if (model.option === 'bone_needles') {
+      if (model.shade) extendNeedles();
+      else retractNeedles();
+    } else if (model.option === 'shale_slabs') {
       if (model.shade) extendShale();
       else retractShale();
     } else if (model.option === 'cocoon_wrap') {
