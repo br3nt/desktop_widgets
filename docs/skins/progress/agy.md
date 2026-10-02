@@ -57,7 +57,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Pharloom Brass Bell & Clapper Hitch join — Articulated forged iron clapper hooks into cast bell lip (Built in prototypes/skins/agy/hollow.html with cast Pharloom brass bell on bone gantry, articulated forged iron clapper on slate boss, golden acoustic resonance soundwave arcs, copper toll strike wavefront, spring clapper release lever, Option 7 switcher, and 'B' keyboard shortcut)
 
 ### Cycle 8: Quaternary Shades
-- [ ] Gothic: Rose Window Oculus Collapse shade — Circular stone tracery diaphragm iris rotates and contracts inward
+- [x] Gothic: Rose Window Oculus Collapse shade — Circular stone tracery diaphragm iris rotates and contracts inward (Built in prototypes/skins/agy/gothic.html with 8 rotating stone tracery blades, embedded stained-glass lancet quarries, cast-bronze quatrefoil hub with glowing amber jewel, lock spark wavefront, dense jeweled frieze with 3 glowing cabochons, unclipped glanceable 44px status strip, Option 8 switcher, and 'O' keyboard shortcut)
 - [ ] Felt: High-Damp Wool Squeeze (Lozenge Squash) shade — Wool body compresses vertically into dense rounded pill
 - [ ] Elven: Prismatic Light Sliver shade — Body dissolves into concentrated horizontal light beam between jade finials
 - [ ] Wire: Coiled Spring Spindle Wind-Up shade — Miniature copper spool winds up dual coiled wire springs
