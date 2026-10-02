@@ -29,7 +29,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .topline p{margin:0;color:#c9b7a7;font-size:13px;max-width:760px}
 #phase{font:11px/1.5 "Courier New",monospace;color:#e7b07c;white-space:nowrap}
 .layer{position:absolute;inset:0;width:1200px;height:600px;overflow:visible;pointer-events:none}
-#under{z-index:1}#over{z-index:6}
+#under{z-index:1}#over{z-index:6}#dial{z-index:5;opacity:0;transition:opacity .35s}
 .w{position:absolute;width:390px;height:130px;user-select:none;touch-action:none;z-index:2;filter:drop-shadow(0 10px 9px #0009)}
 .w.small{width:276px;height:78px}
 .casing{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
@@ -97,6 +97,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="stateRow"><span>State</span></div>
  <div class="row" id="joinRow"><span>Join</span></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-40" max="40" value="15" aria-label="Pivot angle in degrees"><output id="angleOut">+15°</output><button id="detent" aria-pressed="true">Detents 15°</button></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Wire skin stage">
@@ -133,10 +134,11 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
 </section>
 
+<svg id="dial" class="layer" viewBox="0 0 1200 600" aria-hidden="true"></svg>
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -291,8 +293,85 @@ const JOINS={
     s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Bead strand: lift the pearl to separate the widgets"><title>Lift the pearl to release</title><circle cx="${f(q.x)}" cy="${f(q.y)}" r="18" fill="transparent"/><circle class="ringfocus" cx="${f(q.x)}" cy="${f(q.y)}" r="12" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
    return s;
   }
+ },
+ pivot:{label:'Jump-ring pivot',kind:'Angle · hinge',gap:56,slow:1.6,
+  about:'The jump ring as a real joint. The ring threads both eye loops and twists shut as before, then GitDiscuss drops onto it and swings under its own weight, overshooting and settling at the set angle. Like links in a chain, it splits the bend: the ring turns half the angle in Jarvis\'s loop and GitDiscuss turns the other half in the ring, so you can watch the ring\'s closed seam roll round as the angle changes. <b>Set the angle:</b> drag GitDiscuss\'s nameplate up or down to swing it (Jarvis\'s nameplate still moves the pair), use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓. While you swing it, a copper dial wire appears past its far end with a readout. <b>Detents</b> (15°, 30° or off) are seed beads on that dial: near one, the pendant catches and the bead lights amber, and on letting go it clicks into the nearest one, with the outermost beads (±30°) as the limits. Off, any angle from −40° to +40° holds. The pair shifts up or down to stay on the desktop. <b>Near, ready and release</b> are the jump ring\'s: the loops warm, a ghost ring appears, and clicking the ring swings GitDiscuss level before the ring twists open.',
+  sayJoin:'The ring threads both loops and twists shut, then GitDiscuss swings on it and settles at the set angle.',
+  sayJoined:'Joined on a pivot ring. Drag GitDiscuss\'s nameplate to swing it; drag Jarvis to move the pair. Click the ring to open it.',
+  sayRelease:'GitDiscuss swings level, the ring twists open and the pendants drift apart.',
+  sayReady:'Ready: release to hang them on a pivot ring.',sayNear:'Nearby: the loops warm. Move closer.',
+  end(side,lit,h){return JOINS.jumpring.end(side,lit,h)},
+  arc(g,a0,a1){return JOINS.jumpring.arc(g,a0,a1)},
+  // The jump ring's own animation runs in the first 70% of jt; the ring then sits half the swing round from Jarvis's loop.
+  ring(c){
+   const g=JOINS.jumpring.ring({...c,jt:Math.min(1,c.jt/.7)}),ph=swingAt(c.jt)*Math.PI/360,lx=c.a.x+W+14,ly=c.a.y+c.h/2;
+   const drop=g.cy-(ly+c.b.y+c.h/2)/2;
+   return {...g,cx:lx+14*Math.cos(ph),cy:ly+14*Math.sin(ph)+drop,phi:g.phi+ph};
+  },
+  under(c){return JOINS.jumpring.under.call(this,c)},
+  over(c){
+   let s=JOINS.jumpring.over.call(this,c);const g=this.ring(c);
+   // The closed seam of the ring: a fine dark cut that rolls round as the angle changes.
+   if(g.show&&c.jt>=.66){const sn=Math.sin(g.phi),cs=Math.cos(g.phi),x=g.cx-g.ry*sn,y=g.cy+g.ry*cs;
+    s+=`<path d="M${f(x-sn*2.2)} ${f(y+cs*2.2)}L${f(x+sn*2.2)} ${f(y-cs*2.2)}" stroke="#3a2408" stroke-width="1" stroke-linecap="round"/>`}
+   return s;
+  }
  }
 };
+/* ---------- Pivot geometry ---------- */
+// Displayed swing in degrees: level until the ring is shut, then a damped swing that lands exactly on model.angle.
+function swingAt(jt){
+ if(model.join!=='pivot')return 0;
+ const u=seg(jt,.68,1);if(u<=0)return 0;const k=Math.pow(1-u,2);
+ return model.angle*(1-k*Math.cos(3*Math.PI*u))+6*k*Math.sin(2*Math.PI*u);
+}
+// GitDiscuss's vertical extent relative to Jarvis's top edge at angle th.
+function pivotSpan(th,h){
+ const r=th*Math.PI/180,ly=h/2+28*Math.sin(r/2);let lo=0,hi=h;
+ for(const x of [14,W+14])for(const y of [-h/2,h/2]){const v=ly+x*Math.sin(r)+y*Math.cos(r);lo=Math.min(lo,v);hi=Math.max(hi,v)}
+ return [lo,hi];
+}
+const fitY=(y,th,h)=>{const [lo,hi]=pivotSpan(th,h);return clamp(y,46-lo,590-hi)};
+const pivotOn=()=>model.join==='pivot'&&model.jt===1;
+// With detents on, the outermost beads are the limits.
+const lim=()=>model.detent?Math.floor(40/model.detent)*model.detent:40;
+const nearestDetent=v=>{const d=model.detent;return d?clamp(Math.round(v/d)*d,-lim(),lim()):v};
+// The join swing overshoots to about 1.45 times the angle, so the pair is fitted for that peak.
+const peakSwing=()=>Math.sign(model.angle)*Math.min(60,1.45*Math.abs(model.angle));
+function snapAngle(raw){
+ raw=clamp(raw,-lim(),lim());const d=model.detent;if(!d)return raw;
+ const n=nearestDetent(raw);return Math.abs(raw-n)<d*.3?n:raw;
+}
+function setAngle(v){
+ model.angle=clamp(v,-lim(),lim());
+ if(pivotOn()){const y=fitY(model.a.y,model.angle,ctx().h);model.a.y=model.b.y=y}
+ render();
+}
+let settleTok=0,turnTimer=0;
+function settleAngle(){
+ const d=model.detent;if(!d)return;const from=model.angle,to=nearestDetent(from);if(from===to)return;
+ const tok=++settleTok,t0=performance.now(),ms=reduce.matches?0:260;
+ (function step(now){if(tok!==settleTok)return;const t=ms?clamp((now-t0)/ms):1;setAngle(lerp(from,to,backOut(t)));if(t<1)requestAnimationFrame(step);else setAngle(to)})(t0);
+}
+function flashTurning(){model.turning=true;clearTimeout(turnTimer);turnTimer=setTimeout(()=>{model.turning=false;render()},900)}
+// The dial: a copper wire just past GitDiscuss's far end, seed beads at the detents, a hot pointer and a readout tag.
+function dialSvg(c){
+ if(!pivotOn())return '';
+ const lx=c.a.x+W+14,ly=c.a.y+c.h/2,R=424,cur=model.angle,det=model.detent;
+ const P=(a,r=R)=>{const t=a*Math.PI/180;return{x:lx+28*Math.cos(t/2)+r*Math.cos(t),y:ly+28*Math.sin(t/2)+r*Math.sin(t)}};
+ let d='';for(let a=-40;a<=40;a+=2){const p=P(a);d+=(a>-40?'L':'M')+f(p.x)+' '+f(p.y)}
+ let s=`<path d="${d}" transform="translate(2 5)" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="3"/>`+wire(d,'copper',1.4);
+ for(const a of [-40,40]){const p=P(a);s+=wire(circ(p.x,p.y,3.2),'copper',1.3)}
+ if(det){for(let a=-Math.floor(40/det)*det;a<=40;a+=det){const p=P(a),on=Math.abs(a-cur)<.3;
+  if(on)s+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="10" fill="#ffb15e" opacity=".7" filter="url(#soft)"/>`;
+  s+=strandItem({k:'bead',r:on?4.8:3.6,stone:on?'amber':'lab'},p.x,p.y)}}
+ else for(let a=-40;a<=40;a+=10){const p=P(a);s+=strandItem({k:'seed',r:2,stone:'gold'},p.x,p.y)}
+ const p0=P(cur,406),p1=P(cur,R+8);s+=wire(`M${f(p0.x)} ${f(p0.y)}L${f(p1.x)} ${f(p1.y)}`,'hot',1.3);
+ const t=P(cur,R+34),tx=Math.min(t.x,1168),ty=clamp(t.y,60,585),lab=(cur>0?'+':cur<0?'−':'')+Math.abs(Math.round(cur))+'°';
+ s+=`<rect x="${f(tx-24)}" y="${f(ty-11)}" width="48" height="22" rx="6" fill="url(#st-slab)"/>`+wire(rrect(tx-24,ty-11,48,22,6),'copper',1.1)+
+  `<text x="${f(tx)}" y="${f(ty+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-size="14" fill="#f2b866">${lab}</text>`;
+ return s;
+}
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
   about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar) are built and added here.'},
@@ -441,7 +520,7 @@ function strandItem(it,x,cy,small){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',jt:0,st:0,path:null,glow:0,ghost:0,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',jt:0,angle:15,detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -450,8 +529,8 @@ function separatePose(){
 }
 function joinedPose(fixed='a'){
  const g=J().gap;
- if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
- let ax=clamp(model.a.x,24,1200-2*W-g-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24),by=model.join==='pivot'?fitY(fitY(model.b.y,peakSwing(),ctx().h),model.angle,ctx().h):model.b.y;return{a:{x:bx-W-g,y:by},b:{x:bx,y:by}}}
+ let ax=clamp(model.a.x,24,1200-2*W-g-24),ay=model.join==='pivot'?fitY(fitY(model.a.y,peakSwing(),ctx().h),model.angle,ctx().h):model.a.y;return{a:{x:ax,y:ay},b:{x:ax+W+g,y:ay}};
 }
 function setJt(t){
  model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.5));
@@ -498,10 +577,15 @@ const shadeK=()=>{const o=SHADES[model.shade];return o.hk?o.hk(model.st):ease(mo
 function ctx(){const h=lerp(H,HS,shadeK());return{a:model.a,b:model.b,h,jt:model.jt,ghost:model.ghost}}
 function render(){
  const c=ctx(),j=J(),sh=SHADES[model.shade],hk=shadeK(),ch=lerp(CH,CHS,hk);
- const lit=Math.max(model.glow,model.jt>0&&model.jt<1?seg(model.jt,.04,.25)*(1-seg(model.jt,.86,1)):0);
+ const lit=Math.max(model.glow,model.jt>0&&model.jt<1?seg(model.jt,.04,.25)*(1-seg(model.jt,.86,1)):0,model.turning&&pivotOn()?.4:0);
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=f(h)+'px';
+  if(id==='b'){
+   // Pivot: GitDiscuss turns the full swing about its own eye loop, which rides half the swing round the ring.
+   const th=swingAt(model.jt),ph=th*Math.PI/360;
+   el.style.transformOrigin=`-14px ${f(h/2)}px`;el.style.transform=th?`translate(${f(28*Math.cos(ph)-28)}px,${f(28*Math.sin(ph))}px) rotate(${f(th)}deg)`:'';
+  }
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
   let s=sh.draw?sh.draw(id,w,h,small,model.st):casing(w,h,small);
   if(id==='a')s+=j.end(1,lit,h);if(id==='b')s+=j.end(-1,lit,h);
@@ -517,6 +601,10 @@ function render(){
  $('#under').innerHTML=j.under(c);
  const focused=document.activeElement&&document.activeElement.id==='joinHit';
  $('#over').innerHTML=j.over(c);
+ $('#dial').innerHTML=dialSvg(c);$('#dial').style.opacity=model.turning&&pivotOn()?1:0;
+ $('#angleRow').style.display=model.join==='pivot'?'':'none';
+ const ang=Math.round(model.angle);$('#angle').value=ang;$('#angleOut').textContent=(ang>0?'+':ang<0?'−':'')+Math.abs(ang)+'°';
+ $('#detent').textContent=model.detent?'Detents '+model.detent+'°':'Detents off';$('#detent').setAttribute('aria-pressed',String(!!model.detent));
  const hit=$('#joinHit');if(hit){hit.onclick=doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
  // Controls reflect state
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
@@ -524,7 +612,7 @@ function render(){
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
- const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()};
+ const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()+(model.join==='pivot'?' · '+$('#angleOut').textContent:'')};
  $('#phase').textContent=(drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
 }
 
@@ -536,6 +624,7 @@ function options(row,set,key,aboutEl){
  Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)});
 }
 function pick(key,id){
+ if(drag)cancelDrag();
  if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  describe();render();
@@ -547,6 +636,8 @@ function describe(){
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
 $('#scrub').oninput=e=>{++anim;model.busy=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:{a:{...model.a},b:{...model.b}}}:{s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0)model.path=null;render()};
+$('#angle').oninput=e=>{++settleTok;flashTurning();setAngle(nearestDetent(+e.target.value))};
+$('#detent').onclick=()=>{const ds=[15,30,0];model.detent=ds[(ds.indexOf(model.detent)+1)%ds.length];flashTurning();render();settleAngle();say(model.detent?'Detents every '+model.detent+'°: the pendant clicks into the nearest seed bead.':'Detents off: any angle from −40° to +40° holds.')};
 document.addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
  const key=e.key.toLowerCase();
@@ -569,13 +660,26 @@ stage.addEventListener('pointerdown',e=>{
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null}
- drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c},angle:model.angle},group:model.jt===1&&id!=='c',state:'idle'};
+ if(id==='b'&&pivotOn()){
+  // Swing GitDiscuss about Jarvis's eye loop rather than moving the pair.
+  const L={x:model.a.x+W+14,y:model.a.y+ctx().h/2};Object.assign(drag,{mode:'angle',L,psi0:Math.atan2(p.y-L.y,p.x-L.x),th0:model.angle,raw:model.angle,last:p,group:false});
+  ++settleTok;clearTimeout(turnTimer);model.turning=true;say('Swinging GitDiscuss on the ring.');render();
+ }
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e),dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
+ if(drag.mode==='angle'){
+  // The pair may have shifted to stay on stage, so measure from where Jarvis's loop is now.
+  const L={x:model.a.x+W+14,y:model.a.y+ctx().h/2};
+  if(L.y!==drag.L.y){drag.th0=drag.raw;drag.psi0=Math.atan2(drag.last.y-L.y,drag.last.x-L.x);drag.L=L}
+  let dp=Math.atan2(p.y-L.y,p.x-L.x)-drag.psi0;dp=Math.atan2(Math.sin(dp),Math.cos(dp));
+  drag.raw=clamp(drag.th0+dp*180/Math.PI,-lim(),lim());drag.last=p;
+  const was=model.angle;setAngle(snapAngle(drag.raw));
+  if(model.detent&&model.angle%model.detent===0&&was!==model.angle)say('Caught on the '+$('#angleOut').textContent+' detent.');return}
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,10,1200-CW-10);model.c.y=clamp(s.c.y+dy,top,600-CH-10);render();return}
- if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=pivotOn()?fitY(s.a.y+dy,model.angle,ctx().h):clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,top,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
  drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
@@ -587,18 +691,21 @@ stage.addEventListener('pointermove',e=>{
  render();
 });
 function endDrag(){
- if(!drag)return;const d=drag;drag=null;const ready=d.state==='ready';model.glow=0;model.ghost=0;
+ if(!drag)return;const d=drag;drag=null;
+ if(d.mode==='angle'){model.turning=false;settleAngle();render();say(J().sayJoined);return}
+ const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
 }
-function cancelDrag(){if(!drag)return;const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=model.ghost=0;render();say('Move cancelled.')}
+function cancelDrag(){if(!drag)return;const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
+ if(id==='b'&&pivotOn()&&k[1]){const st=Math.min(model.detent||5,lim());++settleTok;flashTurning();setAngle((Math.round(model.angle/st)+Math.sign(k[1]))*st);say('GitDiscuss at '+$('#angleOut').textContent+'.');return}
  const bottom=600-(model.st>.5?HS:H)-14;
- if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=pivotOn()?fitY(model.a.y+k[1],model.angle,ctx().h):clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],10,1200-w-10);m.y=clamp(m.y+k[1],46,id==='c'?600-CH-10:bottom)}render();
 }));
 
