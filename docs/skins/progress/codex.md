@@ -25,7 +25,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Elven · Join · Calligraphic ribbon — binding attachment — Added selectable flat silver figure-eight strapwork, enamel collars, an over-under crossing and reverse unwind; retained all three earlier joins; simulated DOM interaction checks passed; browser visual review blocked by denied Chrome access and failed sandbox browser launch.
 - [x] Wire · Join · Branch graft — structural fusion — Added selectable interleaving copper fans, withdrawing inner hoops, continuous beaded roots and pearl-catch release; retained all three earlier joins; 119 simulated DOM, animation and touch checks passed; full-page visual review blocked by unavailable browser access and denied native Chrome access.
 - [x] Hollow · Join · Shadow dovetail — silhouette fusion — Added selectable shadow-first jagged edges, advancing chalk plates and a pale-rimmed key-notch release; retained all three earlier joins; 96 simulated DOM, geometry, animation and touch checks passed; joint geometry visually inspected, full-page review blocked by sandbox browser launch and denied Chrome access.
-- [ ] Gothic · Join · Radial apse joint — rotating attachment
+- [x] Gothic · Join · Radial apse joint — rotating attachment — Added a selectable eight-petal rose medallion, closing stone crescent jaws and brass-centre release; preserved all four earlier joins; 95 simulated DOM, animation, touch and regression checks passed; full-page visual review blocked by denied Chrome access.
 - [ ] Felt · Join · Blanket-stitch lacing — spanning attachment
 - [ ] Elven · Join · Floating moonstone — field attachment
 - [ ] Wire · Join · Bead-strand toggle — threaded attachment
