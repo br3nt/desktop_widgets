@@ -109,6 +109,15 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .wfold>span{position:absolute;top:50%;transform:translateY(-50%);font:12px/1 var(--sans);color:#d3dbf0;letter-spacing:.4px;white-space:nowrap;text-shadow:0 0 3px #04050e}
 .wfold em{font:700 13.5px/1 var(--sans);font-style:normal;color:#fff;letter-spacing:.6px;margin-right:4px}.wfold i{font-style:normal}
 #a .wfold b{left:30px}#a .wfold>span{right:68px}#b .wfold b{left:68px}#b .wfold>span{right:30px}.small .wfold b{left:30px}.small .wfold>span{right:54px}
+/* Mist strip: one line of text condensed in a frosted band */
+.mist{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.mband{position:absolute;left:0;right:0;top:0;height:44px;pointer-events:none;opacity:0;--tone:#26408a}
+.small .mband{height:38px;width:276px;right:auto}
+.mband b{position:absolute;top:50%;transform:translateY(-54%);font:400 18px/1 var(--script);color:#141a3a;white-space:nowrap;text-shadow:0 0 2px #f4f8ffcc}
+.small .mband b{font-size:16px}
+.mband>span{position:absolute;top:50%;transform:translateY(-50%);font:12px/1 var(--sans);color:#333b5c;letter-spacing:.4px;white-space:nowrap}
+.mband em{font:700 14px/1 var(--sans);font-style:normal;color:var(--tone);letter-spacing:.6px;margin-right:4px}.mband i{font-style:normal}
+#a .mband b{left:36px}#a .mband>span{right:34px}#b .mband b{left:34px}#b .mband>span{right:36px}.small .mband b{left:39px}.small .mband>span{right:34px}
 /* Growth morph: new leaves hang from a birch branch, each with its own moonstone pane */
 .gmorph{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 #c{pointer-events:none}#c .grip{pointer-events:auto}
@@ -161,6 +170,10 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="paneG" cx=".32" cy=".18" r="1"><stop stop-color="#fbfcff"/><stop offset=".55" stop-color="#e7ebf4"/><stop offset="1" stop-color="#cfd6e5"/></radialGradient>
  <filter id="rollShade" x="-10%" y="-400%" width="120%" height="900%"><feGaussianBlur stdDeviation="2.4"/></filter>
  <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>
+ <linearGradient id="frostG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f3f7ff"/><stop offset=".5" stop-color="#dde6f6"/><stop offset="1" stop-color="#c3d0ea"/></linearGradient>
+ <linearGradient id="mistG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e9f0fc"/><stop offset=".6" stop-color="#c9d6ee"/><stop offset="1" stop-color="#a9b9da"/></linearGradient>
+ <filter id="frostGrain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 2.4 0 0 0 -1.15"/><feComposite in2="SourceGraphic" operator="in"/></filter>
+ <filter id="wisp" x="-60%" y="-200%" width="220%" height="500%"><feGaussianBlur stdDeviation="3.2"/></filter>
 </defs></svg>
 <header><div><h1>Elven <span>/ Claude skin study</span></h1><p>Night-glass casings with a pearl sheen and silver hairline rims, leaf-tip ends with tapered filigree, a crescent crest, and moonstone panes for displays. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -177,7 +190,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="under" class="layer" viewBox="0 0 1200 600" aria-hidden="true"></svg>
 <div class="topline"><p id="status" role="status" aria-live="polite">Drag a nameplate toward the other casing, or use the state buttons.</p><span id="phase"></span></div>
 
-<section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg><svg class="lantern" aria-hidden="true"></svg><svg class="wing" aria-hidden="true"></svg>
+<section class="w" id="a" aria-label="Jarvis widget"><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg><svg class="lantern" aria-hidden="true"></svg><svg class="wing" aria-hidden="true"></svg><svg class="mist" aria-hidden="true"></svg>
  <button class="grip" data-drag="a" aria-label="Move Jarvis"><span><b>Jarvis</b>agent control</span><span class="orn" aria-hidden="true">✦</span></button>
  <div class="screen" aria-label="Jarvis display"><div class="pages">
   <div class="page"><div class="tiny">Jarvis · active workflow</div><div class="big"><span class="num">03</span><em class="runText">agents running</em></div><small>Reviewing the capsule renderer</small><span class="bars" aria-hidden="true"></span></div>
@@ -191,9 +204,10 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="fleaf" aria-hidden="true"><span><b>Jarvis</b><i class="frun">running</i></span><em>03</em></div>
  <div class="lamp" aria-hidden="true"><b>Jarvis</b><span class="v"><span class="s"><em>03</em> <i class="lrun">running</i></span><span class="l"><em>03</em> agents <i class="lrun">running</i></span></span></div>
  <div class="wfold" aria-hidden="true"><b>Jarvis</b><span><em>03</em><i class="wrun">running</i></span></div>
+ <div class="mband" aria-hidden="true"><b>Jarvis</b><span><em>03</em><i>agents <i class="mrun">running</i></i></span></div>
 </section>
 
-<section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg><svg class="lantern" aria-hidden="true"></svg><svg class="wing" aria-hidden="true"></svg>
+<section class="w" id="b" aria-label="GitDiscuss widget"><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg><svg class="lantern" aria-hidden="true"></svg><svg class="wing" aria-hidden="true"></svg><svg class="mist" aria-hidden="true"></svg>
  <button class="grip" data-drag="b" aria-label="Move GitDiscuss"><span><b>GitDiscuss</b>review queue</span><span class="orn" aria-hidden="true">✦</span></button>
  <div class="screen" aria-label="GitDiscuss display"><div class="pages">
   <div class="page"><div class="tiny">GitDiscuss · incoming</div><div class="big"><span class="num">02</span><em>need a decision</em></div><small>Capsule joining · design feedback</small></div>
@@ -207,9 +221,10 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="fleaf" aria-hidden="true"><span><b>GitDiscuss</b><i>to decide</i></span><em>02</em></div>
  <div class="lamp" aria-hidden="true"><b>GitDiscuss</b><span class="v"><span class="s"><em>02</em> to decide</span><span class="l"><em>02</em> need a decision</span></span></div>
  <div class="wfold" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em><i>to decide</i></span></div>
+ <div class="mband" aria-hidden="true"><b>GitDiscuss</b><span><em>02</em><i>need a decision</i></span></div>
 </section>
 
-<section class="w small" id="c" aria-label="Checks widget"><svg class="gmorph" aria-hidden="true"></svg><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg><svg class="lantern" aria-hidden="true"></svg><svg class="wing" aria-hidden="true"></svg><svg class="pmorph" aria-hidden="true"></svg>
+<section class="w small" id="c" aria-label="Checks widget"><svg class="gmorph" aria-hidden="true"></svg><svg class="casing" aria-hidden="true"></svg><svg class="constel" aria-hidden="true"></svg><svg class="furl" aria-hidden="true"></svg><svg class="lantern" aria-hidden="true"></svg><svg class="wing" aria-hidden="true"></svg><svg class="mist" aria-hidden="true"></svg><svg class="pmorph" aria-hidden="true"></svg>
  <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b><i class="gcap">independent</i></span><span class="orn" aria-hidden="true">✦</span></button>
  <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="lampdot" aria-hidden="true"></span>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
@@ -217,6 +232,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="fleaf" aria-hidden="true"><span><b>Checks</b><i>passed</i></span><em>12 / 14</em></div>
  <div class="lamp" aria-hidden="true"><b>Checks</b><span class="v"><span class="s"><em>12 / 14</em></span><span class="l"><em>12 / 14</em> · 2 wait</span></span></div>
  <div class="wfold" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em><i>passed</i></span></div>
+ <div class="mband" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em><i>passed</i></span></div>
  <div class="gpane" id="gp2" aria-hidden="true"><div class="tiny">Run 418 · main</div><div class="gbig"><span class="num">86%</span>passed</div><span class="pips"></span></div>
  <div class="gpane" id="gp3" aria-hidden="true"><div class="tiny">Waiting on Brent</div><div class="gw"><i></i>deploy-preview</div><div class="gw"><i></i>e2e-safari</div></div>
  <div class="ppane" id="pl" aria-hidden="true"><div class="tiny">Run 418 · main</div><div class="gbig"><span class="num">12 / 14</span>passed · 86%</div><span class="pips"></span><small>2 waiting for approval</small></div>
@@ -850,7 +866,7 @@ function eyeFronts(S,th,sc,e){if(e<=.05)return '';const r=clamp(e,0,1.3);
  return eyePts(S,th,sc).map(p=>`<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(th*180/PI)}) scale(${f(sc*r*100)/100})"><path d="M0 -4.8A2 4.8 0 0 1 0 4.8" fill="none" stroke="${NIGHT}" stroke-width="3"/><path d="M0 -4.8A2 4.8 0 0 1 0 4.8" fill="none" stroke="url(#silver)" stroke-width="1.5"/><circle cx="1.6" cy="-2.6" r=".7" fill="#fff"/></g>`).join('')}
 const SHADES={
  narrow:{label:'Plain narrow',kind:'Page baseline',
-  about:'Not a brainstorm item. The casing narrows to a slim leaf holding the script nameplate and one moonstone value; the crescent crest, the pendant and the tip filigree stay, drawn smaller. It was the first shade here, kept as a plain reference beside the elven shade modes (constellation, leaf furl, lantern sleep and wing fold so far; mist to come). Shading while joined keeps the join: the vine braids flatter, the brooch draws smaller, the moonlight bridge flattens to a low rail and arch, and the runic seal keeps its two inner runes and its moonstone.'},
+  about:'Not a brainstorm item. The casing narrows to a slim leaf holding the script nameplate and one moonstone value; the crescent crest, the pendant and the tip filigree stay, drawn smaller. It was the first shade here, kept as a plain reference beside the elven shade modes (constellation, leaf furl, lantern sleep, wing fold and mist). Shading while joined keeps the join: the vine braids flatter, the brooch draws smaller, the moonlight bridge flattens to a low rail and arch, and the runic seal keeps its two inner runes and its moonstone.'},
  constellation:{label:'Constellation',kind:'Distil',linear:true,msIn:2600,msOut:1700,custom:true,
   draw:s=>ease(seg(s,.25,.62)),casingOp:s=>1-seg(s,.08,.3),
   sayIn:'The leaf is read as a constellation: its outline settles into one silver line, and the stars kindle one by one.',
@@ -870,8 +886,75 @@ const SHADES={
   draw:s=>ease(seg(s,.34,.74)),casingOp:s=>1-seg(s,.1,.3),
   sayIn:'The night glass clears into two veined wings on a slim body; they quiver, then fold back along their veins and lie flat beside it.',
   sayOut:'The wings lift off the body and fan open along their veins, and the night glass fills back in behind them.',
-  about:'The leaf turns out to have been a pair of wings. The pane and its controls fade, then the night glass clears: veins grow out from a thorax by the joining end and fan across the casing, cross-veins lace between them into cells, and the dark glass thins to a pale translucent membrane over a slim night-glass body that runs the length of the midrib to a forked tail. The wings give two small quivers, then fold back like a damselfly\'s: each closes like a fan along its veins, the upper wing first and the lower a beat behind, every vein swinging toward the tail. The membrane pleats as it closes, alternate panels catching the light, and a pearl sheen runs across it mid-fold. Each folded wing settles with a small overshoot into a thin tapered blade lying along the body\'s edge, above and below. Each wing carries a pterostigma, the small coloured cell near a dragonfly\'s wing tip, and here it is the status: moon-blue for Jarvis running, gold for GitDiscuss\'s decisions, pale green for Checks, grey when paused. A glint runs down the folded wing, then the script name and one value come up on the body, clear of every vein. The strip is the body: the joining stem stays at its head (its two moonstone knops are the eyes), so folded leaves still join by vine, brooch, bridge or seal. Unshading opens the wings again and the glass fills back in.'}
+  about:'The leaf turns out to have been a pair of wings. The pane and its controls fade, then the night glass clears: veins grow out from a thorax by the joining end and fan across the casing, cross-veins lace between them into cells, and the dark glass thins to a pale translucent membrane over a slim night-glass body that runs the length of the midrib to a forked tail. The wings give two small quivers, then fold back like a damselfly\'s: each closes like a fan along its veins, the upper wing first and the lower a beat behind, every vein swinging toward the tail. The membrane pleats as it closes, alternate panels catching the light, and a pearl sheen runs across it mid-fold. Each folded wing settles with a small overshoot into a thin tapered blade lying along the body\'s edge, above and below. Each wing carries a pterostigma, the small coloured cell near a dragonfly\'s wing tip, and here it is the status: moon-blue for Jarvis running, gold for GitDiscuss\'s decisions, pale green for Checks, grey when paused. A glint runs down the folded wing, then the script name and one value come up on the body, clear of every vein. The strip is the body: the joining stem stays at its head (its two moonstone knops are the eyes), so folded leaves still join by vine, brooch, bridge or seal. Unshading opens the wings again and the glass fills back in.'},
+ mist:{label:'Mist',kind:'Distil',linear:true,msIn:3400,msOut:2600,custom:true,
+  draw:s=>ease(seg(s,.4,.6)),casingOp:s=>1-seg(s,.16,.32),
+  sayIn:'The night glass frosts over, the frost lifts off as mist, and the mist settles again as one line of text in a frosted band.',
+  sayOut:'The band breathes out into mist, the mist gathers into the leaf\'s shape, and the frost thaws back into night glass.',
+  about:'The leaf goes the way of a breath on cold glass. The pane and its controls fade, then frost blooms across the night glass in patches until the whole leaf is pale, rim and all. The frost lifts off as mist: the leaf\'s outline frays, the pale shape swells and tears into wisps that drift upward and spread, loose curls of mist slip away from it, and the leaf draws in unseen behind the cloud. Then the mist settles. Wisps gather along one line and recondense, patch by patch, into a frosted band with leaf-pointed ends and silver hairline edges, faint frost ferns feathered into its tips. The text comes up last, blurred like writing seen through condensation, then sharp: the script name in night ink and one value in the widget\'s status tone (moon-blue for Jarvis running, grey when paused, gold for GitDiscuss\'s decisions, green for Checks). A dewdrop gathers under the band and a glint runs along its top edge. After that the mist is gone and nothing moves: the band is still and fully legible. The joining stem stays at the band\'s end, so frosted bands still join by vine, brooch, bridge or seal. Unshading plays it back: the text fogs, the band breathes out into mist, the mist gathers into the leaf\'s shape, and the frost thaws to night glass.'}
 };
+/* ---------- Mist shade drawing ---------- */
+// The value's colour in the band: the status tone, deep enough to read on frost.
+function mistTone(id){if(id==='a')return model.a.run?'#2a4a9a':'#5d6482';if(id==='b')return model.b.run?'#8a5a06':'#5d6482';return '#1f7048'}
+// A mist filter: noise drifts across the shape, displaces it, and a moving threshold tears it into wisps.
+// thr at 0 or below keeps all of it; near .8 keeps none. Seeds differ per widget so no two clouds match.
+// K is the threshold's sharpness: high for crisp frost patches, low for soft fog.
+function mistFilter(fid,seed,x,y,w,h,disp,thr,blur,dx,dy,K=6){
+ return `<filter id="${fid}" filterUnits="userSpaceOnUse" x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}"><feTurbulence type="fractalNoise" baseFrequency=".018 .05" numOctaves="3" seed="${seed}"/><feOffset dx="${f(dx)}" dy="${f(dy)}" result="n"/>`+
+  `<feDisplacementMap in="SourceGraphic" in2="n" scale="${f(disp)}" xChannelSelector="R" yChannelSelector="G" result="d"/>`+
+  `<feColorMatrix in="n" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 ${K} 0 0 0 ${f(-K*thr*100)/100}" result="m"/><feComposite in="d" in2="m" operator="in"/>`+(blur>.05?`<feGaussianBlur stdDeviation="${f(blur)}"/>`:'')+`</filter>`}
+// The frosted band: pointed at the outer tip (both tips on Checks), squared to the joining stem.
+function bandD(w,h,join){const yc=h/2,hb=h/2-7,x0=7,x1=join?w-17:w-7,p=26;
+ let d=`M${x0} ${f(yc)}Q${x0+6} ${f(yc-hb)} ${x0+p} ${f(yc-hb)}`;
+ d+=join?`L${x1-6} ${f(yc-hb)}Q${x1} ${f(yc-hb)} ${x1} ${f(yc-hb+6)}L${x1} ${f(yc+hb-6)}Q${x1} ${f(yc+hb)} ${x1-6} ${f(yc+hb)}`:`L${x1-p} ${f(yc-hb)}Q${x1-6} ${f(yc-hb)} ${x1} ${f(yc)}Q${x1-6} ${f(yc+hb)} ${x1-p} ${f(yc+hb)}`;
+ return d+`L${x0+p} ${f(yc+hb)}Q${x0+6} ${f(yc+hb)} ${x0} ${f(yc)}Z`}
+// A frost fern: a feathered frond of ice crystal growing from a point, each barb a little shorter than the last.
+function frostFern(x,y,a,len){let d=`M${f(x)} ${f(y)}L${f(x+Math.cos(a)*len)} ${f(y+Math.sin(a)*len)}`;
+ for(let i=1;i<6;i++){const t=i/6,px=x+Math.cos(a)*len*t,py=y+Math.sin(a)*len*t,l=len*.42*(1-t*.7);
+  for(const k of [-1,1]){const b=a+k*.75;d+=`M${f(px)} ${f(py)}L${f(px+Math.cos(b)*l)} ${f(py+Math.sin(b)*l)}`}}
+ return `<path d="${d}" fill="none" stroke="#fff" stroke-width=".55" stroke-linecap="round" opacity=".75"/>`}
+const MIST_SEED={a:3,b:11,c:19};
+function mistShade(el,id,w,h,s){
+ const svg=el.querySelector('.mist'),mb=el.querySelector('.mband');
+ if(model.shade!=='mist'||s<=0){if(svg.dataset.on){svg.innerHTML='';delete svg.dataset.on}mb.style.opacity=0;return}
+ svg.dataset.on=1;svg.setAttribute('width',w);svg.setAttribute('height',h);
+ const small=id==='c',join=!small,Hf=small?CH:H,oy=(h-Hf)/2,cx=w/2,seed=MIST_SEED[id];
+ const frost=ease(seg(s,.03,.3)),melt=seg(s,.3,.64),cond=seg(s,.52,.86),done=cond>=1;
+ let g='<defs>';
+ // 1. The frosted leaf: frost blooms in patches, then the shape frays and lifts off as mist.
+ const leafOn=frost>0&&melt<1;
+ if(leafOn){const em=ease(melt),thr=melt>0?lerp(0,.8,em):lerp(.7,0,frost);
+  g+=mistFilter('mf'+id,seed,-60,-70,w+120,Hf+140,40*em,thr,.4+5.5*em,-46*s,-14*s,lerp(14,6,em))}
+ // 2. The band condenses: wisps gather along one line, patch by patch, and sharpen.
+ const bandOn=cond>0,ec=ease(cond);
+ if(bandOn&&!done)g+=mistFilter('bf'+id,seed+5,-60,-40,w+120,h+80,34*(1-ec),lerp(.8,-.1,ec),4.5*(1-ec),-46*s,-14*s);
+ g+=`<clipPath id="bc${id}"><path d="${bandD(w,h,join)}"/></clipPath></defs>`;
+ if(leafOn){const em=ease(melt),sc=1+.14*em,D=body(w,Hf,join,0);
+  g+=`<g transform="translate(${f(cx*(1-sc))} ${f(oy-12*em+Hf/2*(1-sc))}) scale(${f(sc*1000)/1000})" opacity="${op(1-seg(melt,.6,1))}"><g filter="url(#mf${id})"><path d="${D}" fill="url(#mistG)" opacity=".94"/><path d="${D}" fill="url(#pearl)" opacity=".16"/><path d="${D}" fill="none" stroke="#f4f8ff" stroke-width="1.6"/></g></g>`}
+ // 3. Loose wisps slip away from the cloud while it is in the air; none remain at rest.
+ const wa=Math.sin(PI*seg(s,.3,.82));
+ if(wa>.01){const u=seg(s,.3,.82);
+  for(let i=0;i<6;i++){const ph=i*1.7+seed,x=cx+Math.cos(ph)*w*.34+(i%2?1:-1)*u*26,y=h/2+Math.sin(ph*1.3)*Hf*.28-u*(10+i*3);
+   g+=`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(22+i*4)}" ry="${f(4+i%3)}" fill="#dfe8fa" opacity="${op(wa*.32)}" filter="url(#wisp)"/>`}}
+ // 4. The frosted band itself, with frost grain, ferns in the tips, silver hairline edges and a dewdrop.
+ if(bandOn){const B=bandD(w,h,join),yc=h/2,hb=h/2-7,x1=join?w-17:w-7;
+  let b=`<path d="${B}" fill="url(#frostG)" opacity=".93"/><path d="${B}" fill="url(#pearl)" opacity=".12"/>`;
+  b+=`<g clip-path="url(#bc${id})"><rect width="${w}" height="${h}" fill="#fff" opacity=".55" filter="url(#frostGrain)"/>`;
+  b+=frostFern(9,yc,-.55,15)+frostFern(9,yc,.55,15)+frostFern(16,yc-hb,.9,9)+frostFern(16,yc+hb,-.9,9);
+  if(!join)b+=frostFern(w-9,yc,PI+.55,15)+frostFern(w-9,yc,PI-.55,15)+frostFern(w-16,yc-hb,PI-.9,9)+frostFern(w-16,yc+hb,PI+.9,9);
+  else b+=frostFern(x1-3,yc-hb+2,PI*.62,8)+frostFern(x1-3,yc+hb-2,-PI*.62,8);
+  b+=`</g><path d="${B}" fill="none" stroke="url(#silver)" stroke-width="1.1"/><path d="M33 ${f(yc-hb+1.6)}L${f(x1-(join?8:33))} ${f(yc-hb+1.6)}" stroke="#fff" stroke-width=".6" opacity=".7"/>`;
+  g+=done?b:`<g filter="url(#bf${id})">${b}</g>`;
+  // Dew gathers under the band's middle, and a glint runs along its top edge as it sets.
+  const dw=back(seg(s,.84,.96),1.4);
+  if(dw>0){const k=.7*dw,y0=yc+hb;g+=`<path d="M${cx} ${f(y0-.5)}Q${f(cx+3.2*k)} ${f(y0+4.5*k)} ${cx} ${f(y0+8*k)}Q${f(cx-3.2*k)} ${f(y0+4.5*k)} ${cx} ${f(y0-.5)}Z" fill="url(#moonstone)" stroke="#e8eef8" stroke-width=".5"/>`}
+  const gl=seg(s,.86,.99);
+  if(gl>0&&gl<1)g+=star(lerp(30,x1-10,ease(gl)),yc-hb+1,4.2*Math.sin(PI*gl)+.8,.95*Math.sin(PI*gl))}
+ // 5. The joining stem stays, so frosted bands still join.
+ if(join)g+=`<g opacity="${op(Math.max(1-frost*.6,seg(s,.6,.8)))}">${joinStem(w,h)}</g>`;
+ svg.innerHTML=id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${g}</g>`:g;
+ const tx=seg(s,.74,.95);mb.style.opacity=op(tx);mb.style.filter=tx>0&&tx<1?`blur(${f(3.5*(1-ease(tx)))}px)`:'';mb.style.setProperty('--tone',mistTone(id));
+}
 /* ---------- Leaf furl shade drawing ---------- */
 // What the midrib shows: the lit fraction, the buds still to come and their colour.
 function furlData(id){
@@ -1493,7 +1576,7 @@ function render(){
  const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,draw(model.st))),sh=SHADES[model.shade],cn=!!sh.custom,s=model.st;
  // A joined fork keeps GitDiscuss's stem the bend's distance off the knot.
  if(branchOn()){model.b.x=model.a.x+W+j.gap;model.b.y=model.a.y}
- $('#a .crun').textContent=$('#a .frun').textContent=$('#a .wrun').textContent=model.a.run?'running':'paused';$$('#a .lrun').forEach(n=>n.textContent=model.a.run?'running':'paused');
+ $('#a .crun').textContent=$('#a .frun').textContent=$('#a .wrun').textContent=$('#a .mrun').textContent=model.a.run?'running':'paused';$$('#a .lrun').forEach(n=>n.textContent=model.a.run?'running':'paused');
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -1509,7 +1592,7 @@ function render(){
   svg.style.opacity=cn?op(Math.max(sh.casingOp(s),model.shade==='lantern'?.55*ease(WK[id])*seg(s,.86,1):0)):'';
   el.style.filter=model.shade==='constellation'&&s>.45?'drop-shadow(0 0 5px #05061299)':'';
   if(small)plants(el,s);
-  constel(el,id,w,h,s);furl(el,id,w,h,s);lantern(el,id,w,h,s);wingFold(el,id,w,h,s);
+  constel(el,id,w,h,s);furl(el,id,w,h,s);lantern(el,id,w,h,s);wingFold(el,id,w,h,s);mistShade(el,id,w,h,s);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
