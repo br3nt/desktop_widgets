@@ -99,6 +99,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .mw.tbl li:before{margin-right:5px;background:linear-gradient(135deg,#d8f5c4,#25603f)}
 .mw.tbl li.w{color:#8e1f2b}.mw.tbl li.w:before{background:linear-gradient(135deg,#ffb4a8,#a3222f)}
 .w[data-wf] .grip{justify-content:center;gap:8px}.w[data-wf] .grip>span:first-child{font-size:0}.w[data-wf] .grip b{margin:0}
+/* Scale and detail: the ring's and six-foil's small round panes */
+#lv1 .disc .num{font-size:18px;line-height:20px}#lv2 .disc .num{font-size:17px;line-height:19px}#lv2 .disc small{font-size:10px}#lv2 .disc .tiny{font-size:9px}
 .wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
@@ -236,6 +238,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
   <div class="mw ctr" style="left:233px;top:160px;width:99px;height:44px"><div class="tiny">Run 418</div><span class="num">86%</span></div>
   <div class="mw ctr" style="left:337.5px;top:160px;width:99px;height:44px"><div class="tiny">All checks</div><span class="num ink">14</span></div>
  </div>
+ <div class="wv" id="lv1" aria-hidden="true"><div class="mw disc" style="left:27px;top:19px;width:62px;height:62px"><span class="num">12/14</span><div class="tiny">passed</div></div></div>
+ <div class="wv" id="lv2" aria-hidden="true"><div class="mw disc" style="left:51px;top:43px;width:62px;height:62px"><div class="tiny">Passed</div><span class="num">12/14</span><small class="wait">2 waiting</small></div></div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
 </section>
@@ -2112,6 +2116,123 @@ MORPHS.windows={label:'Window types',kind:'Recut',sizes:[['facade','Facade',0,'a
 CHK.forEach((n,j)=>{const b=document.createElement('button'),need=j>11,t=`Check ${j+1} of 14 · ${n} · ${need?'waiting for your approval':'passed'}`,[x,y]=xy(122,114,73,(-90+j*360/14)*D2R);
  b.style.cssText=`left:${f(x-11)}px;top:${f(y-11)}px;width:22px;height:22px`;b.setAttribute('aria-label',t);b.dataset.tip=t;b.dataset.c=need?'need':'pass';
  b.onpointerenter=b.onfocus=b.onclick=()=>showTip(b);b.onpointerleave=b.onblur=hideTip;$('#wv3 .tri').append(b)});
+
+/* ---------- Morph: scale and detail (Checks) ---------- */
+// g runs 0 facade, 1 ring, 2 six-foil, 3 rose: one round window whose tracery gains or drops a level as it crosses each size, so it never thins to grey fuzz.
+// Ring: a plain oculus, the status as two arcs of glass. Six-foil: the stone widens into a plate pierced with six foils. Rose: bar tracery with a petal per check.
+// Everything is a function of g alone, so shrinking plays a step backwards and turning round never jumps. Radii are px from the window's centre.
+const LRO=[0,48,72,112],LRI=38;
+const lDims=k=>k?[Math.max(116,2*LRO[k]+20),2*LRO[k]+22]:[CW,CH];
+const lStep=g=>{const i=Math.min(2,Math.floor(g+1e-9));return{i,u:clamp(g-i)}};
+function lRo(g){if(g<=1)return LRO[1];const{i,u}=lStep(g);return i===1?lerp(LRO[1],LRO[2],ease(seg(u,.05,.55))):lerp(LRO[2],LRO[3],ease(seg(u,.05,.6)))}
+// On the first step the box narrows with the flowing stone, so a Checks near the stage edge doesn't jump sideways at the ring.
+function lBox(g){if(g<1e-6)return[CW,CH];if(g<1-1e-6)return[lerp(CW,116,ease(seg(g,.3,.68))),Math.max(CH,lDims(1)[1])];const R=lRo(g);return[Math.max(116,2*R+20),2*R+22]}
+const lCirc=(cx,cy,r)=>Array.from({length:WN},(_,j)=>{const a=Math.PI/2+2*Math.PI*j/WN;return[cx+r*Math.cos(a),cy+r*Math.sin(a)]});
+const P6=PETAL(40.5,49,58.5,19);
+// The status ring: twelve-fourteenths passed in green, the rest waiting in red, glazed clockwise from the top up to `sw`.
+function lGauge(gi,go,sw,lit){
+ if(sw<=0)return '';
+ const A=n=>(-90+360*n)*D2R,p=(r,a)=>`${f(r*Math.cos(a))} ${f(r*Math.sin(a))}`;
+ const arc=(a0,a1)=>{if(a1-a0<1e-3)return '';const L=a1-a0>Math.PI?1:0;return `M${p(go,a0)}A${f(go)} ${f(go)} 0 ${L} 1 ${p(go,a1)}L${p(gi,a1)}A${f(gi)} ${f(gi)} 0 ${L} 0 ${p(gi,a0)}Z`};
+ const ps=arc(A(0),A(Math.min(sw,12/14))),nd=sw>12/14?arc(A(12/14),A(sw)):'';
+ let s=lit>0?glowG(`<g opacity="${f(.55*lit)}"><path d="${ps}" fill="${LCOL.pass}" stroke="${LCOL.pass}" stroke-width="3"/>${nd?`<path d="${nd}" fill="${LCOL.need}" stroke="${LCOL.need}" stroke-width="3"/>`:''}</g>`):'';
+ for(const[d,st]of[[ps,'pass'],[nd,'need']])if(d)s+=`<path d="${d}" fill="url(#lg-${st})"/><path d="${d}" fill="#16131f" opacity="${f(.72*(1-lit))}"/><path d="${d}" fill="none" stroke="#1d1612" stroke-width="1"/>`;
+ // The glazier's leading edge glints as the glass goes in.
+ if(sw<1){const[x,y]=p((gi+go)/2,A(sw)).split(' ');s+=`<circle cx="${x}" cy="${y}" r="2.6" fill="#fffbe8" opacity=".85"/>`}
+ return s;
+}
+// Six foils pierced through the plate, each opening from its own centre at pierce `p`, with gold roundels between them; `lit` kindles the glass.
+function lSix(p,lit){
+ let sh='',gl='',gw='';
+ for(let j=0;j<6;j++){const a=-90+j*60,q=ease(seg(p,j*.1,j*.1+.5));if(q<=0)continue;
+  const T=`rotate(${a}) translate(49 0) scale(${f(q*100)/100}) translate(-49 0)`,col=j%2?'#1f3f8a':'#8e1f2b',b=(a+30)*D2R,x=f(52*Math.cos(b)),y=f(52*Math.sin(b)),r=f(4.6*q);
+  sh+=`<path d="${P6}" transform="${T}" fill="#2a1f15" stroke="#2a1f15" stroke-width="4" stroke-linejoin="round" opacity=".42"/><circle cx="${x}" cy="${y}" r="${f(6.4*q)}" fill="#2a1f15" opacity=".42"/>`;
+  gl+=`<g transform="${T}"><path d="${P6}" fill="${col}"/><path d="${P6}" fill="url(#glassHi)"/><path d="${P6}" fill="#16131f" opacity="${f(.72*(1-lit))}"/><path d="${P6}" fill="none" stroke="#1d1612" stroke-width="1"/></g>`+
+   `<circle cx="${x}" cy="${y}" r="${r}" fill="#e7b83c" stroke="#1d1612" stroke-width=".9"/><circle cx="${x}" cy="${y}" r="${r}" fill="#16131f" opacity="${f(.6*(1-lit))}"/>`;
+  if(lit>0)gw+=`<path d="${P6}" transform="${T}" fill="${col==='#8e1f2b'?'#e0525a':'#5a82d6'}" opacity="${f(.55*lit)}"/>`;
+ }
+ return sh+(gw?glowG(gw):'')+gl;
+}
+// The gilded keystone at the head of the ring, popping in at `k`.
+function lKey(ro,ri,k){
+ if(k<=0)return '';const e=Math.min(1,k*1.15),h=7.5*D2R,q=(r,a)=>`${f(r*Math.cos(-Math.PI/2+a))} ${f(r*Math.sin(-Math.PI/2+a))}`,rm=(ro+ri)/2;
+ return `<g transform="translate(0 ${f(-rm)}) scale(${f(e*100)/100}) translate(0 ${f(rm)})"><path d="M${q(ri-1,-h*.8)}L${q(ro+2.5,-h)}L${q(ro+2.5,h)}L${q(ri-1,h*.8)}Z" fill="url(#lime)" stroke="#6d5d46" stroke-width=".8"/>`+
+  `<circle cy="${f(-rm)}" r="3.4" fill="url(#gild)" stroke="#3a2c1c" stroke-width=".6"/></g>`;
+}
+function lRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,{i,u}=lStep(g),[w,h]=lBox(g),Ro=lRo(g),cx=w/2,cy=h-20-Ro,sc=Ro/LRO[2];
+ el.dataset.m='1';el.style.width=w+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ const key='l'+i;
+ if(ms.dataset.key!==key){ms.dataset.key=key;ms._st=ms._gl='';fx._s=ms._R=ms._bx=null;
+  ms.innerHTML=`<defs>${stoneFilter('w',29)}</defs><g class="lst"></g>`+(i===0?`<g class="lfac">${cas(0)}</g>`:'')+`<g class="lgl"></g>`+(i===2?`<g class="lrose">${wForm(3)}</g>`:'');
+  if(i===2){const R=ms.querySelector('.lrose');ms._R={R,wt:R.querySelector('.wt'),tr:R.querySelector('.wtr'),G:[...R.querySelectorAll('[data-g]')],D:[...R.querySelectorAll('[data-d]')],L:[...R.querySelectorAll('[data-l]')]}}
+ }
+ const bx=w+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',w);n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${w} ${h}`)}}
+ // The plaque under the window carries the nameplate; it is wider the bigger the window.
+ const pw=clamp(Ro*1.52,96,170),plx=(w-pw)/2,ply=h-22,oF=[(w-CW)/2,h-CH];
+ // Stone: on the first step the facade flows point for point into the ring; after that it is a round surround whose opening is the glass.
+ let Ri=LRI,P,Q,c,pl,plo=1;
+ if(i===0){const s=ease(seg(u,.3,.68)),mx=(X,Y)=>X.map((p,j)=>[lerp(p[0]+oF[0],Y[j][0],s),lerp(p[1]+oF[1],Y[j][1],s)]);
+  P=mx(wSamp(WF[0].o),lCirc(cx,cy,Ro));Q=mx(wSamp(WF[0].i),lCirc(cx,cy,Ri));c=[lerp(WF[0].c[0]+oF[0],cx,s),lerp(WF[0].c[1]+oF[1],cy,s)];
+  pl=[lerp(WF[0].pl[0]+oF[0],plx,s),lerp(WF[0].pl[1]+oF[1],ply,s),lerp(WF[0].pl[2],pw,s)];plo=seg(u,.5,.7);
+  ms.querySelector('.lfac').setAttribute('transform',`translate(${f(oF[0])} ${f(oF[1])})`);ms.querySelector('.lfac').setAttribute('opacity',f(1-seg(u,.08,.3)))}
+ else{if(i===2)Ri=lerp(LRI*sc,98*Ro/112,ease(seg(u,.14,.42)));P=lCirc(cx,cy,Ro);Q=lCirc(cx,cy,Ri);c=[cx,cy];pl=[plx,ply,pw]}
+ const st=wStone(P,Q,c,pl,plo);if(ms._st!==st){ms._st=st;ms.querySelector('.lst').innerHTML=st}
+ // Glass and the smaller stonework, in the window's own frame.
+ const gz=i?1:seg(u,.66,.86),gk=i===0?seg(u,.8,.98):i===1?1:1-seg(u,.76,.9),e2=i===2?ease(seg(u,.05,.6)):0;
+ const p6=i===1?seg(u,.55,.85):i===2?1-seg(u,.1,.3):0,k6=i===1?seg(u,.84,.98):i===2?1-seg(u,0,.12):0;
+ const plate=i===1?seg(u,.45,.6):i===2?1-seg(u,.14,.3):0,ky=i===0?seg(u,.6,.72):i===1?1:1-seg(u,.55,.7),rl=i===0?seg(u,.62,.75):i===1?1:1-seg(u,.55,.8);
+ let gl='';
+ if(rl>0)gl+=`<g opacity="${f(rl)}">${roll(0,0,f(Ro-4))}</g>`;
+ if(plate>0)gl+=`<g opacity="${f(plate)}">${roll(0,0,f(60*sc))}</g>`;
+ if(gk>0||i<2)gl+=`<g opacity="${f(i===2?Math.max(gk,.001):1)}">`+lGauge(lerp(33,44,e2),lerp(37.5,50,e2),gz,gk)+`<circle r="${f(lerp(33,44,e2))}" fill="none" stroke="#1d1612" stroke-width="1.2" opacity="${f(gz>0?1:0)}"/></g>`;
+ if(p6>0)gl+=`<g transform="scale(${f(sc*1000)/1000})">${lSix(p6,k6)}</g>`;
+ // While the plate stands, the keystone keeps to the outer order, clear of the top foil.
+ gl+=lKey(Ro,i===0?LRI:i===1?lerp(LRI,61*sc,plate):Math.max(Ri,lerp(LRI*sc,61*sc,plate)),ky);
+ gl=`<g transform="translate(${f(cx)} ${f(cy)})">${gl}</g>`;
+ if(ms._gl!==gl){ms._gl=gl;ms.querySelector('.lgl').innerHTML=gl}
+ // The rose's bar tracery is cut along the opening once there is room for it, then glazed and kindled petal by petal.
+ if(ms._R){const r=ms._R,dr=seg(u,.5,.75),gzR=seg(u,.6,.86),v=seg(u,.76,1);
+  r.R.setAttribute('transform',`translate(${f(cx)} ${f(cy)}) scale(${f(Ro/112*1000)/1000}) translate(-122 -114)`);
+  r.wt.setAttribute('opacity',f(seg(u,.55,.8)));r.tr.setAttribute('opacity',f(seg(u,.5,.54)));r.tr.setAttribute('stroke-dashoffset',f((1-dr)*1000)/1000);
+  r.G.forEach(d=>d.setAttribute('opacity',f(seg(gzR,+d.dataset.g,+d.dataset.g+.4))));
+  r.D.forEach(d=>d.setAttribute('opacity',f(.7*(1-seg(v,+d.dataset.d,+d.dataset.d+.35)))));
+  r.L.forEach(d=>d.setAttribute('opacity',f(.7*seg(v,+d.dataset.l,+d.dataset.l+.35))))}
+ // Grit where stone moves: the facade flowing, the stone widening, each foil pierced, the plate cut away.
+ let fxs='';
+ if(i===0&&u>.3&&u<.72){const PA=wSamp(WF[0].o),C=lCirc(cx,cy,Ro);for(let j=0;j<8;j++){const q=Math.round((j+.5)*WN/8)%WN,dd=Math.hypot(PA[q][0]+oF[0]-C[q][0],PA[q][1]+oF[1]-C[q][1]);
+  if(dd>8)fxs+=JOINS.buttress.dust(P[q][0],P[q][1],seg(u,.32+.025*j,.56+.025*j),5,10+dd*.05,j+71)}}
+ if(i===1){for(let j=0;j<6;j++){const a=(j*60+15)*D2R;fxs+=JOINS.buttress.dust(cx+Ro*Math.cos(a),cy+Ro*Math.sin(a),seg(u,.06+.06*j,.3+.06*j),4,9,j+83)}
+  for(let j=0;j<6;j++){const q=seg(p6,j*.1,j*.1+.5),a=(-90+j*60)*D2R;if(q>0&&q<1)fxs+=JOINS.buttress.dust(cx+49*sc*Math.cos(a),cy+49*sc*Math.sin(a),q,6,11,j+97)}}
+ if(i===2)for(let j=0;j<8;j++){const a=(j*45+22.5)*D2R;fxs+=JOINS.buttress.dust(cx+Ri*Math.cos(a),cy+Ri*Math.sin(a),seg(u,.14+.02*j,.36+.02*j),5,10,j+113)}
+ if(fx._s!==fxs){fx._s=fxs;fx.innerHTML=fxs}
+ // Displays: each level's pane says only as much as its size can carry, and fades out as the level is left and in once it is kindled.
+ const dv=[i===0?1-seg(u,0,.1):0,i===0?seg(u,.88,1):i===1?1-seg(u,0,.1):0,i===1?seg(u,.88,1):i===2?1-seg(u,0,.1):0,i===2?seg(u,.9,1):0];
+ [[$('#lv1'),58,50,dv[1]],[$('#lv2'),82,74,dv[2]],[$('#wv3'),122,114,dv[3]]].forEach(([d,dx,dy,v])=>{if(v<.01){d.style.display='none';return}
+  Object.assign(d.style,{display:'block',left:f(cx-dx)+'px',top:f(cy-dy)+'px',opacity:f(v)})});
+ $('#wv3 .tri').style.visibility=dv[3]<1?'hidden':'';
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+oF[0])+'px';n.style.top=f(y+oF[1])+'px';n.style.opacity=f(dv[0]);n.style.visibility=dv[0]<.02?'hidden':'visible'}
+ // The nameplate moves from the facade's frieze to the plaque halfway through the first step, faded out while it moves.
+ const fac=i===0&&u<.5,gp=fac?[22+oF[0],6+oF[1],CW-44,15]:[plx+5,ply+3.5,pw-10,15];
+ Object.assign(gr.style,{left:f(gp[0])+'px',top:f(gp[1])+'px',width:f(gp[2])+'px',height:gp[3]+'px',right:'auto',opacity:f(i?1:u<.5?1-seg(u,.3,.42):seg(u,.58,.7))});
+ if(fac)delete el.dataset.wf;else el.dataset.wf='l';
+ el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'changing size')+': 12 of 14 checks passed, 2 waiting for approval');
+ return true;
+}
+function lPhase(){
+ const g=model.g,{i,u}=lStep(g),up=model.mDir>0,pc=Math.round(100*lRo(g)/LRO[3]);
+ const t=i===0?(up?(u<.3?'the facade dims':u<.68?'the stone draws in to a round window':'glazing the status ring'):(u>.66?'the status ring goes out':u>.3?'the stone opens out into a facade':'the facade lights again')):
+  i===1?(up?(u<.55?'the stone widens into a plate':u<.85?'piercing six foils':'kindling the six-foil'):(u>.84?'the six-foil dims':u>.55?'filling in the foils':'the plate narrows to a ring')):
+  (up?(u<.14?'the six-foil dims':u<.45?'cutting the plate away':u<.76?'cutting the bar tracery':'glazing and kindling the rose'):(u>.76?'the rose dims':u>.5?'cutting out the bar tracery':u>.3?'shrinking; the plate closes in':'piercing six foils'));
+ return 'Checks · '+pc+'% size · '+t;
+}
+MORPHS.detail={label:'Scale and detail',kind:'Scale',sizes:[['facade','Facade',0,'a facade'],['ring','Ring',1,'a ring'],['six','Six-foil',2,'a six-foil'],['rose','Rose',3,'a full rose']],ms:[2600,2400],
+ box:lBox,dims:lDims,render:lRender,phase:lPhase,
+ say:(d,S)=>d>0?'Checks grows to '+S[3]+': with more room, the tracery gains a level.':'Checks shrinks to '+S[3]+': with less room, the tracery drops a level so it never blurs to grey.',
+ about:'One round window at three sizes, with as much tracery as each size can hold. Gothic tracery is fine stonework, and drawn too small it turns to grey fuzz, so the window adds or drops a level of tracery as it crosses each size, and its pane says only what fits. <b>Ring</b> (96 px across): a plain oculus with a gilded keystone and no tracery at all. Its status is one ring of glass in two arcs, twelve-fourteenths green for passed and the rest red for waiting, round a pane that shows just the count. <b>Six-foil</b> (144 px): the stone widens into a plate pierced with six foils of ruby and blue glass and gold roundels. This is plate tracery, the earliest kind. The pane adds the label and the two waiting. <b>Rose</b> (224 px): the plate is cut away for bar tracery, the later and finer kind, with fourteen petals, one per check (hover or tap one to read it), ball-flowers round the outer order, and the full readout in the pane. <b>Growing:</b> the stone widens first, and once there is room the new tracery is cut. The six foils are pierced one by one with grit, or the rose\'s bars are drawn in along the opening, then the glass goes in and kindles, and the status passes from the ring into the petals. <b>Shrinking</b> drops the finer level before the window gets too small for it. The phase line shows the size as a share of the full rose. Pick a size, press M, or scrub the slider. Checks grows from its foot and moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way. Shading takes it back to the facade first, and unshading grows it again.'};
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
