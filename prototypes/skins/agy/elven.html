@@ -3634,6 +3634,12 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
+  const btnWillow = $('#btnWillowAnim');
+  if (btnWillow) {
+    btnWillow.textContent = model.joined ? 'Unsheathe willow blades' : 'Sheathe willow blades';
+    btnWillow.disabled = model.busy;
+  }
+
   const btnHarp = $('#btnHarpAnim');
   if (btnHarp) {
     btnHarp.textContent = (model.shade || model.harpCompression > 0.5) ? 'Open harp frame' : 'Compress harp ribs';
@@ -3657,21 +3663,26 @@ function render() {
 
   const release = $('#sylvanRelease');
   release.hidden = !model.joined || model.busy || model.shade;
-  release.style.left = (model.a.x + (model.option === 'crystal_cleavage' ? 334 : (model.option === 'liquid_ithildin' ? 336 : 338))) + 'px';
-  release.style.top = (model.a.y + (model.option === 'crystal_cleavage' ? 12 : (model.option === 'liquid_ithildin' ? 14 : 44))) + 'px';
+  release.style.left = (model.a.x + (model.option === 'crystal_cleavage' ? 334 : (model.option === 'liquid_ithildin' ? 336 : (model.option === 'willow_blade' ? 348 : 338)))) + 'px';
+  release.style.top = (model.a.y + (model.option === 'crystal_cleavage' ? 12 : (model.option === 'liquid_ithildin' ? 14 : (model.option === 'willow_blade' ? 42 : 44)))) + 'px';
   release.style.setProperty('--tension', model.tension);
   if (model.option === 'crystal_cleavage') {
     release.classList.add('crystal-pin');
-    release.classList.remove('quicksilver-pin');
+    release.classList.remove('quicksilver-pin', 'willow-catch');
     release.setAttribute('aria-label', 'Release GitDiscuss: pull crystal pin or press Enter');
     release.setAttribute('title', 'Pull crystal pin to dissolve optical bond · Enter to separate');
   } else if (model.option === 'liquid_ithildin') {
-    release.classList.remove('crystal-pin');
+    release.classList.remove('crystal-pin', 'willow-catch');
     release.classList.add('quicksilver-pin');
     release.setAttribute('aria-label', 'Release GitDiscuss: pull quicksilver needle or press Enter');
     release.setAttribute('title', 'Pull quicksilver needle to break surface tension · Enter to separate');
-  } else {
+  } else if (model.option === 'willow_blade') {
     release.classList.remove('crystal-pin', 'quicksilver-pin');
+    release.classList.add('willow-catch');
+    release.setAttribute('aria-label', 'Release GitDiscuss: press spring bayonet catch or press Enter');
+    release.setAttribute('title', 'Press spring leaf bayonet catch to release blades · Enter to separate');
+  } else {
+    release.classList.remove('crystal-pin', 'quicksilver-pin', 'willow-catch');
     release.setAttribute('aria-label', 'Release GitDiscuss: pull right or press Enter');
     release.setAttribute('title', 'Pull right to unweave silver tendrils · Enter to separate');
   }
@@ -4042,6 +4053,108 @@ async function triggerMeniscusRipple() {
   renderHardware();
 }
 
+// Option 7: Willow-Blade Bayonet Sheath Join Animations
+async function joinWillow(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Three spring-tempered silver willow leaves glide silently toward velvet-lined scabbard slots.');
+  $('#phase').textContent = 'Gliding willow blades into scabbards';
+
+  // 1. Silent insertion along mother-of-pearl guide rails
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.canopy ? 305 : 385, model.a.y));
+
+  if (!await tween(fromDrag ? 240 : 480, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.4) / 0.6);
+    model.bladeProgress = t;
+    model.light = t * 0.7;
+    render();
+  }, token)) return;
+
+  // 2. Full insertion & crisp jewel click lock!
+  $('#phase').textContent = 'Bayonet catches locking with jewel click';
+  model.joined = true;
+  model.blend = 1;
+  model.bladeProgress = 1;
+  model.light = 0;
+  render();
+
+  // Radiating starlight wavefront & shockwave ripples
+  await tween(fromDrag ? 340 : 520, t => {
+    model.bladeClick = t;
+    renderHardware();
+  }, token);
+
+  model.bladeClick = 0;
+  model.busy = false;
+  render();
+  say('Willow blades locked in velvet scabbards with a crisp jewel click. Press spring leaf catch to release.');
+  $('#phase').textContent = 'Joined / Willow-blade bayonet cascade';
+}
+
+async function separateWillow() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Unseating the spring bayonet jewel catches. Silver willow blades slide smoothly from velvet scabbards.');
+  $('#phase').textContent = 'Unseating bayonet jewel catches';
+
+  // 1. Unseating jewel catch pulse
+  if (!await tween(180, t => {
+    model.bladeClick = t * 0.4;
+    renderHardware();
+  }, token)) return;
+
+  model.bladeClick = 0;
+  model.joined = false;
+
+  // 2. Drawing blades cleanly out of scabbards
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Drawing blades from scabbards';
+  if (!await tween(500, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.5);
+    model.bladeProgress = 1 - t;
+    render();
+  }, token)) return;
+
+  model.busy = false;
+  model.blend = 0;
+  model.bladeProgress = 0;
+  render();
+  say('Separated. Spring-tempered silver willow leaves drawn cleanly from scabbards.');
+  $('#phase').textContent = 'Separate / Two star-silver hulls';
+}
+
+async function triggerJewelClick() {
+  if (model.busy) return;
+  const token = ++animationToken;
+  say('Crisp jewel click: Spring bayonet catches seat into blade notches with radiating starlight wavefront.');
+  await tween(540, t => {
+    model.bladeClick = t;
+    renderHardware();
+  }, token);
+  model.bladeClick = 0;
+  renderHardware();
+}
+
 // Option 2: Lotus Petal Nocturne Shade Mode Animations
 async function closeLotusPetals() {
   if (model.busy || (model.shade && model.petalFold >= 0.98)) return;
@@ -4236,11 +4349,14 @@ async function applyState(stateName) {
     if (model.joined) {
       if (model.option === 'crystal_cleavage') await separateCrystal();
       else if (model.option === 'liquid_ithildin') await separateMeniscus();
+      else if (model.option === 'willow_blade') await separateWillow();
       else await separate();
     } else {
       model.tendrilProgress = 0;
       model.crystalGlide = 0;
       model.meniscusProgress = 0;
+      model.bladeProgress = 0;
+      model.bladeClick = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -4263,6 +4379,7 @@ async function applyState(stateName) {
       model.crystalGlide = 0.55;
       model.tendrilProgress = 0;
       model.meniscusProgress = 0;
+      model.bladeProgress = 0;
       model.a.x = 240;
       model.b.x = 240 + W + 46;
       model.b.y = model.a.y - 12; // 30° diagonal approach offset
@@ -4272,15 +4389,27 @@ async function applyState(stateName) {
       model.meniscusProgress = 0.58;
       model.tendrilProgress = 0;
       model.crystalGlide = 0;
+      model.bladeProgress = 0;
       model.a.x = 240;
       model.b.x = 240 + W + 46;
       model.b.y = model.a.y;
       render();
       say('State: Joining — Mid-animation view with liquid star-silver reaching across the gap to form an hourglass neck.');
+    } else if (model.option === 'willow_blade') {
+      model.bladeProgress = 0.55;
+      model.tendrilProgress = 0;
+      model.crystalGlide = 0;
+      model.meniscusProgress = 0;
+      model.a.x = 240;
+      model.b.x = 240 + W + 46;
+      model.b.y = model.a.y;
+      render();
+      say('State: Joining — Mid-animation view with silver willow blades gliding into velvet scabbards along mother-of-pearl rails.');
     } else {
       model.tendrilProgress = 0.58; // mid-flight reaching tendrils
       model.crystalGlide = 0;
       model.meniscusProgress = 0;
+      model.bladeProgress = 0;
       model.a.x = 240;
       model.b.x = 240 + W + 50;
       model.b.y = model.a.y;
@@ -4305,6 +4434,7 @@ async function applyState(stateName) {
         model.crystalGlide = 1;
         model.tendrilProgress = 0;
         model.meniscusProgress = 0;
+        model.bladeProgress = 0;
         render();
         say('State: Joined — Monolithic moonstone prism with invisible optical seam.');
         triggerHarmonicChime();
@@ -4312,13 +4442,23 @@ async function applyState(stateName) {
         model.meniscusProgress = 1;
         model.tendrilProgress = 0;
         model.crystalGlide = 0;
+        model.bladeProgress = 0;
         render();
         say('State: Joined — Smooth quicksilver meniscus resting in carved jade chalice.');
         triggerMeniscusRipple();
+      } else if (model.option === 'willow_blade') {
+        model.bladeProgress = 1;
+        model.tendrilProgress = 0;
+        model.crystalGlide = 0;
+        model.meniscusProgress = 0;
+        render();
+        say('State: Joined — Overlapping cascade of engraved silver leaves locked with nephrite jade catches.');
+        triggerJewelClick();
       } else {
         model.tendrilProgress = 1;
         model.crystalGlide = 0;
         model.meniscusProgress = 0;
+        model.bladeProgress = 0;
         render();
         say('State: Joined — Monolithic star-silver hull with Art Nouveau sylvan lattice.');
       }
@@ -4391,6 +4531,10 @@ $('#btnStateSeparate').onclick = () => applyState('separate');
 $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState('shade');
+$('#btnWillowAnim').onclick = () => {
+  if (model.joined) separateWillow();
+  else joinWillow();
+};
 $('#btnHarpAnim').onclick = () => {
   if (model.shade || model.harpCompression > 0.5) openHarpFrame();
   else compressHarpFrame();
@@ -4398,11 +4542,13 @@ $('#btnHarpAnim').onclick = () => {
 $('#btnJoinAnim').onclick = () => {
   if (model.option === 'crystal_cleavage') joinCrystal();
   else if (model.option === 'liquid_ithildin') joinMeniscus();
+  else if (model.option === 'willow_blade') joinWillow();
   else join();
 };
 $('#btnSeparateAnim').onclick = () => {
   if (model.option === 'crystal_cleavage') separateCrystal();
   else if (model.option === 'liquid_ithildin') separateMeniscus();
+  else if (model.option === 'willow_blade') separateWillow();
   else separate();
 };
 $('#btnLotusAnim').onclick = () => {
@@ -4416,6 +4562,7 @@ $('#btnScabbardAnim').onclick = () => {
 $('#btnChimeAnim').onclick = () => {
   if (model.option === 'harp_compression') strumHarpStrings();
   else if (model.option === 'liquid_ithildin') triggerMeniscusRipple();
+  else if (model.option === 'willow_blade') triggerJewelClick();
   else triggerHarmonicChime();
 };
 $('#btnDesign').onclick = () => {
@@ -4431,31 +4578,48 @@ $('#btnReset').onclick = () => {
     joined: false, busy: false, canopy: false, docked: false, design: false, shade: false,
     blend: 0, cap: 0, tendrilProgress: 0, petalFold: 0, crystalGlide: 0, chimeWave: 0,
     scabbardSlide: 0, scabbardFlash: 0, meniscusProgress: 0, meniscusSnap: 0,
-    harpCompression: 0, harpShimmer: 0,
-    option: 'harp_compression', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    harpCompression: 0, harpShimmer: 0, bladeProgress: 0, bladeClick: 0,
+    option: 'willow_blade', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
-  $('#btnHarpAnim').textContent = 'Compress harp ribs';
-  $('#btnHarpAnim').classList.add('primary-btn');
+  $('#btnWillowAnim').textContent = 'Sheathe willow blades';
+  $('#btnWillowAnim').classList.add('primary-btn');
+  $('#btnHarpAnim').classList.remove('primary-btn');
   $('#btnJoinAnim').classList.remove('primary-btn');
   $('#btnLotusAnim').classList.remove('primary-btn');
   $('#btnScabbardAnim').classList.remove('primary-btn');
   if ($('#btnChimeAnim')) {
-    $('#btnChimeAnim').textContent = 'Strum harp strings';
-    $('#btnChimeAnim').setAttribute('title', 'Strum harmonic starlight harp strings');
+    $('#btnChimeAnim').textContent = 'Jewel click';
+    $('#btnChimeAnim').setAttribute('title', 'Trigger crisp bayonet jewel lock click');
   }
-  $('#optionSelect').value = 'harp_compression';
+  $('#optionSelect').value = 'willow_blade';
   render();
-  say('Reset to initial Elven study configuration with Filigree Harp Compression shade.');
+  say('Reset to initial Elven study configuration with Willow-Blade Bayonet Sheath join.');
 };
 
 $('#optionSelect').onchange = async (e) => {
   model.option = e.target.value;
-  if (model.option === 'harp_compression') {
+  if (model.option === 'willow_blade') {
+    say('Option 7: Willow-Blade Bayonet Sheath join selected. Spring-tempered silver willow leaves glide silently into velvet scabbards.');
+    $('#btnWillowAnim').classList.add('primary-btn');
+    $('#btnHarpAnim').classList.remove('primary-btn');
+    $('#btnJoinAnim').classList.remove('primary-btn');
+    $('#btnLotusAnim').classList.remove('primary-btn');
+    $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Jewel click';
+      $('#btnChimeAnim').setAttribute('title', 'Trigger crisp bayonet jewel lock click');
+    }
+    if (model.shade) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
+    }
+  } else if (model.option === 'harp_compression') {
     say('Option 6: Filigree Harp Compression shade selected. Tracery ribs flex into parabolic curves, drawing rails together.');
     $('#btnHarpAnim').classList.add('primary-btn');
+    $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
@@ -4474,6 +4638,7 @@ $('#optionSelect').onchange = async (e) => {
     say('Option 5: Liquid Ithildin Meniscus (Quicksilver Bridge) join selected. Liquid star-silver droplets snap by surface tension.');
     $('#btnJoinAnim').textContent = 'Snap quicksilver meniscus';
     $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
@@ -4488,6 +4653,7 @@ $('#optionSelect').onchange = async (e) => {
   } else if (model.option === 'scabbard_slide') {
     say('Option 4: Sylvan Scabbard Slide shade selected. Display bay glides upward into overhead repoussé star-silver canopy.');
     $('#btnScabbardAnim').classList.add('primary-btn');
+    $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
@@ -4506,6 +4672,7 @@ $('#optionSelect').onchange = async (e) => {
     say('Option 3: Crystalline Cleavage & Harmonic Chime join selected. 30° moonstone prism planes glide flush.');
     $('#btnJoinAnim').textContent = 'Seat crystal prisms';
     $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
@@ -4520,6 +4687,7 @@ $('#optionSelect').onchange = async (e) => {
   } else if (model.option === 'lotus_petals') {
     say('Option 2: Lotus Petal Nocturne shade selected. Curved filigree plates fold upward across the screen.');
     $('#btnLotusAnim').classList.add('primary-btn');
+    $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
@@ -4538,6 +4706,7 @@ $('#optionSelect').onchange = async (e) => {
     say('Option 1: Living Tendril Braid (Sylvan Weave) join selected. Tendrils reach and intertwine across the gap.');
     $('#btnJoinAnim').textContent = 'Weave silver tendrils';
     $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
@@ -4746,6 +4915,7 @@ function onPointerMove(e) {
       drag.released = true;
       if (model.option === 'crystal_cleavage') separateCrystal();
       else if (model.option === 'liquid_ithildin') separateMeniscus();
+      else if (model.option === 'willow_blade') separateWillow();
       else separate();
     }
   }
@@ -4757,6 +4927,7 @@ function onPointerUp(e) {
     if (pointerDistance(alignedTarget(), model.b) <= DOCKING.capture) {
       if (model.option === 'crystal_cleavage') joinCrystal(true);
       else if (model.option === 'liquid_ithildin') joinMeniscus(true);
+      else if (model.option === 'willow_blade') joinWillow(true);
       else join(true);
       return;
     }
@@ -4796,6 +4967,10 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') applyState('joining');
   if (e.key === '3') applyState('joined');
   if (e.key === '4') applyState('shade');
+  if (e.key === 'w' || e.key === 'W') {
+    if (model.joined) separateWillow();
+    else joinWillow();
+  }
   if (e.key === 'h' || e.key === 'H') {
     if (model.shade || model.harpCompression > 0.5) openHarpFrame();
     else compressHarpFrame();
@@ -4803,6 +4978,7 @@ window.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.activeElement === $('#sylvanRelease')) {
     if (model.option === 'crystal_cleavage') separateCrystal();
     else if (model.option === 'liquid_ithildin') separateMeniscus();
+    else if (model.option === 'willow_blade') separateWillow();
     else separate();
   }
 });
@@ -4824,7 +5000,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Elven & Intricate skin loaded: Spun star-silver with Filigree Harp Compression shade.');
+say('Elven & Intricate skin loaded: Spun star-silver with Willow-Blade Bayonet Sheath join.');
 </script>
 </body>
 </html>
