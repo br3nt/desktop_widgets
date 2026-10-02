@@ -126,6 +126,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="cnRoll" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fffaf0" stop-opacity=".6"/><stop offset=".4" stop-color="#fffaf0" stop-opacity="0"/><stop offset=".75" stop-color="#2a1d10" stop-opacity=".12"/><stop offset="1" stop-color="#2a1d10" stop-opacity=".5"/></linearGradient>
  <radialGradient id="cnLit" cx=".5" cy=".25" r=".9"><stop stop-color="#fffbf1"/><stop offset=".55" stop-color="#f7e8c6"/><stop offset="1" stop-color="#e6c88c"/></radialGradient>
  <radialGradient id="cnCold" cx=".5" cy=".25" r=".9"><stop stop-color="#f6f8ff"/><stop offset=".55" stop-color="#dfe6f4"/><stop offset="1" stop-color="#b3c0dc"/></radialGradient>
+ <linearGradient id="pshade" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#2a1d10" stop-opacity=".42"/><stop offset=".28" stop-color="#fff8e8" stop-opacity=".3"/><stop offset=".55" stop-color="#fff8e8" stop-opacity="0"/><stop offset="1" stop-color="#2a1d10" stop-opacity=".5"/></linearGradient>
+ <linearGradient id="pniche" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0f0a07"/><stop offset=".6" stop-color="#241910"/><stop offset="1" stop-color="#3b2b1c"/></linearGradient>
 </defs></svg>
 <header><div><h1>Gothic cathedral <span>/ Claude skin study</span></h1><p>Weathered limestone facades with pinnacles and cresting, lit windows of clear quarry glass in coloured borders, carved bosses. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -186,7 +188,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M builds Checks up a size (from the nave it comes back down to a lancet) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the lead came, grab the soldered seam and pull down to draw the knife. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M builds Checks up a size (from the nave it comes back down to a lancet) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -239,11 +241,13 @@ function casing(id,w,h){
  // Flying buttress: the joining end is a tall pier with its own pinnacle instead of a half-gable; the corbel springs from it in the overlay.
  const bt=model.join==='buttress'&&!small,PT=12,pw=JP-6;
  // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
- const dl=model.join==='dial'&&!small,sq=bt||dl;
+ const dl=model.join==='dial'&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
+ // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
+ const tooth=x=>{const t=[[x,top]];for(const r of JOINS.pier.rows(h))t.push([x,r.y],[x+r.e*JOINS.pier.TO,r.y],[x+r.e*JOINS.pier.TO,r.yb],[x,r.yb]);t.push([x,h]);return t};
  const pts=[];
- if(s.join==='l')pts.push(...bt?[[0,h],[0,top-PT],[pw,top-PT],[pw,top]]:dl?[[0,h],[0,top]]:[[0,h],[0,top-G],[gx,top]]);else pts.push([-2,h],[-2,h-11],[0,h-11],[0,top]);
- if(s.join==='r')pts.push(...bt?[[w-pw,top],[w-pw,top-PT],[w,top-PT],[w,h]]:dl?[[w,top],[w,h]]:[[w-gx,top],[w,top-G],[w,h]]);else pts.push([w,top],[w,h-11],[w+2,h-11],[w+2,h]);
+ if(s.join==='l')pts.push(...bt?[[0,h],[0,top-PT],[pw,top-PT],[pw,top]]:pr?tooth(0).reverse():dl?[[0,h],[0,top]]:[[0,h],[0,top-G],[gx,top]]);else pts.push([-2,h],[-2,h-11],[0,h-11],[0,top]);
+ if(s.join==='r')pts.push(...bt?[[w-pw,top],[w-pw,top-PT],[w,top-PT],[w,h]]:pr?tooth(w):dl?[[w,top],[w,h]]:[[w-gx,top],[w,top-G],[w,h]]);else pts.push([w,top],[w,h-11],[w+2,h-11],[w+2,h]);
  const body=poly(pts);
  // Everything that belongs to the silhouette is one stone mass under one filter.
  let mass=`<path d="${body}"/>`;
@@ -252,12 +256,12 @@ function casing(id,w,h){
  if(s.join!=='l')mass+=pinnacle(L/2,top,pk);
  if(s.join!=='r')mass+=pinnacle(w-Rw/2,top,pk);
  if(bt)mass+=pinnacle(s.join==='r'?w-pw/2:pw/2,top-PT,1.12);
- else if(s.join==='r'&&!dl)mass+=crockets(w-gx,top,w,top-G,1,3,2)+`<path d="M${w} ${top-G-1.3}A3.3 3.3 0 0 1 ${w} ${top-G-7.9}Z"/><rect x="${w-1}" y="${top-G-2}" width="1" height="3"/>`;
+ else if(s.join==='r'&&!dl&&!pr)mass+=crockets(w-gx,top,w,top-G,1,3,2)+`<path d="M${w} ${top-G-1.3}A3.3 3.3 0 0 1 ${w} ${top-G-7.9}Z"/><rect x="${w-1}" y="${top-G-2}" width="1" height="3"/>`;
  if(s.join==='l'&&!sq)mass+=crockets(gx,top,0,top-G,-1,3,2)+`<path d="M0 ${top-G-1.3}A3.3 3.3 0 0 0 0 ${top-G-7.9}Z"/><rect x="0" y="${top-G-2}" width="1" height="3"/>`;
  let o=`<defs>${stoneFilter(id,s.seed)}<clipPath id="cl-${id}"><path d="${body}"/></clipPath></defs><g fill="url(#lime)" filter="url(#st-${id})">${mass}</g>`;
  // Ashlar courses
  let jd='';const y0=top+(small?18:22),y1=h-(h>=90?29:9);
- for(let y=y0,r=0;y<y1;y+=14,r++){jd+=`M0 ${y}H${w}`;for(let x=(r%2?17:0)+6;x<w;x+=34)jd+=`M${x} ${y}V${Math.min(y+14,y1)}`}
+ for(let y=y0,r=0;y<y1;y+=14,r++){jd+=`M${pr?-7:0} ${y}H${pr?w+7:w}`;for(let x=(r%2?17:0)+6;x<w;x+=34)jd+=`M${x} ${y}V${Math.min(y+14,y1)}`}
  o+=`<g clip-path="url(#cl-${id})" fill="none" stroke-width=".8"><path d="${jd}" stroke="#4a3b2a" stroke-opacity=".3"/><path d="${jd}" stroke="#fff7e6" stroke-opacity=".22" transform="translate(0 .9)"/></g>`;
  // Cornice and frieze recess
  o+=`<path d="M${s.join==='l'&&!sq?gx:0} ${top+1}H${s.join==='r'&&!sq?w-gx:w}" stroke="#fff6e2" stroke-opacity=".55"/><path d="M0 ${top+2.4}H${w}" stroke="#3a2c1c" stroke-opacity=".3"/>`;
@@ -664,6 +668,127 @@ const JOINS={
   // The knife only cuts downward: it follows the pointer down the came and never uncracks a joint.
   move(d,p){if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;if(d.moved)d.amt=Math.max(d.amt,clamp((p.y-d.y0)/Math.max(40,d.len)));setJt(1-.3*d.amt)},
   letGo:d=>!d.moved||d.amt>.6
+ },
+ pier:{label:'Compound pier',kind:'Fuse',gap:0,ms:1.9,sepMs:2700,TO:7,
+  say:{join:'The toothed ends mesh, a clustered pier rises over the seam course by course, a niche is cut in it and a lamp-bearer steps in with the lamp.',
+   joined:'Joined: one clustered pier carries both walls, and its lamp-bearer holds the shared lamp. Drag either nameplate to move the pair. Take the lamp from the bearer\'s hand to release.',
+   sep:'The lamp goes out, the bearer steps back into the wall, and the pier comes down course by course before the walls part.',hold:'Held mid-join: the pier is rising over the seam. Use the scrubber to step through the animation.',
+   ready:'Ready: the ghost of a pier stands over the seam. Release to build it.',near:'Nearby: the toothing stones warm at their beds. Move closer.',readyPh:'Ready · the pier is marked out',nearPh:'Nearby · the toothing warms',
+   back:'The bearer keeps hold of the lamp; still joined.'},
+  phase:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.5?'Joining · the toothing meshes ':jt<.7?'Joining · raising the pier ':jt<.8?'Joining · capital and pinnacle ':jt<.86?'Joining · cutting the niche ':jt<.95?'Joining · the bearer steps in ':'Joining · the lamp is lit '):(jt>.88?'Releasing · taking the lamp ':jt>.7?'Releasing · the bearer steps out ':jt>.4?'Releasing · the pier comes down ':'Releasing · parting '),
+  dragPh:d=>'Taking the lamp · '+Math.round(100*(d.amt||0))+'%',
+  about:'The two end walls become one load-bearing pier. With this option each joining end is left <i>toothed</i>, the way masons leave a wall that is meant to be continued: every other course stands out a few inches, and Jarvis\'s teeth fall exactly where GitDiscuss\'s gaps are. <b>Near:</b> the toothing warms gold along its beds. <b>Ready:</b> the ghost of a pier stands over the seam. Joining: the facades close and the teeth mesh with a puff of grit at each course. A clustered pier (a fat central shaft between two pairs of smaller shafts, each one rounded in the light) is built over the seam: the plinth and moulded bases go down, then the drums drop in course by course from the bottom with a small rebound and dust at every bed. A foliage capital is set under the cornice, and a crocketed pinnacle grows from it above the roofline. A niche under a crocketed gablet is cut into the shafts in a spray of chips, and a small faceless figure in a hooded robe steps into it from inside the wall, three steps, turns and raises a lantern. The lantern kindles and lights the niche, the stone and the floor: that is the shared lamp and the join light, amber while both widgets run and cold blue when either is paused. Shaded, the pier shortens with the wall: the bearer withdraws and the lamp hangs in the niche, and in the lowest strip it burns in a sunk quatrefoil. <b>Release:</b> take the lamp from the bearer\'s hand (drag it away; it dims as you pull, and past halfway it goes out), or click it, or focus it and press Enter. The bearer lowers its arm and steps back into the wall, the niche closes, the pinnacle and capital lift off, the courses are taken down from the top and the walls part.',
+  // Toothing rows: the courses at a joining end. Jarvis's even rows stand out and its odd rows fall back; GitDiscuss's the other way, so they mesh.
+  // Keep y0 and y1 in step with the ashlar courses in casing().
+  rows(h){const y0=30,y1=h-(h>=90?29:9),r=[];for(let y=y0,i=0;y+6<y1;y+=14,i++)r.push({y,yb:Math.min(y+14,y1),e:i%2?-1:1});return r},
+  geo(c){
+   const h=c.h,u=clamp((h-HS)/(H-HS)),top=8,capH=lerp(6,12,u),baseH=lerp(4,7,u),sy0=top+3+capH,sy1=h-11-baseH,z0=sy0+3,z1=sy1-2,Z=z1-z0;
+   const g={h,top,capH,baseH,sy0,sy1,Z,mid:(z0+z1)/2,X:(model.a.x+W+model.b.x)/2,Y:(model.a.y+model.b.y)/2,n:Math.max(2,Math.round((sy1-sy0)/14))};
+   if(Z>=20){const nw=clamp(Z*.27,7,13),ns=z0+Math.max(Z*.17+nw*.6,nw*1.1+5);Object.assign(g,{nw,gt:z0+1,ns,nb:z1-Z*.1,ap:ns-nw*1.1,ped:Z*.08})}
+   return g;
+  },
+  np(g){const{nw,ns,nb,ap}=g;return `M${f(-nw)} ${f(nb)}V${f(ns)}Q${f(-nw)} ${f(ns-nw*.75)} 0 ${f(ap)}Q${f(nw)} ${f(ns-nw*.75)} ${f(nw)} ${f(ns)}V${f(nb)}Z`},
+  // Progress of each part. Forward: plinth, courses bottom up, capital, pinnacle, niche, the bearer, the lamp. Release runs it back, courses top down.
+  st(jt,n){
+   const fwd=model.dir>0,q=1-jt,o={fwd,courses:[]};
+   if(fwd){o.mesh=seg(jt,.4,.5);o.plinth=seg(jt,.45,.51);for(let k=0;k<n;k++){const a=.5+.2*k/n;o.courses.push(seg(jt,a,a+.2/n+.03))}
+    o.cap=seg(jt,.7,.75);o.pin=seg(jt,.74,.8);o.niche=seg(jt,.8,.86);o.step=seg(jt,.86,.93);o.arm=seg(jt,.92,.95);o.lit=seg(jt,.95,1)}
+   else{o.mesh=0;o.lit=1-seg(q,0,.12);o.arm=1-seg(q,.12,.18);o.step=1-seg(q,.18,.3);o.niche=1-seg(q,.3,.36);o.pin=1-seg(q,.36,.4);o.cap=1-seg(q,.38,.42);
+    for(let k=0;k<n;k++){const a=.42+.15*(n-1-k)/n;o.courses.push(1-seg(q,a,a+.15/n+.02))}o.plinth=1-seg(q,.57,.6)}
+   return o;
+  },
+  // A small iron lantern hanging from x,y (its ring), glass from dark to lit.
+  lantern(x,y,k,lit,G){const S=v=>f(v*k);
+   return `<g transform="translate(${f(x)} ${f(y)})"><path d="M0 0V${S(2.4)}" stroke="#2a2016" stroke-width="${S(.8)}"/><path d="M${S(-2.7)} ${S(4.2)}L0 ${S(2.2)}L${S(2.7)} ${S(4.2)}Z" fill="#4a3a28" stroke="#1d140c" stroke-width="${S(.5)}"/>`+
+    `<rect x="${S(-2.2)}" y="${S(4.2)}" width="${S(4.4)}" height="${S(5.4)}" fill="${mixc([52,42,32],G,lit)}" stroke="#1d140c" stroke-width="${S(.6)}"/><path d="M0 ${S(4.2)}V${S(9.6)}" stroke="#1d140c" stroke-width="${S(.45)}" opacity=".7"/>`+
+    `<rect x="${S(-2.7)}" y="${S(9.5)}" width="${S(5.4)}" height="${S(1.3)}" rx="${S(.4)}" fill="#4a3a28" stroke="#1d140c" stroke-width="${S(.5)}"/></g>`},
+  over(c){
+   const g=this.geo(c),jt=c.jt,{h,top,X,Y,sy0,sy1,capH,baseH,nw}=g;
+   const run=model.a.run&&model.b.run,col=run?'#ffc861':'#9fb8ff',G=run?[255,234,168]:[227,235,255];
+   let s='';
+   // Near: the toothing on each joining end warms along its beds.
+   const warm=c.glow*(1-seg(jt,.3,.5)),R=this.rows(h);
+   if(warm>0&&R.length){let d='';for(const[x0,y0]of[[model.a.x+W,model.a.y],[model.b.x,model.b.y]]){d+=`M${f(x0)} ${f(y0+R[0].y)}`;for(const r of R)d+=`H${f(x0+r.e*this.TO)}V${f(y0+r.yb)}`;d+=`H${f(x0)}`}
+    s+=`<g opacity="${f(warm)}" fill="none"><path d="${d}" stroke="#ffc861" stroke-width="4" opacity=".5" filter="url(#lglow)" style="mix-blend-mode:screen"/><path d="${d}" stroke="#ffe3a0" stroke-width="1.3"/></g>`}
+   // Ready: the ghost of the pier over the seam.
+   const gh=jt===0?seg(c.glow,.8,1)*.85:model.dir>0?.7*(1-seg(jt,.5,.75)):0;
+   if(gh>0)s+=`<g transform="translate(${f(X)} ${f(Y)})" fill="none" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="3 2.4" opacity="${f(gh)}"><path d="M-34 ${f(h)}V${f(top-1)}H34V${f(h)}Z" fill="#f3d48a" fill-opacity=".06"/><path d="M-8 ${f(top-17)}L0 ${f(top-44)}L8 ${f(top-17)}"/><path d="M-29 ${f(sy0)}H29M-31 ${f(sy1)}H31"/>${nw?`<path d="${this.np(g)}"/>`:''}</g>`;
+   if(jt===0)return s;
+   const o=this.st(jt,g.n),fwd=o.fwd,SH=[[-25,9],[25,9],[-14.5,11],[14.5,11],[0,17]];
+   const fall=t=>t<.78?Math.pow(t/.78,2):1-.07*Math.sin(Math.PI*(t-.78)/.22),dust=(x,y,t,n,sp,sd)=>JOINS.buttress.dust(x,y,t,n,sp,sd);
+   let body='',dec='',fx='',p='';
+   const put=(v,m,d)=>{if(v<=0)return;const t=v>=1?'':fwd?`translate(0 ${f(-18*(1-fall(v)))})`:`translate(0 ${f(-16*ease(1-v))})`,a=v>=1?1:fwd?seg(v,0,.25):seg(v,0,.7);
+    body+=`<g transform="${t}" opacity="${f(a)}">${m}</g>`;dec+=`<g transform="${t}" opacity="${f(a)}">${d}</g>`};
+   // The pier's shadow on the walls, deepening as it is built
+   const built=o.courses.reduce((a,b)=>a+b,0)/g.n;
+   if(built>0)p+=`<rect x="-33" y="${f(top+2)}" width="66" height="${f(h-top-2)}" fill="#000" opacity="${f(.42*built)}" filter="url(#soft)" transform="translate(4 3)"/>`;
+   if(fwd&&o.mesh>0&&o.mesh<1)R.forEach((r,i)=>{fx+=dust(0,(r.y+r.yb)/2,seg(o.mesh,i*.07,i*.07+.45),4,11,i+90)});
+   // Plinth and moulded bases, one roll per shaft
+   {let m=`<rect x="-34" y="${f(h-11)}" width="68" height="11"/><rect x="-31" y="${f(sy1+baseH*.4)}" width="62" height="${f(h-11-sy1-baseH*.4)}"/>`,d=`<path d="M-34 ${f(h-11)}H34" stroke="#3a2c1c" stroke-opacity=".5"/><path d="M-34 ${f(h-10.3)}H34" stroke="#fff6e2" stroke-opacity=".55"/>`;
+    for(const[x,w]of SH){const r=`x="${f(x-w/2-2)}" y="${f(sy1)}" width="${f(w+4)}" height="${f(baseH)}" rx="${f(baseH/2)}"`;m+=`<rect ${r}/>`;d+=`<rect ${r} fill="url(#pshade)"/>`}
+    put(o.plinth,m,d)}
+   // Shaft drums, one course at a time from the bottom
+   for(let k=0;k<g.n;k++){const yb=lerp(sy1,sy0,k/g.n),ya=lerp(sy1,sy0,(k+1)/g.n),v=o.courses[k];
+    let m=`<rect x="-30" y="${f(ya)}" width="60" height="${f(yb-ya)}"/>`,d='';
+    for(const[x,w]of SH){const r=`x="${f(x-w/2)}" y="${f(ya)}" width="${w}" height="${f(yb-ya)}"`;m+=`<rect ${r}/>`;d+=`<rect ${r} fill="url(#pshade)"/>`}
+    d+=`<path d="M-30 ${f(yb)}H30" stroke="#3a2c1c" stroke-opacity=".5" stroke-width=".8"/><path d="M-30 ${f(ya+.7)}H30" stroke="#fff6e2" stroke-opacity=".35" stroke-width=".7"/>`;
+    put(v,m,d);
+    if(fwd&&v>.72&&v<1)fx+=dust(0,yb,seg(v,.72,1),6,22,k+100);else if(!fwd&&v>0&&v<1)fx+=dust(0,yb,seg(1-v,0,.7),4,14,k+120)}
+   // Foliage capital under an abacus at the cornice line
+   {const c0=top+3,lv=c0+capH*.55,lr=capH*.3;let m=`<rect x="-35" y="${f(top-1)}" width="70" height="4.2"/><path d="M-33 ${f(c0)}H33L29 ${f(sy0)}H-29Z"/>`,
+     d=`<path d="M-35 ${f(top-.4)}H35" stroke="#fff6e2" stroke-opacity=".6" stroke-width=".8"/><path d="M-35 ${f(c0)}H35M-29 ${f(sy0)}H29" stroke="#3a2c1c" stroke-opacity=".5" stroke-width=".8"/>`;
+    for(let x=-27;x<=27.1;x+=6.75){m+=`<circle cx="${f(x)}" cy="${f(lv)}" r="${f(lr)}"/><path d="M${f(x-lr*.9)} ${f(lv)}Q${f(x)} ${f(lv+lr*2.2)} ${f(x+lr*.9)} ${f(lv)}Z"/>`;d+=`<circle cx="${f(x+lr*.25)}" cy="${f(lv+lr*.35)}" r="${f(lr*.42)}" fill="#3a2a18" opacity=".35"/>`}
+    put(o.cap,m,d)}
+   // Pinnacle growing up out of the capital
+   if(o.pin>0){const b=top-1,sc=Math.max(.01,fwd?backOut(o.pin):o.pin);body+=`<g transform="translate(0 ${f(b)}) scale(1 ${f(sc*1000)/1000}) translate(0 ${f(-b)})" opacity="${f(seg(o.pin,0,.2))}">${pinnacle(0,b,1.25)}</g>`}
+   p+=`<g fill="url(#lime)" filter="url(#st-v)">${body}</g>${dec}`;
+   // The niche, the bearer and the lamp
+   const nv=ease(o.niche),fo=nw?seg(g.Z,40,56):0,lit=o.lit,off=model.lampOff||[0,0],dk=drag&&drag.lamp?1:model.lampAt?clamp(1-(performance.now()-model.lampAt)/260):0;
+   let L=nw?[0,(g.ap+g.nb)/2-2]:[0,g.mid-4.5],ls=nw?clamp(nw/13,.6,1):.6,hand=null,inner='';
+   if(nw&&o.niche>0){const{ns,nb,ap,gt,ped}=g,NP=this.np(g),gw=nw+3.5;
+    p+=`<defs><clipPath id="pnc"><path d="${NP}"/></clipPath></defs><g opacity="${f(nv)}"><g transform="translate(0 ${f(-5*(1-nv))})"><g fill="url(#lime)" filter="url(#st-v)"><path d="M${f(-gw)} ${f(ns)}L0 ${f(gt)}L${f(gw)} ${f(ns)}Z"/>${crockets(-gw,ns,0,gt,1,2,1.5)}${crockets(gw,ns,0,gt,-1,2,1.5)}<circle cy="${f(gt-1.6)}" r="1.7"/></g>`+
+     `<path d="M${f(-gw)} ${f(ns)}L0 ${f(gt)}L${f(gw)} ${f(ns)}" fill="none" stroke="#3a2c1c" stroke-opacity=".5" stroke-width=".8"/></g>`+
+     `<path d="${NP}" fill="none" stroke="#3a2c1c" stroke-opacity=".7" stroke-width="3.8"/><path d="${NP}" fill="url(#pniche)" stroke="#d6c9ab" stroke-width="2"/><g clip-path="url(#pnc)"><path d="${NP}" fill="none" stroke="#000" stroke-opacity=".5" stroke-width="5" transform="translate(2 2)"/></g>`+
+     `<path d="${NP}" fill="none" stroke="#fff6e2" stroke-opacity=".45" stroke-width=".6" transform="translate(-.6 -.6)"/>`+
+     `<path d="M${f(-nw*.8)} ${f(nb)}H${f(nw*.8)}V${f(nb+1.8)}Q${f(nw*.5)} ${f(nb+ped+1)} 0 ${f(nb+ped+2)}Q${f(-nw*.5)} ${f(nb+ped+1)} ${f(-nw*.8)} ${f(nb+1.8)}Z" fill="#cbbd9f" stroke="#3a2c1c" stroke-opacity=".55" stroke-width=".7"/></g>`;
+    if(fwd&&o.niche>.1&&o.niche<1)fx+=dust(0,(ap+nb)/2,seg(o.niche,.1,1),8,20,77);
+    // The bearer: hooded, faceless, in stone. It steps in from inside the wall, three steps, and raises the lantern.
+    if(fo>0&&o.step>0){const sc=Math.min(nb-ap-3,46)/36,st=o.step,bx=-2.6*nw*(1-ease(st))-3.5*ease(st),by=-1.3*sc*Math.abs(Math.sin(3*Math.PI*st)),aa=lerp(64,-20,o.arm>=1?1:backOut(o.arm)),A=aa*Math.PI/180;
+     hand=[bx+sc*(2.6+7.2*Math.cos(A)),nb+by+sc*(-20.5+7.2*Math.sin(A))];ls=clamp(sc*.9,.6,1.05);
+     const arm=`<path d="M1.6 -22.4L9.4 -21.2Q10.6 -20.4 9.4 -19.6L1.8 -18.6Z" transform="rotate(${f(aa)} 2.6 -20.5)"/>`;
+     inner+=`<g transform="translate(${f(bx)} ${f(nb+by)}) scale(${f(sc*1000)/1000})" opacity="${f(fo)}"><ellipse rx="6.6" ry="1.2" fill="#000" opacity=".4"/>`+
+      `<g fill="url(#lime)" filter="url(#st-v)"><path d="M-6.2 0C-6.6 -8 -5.2 -17 -3.8 -23.5H3.8C5.2 -17 6.6 -8 6.2 0Z"/><path d="M-4.8 -21.5C-5.4 -27.5 -3.4 -33.5 0 -35.5C3.4 -33.5 5.4 -27.5 4.8 -21.5Q0 -19.8 -4.8 -21.5Z"/>${arm}</g>`+
+      `<g fill="none" stroke-width=".5"><path d="M-6.2 0C-6.6 -8 -5.2 -17 -3.8 -23.5M3.8 -23.5C5.2 -17 6.6 -8 6.2 0M-4.8 -21.5C-5.4 -27.5 -3.4 -33.5 0 -35.5C3.4 -33.5 5.4 -27.5 4.8 -21.5" stroke="#2a1d10" stroke-opacity=".6"/><path d="M-1.8 -19L-2.8 -1M1.4 -19L2.2 -1M-4.2 -12L-4.9 -1" stroke="#3a2c1c" stroke-opacity=".45"/><path d="M-3.6 -26.5C-3.4 -30 -2 -33 0 -34.4" stroke="#fff6e2" stroke-opacity=".55"/></g>`+
+      `<ellipse cx="1" cy="-28" rx="2.2" ry="3.3" fill="#1d140c" opacity=".78"/><g fill="none" stroke="#2a1d10" stroke-opacity=".6" stroke-width=".5">${arm}</g></g>`}
+   }
+   else if(!nw&&o.niche>0)p+=`<g opacity="${f(nv)}" fill="#24180d"><circle cx="-2.6" cy="${f(g.mid)}" r="2.8"/><circle cx="2.6" cy="${f(g.mid)}" r="2.8"/><circle cy="${f(g.mid-2.6)}" r="2.8"/><circle cy="${f(g.mid+2.6)}" r="2.8"/></g>`;
+   // The lamp: in the bearer's hand, or hung in the niche when the bearer has withdrawn (shaded), or in the quatrefoil in the lowest strip.
+   if(hand)L=[lerp(L[0],hand[0],fo),lerp(L[1],hand[1],fo)];
+   const vis=hand?lerp(nv*(1-fo),1,ease(o.step)):nv*(1-fo),Lp=[L[0]+off[0]*dk,L[1]+off[1]*dk];
+   // The lamp lights the back of the niche from wherever it hangs.
+   if(nw&&o.niche>0&&lit>0)p+=`<defs><radialGradient id="pnl" gradientUnits="userSpaceOnUse" cx="${f(Lp[0])}" cy="${f(Lp[1]+6*ls)}" r="${f(nw*2.6)}"><stop stop-color="${col}" stop-opacity=".8"/><stop offset=".5" stop-color="${col}" stop-opacity=".22"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></radialGradient></defs><g clip-path="url(#pnc)" style="mix-blend-mode:screen" opacity="${f(lit*vis)}"><rect x="${f(-nw)}" y="${f(g.ap)}" width="${f(2*nw)}" height="${f(g.nb-g.ap)}" fill="url(#pnl)"/></g>`;
+   if(vis>0){let lamp='';
+    if(nw&&fo<1)lamp+=`<path d="M0 ${f(g.ap+2)}V${f(L[1])}" stroke="#2a2016" stroke-width=".7" opacity="${f(1-fo)}"/>`;
+    if(dk>0&&(off[0]||off[1]))lamp+=`<path d="M${f(L[0])} ${f(L[1])}L${f(Lp[0])} ${f(Lp[1])}" stroke="#2a2016" stroke-width=".7"/>`;
+    lamp+=`<g opacity="${f(vis)}">${this.lantern(Lp[0],Lp[1],ls,lit,G)}</g>`;
+    // Carried in unlit, the lantern stays inside the niche with the bearer; once lit it may be taken out.
+    if(nw&&o.step<1)inner+=lamp;else fx=lamp+fx}
+   if(inner)p+=`<g clip-path="url(#pnc)">${inner}</g>`;
+   if(lit>0&&vis>0){const gx=Lp[0],gy=Lp[1]+6.9*ls;
+    p+=`<defs><radialGradient id="ppool"><stop stop-color="${col}" stop-opacity=".42"/><stop offset=".55" stop-color="${col}" stop-opacity=".12"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></radialGradient></defs>`+
+     `<g style="mix-blend-mode:screen" opacity="${f(lit*vis)}"><circle cx="${f(gx)}" cy="${f(gy)}" r="${f(28*ls+6)}" fill="${col}" opacity=".2" filter="url(#soft)"/><ellipse cx="-6" cy="${f(h+34)}" rx="84" ry="13" fill="url(#ppool)"/></g>`;
+    fx+=`<circle cx="${f(gx)}" cy="${f(gy)}" r="${f(8*ls+2)}" fill="${col}" opacity="${f(.7*lit*vis)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`;
+    if(fwd&&lit<1)fx+=`<g opacity="${f(Math.sin(Math.PI*lit))}">${sparkle(gx,gy,10*ls*Math.sin(Math.PI*lit))}</g>`}
+   p+=fx;
+   if(jt===1){const[x0,y0,x1,y1]=nw?[-nw-5,g.ap-5,nw+5,g.nb+5]:[-12,g.mid-12,12,g.mid+12];
+    p+=`<g class="hit" id="lampHit" tabindex="0" role="button" aria-label="Lamp: take it from the bearer's hand, or press Enter, to separate the widgets"><title>Take the lamp to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(x0-2)}" y="${f(y0-2)}" width="${f(x1-x0+4)}" height="${f(y1-y0+4)}" rx="3" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g>`}
+   return s+`<g transform="translate(${f(X)} ${f(Y)})">${p}</g>`;
+  },
+  grab(p){model.lampOff=[0,0];model.lampAt=0;return{lamp:true,x0:p.x,y0:p.y,amt:0,moved:false}},
+  // The lamp follows the pointer on its chain, a little way; it dims as it is drawn off, and past halfway the bearer lets it go.
+  move(d,p){const dx=p.x-d.x0,dy=p.y-d.y0,l=Math.hypot(dx,dy),k=l>0?Math.min(l,20)/l:0;if(l>4)d.moved=true;d.amt=clamp(l/48);model.lampOff=[dx*k,dy*k];setJt(1-.12*d.amt)},
+  // Taken: the lamp stays where it was drawn to as it goes out. Kept: it swings back to the hand.
+  letGo(d){const ok=!d.moved||d.amt>.55;model.lampAt=performance.now()+(ok?1e9:0);return ok}
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
@@ -1116,7 +1241,7 @@ function morphTo(id,fast){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,lastDet:0,clickAt:-1e4,turnUntil:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH]};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH]};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -1148,6 +1273,7 @@ const say=t=>$('#status').textContent=t;
 
 async function doJoin(fixed='a',ms=2000){
  if(model.jt===1)return;
+ model.lampOff=[0,0];model.lampAt=0;
  if(model.jt===0){if(model.dir!==1||!model.ready)startJoinFrom({...REST},0);model.ready=false;model.path={s:here(),j:joinedPose(fixed)}}
  else if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};
  const j=J();say(j.say.join);
@@ -1163,7 +1289,7 @@ async function doSeparate(){
  else if(model.dir>0){model.th0={...REST};model.lit0=0}
  if(model.jt===1||!model.path)model.path={s:separatePose(),j:here()};
  say(J().say.sep);
- if(await tween(model.jt,0,(J().sepMs||1600)*model.jt,setJt)){model.path=null;model.dir=1;say('Separate. Displays and pages were not touched.')}
+ if(await tween(model.jt,0,(J().sepMs||1600)*model.jt,setJt)){model.path=null;model.dir=1;model.lampOff=[0,0];model.lampAt=0;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
  ++anim;model.busy=false;stopAngle();
