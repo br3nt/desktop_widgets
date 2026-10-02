@@ -37,7 +37,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 
 ### Cycle 5: Tertiary Joins
 - [x] Gothic: Flying Buttress Arm Swing join — Arched stone buttress pivots 42° from pier shoulder to seat into carved corbel with iron tie-pin lock and open-air shadow gap (Built in prototypes/skins/agy/gothic.html with crocketed pier pinnacle, gargoyle spout, openwork trefoil flyer, acanthus corbel, tie-pin release bar, and Option 5 switcher)
-- [ ] Felt: Running Cross-Stitch Zipper join — Contrasting embroidery floss laces through eyelets in X-stitches
+- [x] Felt: Running Cross-Stitch Zipper join — Contrasting embroidery floss laces through eyelets in X-stitches (Built in prototypes/skins/agy/felt.html with stiffened bridle-leather welts, 7 pairs of antique brass eyelet grommets, vibrant 6-strand scarlet embroidery floss, dynamic bodkin needle lacing animation, 6 interlocking cross-stitch X tiers with 3D over-under weave, hand-tied butterfly bow knot with turned brass aglet ferrules, interactive needle release toggle, and Option 5 switcher)
 - [ ] Elven: Liquid Ithildin Meniscus (Quicksilver Bridge) join — Liquid star-silver droplets snap by surface tension
 - [ ] Wire: Recycled Pop-Tab Cotter-Pin Hinge join — Stamped can pull-tabs align and lock with looped wire cotter pin
 - [ ] Hollow: Nail-Blade Sheath & Bone Peg join — Iron nail-blade slides into bronze scabbard and bone peg snaps down
