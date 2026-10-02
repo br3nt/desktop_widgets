@@ -126,6 +126,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .ringfocus{opacity:0}
 .tog{position:absolute;width:30px;margin-left:-15px;padding:0;border:0;border-radius:9px;background:none;cursor:grab;display:none;touch-action:none;z-index:3}
 .tog:active{cursor:grabbing}.tog:focus-visible{outline-offset:0}
+.turnb{position:absolute;padding:0;border:0;border-radius:7px;background:none;cursor:pointer;display:none;touch-action:manipulation;z-index:3}
+.turnb:focus-visible{outline:2px solid #ffd08a;outline-offset:1px}
 .snipHint{opacity:0;transition:opacity .2s;pointer-events:none}.hit.tap{cursor:pointer}.hit:hover .snipHint,.hit:focus-visible .snipHint{opacity:.95}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;color:#c4af98;font-size:13px}
 .about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#f5dcc0}.about h2 small{font:11px -apple-system,sans-serif;color:#a8907a;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
@@ -206,7 +208,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -672,6 +674,135 @@ function labelDraw(id,w,h,small,st){
   t+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
  if(P.sq>1e-4)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
  return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${t}</g>`:t;
+}
+
+/* ---------- Turning blocks shade ---------- */
+// The rotating-blocks toy in stuffed felt: two soft square blocks on a wooden dowel, each face a page of the widget.
+// The cushion lets its stuffing out to a strip, the name band gathers into a tab at the left end, felt loops are sewn on,
+// the dowel is pushed in through them, the blocks puff up on it and give one cascading quarter turn onto the current page.
+// Tap the blocks (or use the arrow keys) to turn them a face: the label block goes first and the value block follows.
+// Face k shows page k mod 3, so the blocks always turn forward through the pages, like the toy.
+const BLK_F=[{felt:'#e3bd5c',ink:'#4f330b'},{felt:'#94bfc6',ink:'#173f45'},{felt:'#d9939c',ink:'#561a27'}];
+const mod3=n=>((n%3)+3)%3;
+function blockFaces(id){
+ if(id==='a')return[{l:'Status',num:'03',word:model.a.run?'running':'paused'},{l:'Task',text:'Verify shell assembly'},{l:'Log',text:'10:43 waiting on you'}];
+ if(id==='b')return[{l:'Queue',num:'02',word:'to decide'},{l:'Thread',text:'Casing geometry'},{l:'Log',text:'Feedback collected'}];
+ return[{l:'Passed',num:'12/14',word:'passed'},{l:'Waiting',num:'2',word:'waiting'},{l:'Run',text:'run 418 · 86%'}];
+}
+// R is the face the blocks are set to (it only grows or shrinks by one per turn); r1 and r2 are where each block is drawn.
+const TURN={a:{R:0,r1:0,r2:0,q1:0,q2:0,busy:false,tok:0},b:{R:0,r1:0,r2:0,q1:0,q2:0,busy:false,tok:0},c:{R:0,r1:0,r2:0,q1:0,q2:0,busy:false,tok:0,p:0}};
+const blkPage=id=>id==='c'?TURN.c.p:model[id].page;
+// When the page changes some other way (the tabs or › while unshaded), the blocks are simply set to it, turning forward.
+function syncTurn(id){const T=TURN[id];if(T.busy)return;const p=blkPage(id);if(mod3(T.R)!==p)T.R+=mod3(p-mod3(T.R));T.r1=T.r2=T.R;T.q1=T.q2=0}
+function blocksParts(st,small){
+ const H0=small?CH:H,HF=small?48:58,dfl=ease(seg(st,.04,.26)),fb=seg(st,.24,.38);
+ return{H0,HF,dfl,sq:Math.sin(Math.PI*seg(st,.24,.32))*.08,fib:fb>0&&fb<1?fb:0,band:ease(seg(st,.26,.4)),
+  loops:backOut(seg(st,.32,.44)),rod:ease(seg(st,.4,.56)),b1:seg(st,.56,.7),b2:seg(st,.62,.76),emb:seg(st,.66,.84),
+  sp1:backOut(seg(st,.8,.92)),sp2:backOut(seg(st,.86,.98)),h:Math.round(lerp(H0,HF,dfl))};
+}
+// Layout of the strip, from its final height so nothing moves once the strip has landed.
+function blocksGeo(id,w,small){
+ const HF=small?48:58,nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?15:17,nw=measure(nm,`italic ${nf}px Georgia,serif`);
+ const bandX=10,bandW=nw+24,rodX0=bandX+bandW+8,rodX1=w-(small?12:14),lx0=rodX0+9,lx1=rodX1-9,bx0=lx0+9,bx1=lx1-9;
+ const s=small?30:38,w1=small?50:62;
+ return{HF,nm,nf,nw,bandX,bandW,rodX0,rodX1,lx0,lx1,s,a:s/2,cy:HF/2,rr:small?2.4:3,blocks:[{x0:bx0,x1:bx0+w1},{x0:bx0+w1+6,x1:bx1}]};
+}
+const VAL_F=px=>`600 ${px}px 'Avenir Next',Avenir,'Segoe UI',Helvetica,sans-serif`;
+// One face's content, laid out flat about the block's centre line; the caller foreshortens it.
+function blockFace(id,which,B,G,page,small){
+ const F=blockFaces(id)[page],C=BLK_F[page],cx=(B.x0+B.x1)/2,cy=G.cy;
+ if(which===0){const lf=small?11.5:13;
+  return `<text x="${f(cx)}" y="${f(cy)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${lf}" fill="${C.ink}">${F.l}</text>`+
+   `<text x="${f(cx)}" y="${f(cy)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${lf}" fill="url(#satin)">${F.l}</text>`}
+ // The value block carries a cream cotton patch, stitched round in the face's thread.
+ const ins=small?4:5,px0=B.x0+ins,pw=B.x1-B.x0-2*ins,py0=cy-G.a+ins,ph=G.s-2*ins,room=pw-(small?8:12);
+ let o=`<rect x="${f(px0)}" y="${f(py0)}" width="${f(pw)}" height="${f(ph)}" rx="2.5" fill="#f6ecd6"/><rect x="${f(px0)}" y="${f(py0)}" width="${f(pw)}" height="${f(ph)}" rx="2.5" fill="url(#weave)" opacity=".6"/>`+
+  `<rect x="${f(px0-1.6)}" y="${f(py0-1.6)}" width="${f(pw+3.2)}" height="${f(ph+3.2)}" rx="3.5" fill="none" stroke="${C.ink}" stroke-opacity=".7" stroke-width=".9" stroke-dasharray="2.2 1.8"/>`;
+ if(F.num){const c=small?1.7:2.1,xp=xpaths(F.num,c),wf=small?11:12.5,ww=measure(F.word,`italic ${wf}px Georgia,serif`),word=xp.w+6+ww<=room,tw=xp.w+(word?6+ww:0),x=cx-tw/2;
+  o+=`<g transform="translate(${f(x)} ${f(cy-3.5*c)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".3" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="${C.ink}" stroke-opacity=".7"/><path d="${xp.d2}" stroke="${C.ink}"/></g>`;
+  if(word)o+=`<text x="${f(x+xp.w+6)}" y="${f(cy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="${C.ink}">${F.word}</text>`}
+ else{let px=small?11:12;while(px>9.5&&measure(F.text,VAL_F(px))>room)px-=.5;
+  o+=`<text x="${f(cx)}" y="${f(cy+.5)}" text-anchor="middle" dominant-baseline="central" style="font:${VAL_F(px)}" fill="#3a2a1e">${F.text}</text>`}
+ return o;
+}
+// A stuffed square block turning about the dowel, seen side on: each visible face is foreshortened by cos and lit from above.
+function blockDraw(id,which,B,G,r,q,inf,small){
+ const sc=small?.22:.24,out=[];let o='';
+ for(const k of [Math.floor(r),Math.floor(r)+1]){const al=(r-k)*Math.PI/2,co=Math.cos(al);if(co<.03)continue;
+  const yc=G.cy-G.a*Math.sin(al),hh=G.a*co,page=mod3(k),C=BLK_F[page],rx=Math.min(G.s*sc,hh),x0=B.x0,wd=B.x1-B.x0;
+  let s=`<rect x="${f(x0)}" y="${f(yc-hh)}" width="${f(wd)}" height="${f(2*hh)}" rx="${f(rx)}" fill="${C.felt}" filter="url(#g-${id})"/>`;
+  s+=`<rect x="${f(x0)}" y="${f(yc-hh)}" width="${f(wd)}" height="${f(2*hh)}" rx="${f(rx)}" fill="url(#bk-${id})" opacity=".9"/>`;
+  // Running stitch round each face's edge, the way soft blocks are sewn.
+  if(hh>2)s+=`<rect opacity="${f(seg(hh,2,6))}" x="${f(x0+3)}" y="${f(yc-hh+3*co)}" width="${f(wd-6)}" height="${f(Math.max(0,2*hh-6*co))}" rx="${f(Math.max(1,rx-2))}" fill="none" stroke="#fbf0d6" stroke-opacity=".7" stroke-width="1" stroke-dasharray="2.6 2.2"/>`;
+  if(co>.12)s+=`<g transform="translate(0 ${f(yc)}) scale(1 ${f(co*1000)/1000}) translate(0 ${f(-G.cy)})" opacity="${f(seg(co,.12,.3))}">${blockFace(id,which,B,G,page,small)}</g>`;
+  // The crease where this face meets the one below it.
+  if(al>.002)s+=`<path d="M${f(x0+rx*.5)} ${f(yc+hh)}H${f(x0+wd-rx*.5)}" stroke="#1d0f06" stroke-opacity=".45" stroke-width=".9"/>`;
+  // Faces turning up catch the lamp; faces turning down fall into shade.
+  const sn=Math.sin(al),dk=Math.max(0,-sn)*.42+(1-co)*.12,lt=Math.max(0,sn)*.16;
+  if(dk>.01)s+=`<rect x="${f(x0)}" y="${f(yc-hh)}" width="${f(wd)}" height="${f(2*hh)}" rx="${f(rx)}" fill="#1d0f06" opacity="${f(dk)}"/>`;
+  if(lt>.01)s+=`<rect x="${f(x0)}" y="${f(yc-hh)}" width="${f(wd)}" height="${f(2*hh)}" rx="${f(rx)}" fill="#fff6e4" opacity="${f(lt)}"/>`;
+  out.push([co,s])}
+ // The front-most face is drawn last; the seam between two faces shows as a dark crease.
+ out.sort((p,q2)=>p[0]-q2[0]).forEach(p=>o+=p[1]);
+ const base=G.cy+G.a,cx=(B.x0+B.x1)/2,sy=inf<1?Math.max(.06,backOut(inf)):1-q,sx=inf<1?.82+.18*inf:1+q*.5;
+ const shadow=`<ellipse cx="${f(cx)}" cy="${f(base+1.5)}" rx="${f((B.x1-B.x0)/2)}" ry="2.6" fill="#000" opacity="${f(.35*Math.min(1,inf*2))}" filter="url(#sh)"/>`;
+ if(Math.abs(sy-1)<1e-3&&Math.abs(sx-1)<1e-3)return shadow+o;
+ // Puffing up on the dowel, or squashing as it lands from a turn: scaled about the dowel when puffing, about its foot when squashing.
+ const oy=inf<1?G.cy:base;
+ return shadow+`<g transform="translate(${f(cx)} ${f(oy)}) scale(${f(sx*1000)/1000} ${f(sy*1000)/1000}) translate(${f(-cx)} ${f(-oy)})" opacity="${f(Math.min(1,inf*4))}">${o}</g>`;
+}
+function blocksDraw(id,w,h,small,st){
+ const P=blocksParts(st,small);
+ if(P.dfl<=0)return casing(id,w,h);
+ const s=SKIN[id],G=blocksGeo(id,w,small),T=TURN[id];
+ // The strip body: the cushion's felt, running stitch and shadow, without its name band (drawn below as it gathers).
+ let t=`<defs>${feltFilters(id,s.seed)}<linearGradient id="bk-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff4e2" stop-opacity=".28"/><stop offset=".45" stop-color="#fff4e2" stop-opacity="0"/><stop offset="1" stop-color="#1d0f06" stop-opacity=".3"/></linearGradient>`+
+  `<linearGradient id="bw-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6dcaa"/><stop offset=".4" stop-color="#c8925a"/><stop offset="1" stop-color="#6d4520"/></linearGradient>`+
+  `<radialGradient id="bkn-${id}" cx=".36" cy=".3" r=".8"><stop stop-color="#f8e2b6"/><stop offset=".55" stop-color="#b98146"/><stop offset="1" stop-color="#5a3518"/></radialGradient></defs>`;
+ t+=`<path d="${rr4(2.5,6,w-5,h-4.5,s.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/><path d="${rr4(EDGE,EDGE,w-2*EDGE,h-2*EDGE,s.r)}" fill="${s.body}" filter="url(#f-${id})"/>`;
+ const st0=rr4(10,10,w-20,h-20,s.r.map(v=>Math.max(3,v-6)).map(v=>Math.min(v,(h-20)/2)));
+ t+=`<path d="${st0}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${st0}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`;
+ // The name band gathers into a tab at the left end, full height.
+ const bx=small?22:34,by=small?3:5,bh=small?20:22,k=P.band,X=lerp(bx,G.bandX,k),Y=lerp(by,7,k),BW=lerp(w-2*bx,G.bandW,k),BH=lerp(bh,h-14,k);
+ const band=rr4(X,Y,BW,BH,[9,8,10,8]);
+ t+=`<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band}" fill="${s.band}" filter="url(#g-${id})"/>`+
+  `<path d="${rr4(X+3.5,Y+3.5,BW-7,BH-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ // The name, satin-stitched left to right.
+ if(P.emb>0){const x0=G.bandX+12,cy=h/2;
+  t+=`<clipPath id="bn-${id}"><rect x="${f(x0-3)}" y="0" width="${f((G.nw+6)*P.emb)}" height="${h}"/></clipPath><g clip-path="url(#bn-${id})">`+
+   `<text x="${f(x0)}" y="${f(cy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${G.nf}" fill="#000" fill-opacity=".4" transform="translate(.5 .9)">${G.nm}</text>`+
+   `<text x="${f(x0)}" y="${f(cy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${G.nf}" fill="#fbf0d6">${G.nm}</text>`+
+   `<text x="${f(x0)}" y="${f(cy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${G.nf}" fill="url(#satin)">${G.nm}</text></g>`}
+ // The dowel is pushed in from the right end, turned knob first out of the felt; it is clipped where it is still behind the cushion.
+ const cy=G.cy,rr=G.rr,kr=rr+(small?1.8:2.3);
+ if(P.rod>0){const tx=(1-P.rod)*(G.rodX1-G.rodX0+16),a0=G.rodX0+tx,a1=G.rodX1+tx;
+  const knob=x=>`<circle cx="${f(x+.6)}" cy="${f(cy+1.2)}" r="${f(kr)}" fill="#000" opacity=".35"/><circle cx="${f(x)}" cy="${f(cy)}" r="${f(kr)}" fill="url(#bkn-${id})" stroke="#3a210c" stroke-width=".5"/><circle cx="${f(x-kr*.35)}" cy="${f(cy-kr*.4)}" r="${f(kr*.28)}" fill="#fff" opacity=".45"/>`;
+  t+=`<clipPath id="br-${id}"><rect x="-10" y="0" width="${f(w+7)}" height="${h}"/></clipPath><g clip-path="url(#br-${id})">`+
+   `<rect x="${f(a0)}" y="${f(cy-rr+1.2)}" width="${f(a1-a0)}" height="${f(2*rr)}" fill="#000" opacity=".3" filter="url(#sh)"/>`+
+   `<rect x="${f(a0)}" y="${f(cy-rr)}" width="${f(a1-a0)}" height="${f(2*rr)}" rx="${f(rr*.6)}" fill="url(#bw-${id})" stroke="#4a2a10" stroke-width=".45"/>`+
+   `<path d="M${f(a0+2)} ${f(cy-rr*.45)}H${f(a1-2)}" stroke="#fff" stroke-opacity=".35" stroke-width=".6"/>`+knob(a0)+knob(a1)+'</g>'}
+ // Felt loops sewn to the strip, wrapped over the dowel, each tacked with a cross at the top and the foot.
+ if(P.loops>0)for(const lx of [G.lx0,G.lx1]){const lh=(2*rr+10)*P.loops,lw=small?8:9.5,ly=cy-lh/2;
+  t+=`<rect x="${f(lx-lw/2)}" y="${f(ly+1.2)}" width="${f(lw)}" height="${f(lh)}" rx="3" fill="#000" opacity=".4" filter="url(#sh)"/><rect x="${f(lx-lw/2)}" y="${f(ly)}" width="${f(lw)}" height="${f(lh)}" rx="3" fill="${s.band}" filter="url(#g-${id})"/>`;
+  if(P.loops>=1)t+=`<path d="M${f(lx-2)} ${f(ly+1.5)}l4 3m0-3l-4 3M${f(lx-2)} ${f(ly+lh-4.5)}l4 3m0-3l-4 3" stroke="#f7e8c9" stroke-opacity=".85" stroke-width=".9" stroke-linecap="round"/>`}
+ // The blocks: puffed up in turn on the dowel, then given one cascading quarter turn onto the current page.
+ const infs=[P.b1,P.b2],sps=[P.sp1,P.sp2],rs=[T.r1,T.r2],qs=[T.q1,T.q2];
+ G.blocks.forEach((B,i)=>{if(infs[i]<=0)return;t+=blockDraw(id,i,B,G,rs[i]-(1-sps[i]),qs[i],infs[i],small)});
+ // Fibres shaken loose when the strip lands.
+ if(P.fib)for(const fx0 of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=fx0+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
+  t+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
+ return P.sq>1e-4?`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`:t;
+}
+// Turn a widget's blocks one face forward (d=1) or back (d=-1): the label block leads, the value block follows two frames behind,
+// each overshooting a little and squashing as it lands. The page under the display turns with them.
+function turnBlocks(id,d){
+ const T=TURN[id],name={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id];
+ if(id==='c')T.p=mod3(T.p+d);else model[id].page=mod3(model[id].page+d);
+ const f1=T.r1,f2=T.r2;T.R+=d;T.busy=true;const tok=++T.tok,to=T.R;
+ const land=u=>u>0&&u<1?Math.sin(Math.PI*u)*.07:0;
+ stepped(820,t=>{const u1=seg(t,0,.68),u2=seg(t,.2,.88);T.r1=lerp(f1,to,backOut(u1));T.r2=lerp(f2,to,backOut(u2));
+  T.q1=land(seg(t,.62,.84));T.q2=land(seg(t,.82,1));render()},tok,k=>k===T.tok).then(ok=>{if(ok){T.busy=false;T.r1=T.r2=T.R;T.q1=T.q2=0;render()}});
+ const F=blockFaces(id)[blkPage(id)];say(`${name}: ${F.l.toLowerCase()} · ${F.num?F.num+' '+F.word:F.text}.`);
 }
 
 /* ---------- Zipper geometry ---------- */
@@ -1828,7 +1959,7 @@ JOINS.bunting={label:'Bunting',kind:'Bridge',gap:BU.gap,ms:3800,msDrag:3400,relM
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -1853,7 +1984,12 @@ const SHADES={
   about:'The most minimal felt shade: the cushion becomes the thing sewn inside its own collar. The cotton display is put away and the stuffing lets out until the cushion is a thin felt band, landing with a squash that shakes fibres loose. Then a clothing label is woven onto it a frame at a time. Fine warp threads are strung across from the left, and a wooden shuttle runs the weft back and forth, a row per pass, with the beater line moving down as the cloth grows; the name and value come up in the cloth with it, like jacquard. Each label has its own ground: cream with a red name for Jarvis, navy with gold for GitDiscuss, black with ivory for Checks. <b>The two woven border stripes are the status colour</b>: amber running (blue when Jarvis is paused), red for GitDiscuss\'s decisions, green for Checks. The fringed warp ends fold under, a line of machine stitch tacks down each end, and a sheen crosses the satin. Plain sans capitals for the name, the key value beside it, and three tiny woven care symbols at the end. Unshading unpicks the tacks, unfolds the ends, pulls the weft out from the bottom up in one kinked thread, and the cushion refills with a bounce. Joined pairs stay joined.',
   sayOn:'Shaded: each cushion deflates to a felt band and a name label is woven onto it.',sayOff:'Unshaded: the label is unpicked and unravelled, and the cushions refill.',
   height:(st,small)=>labelParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:labelDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:labelDraw},
+ blocks:{label:'Turning blocks',kind:'Turn',ms:2600,ownStrip:true,
+  about:'The rotating-blocks toy (cubes on a rod that you turn to match the pictures) in stuffed felt. The cotton display is put away and the stuffing lets out to a strip, landing with a squash that shakes fibres loose. The name band gathers into a tab at the left end and the name is satin-stitched on it. Two felt loops are sewn on, a wooden dowel with turned knobs is pushed in through them from the right, and two soft square blocks puff up on it one after the other. <b>Each face is one of the widget\'s screens</b>, in its own felt: mustard for the first (Status, Queue, Passed), duck-egg for the second (Task, Thread, Waiting), rose for the third (Log, Run). The left block names the screen in satin stitch; the right one carries its key value on a cotton patch, cross-stitched where it is a number. The blocks then give one quarter turn onto the current screen, the label block first and the value block a beat behind. <b>Tap the blocks</b> (or focus them and press Enter or ↓; ↑ turns back) to turn them a face: each overshoots a little and squashes as it lands. A tap always turns forward through the three screens, as the toy does, and they never turn by themselves. On Jarvis and GitDiscuss the screen under the display turns with them, so unshading shows the screen you turned to. Drag the strip by its name tab. Unshading plays it backwards. Joined pairs stay joined.',
+  sayOn:'Shaded: each cushion becomes a strip with two felt blocks on a dowel. Tap the blocks to turn them to the next screen.',sayOff:'Unshaded: the blocks and dowel come off and the cushions refill.',
+  height:(st,small)=>blocksParts(st,small).h,key:id=>{const T=TURN[id];return`|${f(T.r1*1000)}|${f(T.r2*1000)}|${f(T.q1*1000)}|${f(T.q2*1000)}`},
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:blocksDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
@@ -2518,7 +2654,8 @@ function render(){
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';
   if(small&&morphRender(el))continue;
   el.style.height=h+'px';
-  const own=sh.draw&&model.st>0,svg=el.querySelector('.casing'),key=w+'x'+h+(own?`|${model.shade}|${f(model.st*1000)}|${BO}|${m.run}|${model.shDir}`:'');
+  syncTurn(id);
+  const own=sh.draw&&model.st>0,svg=el.querySelector('.casing'),key=w+'x'+h+(own?`|${model.shade}|${f(model.st*1000)}|${BO}|${m.run}|${model.shDir}${sh.key?sh.key(id):''}`:'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=own?sh.draw(id,w,h,small,model.st):casing(id,w,h)}
   if(!small){const side=id==='a'?1:-1,phi=(side>0?-1:1)*z.th;
    el.style.transformOrigin=`${side>0?W-EDGE:EDGE}px ${f(z.th>.001?z.ys:h/2)}px`;el.style.transform=z.th>.001?`rotate(${f(phi*100)/100}deg)`:Math.abs(z.sq)>.0005?`scaleX(${(1-z.sq).toFixed(4)})`:'';
@@ -2532,6 +2669,12 @@ function render(){
   const tog=el.querySelector('.tog'),togOn=model.shade==='drawstring'&&(model.st===1||togDrag&&togDrag.id===id);
   tog.style.display=togOn?'block':'none';
   if(togOn){const G=dsGeo(w,h,small,drawParts(model.st,small));Object.assign(tog.style,{left:f(G.tx)+'px',top:f(G.ty-G.TH/2-5)+'px',height:f(G.TH+G.tail+14)+'px'})}
+  // The turning blocks are a real button once they are on the dowel.
+  const tb=el.querySelector('.turnb'),tbOn=model.shade==='blocks'&&model.st===1;
+  if(!tbOn&&document.activeElement===tb)el.querySelector('.grip').focus({preventScroll:true});
+  tb.style.display=tbOn?'block':'none';
+  if(tbOn){const G=blocksGeo(id,w,small),B=G.blocks,F=blockFaces(id)[blkPage(id)];Object.assign(tb.style,{left:f(B[0].x0-3)+'px',top:f(G.cy-G.a-3)+'px',width:f(B[1].x1-B[0].x0+6)+'px',height:f(G.s+6)+'px'});
+   tb.setAttribute('aria-label',`${{a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id]} blocks, showing ${F.l}: ${F.num?F.num+' '+F.word:F.text}. Press Enter or arrow down to turn to the next screen, arrow up for the previous one.`)}
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
@@ -2721,6 +2864,19 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  t.addEventListener('pointerup',()=>end(true));t.addEventListener('pointercancel',()=>end(false));t.addEventListener('lostpointercapture',()=>end(false));
  // Keyboard: Enter or Space opens it.
  t.addEventListener('click',e=>{if(e.detail===0&&model.st===1){el.querySelector('.grip').focus({preventScroll:true});toggleShade(0)}});
+});
+
+/* ---------- Turning blocks: tap to turn them a face ---------- */
+['a','b','c'].forEach(id=>{
+ const el=$('#'+id),t=document.createElement('button');
+ t.className='turnb';t.title='Tap to turn the blocks to the next screen';el.append(t);
+ // A press that slides more than a few pixels is not a tap, so it doesn't turn the blocks.
+ let p0=null;
+ t.addEventListener('pointerdown',e=>{e.stopPropagation();if(drag)cancelDrag();p0={x:e.clientX,y:e.clientY}});
+ t.addEventListener('click',e=>{e.stopPropagation();const moved=p0&&e.detail>0&&Math.hypot(e.clientX-p0.x,e.clientY-p0.y)>4;p0=null;
+  if(!moved&&model.st===1&&model.shade==='blocks')turnBlocks(id,1)});
+ t.addEventListener('keydown',e=>{const d=e.key==='ArrowDown'?1:e.key==='ArrowUp'?-1:0;
+  if(d&&model.st===1&&model.shade==='blocks'){e.preventDefault();e.stopPropagation();turnBlocks(id,d)}});
 });
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
