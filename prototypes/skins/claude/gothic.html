@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="stateRow"><span>State</span></div>
  <div class="row" id="joinRow"><span>Join</span></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
- <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-45" max="45" step="15" value="30" aria-label="Rose dial angle in degrees"><output id="angleOut">+30°</output></div>
+ <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-45" max="45" step="15" value="30" aria-label="Rose dial angle in degrees"><output id="angleOut">+30°</output><div id="stepBtns" style="display:none;gap:6px"></div></div>
  <div class="row" id="morphRow"><span>Morph</span></div>
  <div class="row" id="sizeRow"><span>Checks</span><input type="range" id="grow" min="0" max="200" value="0" aria-label="Checks size, lancet to nave"><output id="growOut" style="width:84px">lancet</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
@@ -188,7 +188,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M builds Checks up a size (from the nave it comes back down to a lancet) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M builds Checks up a size (from the nave it comes back down to a lancet) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -241,7 +241,7 @@ function casing(id,w,h){
  // Flying buttress: the joining end is a tall pier with its own pinnacle instead of a half-gable; the corbel springs from it in the overlay.
  const bt=model.join==='buttress'&&!small,PT=12,pw=JP-6;
  // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
- const dl=model.join==='dial'&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
+ const dl=(model.join==='dial'||model.join==='apse')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
  // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
  const tooth=x=>{const t=[[x,top]];for(const r of JOINS.pier.rows(h))t.push([x,r.y],[x+r.e*JOINS.pier.TO,r.y],[x+r.e*JOINS.pier.TO,r.yb],[x,r.yb]);t.push([x,h]);return t};
@@ -789,6 +789,97 @@ const JOINS={
   move(d,p){const dx=p.x-d.x0,dy=p.y-d.y0,l=Math.hypot(dx,dy),k=l>0?Math.min(l,20)/l:0;if(l>4)d.moved=true;d.amt=clamp(l/48);model.lampOff=[dx*k,dy*k];setJt(1-.12*d.amt)},
   // Taken: the lamp stays where it was drawn to as it goes out. Kept: it swings back to the hand.
   letGo(d){const ok=!d.moved||d.amt>.55;model.lampAt=performance.now()+(ok?1e9:0);return ok}
+ },
+ apse:{label:'Apse wall',kind:'Angle · canted wall',gap:46,ms:1.8,sepMs:2600,
+  get step(){return model.apseStep},get max(){return 2*model.apseStep},
+  say:{join:'The facades close a narrow bay apart, a canted wall is laid course by course between them, its gablet is set and its lancet glazed and lit, and GitDiscuss turns to its angle.',
+   joined:'Joined by a canted apse wall. Drag the wall, or GitDiscuss\'s nameplate, to set the angle in apse steps; the wall turns half as far and widens to fit. Tap the finial on its gablet to release.',
+   sep:'GitDiscuss turns level, the lancet goes dark, the gablet is lifted off, the wall is taken down course by course and the facades part.',hold:'Held mid-join: the canted wall is going up course by course. Use the scrubber to step through the animation.',
+   ready:'Ready: the canted wall is set out in chalk across the gap. Release to join.',near:'Nearby: toothing stones step out of both ends, ready to bond a wall. Move closer.',readyPh:'Ready · the wall is set out',nearPh:'Nearby · toothing out'},
+  phase:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.62?'Joining · laying the courses ':jt<.7?'Joining · setting the gablet ':jt<.8?'Joining · glazing the lancet ':'Joining · canting to '+signed(model.angle)+' · '):(jt>.82?'Releasing · turning level ':jt>.72?'Releasing · the lancet goes dark ':jt>.62?'Releasing · lifting the gablet ':jt>.4?'Releasing · taking the wall down ':'Releasing · parting '),
+  dragPh:()=>'Canting the wall · GitDiscuss at '+signed(model.angle),
+  about:'An apse is a polygon: the walls of a chevet turn by fixed fractions of a circle. Here the joint between the facades is one more wall of that polygon. The joining ends stop square at the cornice. <b>Near:</b> toothing stones step out of every other course on both ends, the way a mason leaves a wall ready to be bonded to. <b>Ready:</b> the canted wall, its gablet and its lancet are chalked out in the gap. Joining: the facades close a narrow bay apart, the toothing draws in, and the wall is laid course by course from the bottom up, each course dropping onto its bed with a puff of grit. A crocketed gablet with a trefoil is lowered onto the top with a run of cresting, the lancet is glazed pane by pane from the sill up, and it lights: that lancet is the join light. Then GitDiscuss turns to its angle and the wall cants with it. <b>Apse steps:</b> angles snap to steps of 22.5° (−45° to +45°) or 30° (−60° to +60°); choose with the buttons beside the slider. The wall always turns half as far as GitDiscuss, so both of its joints are the same mitre, and it <b>widens as the angle grows</b> so its inner face never closes up. The plinth and base mouldings run round it unbroken. To set the angle: drag the wall (it turns about Jarvis\'s end), drag GitDiscuss\'s nameplate, use the slider, or focus the wall and press the arrow keys. Each step taps into place with a glint on the finial, and a mason\'s plan pinned under Jarvis shows the three walls, the bend and its steps. <b>Release:</b> tap the finial on the gablet (or focus the wall and press Enter). GitDiscuss turns level, the lancet goes dark, the gablet is lifted off, the wall comes down course by course from the top, and the facades part.',
+  bend:jt=>JOINS.dial.bend(jt),
+  // The canted wall turns half the bend and widens with it, so its inner face never closes up.
+  dims(bend,h){const a=bend*Math.PI/360;return{a,cw:this.gap+.7*h*Math.abs(Math.sin(a))}},
+  geo(c,bend){const h=c.h,{a,cw}=this.dims(bend,h),E1={x:c.a.x+W,y:c.a.y+h/2},ca=Math.cos(a),sa=Math.sin(a);
+   return{h,a,cw,E1,M:{x:E1.x+cw/2*ca,y:E1.y+cw/2*sa},E2:{x:E1.x+cw*ca,y:E1.y+cw*sa},sT:-h/2+8,sB:h/2,big:h>=90}},
+  state(c){const jt=c.jt;
+   if(jt===0)return{tooth:c.glow,build:0,gab:0,glaze:0,lit:0,pulse:0};
+   return{tooth:model.dir>0?Math.max(model.lit0>0?1:0,seg(jt,0,.3)):seg(jt,.2,.4),build:seg(jt,.4,.62),gab:seg(jt,.6,.7),glaze:seg(jt,.68,.78),lit:seg(jt,.76,.86),pulse:model.dir>0?Math.sin(Math.PI*seg(jt,.76,.84)):0}},
+  head:(r,va,vb)=>`M${f(-r)} ${f(vb)}V${f(va+r*1.6)}Q${f(-r)} ${f(va+r*.45)} 0 ${f(va)}Q${f(r)} ${f(va+r*.45)} ${f(r)} ${f(va+r*1.6)}V${f(vb)}Z`,
+  detent(b,jt){if(jt===0){model.lastDet=0;return}const st=this.step,n=Math.round(b/st);if(n!==model.lastDet&&Math.abs(b-n*st)<4){model.lastDet=n;if(!reduce.matches)pawlClick()}},
+  over(c){
+   const jt=c.jt,bend=this.bend(jt),G=this.geo(c,bend),r=this.state(c),{a,cw,sT,sB,big}=G,sa=Math.sin(a),ca=Math.cos(a),D=180/Math.PI;
+   this.detent(bend,jt);
+   const hop=jt===1||model.dir>0?Math.sin(Math.PI*clamp((performance.now()-model.clickAt)/220)):0;
+   // Local frame: u along the wall, v down it; a point s along a joint edge sits at v = s·cos a.
+   const uL=s=>-cw/2+s*sa,uR=s=>cw/2-s*sa,P=(u,s)=>f(u)+' '+f(s*ca),quad=(s0,s1)=>`M${P(uL(s0),s0)}L${P(uR(s0),s0)}L${P(uR(s1),s1)}L${P(uL(s1),s1)}Z`;
+   const lr=big?7:4.5,va=(sT+(big?20:6))*ca,vb=(sB-(big?33:13))*ca,gw=big?13:9,gh=big?26:15,vt=sT*ca;
+   let s='';
+   // Toothing: every other course steps out of both square ends (world frame; the pair is level until the wall is built).
+   if(r.tooth>0&&jt<.5){let t='',l='';const w=7*ease(r.tooth);
+    for(const[x,y,o]of[[c.a.x+W,c.a.y,1],[c.b.x,c.b.y,-1]])for(let yy=y+30,i=0;yy+13<=y+G.h-(big?29:11);yy+=14,i++)if(i%2===0){
+     t+=`<rect x="${f(o>0?x-1:x-w)}" y="${yy}" width="${f(w+1)}" height="13"/>`;l+=`<path d="M${f(x+o*w)} ${yy}V${yy+13}M${f(x)} ${yy+13.5}H${f(x+o*w)}" stroke="#3a2c1c" stroke-opacity=".45"/>`}
+    s+=`<g fill="url(#lime)" filter="url(#st-v)">${t}</g><g fill="none" stroke-width=".8">${l}</g>`}
+   // Ready: the wall chalked out in the gap.
+   const gho=jt===0?seg(c.glow,.8,1)*.85:0;
+   if(gho>0){const x0=c.a.x+W,w=Math.max(14,c.b.x-x0),y0=c.a.y+G.h/2;
+    s+=`<g transform="translate(${f(x0+w/2)} ${f(y0)})" fill="none" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="3 2.4" opacity="${f(gho)}"><rect x="${f(-w/2)}" y="${f(sT)}" width="${f(w)}" height="${f(sB-sT)}" fill="#f3d48a" fill-opacity=".05"/><path d="M${-gw} ${f(sT)}L0 ${f(sT-gh)}L${gw} ${f(sT)}"/><path d="${this.head(lr,sT+(big?20:6),sB-(big?33:13))}"/></g>`}
+   if(r.build<=0)return s;
+   const op=`translate(${f(G.M.x)} ${f(G.M.y)}) rotate(${f(a*D*100)/100})`;
+   let w='';
+   if(r.lit>0)w+=`<defs><radialGradient id="apGlow"><stop stop-color="#fff0c4" stop-opacity=".6"/><stop offset=".35" stop-color="#d0475a" stop-opacity=".26"/><stop offset=".7" stop-color="#4a6fd8" stop-opacity=".12"/><stop offset="1" stop-color="#4a6fd8" stop-opacity="0"/></radialGradient></defs>`;
+   // Courses, bottom up, each dropping onto its bed with grit.
+   const N=Math.max(3,Math.round((sB-sT)/15)),hs=(sB-sT)/N,sh=f(.04+.42*Math.abs(a)),D0=JOINS.buttress.dust.bind(JOINS.buttress);
+   let body='',lines='',dust='';
+   for(let i=0;i<N;i++){const s1=sB-i*hs,s0=s1-hs,t=seg(r.build,i/N*.72,i/N*.72+.28);if(t<=0)continue;
+    const tr=`transform="translate(0 ${f(-20*Math.pow(1-t,2))})" opacity="${f(seg(t,0,.3))}"`,sm=(s0+s1)/2,ju=lerp(uL(sm),uR(sm),i%2?.2:.8);
+    body+=`<path ${tr} d="${quad(s0,s1)}"/>`;
+    lines+=`<g ${tr}><path d="${quad(s0,s1)}" fill="#1d140b" fill-opacity="${sh}"/><path d="M${P(uL(s0),s0)}L${P(uR(s0),s0)}M${f(ju)} ${f(s0*ca)}V${f(s1*ca)}M${P(uL(s0),s0)}L${P(uL(s1),s1)}M${P(uR(s0),s0)}L${P(uR(s1),s1)}" stroke="#3a2c1c" stroke-opacity=".42"/><path d="M${P(uL(s0)+1,s0+.9)}L${P(uR(s0)-1,s0+.9)}" stroke="#fff7e6" stroke-opacity=".25"/></g>`;
+    if(t>.72&&t<1)dust+=D0(uL(s1),s1*ca,seg(t,.72,1),4,10,i+130,-1)+D0(uR(s1),s1*ca,seg(t,.72,1),4,10,i+150,1)}
+   w+=`<g fill="url(#lime)" filter="url(#st-v)">${body}</g><g fill="none" stroke-width=".8">${lines}</g>${dust}`;
+   // Mouldings run round the polygon: plinth and base course meet both neighbours' lines at the mitres.
+   const mo=seg(r.build,.85,1);
+   if(mo>0){let m='';for(const k of big?[29,11]:[11]){const sm=sB-k;m+=`<path d="M${P(uL(sm),sm)}L${P(uR(sm),sm)}" stroke="#3a2c1c" stroke-opacity=".38"/>`;if(k===29)m+=`<path d="M${P(uL(sm+1.2),sm+1.2)}L${P(uR(sm+1.2),sm+1.2)}" stroke="#fff6e2" stroke-opacity=".45"/>`}
+    if(big){const qv=(sB-15)*ca;m+=`<g transform="translate(0 ${f(qv)})"><circle r="7" fill="none" stroke="#2a1d10" stroke-opacity=".3"/><g fill="#24180d" opacity=".32"><circle cx="-2.8" r="2.9"/><circle cx="2.8" r="2.9"/><circle cy="-2.8" r="2.9"/><circle cy="2.8" r="2.9"/></g><circle r="1.3" fill="url(#gild)"/></g>`}
+    w+=`<g opacity="${f(mo)}" fill="none">${m}</g>`}
+   // The lancet: a dark recess once the wall is up, glazed pane by pane from the sill, then lit.
+   if(mo>0){const H1=this.head(lr,va,vb),n=Math.max(2,Math.ceil((vb-va)/(2*lr)));
+    w+=`<g opacity="${f(mo)}"><path d="${this.head(lr+2.6,va-3,vb+2.2)}" fill="#2a1f15" opacity=".5"/><path d="${H1}" fill="#120e16"/><path d="M${f(-lr-2.6)} ${f(vb+2.2)}H${f(lr+2.6)}" stroke="#fff6e2" stroke-opacity=".55"/></g>`;
+    if(r.glaze>0){let g='';
+     for(let i=0;i<n;i++){const y1=vb-i*2*lr,y0=y1-2*lr,vm=(y0+y1)/2,o=f(seg(r.glaze,i/n*.7,i/n*.7+.3));if(o<=0)continue;
+      g+=`<g opacity="${o}"><rect x="${f(-lr)}" y="${f(y0)}" width="${f(2*lr)}" height="${f(2*lr+.3)}" fill="${i%2?'#1f3f8a':'#8e1f2b'}"/><path d="M0 ${f(y0)}L${f(lr)} ${f(vm)}L0 ${f(y1)}L${f(-lr)} ${f(vm)}Z" fill="${i%2?'#a3222f':'#2b56b3'}" stroke="${LEAD}" stroke-width=".8"/><circle cy="${f(vm)}" r="${f(lr*.22)}" fill="#e7b83c"/></g>`}
+     w+=`<defs><clipPath id="apL"><path d="${H1}"/></clipPath></defs><g clip-path="url(#apL)">${g}<rect x="${f(-lr)}" y="${f(va)}" width="${f(2*lr)}" height="${f(vb-va)}" fill="#120e16" opacity="${f(.68*(1-r.lit))}"/></g><path d="${H1}" fill="none" stroke="${LEAD}" stroke-width="1.1" opacity="${f(r.glaze)}"/>`}
+    if(r.lit>0)w+=`<ellipse cx="0" cy="${f((va+vb)/2)}" rx="${f(lr*4.2)}" ry="${f((vb-va)*.75)}" fill="url(#apGlow)" style="mix-blend-mode:screen" opacity="${f(r.lit)}"/>`;
+    if(r.pulse>.05)w+=`<g opacity="${f(r.pulse)}">${sparkle(0,va+lr*.8,r.pulse*lr*1.6)}</g>`}
+   // Gablet and cresting, lowered on last.
+   if(r.gab>0){const dy=-24*(1-ease(r.gab)),u0=uL(sT)+5,u1=uR(sT)-5;let cr='';
+    for(let u=u0;u<=u1;u+=9)if(Math.abs(u)>gw+3)cr+=`<path d="M${f(u-2.6)} ${f(vt+.5)}L${f(u)} ${f(vt-4)}L${f(u+2.6)} ${f(vt+.5)}Z"/><circle cx="${f(u)}" cy="${f(vt-5)}" r="1.3"/>`;
+    w+=`<g transform="translate(0 ${f(dy)})" opacity="${f(seg(r.gab,0,.3))}"><g fill="url(#lime)" filter="url(#st-v)">${cr}<path d="M${-gw} ${f(vt+1)}L0 ${f(vt-gh)}L${gw} ${f(vt+1)}Z"/>${crockets(-gw,vt,0,vt-gh,1,2,1.5)}${crockets(gw,vt,0,vt-gh,-1,2,1.5)}<circle cy="${f(vt-gh-2.4)}" r="2.3"/><rect x="-3.4" y="${f(vt-gh-3)}" width="6.8" height="1.3"/></g>`+
+     `<g fill="#24180d" opacity=".34">${[[-1.9,1],[1.9,1],[0,-1.9]].map(([x,y])=>`<circle cx="${f(x*(big?1:.7))}" cy="${f(vt-gh*.36+y*(big?1:.7))}" r="${big?2:1.4}"/>`).join('')}</g><path d="M${-gw} ${f(vt+1)}L0 ${f(vt-gh)}" stroke="#fff6e2" stroke-opacity=".5" stroke-width=".8"/></g>`;
+    if(r.gab>.7&&r.gab<1)w+=D0(-gw,vt,seg(r.gab,.7,1),5,12,171,-1)+D0(gw,vt,seg(r.gab,.7,1),5,12,173,1)}
+   if(hop>.05)w+=`<g opacity="${f(hop)}">${sparkle(0,vt-gh-2.4-3*hop,7*hop)}</g>`;
+   if(jt===1)w+=`<g class="hit" id="wallHit" tabindex="0" role="slider" aria-label="Canted apse wall: GitDiscuss angle. Arrow keys cant it one apse step; Enter separates the widgets" aria-valuemin="${-this.max}" aria-valuemax="${this.max}" aria-valuenow="${Math.round(model.angle*2)/2}" aria-valuetext="${signed(model.angle)}" style="cursor:grab"><title>Drag the wall to set the angle</title><path d="${quad(sT,sB)}" fill="transparent"/><path class="ringfocus" d="${quad(sT-2,sB+2)}" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g>`+
+    `<g class="hit" id="finialHit" role="button" aria-label="Lift the gablet to separate the widgets" style="cursor:pointer"><title>Tap the finial to release</title><rect x="${-gw-5}" y="${f(vt-gh-9)}" width="${2*gw+10}" height="${gh+10}" fill="transparent"/></g>`;
+   s+=`<g transform="${op}">${w}</g>`;
+   // While it turns: a mason's plan pinned under Jarvis's end, with the three walls, the bend and the apse steps.
+   if(jt===1&&(performance.now()<model.turnUntil||drag&&(drag.dial||drag.mode==='angle'))){
+    const Lw=212,Lh=60,lx=G.E1.x-10-Lw,ly=c.a.y+G.h+10,j0=[lx+40,ly+Lh/2],Lc=7+cw*.07,A=a,j1=[j0[0]+Lc*Math.cos(A),j0[1]+Lc*Math.sin(A)],j2=[j1[0]+22*Math.cos(2*A),j1[1]+22*Math.sin(2*A)];
+    const st=this.step,n=Math.round(Math.abs(bend)/st),R=17;let ticks='';
+    for(let k=-this.max;k<=this.max+.01;k+=st){const t=k*Math.PI/180,on=Math.abs(k-Math.round(bend/st)*st)<.01;ticks+=on?`<circle cx="${f(j1[0]+R*Math.cos(t))}" cy="${f(j1[1]+R*Math.sin(t))}" r="2" fill="url(#gild)" stroke="#6e4a12" stroke-width=".5"/>`:`<path d="M${f(j1[0]+(R-2)*Math.cos(t))} ${f(j1[1]+(R-2)*Math.sin(t))}L${f(j1[0]+(R+2)*Math.cos(t))} ${f(j1[1]+(R+2)*Math.sin(t))}" stroke="#6b5a43" stroke-width=".8"/>`}
+    const arc=Math.abs(bend)>.5?`<path d="M${f(j1[0]+R)} ${f(j1[1])}A${R} ${R} 0 0 ${bend>0?1:0} ${f(j1[0]+R*Math.cos(2*A))} ${f(j1[1]+R*Math.sin(2*A))}" fill="none" stroke="#8e1f2b" stroke-width="1.1"/>`:'';
+    s+=`<g><rect x="${f(lx-4)}" y="${f(ly-4)}" width="${Lw+8}" height="${Lh+8}" fill="#4a3d2c"/><rect x="${f(lx-3)}" y="${f(ly-3)}" width="${Lw+6}" height="${Lh+6}" fill="#cbbd9f"/><rect x="${f(lx)}" y="${f(ly)}" width="${Lw}" height="${Lh}" fill="#f6ead0" stroke="#1d1612" stroke-width="1.5"/>`+
+     `<path d="M${f(j1[0])} ${f(j1[1])}H${f(j1[0]+26)}" stroke="#8e1f2b" stroke-width=".8" stroke-dasharray="2 2"/>${ticks}${arc}`+
+     `<path d="M${f(j0[0]-30)} ${f(j0[1])}L${f(j0[0])} ${f(j0[1])}L${f(j1[0])} ${f(j1[1])}L${f(j2[0])} ${f(j2[1])}" fill="none" stroke="#4a3d2c" stroke-width="4" stroke-linejoin="miter"/><path d="M${f(j0[0])} ${f(j0[1])}L${f(j1[0])} ${f(j1[1])}" stroke="#b8861c" stroke-width="4"/>`+
+     `<g font-family="Georgia,serif" fill="#2c2117"><text x="${lx+84}" y="${ly+18}" font-size="12">GitDiscuss <tspan font-weight="700" fill="#8e1f2b">${signed(bend)}</tspan></text><text x="${lx+84}" y="${ly+34}" font-size="10.5" font-style="italic">${n?n+' step'+(n>1?'s':'')+' of '+st+'°':'straight · '+st+'° steps'}</text><text x="${lx+84}" y="${ly+49}" font-size="10.5" font-style="italic">wall cants ${(bend>0?'+':bend<0?'−':'')+Math.round(Math.abs(bend/2)*100)/100}°</text></g></g>`}
+   return s;
+  },
+  // Drag the wall round Jarvis's end: it follows the pointer, and GitDiscuss turns twice as far.
+  grab(p){const E=this.geo(ctx(),model.angle).E1;return{dial:true,cx:E.x,cy:E.y,prev:Math.atan2(p.y-E.y,p.x-E.x),deg:0,th0:model.angle,moved:false}},
+  move(d,p){const a=Math.atan2(p.y-d.cy,p.x-d.cx);let da=(a-d.prev)*180/Math.PI;da=((da+540)%360)-180;d.prev=a;
+   d.deg=clamp(d.deg+da,(-this.max-d.th0)/2,(this.max-d.th0)/2);if(Math.abs(d.deg)>1.5)d.moved=true;model.angle=magnet(d.th0+2*d.deg)},
+  key(e,hit){if(hit.id!=='wallHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
@@ -796,24 +887,37 @@ const SOLDER=[[0,[143,141,136]],[.1,[107,74,58]],[.25,[168,52,26]],[.45,[236,106
 const mixc=(A,B,t)=>'rgb('+A.map((v,j)=>Math.round(lerp(v,B[j],clamp(t)))).join(',')+')';
 const heat=t=>{t=clamp(t);let i=1;while(i<SOLDER.length-1&&SOLDER[i][0]<t)i++;const[a,A]=SOLDER[i-1],[b,B]=SOLDER[i];return mixc(A,B,(t-a)/(b-a))};
 /* Rose dial helpers: signed degrees, petal detents, keeping the angled pair on the stage, and the angle's own clock. */
-const signed=v=>(v>0?'+':v<0?'−':'')+Math.abs(Math.round(v))+'°';
-const magnet=v=>{v=clamp(v,-45,45);const n=Math.round(v/15)*15;return Math.abs(v-n)<3.5?n:v};
+// Halves are kept, for the apse's 22.5° steps.
+const signed=v=>{const m=Math.round(Math.abs(v)*2)/2;return(m&&v>0?'+':m&&v<0?'−':'')+m+'°'};
+// The angled joins (rose dial, apse wall) carry their own step and range.
+const AJ=()=>J().step?J():null;
+const magnet=v=>{const j=AJ()||JOINS.dial,st=j.step;v=clamp(v,-j.max,j.max);const n=Math.round(v/st)*st;return Math.abs(v-n)<3.5?n:v};
 // Allowed range of the pair's y for an angle: Jarvis and the wheel, plus GitDiscuss's corners (with pinnacle headroom) swung about the rose.
 function dialRange(ang,h){
  const g=JOINS.dial.gap,th=ang*Math.PI/180,sn=Math.sin(th),cs=Math.cos(th);let lo=-26,hi=Math.max(h,h/2+Math.hypot(g/2,h/2)+40);// the wheel plus the angle label under it
  for(const[x,y]of[[0,-26],[W,-26],[0,h],[W,h]]){const ry=h/2+(x+g/2)*sn+(y-h/2)*cs;lo=Math.min(lo,ry);hi=Math.max(hi,ry)}
  const a=TOP-26-lo,b=600-14-hi;return[a,Math.max(a,b)];
 }
-const fitDial=(y,ang=model.angle)=>{const[a,b]=dialRange(ang,lowH());return clamp(y,a,b)};
+// Apse wall: Jarvis, the canted wall's gablet, GitDiscuss's corners about the far mitre, and the mason's plan under Jarvis.
+function apseRange(ang,h){
+ const{a,cw}=JOINS.apse.dims(ang,h),sa=Math.sin(a),ca=Math.cos(a),s2=Math.sin(2*a),c2=Math.cos(2*a);let lo=Math.min(-26,h/2+cw/2*sa+(-h/2-30)*ca),hi=h+76;
+ for(const[x,y]of[[0,-26],[W,-26],[0,h],[W,h]]){const ry=h/2+cw*sa+x*s2+(y-h/2)*c2;lo=Math.min(lo,ry);hi=Math.max(hi,ry)}
+ const A=TOP-26-lo,B=600-14-hi;return[A,Math.max(A,B)];
+}
+const angRange=(ang,h)=>(model.join==='apse'?apseRange:dialRange)(ang,h);
+const fitDial=(y,ang=model.angle)=>{const[a,b]=angRange(ang,lowH());return clamp(y,a,b)};
 let angAnim=0,clickRaf=0;
 function animateAngle(to,ms=560){
- to=clamp(to,-45,45);model.angTo=to;const from=model.angle,y0=model.a.y,y1=fitDial(y0,to),token=++angAnim,t0=performance.now();model.turnUntil=t0+ms+1100;
+ const mx=(AJ()||JOINS.dial).max;to=clamp(to,-mx,mx);model.angTo=to;const from=model.angle,y0=model.a.y,y1=fitDial(y0,to),token=++angAnim,t0=performance.now();model.turnUntil=t0+ms+1100;
  (function step(now){if(token!==angAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);
   model.angle=t>=1?to:lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*Math.PI*t));model.a.y=model.b.y=lerp(y0,y1,ease(t));render();
   if(t<1)requestAnimationFrame(step);else{model.turnUntil=performance.now()+1100;setTimeout(render,1150)}})(t0);
 }
-function stepDial(k){const base=Math.round((model.angTo??model.angle)/15)*15,to=clamp(base+15*k,-45,45);animateAngle(to);say('The rose turns '+(k>0?'clockwise':'anticlockwise')+' a petal; GitDiscuss at '+signed(to)+'.')}
-function setDialAngle(v){v=Math.round(clamp(v,-45,45)/15)*15;if(model.jt===1&&model.join==='dial')animateAngle(v);else{stopAngle();model.angle=model.angTo=v;render()}}
+function stepDial(k){const j=AJ()||JOINS.dial,st=j.step,base=Math.round((model.angTo??model.angle)/st)*st,to=clamp(base+st*k,-j.max,j.max);animateAngle(to);
+ say(model.join==='apse'?'The wall cants '+(k>0?'down':'up')+' an apse step; GitDiscuss at '+signed(to)+'.':'The rose turns '+(k>0?'clockwise':'anticlockwise')+' a petal; GitDiscuss at '+signed(to)+'.')}
+function setDialAngle(v){const j=AJ()||JOINS.dial;v=Math.round(clamp(v,-j.max,j.max)/j.step)*j.step;if(model.jt===1&&AJ())animateAngle(v);else{stopAngle();model.angle=model.angTo=v;render()}}
+// Apse steps: 22.5° or 30°. The angle moves to the nearest step of the new size.
+function setApseStep(st){model.apseStep=st;const v=clamp(Math.round(model.angle/st)*st,-2*st,2*st);model.lastDet=Math.round(v/st);setDialAngle(v);say('Apse steps of '+st+'°: GitDiscuss at '+signed(v)+'.')}
 // Stops a running swing at its target, so no other state change has the pair moved under it.
 function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angTo;model.turnUntil=0}
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
@@ -1241,18 +1345,18 @@ function morphTo(id,fast){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH]};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH]};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,24,1200-2*W-g-SEP-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
 function joinedPose(fixed='a'){
- const g=J().gap,fy=y=>model.join==='dial'?fitDial(y,1.07*model.angle):y;
+ const g=J().gap,fy=y=>AJ()?fitDial(y,1.07*model.angle):y;
  if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24),y=fy(model.b.y);return{a:{x:bx-W-g,y},b:{x:bx,y}}}
  let ax=clamp(model.a.x,24,1200-2*W-g-24),y=fy(model.a.y);return{a:{x:ax,y},b:{x:ax+W+g,y}};
 }
 // The vertical range a joined pair may move in; an angled rose dial needs room for GitDiscuss's swing.
-const pairY=()=>model.join==='dial'&&model.jt===1?dialRange(model.angle,lowH()):[TOP,600-lowH()-14];
+const pairY=()=>AJ()&&model.jt===1?angRange(model.angle,lowH()):[TOP,600-lowH()-14];
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
  model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.4));
@@ -1307,7 +1411,7 @@ function toggleShade(force){
  // Shade runs on its own clock so it can overlap a join.
  (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,ease(t));
   // An angled rose-dial pair grows when unshaded, so it is kept on the stage as it does.
-  if(model.join==='dial'&&model.jt===1)model.a.y=model.b.y=fitDial(model.a.y);
+  if(AJ()&&model.jt===1)model.a.y=model.b.y=fitDial(model.a.y);
   render();if(t<1)requestAnimationFrame(step);else if(!to&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}})(t0);
  say(to?sh.on||'Shaded: the wall lowers to its cornice, nameplate and one lit value.':sh.off||'Unshaded: the wall rises again.');
 }
@@ -1324,7 +1428,10 @@ function render(){
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   if(small&&morphRender(el))continue;
   // Rose dial: GitDiscuss pivots about the rose's centre, half the gap beyond its own edge.
-  if(id==='b'){const bd=model.join==='dial'?JOINS.dial.bend(model.jt):0;el.style.transformOrigin=`${-JOINS.dial.gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
+  // Apse wall: GitDiscuss turns about its own edge, carried to the far mitre of the canted wall.
+  if(id==='b'){const bd=AJ()?AJ().bend(model.jt):0;
+   if(model.join==='apse'){const E=JOINS.apse.geo(c,bd).E2;el.style.transformOrigin=`0px ${f(h/2)}px`;el.style.transform=bd?`translate(${f(E.x-m.x)}px,${f(E.y-m.y-h/2)}px) rotate(${f(bd*100)/100}deg)`:''}
+   else{el.style.transformOrigin=`${-JOINS.dial.gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}}
   const k=ease(model.st),cnG=cn?cnGeo(id):null,Se=cn?cnSoffit(cnG,k):0;
   const svg=el.querySelector('.casing'),key=cn?`cn|${w}x${h}|${model.join}|${f(Se)}`:w+'x'+h+model.join;
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=cn?cornWall(id,w,h,k):casing(id,w,h)}
@@ -1354,8 +1461,9 @@ function render(){
  $('#over').innerHTML=j.over(c);
  $$('#over .hit').forEach(hit=>hit.onkeydown=e=>{if(j.key&&j.key(e,hit))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}});
  if(fid)document.getElementById(fid)?.focus();
- const dial=model.join==='dial';$('#angleRow').style.display=dial?'':'none';
- if(dial){$('#angle').value=Math.round(model.angle);$('#angleOut').textContent=signed(model.angle)}
+ const aj=AJ(),dial=!!aj;$('#angleRow').style.display=dial?'':'none';
+ if(dial){const sl=$('#angle');sl.min=-aj.max;sl.max=aj.max;sl.step=aj.step;sl.value=model.angle;sl.setAttribute('aria-label',(model.join==='apse'?'Apse wall':'Rose dial')+' angle in degrees');$('#angleOut').textContent=signed(model.angle);
+  $('#stepBtns').style.display=model.join==='apse'?'flex':'none';$$('#stepBtns button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.step===model.apseStep)))}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
@@ -1376,7 +1484,9 @@ STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.
 function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
- if(key==='join'&&id!==model.join){if(drag)cancelDrag();stopAngle();const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;startJoinFrom({...REST},0);if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='join'&&id!==model.join){if(drag)cancelDrag();stopAngle();const was=model.jt;
+  // Each angled join keeps its own angle.
+  if(model.join in model.angles)model.angles[model.join]=model.angle;if(id in model.angles)model.angle=model.angTo=model.angles[id];++anim;model.busy=false;model.join=id;if(AJ())model.lastDet=Math.round(model.angle/AJ().step);model.path=null;model.jt=0;startJoinFrom({...REST},0);if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  if(key==='morph')model.morph=id;
  describe();render();
@@ -1407,6 +1517,7 @@ $('#scrub').oninput=e=>{++anim;model.busy=false;stopAngle();
  if(model.jt===0||model.jt===1||!model.path){model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};startJoinFrom({...REST},0)}
  setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
 $('#angle').oninput=e=>setDialAngle(+e.target.value);
+[22.5,30].forEach(st=>{const b=document.createElement('button');b.dataset.step=st;b.textContent=st+'° steps';b.title='Apse steps';b.onclick=()=>setApseStep(st);$('#stepBtns').append(b)});
 document.addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
  const key=e.key.toLowerCase();
@@ -1430,9 +1541,9 @@ stage.addEventListener('pointerdown',e=>{
  if(!e.target.closest('.lights,.tri'))hideTip();
  // Rose dial: the pawl releases; the rest of the wheel turns the rose.
  const dh=e.target.closest('#over .hit');
- if(dh&&model.jt===1&&model.join==='dial'){e.preventDefault();
-  if(dh.id==='pawlHit'){$('#a .grip').focus();doSeparate();return}
-  ++angAnim;drag={hit:true,...J().grab(local(e))};stage.setPointerCapture(e.pointerId);render();return}
+ if(dh&&model.jt===1&&AJ()){e.preventDefault();
+  if(dh.id==='pawlHit'||dh.id==='finialHit'){$('#a .grip').focus();doSeparate();return}
+  stopAngle();drag={hit:true,...J().grab(local(e))};stage.setPointerCapture(e.pointerId);render();return}
  if(dh&&model.jt===1){
   e.preventDefault();++anim;model.busy=false;model.dir=-1;model.tsign=1;model.path={s:separatePose(),j:here()};
   drag={hit:true,...J().grab(local(e))};stage.setPointerCapture(e.pointerId);render();return;
@@ -1443,13 +1554,13 @@ stage.addEventListener('pointerdown',e=>{
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1}
  drag={id,start:p,cb:cBase(),saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
  // On the rose dial, GitDiscuss's nameplate swings it about the rose (Jarvis still moves the pair).
- if(id==='b'&&model.jt===1&&model.join==='dial'){++angAnim;const C=JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
+ if(id==='b'&&model.jt===1&&AJ()){stopAngle();const C=model.join==='apse'?JOINS.apse.geo(ctx(),model.angle).M:JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e),dx=p.x-drag.start?.x,dy=p.y-drag.start?.y;
  if(drag.hit){J().move(drag,p);render();return}
- if(drag.mode==='angle'){const a=Math.atan2(p.y-drag.C.y,p.x-drag.C.x);let d=(a-drag.prev)*180/Math.PI;d=((d+540)%360)-180;drag.prev=a;drag.raw=clamp(drag.raw+d,-45,45);if(Math.abs(drag.raw-drag.th0)>1.5)drag.moved=true;model.angle=magnet(drag.raw);render();return}
+ if(drag.mode==='angle'){const a=Math.atan2(p.y-drag.C.y,p.x-drag.C.x);let d=(a-drag.prev)*180/Math.PI;d=((d+540)%360)-180;drag.prev=a;drag.raw=clamp(drag.raw+d,-AJ().max,AJ().max);if(Math.abs(drag.raw-drag.th0)>1.5)drag.moved=true;model.angle=magnet(drag.raw);render();return}
  const s=drag.saved,[top,bottom]=pairY();
  if(drag.id==='c'){placeBase(drag.cb.x+dx,drag.cb.y+dy);if(model.g%1)model.cMoved=true;render();return}
  if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
@@ -1465,8 +1576,8 @@ stage.addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  // Rose dial: let go and the nearest petal drops under the pawl.
- if(d.dial||d.mode==='angle'){if(d.moved)animateAngle(Math.round(model.angle/15)*15,420);else render();
-  say(d.dial&&!d.moved?'Turn the rose to set the angle; tap the gilded pawl at its top to release.':'GitDiscuss set at '+signed(Math.round(model.angle/15)*15)+'.');return}
+ if(d.dial||d.mode==='angle'){const st=(AJ()||JOINS.dial).step,to=Math.round(model.angle/st)*st;if(d.moved||model.angle!==to)animateAngle(to,420);else render();
+  say(d.dial&&!d.moved?(model.join==='apse'?'Drag the canted wall to set the angle; tap the finial on its gablet to release.':'Turn the rose to set the angle; tap the gilded pawl at its top to release.'):'GitDiscuss set at '+signed(to)+'.');return}
  if(d.hit){if(J().letGo(d))doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;model.dir=1;say(J().say.back||(model.join==='rose'?'The rose settles back; still joined.':'The keystone drops back into place; still joined.'))}});return}
  const ready=d.state==='ready';
  if(ready){startJoinFrom({a:0,b:0},.55);model.ready=true;model.path=null;doJoin(d.id==='b'?'a':'b',1500)}else{model.glow=0;render()}
@@ -1483,7 +1594,7 @@ stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
- if(id==='b'&&model.jt===1&&model.join==='dial'&&k[1]){stepDial(Math.sign(k[1]));return}
+ if(id==='b'&&model.jt===1&&AJ()&&k[1]){stepDial(Math.sign(k[1]));return}
  if(model.jt>0&&model.jt<1&&id!=='c')return;
  const[top,bottom]=pairY();
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
