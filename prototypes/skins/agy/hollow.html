@@ -501,6 +501,101 @@ header {
   margin-right: 8px;
 }
 
+/* Option 10: Insect Carapace Unfurling Morph & Spore Chamber Styles */
+.hollow-ext-screen {
+  position: absolute;
+  left: 342px;
+  top: 32px;
+  width: 0;
+  height: 64px;
+  background: var(--screen-bg);
+  border-radius: 6px;
+  border: 1.5px solid #232d33;
+  box-shadow:
+    inset 0 3px 12px rgba(0, 0, 0, 0.98),
+    0 0 0 1px rgba(56, 70, 79, 0.5),
+    0 0 14px rgba(252, 192, 66, 0.12);
+  box-sizing: border-box;
+  padding: 5px 8px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 180ms ease, width 80ms ease;
+  white-space: nowrap;
+}
+.hollow-ext-screen.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.hollow-ext-screen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(8, 12, 14, 0.35) 0 1px, transparent 1px 3px);
+  pointer-events: none;
+}
+.hollow-ext-screen .slate-label {
+  font: 9px/1.2 "Courier New", monospace;
+  color: var(--silk-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 3px;
+}
+.soul-vessels-row {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  margin-bottom: 3px;
+}
+.soul-icon {
+  font-size: 9px;
+  line-height: 1;
+  color: #fffde6;
+  text-shadow: 0 0 4px #ffff94, 0 0 8px rgba(252, 192, 66, 0.7);
+}
+.ext-metrics {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font: 9px/1.2 "Courier New", monospace;
+  color: #8c9da8;
+}
+.lumafly-badge {
+  color: #ffff94;
+  text-shadow: 0 0 4px rgba(255, 255, 148, 0.7);
+}
+.tension-badge {
+  color: var(--silk-gold);
+}
+.module.shade .hollow-ext-screen {
+  opacity: 0;
+  pointer-events: none;
+}
+.shade-ext-badge {
+  font: 10px/1 "Courier New", monospace;
+  color: var(--silk-gold);
+  letter-spacing: 0.6px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.shade-ext-badge .glyph {
+  color: #ffff94;
+  text-shadow: 0 0 5px #fcc042;
+}
+.shade-ext-badge em {
+  font-style: normal;
+  color: var(--bone-white);
+  font-weight: 600;
+}
+.hollow-unfurl-toggle:hover circle:first-child {
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 6px rgba(252, 192, 66, 0.8));
+}
+
 /* Tabs & Interactive Controls */
 .tab-row {
   position: absolute;
@@ -1050,8 +1145,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Hollow Knight &amp; Silksong <span>/ lumafly lantern, bone needles, brass bell, shale slabs, nail-blade, cocoon, mandible interlock &amp; silk lash</span></h1>
-    <p>Bleached chitin shell silhouette · Semicircular amber glass blister lenses &amp; fused lumafly lantern · Polished bone needle guide retraction · Cast Pharloom brass bell &amp; iron clapper · Cold-forged iron nail-blade &amp; bone peg · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Silk cocoon wrap · Layered shale slabs</p>
+    <h1>Hollow Knight &amp; Silksong <span>/ insect carapace unfurl, lumafly lantern, bone needles, brass bell, shale slabs, nail-blade, cocoon, mandible interlock &amp; silk lash</span></h1>
+    <p>Bleached chitin shell silhouette · Insect carapace unfurling morph with amber spore chamber · Semicircular amber glass blister lenses &amp; fused lumafly lantern · Polished bone needle guide retraction · Cast Pharloom brass bell &amp; iron clapper · Cold-forged iron nail-blade &amp; bone peg · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Silk cocoon wrap · Layered shale slabs</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -1065,7 +1160,8 @@ footer .note-highlight {
         <option value="shale_slabs">6. Layered Shale Slabs (Roof Shingle Retraction shade)</option>
         <option value="bell_hitch">7. Pharloom Brass Bell &amp; Clapper Hitch join (Cast Bell &amp; Articulated Iron Clapper)</option>
         <option value="bone_needles">8. Bone Needle Guide Retraction shade (Polished Bone Needles &amp; Insectoid Click)</option>
-        <option value="lumafly_lantern" selected>9. Lumafly Lantern Lens Dock join (Amber Glass Blisters &amp; Fused Orb)</option>
+        <option value="lumafly_lantern">9. Lumafly Lantern Lens Dock join (Amber Glass Blisters &amp; Fused Orb)</option>
+        <option value="carapace_unfurl" selected>10. Insect Carapace Unfurling morph (Split Chitin Shell, Amber Spore Chamber &amp; Wing Struts)</option>
       </select>
     </div>
     <div class="control-group">
@@ -1075,14 +1171,15 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim">Fuse lumafly lantern</button>
+    <button id="btnUnfurlAnim" class="primary-btn">Unfurl carapace</button>
+    <button id="btnJoinAnim">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnElytraAnim">Fold elytra</button>
     <button id="btnCocoonAnim">Wrap cocoon</button>
     <button id="btnShaleAnim">Retract shale slabs</button>
     <button id="btnBellAnim">Hitch brass bell</button>
     <button id="btnNeedleAnim">Retract along bone needles</button>
-    <button id="btnLanternAnim" class="primary-btn">Fuse lumafly lantern</button>
+    <button id="btnLanternAnim">Fuse lumafly lantern</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -1281,6 +1378,39 @@ footer .note-highlight {
           <stop offset="85%" stop-color="#5c4314"/>
           <stop offset="100%" stop-color="#241703"/>
         </linearGradient>
+
+        <!-- Option 10: Insect Carapace Unfurling & Amber Spore Chamber Gradients -->
+        <radialGradient id="amberSporeGlow" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="25%" stop-color="#ffff94"/>
+          <stop offset="55%" stop-color="#ffbe3b"/>
+          <stop offset="80%" stop-color="#e08316"/>
+          <stop offset="100%" stop-color="#2b1402"/>
+        </radialGradient>
+
+        <linearGradient id="amberSporeChamberGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e272c"/>
+          <stop offset="20%" stop-color="#141c20"/>
+          <stop offset="60%" stop-color="#090d0f"/>
+          <stop offset="88%" stop-color="#151206"/>
+          <stop offset="100%" stop-color="#241c09"/>
+        </linearGradient>
+
+        <linearGradient id="unfurledWingGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="16%" stop-color="#f5f6ee"/>
+          <stop offset="42%" stop-color="#dce0cf"/>
+          <stop offset="75%" stop-color="#9ea08f"/>
+          <stop offset="100%" stop-color="#363930"/>
+        </linearGradient>
+
+        <linearGradient id="silkStrutGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#52310b"/>
+          <stop offset="25%" stop-color="#d49326"/>
+          <stop offset="50%" stop-color="#fffde6"/>
+          <stop offset="75%" stop-color="#fcc042"/>
+          <stop offset="100%" stop-color="#693708"/>
+        </linearGradient>
       </defs>
 
       <g id="sharedHollowStage"></g>
@@ -1349,9 +1479,32 @@ footer .note-highlight {
         </div>
       </div>
 
+      <!-- Auxiliary Deepnest Spore Screen (Option 10 Carapace Unfurling Morph) -->
+      <div class="hollow-ext-screen" id="hollowExtScreen-a" aria-label="Jarvis auxiliary spore chamber display">
+        <div class="slate-label">Soul Reservoir</div>
+        <div class="soul-vessels-row">
+          <span class="soul-icon" title="Soul Vessel 1">⚪</span>
+          <span class="soul-icon" title="Soul Vessel 2">⚪</span>
+          <span class="soul-icon" title="Soul Vessel 3">⚪</span>
+          <span class="soul-icon" title="Soul Vessel 4">⚪</span>
+          <span class="soul-icon" title="Soul Vessel 5">⚪</span>
+          <span class="soul-icon" title="Soul Vessel 6">⚪</span>
+          <span class="soul-icon" title="Soul Vessel 7">⚪</span>
+          <span class="soul-icon" title="Soul Vessel 8">⚪</span>
+          <span class="soul-icon" title="Soul Vessel 9">⚪</span>
+        </div>
+        <div class="ext-metrics">
+          <span class="lumafly-badge">✦ 14 lumaflies</span>
+          <span class="tension-badge">7.8N silk</span>
+        </div>
+      </div>
+
       <!-- Compact Horn Crest for Shade Mode -->
       <div class="shade-strip" data-drag="a" title="Drag Jarvis horn-crest">
         <span class="shade-title"><span class="glyph">✦</span> JARVIS · <em>03 VESSELS ACTIVE</em></span>
+        <div class="shade-ext-badge" id="shadeExtBadge-a" hidden>
+          <span class="glyph">✦</span> SOUL 9/9 · <em>UNFURLED</em>
+        </div>
         <div class="shade-eyes">
           <i></i><i></i>
         </div>
@@ -1499,6 +1652,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 9 — Lumafly Lantern Lens Dock join:</span> Module A and Module B each carry complementary semicircular convex amber glass blister lenses mounted in dark slate brackets with Pharloom brass retaining rims and cold-forged iron cage ribs. Three captive, bioluminescent yellow lumaflies flutter continuously inside each blister dome. On docking or selecting Joining state, the blisters slide toward each other as golden-amber electrical filaments and bioluminescent arcs crackle across the gap. Once docked, the two blister halves seamlessly fuse into a complete, luminous circular lantern globe pinned by a brass equator locking ring, four forged-iron clamping lugs, and polished bone seal pins. The six captive lumaflies swarm together in an energetic harmonic orbital dance, illuminating the dark subterranean slate casing seam from within with warm, radiant amber bioluminescence. Pulling the Pharloom brass lantern release clasp right unclamps the equator ring and separates the modules.
   </p>
+  <p>
+    <span class="note-highlight">Option 10 — Insect Carapace Unfurling morph:</span> Expanding Module A (Jarvis) evokes an insect spreading its protective elytra or a silk cocoon cracking open under biological pressure. The bleached bone-white chitin carapace splits along an organic center suture line with an insectoid chittering vibration. Cold-forged iron scissor struts with Pharloom brass pivot pins deploy behind the separating shell plates, bracing the right chitin wing outward by 140px. The split exposes the inner Subterranean Spore Chamber: an auxiliary dark slate telemetry bay bathed in warm bioluminescent amber spore dust and floating lumafly embers. Sinuous golden weaver-silk stays maintain mechanical tension across the void. The auxiliary display renders live Soul Reservoir telemetry with 9 glowing white soul vessels, active lumafly swarm counts, and 7.8N silk tension. The unfurled state smoothly clears adjacent widgets, gently nudging GitDiscuss aside to ensure zero occlusion, and restoring its position upon retraction. Clicking the central brass soul beetle totem or pressing U/M smoothly toggles the unfurling animation.
+  </p>
 </footer>
 
 <script>
@@ -1537,7 +1693,10 @@ const model = {
   needleVibe: 0,          // needle slide friction jitter
   lanternProgress: 0,     // Option 9: 0 = separate, 0.5 = blister lenses arcing, 1.0 = fused glowing lantern orb
   lanternVibe: 0,         // bioluminescent arc and impact jitter
-  option: 'lumafly_lantern',
+  morphProgress: 0,       // Option 10: 0 = standard shell, 1.0 = fully unfurled chitin carapace & spore chamber
+  extended: false,        // Option 10: whether morph extension is currently expanded
+  bNudge: 0,              // clearance displacement applied to sibling GitDiscuss widget
+  option: 'carapace_unfurl',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -3454,14 +3613,173 @@ function drawBoneNeedles(progress = 0, width = W, isShade = false) {
   return s;
 }
 
+// Option 10: Insect Carapace Unfurling Morph SVG Layer (Chitin Plates Split & Spore Chamber)
+function drawCarapaceUnfurlingMorph(x0, x1, bayW, f, isShade) {
+  if (bayW <= 4 || f <= 0.01) return '';
+  const midBayX = x0 + bayW * 0.5;
+  let s = `<g class="hollow-unfurling-morph" opacity="${Math.min(1, f * 1.5)}">`;
+
+  if (!isShade) {
+    // 1. Deep Subterranean Drop Shadow
+    s += `<rect x="${x0 - 4}" y="10" width="${bayW + 8}" height="110" rx="8" fill="#000000" opacity="0.75" filter="url(#chitinShadow)"/>`;
+
+    // 2. Slate Under-Chassis Floor & Roof Slabs
+    s += `<rect x="${x0 - 2}" y="8" width="${bayW + 4}" height="22" rx="4" fill="url(#slateGrad)" stroke="#1a2226" stroke-width="1.8"/>`;
+    s += `<line x1="${x0}" y1="12" x2="${x1}" y2="12" stroke="#485c69" stroke-width="1" opacity="0.8"/>`;
+    s += `<rect x="${x0 - 2}" y="100" width="${bayW + 4}" height="24" rx="4" fill="url(#slateGrad)" stroke="#1a2226" stroke-width="1.8"/>`;
+    s += `<line x1="${x0}" y1="118" x2="${x1}" y2="118" stroke="#485c69" stroke-width="1" opacity="0.8"/>`;
+
+    // 3. Bioluminescent Amber Lumafly Spore Ambient Glow in Chamber
+    s += `<ellipse cx="${midBayX}" cy="65" rx="${Math.max(8, bayW * 0.44)}" ry="40"
+                   fill="#ffbe3b" opacity="${0.2 + f * 0.3}" filter="url(#lumaflyGlow)"/>`;
+    s += `<ellipse cx="${midBayX}" cy="65" rx="${Math.max(4, bayW * 0.22)}" ry="24"
+                   fill="#ffff94" opacity="${0.28 + f * 0.35}" filter="url(#lumaflyGlow)"/>`;
+
+    // 4. Drifting Golden Lumafly Spore Embers
+    const sporePoints = [
+      [0.2, 38, 2.2, '#ffff94'],
+      [0.45, 48, 1.8, '#ffffff'],
+      [0.75, 42, 2.5, '#fcc042'],
+      [0.3, 82, 2.0, '#ffff94'],
+      [0.62, 78, 1.8, '#e08316'],
+      [0.85, 64, 2.4, '#ffd269'],
+      [0.5, 92, 1.4, '#ffffff'],
+      [0.15, 68, 1.6, '#ffff94']
+    ];
+    sporePoints.forEach(([frac, py, pr, pcol]) => {
+      const px = x0 + bayW * frac;
+      s += `<circle cx="${px}" cy="${py}" r="${pr}" fill="${pcol}" filter="url(#lumaflyGlow)"/>`;
+      s += `<circle cx="${px}" cy="${py}" r="${pr * 0.5}" fill="#ffffff"/>`;
+    });
+
+    // 5. Scissor Wing-Bracing Struts (Cold-Forged Iron & Pharloom Brass)
+    const strutSpread = f * 10;
+    s += `<g class="wing-strut-upper">
+      <path d="M ${x0 + 4} 18 Q ${midBayX} ${14 - strutSpread} ${x1 - 10} 22"
+            fill="none" stroke="url(#ironNailGrad)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M ${x0 + 4} 18 Q ${midBayX} ${14 - strutSpread} ${x1 - 10} 22"
+            fill="none" stroke="#cfdce3" stroke-width="0.9" opacity="0.85"/>
+      <circle cx="${midBayX}" cy="${14 - strutSpread}" r="3.2" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>
+      <circle cx="${midBayX}" cy="${14 - strutSpread}" r="1.2" fill="#fffde6"/>
+    </g>`;
+
+    s += `<g class="wing-strut-lower">
+      <path d="M ${x0 + 4} 112 Q ${midBayX} ${116 + strutSpread} ${x1 - 10} 108"
+            fill="none" stroke="url(#ironNailGrad)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M ${x0 + 4} 112 Q ${midBayX} ${116 + strutSpread} ${x1 - 10} 108"
+            fill="none" stroke="#cfdce3" stroke-width="0.9" opacity="0.85"/>
+      <circle cx="${midBayX}" cy="${116 + strutSpread}" r="3.2" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>
+      <circle cx="${midBayX}" cy="${116 + strutSpread}" r="1.2" fill="#fffde6"/>
+    </g>`;
+
+    // 6. Sinuous Golden Weaver-Silk Stays Crossing the Gap
+    s += `<g class="wing-silk-stays" opacity="${0.65 + f * 0.35}">
+      <path d="M ${x0 + 6} 22 Q ${midBayX} 65 ${x1 - 12} 108"
+            fill="none" stroke="url(#silkGrad)" stroke-width="1.8" filter="url(#silkBoom)"/>
+      <path d="M ${x0 + 6} 22 Q ${midBayX} 65 ${x1 - 12} 108"
+            fill="none" stroke="#fffde6" stroke-width="0.9"/>
+      <path d="M ${x0 + 6} 108 Q ${midBayX} 65 ${x1 - 12} 22"
+            fill="none" stroke="url(#silkGrad)" stroke-width="1.8" filter="url(#silkBoom)"/>
+      <path d="M ${x0 + 6} 108 Q ${midBayX} 65 ${x1 - 12} 22"
+            fill="none" stroke="#fffde6" stroke-width="0.9"/>
+      <!-- Center Silk Weaver Knot -->
+      <circle cx="${midBayX}" cy="65" r="3.5" fill="url(#brassGrad)" stroke="#241703" stroke-width="1"/>
+      <circle cx="${midBayX}" cy="65" r="1.8" fill="#ffff94" filter="url(#lumaflyGlow)"/>
+    </g>`;
+
+    // 7. Parted Chitin Carapace Suture Teeth along left edge
+    const teethY = [28, 44, 60, 76, 92];
+    teethY.forEach((ty, idx) => {
+      const toothDir = idx % 2 === 0 ? 6 : 2;
+      s += `<polygon points="${x0} ${ty - 5}, ${x0 + toothDir} ${ty}, ${x0} ${ty + 5}"
+                    fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="0.8"/>`;
+      s += `<line x1="${x0 + toothDir}" y1="${ty}" x2="${x0 + toothDir + 8 * f}" y2="${ty}"
+                  stroke="#ffff94" stroke-width="0.8" opacity="${0.4 + f * 0.5}"/>`;
+    });
+
+    // 8. Interactive Bone Beetle Soul Totem at Left Hinge (Click to toggle unfurl)
+    s += `<g class="hollow-unfurl-toggle" transform="translate(${x0 + 8}, 65)" style="cursor:pointer;"
+             role="button" tabindex="0" aria-label="Toggle carapace unfurl" title="Click to unfurl / close insect carapace">
+      <circle cx="0" cy="0" r="7.5" fill="#090d0f" stroke="url(#brassGrad)" stroke-width="1.6"/>
+      <circle cx="0" cy="0" r="4.8" fill="#ffff94" filter="url(#lumaflyGlow)"/>
+      <circle cx="0" cy="0" r="2.2" fill="#ffffff"/>
+      <path d="M -3 -6 Q 0 -9 3 -6" fill="none" stroke="#ffffff" stroke-width="0.9"/>
+    </g>`;
+
+  } else {
+    // Shade Mode: Slender Bleached Chitin Diadem Wand Extension
+    s += `
+      <path d="M ${x0 - 4} 8 L ${x1 + 4} 8 L ${x1 + 4} 36 L ${x0 - 4} 36 Z"
+            fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="2.2" stroke-linejoin="round"/>
+      <line x1="${x0 - 2}" y1="12" x2="${x1 + 2}" y2="12" stroke="#ffffff" stroke-width="1.2" opacity="0.85"/>
+      <line x1="${x0 - 2}" y1="32" x2="${x1 + 2}" y2="32" stroke="#4f5246" stroke-width="1.2"/>
+      <ellipse cx="${midBayX}" cy="22" rx="6" ry="2.8" fill="#ffff94" filter="url(#lumaflyGlow)"/>
+      <circle cx="${midBayX}" cy="22" r="1.4" fill="#ffffff"/>
+      <line x1="${midBayX - 18}" y1="22" x2="${midBayX - 8}" y2="22" stroke="#e08316" stroke-width="0.9"/>
+      <line x1="${midBayX + 8}" y1="22" x2="${midBayX + 18}" y2="22" stroke="#e08316" stroke-width="0.9"/>
+    `;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+function updateExtensionLayout() {
+  const morph = model.morphProgress || 0;
+  const extraW = Math.round(morph * 140);
+  const curWA = W + extraW;
+
+  const aEl = $('#a');
+  if (aEl) {
+    aEl.style.width = curWA + 'px';
+    const shellA = $('#shell-a');
+    if (shellA) {
+      shellA.style.width = curWA + 'px';
+      shellA.setAttribute('viewBox', `0 0 ${curWA} 130`);
+    }
+    ['elytra-a', 'cocoon-a', 'shale-a', 'needle-a'].forEach(sid => {
+      const sEl = $('#' + sid);
+      if (sEl) {
+        sEl.style.width = curWA + 'px';
+        sEl.setAttribute('viewBox', `0 0 ${curWA} 130`);
+      }
+    });
+    const extScreen = $('#hollowExtScreen-a');
+    if (extScreen) {
+      if (morph > 0.04) {
+        extScreen.classList.add('visible');
+        extScreen.style.width = Math.max(0, extraW - 16) + 'px';
+      } else {
+        extScreen.classList.remove('visible');
+        extScreen.style.width = '0px';
+      }
+    }
+    const shadeStrip = aEl.querySelector('.shade-strip');
+    const badge = $('#shadeExtBadge-a');
+    if (shadeStrip) {
+      if (model.shade && morph > 0.1) {
+        shadeStrip.style.width = Math.min(curWA - 40, 284 + Math.round(extraW * 0.7)) + 'px';
+      } else {
+        shadeStrip.style.width = '';
+      }
+    }
+    if (badge) {
+      badge.hidden = (!model.shade || morph < 0.6);
+    }
+  }
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
   const isShade = model.shade;
   const glow = model.busy ? model.light : connectionGlow.socket.value;
+  const morph = model.morphProgress || 0;
+  const extraW = Math.round(morph * 140);
+  const curWA = W + extraW;
   let shared = '';
 
-  const midX = (a.x + W - 22 + b.x + 22) / 2;
+  const midX = (a.x + curWA - 22 + b.x + 22) / 2;
 
   if (p > 0) {
     // Seamless Monolithic Chitin Carapace Frame
@@ -3479,43 +3797,43 @@ function renderHardware() {
     }
   }
 
-  // Draw Lumafly Lantern Join for Option 9, Pharloom Bell Join for Option 7, Nail-Blade Sheath Join for Option 5, Mandible Interlock Join for Option 3, or Silk Lash Join for Option 1 & 2
+  // Draw Lumafly Lantern Join for Option 9 & 10, Pharloom Bell Join for Option 7, Nail-Blade Sheath Join for Option 5, Mandible Interlock Join for Option 3, or Silk Lash Join for Option 1 & 2
   if (!isShade) {
-    if (model.option === 'lumafly_lantern') {
+    if (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl') {
       if (model.joined || model.lanternProgress > 0.02 || (glow > 0.25 && !model.joined)) {
         const prog = model.joined ? 1 : model.lanternProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
-        const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE + extraW : midX;
         shared += drawLanternJoin(kMidX, a.y, prog, model.lanternVibe, Math.max(p, glow > 0.25 ? 0.95 : prog));
       }
     } else if (model.option === 'bell_hitch') {
       if (model.joined || model.bellProgress > 0.02 || (glow > 0.25 && !model.joined)) {
         const prog = model.joined ? 1 : model.bellProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
-        const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE + extraW : midX;
         shared += drawBellJoin(kMidX, a.y, prog, model.bellTollVibe, Math.max(p, glow > 0.25 ? 0.95 : prog));
       }
     } else if (model.option === 'nail_blade') {
       if (model.joined || model.bladeSheathProgress > 0.02 || (glow > 0.25 && !model.joined)) {
         const prog = model.joined ? 1 : model.bladeSheathProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
-        const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE + extraW : midX;
         shared += drawNailBladeJoin(kMidX, a.y, prog, model.bladeScrapeVibe, Math.max(p, glow > 0.25 ? 0.95 : prog));
       }
     } else if (model.option === 'mandible_interlock') {
       if (model.joined || model.mandibleProgress > 0.02 || (glow > 0.25 && !model.joined)) {
         const prog = model.joined ? 1 : model.mandibleProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
-        const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE + extraW : midX;
         shared += drawMandibleInterlockJoin(kMidX, a.y, prog, model.mandibleChitter, Math.max(p, glow > 0.25 ? 0.95 : prog));
       }
     } else {
       if (model.joined || model.silkWhipProgress > 0.02 || (glow > 0.25 && !model.joined)) {
         const prog = model.joined ? 1 : model.silkWhipProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
-        const kMidX = model.joined ? a.x + JOIN_DISTANCE : midX;
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE + extraW : midX;
         shared += drawSilkLashJoin(kMidX, a.y, prog, model.silkVibration, Math.max(p, glow > 0.25 ? 0.95 : prog));
       }
     }
   }
 
   if (model.joined && model.design) {
-    shared += `<line x1="${a.x + JOIN_DISTANCE}" y1="${a.y + 8}" x2="${a.x + JOIN_DISTANCE}" y2="${a.y + 122}"
+    shared += `<line x1="${a.x + JOIN_DISTANCE + extraW}" y1="${a.y + 8}" x2="${a.x + JOIN_DISTANCE + extraW}" y2="${a.y + 122}"
                      stroke="#fcc042" stroke-dasharray="4 3" stroke-width="1.5"/>`;
   }
 
@@ -3524,54 +3842,60 @@ function renderHardware() {
   // Individual Capsule SVG Shells & Elytra Wing-Case Shields
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
+    const curW = isA ? curWA : W;
+    const capX = isA ? extraW : 0;
     let capL, capR;
-    if (model.option === 'lumafly_lantern') {
+    if (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl') {
       capL = drawLanternCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
-      capR = drawLanternCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+      capR = drawLanternCap(capX, 0, true, isA, isA ? model.cap : 0, isShade);
     } else if (model.option === 'bell_hitch') {
       capL = drawBellCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
-      capR = drawBellCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+      capR = drawBellCap(capX, 0, true, isA, isA ? model.cap : 0, isShade);
     } else if (model.option === 'nail_blade') {
       capL = drawNailBladeCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
-      capR = drawNailBladeCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+      capR = drawNailBladeCap(capX, 0, true, isA, isA ? model.cap : 0, isShade);
     } else if (model.option === 'mandible_interlock') {
       capL = drawMandibleCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
-      capR = drawMandibleCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+      capR = drawMandibleCap(capX, 0, true, isA, isA ? model.cap : 0, isShade);
     } else {
       capL = drawHollowCap(0, 0, false, false, isA ? 0 : model.cap, isShade);
-      capR = drawHollowCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+      capR = drawHollowCap(capX, 0, true, isA, isA ? model.cap : 0, isShade);
     }
-    const individual = drawHollowCasing(0, 0, W, 1, isShade) + capL + capR;
+    let morphLayer = '';
+    if (isA && (morph > 0.01 || model.extended)) {
+      morphLayer = drawCarapaceUnfurlingMorph(346, curWA - 4, extraW, morph, isShade);
+    }
+    const individual = drawHollowCasing(0, 0, curW, 1, isShade) + capL + capR + morphLayer;
 
     $('#shell-' + id).innerHTML = `
       <g opacity="${1 - p}">
         ${individual}
-        ${drawHollowProximityAura(isA ? W - 22 : 22, 0, glow)}
+        ${drawHollowProximityAura(isA ? curW - 22 : 22, 0, glow)}
       </g>
     `;
 
     // Render Elytra Wing-Case Shield Layer
     const el = $('#elytra-' + id);
     if (el) {
-      el.innerHTML = drawElytraShield(model.elytraGlide, W);
+      el.innerHTML = drawElytraShield(model.elytraGlide, curW);
     }
 
     // Render Silk Cocoon Wrap Layer
     const coc = $('#cocoon-' + id);
     if (coc) {
-      coc.innerHTML = drawSilkCocoonWrap(model.cocoonProgress, W);
+      coc.innerHTML = drawSilkCocoonWrap(model.cocoonProgress, curW);
     }
 
     // Render Layered Shale Slabs Retraction Layer
     const sha = $('#shale-' + id);
     if (sha) {
-      sha.innerHTML = drawShaleSlabs(model.shaleProgress, W);
+      sha.innerHTML = drawShaleSlabs(model.shaleProgress, curW);
     }
 
     // Render Bone Needle Guide Retraction Layer
     const nee = $('#needle-' + id);
     if (nee) {
-      nee.innerHTML = drawBoneNeedles(model.needleProgress, W, isShade);
+      nee.innerHTML = drawBoneNeedles(model.needleProgress, curW, isShade);
     }
   }
 
@@ -3579,7 +3903,7 @@ function renderHardware() {
   if (!isShade && glow > 0.05 && p < 0.98) {
     $('#hollowLightAura').innerHTML = `
       <g opacity="${glow}">
-        ${drawHollowProximityAura(a.x + W - 22, a.y, glow)}
+        ${drawHollowProximityAura(a.x + curWA - 22, a.y, glow)}
         ${drawHollowProximityAura(b.x + 22, b.y, glow)}
       </g>
     `;
@@ -3614,10 +3938,15 @@ function updateStateButtons() {
 }
 
 function render() {
+  updateExtensionLayout();
   updateGlowTargets();
   renderHardware();
   paintGlowValues();
   updateStateButtons();
+
+  const morph = model.morphProgress || 0;
+  const extraW = Math.round(morph * 140);
+  const curWA = W + extraW;
 
   ['a', 'b'].forEach(id => {
     const m = model[id], el = $('#' + id);
@@ -3678,7 +4007,7 @@ function render() {
   stage.classList.toggle('design', model.design);
   $('#btnDesign').setAttribute('aria-pressed', String(model.design));
 
-  if (model.option === 'lumafly_lantern') {
+  if (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl') {
     $('#portA').dataset.label = 'Amber Lens Blister · A';
     $('#portB').dataset.label = 'Amber Lens Blister · B';
   } else if (model.option === 'bell_hitch') {
@@ -3694,7 +4023,7 @@ function render() {
     $('#portA').dataset.label = 'Silk Spool Pin · A';
     $('#portB').dataset.label = 'Chitin Eyelet Catch · B';
   }
-  $('#portA').style.left = (model.a.x + W - 30) + 'px';
+  $('#portA').style.left = (model.a.x + curWA - 30) + 'px';
   $('#portA').style.top = (model.a.y + 54) + 'px';
   $('#portB').style.left = (model.b.x + 12) + 'px';
   $('#portB').style.top = (model.b.y + 54) + 'px';
@@ -3704,9 +4033,9 @@ function render() {
 
   const joinBtn = $('#btnJoinAnim');
   if (joinBtn) {
-    if (model.option === 'lumafly_lantern') {
+    if (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl') {
       joinBtn.textContent = 'Fuse lumafly lantern';
-      joinBtn.classList.toggle('primary-btn', !model.joined);
+      joinBtn.classList.toggle('primary-btn', !model.joined && model.option !== 'carapace_unfurl');
     } else if (model.option === 'bell_hitch') {
       joinBtn.textContent = 'Hitch brass bell';
       joinBtn.classList.toggle('primary-btn', !model.joined);
@@ -3723,6 +4052,14 @@ function render() {
       joinBtn.textContent = 'Join capsules';
       joinBtn.classList.toggle('primary-btn', false);
     }
+  }
+
+  const unfurlBtn = $('#btnUnfurlAnim');
+  if (unfurlBtn) {
+    unfurlBtn.textContent = (model.extended && model.morphProgress > 0.5) ? 'Close carapace' : 'Unfurl carapace';
+    unfurlBtn.disabled = model.busy;
+    const isUnfurlOption = model.option === 'carapace_unfurl';
+    unfurlBtn.classList.toggle('primary-btn', isUnfurlOption);
   }
 
   const elytraBtn = $('#btnElytraAnim');
@@ -3778,14 +4115,14 @@ function render() {
 
   const release = $('#silkRelease');
   release.hidden = !model.joined || model.busy || model.shade;
-  release.style.left = (model.a.x + 338) + 'px';
+  release.style.left = (model.a.x + 338 + extraW) + 'px';
   release.style.top = (model.a.y + 44) + 'px';
   release.style.setProperty('--tension', model.tension);
-  release.classList.toggle('lantern-mode', model.option === 'lumafly_lantern');
+  release.classList.toggle('lantern-mode', model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl');
   release.classList.toggle('bell-mode', model.option === 'bell_hitch');
   release.classList.toggle('mandible-mode', model.option === 'mandible_interlock');
   release.classList.toggle('nail-mode', model.option === 'nail_blade');
-  if (model.option === 'lumafly_lantern') {
+  if (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl') {
     release.setAttribute('aria-label', 'Release GitDiscuss: pull right or press Enter to unclamp lantern');
     release.setAttribute('title', 'Pull right to unclamp lumafly lantern · Enter to separate');
   } else if (model.option === 'bell_hitch') {
@@ -3812,7 +4149,9 @@ function render() {
         $('#phase').textContent = 'Shade mode / Bleached chitin horn-crest diadem';
       }
     } else if (model.joined) {
-      if (model.option === 'lumafly_lantern') {
+      if (model.option === 'carapace_unfurl') {
+        $('#phase').textContent = model.extended ? 'Joined / Unfurled carapace with fused lumafly lantern' : 'Joined / Fused lumafly lantern';
+      } else if (model.option === 'lumafly_lantern') {
         $('#phase').textContent = 'Joined / Glowing lumafly lantern lens dock fused';
       } else if (model.option === 'bell_hitch') {
         $('#phase').textContent = 'Joined / Pharloom brass bell & articulated iron clapper hitched';
@@ -3824,7 +4163,7 @@ function render() {
         $('#phase').textContent = 'Joined / One monolithic chitin carapace bound in golden silk';
       }
     } else if (model.lanternProgress > 0.1 || model.bellProgress > 0.1 || model.bladeSheathProgress > 0.1 || model.mandibleProgress > 0.1 || model.silkWhipProgress > 0.1) {
-      if (model.option === 'lumafly_lantern') {
+      if (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl') {
         $('#phase').textContent = 'Joining / Amber glass blister lenses uniting with lumafly arcs';
       } else if (model.option === 'bell_hitch') {
         $('#phase').textContent = 'Joining / Articulated forged iron clapper swinging toward brass bell lip';
@@ -3871,7 +4210,10 @@ async function join(fromDrag = false) {
   const token = ++animationToken;
   render();
 
-  if (model.option === 'lumafly_lantern') {
+  const morph = model.morphProgress || 0;
+  const extraW = Math.round(morph * 140);
+
+  if (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl') {
     say('Capsules enter attraction threshold. Amber glass blister lenses align across the divide.');
     $('#phase').textContent = 'Amber glass blisters glowing; lumaflies swirling';
 
@@ -3890,14 +4232,14 @@ async function join(fromDrag = false) {
     }, token)) return;
 
     const startA = { ...model.a }, startB = { ...model.b };
-    const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+    const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + extraW + W) - 30, model.a.x));
     const targetY = Math.max(110, Math.min(model.cradle ? 305 : 385, model.a.y));
 
     $('#phase').textContent = 'Glass blisters meeting; lumaflies swarming together';
     if (!await tween(fromDrag ? 240 : 420, t => {
       model.a.x = startA.x + (targetX - startA.x) * t;
       model.a.y = startA.y + (targetY - startA.y) * t;
-      model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+      model.b.x = startB.x + (targetX + JOIN_DISTANCE + extraW - startB.x) * t;
       model.b.y = startB.y + (targetY - startB.y) * t;
       model.blend = Math.max(0, (t - 0.35) / 0.65);
       model.lanternProgress = 0.55 + 0.35 * t;
@@ -4166,13 +4508,14 @@ async function separate(distance = 160) {
   stopDrag();
   model.feel = 'free';
   const token = ++animationToken;
+  const extraW = Math.round((model.morphProgress || 0) * 140);
 
-  if (model.option === 'lumafly_lantern') {
-    say('Pharloom brass lantern clamp unlatched. Amber glass blister lenses separate.');
+  if (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl') {
+    say(model.option === 'carapace_unfurl' ? 'Pharloom brass lantern clamp unlatched. Amber glass blister lenses separate while carapace remains unfurled.' : 'Pharloom brass lantern clamp unlatched. Amber glass blister lenses separate.');
     $('#phase').textContent = 'Lantern unlatching & separating into blister halves';
 
     const startB = { ...model.b };
-    const targetBX = Math.min(1200 - W - 20, startB.x + distance);
+    const targetBX = Math.min(1200 - W - 20, Math.max(model.a.x + W + extraW + 30, startB.x + distance));
 
     // Quick clamp unlatch snap
     await tween(110, t => {
@@ -4577,6 +4920,115 @@ async function extendNeedles() {
   $('#phase').textContent = model.joined ? 'Joined / Monolithic chitin carapace' : 'Separate / Two independent chitin instruments';
 }
 
+// Option 10: Insect Carapace Unfurling Morph Animations
+async function unfurlCarapace() {
+  if (model.busy || (model.extended && (model.morphProgress || 0) >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Carapace unfurling: Chitin plates split along organic centerline, revealing amber spore chamber and Pharloom wing struts.');
+  $('#phase').textContent = 'Unfurling chitin carapace & exposing spore chamber';
+
+  const startProgress = model.morphProgress || 0;
+  const startBX = model.b.x;
+  const wasJoined = model.joined;
+
+  // Calculate needed neighbor push if separate
+  const targetExtraW = 140;
+  let pushDist = 0;
+  if (!wasJoined) {
+    const minBX = model.a.x + (W + targetExtraW) + 28;
+    if (startBX < minBX) {
+      pushDist = minBX - startBX;
+      model.bNudge = (model.bNudge || 0) + pushDist;
+    }
+  }
+
+  model.extended = true;
+
+  await tween(520, t => {
+    // Insectoid unfurling ease
+    const ease = t === 1 ? 1 : 1 - Math.pow(1 - t, 2.8);
+    const curProg = startProgress + (1 - startProgress) * ease;
+    model.morphProgress = curProg;
+    const curExtraW = Math.round(curProg * 140);
+
+    if (wasJoined) {
+      model.b.x = model.a.x + JOIN_DISTANCE + curExtraW;
+      model.b.y = model.a.y;
+    } else if (pushDist > 0) {
+      model.b.x = startBX + pushDist * ease;
+    }
+    render();
+  }, token);
+
+  model.morphProgress = 1;
+  if (wasJoined) {
+    model.b.x = model.a.x + JOIN_DISTANCE + 140;
+    model.b.y = model.a.y;
+  }
+  model.busy = false;
+  render();
+  if ($('#btnUnfurlAnim')) $('#btnUnfurlAnim').textContent = 'Close carapace';
+  say('Carapace fully unfurled. Amber spore chamber and Soul Reservoir active with 14 captive lumaflies. Neighbor widget smoothly cleared.');
+  $('#phase').textContent = model.joined ? 'Joined / Unfurled carapace with fused lumafly lantern' : 'Separate / Unfurled chitin carapace with amber spore chamber';
+}
+
+async function retractCarapace() {
+  if (model.busy || (!model.extended && (model.morphProgress || 0) <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Retracting carapace: Chitin plates glide inward along scissor struts, sealing amber spore chamber with an organic click.');
+  $('#phase').textContent = 'Closing chitin plates & sealing spore chamber';
+
+  const startProgress = model.morphProgress || 1;
+  const startBX = model.b.x;
+  const wasJoined = model.joined;
+  const restoreDist = model.bNudge || 0;
+
+  model.extended = false;
+
+  await tween(480, t => {
+    const ease = t === 1 ? 1 : 1 - Math.pow(1 - t, 2.5);
+    const curProg = startProgress * (1 - ease);
+    model.morphProgress = curProg;
+    const curExtraW = Math.round(curProg * 140);
+
+    if (wasJoined) {
+      model.b.x = model.a.x + JOIN_DISTANCE + curExtraW;
+      model.b.y = model.a.y;
+    } else if (restoreDist > 0) {
+      model.b.x = Math.max(model.a.x + (W + curExtraW) + 28, startBX - restoreDist * ease);
+    }
+    render();
+  }, token);
+
+  model.morphProgress = 0;
+  model.bNudge = 0;
+  if (wasJoined) {
+    model.b.x = model.a.x + JOIN_DISTANCE;
+    model.b.y = model.a.y;
+  }
+  model.busy = false;
+  render();
+  if ($('#btnUnfurlAnim')) $('#btnUnfurlAnim').textContent = 'Unfurl carapace';
+  say('Chitin carapace sealed shut. Compact insectoid shell restored.');
+  $('#phase').textContent = model.joined
+    ? (model.option === 'lumafly_lantern' || model.option === 'carapace_unfurl' ? 'Joined / Fused lumafly lantern' : 'Joined / Monolithic chitin carapace')
+    : 'Separate / Two independent chitin instruments';
+}
+
+function toggleCarapaceUnfurl() {
+  if (model.extended || (model.morphProgress || 0) > 0.5) {
+    retractCarapace();
+  } else {
+    unfurlCarapace();
+  }
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -4611,7 +5063,8 @@ async function applyState(stateName) {
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
-      model.b.x = 680;
+      const extraW = Math.round((model.morphProgress || 0) * 140);
+      model.b.x = Math.max(680, 140 + W + extraW + 30);
       render();
       say('State: Separate — Two independent bleached chitin instruments.');
     }
@@ -4626,10 +5079,24 @@ async function applyState(stateName) {
     model.blend = 0.25;
     model.cap = 0.6;
     model.light = 0.8;
+    const extraW = Math.round((model.morphProgress || 0) * 140);
     model.a.x = 240;
-    model.b.x = 240 + W + 50; // approaching each other
+    model.b.x = 240 + W + extraW + 50; // approaching each other
 
-    if (model.option === 'lumafly_lantern') {
+    if (model.option === 'carapace_unfurl') {
+      model.lanternProgress = 0.55;
+      model.lanternVibe = 0.5;
+      model.bellProgress = 0;
+      model.bellTollVibe = 0;
+      model.bladeSheathProgress = 0;
+      model.bladeScrapeVibe = 0;
+      model.mandibleProgress = 0;
+      model.mandibleChitter = 0;
+      model.silkWhipProgress = 0;
+      model.silkVibration = 0;
+      render();
+      say('State: Joining — Mid-animation view with unfurled carapace and amber glass blister lenses uniting.');
+    } else if (model.option === 'lumafly_lantern') {
       model.lanternProgress = 0.55;
       model.lanternVibe = 0.5;
       model.bellProgress = 0;
@@ -4689,14 +5156,28 @@ async function applyState(stateName) {
       else await spreadElytra();
     }
     if (!model.joined) {
+      const extraW = Math.round((model.morphProgress || 0) * 140);
       model.a.x = 220;
-      model.b.x = 220 + JOIN_DISTANCE;
+      model.b.x = 220 + JOIN_DISTANCE + extraW;
       model.joined = true;
       model.blend = 1;
       model.cap = 1;
       model.light = 0;
 
-      if (model.option === 'lumafly_lantern') {
+      if (model.option === 'carapace_unfurl') {
+        model.lanternProgress = 1;
+        model.lanternVibe = 0;
+        model.bellProgress = 0;
+        model.bellTollVibe = 0;
+        model.bladeSheathProgress = 0;
+        model.bladeScrapeVibe = 0;
+        model.mandibleProgress = 0;
+        model.mandibleChitter = 0;
+        model.silkWhipProgress = 0;
+        model.silkVibration = 0;
+        render();
+        say('State: Joined — Monolithic carapace with unfurled spore chamber and fused lumafly lantern.');
+      } else if (model.option === 'lumafly_lantern') {
         model.lanternProgress = 1;
         model.lanternVibe = 0;
         model.bellProgress = 0;
@@ -4864,6 +5345,20 @@ $('#btnLanternAnim').onclick = () => {
   else join();
 };
 
+const unfurlBtn = $('#btnUnfurlAnim');
+if (unfurlBtn) {
+  unfurlBtn.onclick = () => toggleCarapaceUnfurl();
+}
+
+const shellA = $('#shell-a');
+if (shellA) {
+  shellA.addEventListener('click', e => {
+    if (e.target.closest('.hollow-unfurl-toggle')) {
+      toggleCarapaceUnfurl();
+    }
+  });
+}
+
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
   render();
@@ -4899,7 +5394,10 @@ $('#btnReset').onclick = () => {
   model.needleVibe = 0;
   model.lanternProgress = 0;
   model.lanternVibe = 0;
-  model.option = 'lumafly_lantern';
+  model.morphProgress = 0;
+  model.extended = false;
+  model.bNudge = 0;
+  model.option = 'carapace_unfurl';
   model.light = 0;
   model.limit = 3;
   model.tension = 0;
@@ -4907,15 +5405,26 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
-  $('#optionSelect').value = 'lumafly_lantern';
+  $('#optionSelect').value = 'carapace_unfurl';
   render();
-  say('Reset to initial experiment layout.');
+  say('Reset to initial experiment layout with Insect Carapace Unfurling morph.');
 };
 
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
   say('Selected option: ' + e.target.options[e.target.selectedIndex].text);
-  if (model.option === 'lumafly_lantern') {
+  if (model.option === 'carapace_unfurl') {
+    if (model.shade) {
+      if (model.needleProgress > 0) await extendNeedles();
+      else if (model.shaleProgress > 0) await extendShale();
+      else if (model.cocoonProgress > 0) await unwrapCocoon();
+      else await spreadElytra();
+    }
+    if (!model.extended && (model.morphProgress || 0) < 0.5) {
+      await unfurlCarapace();
+    }
+    say('Option 10: Insect Carapace Unfurling morph selected. Chitin plates split on organic centerline revealing amber spore chamber.');
+  } else if (model.option === 'lumafly_lantern') {
     if (model.shade) {
       if (model.needleProgress > 0) await extendNeedles();
       else if (model.shaleProgress > 0) await extendShale();
@@ -5020,7 +5529,8 @@ $('#b .loom-btn').onclick = () => {
 
 // Physics, Glow Calculation & Magnetic Guidance
 function socketDistance(a = model.a, b = model.b) {
-  const targetX = a.x + JOIN_DISTANCE, targetY = a.y;
+  const extraW = Math.round((model.morphProgress || 0) * 140);
+  const targetX = a.x + JOIN_DISTANCE + extraW, targetY = a.y;
   return Math.hypot(b.x - targetX, b.y - targetY);
 }
 
@@ -5160,23 +5670,26 @@ function onPointerMove(e) {
 
   if (drag.kind === 'a' || drag.kind === 'b') {
     const dx = p.x - drag.start.x, dy = p.y - drag.start.y;
+    const extraW = Math.round((model.morphProgress || 0) * 140);
+    const targetOffset = JOIN_DISTANCE + extraW;
+    const curWA = W + extraW;
     if (model.joined) {
-      const minX = 20, maxX = 1200 - (JOIN_DISTANCE + W) - 20;
+      const minX = 20, maxX = 1200 - (targetOffset + W) - 20;
       const minY = 30, maxY = 550;
       const nx = Math.max(minX, Math.min(maxX, drag.originA.x + dx));
       const ny = Math.max(minY, Math.min(maxY, drag.originA.y + dy));
       model.a.x = nx; model.a.y = ny;
-      model.b.x = nx + JOIN_DISTANCE; model.b.y = ny;
+      model.b.x = nx + targetOffset; model.b.y = ny;
     } else {
       const activeObj = drag.kind === 'a' ? model.a : model.b;
       const originObj = drag.kind === 'a' ? drag.originA : drag.originB;
       const otherObj = drag.kind === 'a' ? model.b : model.a;
 
       let rawX = originObj.x + dx, rawY = originObj.y + dy;
-      rawX = Math.max(10, Math.min(1200 - W - 10, rawX));
+      rawX = Math.max(10, Math.min(1200 - (drag.kind === 'a' ? curWA : W) - 10, rawX));
       rawY = Math.max(20, Math.min(560, rawY));
 
-      const targetX = drag.kind === 'b' ? otherObj.x + JOIN_DISTANCE : otherObj.x - JOIN_DISTANCE;
+      const targetX = drag.kind === 'b' ? otherObj.x + targetOffset : otherObj.x - targetOffset;
       const targetY = otherObj.y;
       const dist = Math.hypot(rawX - targetX, rawY - targetY);
 
@@ -5303,6 +5816,8 @@ window.addEventListener('keydown', e => {
     applyState('joined');
   } else if (e.key === '4') {
     applyState('shade');
+  } else if (e.key === 'u' || e.key === 'U' || e.key === 'm' || e.key === 'M') {
+    toggleCarapaceUnfurl();
   } else if (e.key === 'n' || e.key === 'N') {
     if (model.option !== 'bone_needles') {
       $('#optionSelect').value = 'bone_needles';
