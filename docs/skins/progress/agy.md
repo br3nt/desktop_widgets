@@ -59,7 +59,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 ### Cycle 8: Quaternary Shades
 - [x] Gothic: Rose Window Oculus Collapse shade — Circular stone tracery diaphragm iris rotates and contracts inward (Built in prototypes/skins/agy/gothic.html with 8 rotating stone tracery blades, embedded stained-glass lancet quarries, cast-bronze quatrefoil hub with glowing amber jewel, lock spark wavefront, dense jeweled frieze with 3 glowing cabochons, unclipped glanceable 44px status strip, Option 8 switcher, and 'O' keyboard shortcut)
 - [x] Felt: High-Damp Wool Squeeze (Lozenge Squash) shade — Wool body compresses vertically into dense rounded pill (Built in prototypes/skins/agy/felt.html with viscoelastic squash-and-stretch Poisson bulge, compressed scalloped rims, twin bridle-leather cinch bands with brass rivets and boxwood cleats, unclipped glanceable 44px status strip, Option 8 switcher, and 'L'/'S' keyboard shortcut)
-- [ ] Elven: Prismatic Light Sliver shade — Body dissolves into concentrated horizontal light beam between jade finials
+- [x] Elven: Prismatic Light Sliver shade — Body dissolves into concentrated horizontal light beam between jade finials (Built in prototypes/skins/agy/elven.html with twin carved nephrite jade finials, electrum claw collars, collimating emitter nozzles, 5-tier harmonic dispersion ribbons, diamond starlight caustics, unclipped 24px obsidian status strip, Option 8 switcher, and 'P'/'L' keyboard shortcut)
 - [ ] Wire: Coiled Spring Spindle Wind-Up shade — Miniature copper spool winds up dual coiled wire springs
 - [ ] Hollow: Bone Needle Guide Retraction shade — Display frame retracts along polished bone needles with insectoid click
 
