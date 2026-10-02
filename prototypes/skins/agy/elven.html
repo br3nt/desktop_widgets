@@ -250,6 +250,19 @@ header {
 .module.shade .lotus-overlay {
   height: 44px;
 }
+.scabbard-overlay {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+  transition: height 260ms cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+.module.shade .scabbard-overlay {
+  height: 44px;
+}
 
 /* Star-Silver Grip: Curved Filigree Bow with Carved Jade Accents */
 .elven-grip {
@@ -368,7 +381,7 @@ header {
   box-shadow: 0 0 5px rgba(123, 242, 198, 0.4);
 }
 
-/* Shade Diadem Strip */
+/* Option 2: Shade Diadem Strip (Lotus Petal Nocturne) */
 .shade-diadem {
   position: absolute;
   left: 48px;
@@ -385,7 +398,7 @@ header {
   z-index: 4;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(123, 242, 198, 0.2);
 }
-.module.shade .shade-diadem {
+.module.shade:not(.scabbard-active) .shade-diadem {
   display: flex;
 }
 .shade-title {
@@ -412,6 +425,73 @@ header {
 .shade-gems i.jade { background: var(--nephrite-jade-bright); color: var(--nephrite-jade-bright); }
 .shade-gems i.moon { background: var(--moonstone-blue); color: var(--moonstone-blue); }
 .shade-gems i.gold { background: var(--electrum-gold); color: var(--electrum-gold); }
+
+/* Option 4: Mother-of-Pearl Scabbard Strip (Sylvan Scabbard Slide) */
+.scabbard-strip {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  top: 10px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: linear-gradient(90deg, #13222d 0%, #20394b 35%, #2a475d 50%, #20394b 65%, #13222d 100%);
+  border: 1.5px solid #8ebddc;
+  border-radius: 6px;
+  z-index: 5;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.75),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.6),
+    0 0 10px rgba(123, 242, 198, 0.35);
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+.module.shade.scabbard-active .scabbard-strip {
+  display: flex;
+}
+.scabbard-title {
+  font: 10px/1 "Courier New", monospace;
+  color: var(--star-silver-bright);
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.scabbard-title .scabbard-icon {
+  color: var(--nephrite-jade-bright);
+  font-size: 11px;
+  text-shadow: 0 0 6px var(--nephrite-jade-bright);
+}
+.scabbard-title .scabbard-sep {
+  color: #648da5;
+}
+.scabbard-title .scabbard-metric {
+  color: #7bf2c6;
+  font-weight: bold;
+}
+.scabbard-gems {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.scabbard-latch-pin {
+  width: 3px;
+  height: 12px;
+  background: linear-gradient(180deg, #ffffff, #8ebddc);
+  border-radius: 1px;
+  margin-right: 2px;
+  box-shadow: 0 0 4px #7bf2c6;
+}
+.scabbard-gems i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px currentColor;
+}
+.scabbard-gems i.jade { background: var(--nephrite-jade-bright); color: var(--nephrite-jade-bright); }
+.scabbard-gems i.moon { background: var(--moonstone-blue); color: var(--moonstone-blue); }
 
 /* Tabs & Interactive Controls */
 .tab-row {
@@ -878,8 +958,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Elven &amp; Intricate <span>/ living tendril braid &amp; lotus petal nocturne</span></h1>
-    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Living sylvan lattice · Lotus petal nocturne shade</p>
+    <h1>Elven &amp; Intricate <span>/ tendril braid, lotus nocturne, crystal cleavage &amp; scabbard slide</span></h1>
+    <p>Spun star-silver (Ithildin) · Nephrite jade gems · 30° moonstone prisms · Sylvan scabbard slide</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -887,7 +967,8 @@ footer .note-highlight {
       <select id="optionSelect" aria-label="Select skin exploration option">
         <option value="tendril_braid">1. Living Tendril Braid (Sylvan Weave)</option>
         <option value="lotus_petals">2. Lotus Petal Nocturne shade</option>
-        <option value="crystal_cleavage" selected>3. Crystalline Cleavage &amp; Harmonic Chime join</option>
+        <option value="crystal_cleavage">3. Crystalline Cleavage &amp; Harmonic Chime join</option>
+        <option value="scabbard_slide" selected>4. Sylvan Scabbard Slide shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -897,7 +978,8 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim" class="primary-btn">Seat crystal prisms</button>
+    <button id="btnScabbardAnim" class="primary-btn">Slide into scabbard</button>
+    <button id="btnJoinAnim">Seat crystal prisms</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnLotusAnim">Close lotus petals</button>
     <button id="btnChimeAnim" title="Trigger pure-harmonic chime wavefront">Chime resonance</button>
@@ -1029,6 +1111,35 @@ footer .note-highlight {
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
+
+        <!-- Option 4: Sylvan Scabbard Repoussé & Mother-of-Pearl Gradients -->
+        <linearGradient id="scabbardRepousseGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="10%" stop-color="#d6e8f5"/>
+          <stop offset="35%" stop-color="#8baec7"/>
+          <stop offset="65%" stop-color="#3d576a"/>
+          <stop offset="90%" stop-color="#192a35"/>
+          <stop offset="100%" stop-color="#4d6f85"/>
+        </linearGradient>
+        <linearGradient id="nacreRimGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#a6cadc"/>
+          <stop offset="25%" stop-color="#f4fbff"/>
+          <stop offset="50%" stop-color="#b6f0db"/>
+          <stop offset="75%" stop-color="#d2e8ff"/>
+          <stop offset="100%" stop-color="#a6cadc"/>
+        </linearGradient>
+        <linearGradient id="scabbardThroatGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#04080c"/>
+          <stop offset="70%" stop-color="#0c1720"/>
+          <stop offset="100%" stop-color="#14232e"/>
+        </linearGradient>
+        <linearGradient id="quicksilverBeamGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#7bf2c6" stop-opacity="0"/>
+          <stop offset="25%" stop-color="#7bf2c6" stop-opacity="0.8"/>
+          <stop offset="50%" stop-color="#ffffff" stop-opacity="1"/>
+          <stop offset="75%" stop-color="#a5d8ff" stop-opacity="0.8"/>
+          <stop offset="100%" stop-color="#a5d8ff" stop-opacity="0"/>
+        </linearGradient>
       </defs>
 
       <!-- Shared Hull & Intertwined Tendril Weave -->
@@ -1067,6 +1178,7 @@ footer .note-highlight {
     <section class="module" id="a" aria-label="Jarvis elven capsule">
       <svg class="module-svg" id="shell-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="lotus-overlay" id="lotus-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <svg class="scabbard-overlay" id="scabbard-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <button class="elven-grip" data-drag="a" aria-label="Move Jarvis capsule">
         <span><span class="rune-mark">✧</span> Jarvis / Sylvan Regent</span>
         <span>⋮⋮</span>
@@ -1104,6 +1216,15 @@ footer .note-highlight {
         </div>
       </div>
 
+      <!-- Compact Mother-of-Pearl Scabbard Strip for Option 4 Shade Mode -->
+      <div class="scabbard-strip" aria-label="Jarvis scabbard shade summary">
+        <span class="scabbard-title"><span class="scabbard-icon">✦</span> JARVIS <span class="scabbard-sep">·</span> <strong class="scabbard-metric">03 AGENTS</strong></span>
+        <div class="scabbard-gems">
+          <span class="scabbard-latch-pin" title="Bayonet catch pin"></span>
+          <i class="jade"></i><i class="moon"></i><i class="jade"></i>
+        </div>
+      </div>
+
       <div class="tab-row" role="tablist" aria-label="Jarvis screens">
         <button class="elven-tab" role="tab" aria-selected="true" data-page="0">Status</button>
         <button class="elven-tab" role="tab" aria-selected="false" data-page="1">Task</button>
@@ -1119,6 +1240,7 @@ footer .note-highlight {
     <section class="module" id="b" aria-label="GitDiscuss elven capsule">
       <svg class="module-svg" id="shell-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="lotus-overlay" id="lotus-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <svg class="scabbard-overlay" id="scabbard-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <button class="elven-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
         <span><span class="rune-mark">✧</span> GitDiscuss / Archive Weaver</span>
         <span>⋮⋮</span>
@@ -1148,6 +1270,15 @@ footer .note-highlight {
       <div class="shade-diadem">
         <span class="shade-title"><span>✧</span> GITDISCUSS · 02 QUEUED</span>
         <div class="shade-gems">
+          <i class="moon"></i><i class="jade"></i>
+        </div>
+      </div>
+
+      <!-- Compact Mother-of-Pearl Scabbard Strip for Option 4 Shade Mode -->
+      <div class="scabbard-strip" aria-label="GitDiscuss scabbard shade summary">
+        <span class="scabbard-title"><span class="scabbard-icon">✦</span> GITDISCUSS <span class="scabbard-sep">·</span> <strong class="scabbard-metric">02 QUEUED</strong></span>
+        <div class="scabbard-gems">
+          <span class="scabbard-latch-pin" title="Bayonet catch pin"></span>
           <i class="moon"></i><i class="jade"></i>
         </div>
       </div>
@@ -1192,7 +1323,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade &amp; Crystalline Cleavage Join</h3>
+  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade, Crystalline Cleavage Join &amp; Sylvan Scabbard Slide Shade</h3>
   <p>
     Forged from spun star-silver (Ithildin), white birchwood inlays, and mother-of-pearl bezels. Contours follow swept aerodynamic swan-wing curves and delicate botanical filigree crowns, preserving high contrast and uncompromised display readability.
   </p>
@@ -1204,6 +1335,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 3 — Crystalline Cleavage &amp; Harmonic Chime join:</span> Complementary angled prism planes carved from pale moonstone and beryl. The mating faces feature precision 30° cleavage planes with internal refractive facets. As the capsules approach, shimmering spectral refraction rays arc across the gap; the planes glide together along the 30° bias until seating flush with mathematical perfection. At lock, a pure-harmonic chime pulse sweeps through the crystals with a bell-like resonance, dissolving the seam into an invisible optical joint through which starlight passes without refraction.
+  </p>
+  <p>
+    <span class="note-highlight">Option 4 — Sylvan Scabbard Slide shade:</span> The lower display bay glides upward into an overhead repoussé star-silver canopy, inspired by a ceremonial blade sliding home into its velvet-lined scabbard. Mother-of-pearl vertical guide rails guide the motion with weightless, frictionless Art Nouveau grace. As the blade seats home, twin spring-tempered silver catches lock into scabbard detents, leaving only a 22px mother-of-pearl chape rim exposed with an unclipped, high-contrast starlight status strip (widget name and key live metric) and glowing jade and moonstone jewels.
   </p>
 </footer>
 
@@ -1229,7 +1363,9 @@ const model = {
   petalFold: 0,       // 0 = bloomed open, 1 = closed lotus petal nocturne shade
   crystalGlide: 0,    // 0 = separate 30° prism planes, 1 = seated monolithic crystal
   chimeWave: 0,       // 0 to 1 = expanding harmonic chime wavefront ripples
-  option: 'crystal_cleavage',
+  scabbardSlide: 0,   // 0 = fully extended blade, 1 = seated inside scabbard
+  scabbardFlash: 0,   // 0 to 1 = insertion starlight quicksilver shimmer
+  option: 'scabbard_slide',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1840,6 +1976,133 @@ function drawCrystalCleavageJoin(a, b, progress, isJoined, light, chimeWave, isS
   return s;
 }
 
+// Option 4: Sylvan Scabbard Slide Shade Mode (Ceremonial Blade Retraction into Repoussé Canopy)
+function drawScabbardOverlay(f, width = W) {
+  if (model.option !== 'scabbard_slide' && f <= 0.001) return '';
+  const midX = width / 2;
+  const dy = -f * 84;
+  let s = `<g class="sylvan-scabbard-overlay">`;
+
+  // 1. Velvet-Lined Scabbard Throat Cavity (where blade enters canopy)
+  s += `<rect x="44" y="24" width="${width - 88}" height="22" rx="4" fill="url(#scabbardThroatGrad)" stroke="#111d25" stroke-width="1.2"/>`;
+
+  // 2. Left & Right Vertical Mother-of-Pearl Guide Rails
+  // Left rail
+  s += `<rect x="38" y="14" width="6" height="108" rx="3" fill="url(#nacreRimGrad)" stroke="#1a2e3b" stroke-width="0.8"/>`;
+  s += `<line x1="41" y1="18" x2="41" y2="118" stroke="#162732" stroke-width="1.2"/>`;
+  s += `<circle cx="41" cy="18" r="2.2" fill="url(#nephriteJadeGrad)"/>`;
+  s += `<circle cx="41" cy="118" r="2.2" fill="url(#nephriteJadeGrad)"/>`;
+
+  // Right rail
+  s += `<rect x="${width - 44}" y="14" width="6" height="108" rx="3" fill="url(#nacreRimGrad)" stroke="#1a2e3b" stroke-width="0.8"/>`;
+  s += `<line x1="${width - 41}" y1="18" x2="${width - 41}" y2="118" stroke="#162732" stroke-width="1.2"/>`;
+  s += `<circle cx="${width - 41}" cy="18" r="2.2" fill="url(#nephriteJadeGrad)"/>`;
+  s += `<circle cx="${width - 41}" cy="118" r="2.2" fill="url(#nephriteJadeGrad)"/>`;
+
+  // 3. Overhead Repoussé Star-Silver Scabbard Mouth / Ferrule Arch
+  s += `
+    <g class="scabbard-mouth">
+      <!-- Repoussé Arch Lip -->
+      <path d="M 42 36 Q ${midX} 28 ${width - 42} 36 L ${width - 42} 44 Q ${midX} 36 42 44 Z"
+            fill="url(#scabbardRepousseGrad)" stroke="#162532" stroke-width="1.5"/>
+      <path d="M 46 38 Q ${midX} 30 ${width - 46} 38"
+            fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.85"/>
+      <!-- Sinuous Acanthus / Willow Foliage Repoussé Scrolls -->
+      <path d="M 52 32 Q 80 18 120 28 Q ${midX - 40} 18 ${midX} 26 Q ${midX + 40} 18 ${width - 120} 28 Q ${width - 80} 18 ${width - 52} 32"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.6" stroke-linecap="round"/>
+      <!-- Nephrite Jade Studs along Scabbard Ferrule -->
+      <circle cx="72" cy="38" r="2.2" fill="url(#nephriteJadeGrad)"/>
+      <circle cx="130" cy="34" r="2.2" fill="url(#nephriteJadeGrad)"/>
+      <circle cx="${midX}" cy="32" r="2.8" fill="url(#nephriteJadeGrad)"/>
+      <circle cx="${width - 130}" cy="34" r="2.2" fill="url(#nephriteJadeGrad)"/>
+      <circle cx="${width - 72}" cy="38" r="2.2" fill="url(#nephriteJadeGrad)"/>
+    </g>
+  `;
+
+  // 4. Spring-Tempered Bayonet Catch Prongs (Left & Right)
+  const catchRotL = f > 0.85 ? 18 : f * 18;
+  const catchRotR = f > 0.85 ? -18 : -f * 18;
+  s += `
+    <!-- Left Bayonet Catch Hook -->
+    <g transform="translate(36, 38) rotate(${catchRotL})">
+      <path d="M 0 -8 C 4 -8 7 -4 7 0 C 7 6 2 10 -4 12 L -6 10 C -2 8 2 6 2 0 C 2 -3 0 -5 -2 -5 Z"
+            fill="url(#starSilverGrad)" stroke="#132029" stroke-width="0.9"/>
+      <circle cx="0" cy="0" r="2" fill="url(#nephriteJadeGrad)"/>
+    </g>
+    <!-- Right Bayonet Catch Hook -->
+    <g transform="translate(${width - 36}, 38) rotate(${catchRotR})">
+      <path d="M 0 -8 C -4 -8 -7 -4 -7 0 C -7 6 -2 10 4 12 L 6 10 C 2 8 -2 6 -2 0 C -2 -3 0 -5 2 -5 Z"
+            fill="url(#starSilverGrad)" stroke="#132029" stroke-width="0.9"/>
+      <circle cx="0" cy="0" r="2" fill="url(#nephriteJadeGrad)"/>
+    </g>
+  `;
+
+  // 5. Sliding Ceremonial Blade Carriage & 22px Mother-of-Pearl Chape Rim
+  const chapeY = 106 + dy;
+  s += `
+    <g class="sliding-blade-chape">
+      <!-- 22px Pale Mother-of-Pearl Chape Rim -->
+      <path d="M 44 ${chapeY}
+               H ${width - 44}
+               Q ${width - 38} ${chapeY + 11} ${width - 44} ${chapeY + 22}
+               H 44
+               Q 38 ${chapeY + 11} 44 ${chapeY}
+               Z"
+            fill="url(#nacreRimGrad)" stroke="#162936" stroke-width="1.8"/>
+      <!-- Nacre grain texture -->
+      <path d="M 44 ${chapeY}
+               H ${width - 44}
+               Q ${width - 38} ${chapeY + 11} ${width - 44} ${chapeY + 22}
+               H 44
+               Q 38 ${chapeY + 11} 44 ${chapeY}
+               Z"
+            fill="url(#nacreGrain)" opacity="0.6"/>
+      <!-- Specular Highlight Filigree -->
+      <path d="M 46 ${chapeY + 2} H ${width - 46}" stroke="#ffffff" stroke-width="1" opacity="0.85"/>
+      <path d="M 46 ${chapeY + 20} H ${width - 46}" stroke="#4d6f85" stroke-width="1"/>
+
+      <!-- Star-Silver Leaf Scrolls along Chape -->
+      <path d="M 52 ${chapeY + 11} Q 80 ${chapeY + 6} 120 ${chapeY + 11} Q ${midX} ${chapeY + 14} ${width - 120} ${chapeY + 11} Q ${width - 80} ${chapeY + 6} ${width - 52} ${chapeY + 11}"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.3" stroke-linecap="round"/>
+
+      <!-- Center Nephrite Jade Brooch on Chape -->
+      <circle cx="${midX}" cy="${chapeY + 11}" r="3.2" fill="url(#nephriteJadeGrad)" stroke="#13241e" stroke-width="0.8"/>
+      <circle cx="${midX}" cy="${chapeY + 11}" r="1.5" fill="#ffffff" opacity="0.8"/>
+
+      <!-- Corner Guide Runners (sliding in outer rails) -->
+      <rect x="36" y="${chapeY + 3}" width="6" height="16" rx="2" fill="url(#starSilverGrad)" stroke="#162732" stroke-width="0.8"/>
+      <rect x="${width - 42}" y="${chapeY + 3}" width="6" height="16" rx="2" fill="url(#starSilverGrad)" stroke="#162732" stroke-width="0.8"/>
+    </g>
+  `;
+
+  // 6. Starlight Insertion Quicksilver Shimmer Pulse when fully seated
+  if (f > 0.75) {
+    const flash = (f - 0.75) / 0.25;
+    const flashY = 106 - 84; // y = 22
+    s += `
+      <!-- Quicksilver Shimmer Beam across seated rim -->
+      <rect x="44" y="${flashY - 2}" width="${width - 88}" height="26" rx="4"
+            fill="url(#quicksilverBeamGrad)" opacity="${(1 - flash * 0.4) * flash}" filter="url(#moonlitCausticGlow)"/>
+      <line x1="46" y1="${flashY + 11}" x2="${width - 46}" y2="${flashY + 11}"
+            stroke="#ffffff" stroke-width="${3 * (1 - flash) + 1}" opacity="${1 - flash * 0.2}"/>
+    `;
+    if (f >= 0.95) {
+      [-1, 1].forEach(side => {
+        const sx = side === -1 ? 40 : width - 40;
+        s += `
+          <g transform="translate(${sx}, 34) scale(${flash})">
+            <path d="M 0 -7 L 3 0 L 0 7 L -3 0 Z" fill="#ffffff" filter="url(#crystalOpticalGlow)"/>
+            <circle cx="0" cy="0" r="1.5" fill="#7bf2c6"/>
+          </g>
+        `;
+      });
+    }
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -1913,6 +2176,14 @@ function renderHardware() {
     }
   }
 
+  // Sylvan Scabbard Slide in each module
+  for (const id of ['a', 'b']) {
+    const sEl = $('#scabbard-' + id);
+    if (sEl) {
+      sEl.innerHTML = drawScabbardOverlay(model.scabbardSlide, W);
+    }
+  }
+
   // Active Proximity Aura (for Tendril Braid)
   if (model.option !== 'crystal_cleavage' && !isShade && glow > 0.05 && p < 0.98) {
     $('#elvenLightAura').innerHTML = `
@@ -1927,7 +2198,7 @@ function renderHardware() {
 }
 
 function updateStateButtons() {
-  const isShade = model.shade || model.petalFold > 0.5;
+  const isShade = model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5;
   const isJoined = model.joined;
   const isJoining = ((model.option === 'crystal_cleavage' ? (model.crystalGlide > 0.1 && model.crystalGlide < 0.95) : (model.tendrilProgress > 0.1 && model.tendrilProgress < 0.95))) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
@@ -1957,19 +2228,64 @@ function render() {
     el.style.top = m.y + 'px';
     el.style.zIndex = model.front === id ? '4' : '2';
     el.classList.toggle('shade', model.shade);
+    el.classList.toggle('scabbard-active', (model.option === 'scabbard_slide' || model.scabbardSlide > 0.5) && (model.shade || model.scabbardSlide > 0.5));
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.elven-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
 
     const screenEl = el.querySelector('.elven-screen');
-    if (screenEl) {
-      if (model.shade || model.petalFold > 0.95) {
-        screenEl.style.opacity = '0';
-        screenEl.style.pointerEvents = 'none';
-      } else {
-        screenEl.style.opacity = String(Math.max(0, 1 - model.petalFold * 0.95));
-        screenEl.style.pointerEvents = model.petalFold > 0.25 ? 'none' : 'auto';
+    const tabRow = el.querySelector('.tab-row');
+    const canopyBtn = el.querySelector('.canopy-btn');
+    const jewelBtns = el.querySelectorAll('.sylvan-jewel-btn');
+    const slide = model.scabbardSlide;
+    const isScabbard = model.option === 'scabbard_slide' || slide > 0.001;
+
+    if (isScabbard && slide > 0.001) {
+      const dy = -slide * 84;
+      const opacity = Math.max(0, 1 - slide * 1.5);
+      if (screenEl) {
+        screenEl.style.transform = `translateY(${dy}px)`;
+        screenEl.style.opacity = String(opacity);
+        screenEl.style.pointerEvents = slide > 0.2 ? 'none' : 'auto';
       }
+      if (tabRow) {
+        tabRow.style.transform = `translateY(${dy}px)`;
+        tabRow.style.opacity = String(opacity);
+        tabRow.style.pointerEvents = slide > 0.2 ? 'none' : 'auto';
+      }
+      if (canopyBtn) {
+        canopyBtn.style.transform = `translateY(${dy}px)`;
+        canopyBtn.style.opacity = String(opacity);
+        canopyBtn.style.pointerEvents = slide > 0.2 ? 'none' : 'auto';
+      }
+      jewelBtns.forEach(b => {
+        b.style.transform = `translateY(${dy}px)`;
+        b.style.opacity = String(opacity);
+        b.style.pointerEvents = slide > 0.2 ? 'none' : 'auto';
+      });
+    } else if (model.option === 'lotus_petals' || model.petalFold > 0.01) {
+      if (screenEl) {
+        if (model.shade || model.petalFold > 0.95) {
+          screenEl.style.opacity = '0';
+          screenEl.style.pointerEvents = 'none';
+        } else {
+          screenEl.style.opacity = String(Math.max(0, 1 - model.petalFold * 0.95));
+          screenEl.style.pointerEvents = model.petalFold > 0.25 ? 'none' : 'auto';
+        }
+        screenEl.style.transform = '';
+      }
+      if (tabRow) { tabRow.style.transform = ''; tabRow.style.opacity = model.shade ? '0' : '1'; tabRow.style.pointerEvents = model.shade ? 'none' : 'auto'; }
+      if (canopyBtn) { canopyBtn.style.transform = ''; canopyBtn.style.opacity = model.shade ? '0' : '1'; canopyBtn.style.pointerEvents = model.shade ? 'none' : 'auto'; }
+      jewelBtns.forEach(b => { b.style.transform = ''; b.style.opacity = model.shade ? '0' : '1'; b.style.pointerEvents = model.shade ? 'none' : 'auto'; });
+    } else {
+      if (screenEl) {
+        screenEl.style.transform = '';
+        screenEl.style.opacity = model.shade ? '0' : '1';
+        screenEl.style.pointerEvents = model.shade ? 'none' : 'auto';
+      }
+      if (tabRow) { tabRow.style.transform = ''; tabRow.style.opacity = model.shade ? '0' : '1'; tabRow.style.pointerEvents = model.shade ? 'none' : 'auto'; }
+      if (canopyBtn) { canopyBtn.style.transform = ''; canopyBtn.style.opacity = model.shade ? '0' : '1'; canopyBtn.style.pointerEvents = model.shade ? 'none' : 'auto'; }
+      jewelBtns.forEach(b => { b.style.transform = ''; b.style.opacity = model.shade ? '0' : '1'; b.style.pointerEvents = model.shade ? 'none' : 'auto'; });
     }
 
     const btn = el.querySelector('.run-btn');
@@ -2032,6 +2348,12 @@ function render() {
     btnLotus.disabled = model.busy;
   }
 
+  const btnScabbard = $('#btnScabbardAnim');
+  if (btnScabbard) {
+    btnScabbard.textContent = (model.shade || model.scabbardSlide > 0.5) ? 'Draw from scabbard' : 'Slide into scabbard';
+    btnScabbard.disabled = model.busy;
+  }
+
   $('#harmonyValue').textContent = model.limit;
   $('#harmonyDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
 
@@ -2056,8 +2378,12 @@ function render() {
   }
 
   if (!model.busy) {
-    if (model.shade || model.petalFold > 0.5) {
-      $('#phase').textContent = 'Shade mode / Lotus Petal Nocturne diadem wand';
+    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5) {
+      if (model.option === 'scabbard_slide' || model.scabbardSlide > 0.5) {
+        $('#phase').textContent = 'Shade mode / Sylvan Scabbard Slide (22px rim)';
+      } else {
+        $('#phase').textContent = 'Shade mode / Lotus Petal Nocturne diadem wand';
+      }
     } else if (model.joined) {
       $('#phase').textContent = model.option === 'crystal_cleavage'
         ? 'Joined / Monolithic moonstone prism'
@@ -2359,14 +2685,72 @@ async function bloomLotusPetals() {
   $('#phase').textContent = model.joined ? 'Joined / One unified sylvan instrument' : 'Separate / Two sylvan star-silver hulls';
 }
 
+// Option 4: Sylvan Scabbard Slide Shade Mode Animations
+async function slideScabbardBlade() {
+  if (model.busy || (model.shade && model.scabbardSlide >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Sylvan Scabbard Slide closing: Display bay glides upward into overhead repoussé star-silver canopy.');
+  $('#phase').textContent = 'Display bay sliding into scabbard';
+
+  model.shade = true;
+  render();
+
+  await tween(460, t => {
+    const slide = t === 1 ? 1 : 1 - Math.pow(1 - t, 2.6);
+    model.scabbardSlide = slide;
+    if (t > 0.75) {
+      model.scabbardFlash = (t - 0.75) / 0.25;
+    }
+    render();
+  }, token);
+
+  model.scabbardSlide = 1;
+  model.scabbardFlash = 0;
+  model.busy = false;
+  render();
+  say('Ceremonial blade seated home in scabbard. Spring catches locked. 22px mother-of-pearl rim status strip illuminated.');
+  $('#phase').textContent = 'Shade mode / Sylvan Scabbard Slide';
+}
+
+async function drawScabbardBlade() {
+  if (model.busy || (!model.shade && model.scabbardSlide <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Drawing ceremonial blade from scabbard. Star-silver casing expands.');
+  $('#phase').textContent = 'Drawing blade from scabbard';
+
+  model.shade = false;
+  render();
+
+  await tween(440, t => {
+    const unslide = 1 - (t === 1 ? 1 : 1 - Math.pow(1 - t, 2.4));
+    model.scabbardSlide = unslide;
+    render();
+  }, token);
+
+  model.scabbardSlide = 0;
+  model.busy = false;
+  render();
+  say('Ceremonial blade fully drawn. Full crystalline obsidian screen and sylvan controls restored.');
+  $('#phase').textContent = model.joined
+    ? (model.option === 'crystal_cleavage' ? 'Joined / Monolithic moonstone prism' : 'Joined / One unified sylvan instrument')
+    : 'Separate / Two sylvan star-silver hulls';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    if (model.shade || model.petalFold > 0.05) {
-      await bloomLotusPetals();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else await bloomLotusPetals();
     }
     if (model.joined) {
       if (model.option === 'crystal_cleavage') await separateCrystal();
@@ -2380,11 +2764,12 @@ async function applyState(stateName) {
       model.b.x = 680;
       model.b.y = model.a.y;
       render();
-      say('State: Separate — Two independent star-silver capsules with exposed 30° prism faces.');
+      say('State: Separate — Two independent star-silver capsules with exposed mating collars.');
     }
   } else if (stateName === 'joining') {
-    if (model.shade || model.petalFold > 0.05) {
-      await bloomLotusPetals();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else await bloomLotusPetals();
     }
     model.joined = false;
     model.blend = 0.25;
@@ -2408,8 +2793,9 @@ async function applyState(stateName) {
       say('State: Joining — Mid-animation view with silver tendrils uncoiling across the chasm.');
     }
   } else if (stateName === 'joined') {
-    if (model.shade || model.petalFold > 0.05) {
-      await bloomLotusPetals();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else await bloomLotusPetals();
     }
     if (!model.joined) {
       model.a.x = 220;
@@ -2433,10 +2819,12 @@ async function applyState(stateName) {
       }
     }
   } else if (stateName === 'shade') {
-    if (model.shade || model.petalFold > 0.5) {
-      await bloomLotusPetals();
+    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5) {
+      if (model.scabbardSlide > 0.5) await drawScabbardBlade();
+      else await bloomLotusPetals();
     } else {
-      await closeLotusPetals();
+      if (model.option === 'scabbard_slide') await slideScabbardBlade();
+      else await closeLotusPetals();
     }
   }
 }
@@ -2508,6 +2896,10 @@ $('#btnLotusAnim').onclick = () => {
   if (model.shade || model.petalFold > 0.5) bloomLotusPetals();
   else closeLotusPetals();
 };
+$('#btnScabbardAnim').onclick = () => {
+  if (model.shade || model.scabbardSlide > 0.5) drawScabbardBlade();
+  else slideScabbardBlade();
+};
 $('#btnChimeAnim').onclick = () => triggerHarmonicChime();
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
@@ -2521,34 +2913,50 @@ $('#btnReset').onclick = () => {
   Object.assign(model, {
     joined: false, busy: false, canopy: false, docked: false, design: false, shade: false,
     blend: 0, cap: 0, tendrilProgress: 0, petalFold: 0, crystalGlide: 0, chimeWave: 0,
-    option: 'crystal_cleavage', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    scabbardSlide: 0, scabbardFlash: 0,
+    option: 'scabbard_slide', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
   $('#btnJoinAnim').textContent = 'Seat crystal prisms';
-  $('#btnJoinAnim').classList.add('primary-btn');
+  $('#btnJoinAnim').classList.remove('primary-btn');
   $('#btnLotusAnim').classList.remove('primary-btn');
-  $('#optionSelect').value = 'crystal_cleavage';
+  $('#btnScabbardAnim').classList.add('primary-btn');
+  $('#optionSelect').value = 'scabbard_slide';
   render();
-  say('Reset to initial Elven study configuration with Crystalline Cleavage join.');
+  say('Reset to initial Elven study configuration with Sylvan Scabbard Slide shade.');
 };
 
 $('#optionSelect').onchange = async (e) => {
   model.option = e.target.value;
-  if (model.option === 'crystal_cleavage') {
+  if (model.option === 'scabbard_slide') {
+    say('Option 4: Sylvan Scabbard Slide shade selected. Display bay glides upward into overhead repoussé star-silver canopy.');
+    $('#btnScabbardAnim').classList.add('primary-btn');
+    $('#btnJoinAnim').classList.remove('primary-btn');
+    $('#btnLotusAnim').classList.remove('primary-btn');
+    if (model.shade && model.petalFold > 0.05) {
+      await bloomLotusPetals();
+      await slideScabbardBlade();
+    }
+  } else if (model.option === 'crystal_cleavage') {
     say('Option 3: Crystalline Cleavage & Harmonic Chime join selected. 30° moonstone prism planes glide flush.');
     $('#btnJoinAnim').textContent = 'Seat crystal prisms';
     $('#btnJoinAnim').classList.add('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
-    if (model.shade) {
-      await bloomLotusPetals();
+    $('#btnScabbardAnim').classList.remove('primary-btn');
+    if (model.shade && model.scabbardSlide > 0.05) {
+      await drawScabbardBlade();
     }
   } else if (model.option === 'lotus_petals') {
     say('Option 2: Lotus Petal Nocturne shade selected. Curved filigree plates fold upward across the screen.');
     $('#btnLotusAnim').classList.add('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
-    if (!model.shade) {
+    $('#btnScabbardAnim').classList.remove('primary-btn');
+    if (model.shade && model.scabbardSlide > 0.05) {
+      await drawScabbardBlade();
+      await closeLotusPetals();
+    } else if (!model.shade) {
       await closeLotusPetals();
     }
   } else if (model.option === 'tendril_braid') {
@@ -2556,8 +2964,10 @@ $('#optionSelect').onchange = async (e) => {
     $('#btnJoinAnim').textContent = 'Weave silver tendrils';
     $('#btnJoinAnim').classList.add('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
+    $('#btnScabbardAnim').classList.remove('primary-btn');
     if (model.shade) {
-      await bloomLotusPetals();
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else await bloomLotusPetals();
     }
   }
   render();
@@ -2821,7 +3231,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Elven & Intricate skin loaded: Spun star-silver with Crystalline Cleavage & Harmonic Chime join.');
+say('Elven & Intricate skin loaded: Spun star-silver with Sylvan Scabbard Slide shade.');
 </script>
 </body>
 </html>
