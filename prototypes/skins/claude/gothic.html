@@ -109,6 +109,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="stateRow"><span>State</span></div>
  <div class="row" id="joinRow"><span>Join</span></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-45" max="45" step="15" value="30" aria-label="Rose dial angle in degrees"><output id="angleOut">+30°</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Gothic skin stage">
@@ -147,7 +148,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -199,10 +200,12 @@ function casing(id,w,h){
  const s=SK[id],small=id==='c',top=small?5:8,L=s.join==='l'?JP:small?16:20,Rw=s.join==='r'?JP:small?16:20,G=30,gx=32;
  // Flying buttress: the joining end is a tall pier with its own pinnacle instead of a half-gable; the corbel springs from it in the overlay.
  const bt=model.join==='buttress'&&!small,PT=12,pw=JP-6;
+ // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
+ const dl=model.join==='dial'&&!small,sq=bt||dl;
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
  const pts=[];
- if(s.join==='l')pts.push(...bt?[[0,h],[0,top-PT],[pw,top-PT],[pw,top]]:[[0,h],[0,top-G],[gx,top]]);else pts.push([-2,h],[-2,h-11],[0,h-11],[0,top]);
- if(s.join==='r')pts.push(...bt?[[w-pw,top],[w-pw,top-PT],[w,top-PT],[w,h]]:[[w-gx,top],[w,top-G],[w,h]]);else pts.push([w,top],[w,h-11],[w+2,h-11],[w+2,h]);
+ if(s.join==='l')pts.push(...bt?[[0,h],[0,top-PT],[pw,top-PT],[pw,top]]:dl?[[0,h],[0,top]]:[[0,h],[0,top-G],[gx,top]]);else pts.push([-2,h],[-2,h-11],[0,h-11],[0,top]);
+ if(s.join==='r')pts.push(...bt?[[w-pw,top],[w-pw,top-PT],[w,top-PT],[w,h]]:dl?[[w,top],[w,h]]:[[w-gx,top],[w,top-G],[w,h]]);else pts.push([w,top],[w,h-11],[w+2,h-11],[w+2,h]);
  const body=poly(pts);
  // Everything that belongs to the silhouette is one stone mass under one filter.
  let mass=`<path d="${body}"/>`;
@@ -211,15 +214,15 @@ function casing(id,w,h){
  if(s.join!=='l')mass+=pinnacle(L/2,top,pk);
  if(s.join!=='r')mass+=pinnacle(w-Rw/2,top,pk);
  if(bt)mass+=pinnacle(s.join==='r'?w-pw/2:pw/2,top-PT,1.12);
- else if(s.join==='r')mass+=crockets(w-gx,top,w,top-G,1,3,2)+`<path d="M${w} ${top-G-1.3}A3.3 3.3 0 0 1 ${w} ${top-G-7.9}Z"/><rect x="${w-1}" y="${top-G-2}" width="1" height="3"/>`;
- if(s.join==='l'&&!bt)mass+=crockets(gx,top,0,top-G,-1,3,2)+`<path d="M0 ${top-G-1.3}A3.3 3.3 0 0 0 0 ${top-G-7.9}Z"/><rect x="0" y="${top-G-2}" width="1" height="3"/>`;
+ else if(s.join==='r'&&!dl)mass+=crockets(w-gx,top,w,top-G,1,3,2)+`<path d="M${w} ${top-G-1.3}A3.3 3.3 0 0 1 ${w} ${top-G-7.9}Z"/><rect x="${w-1}" y="${top-G-2}" width="1" height="3"/>`;
+ if(s.join==='l'&&!sq)mass+=crockets(gx,top,0,top-G,-1,3,2)+`<path d="M0 ${top-G-1.3}A3.3 3.3 0 0 0 0 ${top-G-7.9}Z"/><rect x="0" y="${top-G-2}" width="1" height="3"/>`;
  let o=`<defs>${stoneFilter(id,s.seed)}<clipPath id="cl-${id}"><path d="${body}"/></clipPath></defs><g fill="url(#lime)" filter="url(#st-${id})">${mass}</g>`;
  // Ashlar courses
  let jd='';const y0=top+(small?18:22),y1=h-(h>=90?29:9);
  for(let y=y0,r=0;y<y1;y+=14,r++){jd+=`M0 ${y}H${w}`;for(let x=(r%2?17:0)+6;x<w;x+=34)jd+=`M${x} ${y}V${Math.min(y+14,y1)}`}
  o+=`<g clip-path="url(#cl-${id})" fill="none" stroke-width=".8"><path d="${jd}" stroke="#4a3b2a" stroke-opacity=".3"/><path d="${jd}" stroke="#fff7e6" stroke-opacity=".22" transform="translate(0 .9)"/></g>`;
  // Cornice and frieze recess
- o+=`<path d="M${s.join==='l'&&!bt?gx:0} ${top+1}H${s.join==='r'&&!bt?w-gx:w}" stroke="#fff6e2" stroke-opacity=".55"/><path d="M0 ${top+2.4}H${w}" stroke="#3a2c1c" stroke-opacity=".3"/>`;
+ o+=`<path d="M${s.join==='l'&&!sq?gx:0} ${top+1}H${s.join==='r'&&!sq?w-gx:w}" stroke="#fff6e2" stroke-opacity=".55"/><path d="M0 ${top+2.4}H${w}" stroke="#3a2c1c" stroke-opacity=".3"/>`;
  const fx=L+5,fw=w-L-Rw-10,fy=top+2,fh=small?14:17;
  o+=`<rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" rx="1" fill="#3a2a18" opacity=".16"/><path d="M${fx} ${fy+.6}H${fx+fw}" stroke="#2a1d10" stroke-opacity=".45"/><path d="M${fx} ${fy+fh-.4}H${fx+fw}" stroke="#fff8e8" stroke-opacity=".5"/>`;
  // Tall blind lancets carved in the outer piers
@@ -413,8 +416,126 @@ const JOINS={
   grab(p){return{lift:true,x0:p.x,y0:p.y,amt:0,moved:false}},
   move(d,p){d.amt=clamp((d.y0-p.y)/46);if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;setJt(1-.14*d.amt)},
   letGo:d=>!d.moved||d.amt>.5
+ },
+ dial:{label:'Rose dial',kind:'Angle · hinge',gap:52,ms:1.7,sepMs:2600,step:15,max:45,
+  say:{join:'The facades close, the half-roses slide out to meet, a stone wheel is set round them, and GitDiscuss swings to its angle.',joined:'Joined on the rose dial. Turn the rose, or drag GitDiscuss\'s nameplate, to set the angle; each petal past the pawl is 15°. Lift the gilded pawl to release.',
+   sep:'GitDiscuss swings level, the pawl lifts, the wheel comes apart and the facades part.',hold:'Held mid-join: the wheel is being set round the rose. Use the scrubber to step through the animation.',
+   ready:'Ready: the ghost of the wheel hangs in the gap. Release to join.',near:'Nearby: the two half-roses turn toward each other. Move closer.',readyPh:'Ready · the wheel is marked out',nearPh:'Nearby · the halves turn'},
+  phase:(jt,dir)=>dir>0?(jt<.36?'Joining · closing in ':jt<.5?'Joining · the halves meet ':jt<.66?'Joining · setting the wheel ':jt<.8?'Joining · lighting the rose ':'Joining · swinging to '+signed(model.angle)+' · '):(jt>.82?'Releasing · swinging level ':jt>.64?'Releasing · lifting the pawl ':jt>.48?'Releasing · the wheel comes apart ':jt>.36?'Releasing · the halves withdraw ':'Releasing · parting '),
+  dragPh:()=>'Turning the rose · GitDiscuss at '+signed(model.angle),
+  about:'The half-rose join, with the rose made into the hinge. The facades close to a hand\'s width apart instead of touching, and the two half-roses slide out of their piers to meet in the gap. A wheel of twelve stones is set round them from the bottom up, each dropping in with a puff of grit, cusped along its inner edge. A gilded pawl with a fleur-de-lis head drops into the notch between two petals at the top, and the rose lights from its boss. Then GitDiscuss swings on the wheel to the set angle and settles with a little weight. <b>The rose is the dial.</b> Turn it and GitDiscuss turns half as far, so each petal that passes under the pawl is one 15° detent: the pawl hops and glints as it drops into each notch. Angles run from −45° to +45°, three petals each way. Drag round the rose to turn it, drag GitDiscuss\'s nameplate to swing it directly, use the slider, or focus the rose and press the arrow keys; while it turns, a parchment label under the wheel reads the angle and the petal count. The wheel overhangs both facade ends, so the corners that would clash or gape are always behind stone. <b>Near and ready</b> work as for the half-rose; on ready the ghost of the wheel appears in the gap. <b>Release:</b> lift the pawl (tap it, or focus the rose and press Enter). GitDiscuss swings level, the pawl tips out, the wheel comes apart from the top down, the halves withdraw and the facades part.',
+  // Displayed bend: level until the wheel is lit, then a heavy swing with one small overshoot.
+  bend(jt){const A=model.angle;if(jt>=1)return A;if(model.dir>0){const u=seg(jt,.8,1);return A*(1-Math.pow(1-u,3)*Math.cos(1.6*Math.PI*u))}return A*ease(seg(jt,.82,1))},
+  geo(c){const h=c.h,ax=model.a.x+W,bx=model.b.x,ay=model.a.y+h/2,by=model.b.y+h/2,Ro=Math.hypot(this.gap/2,h/2)+2,rw=Math.round(clamp(Ro*.28,7,20));
+   return{h,ax,bx,ay,by,P:{x:(ax+bx)/2,y:(ay+by)/2},Ro,rw,Rd:Ro-rw,Rh:clamp(h/2-5,14,RB)}},
+  state(c){
+   const jt=c.jt;
+   if(jt===0)return{ta:REST.a*(1-c.glow),tb:REST.b*(1-c.glow),slide:0,lit:.55*c.glow,ring:0,pawl:0,spill:0,pulse:0};
+   const o={slide:ease(seg(jt,.36,.5)),ring:seg(jt,.48,.68),pawl:seg(jt,.64,.72),spill:seg(jt,.76,.96),lit:seg(jt,.68,.86),pulse:0};
+   if(model.dir>0){const e=backOut(seg(jt,0,.4));o.ta=model.th0.a*(1-e);o.tb=model.th0.b*(1-e);o.lit=Math.max(model.lit0*(1-seg(jt,.36,.48)),o.lit);o.pulse=Math.sin(Math.PI*seg(jt,.64,.72))}
+   else{const u=1-seg(jt,0,.36);o.ta=REST.a*u;o.tb=REST.b*u}
+   return o;
+  },
+  // Half a rose (side 1 = Jarvis's, -1 = GitDiscuss's) or, once fused, the whole disc (side 0).
+  disc(key,cx,cy,R,side,th,lit,pulse,bar,frame){
+   const lod=R>=26?1:0,sc=R/RB,k=1+.045*pulse,lo=clamp(lit),hi=Math.min(1.001,lo+.18);
+   const arc=r=>`M${f(cx)} ${f(cy-r)}A${f(r)} ${f(r)} 0 0 ${side>0?0:1} ${f(cx)} ${f(cy+r)}`,cl=side?arc(R+.6)+'Z':`M${f(cx-R-.6)} ${f(cy)}A${f(R+.6)} ${f(R+.6)} 0 1 0 ${f(cx+R+.6)} ${f(cy)}A${f(R+.6)} ${f(R+.6)} 0 1 0 ${f(cx-R-.6)} ${f(cy)}Z`;
+   let s=`<defs><clipPath id="dc-${key}"><path d="${cl}"/></clipPath><radialGradient id="dd-${key}" cx="${f(cx)}" cy="${f(cy)}" r="${f(R)}" gradientUnits="userSpaceOnUse"><stop offset="${f(lo*100)/100}" stop-color="#120e16" stop-opacity="0"/><stop offset="${f(hi*100)/100}" stop-color="#120e16" stop-opacity=".66"/></radialGradient>`+
+    `<radialGradient id="db-${key}" cx="${f(cx)}" cy="${f(cy)}" r="${f(R*Math.max(.05,lo))}" gradientUnits="userSpaceOnUse"><stop stop-color="#fff6d8" stop-opacity=".5"/><stop offset="1" stop-color="#fff6d8" stop-opacity="0"/></radialGradient></defs>`;
+   s+=`<g transform="translate(${f(cx)} ${f(cy)}) scale(${f(k*1000)/1000}) translate(${f(-cx)} ${f(-cy)})"><g clip-path="url(#dc-${key})"><g transform="translate(${f(cx)} ${f(cy)}) rotate(${f(th)}) scale(${f(sc*1000)/1000})">${rosePattern(lod)}</g>`;
+   s+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R)}" fill="url(#dd-${key})"/>`;
+   if(lo>0)s+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R)}" fill="url(#db-${key})" style="mix-blend-mode:screen"/>`;
+   if(bar>0)s+=`<g opacity="${f(bar)}"><path d="M${f(cx)} ${f(cy-R)}V${f(cy+R)}" stroke="${LEAD}" stroke-width="${f(5.4*sc)}"/><path d="M${f(cx)} ${f(cy-R)}V${f(cy+R)}" stroke="${STONE}" stroke-width="${f(3.2*sc)}"/></g>`;
+   s+='</g>';
+   if(frame>0&&side)s+=`<g opacity="${f(frame)}" fill="none"><path d="${arc(R+2.2*sc)}" stroke="${LEAD}" stroke-width="${f(7.5*sc)}"/><path d="${arc(R+2.2*sc)}" stroke="#cfc2a4" stroke-width="${f(5*sc)}"/><path d="${arc(R+.8*sc)}" stroke="#f4ecd8" stroke-width="${f(.9*sc)}" opacity=".7"/></g>`;
+   return s+'</g>';
+  },
+  // The wheel: twelve stones, fixed to Jarvis, set from the bottom up. Joints fall either side of the top stone, which carries the pawl.
+  ring(G,k){
+   const{P,Ro,Rd,rw}=G,Ri=Rd+.4,cd=Math.max(2.2,Rd*.09),D=Math.PI/180;
+   const pt=(r,a)=>[P.x+r*Math.cos(a*D),P.y+r*Math.sin(a*D)],q=p=>f(p[0])+' '+f(p[1]);
+   let body='',lines='',dust='';
+   for(let i=0;i<12;i++){
+    const ca=-90+30*i,d=Math.abs((((ca-90)%360)+540)%360-180)/180,t=seg(k,d*.6,d*.6+.34);if(t<=0)continue;
+    const off=18*Math.pow(1-t,2),tr=`translate(${f(off*Math.cos(ca*D))} ${f(off*Math.sin(ca*D))})`,op=f(seg(t,0,.25)),a0=ca-15+.35,a1=ca+15-.35;
+    const shape=`M${q(pt(Ro,a0))}A${f(Ro)} ${f(Ro)} 0 0 1 ${q(pt(Ro,a1))}L${q(pt(Ri,a1))}A${f(Ri)} ${f(Ri)} 0 0 0 ${q(pt(Ri,a0))}Z`;
+    let cusp='';for(const ac of[ca-7.5,ca+7.5]){const tip=pt(Ri-cd,ac);cusp+=`<path d="M${q(pt(Ri+.5,ac-4.4))}L${q(tip)}L${q(pt(Ri+.5,ac+4.4))}Z"/><circle cx="${f(tip[0])}" cy="${f(tip[1])}" r="${f(Math.max(.8,cd*.3))}"/>`}
+    body+=`<g transform="${tr}" opacity="${op}"><path d="${shape}"/>${cusp}</g>`;
+    let carve='';if(i){const m=pt((Ri+Ro)/2,ca),cr=rw*.12;carve=`<g fill="#24180d" opacity=".32">${[[-1,0],[1,0],[0,-1],[0,1]].map(([a,b])=>`<circle cx="${f(m[0]+a*cr)}" cy="${f(m[1]+b*cr)}" r="${f(cr*1.05)}"/>`).join('')}</g><circle cx="${f(m[0])}" cy="${f(m[1])}" r="${f(cr*.6)}" fill="url(#gild)"/>`}
+    lines+=`<g transform="${tr}" opacity="${op}" fill="none" stroke-width=".8"><path d="${shape}" stroke="#3a2c1c" stroke-opacity=".55"/><path d="M${q(pt(Ro-2.4,a0))}A${f(Ro-2.4)} ${f(Ro-2.4)} 0 0 1 ${q(pt(Ro-2.4,a1))}" stroke="#fff6e2" stroke-opacity=".5"/><path d="M${q(pt(Ri+2.2,a0))}A${f(Ri+2.2)} ${f(Ri+2.2)} 0 0 1 ${q(pt(Ri+2.2,a1))}" stroke="#3a2c1c" stroke-opacity=".3"/>${carve}</g>`;
+    if(i%2===0&&t>.7&&t<1){const p=pt(Ro,ca);dust+=JOINS.buttress.dust(p[0],p[1],seg(t,.7,1),4,Ro/6,i+80)}
+   }
+   return `<g fill="url(#lime)" filter="url(#st-v)">${body}</g>${lines}${dust}`;
+  },
+  // The gilded pawl: a tongue that sits in the notch between two petals, under a fleur-de-lis head pinned to the top stone.
+  pawl(G,p,dir,hop){
+   const{P,Ro,Rd,rw}=G,s=clamp(Ro/72,.55,1),yb=-(Ro-rw*.42),yt=-Rd*.82,ym=(yb+yt)/2;
+   const y=(dir>0?-26*s*(1-backOut(p)):-18*s*(1-p))-3.5*s*hop,tilt=dir>0?0:-30*(1-p),S=v=>f(v*s);
+   return `<g opacity="${f(seg(p,0,.3))}" transform="translate(${f(P.x)} ${f(P.y+y)}) rotate(${f(tilt)} 0 ${f(yb)})" fill="url(#gild)" stroke="#3a2608" stroke-width=".7">`+
+    `<path d="M${S(-4.6)} ${f(yb)}Q${S(-3.4)} ${f(ym)} 0 ${f(yt)}Q${S(3.4)} ${f(ym)} ${S(4.6)} ${f(yb)}Z"/><path d="M0 ${f(yt+3*s)}V${f(yb)}" stroke="#7a5214" stroke-width=".6" opacity=".7" fill="none"/>`+
+    `<circle cx="${S(-5.2)}" cy="${f(yb-6.2*s)}" r="${S(2.4)}"/><circle cx="${S(5.2)}" cy="${f(yb-6.2*s)}" r="${S(2.4)}"/>`+
+    `<path d="M0 ${f(yb-14*s)}C${S(3.6)} ${f(yb-10*s)} ${S(3.2)} ${f(yb-5.5*s)} 0 ${f(yb-2*s)}C${S(-3.2)} ${f(yb-5.5*s)} ${S(-3.6)} ${f(yb-10*s)} 0 ${f(yb-14*s)}Z"/>`+
+    `<rect x="${S(-6.4)}" y="${f(yb-4.4*s)}" width="${S(12.8)}" height="${S(2.4)}" rx="${S(1)}"/><circle cy="${f(yb)}" r="${S(2.8)}"/><circle cy="${f(yb)}" r="${S(.9)}" fill="#3a2608" stroke="none"/></g>`;
+  },
+  // A click and a glint each time a petal drops under the pawl.
+  detent(b,jt){if(jt===0){model.lastDet=0;return}const n=Math.round(b/15);if(n!==model.lastDet&&Math.abs(b-n*15)<4){model.lastDet=n;if(!reduce.matches)pawlClick()}},
+  over(c){
+   const G=this.geo(c),r=this.state(c),jt=c.jt,bend=this.bend(jt),spin=2*bend,P=G.P;
+   this.detent(bend,jt);
+   const hop=Math.sin(Math.PI*clamp((performance.now()-model.clickAt)/220));
+   let s='';
+   if(r.spill>0)s+=`<defs><radialGradient id="dspill"><stop stop-color="#ffe9b0" stop-opacity=".55"/><stop offset=".3" stop-color="#d0475a" stop-opacity=".3"/><stop offset=".62" stop-color="#4a6fd8" stop-opacity=".16"/><stop offset="1" stop-color="#4a6fd8" stop-opacity="0"/></radialGradient>`+
+    `<radialGradient id="dpool"><stop stop-color="#c8414f" stop-opacity=".5"/><stop offset=".5" stop-color="#3f62c8" stop-opacity=".28"/><stop offset="1" stop-color="#3f62c8" stop-opacity="0"/></radialGradient></defs>`+
+    `<g style="mix-blend-mode:screen" opacity="${f(r.spill)}"><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(G.Rd*2.5)}" fill="url(#dspill)"/><ellipse cx="${f(P.x-18)}" cy="${f(P.y+G.h/2+42)}" rx="${f(G.Rd*2.6)}" ry="${f(G.Rd*.4)}" fill="url(#dpool)"/></g>`;
+   const gh=jt===0?seg(c.glow,.8,1)*.85:0;
+   if(gh>0)s+=`<g fill="none" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="3 2.4" opacity="${f(gh)}"><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(G.Ro)}" fill="#f3d48a" fill-opacity=".05"/><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(G.Rd)}"/><path d="M${f(P.x-4)} ${f(P.y-G.Ro)}L${f(P.x)} ${f(P.y-G.Rd*.82)}L${f(P.x+4)} ${f(P.y-G.Ro)}"/></g>`;
+   const sl=r.slide,R=lerp(G.Rh,G.Rd,sl),bar=1-seg(jt,.5,.6),frame=1-seg(jt,.46,.56);
+   if(r.ring>0)s+=`<circle cx="${f(P.x)}" cy="${f(P.y+5)}" r="${f(G.Ro)}" fill="#000" opacity="${f(.5*seg(r.ring,.3,.8))}" filter="url(#soft)"/>`;
+   s+=sl>=1&&bar<=0?this.disc('d',P.x,P.y,G.Rd,0,spin,r.lit,r.pulse,0,0):
+    this.disc('a',lerp(G.ax,P.x,sl),lerp(G.ay,P.y,sl),R,1,r.ta+spin,r.lit,r.pulse,bar,frame)+this.disc('b',lerp(G.bx,P.x,sl),lerp(G.by,P.y,sl),R,-1,r.tb+spin,r.lit,r.pulse,bar,frame);
+   if(r.ring>0)s+=this.ring(G,r.ring);
+   if(r.pawl>0)s+=this.pawl(G,r.pawl,model.dir,jt===1||model.dir>0?hop:0);
+   const tip=[P.x,P.y-G.Rd*.82],gl=Math.max(r.pulse,.8*hop);
+   if(gl>.05)s+=`<g opacity="${f(gl)}">${sparkle(tip[0],tip[1]-3.5*hop,gl*G.Rd*.36)}</g>`;
+   // While it turns: a parchment label under the wheel with the angle and the petal count.
+   if(jt===1&&(performance.now()<model.turnUntil||drag&&(drag.dial||drag.mode==='angle'))){
+    const n=Math.round(Math.abs(bend)/15),deg=signed(Math.round(bend)),tail=` · ${n} petal${n===1?'':'s'}`,lw=Math.round(('GitDiscuss '+deg+tail).length*6.3+22),lx=P.x-lw/2,ly=P.y+G.Ro+12;
+    s+=`<g><rect x="${f(lx-4)}" y="${f(ly-4)}" width="${lw+8}" height="27" fill="#4a3d2c"/><rect x="${f(lx-3)}" y="${f(ly-3)}" width="${lw+6}" height="25" fill="#cbbd9f"/><rect x="${f(lx)}" y="${f(ly)}" width="${lw}" height="19" fill="#f6ead0" stroke="#1d1612" stroke-width="1.5"/>`+
+     `<text x="${f(P.x)}" y="${f(ly+13.5)}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#2c2117">GitDiscuss <tspan font-weight="700" fill="#8e1f2b">${deg}</tspan>${tail}</text></g>`}
+   if(jt===1){const s2=clamp(G.Ro/72,.55,1);
+    s+=`<g class="hit" id="dialHit" tabindex="0" role="slider" aria-label="Rose dial: GitDiscuss angle. Arrow keys turn it a petal (15°); Enter lifts the pawl to separate" aria-valuemin="-45" aria-valuemax="45" aria-valuenow="${Math.round(model.angle)}" aria-valuetext="${signed(Math.round(model.angle))}"><title>Turn the rose to set the angle</title><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(G.Ro)}" fill="transparent"/><circle class="ringfocus" cx="${f(P.x)}" cy="${f(P.y)}" r="${f(G.Ro+3)}" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g>`+
+     `<g class="hit" id="pawlHit" role="button" aria-label="Lift the pawl to separate the widgets" style="cursor:pointer"><title>Lift the pawl to release</title><rect x="${f(P.x-13*s2)}" y="${f(P.y-G.Ro-14*s2)}" width="${f(26*s2)}" height="${f(G.rw+18*s2)}" fill="transparent"/></g>`}
+   return s;
+  },
+  grab(p){const P=this.geo(ctx()).P,a=Math.atan2(p.y-P.y,p.x-P.x);return{dial:true,cx:P.x,cy:P.y,prev:a,deg:0,th0:model.angle,moved:false}},
+  // The rose turns twice as far as GitDiscuss, so the drag is unwrapped step by step and clamped to the range.
+  move(d,p){const a=Math.atan2(p.y-d.cy,p.x-d.cx);let da=(a-d.prev)*180/Math.PI;da=((da+540)%360)-180;d.prev=a;
+   d.deg=clamp(d.deg+da,2*(-this.max-d.th0),2*(this.max-d.th0));if(Math.abs(d.deg)>3)d.moved=true;model.angle=magnet(d.th0+d.deg/2)},
+  key(e,hit){if(hit.id!=='dialHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
  }
 };
+/* Rose dial helpers: signed degrees, petal detents, keeping the angled pair on the stage, and the angle's own clock. */
+const signed=v=>(v>0?'+':v<0?'−':'')+Math.abs(Math.round(v))+'°';
+const magnet=v=>{v=clamp(v,-45,45);const n=Math.round(v/15)*15;return Math.abs(v-n)<3.5?n:v};
+// Allowed range of the pair's y for an angle: Jarvis and the wheel, plus GitDiscuss's corners (with pinnacle headroom) swung about the rose.
+function dialRange(ang,h){
+ const g=JOINS.dial.gap,th=ang*Math.PI/180,sn=Math.sin(th),cs=Math.cos(th);let lo=-26,hi=Math.max(h,h/2+Math.hypot(g/2,h/2)+40);// the wheel plus the angle label under it
+ for(const[x,y]of[[0,-26],[W,-26],[0,h],[W,h]]){const ry=h/2+(x+g/2)*sn+(y-h/2)*cs;lo=Math.min(lo,ry);hi=Math.max(hi,ry)}
+ const a=TOP-26-lo,b=600-14-hi;return[a,Math.max(a,b)];
+}
+const fitDial=(y,ang=model.angle)=>{const[a,b]=dialRange(ang,lowH());return clamp(y,a,b)};
+let angAnim=0,clickRaf=0;
+function animateAngle(to,ms=560){
+ to=clamp(to,-45,45);model.angTo=to;const from=model.angle,y0=model.a.y,y1=fitDial(y0,to),token=++angAnim,t0=performance.now();model.turnUntil=t0+ms+1100;
+ (function step(now){if(token!==angAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);
+  model.angle=t>=1?to:lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*Math.PI*t));model.a.y=model.b.y=lerp(y0,y1,ease(t));render();
+  if(t<1)requestAnimationFrame(step);else{model.turnUntil=performance.now()+1100;setTimeout(render,1150)}})(t0);
+}
+function stepDial(k){const base=Math.round((model.angTo??model.angle)/15)*15,to=clamp(base+15*k,-45,45);animateAngle(to);say('The rose turns '+(k>0?'clockwise':'anticlockwise')+' a petal; GitDiscuss at '+signed(to)+'.')}
+function setDialAngle(v){v=Math.round(clamp(v,-45,45)/15)*15;if(model.jt===1&&model.join==='dial')animateAngle(v);else{stopAngle();model.angle=model.angTo=v;render()}}
+// Stops a running swing at its target, so no other state change has the pair moved under it.
+function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angTo;model.turnUntil=0}
+function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
   about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It keeps the shade state working until the gothic shade modes (clerestory, triptych, crypt, cornice, inscription drum) are built and added here.'},
@@ -544,16 +665,18 @@ function triptych(id,k){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,lastDet:0,clickAt:-1e4,turnUntil:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,24,1200-2*W-g-SEP-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
 function joinedPose(fixed='a'){
- const g=J().gap;
- if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
- let ax=clamp(model.a.x,24,1200-2*W-g-24);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+ const g=J().gap,fy=y=>model.join==='dial'?fitDial(y,1.07*model.angle):y;
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24),y=fy(model.b.y);return{a:{x:bx-W-g,y},b:{x:bx,y}}}
+ let ax=clamp(model.a.x,24,1200-2*W-g-24),y=fy(model.a.y);return{a:{x:ax,y},b:{x:ax+W+g,y}};
 }
+// The vertical range a joined pair may move in; an angled rose dial needs room for GitDiscuss's swing.
+const pairY=()=>model.join==='dial'&&model.jt===1?dialRange(model.angle,lowH()):[TOP,600-lowH()-14];
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
  model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.4));
@@ -583,6 +706,7 @@ async function doJoin(fixed='a',ms=2000){
 }
 async function doSeparate(){
  if(model.jt===0)return;
+ stopAngle();
  if(model.jt===1){model.dir=-1;model.tsign=1}
  // Reversing a join: unwind toward the resting offsets and a dark rose, so jt 0 meets the separate pose.
  else if(model.dir>0){model.th0={...REST};model.lit0=0}
@@ -591,14 +715,17 @@ async function doSeparate(){
  if(await tween(model.jt,0,(J().sepMs||1600)*model.jt,setJt)){model.path=null;model.dir=1;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
- ++anim;model.busy=false;
+ ++anim;model.busy=false;stopAngle();
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
  startJoinFrom({...REST},0);setJt(.62);render();say(J().say.hold);
 }
 function toggleShade(){
  const to=model.st>.5?0:1,start=model.st,token=++shadeAnim,sh=SHADES[model.shade],ms=(sh.ms||700)*Math.abs(to-start),t0=performance.now();hideTip();
  // Shade runs on its own clock so it can overlap a join.
- (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,ease(t));render();if(t<1)requestAnimationFrame(step)})(t0);
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,ease(t));
+  // An angled rose-dial pair grows when unshaded, so it is kept on the stage as it does.
+  if(model.join==='dial'&&model.jt===1)model.a.y=model.b.y=fitDial(model.a.y);
+  render();if(t<1)requestAnimationFrame(step)})(t0);
  say(to?sh.on||'Shaded: the wall lowers to its cornice, nameplate and one lit value.':sh.off||'Unshaded: the wall rises again.');
 }
 
@@ -612,6 +739,8 @@ function render(){
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
+  // Rose dial: GitDiscuss pivots about the rose's centre, half the gap beyond its own edge.
+  if(id==='b'){const bd=model.join==='dial'?JOINS.dial.bend(model.jt):0;el.style.transformOrigin=`${-JOINS.dial.gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
   const svg=el.querySelector('.casing'),key=w+'x'+h+model.join;
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h)}
   // Window contents fade with the wall's height, so they never hang below a wall that drops early.
@@ -630,17 +759,20 @@ function render(){
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
  $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
- const focused=!!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#over .hit'));
+ const fid=document.activeElement?.closest?.('#over .hit')?.id;
  $('#over').innerHTML=j.over(c);
- const hit=$('#over .hit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ $$('#over .hit').forEach(hit=>hit.onkeydown=e=>{if(j.key&&j.key(e,hit))return;if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}});
+ if(fid)document.getElementById(fid)?.focus();
+ const dial=model.join==='dial';$('#angleRow').style.display=dial?'':'none';
+ if(dial){$('#angle').value=Math.round(model.angle);$('#angleOut').textContent=signed(model.angle)}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
- const ph={separate:'Separate · two facades',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()};
- $('#phase').textContent=(drag&&drag.hit?j.dragPh(drag):drag&&drag.state==='ready'?j.say.readyPh:drag&&drag.state==='near'?j.say.nearPh:ph[state])+(model.st>.5?' · shaded':'');
+ const ph={separate:'Separate · two facades',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(dial?' · '+signed(model.angle):'')};
+ $('#phase').textContent=(drag&&drag.mode==='angle'?'Swinging GitDiscuss · '+signed(model.angle):drag&&drag.hit?j.dragPh(drag):drag&&drag.state==='ready'?j.say.readyPh:drag&&drag.state==='near'?j.say.nearPh:ph[state])+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -649,7 +781,7 @@ STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.
 function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;startJoinFrom({...REST},0);if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='join'&&id!==model.join){if(drag)cancelDrag();stopAngle();const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;startJoinFrom({...REST},0);if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  describe();render();
 }
@@ -659,9 +791,10 @@ function describe(){
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
-$('#scrub').oninput=e=>{++anim;model.busy=false;
+$('#scrub').oninput=e=>{++anim;model.busy=false;stopAngle();
  if(model.jt===0||model.jt===1||!model.path){model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};startJoinFrom({...REST},0)}
  setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
+$('#angle').oninput=e=>setDialAngle(+e.target.value);
 document.addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
  const key=e.key.toLowerCase();
@@ -682,7 +815,12 @@ function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
  if(!e.target.closest('.lights'))hideTip();
- if(e.target.closest('#over .hit')&&model.jt===1){
+ // Rose dial: the pawl releases; the rest of the wheel turns the rose.
+ const dh=e.target.closest('#over .hit');
+ if(dh&&model.jt===1&&model.join==='dial'){e.preventDefault();
+  if(dh.id==='pawlHit'){$('#a .grip').focus();doSeparate();return}
+  ++angAnim;drag={hit:true,...J().grab(local(e))};stage.setPointerCapture(e.pointerId);render();return}
+ if(dh&&model.jt===1){
   e.preventDefault();++anim;model.busy=false;model.dir=-1;model.tsign=1;model.path={s:separatePose(),j:here()};
   drag={hit:true,...J().grab(local(e))};stage.setPointerCapture(e.pointerId);render();return;
  }
@@ -691,15 +829,18 @@ stage.addEventListener('pointerdown',e=>{
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1}
  drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
+ // On the rose dial, GitDiscuss's nameplate swings it about the rose (Jarvis still moves the pair).
+ if(id==='b'&&model.jt===1&&model.join==='dial'){++angAnim;const C=JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e),dx=p.x-drag.start?.x,dy=p.y-drag.start?.y;
  if(drag.hit){J().move(drag,p);render();return}
- const s=drag.saved,bottom=600-lowH()-14;
+ if(drag.mode==='angle'){const a=Math.atan2(p.y-drag.C.y,p.x-drag.C.x);let d=(a-drag.prev)*180/Math.PI;d=((d+540)%360)-180;drag.prev=a;drag.raw=clamp(drag.raw+d,-45,45);if(Math.abs(drag.raw-drag.th0)>1.5)drag.moved=true;model.angle=magnet(drag.raw);render();return}
+ const s=drag.saved,[top,bottom]=pairY();
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,14,1200-CW-14);model.c.y=clamp(s.c.y+dy,TOP-20,600-CH-10);render();return}
- if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
- const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,TOP,bottom)};
+ if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,top,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
  drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
  const pull=drag.state==='ready'?.88:drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
@@ -710,12 +851,16 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
+ // Rose dial: let go and the nearest petal drops under the pawl.
+ if(d.dial||d.mode==='angle'){if(d.moved)animateAngle(Math.round(model.angle/15)*15,420);else render();
+  say(d.dial&&!d.moved?'Turn the rose to set the angle; tap the gilded pawl at its top to release.':'GitDiscuss set at '+signed(Math.round(model.angle/15)*15)+'.');return}
  if(d.hit){if(J().letGo(d))doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;model.dir=1;say(model.join==='rose'?'The rose settles back; still joined.':'The keystone drops back into place; still joined.')}});return}
  const ready=d.state==='ready';
  if(ready){startJoinFrom({a:0,b:0},.55);model.ready=true;model.path=null;doJoin(d.id==='b'?'a':'b',1500)}else{model.glow=0;render()}
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.dial||d.mode==='angle'){++angAnim;model.angle=model.angTo=d.th0;model.turnUntil=0;render();say('Turn cancelled.');return}
  if(d.hit){++anim;model.busy=false;setJt(1);model.path=null;model.dir=1;render();say('Release cancelled.');return}
  const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
 }
@@ -724,9 +869,10 @@ stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
+ if(id==='b'&&model.jt===1&&model.join==='dial'&&k[1]){stepDial(Math.sign(k[1]));return}
  if(model.jt>0&&model.jt<1&&id!=='c')return;
- const bottom=600-lowH()-14;
- if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ const[top,bottom]=pairY();
+ if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=clamp(model.a.y+k[1],top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],14,1200-w-14);m.y=clamp(m.y+k[1],id==='c'?TOP-20:TOP,id==='c'?600-CH-10:bottom)}render();
 }));
 
