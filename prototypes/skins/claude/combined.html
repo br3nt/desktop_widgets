@@ -2510,7 +2510,7 @@ function joinedPose(fixed='a'){
  let ax=clamp(model.a.x,24,1200-2*W-g-24-RX());return{a:{x:ax,y:fy(model.a.y)},b:{x:ax+W+g,y:fy(model.a.y)}};
 }
 // A mix whose join hardware spills past the pair (the hoop) keeps that much more room from the stage edges once joined.
-const RX=()=>X().room?X().room.x:0,RT=()=>X().room?X().room.top:0,RB=()=>X().room?X().room.bottom:0;
+const RX=()=>X().room?X().room.x:0,RT=()=>X().room?X().room.top:0,RBOT=()=>X().room?X().room.bottom:0;
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y},...(DOCK()?{c:{x:model.c.x,y:model.c.y}}:{})});
 function setJt(t){
  model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.4));
@@ -2685,7 +2685,7 @@ stage.addEventListener('pointermove',e=>{
   model.glow=drag.state==='ready'?1:drag.state==='near'?.15+.6*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
   if(drag.state==='ready')say(T().ready);else if(drag.state==='near')say(T().near);
   render();return}
- if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10-RX()),ay=clamp(s.a.y+dy,TOP+RT(),bottom-RB());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10-RX()),ay=clamp(s.a.y+dy,TOP+RT(),bottom-RBOT());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,TOP,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
  drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
@@ -2714,7 +2714,7 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  if(model.jt>0&&model.jt<1&&(id!=='c'||DOCK()))return;
  const bottom=600-(model.st>.5?HS:H)-14;
  if(DOCK()&&(id!=='c'||model.jt===1)){const ax=clamp(model.a.x+k[0],10,1200-2*W-10),ay=clamp(model.a.y+k[1],TOP,dockBottom());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W,y:ay})}
- else if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10-RX()),ay=clamp(model.a.y+k[1],TOP+RT(),bottom-RB());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ else if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10-RX()),ay=clamp(model.a.y+k[1],TOP+RT(),bottom-RBOT());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],14,1200-w-14);m.y=clamp(m.y+k[1],id==='c'?TOP-20:TOP,id==='c'?600-CH-10:bottom)}render();
 }));
 

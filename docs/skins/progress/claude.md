@@ -1,5 +1,5 @@
-- [ ] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/combined.html: SyntaxError: Identifier 'RB' has already been declared
-prototypes/skins/claude/combined.html: ["Uncaught SyntaxError: Identifier 'RB' has already been declared @line 2513"]
+- [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/combined.html: SyntaxError: Identifier 'RB' has already been declared
+  - Fixed: the hoop mix's room-margin helper `RB()` (line 2513) clashed with the rose radius constant `RB` (line 624). It is renamed `RBOT()` at its declaration and both call sites (group drag and keyboard move). Not yet checked in a browser (browser and node access were blocked this run).
 # Claude skin study: progress
 
 One item per run, in this order. Aesthetics are interleaved so none waits long. Pages: `prototypes/skins/claude/<skin>.html` and `combined.html`, with the index at `prototypes/skins/claude/index.html`.
