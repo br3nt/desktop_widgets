@@ -146,7 +146,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -786,8 +786,76 @@ const JOINS={
    if(jt===1&&L)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Overlapping hoops: tap the lens lamp, or press Enter, to unlink the hoops and separate the widgets"><title>Tap the lamp to unlink the hoops</title><circle cx="${f(L.m[0])}" cy="${f(L.m[1])}" r="${f(R*.62+6)}" fill="transparent"/><path class="ringfocus" d="${L.d}" fill="none" stroke="#f0c08f" stroke-width="1.5" transform="translate(${f(L.m[0])} ${f(L.m[1])}) scale(1.3) translate(${f(-L.m[0])} ${f(-L.m[1])})"/></g>`;
    return s;
   }
+ },
+ rose:{label:'Wire rose',kind:'Grow',gap:72,slow:1.9,
+  about:'The other centre for the nest (ref 8): a wire rose, the kind a wire-wrapper winds from one long wire. Each joinable end carries a short stem bound into its frame with a tendril curled off it: copper on Jarvis, brass on GitDiscuss. <b>Near:</b> the stems warm, lengthen and their curls loosen as if reaching. <b>Ready:</b> a dashed ghost of the rose and its heart appears in the gap. Joining: a wire runs from each stem across the gap, hot at the tip, Jarvis\'s dipping under and GitDiscuss\'s arching over, and they meet in the middle with a spark. The copper winds a tight bud there, turn by turn. Then the petals loop out round it, each a double loop of wire over a dark backing, opening from a tight curl with a small overshoot while the whole flower turns into place: five copper petals first, then seven brass ones behind them. Two leaves of green glass in wire unfurl from the stems, one below on the copper side and one above on the brass side, and a carnelian drops into the heart and bounces. The heart is the join light: its glow is amber while either widget is running and cold blue when both are paused. <b>Release:</b> tap the rose, or focus it and press Enter: the outer petals close first, then the inner ones, the bud unwinds and the wires draw back into their stems as the pendants part.',
+  sayJoin:'Wires reach across from both stems and meet; the copper winds a bud, petals loop open round it ring by ring, two leaves unfurl and a carnelian seats in the heart.',
+  sayJoined:'Joined by a wire rose. Drag either nameplate to move the pair. Tap the rose to close it.',
+  sayRelease:'The rose closes, outer petals first, the bud unwinds and the wires draw home.',
+  sayReady:'Ready: release to wind a rose between them.',sayNear:'Nearby: the stems warm and their curls reach. Move closer.',
+  end(side,lit,h){
+   const x=side>0?W-5:5,y=h/2,sc=roseSc(h),m=lit>.5?'hot':side>0?'copper':'brass',tx=x+side*(7+4*lit),r=(3.6-1.4*lit)*sc+1.4,up=side>0;
+   let s='';
+   if(lit>0)s+=`<circle cx="${f(x+side*9)}" cy="${f(y)}" r="${f(10*sc+6)}" fill="#ffb15e" opacity="${f(lit*.5)}" filter="url(#soft)"/>`;
+   // The stem, and its tendril: Jarvis's curls up off the tip, GitDiscuss's down. Nearer, the curl loosens.
+   s+=wire(`M${x} ${f(y)}H${f(tx)}`,m,1.6)+wire(spiral(tx,up?y-r:y+r,r,1.35-.45*lit,-1,up?Math.PI/2:-Math.PI/2),m,1.05);
+   return s+wire(band(x+side*2.5,y,false,3,7,2.2),'copper',1.05);
+  },
+  under(){return ''},
+  over(c){
+   const jt=c.jt,sc=roseSc(c.h),on=model.a.run||model.b.run,R=27*sc,ww=lerp(.8,1.15,(sc-.45)/.55);
+   const A={x:c.a.x+W+2,y:c.a.y+c.h/2},B={x:c.b.x-2,y:c.b.y+c.h/2},M={x:(A.x+B.x)/2,y:(A.y+B.y)/2};
+   const CA={x:lerp(A.x,M.x,.55),y:A.y+16*sc},CB={x:lerp(B.x,M.x,.55),y:B.y-16*sc};
+   let s='';
+   if(jt===0){
+    if(c.ghost>0)s+=`<g fill="none" stroke="#f3c96a" stroke-width="1.1" stroke-dasharray="2 2.2" opacity="${f(c.ghost*.85)}"><path d="${circ(M.x,M.y,R)}"/>`+
+     [0,1,2,3,4].map(k=>`<path d="${rosePetal(M.x,M.y,k*1.2566-1.57,R*.12,R*.66,R*.3)}" stroke-opacity=".6"/>`).join('')+`<circle cx="${f(M.x)}" cy="${f(M.y)}" r="${f(R*.15)}"/></g>`;
+    return s;
+   }
+   // The beat sheet: wires cross while the casings close, bud, inner petals, outer petals, leaves, heart, glint.
+   const T={feed:ease(seg(jt,.06,.46)),bud:seg(jt,.46,.6),turn:ease(seg(jt,.46,.86)),leaf:seg(jt,.76,.88),drop:seg(jt,.84,.94),glow:seg(jt,.88,1)},rot=-.9*(1-T.turn);
+   const forming=jt<1;
+   // Feeder wires: each grows from its stem toward the heart (they end hidden under the petals).
+   const feeders=[[A,CA,'copper'],[B,CB,'brass']].map(([P0,C,m])=>{const n=Math.max(2,Math.ceil(24*T.feed)),P=[];for(let k=0;k<=n;k++)P.push(quad([P0.x,P0.y],[C.x,C.y],[M.x,M.y],T.feed*k/n));return{P,m}});
+   // Leaves of green glass in wire, unfurling from the stems: below on the copper side, above on the brass side.
+   const lg=backOut(T.leaf);
+   const leaves=lg>0?[[A,CA,'copper',-.5,1],[B,CB,'brass',.5,-1]].map(([P0,C,m,dx,dy])=>{const b=quad([P0.x,P0.y],[C.x,C.y],[M.x,M.y],.3),n=Math.hypot(dx,dy),L=22*sc*lg,w=5.5*sc*lg,ux=dx/n,uy=dy/n,px=-uy,py=ux,t=[b[0]+ux*L,b[1]+uy*L],mx=b[0]+ux*L*.45,my=b[1]+uy*L*.45;
+    const d=`M${f(b[0])} ${f(b[1])}Q${f(mx+px*w*1.6)} ${f(my+py*w*1.6)} ${f(t[0])} ${f(t[1])}Q${f(mx-px*w*1.6)} ${f(my-py*w*1.6)} ${f(b[0])} ${f(b[1])}Z`;
+    return `<path d="${d}" fill="url(#st-mal)" opacity="${f(clamp(lg*3)*.82)}"/>`+wire(d,forming&&T.leaf<1?'hot':m,.85*ww)+wire(`M${f(b[0])} ${f(b[1])}L${f(b[0]+ux*L*.82)} ${f(b[1]+uy*L*.82)}`,'dim',.55*ww)}).join(''):'';
+   const any=seg(jt,.56,.6);
+   if(any>0)s+=`<circle cx="${f(M.x+2)}" cy="${f(M.y+5)}" r="${f(R*lerp(.5,.92,seg(jt,.6,.86)))}" fill="#000" opacity="${f(.28*any)}" filter="url(#soft)"/>`;
+   s+=`<path d="${feeders.map(q=>poly(q.P)).join('')}" transform="translate(1.5 4)" fill="none" stroke="#000" stroke-opacity=".25" stroke-width="2.6"/>`;
+   s+=leaves+feeders.map(q=>wire(poly(q.P),T.feed<1?'hot':q.m,1.5*ww)).join('');
+   if(T.feed<1)feeders.forEach(q=>{const p=q.P[q.P.length-1];s+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="4" fill="#ffb15e" opacity="${f(.55*clamp(jt/.06))}" filter="url(#soft)"/><circle cx="${f(p[0])}" cy="${f(p[1])}" r="1.6" fill="#fff0c8" opacity="${f(clamp(jt/.06))}"/>`});
+   const sp=Math.sin(Math.PI*seg(jt,.44,.54));if(sp>.03)s+=sparkle(M.x,M.y,sp*.7);
+   // The petals back to front: seven brass behind, five copper in front.
+   const pet=(k,n,t0,rb,L0,L1,w0,w1,sw,m)=>{const o=backOut(seg(jt,t0+k*.022,t0+.12+k*.022));if(o<=0)return '';
+    const a=rot+k*2*Math.PI/n+sw+(1-o)*.55,L=lerp(L0,L1,o),w=lerp(w0,w1,o),d=rosePetal(M.x,M.y,a,rb,L,w),C=METAL[m];
+    return `<g opacity="${f(clamp(o*4))}"><path d="${d}" fill="#140a05" fill-opacity=".72"/><path d="${d}" fill="${C[1]}" fill-opacity=".3"/>`+
+     wire(rosePetal(M.x,M.y,a,rb*1.1,lerp(rb,L,.8),w*.52),'dim',.6*ww)+wire(d,forming&&o<.98?'hot':m,1.05*ww)+`</g>`};
+   for(let k=0;k<7;k++)s+=pet(k,7,.64,R*.3,R*.42,R,R*.06,R*.36,.22,'brass');
+   for(let k=0;k<5;k++)s+=pet(k,5,.56,R*.1,R*.24,R*.66,R*.05,R*.3,-.31,'copper');
+   // The bud: the copper winds a tight spiral at the heart.
+   if(T.bud>0){const rb=R*.3,n=Math.ceil(40*T.bud),P=[];for(let k=0;k<=n;k++){const t=T.bud*k/n,a=rot*1.6+t*2.3*2*Math.PI,rr=rb*(1-.78*t);P.push([M.x+rr*Math.cos(a),M.y+rr*Math.sin(a)])}
+    s+=`<circle cx="${f(M.x)}" cy="${f(M.y)}" r="${f(rb+1)}" fill="#140a05" opacity="${f(.8*clamp(T.bud*3))}"/>`+wire(poly(P),forming&&T.bud<1?'hot':'copper',1.15*ww)}
+   // The heart: a carnelian drops in and bounces; its glow is the join light.
+   if(T.drop>0){const br=R*.12+1.2,y=M.y-28*sc*Math.pow(1-clamp(T.drop/.6),2)-(T.drop>.6?4*sc*Math.sin(Math.PI*seg(T.drop,.6,.85)):0);
+    if(T.glow>0)s+=`<circle cx="${f(M.x)}" cy="${f(M.y)}" r="${f(R*.42+4)}" fill="${on?'#ffb15e':'#7f9cff'}" opacity="${f(.5*T.glow)}" filter="url(#soft)"/>`;
+    s+=`<g opacity="${f(clamp(T.drop*5))}"><circle cx="${f(M.x)}" cy="${f(y)}" r="${f(br)}" fill="url(#st-carn)" stroke="#3a0d04" stroke-width=".6"/><circle cx="${f(M.x-br*.35)}" cy="${f(y-br*.38)}" r="${f(br*.3)}" fill="#fff" opacity=".75"/></g>`}
+   const gl=Math.sin(Math.PI*seg(jt,.92,1));if(gl>.03)s+=sparkle(M.x-R*.42,M.y-R*.5,gl*.6);
+   if(jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Wire rose: tap the rose, or press Enter, to close it and separate the widgets"><title>Tap the rose to close it</title><circle cx="${f(M.x)}" cy="${f(M.y)}" r="${f(R+6)}" fill="transparent"/><circle class="ringfocus" cx="${f(M.x)}" cy="${f(M.y)}" r="${f(R+4)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+   return s;
+  }
  }
 };
+/* ---------- Wire rose geometry ---------- */
+const roseSc=h=>lerp(.45,1,clamp((h-HS)/(H-HS)));
+// One petal: a loop of wire from a base rb out from the heart at angle a, to a broad rounded tip at L, half-width w.
+function rosePetal(cx,cy,a,rb,L,w){
+ const dx=Math.cos(a),dy=Math.sin(a),px=-dy,py=dx,h=L-rb,b=[cx+dx*rb,cy+dy*rb],t=[cx+dx*L,cy+dy*L];
+ const P=(o,k,u)=>f(o[0]+dx*k+px*u)+' '+f(o[1]+dy*k+py*u);
+ return `M${P(b,0,0)}C${P(b,h*.15,w*1.15)} ${P(t,h*.28,w*.8)} ${P(t,0,0)}C${P(t,h*.28,-w*.8)} ${P(b,h*.15,-w*1.15)} ${P(b,0,0)}Z`;
+}
 /* ---------- Overlapping hoops geometry ---------- */
 // The hoops shrink with the casing; each centre sits so that, joined, the two centres are one radius apart (a vesica lens).
 // GitDiscuss's hoop turns edge-on about its stem, so its centre slides toward the stem as it narrows.
