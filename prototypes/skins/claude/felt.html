@@ -43,7 +43,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .grip .dots{color:#fbe9cc99;letter-spacing:1px}
 .small .grip{left:24px;right:24px;top:4px;height:19px}
 /* Display: a smooth cotton patch sewn into the felt */
-.screen,.mini,.patch,.pp{position:absolute;overflow:hidden;color:#3a2a1e;border-radius:4px;
+.screen,.mini,.patch,.pp,.cp{position:absolute;overflow:hidden;color:#3a2a1e;border-radius:4px;
  background:repeating-linear-gradient(0deg,#5a40280b 0 1px,transparent 1px 2.5px),repeating-linear-gradient(90deg,#5a40280b 0 1px,transparent 1px 2.5px),linear-gradient(170deg,#f8efdb,#efe2c6);
  box-shadow:0 1px 1.5px #0006,inset 0 0 0 1px #6b4d3014;outline:1.4px dashed var(--thread);outline-offset:3px}
 .screen{left:45px;top:33px;width:300px;height:62px}
@@ -94,6 +94,14 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .pp ul{list-style:none;margin:6px 0 0;padding:4px 0 0;border-top:1.2px dashed #6b4d3055;font-size:11px;line-height:1.75;color:#3a2a1e}
 .pp li{display:flex;align-items:center;gap:7px}
 .pp li i{width:8px;height:8px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe2a8,#e0a03a 55%,#8a5512);box-shadow:0 1px 1px #0006}
+/* Crescent morph: a cotton patch in the belly of the arc and of the crescent */
+.cp{display:none;padding:3px 10px;white-space:nowrap;opacity:0;font-size:10px;line-height:1.35;color:#5d4838}
+.cp1 .xs{display:inline-block;vertical-align:-1px;margin-right:6px}
+.cp2{padding:3px 10px 0}
+.cp2 .tiny{font-size:10px;line-height:1.3;color:#8c725b;letter-spacing:.2px}
+.cp2 .big{display:flex;align-items:flex-end;gap:8px;margin:2px 0 1px}
+.cp2 .big em{font:italic 400 15px/1 Georgia,serif;color:var(--accent);padding-bottom:1px}
+.cp2 small{font-size:11px;line-height:1.4;color:#5d4838;display:block}
 .strip{position:absolute;left:40px;right:40px;top:6px;height:21px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 8px;pointer-events:none;opacity:0}
 .strip b{font:italic 400 15px/1 Georgia,serif;color:#fff3dc;text-shadow:0 1px 0 #0007}
 .strip span{padding:1px 9px;border-radius:3px;font-size:11px;color:#3a2a1e;background:linear-gradient(170deg,#f8efdb,#ecdcbd);box-shadow:0 1px 1px #0006;outline:1px dashed var(--thread);outline-offset:2px}
@@ -174,6 +182,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  </div>
  <div class="pp pp1" aria-hidden="true"><div class="tiny">main · run 418 · a French knot per check</div><div class="row2"><span class="knots"></span><em>86%</em></div></div>
  <div class="pp pp2" aria-hidden="true"><div class="tiny">recent runs</div><div class="row2"><span class="bars2"></span><em>steady</em></div><ul><li><i></i>deploy-preview</li><li><i></i>e2e-safari</li></ul></div>
+ <div class="cp cp1" aria-hidden="true"><span class="xs" data-x="12 / 14" data-c="2.2"></span>checks passed<br>2 waiting · run 418 · 86%</div>
+ <div class="cp cp2" aria-hidden="true"><div class="tiny">Checks / main · run 418</div><div class="big"><span class="xs" data-x="12 / 14" data-c="2.6"></span><em>86%</em></div><small>2 waiting for approval</small></div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
 </section>
 
@@ -1529,7 +1539,12 @@ const MORPHS={
   about:'Checks grows by having new felt panels sewn on, like patchwork. <b>Growing:</b> a hand-cut panel is brought in from off the table, held up so its shadow falls wide, then laid down so its edge tucks under the pad. It lands with a squash that knocks a few fibres loose. Three glass-headed pins go in across the seam one at a time. A needle then whip-stitches the seam in thick wool, one slanted stitch after another over the pad\'s edge, pulling out each pin as it reaches it. A last tug puckers the felt, a gleam runs along the new stitching, and the panel\'s cotton label fades in. <b>Patched</b> adds an olive panel underneath, sewn in cream wool, with the run, a French knot per check (green passed, amber waiting) and the pass rate. <b>Patchwork</b> adds a denim panel down the right side, sewn in orange wool and tucked under both, with a cross-stitch chart of recent runs and the two checks waiting for Brent. <b>Shrinking:</b> the label goes, a seam ripper runs back along the seam and cut stitches curl and drop, then the panel is peeled up and lifted away, and the pad settles. The pad itself never changes, so its display and nameplate stay put the whole time. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a grown Checks unpicks its panels first, and unshading sews them back on. Switching morphs takes Checks back to a pad first.',
   anchorTL:true,sizes:['Pad','Patched','Patchwork'],noun:['a pad','a patched pad','a patchwork'],up:3600,down:2400,
   fill:(g,d)=>{const i=Math.min(1,Math.floor(g));return panelAt(g-i,d).fill},box:i=>PT.box[i],dims:()=>patchDims(patchAt(model.gq,model.mDir)),
-  sayUp:n=>'A new panel is pinned and sewn on: Checks becomes '+n+'.',sayDown:n=>'The seam is unpicked and the panel peeled off: Checks shrinks to '+n+'.'}
+  sayUp:n=>'A new panel is pinned and sewn on: Checks becomes '+n+'.',sayDown:n=>'The seam is unpicked and the panel peeled off: Checks shrinks to '+n+'.'},
+ crescent:{label:'Crescent bend',kind:'Bend',
+  about:'Felt is soft, so Checks changes form by bending, not by adding parts. It is one long felt bolster whose curve and taper run on a single dial. <b>Growing:</b> the display is put away and the pad crouches, then its ends lift and it bends into a bowl a frame at a time. It swings a little past the new curve and comes back. On the inside of the bend the felt bunches into creases (more the tighter it curls), and the outside stretches pale. Once bent, it lands and rocks on its round belly like a rocking toy until it settles. <b>Arc</b> is a gentle smile with the count and the run in its belly. A French knot is sewn along each end for every check, left to right: twelve green passed and two amber waiting, at the right tip. <b>Crescent</b> curls the arc on until the ends rise past level and taper into horns, like a felt moon on its back. The belly carries a bigger cross-stitched count and the pass rate, the knots ride up the horns, the two waiting checks are satin-stitched along them by name, and a felt star is caught on each tip. <b>Shrinking:</b> the stars and knots are unpicked first, then it springs open, bows a hair past flat and settles. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a grown Checks straightens it first, and unshading bends it again. Switching morphs takes Checks back to a pad first.',
+  sizes:['Pad','Arc','Crescent'],noun:['a pad','an arc','a crescent moon'],up:2600,down:2000,
+  fill:(g,d)=>{const o=cbAt(g,d);return o.u-o.i},box:i=>{const B=cbBox(cbShape(i));return[B.w,B.h]},dims:()=>{const B=cbBox(cbShape(cbAt(model.gq,model.mDir).u));return[B.w,B.h]},
+  sayUp:n=>'Checks bends into '+n+'.',sayDown:n=>'Checks straightens out to '+n+'.'}
 };
 const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
@@ -1618,11 +1633,12 @@ function stuffSvg(o,q,fr){
 function morphRender(el){
  const svg=el.querySelector('.casing'),pa=el.querySelector('.patch'),gr=el.querySelector('.grip'),kn=el.querySelector('.knot');
  if(model.g<=0){
-  if(el.dataset.m){delete el.dataset.m;el.style.width=el.style.transform=gr.style.top=gr.style.right=kn.style.left=kn.style.top='';pa.style.display='none';el.querySelectorAll('.pp').forEach(n=>n.style.display='none');svg.dataset.key=''}
+  if(el.dataset.m){delete el.dataset.m;el.style.width=el.style.transform=gr.style.top=gr.style.right=gr.style.left=kn.style.left=kn.style.top='';pa.style.display='none';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');svg.dataset.key=''}
   el.setAttribute('aria-label','Checks widget');return false;
  }
  if(model.morph==='patches')return patchRender(el,svg,gr,kn,pa);
- el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp').forEach(n=>n.style.display='none');
+ if(model.morph==='crescent')return crescRender(el,svg,gr,kn,pa);
+ el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
  const key=`m|${model.gq}|${model.mDir}|${model.mFr<0?-1:model.mFr%3}`;
@@ -1739,6 +1755,114 @@ function patchRender(el,svg,gr,kn,pa){
  gr.style.opacity=1;gr.style.top='';gr.style.right=(w-CW+24)+'px';el.querySelector('.strip').style.opacity=0;
  const i=SIZES.findIndex(x=>x[2]===model.g);
  el.setAttribute('aria-label','Checks widget, '+(i>=0?sizeLabel(i).toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418, 86% passed':'')+(model.g>=2?'; deploy-preview and e2e-safari waiting for Brent':''));
+ return true;
+}
+/* ---------- Morph: crescent bend (Checks) ---------- */
+// u runs 0 pad, 1 arc, 2 crescent on one continuous bend. The felt is a centreline arc of sweep th and length L, with
+// half-thickness hw(s)=T/2·(1-|s|^n)^m along it (s from -1 to 1): n=10 gives the pad's squared-off ends, n=4 with m=.5
+// the arc's round ends, n=2 with m>1 the crescent's pointed horns. The name band stays straight under the inside edge's
+// lowest point, so it is always on the felt. Patches are [x,y,w,h] from the centreline's midpoint, under the band and clear of the stitch.
+const CB={L:[268,360,470],T:[70,92,124],th:[0,80,205],n:[10,4,2],m:[.1,.5,1.05],bw:[232,200,176],patch:[null,[-90,-21,180,40],[-90,-37,180,58]]};
+const CBN=44,CBS=Array.from({length:CBN+1},(_,k)=>-Math.cos(Math.PI*k/CBN));
+const cbKey=(a,u)=>{const v=clamp(u,0,2),i=Math.min(1,Math.floor(v));return lerp(a[i],a[i+1],v-i)};
+function cbShape(u){
+ // Past either end of the range only the sweep carries on, so an overshoot curls the crescent a little tighter, or bows the pad a hair the other way.
+ const j=u<1?0:1,th=lerp(CB.th[j],CB.th[j+1],u-j)*Math.PI/180,L=cbKey(CB.L,u),T=cbKey(CB.T,u),n=cbKey(CB.n,u),m=cbKey(CB.m,u),R=Math.abs(th)>1e-4?L/th:0;
+ return{u,L,T,th,R,
+  hw:s=>T/2*Math.pow(Math.max(0,1-Math.pow(Math.abs(s),n)),m),
+  // The point at arc position s, moved off along the normal (positive is the outside of the bowl: down, at the middle).
+  at:(s,off)=>{if(!R)return{x:s*L/2,y:off};const p=s*th/2;return{x:(R+off)*Math.sin(p),y:-R+(R+off)*Math.cos(p)}}};
+}
+// The outside edge left to right, then the inside edge back. An inset pulls it in for the stitch line: each point moves
+// along the mean of its two edges' inward normals, so the ends come in as well as the sides, and the thin tips drop out.
+function cbOutline(S,inset=0){
+ const o=CBS.map(s=>({s,...S.at(s,S.hw(s))})),i=CBS.map(s=>({s,...S.at(s,-S.hw(s))})).reverse(),P=o.concat(i.slice(1,-1));
+ if(!inset)return P;
+ const n=P.length,nr=(a,b)=>{const e=unit(V.sub(b,a));return{x:e.y,y:-e.x}};
+ return P.map((p,k)=>{const a=nr(P[(k+n-1)%n],p),b=nr(p,P[(k+1)%n]),m=unit(V.add(a,b)),c=Math.max(.5,m.x*b.x+m.y*b.y);return{s:p.s,x:p.x+m.x*inset/c,y:p.y+m.y*inset/c}}).filter(p=>S.hw(p.s)>inset+.5);
+}
+const smoothClosed=P=>{const mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});let d=`M${pt(mid(P[P.length-1],P[0]))}`;P.forEach((p,k)=>d+=`Q${pt(p)} ${pt(mid(p,P[(k+1)%P.length]))}`);return d+'Z'};
+// The box round the felt, with room over the horns for their stars as it curls.
+function cbBox(S){
+ let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;for(const p of cbOutline(S)){x0=Math.min(x0,p.x);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)}
+ const top=7*clamp(S.u-1);
+ return{x0:x0-EDGE,y0:y0-EDGE-top,w:Math.round(x1-x0+2*EDGE),h:Math.round(y1-y0+2*EDGE+top)};
+}
+// One step's timeline. Growing: crouch, bend with an overshoot, land rocking; the knots (to the arc) or stars (to the crescent) go on last.
+// Shrinking: stars or knots come off first, then it springs open past the old curve and rocks (to the arc) or squashes (to the pad).
+function cbAt(g,dir){
+ const i=Math.min(1,Math.floor(g)),t=g-i,o={i,t,u:i,sq:0,rock:0,tally:i?14:0,stars:0};
+ if(dir>=0){
+  o.u=i+backOut(seg(t,.14,.72));o.sq=.05*Math.sin(Math.PI*seg(t,.05,.14));
+  const r=seg(t,.72,.96);o.rock=(i?6:3.5)*Math.sin(r*Math.PI*3)*Math.pow(1-r,1.5);
+  if(!i)o.tally=14*seg(t,.8,.96);else o.stars=backOut(seg(t,.88,.98));
+ }else{
+  const s=1-t,r=seg(s,.7,.94);
+  o.u=i+1-backOut(seg(s,.14,.7));
+  if(!i){o.tally=14*(1-seg(s,.02,.13));o.sq=.06*Math.sin(Math.PI*r)}else{o.stars=1-seg(s,0,.08);o.rock=3*Math.sin(r*Math.PI*3)*Math.pow(1-r,1.5)}
+ }
+ return o;
+}
+// Display opacities by size: the old one goes before anything moves, the new one comes once it has settled.
+function cbShow(o,dir){const v=[0,0,0],t=o.t;
+ if(dir>=0){v[o.i]=1-seg(t,.02,.08);v[o.i+1]=seg(t,.8,.92)}else{const s=1-t;v[o.i+1]=1-seg(s,0,.08);v[o.i]=seg(s,.76,.9)}
+ return v}
+function crescSvg(o,S,B,fr){
+ const s=SKIN.c,keep=BO;BO=fr<0?0:(fr%3)*31;
+ // Lying flat it is the pad's own casing, so the crouch and the settle match it exactly.
+ if(!S.R&&S.u<=0){const c=casing('c',CW,CH);BO=keep;return c}
+ let x=`<defs>${feltFilters('c',s.seed)}<radialGradient id="kn-ok" cx=".36" cy=".3" r=".8"><stop stop-color="#e3f7b9"/><stop offset=".5" stop-color="#8fbf4f"/><stop offset="1" stop-color="#3f6b1c"/></radialGradient>`+
+  `<radialGradient id="kn-wait" cx=".36" cy=".3" r=".8"><stop stop-color="#ffe2a8"/><stop offset=".5" stop-color="#e0a03a"/><stop offset="1" stop-color="#8a5512"/></radialGradient></defs>`;
+ BO=keep;
+ const v=cbShow(o,model.mDir),k=clamp(S.th/(205*Math.PI/180)),body=smoothClosed(cbOutline(S));
+ x+=`<g transform="translate(${f(-B.x0)} ${f(-B.y0)})">`;
+ x+=`<path d="${body}" fill="#3b291d" stroke="#3b291d" stroke-width="3" stroke-linejoin="round" transform="translate(0 2)" filter="url(#g-c)"/><path d="${body}" fill="${s.body}" filter="url(#f-c)"/>`;
+ if(k>0){
+  // The outside of the bend stretches pale; the inside bunches into creases, more of them the tighter it curls.
+  let d='';CBS.forEach((sv,j)=>d+=(j?'L':'M')+pt(S.at(sv,Math.max(0,S.hw(sv)-3.5))));
+  x+=`<path d="${d}" fill="none" stroke="#f6d3e4" stroke-opacity="${f(.3*k)}" stroke-width="5" stroke-linecap="round" filter="url(#sh)"/>`;
+  const N=Math.round(S.th*180/Math.PI/13),m={x:.9,y:-1};let dk='',lt='';
+  const bw=cbKey(CB.bw,S.u);
+  for(let j=0;j<N;j++){const sv=lerp(-.84,.84,(j+.5)/N),h=S.hw(sv),a=S.at(sv,1-h);if(Math.abs(a.x)<bw/2)continue;const e=S.at(sv,h*(.32+.2*k)-h),tg=unit(V.sub(S.at(sv+.02,0),S.at(sv-.02,0))),c=V.add(V.mix(a,e,.5),V.mul(tg,j%2?2.2:-2.2));
+   dk+=`M${pt(a)}Q${pt(c)} ${pt(e)}`;lt+=`M${pt(V.add(a,m))}Q${pt(V.add(c,m))} ${pt(V.add(e,m))}`}
+  x+=`<g fill="none" stroke-linecap="round"><path d="${dk}" stroke="#250918" stroke-opacity="${f(.5*k)}" stroke-width="2.2"/><path d="${lt}" stroke="#f3c9de" stroke-opacity="${f(.38*k)}" stroke-width="1"/></g>`;
+ }
+ const st=smoothClosed(cbOutline(S,6));
+ x+=`<path d="${st}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${st}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`;
+ const bw=cbKey(CB.bw,S.u),bx=-bw/2,by=-S.hw(0)-1,band=rr4(bx,by,bw,20,[9,8,10,8]);
+ x+=`<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band}" fill="${s.band}" filter="url(#g-c)"/><path d="${rr4(bx+3.5,by+3.5,bw-7,13,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ // A French knot per check along each end, sewn left to right: twelve green passed, two amber waiting at the right tip. They ride up the horns as it curls.
+ const s0=lerp(.55,.42,clamp(S.u-1)),s1=lerp(.92,.8,clamp(S.u-1));
+ for(let j=0;j<14;j++){const sc=clamp(o.tally-j);if(sc<=0)break;
+  const r=3.6*(sc<1?backOut(sc):1),sv=j<7?-lerp(s1,s0,j/6):lerp(s0,s1,(j-7)/6),p=S.at(sv,Math.max(0,S.hw(sv)-11));
+  x+=`<circle cx="${f(p.x+.4)}" cy="${f(p.y+1)}" r="${f(r+.2)}" fill="#000" opacity=".35"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r)}" fill="url(#kn-${j<12?'ok':'wait'})"/><path d="M${f(p.x-r/2)} ${f(p.y-.6)}q${f(r/2)} -1.6 ${f(r)} 0" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width=".7"/>`}
+ // On the crescent, the two waiting checks are satin-stitched along the horns: down the left horn from its tip, up the right horn toward its tip.
+ if(v[2]>.02){const hp=(a,b)=>{let d='';for(let j=0;j<=16;j++)d+=(j?'L':'M')+pt(S.at(lerp(a,b,j/16),-2));return d};
+  x+=`<defs><path id="cbL" d="${hp(-.88,-.5)}"/><path id="cbR" d="${hp(.5,.88)}"/></defs><g opacity="${f(v[2])}" font-family="Georgia,'Times New Roman',serif" font-style="italic" font-size="11.5" letter-spacing=".3" fill="#fbecd2" stroke="#2c0f22" stroke-opacity=".6" stroke-width="2.4" stroke-linejoin="round" paint-order="stroke">`+
+   `<text dy="4"><textPath href="#cbL" startOffset="50%" text-anchor="middle">deploy-preview</textPath></text><text dy="4"><textPath href="#cbR" startOffset="50%" text-anchor="middle">e2e-safari</textPath></text></g>`}
+ // A felt star caught on each horn tip.
+ if(o.stars>.01)for(const sv of[-.975,.975]){const p=S.at(sv,0),r=6.5*o.stars,rot=sv<0?-.25:.3;let d='';
+  for(let j=0;j<10;j++){const a=rot+j*Math.PI/5-Math.PI/2,rr=j%2?r*.47:r;d+=(j?'L':'M')+pt({x:p.x+Math.cos(a)*rr,y:p.y+Math.sin(a)*rr})}
+  x+=`<path d="${d}Z" fill="#000" opacity=".35" transform="translate(.6 1.4)"/><path d="${d}Z" fill="#e8b545" stroke="#9a6a14" stroke-width=".7" stroke-linejoin="round" filter="url(#tagfelt)"/><path d="M${f(p.x-1.6*o.stars)} ${f(p.y-1.6*o.stars)}l${f(3.2*o.stars)} ${f(3.2*o.stars)}m0 ${f(-3.2*o.stars)}l${f(-3.2*o.stars)} ${f(3.2*o.stars)}" stroke="#fff3d6" stroke-width=".9" stroke-linecap="round"/>`}
+ return x+'</g>';
+}
+function crescRender(el,svg,gr,kn,pa){
+ el.dataset.m='1';pa.style.display='none';el.querySelectorAll('.pp').forEach(n=>n.style.display='none');
+ const o=cbAt(model.gq,model.mDir),S=cbShape(o.u),B=cbBox(S),v=cbShow(cbAt(model.g,model.mDir),model.mDir),ox=-B.x0,oy=-B.y0,h0=S.hw(0);
+ el.style.width=B.w+'px';el.style.height=B.h+'px';
+ const key=`b|${model.gq}|${model.mDir}|${model.mFr<0?-1:model.mFr%3}`;
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',B.w);svg.setAttribute('height',B.h);svg.setAttribute('viewBox',`0 0 ${B.w} ${B.h}`);svg.innerHTML=crescSvg(o,S,B,model.mFr)}
+ // It rocks on its belly like a rocking toy, rolling without sliding: it turns about its centre of curvature, which moves along as the belly rolls.
+ el.style.transformOrigin=`${f(ox)}px ${f(S.R&&o.rock?oy-S.R:oy+h0)}px`;
+ el.style.transform=o.rock&&S.R?`translateX(${f((S.R+h0)*o.rock*Math.PI/180)}px) rotate(${f(o.rock)}deg)`:o.sq?`scale(${(1+o.sq*.7).toFixed(3)},${(1-o.sq).toFixed(3)})`:'';
+ // The pad's own display and knot fade out before it bends and back once it lies flat.
+ for(const n of[el.querySelector('.mini'),kn]){n.style.opacity=f(v[0]);n.style.visibility=v[0]<.02?'hidden':'visible'}
+ kn.style.left=kn.style.top='';
+ [1,2].forEach(i=>{const n=el.querySelector('.cp'+i),[px,py,pw,ph]=CB.patch[i];n.style.display=v[i]>.02?'block':'none';Object.assign(n.style,{left:f(ox+px)+'px',top:f(oy+py)+'px',width:pw+'px',height:ph+'px',opacity:f(v[i])})});
+ const bw=cbKey(CB.bw,S.u),bl=ox-bw/2;
+ gr.style.opacity=1;gr.style.left=f(bl+2)+'px';gr.style.right=f(B.w-bl-bw+2)+'px';gr.style.top=f(oy-h0)+'px';el.querySelector('.strip').style.opacity=0;
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'changing shape')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418, 86% passed':'')+(model.g>=2?'; deploy-preview and e2e-safari waiting':''));
  return true;
 }
 const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
