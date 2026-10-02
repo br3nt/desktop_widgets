@@ -94,7 +94,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .mlabel span{font:italic 11.5px/1 Georgia,serif;color:#3a2c1e}
 .mlabel em{font-style:normal;font-weight:700;color:#8f1c22;margin-right:3px}
 .small .mlabel b{font-size:11.5px}.small .mlabel span{font-size:11px}
-.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit .pinhit{cursor:pointer}
+.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.platehit{cursor:w-resize}.hit .pinhit{cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0;pointer-events:none}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
@@ -472,6 +472,80 @@ const JOINS={
      `<circle class="pinhit" data-part="pin" cx="${f(K.x)}" cy="${f(K.y)}" r="13" fill="transparent"><title>Tap the knuckle pin to release</title></circle></g>`}
    return s;
   }
+ },
+ carapace:{label:'Carapace overlap',kind:'Interlock',gap:14,holdAt:.5,msOut:1700,
+  about:'The joining ends are shell plates, like the segments of a pill bug. <b>Near:</b> the eyelets under each end catch the light. <b>Ready:</b> a dotted ghost of the extended plates shows across the gap. Joining: the shells close to a finger\'s width apart, and the end plate on Jarvis lifts off its strap with a small drop while GitDiscuss raises a collar plate to meet it. Then the plates telescope across the gap, each a little smaller and sliding out from under the last, a row of three thorns riding the dorsal ridge. The last plate is held high as it runs out, then drops over GitDiscuss\'s collar with a <b>click</b>: the shells jolt together, sparks at the catch, chalk tick marks at the seam, and a glint runs down the closed edge. The seam is overlapping shell edges, each with a dark gap line under its lip. <b>Release:</b> push the plates back toward Jarvis (drag the seam left): the last plate lifts and slides in as you push, and past the catch it unclicks. A tap on the seam, or Enter on it, does the same. The plates fold back into each other, settle onto their straps and the shells part.',
+  text:{join:'The shells close; the end plates lift and telescope across the gap, and click over GitDiscuss\'s collar.',joined:'Joined: overlapping shell plates. Drag either nameplate to move the pair. Push the plates back toward Jarvis, or tap the seam, to release.',
+   release:'Unclicked: the last plate lifts off the collar and the plates fold back into each other.',back:'The plates slide back under each other.',hold:'Held mid-join: the plates telescoping across the gap. Use the scrubber to step through the animation.',
+   ready:'Ready: the plates are ghosted across the gap. Release to interlock.',near:'Nearby: the end eyelets catch the light. Move closer.',phReady:'Ready · the plates are ghosted',phNear:'Nearby · the eyelets catch the light',get phDrag(){return drag&&drag.pull>9?'Pushed off the catch · keep pushing':'Push the plates back toward Jarvis'}},
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.26?'Joining · closing in ':jt<.36?'Joining · the end plates lift ':jt<.64?'Joining · telescoping ':jt<.76?'Joining · click ':'Joining · settling '):(r<.12?'Releasing · unclicked ':r<.45?'Releasing · the plates fold back ':'Releasing · parting ')},
+  // The click jolts the shells together by a couple of pixels and lets them spring back.
+  nudge(jt,dir){if(dir<=0||jt>=1)return 0;const u=seg(jt,.64,.78);return u>0&&u<1?2.6*Math.sin(Math.PI*u)*(1-u):0},
+  releaseStart(){},
+  key(){$('#a .grip').focus();doSeparate()},
+  seamDown(p){this.spring=0;return{seam:true,p0:p,pull:0,moved:0}},
+  // A full push hands its pulled-in, lifted plate straight to the release, so nothing jumps back out.
+  seamMove(d,p){d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));d.pull=clamp(d.p0.x-p.x,0,40);
+   if(d.pull>=30){drag=null;this.push=1;$('#a .grip').focus();doSeparate();return}render()},
+  seamUp(d){if(d.moved<5){$('#a .grip').focus();doSeparate();return}
+   if(d.pull>2){say('The plates spring back and click home. Push them further toward Jarvis to unclick them.');
+    const from=d.pull,t0=performance.now(),me=this;(function step(now){const t=reduce.matches?1:clamp((now-t0)/220);me.spring=from*(1-backOut(t));render();if(t<1&&model.jt===1&&!drag)requestAnimationFrame(step);else me.spring=0})(t0)}
+   else render()},
+  // One plate between its trailing edge xt and leading edge xe, both edges bowed the way it slides.
+  plateD(xt,xe,y0,y1){const b=5*Math.sign(xe-xt),mx=(xt+xe)/2,my=(y0+y1)/2;
+   return `M${f(xt)} ${f(y0+3)}Q${f(mx)} ${f(y0-3)} ${f(xe)} ${f(y0+3)}Q${f(xe+2*b)} ${f(my)} ${f(xe)} ${f(y1-3)}Q${f(mx)} ${f(y1+3)} ${f(xt)} ${f(y1-3)}Q${f(xt+2*b)} ${f(my)} ${f(xt)} ${f(y0+3)}Z`},
+  plate(xt,xe,y0,y1,seamY,o={}){const sg=Math.sign(xe-xt),b=5*sg,mx=(xt+xe)/2,my=(y0+y1)/2,D=this.plateD(xt,xe,y0,y1),op=o.op??1;
+   let s=`<g opacity="${f(op*100)/100}">`;
+   // The dark gap line: the plate's lip casts a shadow onto whatever it overlaps.
+   s+=`<path d="${D}" fill="${INK}" opacity=".62" transform="translate(${f(sg*(3+(o.lift||0)*.6))} ${f(1.5+(o.lift||0))})"/>`;
+   s+=`<path d="${D}" fill="${INK}" transform="translate(0 2.4)"/><path d="${D}" fill="url(#shell)" filter="url(#chitin)"/><path d="${D}" fill="url(#sheen)"/>`;
+   s+=`<g fill="none" stroke-linecap="round"><path d="M${f(xt+4*sg)} ${f(y0+4)}Q${f(mx)} ${f(y0-.6)} ${f(xe-4*sg)} ${f(y0+4)}" stroke="#e3eaf2" stroke-width="1.7" opacity=".5"/>`+
+    `<path d="M${f(xt+2*sg)} ${f(seamY)}Q${f(mx)} ${f(seamY-2.5)} ${f(xe+b*.9)} ${f(seamY)}" stroke="${INK}" stroke-width="1.3" opacity=".75"/>`+
+    `<path d="M${f(xe-2*sg)} ${f(y0+6)}Q${f(xe+2*b-2*sg)} ${f(my)} ${f(xe-2*sg)} ${f(y1-6)}" stroke="#c9d6e6" stroke-width=".9" opacity="${f(.28+.5*(o.shine||0))}"/></g>`;
+   s+=`<path d="${D}" fill="none" stroke="${INK}" stroke-width="2.1" stroke-linejoin="round" filter="url(#wobW)"/>`;
+   // A thorn on the dorsal ridge, curving back toward the plate it slid out of.
+   if(o.thorn)s+=`<path d="M${f(mx+5*sg)} ${f(y0+.6)}Q${f(mx-1*sg)} ${f(y0-5)} ${f(mx-8*sg)} ${f(y0-10)}Q${f(mx-2*sg)} ${f(y0-3.6)} ${f(mx-5*sg)} ${f(y0+.6)}Z" fill="#0b0e14" stroke="${INK}" stroke-width=".8" stroke-linejoin="round"/>`;
+   return s+'</g>'},
+  over(c){
+   const h=c.h,jt=c.jt,ay=model.a.y,by=model.b.y,Ma=model.a.x+W+this.gap/2,Mb=model.b.x-this.gap/2;
+   const top=y=>y-4,bot=y=>y+h+4,seamA=ay+31,seamB=by+31,pl=(k,y)=>[top(y)+2.6*k,bot(y)-2.6*k];
+   let s='';
+   if(jt===0){this.push=0;const g=c.glow;if(g<=0)return '';
+    s+=glints([{x:model.a.x+W-9.5,y:ay+h/2},{x:model.b.x+9.5,y:by+h/2}],g);
+    if(g>=1){const gh=d=>`<path d="${d}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="2.5 4" stroke-linecap="round" opacity=".55"/>`,M=Ma;
+     s+=gh(this.plateD(M-44,M-12,...pl(0,ay)))+gh(this.plateD(M-24,M+8,...pl(1,ay)))+gh(this.plateD(M-4,M+28,...pl(2,ay)))}
+    return s}
+   // Progress of each part: op (plates showing), drop (the lift-off settle), d2 / d3 (telescoping), dc (collar), lift (last plate held up).
+   let op=1,drop=0,d2=1,d3=1,dc=1,lift=0,click=0,glint=-1,sparkU=-1;
+   const pull=jt<1?0:drag&&drag.seam?drag.pull:Math.max(0,this.spring||0),ps=this.push||0;
+   if(jt<1&&model.dir>0){this.push=0;const a=seg(jt,.26,.36);op=clamp(a*3);drop=-6*(1-backOut(a));
+    d2=dart(seg(jt,.36,.52));d3=dart(seg(jt,.44,.62));dc=dart(seg(jt,.4,.56));
+    lift=jt<.62?-4*seg(jt,.36,.44):-4*(1-backOut(seg(jt,.62,.7)));
+    if(jt>.62&&jt<.74)sparkU=seg(jt,.62,.74);if(jt>.62&&jt<.82)click=seg(jt,.62,.82);if(jt>.7&&jt<.9)glint=seg(jt,.7,.9)}
+   else if(jt<1){const r=1-jt;lift=ps?-4:-4*seg(r,0,.1);d3=Math.min(1-.55*ps,1-dart(seg(r,.1,.28)));d2=1-dart(seg(r,.2,.38));dc=1-dart(seg(r,.22,.38));op=1-seg(r,.38,.46);
+    if(r<.12)sparkU=seg(r,0,.12)}
+   else if(pull>0){const k=clamp(pull/30);d3=1-.55*k;lift=-Math.min(4,pull*.5)}
+   if(op<=0)return '';
+   // The plates ride the click's jolt with their shells.
+   const n=this.nudge(jt,model.dir),e1=Ma-12+n,e2=lerp(e1,Ma+8+n,d2),e3=lerp(e2,e2+20,d3),ec=lerp(Mb+10,Mb+2,dc)-n;
+   const yA=ay+drop,[c0,c1]=pl(1.6,by);
+   s+=this.plate(ec+32,ec,c0,c1,seamB,{op});
+   if(d3>0&&e3>e2+.5)s+=this.plate(e3-32,e3,...pl(2,yA+lift),seamA+drop+lift,{op,thorn:true,lift:-lift,shine:jt===1&&!pull?1:0});
+   if(d2>0&&e2>e1+.5)s+=this.plate(e2-32,e2,...pl(1,yA),seamA+drop,{op,thorn:true});
+   s+=this.plate(e1-32,e1,...pl(0,yA),seamA+drop,{op,thorn:true});
+   // The click: sparks at the catch, chalk tick marks either side of the seam, and a glint running down the closed edge.
+   const cat=[{x:e3+2,y:pl(2,ay)[0]+4},{x:e3+2,y:pl(2,ay)[1]-4}];
+   if(sparkU>=0)for(const p of cat)s+=spark(p,1-sparkU,4+7*sparkU);
+   if(click>0){const k=1-click,rr=10+12*ease(click);let t='';
+    for(const[p,sy]of [[cat[0],-1],[cat[1],1]])for(const a of [-50,0,50]){const ra=a*Math.PI/180,u={x:Math.sin(ra),y:sy*Math.cos(ra)};
+     t+=`M${f(p.x+u.x*rr*.55)} ${f(p.y+u.y*rr*.55)}L${f(p.x+u.x*rr)} ${f(p.y+u.y*rr)}`}
+    s+=`<path d="${t}" stroke="#e9edf1" stroke-width="${f(1+1.4*k)}" stroke-linecap="round" fill="none" opacity="${f(k)}"/>`}
+   if(glint>=0){const y=lerp(cat[0].y,cat[1].y,ease(glint)),x=e3+4.6*Math.sin(Math.PI*ease(glint)),a=Math.sin(Math.PI*glint);
+    s+=`<circle cx="${f(x)}" cy="${f(y)}" r="9" fill="url(#silkGlow)" opacity="${f(a)}"/>`+spark({x,y},a,3+3*a)}
+   if(jt===1){const x0=Ma-48,y0=ay-14,wd=90,ht=h+22;
+    s+=`<g class="hit platehit" id="seamHit" tabindex="0" role="button" aria-label="Carapace overlap: push the plates back toward Jarvis, tap, or press Enter, to separate the widgets"><title>Push the plates back toward Jarvis, or tap, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${wd}" height="${f(ht)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${wd}" height="${f(ht)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -749,6 +823,9 @@ function render(){
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   // GitDiscuss turns about the bracket's knuckle, in the middle of the gap.
   if(id==='b'){const bd=model.join==='bracket'?JOINS.bracket.bend(model.jt):0;el.style.transformOrigin=`${-JOINS.bracket.gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
+  // A join's click can jolt the two shells toward each other for a moment.
+  if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
+  else if(id==='a')el.style.transform='';
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
   const k=ease(s),show=coc?1-seg(s,0,.2):mr?1-seg(s,0,.12):1-clamp(k*2.2),strip=coc||mr?0:seg(k,.55,1);
