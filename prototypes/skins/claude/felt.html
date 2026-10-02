@@ -143,7 +143,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the button tab, tug the tab to unbutton it. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -416,6 +416,38 @@ const fitHinge=(y,th,h)=>{const[lo,hi]=hingeSpan(th,h);return clamp(y,46-lo,590-
 const peakBend=()=>1.25*model.angle;
 const signed=v=>{v=Math.round(v);return(v>0?'+':v<0?'−':'')+Math.abs(v)+'°'};
 
+/* ---------- Button tab geometry ---------- */
+// A raspberry felt tab is rooted 14 px in from Jarvis's right end; its buttonhole sits 40 px along it,
+// which lands on the horn button sewn 24 px in from GitDiscuss's left end when the pair is joined.
+const BT={gap:10-2*EDGE,root:14,len:48,hole:40,n:24,hw:12,br:11,col:'#a63a50',patch:'#7c2638',rest:-84,restCurl:-10,tugMax:24};
+const BTX=BT.hole-BT.root-BT.gap;
+// The tab's centre line: phi is its angle at the root (0 points at GitDiscuss, + is up), curl bends it along its length,
+// flick bends only the tail past the buttonhole, and T drags the tip (and the button with it) toward a tugging pointer.
+function tabLine(rx,ry,phi,curl,flick,T){
+ const P=[],th=BT.hole/BT.len;let x=rx,y=ry;
+ for(let i=0;i<=BT.n;i++){const t=i/BT.n,a=(phi+curl*Math.pow(t,1.6)+flick*Math.pow(Math.max(0,(t-th)/(1-th)),1.3))*Math.PI/180;
+  P.push({x:x+(T?T.x*t*t:0),y:y+(T?T.y*t*t:0)});x+=Math.cos(a)*BT.len/BT.n;y-=Math.sin(a)*BT.len/BT.n}
+ return P;
+}
+// Felt strap round a centre line, swelling where the buttonhole is stretched over the button, with a rounded tip.
+function tabShape(P,open,inset=0){
+ const n=P.length-1,th=BT.hole/BT.len,L=[],R=[];
+ P.forEach((p,i)=>{const q=P[Math.max(0,i-1)],r=P[Math.min(n,i+1)],d=unit(V.sub(r,q)),t=i/n,hw=BT.hw+3.4*open*Math.exp(-Math.pow((t-th)/.13,2))-inset;
+  L.push(V.add(p,{x:-d.y*hw,y:d.x*hw}));R.push(V.add(p,{x:d.y*hw,y:-d.x*hw}))});
+ const d=unit(V.sub(P[n],P[n-1])),k=(BT.hw-inset)*1.1,l=L[n],r=R[n];
+ return 'M'+L.map(pt).join('L')+`C${pt(V.add(l,V.mul(d,k)))} ${pt(V.add(r,V.mul(d,k)))} ${pt(r)}L`+R.reverse().map(pt).join('L')+'Z';
+}
+// A horn coat button with four holes, cross-stitched on in cream floss. lift raises it off the felt a little.
+function hornButton(x,y,s,lift=0){
+ return `<g transform="translate(${f(x)} ${f(y)}) scale(${f(s*100)/100})"><circle r="${BT.br}" fill="#000" opacity="${f(.4+.15*lift)}" filter="url(#sh)" transform="translate(${f(.8+lift)} ${f(1.8+2.2*lift)})"/>`+
+  `<circle r="${BT.br}" fill="url(#horn)" stroke="#2e1a0b" stroke-width=".9"/><circle r="7.6" fill="#000" fill-opacity=".14" stroke="#e7bf86" stroke-opacity=".45" stroke-width=".9"/>`+
+  `<path d="M-7.2 -4.4A8.6 8.6 0 0 1 2.6 -8.2" fill="none" stroke="#fff4dc" stroke-opacity="${f(.45+.3*lift)}" stroke-width="1.3" stroke-linecap="round"/>`+
+  `<g fill="#170b04">${[[-1,-1],[1,-1],[1,1],[-1,1]].map(([a,b])=>`<circle cx="${a*2.5}" cy="${b*2.5}" r="1.15"/>`).join('')}</g>`+
+  `<path d="M-2.5 -2.5L2.5 2.5M2.5 -2.5L-2.5 2.5" stroke="#f4e6c6" stroke-width="1.25" stroke-linecap="round"/></g>`;
+}
+// Bits of fluff knocked loose as the button pops through.
+const FLUFF=[[-.2,-1,.3],[.5,-.9,-.6],[-.7,-.6,1.1],[.25,1,.5],[-.45,.85,-1],[.8,.4,.2]];
+
 const mixHex=(a,b,t)=>'#'+[0,2,4].map(i=>Math.round(lerp(parseInt(a.substr(i+1,2),16),parseInt(b.substr(i+1,2),16),t)).toString(16).padStart(2,'0')).join('');
 
 /* ---------- Options ---------- */
@@ -627,6 +659,75 @@ const JOINS={
      `<path d="M${f(-tw/2+5)} ${f(-th/2+3)}L${f(-tw/2-7)} ${f(-th/2-6)}" stroke="url(#metal)" stroke-width="1.1"/><circle cx="${f(-tw/2+5)}" cy="${f(-th/2+3)}" r="2.6" fill="#c4372a" stroke="#5a1209" stroke-width=".5"/><circle cx="${f(-tw/2+4.2)}" cy="${f(-th/2+2.2)}" r=".8" fill="#ffd2c4"/></g>`}
    return s;
   }
+ },
+ button:{label:'Button tab',kind:'Clasp',gap:BT.gap,ms:2300,msDrag:1900,relMs:1800,moveEnd:.3,hold:.64,tug:true,snip:true,
+  ph:[[0,.3,.46,.62,.72,1],[0,.2,.34,.5,.62,1]],
+  about:'A raspberry felt tab is box-stitched to the end of Jarvis and hangs off it, limp, with a blanket-stitched buttonhole near its tip. GitDiscuss has a big horn coat button sewn on its joining end with a cream cross-stitch. <b>Near:</b> the tab perks up toward GitDiscuss and the button stands up off the felt. <b>Ready:</b> the tab reaches out level, its buttonhole gapes and a warm ghost shows where it will land. Joining: the cushions close, the tab flicks up and back, then flops over onto the button, overshoots and slaps down. The button pops up through the hole, both cushions squash, the felt stretches round the button, a few fibres shake loose, and the loose end of the tab wobbles and settles. <b>Release:</b> tug the tab. Drag it any way: the felt stretches and the button is dragged with it, puckering GitDiscuss, until it pops free. Let go early and it holds. Or click the tab, or focus it and press Enter. The button slips back through, the tab drops and swings, then the cushions part.',
+  sayJoin:'The cushions close and the felt tab flops over onto the button.',
+  sayJoined:'Buttoned. Drag either nameplate to move the pair. Tug the felt tab to unbutton it.',
+  sayRelease:'Unbuttoned. The button slips back through, the tab drops and swings, and the cushions part.',
+  sayReady:'Ready: the tab reaches out with its buttonhole open. Release to button up.',
+  sayNear:'Nearby: the tab perks up and the button stands up. Move closer.',
+  sayHold:'Held mid-join: the tab has flopped over and the button is pushing up through the hole. Use the scrubber to step through it.',
+  phReady:'Ready · buttonhole open',
+  pose:jt=>({th:0,ys:0,sq:model.dir>0?.02*Math.sin(Math.PI*seg(jt,.6,.76)):0}),
+  phase(jt){
+   if(model.dir<0&&model.snip){const u=1-jt;return u<.18?'Releasing · unbuttoning':u<.7?'Releasing · the tab drops':'Releasing · parting'}
+   return jt<.3?'Joining · closing in':jt<.46?'Joining · tab flicks up':jt<.62?'Joining · flopping over':jt<.72?'Joining · button pops through':'Joining · settling';
+  },
+  // Every moving part of the clasp, from join progress.
+  state(c){
+   const jt=c.jt,R=BT.rest,RC=BT.restCurl;
+   if(jt===0&&!(model.busy&&model.dir>0)){const e=Math.pow(c.glow,.85);return{phi:lerp(R,-3,e),curl:lerp(RC,5,e),flick:0,open:c.glow>=1?.5:.1+.2*e,btn:0,press:0,lift:e}}
+   // A half-made join that is separated just runs backwards; only a finished one is unbuttoned.
+   if(!(model.dir<0&&model.snip)){
+    const g0=model.fast?1:0,p0=lerp(R,-3,g0),c0=lerp(RC,5,g0);
+    if(jt<.3){const e=ease(seg(jt,0,.3));return{phi:lerp(p0,-6,e),curl:lerp(c0,4,e),flick:0,open:lerp(.1+.4*g0,.5,e),btn:0,press:0,lift:lerp(g0,1,e)}}
+    if(jt<.46){const e=ease(seg(jt,.3,.46));return{phi:lerp(-6,104,e),curl:lerp(4,-26,e),flick:0,open:lerp(.5,.75,e),btn:0,press:0,lift:1}}
+    if(jt<.62){const u=seg(jt,.46,.62);return{phi:104*(1-backOut(u)),curl:lerp(-26,0,u)+24*Math.sin(Math.PI*u),flick:0,open:lerp(.75,1,seg(u,0,.6)),btn:0,press:0,lift:1}}
+    const q=seg(jt,.7,1);
+    return{phi:0,curl:0,flick:18*Math.sin(5*Math.PI*q)*Math.pow(1-q,2),open:1,btn:Math.max(.001,backOut(seg(jt,.62,.72))),press:Math.sin(Math.PI*seg(jt,.62,.76)),lift:0};
+   }
+   // Releasing: the tab is tugged up off the button, drops and swings like a pendulum, then the cushions part.
+   const u=1-jt;
+   if(u<.18){const e=ease(seg(u,.06,.18));return{phi:30*e,curl:-10*e,flick:0,open:1,btn:u<.06?1:0,press:0,lift:0}}
+   const q=seg(u,.18,.7),open=lerp(1,.1,seg(u,.2,.5));
+   if(q<.35){const k=q/.35;return{phi:lerp(30,-98,k*k),curl:lerp(-10,0,k)+18*Math.sin(Math.PI*k),flick:0,open,btn:0,press:0,lift:0}}
+   const k=(q-.35)/.65;return{phi:R-14*Math.cos(3*Math.PI*k)*(1-k),curl:lerp(0,RC,k),flick:0,open,btn:0,press:0,lift:0};
+  },
+  over(c){
+   const r=this.state(c),a=model.a,b=model.b,cy=c.h/2,rx=a.x+W-BT.root,ry=a.y+cy,bx0=b.x+BTX,by0=b.y+cy;
+   // A tug drags the tip toward the pointer, and the button comes with the hole; it fades as the button pops free.
+   const tugging=drag&&drag.tug,T=model.tug&&(tugging||(model.dir<0&&model.busy))?V.mul(model.tug,tugging?1:1-seg(1-c.jt,0,.08)):null;
+   const P=tabLine(rx,ry,r.phi,r.curl,r.flick,T),nh=Math.round(BT.n*BT.hole/BT.len),hp=P[nh],on=r.btn>0;
+   const hd=unit(V.sub(P[nh+1],P[nh-1])),hdeg=angOf(hd.x,hd.y),tk=T?Math.hypot(T.x,T.y)/BT.tugMax:0;
+   const S=tabShape(P,r.open),I=tabShape(P,r.open,3.4),patch=rr4(rx-14,ry-14,28,28,[6,7,6,7]);
+   let s=`<defs><radialGradient id="horn" cx=".36" cy=".3" r=".8"><stop stop-color="#c99057"/><stop offset=".5" stop-color="#8a5226"/><stop offset="1" stop-color="#4a2810"/></radialGradient></defs>`;
+   if(c.ghost>0&&c.jt===0)s+=`<circle cx="${f(bx0)}" cy="${f(by0)}" r="20" fill="#ffc36a" opacity="${f(c.ghost*.5)}" filter="url(#soft)"/><circle cx="${f(rx+BT.hole)}" cy="${f(ry)}" r="14" fill="none" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="4 3"/>`;
+   // Puckers in GitDiscuss's felt where the button is pressed in, or dragged by a tug.
+   const pk=Math.max(r.press,tk);
+   if(pk>.02){let d='';const bp=on?hp:{x:bx0,y:by0},dir=T?unit(T):{x:-1,y:0};
+    for(let i=0;i<6;i++){const ang=i*Math.PI/3+.3,o={x:Math.cos(ang),y:Math.sin(ang)},pull=T?1+.8*Math.max(0,-(o.x*dir.x+o.y*dir.y)):1,p0=V.add(bp,V.mul(o,BT.br+2)),p1=V.add(bp,V.mul(o,BT.br+2+7*pull*pk));d+=`M${pt(p0)}L${pt(p1)}`}
+    s+=`<g fill="none" stroke-linecap="round" opacity="${f(Math.min(1,pk*1.4))}"><path d="${d}" stroke="#0d211f" stroke-opacity=".5" stroke-width="1.3"/><path d="${d}" stroke="#bfe3dc" stroke-opacity=".3" stroke-width="1" transform="translate(-.6 -.8)"/></g>`}
+   if(!on)s+=hornButton(bx0,by0,1,r.lift);
+   s+=`<path d="${S}" fill="#000" opacity=".42" filter="url(#sh)" transform="translate(1.5 3.2)"/><path d="${S}" fill="${BT.col}" filter="url(#tagfelt)"/>`;
+   if(tk>.05)s+=`<path d="${S}" fill="#fff0e8" opacity="${f(.18*tk)}"/>`;
+   s+=`<path d="${I}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.3" stroke-dasharray="3.2 2.6" transform="translate(.4 .8)"/><path d="${I}" fill="none" stroke="#f7e8c9" stroke-opacity=".85" stroke-width="1.1" stroke-dasharray="3.2 2.6" stroke-linecap="round"/>`;
+   // The blanket-stitched buttonhole: a slit at rest, gaping when ready, stretched round the button when buttoned.
+   const hx=lerp(5.5,10.5,r.open)*(1+.25*tk),hy=lerp(1.1,9.5,r.open);
+   s+=`<g transform="translate(${f(hp.x)} ${f(hp.y)}) rotate(${f(hdeg)})"><ellipse rx="${f(hx+2.3)}" ry="${f(hy+2.3)}" fill="none" stroke="#3d0f19" stroke-opacity=".55" stroke-width="3.2"/><ellipse rx="${f(hx+2.2)}" ry="${f(hy+2.2)}" fill="none" stroke="#f7e8c9" stroke-width="2.6" stroke-dasharray=".8 .9"/><ellipse rx="${f(hx)}" ry="${f(hy)}" fill="#1a0e0a"/></g>`;
+   // The root patch, box-stitched to the cushion.
+   s+=`<path d="${patch}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.5 1.6)"/><path d="${patch}" fill="${BT.patch}" filter="url(#tagfelt)"/>`;
+   const box=rr4(rx-10,ry-10,20,20,[3,3,3,3])+`M${f(rx-9)} ${f(ry-9)}L${f(rx+9)} ${f(ry+9)}M${f(rx+9)} ${f(ry-9)}L${f(rx-9)} ${f(ry+9)}`;
+   s+=`<path d="${box}" fill="none" stroke="#f7e8c9" stroke-opacity=".85" stroke-width="1.1" stroke-dasharray="3 2.4" stroke-linecap="round"/>`;
+   if(on)s+=hornButton(hp.x,hp.y,.62+.38*r.btn,0);
+   // A few fibres shaken loose as the button pops through.
+   if(model.dir>0&&c.jt>.64&&c.jt<.9){const u=seg(c.jt,.64,.9);
+    for(const[dx,dy,rot]of FLUFF){const x=hp.x+dx*22*(.4+u),y=hp.y+dy*16*(.8+u*.6)+20*u*u;
+     s+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+u*90)})" fill="none" stroke="#e98aa0" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-u)}"/>`}}
+   if(c.jt===1)s+=`<g class="hit" id="pullHit" tabindex="0" role="button" aria-label="Felt button tab: tug it, click it or press Enter to unbutton and separate the widgets"><title>Tug the tab to unbutton it</title><path d="${S}" fill="transparent" stroke="transparent" stroke-width="16"/><path class="ringfocus" d="${S}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
+   return s;
+  }
  }
 };
 const SHADES={
@@ -689,7 +790,9 @@ const remap=(v,from,to)=>{for(let i=1;i<from.length;i++)if(v<=from[i])return ler
 async function doJoin(fixed='a',fast=false){
  if(model.jt===1)return;
  const j=J(),[pj,pt]=j.ph||[PH_JT,PH_T];
- model.dir=1;model.snip=false;
+ // fast marks a join released from the ready pose, so the button tab carries on from where it was reaching.
+ if(model.jt===0)model.fast=fast;
+ model.dir=1;model.snip=false;model.tug=null;
  if(!model.path||model.jt===0)model.path={s:here(),j:joinedPose(fixed)};
  say(j.sayJoin);
  const t0=remap(model.jt,pj,pt);
@@ -706,7 +809,7 @@ async function doSeparate(){
  if(await tween(model.jt,0,(j.relMs||1300)*model.jt,setJt)){model.path=null;model.snip=false;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
- ++anim;model.busy=false;model.dir=1;model.snip=false;
+ model.fast=false;++anim;model.busy=false;model.dir=1;model.snip=false;
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
  setJt(J().hold||.64);render();say(J().sayHold);
 }
@@ -750,7 +853,7 @@ function render(){
  $('#angleRow').style.display=model.join==='hinge'?'':'none';$('#angle').value=Math.round(model.angle);$('#angleOut').textContent=signed(model.angle);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const ph={separate:'Separate · two cushions',joining:j.phase(model.jt),joined:'Joined · '+j.label.toLowerCase()+(model.join==='hinge'?' · '+signed(model.angle):'')};
- $('#phase').textContent=(drag&&drag.pull?'Unzipping · '+Math.round(model.jt*100)+'%':drag&&drag.mode==='angle'?'Bending · '+signed(model.angle):drag&&drag.state==='ready'?(j.phReady||'Ready · release to zip'):drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
+ $('#phase').textContent=(drag&&drag.tug?'Tugging · '+Math.round(Math.hypot(model.tug.x,model.tug.y)/(BT.tugMax*.9)*100)+'%':drag&&drag.pull?'Unzipping · '+Math.round(model.jt*100)+'%':drag&&drag.mode==='angle'?'Bending · '+signed(model.angle):drag&&drag.state==='ready'?(j.phReady||'Ready · release to zip'):drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -759,6 +862,7 @@ STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.
 function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();else toggleShade()}
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
+ if(drag)cancelDrag();
  if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.snip=false;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  if(hingeOn())model.a.y=model.b.y=hingeY(model.a.y);
@@ -779,7 +883,7 @@ function setAngle(v){
 let turnTimer=0;
 function flashTurning(){model.turning=true;clearTimeout(turnTimer);turnTimer=setTimeout(()=>{model.turning=false;render()},900)}
 $('#angle').oninput=e=>{flashTurning();setAngle(+e.target.value)};
-$('#scrub').oninput=e=>{++anim;model.busy=false;model.dir=1;model.snip=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
+$('#scrub').oninput=e=>{model.fast=false;++anim;model.busy=false;model.dir=1;model.snip=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
 document.addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
  const key=e.key.toLowerCase();
@@ -800,6 +904,7 @@ function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
  if(e.target.closest('#pullHit')&&model.jt===1){
+  if(J().tug){e.preventDefault();model.tug={x:0,y:0};drag={tug:true,start:local(e),moved:false};stage.setPointerCapture(e.pointerId);render();return}
   if(!J().pullDrag){e.preventDefault();doSeparate();return}
   e.preventDefault();++anim;model.busy=false;model.dir=-1;model.path={s:separatePose(),j:here()};
   drag={pull:true,start:local(e),moved:false};stage.setPointerCapture(e.pointerId);render();return;
@@ -818,6 +923,13 @@ stage.addEventListener('pointerdown',e=>{
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e),dx=p.x-drag.start.x,dy=p.y-drag.start.y;
+ if(drag.tug){
+  // The felt gives a little, then the button pops free once the tug goes far enough.
+  const d=Math.hypot(dx,dy);if(d>4)drag.moved=true;
+  const k=Math.min(1,BT.tugMax/(d||1))*.9;model.tug={x:dx*k,y:dy*k};
+  if(d*.9>=BT.tugMax){drag=null;try{stage.releasePointerCapture(e.pointerId)}catch(_){}doSeparate();return}
+  render();return;
+ }
  if(drag.pull){
   // The pull follows the pointer down the seam; letting go below halfway unzips the rest.
   if(Math.abs(dy)>3)drag.moved=true;const z=zipState(1,ctx().h),travel=z.z1-z.z0;
@@ -839,6 +951,7 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.tug){if(!d.moved)doSeparate();else{model.tug=null;render();say('The button holds. Tug the tab further to unbutton it.')}return}
  if(d.pull){if(!d.moved||model.jt<.75)doSeparate();else{model.dir=1;tween(model.jt,1,260,setJt).then(ok=>{if(ok){model.path=null;say('Zipped back up.')}})}return}
  if(d.mode==='angle'){model.turning=false;setAngle(model.angle);say(J().sayJoined);return}
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
@@ -846,6 +959,7 @@ function endDrag(){
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.tug){model.tug=null;render();return}
  if(d.pull){++anim;model.busy=false;setJt(1);model.path=null;render();say('Unzip cancelled.');return}
  const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.');
 }
