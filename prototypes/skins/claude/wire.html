@@ -89,7 +89,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="st-gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff2b8"/><stop offset=".45" stop-color="#d4a640"/><stop offset="1" stop-color="#5c3f0c"/></linearGradient>
  <radialGradient id="st-amet" cx=".4" cy=".3" r=".8"><stop stop-color="#e6c8f2"/><stop offset=".35" stop-color="#8a55a6"/><stop offset=".8" stop-color="#3e1f52"/><stop offset="1" stop-color="#22102e"/></radialGradient>
  <linearGradient id="tr-glass" x1="0" y1="0" x2=".4" y2="1"><stop stop-color="#16303a"/><stop offset=".55" stop-color="#0b171b"/><stop offset="1" stop-color="#071013"/></linearGradient>
- <radialGradient id="st-pearl"cx=".36" cy=".3" r=".8"><stop stop-color="#fffdf6"/><stop offset=".3" stop-color="#efe3d6"/><stop offset=".7" stop-color="#c7b3b4"/><stop offset="1" stop-color="#6e5d63"/></radialGradient>
+ <radialGradient id="st-pearl" cx=".36" cy=".3" r=".8"><stop stop-color="#fffdf6"/><stop offset=".3" stop-color="#efe3d6"/><stop offset=".7" stop-color="#c7b3b4"/><stop offset="1" stop-color="#6e5d63"/></radialGradient>
  <linearGradient id="st-slab" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#1b343b"/><stop offset=".55" stop-color="#0c1a1e"/><stop offset="1" stop-color="#060d10"/></linearGradient>
  <linearGradient id="cb-brass" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#fbe9b4"/><stop offset=".4" stop-color="#d7ad5e"/><stop offset=".85" stop-color="#9a6b2a"/><stop offset="1" stop-color="#6b4517"/></linearGradient>
  <linearGradient id="rim-cu" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe0c0"/><stop offset=".45" stop-color="#e2a06c"/><stop offset="1" stop-color="#9b5b35"/></linearGradient>
@@ -507,7 +507,7 @@ function curlD(x,y,side,up,r,turns){let d='';const n=20,cy=y+(up?-r:r),a0=up?Mat
 /* ---------- Coil wrap geometry ---------- */
 // How far in from a pendant's outer edge its frame wire sits at height y (the frame's corners are rounded).
 // The bead strand and coil band shades squeeze the frame toward the middle, so the frame's height follows the shade.
-function frameH(h){const k=shadeK();return model.shade==='strand'?(h-10)*(1-seg(k,.35,1)):model.shade==='coil'?lerp(h-10,20,k):h-10}
+function frameH(h){const k=shadeK();return model.shade==='strand'?(h-10)*(1-seg(k,.35,1)):model.shade==='coil'?lerp(h-10,20,k):model.shade==='fold'?lerp(h-10,6,seg(model.st,.6,.72)):h-10}
 const frameY=(y,h)=>{const fh=frameH(h);return fh<4?h/2:clamp(y,h/2-fh/2+2,h/2+fh/2-2)};
 function frameIn(y,h){const fh=frameH(h),r=Math.min(26,fh/2),dy=Math.max(0,h/2-fh/2+r-y,y-(h/2+fh/2-r));return 5+r-Math.sqrt(Math.max(0,r*r-dy*dy))}
 // Spine extent, turns per band, pitch and band centres for a pendant of height h; shading drops the bands to two turns.
@@ -609,8 +609,70 @@ const SHADES={
   about:'The pendant empties back into its frame, like a hoop with no tree in it. The display and buttons sink away first: the plate drops back and darkens, the coils round the stone unwind, the scroll curls draw in, and the inner wire swells outward until it lies along the frame. Then the frame closes down to a strip and stays as a bare copper outline with nothing inside, so the stage shows through. A single glass bead threads onto the bottom rim at the left corner and slides along to the right, where it settles with a click; it carries the one key value, and its core glows with the status: <b>amber</b> running, <b>labradorite</b> paused, <b>carnelian</b> needs a decision, <b>malachite</b> passing. Last, a hot wire point writes the name into the empty space in copper. Unshading plays it backwards: the name unwrites, the bead slides back to the corner and fades, and the contents rise back out of the frame. The eye loops and bead caps stay on the ends, so shaded rims still join.',
   sayOn:'Shaded: the contents sink into the frame, leaving an empty copper outline, a single bead readout and the name written in wire.',
   hk:st=>ease(seg(st,.24,.6)),show:st=>1-ease(seg(st,0,.3)),sink:st=>ease(seg(st,0,.36)),
-  draw(id,w,h,small,st){return hoopRim(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return hoopRim(id,w,h,small,st)}},
+ fold:{label:'Folded branches',kind:'Fold',ms:1800,ownStrip:true,
+  about:'The pendant turns into a wire tree lying on its side, then closes like an umbrella. The display fades and the plate falls away, and a three-strand copper trunk twists across the empty frame from end to end, brass ferrules at both ends. Branches sprout from it one after another, alternating up and down, hot at the tips, each bound on with a small coil collar and carrying a stone at its tip, so for a moment the frame holds an open fern of wire. Then the branches fold toward the crown end like umbrella ribs, the crown-end ones first, each overshooting a little and springing back, while the frame closes in and herds the slower ones down before it fades away. The stones end up lined along the trunk, alternating above and below it: <b>amber</b> per running Jarvis agent (labradorite when paused) and two <b>pearls</b> for its queued checks; <b>carnelian</b> per GitDiscuss decision and four pearls for the comments; for Checks, fourteen twigs with <b>malachite</b> for the 12 passed and carnelian for the 2 waiting. Brass wraps cinch the bundle at both ends with a spark, then the name slab and the value cabochon flip up onto the trunk. Unshading plays it backwards: the wraps loosen, the branches spring open, the frame returns and the tree withdraws. Join ends stay on the trunk, so folded pendants still join.',
+  sayOn:'Shaded: a wire tree sprouts in the frame, then its branches fold down along the trunk like an umbrella, stones lined along it.',
+  hk:st=>ease(seg(st,.3,.7)),show:st=>1-ease(seg(st,0,.2)),
+  draw(id,w,h,small,st){return foldBranches(id,w,h,small,st)}}
 };
+
+/* ---------- Folded branches pieces ---------- */
+// A small overshoot (about 4%) for ribs and tags settling.
+const springOut=t=>1+2*Math.pow(t-1,3)+Math.pow(t-1,2);
+function foldLayout(id,w,small){
+ const m=model[id],d=strandData(id);
+ const beads=id==='a'?[...Array(3).fill(m.run?'amber':'lab'),'pearl','pearl']:id==='b'?[...Array(2).fill(m.run?'carn':'lab'),...Array(4).fill('pearl')]:d.beads;
+ const r=small?3:4.4,L0=small?30:50,L1=small?16:28,a1=Math.asin((2.6+r+.8)/L1);
+ const tw=Math.ceil(measure(d.name,NAME_F))+(small?16:20),vw=Math.ceil(measure(d.num,NUM_F)+(d.word?measure(d.word,WORD_F)+5:0))+(small?18:22);
+ const e0=16,e1=w-16,zx0=e0+6+tw+10,zx1=e1-6-vw-10,run=zx1-zx0-L1*Math.cos(a1)-r-2,n=beads.length;
+ return{r,L0,L1,a1,zx0,zx1,
+  tag:{k:'tag',wd:tw,text:d.name,x:e0+6+tw/2},val:{k:'val',wd:vw,num:d.num,word:d.word,x:e1-6-vw/2},
+  ribs:beads.map((stone,i)=>({x:zx0+run*(i+.5)/n,side:i%2?1:-1,stone,u:n>1?i/(n-1):0}))};
+}
+function foldBranches(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const cy=h/2,L=foldLayout(id,w,small),fr=Math.min(small?20:26,(h-10)/2),A0=58*Math.PI/180;
+ // The plate falls away first; the frame fades out before the join ends' anchors close onto the trunk (frameH).
+ const po=1-seg(st,.04,.34),fo=1-seg(st,.45,.62);
+ let s='';
+ if(po>0)s+=`<g opacity="${f(po)}">${casing(w,h,small,true)}</g>`;
+ if(fo>0)s+=wire(rrect(5,5,w-10,h-10,fr),'copper',3.1,fo);
+ // The trunk twists across from the left ferrule to the right.
+ const tg=ease(seg(st,.06,.26));if(tg<=0)return s;
+ const xa=8,xb=lerp(xa,w-8,tg);
+ s+=`<path d="M${xa} ${f(cy)}H${f(xb)}" transform="translate(1.5 4)" stroke="#000" stroke-opacity=".32" stroke-width="5" stroke-linecap="round"/>`;
+ // Branches: sprout root to crown at the open angle, then fold toward the crown, crown end first. The closing frame herds the slower ones down.
+ let ribs='',beads='',collars='';
+ for(const R of L.ribs){
+  const sp=ease(seg(st,.12+.12*R.u,.26+.12*R.u));if(sp<=0)continue;
+  const p=seg(st,.36+.1*(1-R.u),.6+.1*(1-R.u)),len=lerp(L.L0,L.L1,ease(p))*sp;
+  let a=L.a1+(A0-L.a1)*(1-springOut(p));
+  const room=(h/2-5-L.r)/Math.max(1,len);if(room<1)a=Math.min(a,Math.asin(Math.max(0,room)));
+  const tip=[R.x+len*Math.cos(a),cy+R.side*len*Math.sin(a)],c=[R.x+len*.5*Math.cos(a*.55),cy+R.side*len*.5*Math.sin(a*.55)];
+  ribs+=wire(`M${f(R.x)} ${f(cy)}Q${f(c[0])} ${f(c[1])} ${f(tip[0])} ${f(tip[1])}`,sp<1?'hot':'copper',small?1.1:1.35);
+  const bo=seg(sp,.55,1);
+  if(bo>0)beads+=`<g opacity="${f(bo)}">${strandItem({k:'bead',r:f(L.r*(.5+.5*bo)),stone:R.stone},tip[0],tip[1])}</g>`;
+  collars+=wire(band(R.x,cy,false,2,small?7:9,2.2),'copper',1,sp);
+ }
+ s+=ribs;
+ s+=`<path d="M${xa} ${f(cy)}H${f(xb)}" stroke="#1f110a" stroke-width="${small?5.6:6.4}" stroke-linecap="round"/>`;
+ let rope='';for(let i=0;i<3;i++){let d='';for(let x=xa;x<=xb+.01;x+=2)d+=(x>xa?'L':'M')+f(x)+' '+f(cy+1.7*Math.sin(x/3.6+i*2.094));rope+=d}
+ s+=wire(rope,'copper',1.15)+collars+beads;
+ if(tg<1)s+=`<circle cx="${f(xb)}" cy="${f(cy)}" r="7" fill="#ffb15e" opacity=".6" filter="url(#soft)"/><circle cx="${f(xb)}" cy="${f(cy)}" r="1.6" fill="#fff4d0"/>`;
+ s+=wire(band(12,cy,false,3,11,2.3),'brass',1.2)+(tg>=1?wire(band(w-12,cy,false,3,11,2.3),'brass',1.2,seg(st,.26,.3)):'');
+ // Brass wraps cinch the folded bundle at both ends, going on loose and snapping tight.
+ const ct=seg(st,.7,.8);
+ if(ct>0){const sp=lerp(17,11,ease(ct));s+=wire(band(L.zx0-4,cy,false,3,sp,2.2)+band(L.zx1+4,cy,false,3,sp,2.2),'brass',1.2,clamp(ct*3));
+  const k=Math.sin(Math.PI*seg(st,.74,.86));if(k>.03)s+=sparkle(L.zx0-4,cy-sp/2-1,k*.7)+sparkle(L.zx1+4,cy-sp/2-1,k*.7)}
+ // The name slab and the value cabochon flip up onto the trunk.
+ for(const [it,t0] of [[L.tag,.78],[L.val,.85]]){
+  const q=seg(st,t0,t0+.14);if(q<=0)continue;
+  const sy=Math.max(.01,springOut(q));
+  s+=`<g opacity="${f(clamp(q*4))}" transform="translate(0 ${f(cy)}) scale(1 ${f(sy*1000)/1000}) translate(0 ${f(-cy)})">${strandItem(it,it.x,cy,small)}</g>`;
+ }
+ return s;
+}
 
 /* ---------- Hoop rim pieces ---------- */
 const RIM_NAME={a:'Jarvis',b:'GitDiscuss',c:'Checks'},RIM_GLOW={amber:'#f0ac4e',carn:'#e2582c',mal:'#3fae6a',lab:'#8b9aa8'};
