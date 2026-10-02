@@ -138,7 +138,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -147,7 +147,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 /* ---------- Wire drawing kit ---------- */
-const METAL={copper:['#1f110a','#9b5b35','#f3bd92'],brass:['#2a1d08','#b68b34','#fde9a8'],hot:['#3a1a06','#e08a3c','#fff0c8']};
+const METAL={copper:['#1f110a','#9b5b35','#f3bd92'],brass:['#2a1d08','#b68b34','#fde9a8'],hot:['#3a1a06','#e08a3c','#fff0c8'],dim:['#120a06','#5e3820','#a8724e']};
 function wire(d,m='copper',w=3,op=1){
  const c=METAL[m];
  return `<g opacity="${op}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="${c[0]}" stroke-width="${w+1.7}"/><path d="${d}" stroke="${c[1]}" stroke-width="${w}"/><path d="${d}" stroke="${c[2]}" stroke-width="${f(w*.32)}" stroke-opacity=".85" transform="translate(-.5 -.6)"/></g>`;
@@ -162,6 +162,17 @@ function coilsAlong(d,step=2.3,half=2.5,from=0,to=1){
  return out;
 }
 function band(x,y,vertical,n,span=9,gap=2.5){let d='';for(let i=0;i<n;i++){const o=(i-(n-1)/2)*gap;d+=vertical?`M${f(x-span/2)} ${f(y+o-.6)}Q${x} ${f(y+o+.9)} ${f(x+span/2)} ${f(y+o-.6)}`:`M${f(x+o-.6)} ${f(y-span/2)}Q${f(x+o+.9)} ${y} ${f(x+o-.6)} ${f(y+span/2)}`}return d}
+const poly=pts=>pts.map((p,i)=>(i?'L':'M')+f(p[0])+' '+f(p[1])).join('');
+const quad=(a,c,b,t)=>[(1-t)*(1-t)*a[0]+2*(1-t)*t*c[0]+t*t*b[0],(1-t)*(1-t)*a[1]+2*(1-t)*t*c[1]+t*t*b[1]];
+const sparkle=(x,y,s)=>`<path d="M0 -7L1.3 -1.3L7 0L1.3 1.3L0 7L-1.3 1.3L-7 0L-1.3 -1.3Z" fill="#fffbe6" transform="translate(${f(x)} ${f(y)}) scale(${f(s*100)/100}) rotate(${f(s*30)})"/>`;
+// A helix round a vertical axis from turn `from` to turn `to`, split into the half in front and the half behind. Turns within 0.9 of S sit loose.
+function helix(cx,rr,y0,p,from,to,S){
+ const fr=[],bk=[];let run=null,side=null,prev=null;const N=Math.max(2,Math.ceil((to-from)*24));
+ for(let i=0;i<=N;i++){const u=from+(to-from)*i/N,th=u*2*Math.PI,lz=clamp(1-(S-u)/.9),x=cx+(rr+2*lz)*Math.cos(th),y=y0+p*u+p*(.55+.75*lz)*Math.sin(th),pt=[x,y],s=Math.sin(th)>=-.02;
+  if(s!==side){if(run&&run.length>1)(side?fr:bk).push(run);run=prev?[prev]:[];side=s}run.push(pt);prev=pt}
+ if(run&&run.length>1)(side?fr:bk).push(run);
+ return{f:fr.map(poly).join(''),b:bk.map(poly).join(''),end:prev};
+}
 function spiral(cx,cy,r,turns,dir=1,start=0){let d='';const n=48;for(let i=0;i<=n;i++){const t=i/n,a=start+dir*t*turns*Math.PI*2,rr=r*(1-t*.86);d+=(i?'L':'M')+f(cx+Math.cos(a)*rr)+' '+f(cy+Math.sin(a)*rr)}return d}
 
 /* Casing: hammered backplate, double wire frame bound by coil bands, scroll curls, coiled stone bezel. */
@@ -316,8 +327,101 @@ const JOINS={
     s+=`<path d="M${f(x-sn*2.2)} ${f(y+cs*2.2)}L${f(x+sn*2.2)} ${f(y-cs*2.2)}" stroke="#3a2408" stroke-width="1" stroke-linecap="round"/>`}
    return s;
   }
+ },
+ coil:{label:'Coil wrap',kind:'Bind',gap:14,slow:1.8,pull:true,
+  about:'Like the roots of a hoop tree wrapped onto the ring. Each joinable end carries a spine, a straight bar of heavy wire bent out from the frame on two elbows, and Jarvis has three wire ends, bound to its frame and curled at the tip. <b>Near:</b> the curls open and the wire ends reach toward GitDiscuss, their tips and both spines warming. <b>Ready:</b> the tips touch GitDiscuss\'s spine and dashed ghosts of three coil bands show where the spines will meet. Joining: the wire ends leap across one after another in high arcs and hook GitDiscuss\'s spine with a spark, then draw taut and reel it in until the two spines lie side by side. Each end then winds round both spines together, five tight turns, passing behind the bars and round the front. The working end runs hot and each fresh turn sits loose until the next one cinches it. The ends tuck into curls, the middle one holding an amber bead, and a wave of heat runs down the three bands as they anneal; the amber bead stays lit as the join light. In shade the bands drop to two turns on shorter spines. <b>Release:</b> grab a band and pull in any direction; the bands unwind as you pull, and past halfway they let go, the hooks slip off and the wire ends spring back into curls. Let go sooner and the wire winds back on. A click, or Enter on the focused bands, unwinds them in one go.',
+  sayJoin:'Three wire ends leap across and hook GitDiscuss\'s spine, reel it in, then wind both spines together in three tight bands.',
+  sayJoined:'Bound by three coil bands. Drag either nameplate to move the pair. Grab a band and pull to unwind it, or click it.',
+  sayRelease:'The bands unwind, the hooks slip off and the wire ends curl back home.',
+  sayReady:'Ready: the wire ends touch GitDiscuss\'s spine. Release to bind them.',sayNear:'Nearby: Jarvis\'s wire ends uncurl and reach. Move closer.',
+  end(side,lit,h){
+   const G=coilLocal(h),xs=side>0?W+4:-4,fx=y=>side>0?W-frameIn(y,h):frameIn(y,h),t=G.st,b=h-G.st,c0=frameY(t-5,h),c1=frameY(b+5,h);
+   const d=`M${f(fx(c0))} ${f(c0)}C${f(lerp(fx(c0),xs,.75))} ${f(c0)} ${xs} ${f(c0+1)} ${xs} ${f(t+3)}V${f(b-3)}C${xs} ${f(c1-1)} ${f(lerp(fx(c1),xs,.75))} ${f(c1)} ${f(fx(c1))} ${f(c1)}`;
+   let s='';
+   if(lit>0)s+=`<rect x="${xs-7}" y="${f(t)}" width="14" height="${f(b-t)}" rx="7" fill="#ffb15e" opacity="${f(lit*.5)}" filter="url(#soft)"/>`;
+   s+=`<path d="${d}" transform="translate(${side*1.5} 4)" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="3.5"/>`+wire(d,lit>.5?'hot':'copper',2.6);
+   // Two small wraps lock each elbow onto the bar.
+   s+=wire(band(xs,t+3.5,true,2,7,2.2)+band(xs,b-3.5,true,2,7,2.2),'copper',1.05);
+   return s;
+  },
+  under(c){
+   if(c.jt<.5)return '';const g=coilGeo(c);let s='';
+   g.bands.forEach((B,i)=>{const t=coilT(c.jt,i);if(t.wrap<=0)return;
+    const S=g.n*t.wrap,Hx=helix(g.mid,g.rr,B.y0,g.p,0,S,S+1.2*clamp(t.tail));
+    // The lead runs behind both spines from Jarvis's frame to where the first turn starts.
+    s+=wire(`M${f(B.root[0])} ${f(B.root[1])}Q${f(g.mid)} ${f(B.y0-1)} ${f(g.mid+g.rr)} ${f(B.y0)}`,'dim',1.5)+wire(Hx.b,'dim',1.5);
+   });
+   return s;
+  },
+  over(c){
+   const g=coilGeo(c),jt=c.jt,reach=jt===0?model.glow:Math.max(model.glow,seg(jt,0,.12));let s='';
+   g.bands.forEach((B,i)=>{
+    const t=coilT(jt,i),R=B.root;
+    if(t.leap<=0){
+     // Resting: a wire end curled at the tip, alternately up and down. Near and ready open the curl and reach.
+     const tx=Math.min(R[0]+lerp(15,24,reach),Math.max(R[0]+15,g.sB+1)),rad=lerp(3.2,1.8,reach),turns=lerp(1.35,.25,reach),dn=i===1;
+     const d=`M${f(R[0])} ${f(R[1])}L${f(tx)} ${f(R[1])}`+spiral(tx,R[1]+(dn?-rad:rad),rad,turns,dn?-1:1,dn?Math.PI/2:-Math.PI/2).replace(/^M/,'L');
+     if(reach>0)s+=`<circle cx="${f(tx)}" cy="${f(R[1])}" r="7" fill="#ffb15e" opacity="${f(reach*.55)}" filter="url(#soft)"/>`;
+     s+=wire(d,reach>.6?'hot':'copper',1.6);
+     if(c.ghost>0&&jt===0){const Hx=helix(g.mid,g.rr,B.y0,g.p,0,g.n,99);
+      s+=`<g fill="none" stroke="#f3c96a" stroke-width="1.1" stroke-dasharray="2 2.2" stroke-linecap="round" opacity="${f(c.ghost)}"><path d="${Hx.f}" stroke-opacity=".9"/><path d="${Hx.b}" stroke-opacity=".4"/></g>`}
+     return;
+    }
+    if(t.wrap<=0){
+     // In flight the end arcs high over the gap and hooks GitDiscuss's spine; then it draws taut and reels GitDiscuss in.
+     const Hk=[g.sB+2.6,B.hy],C0=[(R[0]+Hk[0])/2+6,Math.min(R[1],Hk[1])-30-8*(i%2)];
+     const C=[lerp(C0[0],(R[0]+Hk[0])/2,t.taut),lerp(C0[1],(R[1]+Hk[1])/2+1.5,t.taut)];
+     const pts=[];for(let k=0;k<=18;k++)pts.push(quad(R,C,Hk,t.leap*k/18));
+     s+=wire(poly(pts),'copper',1.6);
+     if(t.leap<1){const q=pts[pts.length-1];s+=wire(poly(pts.slice(-4)),'hot',1.6)+`<circle cx="${f(q[0])}" cy="${f(q[1])}" r="6" fill="#ffb15e" opacity=".55" filter="url(#soft)"/>`}
+     else s+=wire(`M${f(Hk[0])} ${f(Hk[1])}a2.6 2.6 0 0 0 -5.2 0q0 2.6 1.8 4`,t.taut<1?'hot':'copper',1.5);
+     const sp=Math.sin(Math.PI*seg(jt,.25+.05*i,.33+.05*i));if(sp>.03)s+=sparkle(Hk[0],Hk[1]-3,sp*.7);
+     return;
+    }
+    const S=g.n*t.wrap,tl=clamp(t.tail),Hx=helix(g.mid,g.rr,B.y0,g.p,0,S,S+1.2*tl);
+    s+=wire(Hx.f,'copper',1.5);
+    if(t.wrap<1){
+     // The hot working end, with the wire still to wind flicking out beyond it.
+     const w=helix(g.mid,g.rr,B.y0,g.p,Math.max(0,S-.3),S,S),E=Hx.end;
+     s+=wire(w.f,'hot',1.5)+wire(`M${f(E[0])} ${f(E[1])}q7 -6 ${f(10+6*(1-t.wrap))} -3`,'hot',1.3)+`<circle cx="${f(E[0])}" cy="${f(E[1])}" r="5" fill="#ffb15e" opacity=".5" filter="url(#soft)"/>`;
+    }
+    // Annealing: a wave of heat runs down the finished bands, top first.
+    if(t.heat>0&&t.heat<1){const o=Math.sin(Math.PI*t.heat);
+     s+=`<ellipse cx="${f(g.mid)}" cy="${f(B.y0+S*g.p/2)}" rx="10" ry="${f(S*g.p/2+5)}" fill="#ff9a4a" opacity="${f(.45*o)}" filter="url(#soft)"/>`+wire(Hx.f,'hot',1.5,o)}
+    // Tie-off: the end tucks into a curl; the middle curl holds the amber join light.
+    if(t.tail>.01){const E=Hx.end,mid=i===1,cr=mid?3.3:2.3,on=mid?seg(jt,.92,1):0;
+     // Rotated to curl downward, so the curl stays in the gap below its band instead of reaching onto GitDiscuss's frame.
+     s+=`<g transform="translate(${f(E[0])} ${f(E[1])}) rotate(90) scale(${f(t.tail*lerp(.65,1,g.hs))})">`+(on>0?`<circle cx="4" cy="${f(4+cr)}" r="10" fill="#ffb15e" opacity="${f(.6*on)}" filter="url(#soft)"/>`:'')+
+      wire(`M0 0Q5 .5 ${f(4+cr*.95)} ${f(4+cr*.69)}`+spiral(4,4+cr,cr,1.2,1,-Math.PI*.1).replace(/^M/,'L'),'copper',1.2)+
+      (mid?`<circle cx="4" cy="${f(4+cr)}" r="${f(cr*.8)}" fill="url(#st-amber)" stroke="#2a170d" stroke-width=".5"/>`+(on>0?`<circle cx="3.4" cy="${f(3.4+cr)}" r="${f(cr*.42)}" fill="#fff4cf" opacity="${f(.75*on)}"/>`:''):`<circle cx="4" cy="${f(4+cr)}" r="1.1" fill="url(#st-gold)"/>`)+`</g>`}
+   });
+   if(jt===1){
+    const y0=g.bands[0].y0-7,y1=g.bands[2].y0+g.n*g.p+9;let r='';
+    g.bands.forEach(B=>{r+=`<rect x="${f(g.mid-13)}" y="${f(B.y0-5)}" width="26" height="${f(g.n*g.p+11)}" fill="transparent"/>`});
+    s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Coil wrap: pull a band, or press Enter, to unwind the wire and separate the widgets"><title>Grab a band and pull to unwind it</title>${r}<rect class="ringfocus" x="${f(g.mid-15)}" y="${f(y0)}" width="30" height="${f(y1-y0)}" rx="9" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+   }
+   return s;
+  }
  }
 };
+/* ---------- Coil wrap geometry ---------- */
+// How far in from a pendant's outer edge its frame wire sits at height y (the frame's corners are rounded).
+// The bead strand and coil band shades squeeze the frame toward the middle, so the frame's height follows the shade.
+function frameH(h){const k=shadeK();return model.shade==='strand'?(h-10)*(1-seg(k,.35,1)):model.shade==='coil'?lerp(h-10,20,k):h-10}
+const frameY=(y,h)=>{const fh=frameH(h);return clamp(y,h/2-fh/2+2,h/2+fh/2-2)};
+function frameIn(y,h){const fh=frameH(h),r=Math.min(26,fh/2),dy=Math.max(0,h/2-fh/2+r-y,y-(h/2+fh/2-r));return 5+r-Math.sqrt(Math.max(0,r*r-dy*dy))}
+// Spine extent, turns per band, pitch and band centres for a pendant of height h; shading drops the bands to two turns.
+function coilLocal(h){
+ const hs=clamp((h-HS)/(H-HS)),sp=lerp(10,27,hs);
+ return{hs,st:lerp(6,22,hs),n:Math.round(lerp(2,5,hs)),p:lerp(2.2,2.6,hs),ys:[-1,0,1].map(k=>h/2+k*sp)};
+}
+function coilGeo(c){
+ const G=coilLocal(c.h),sA=c.a.x+W+4;
+ return{...G,sA,sB:c.b.x-4,mid:sA+(JOINS.coil.gap-8)/2,rr:5.2,
+  bands:G.ys.map(ly=>{const yc=c.a.y+ly,ry=frameY(ly,c.h);return{y0:yc-G.n*G.p/2,root:[c.a.x+W-frameIn(ry,c.h)-.5,c.a.y+ry],hy:c.b.y+ly}})};
+}
+// The beat sheet for band i: leap and hook, draw taut while the casings close, wind, tuck the end, anneal.
+const coilT=(jt,i)=>({leap:ease(seg(jt,.12+.05*i,.27+.05*i)),taut:ease(seg(jt,.3+.04*i,.48)),wrap:seg(jt,.5+.05*i,.76+.05*i),tail:backOut(seg(jt,.78+.04*i,.86+.04*i)),heat:seg(jt,.86+.03*i,.97+.01*i)});
 /* ---------- Pivot geometry ---------- */
 // Displayed swing in degrees: level until the ring is shut, then a damped swing that lands exactly on model.angle.
 function swingAt(jt){
@@ -605,7 +709,7 @@ function render(){
  $('#angleRow').style.display=model.join==='pivot'?'':'none';
  const ang=Math.round(model.angle);$('#angle').value=ang;$('#angleOut').textContent=(ang>0?'+':ang<0?'−':'')+Math.abs(ang)+'°';
  $('#detent').textContent=model.detent?'Detents '+model.detent+'°':'Detents off';$('#detent').setAttribute('aria-pressed',String(!!model.detent));
- const hit=$('#joinHit');if(hit){hit.onclick=doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ const hit=$('#joinHit');if(hit){hit.onclick=j.pull?(e=>{if(e.detail===0)doSeparate()}):doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
  // Controls reflect state
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
@@ -613,7 +717,7 @@ function render(){
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()+(model.join==='pivot'?' · '+$('#angleOut').textContent:'')};
- $('#phase').textContent=(drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
+ $('#phase').textContent=(drag&&drag.unwind?'Unwinding · '+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -656,6 +760,12 @@ document.addEventListener('keydown',e=>{
 function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:(e.clientX-r.left)/s,y:(e.clientY-r.top)/s}}
 function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
 stage.addEventListener('pointerdown',e=>{
+ // Coil wrap: grabbing a band starts unwinding it.
+ if(e.button===0&&model.jt===1&&J().pull&&e.target.closest('#joinHit')){
+  e.preventDefault();++anim;model.busy=false;const p=local(e);
+  model.path={s:separatePose(),j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}};
+  drag={unwind:true,x0:p.x,y0:p.y,deg:0,moved:false};stage.setPointerCapture(e.pointerId);say('Unwinding: pull further to let go.');render();return;
+ }
  const g=e.target.closest('[data-drag]');if(!g||e.button!==0)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
@@ -669,7 +779,9 @@ stage.addEventListener('pointerdown',e=>{
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
- if(!drag)return;const p=local(e),dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
+ if(!drag)return;const p=local(e);
+ if(drag.unwind){const d=Math.hypot(p.x-drag.x0,p.y-drag.y0);if(d>3)drag.moved=true;drag.deg=clamp(d/70);setJt(1-.5*drag.deg);render();return}
+ const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
  if(drag.mode==='angle'){
   // The pair may have shifted to stay on stage, so measure from where Jarvis's loop is now.
   const L={x:model.a.x+W+14,y:model.a.y+ctx().h/2};
@@ -692,11 +804,12 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.unwind){if(!d.moved||d.deg>.5)doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;say(J().sayJoined)}});return}
  if(d.mode==='angle'){model.turning=false;settleAngle();render();say(J().sayJoined);return}
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
 }
-function cancelDrag(){if(!drag)return;const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
+function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say('Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
