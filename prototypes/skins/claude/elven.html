@@ -115,7 +115,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit{pointer-events:all;cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
-.hit.lift{cursor:grab}.hit.lift:active{cursor:grabbing}
+.hit.lift{cursor:grab}.hit.lift:active{cursor:grabbing}.hit.slide{cursor:ns-resize}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb6cf;font-size:13px}
 .about h2{margin:0 0 4px;font:400 21px var(--script);color:#eef1fb}.about h2 small{font:11px var(--sans);color:#7f8ab0;letter-spacing:1.4px;text-transform:uppercase;margin-left:8px}
 .about p{margin:0 0 6px}
@@ -420,6 +420,19 @@ const JOINS={
   about:'A bridge, so the casings stay a span apart with the night showing through. <b>Near:</b> the knops glow and thin threads of light rise from each stem toward the other. <b>Ready:</b> a dashed ghost of the whole bridge (an arched rail over a taller arch) spans the gap, with a star at its crown. Joining: the casings draw up 120 px apart and a moonbeam falls from the moon behind them into the gap, with motes drifting down it. Light draws up out of both stems along the arch and the rail and meets at the crown with a flare. Then the light frosts into silver from the springings up, a glinting frost line climbing each side, and the beam fades. Filigree curls into the spandrels: hangers drop from the rail to the arch, each with a pair of opposed spirals, small leaves open at the springings and a row of silver granules hangs under the rail. Last, a crescent cradle forms at the crown and the moonstone it holds kindles as the join light, a glint runs along the rail, and a faint moonlight stays inside the arch. Shaded, the bridge flattens to a low rail and arch with the keystone. <b>Release:</b> click the keystone moon or anywhere on the bridge, or focus it and press Enter. The keystone dims, the filigree uncurls, the silver melts back into light, the light fades from the crown down into the stems, and the casings part. Drag a nameplate to move the pair.',
   under:c=>bridgeUnder(c),
   over:c=>drawBridge(c)
+ },
+ runes:{label:'Runic seal',kind:'Interlock',gap:22,slide:true,slow:1.1,msOut:2500,
+  txt:{join:'The casings close, the rune staves slide out and meet, and GitDiscuss\'s half-runes turn over one by one until each matches its partner.',
+   joined:'Sealed: the runes matched and faded to a whisper; hover the seam to read them. Drag a nameplate to move the pair; slide the seal up or down a rune (or click it) to break the match.',
+   release:'The runes flare, the seal\'s rim unwrites, the half-runes turn back to a scramble and the staves draw in.',
+   stop:'The half-runes turn back and the staves draw in.',
+   hold:'Held mid-join: the half-runes are turning over to match. Use the scrubber to step through the lock.',
+   ready:'Ready: every rune burns and threads of light link each pair across the gap. Release to set the seal.',near:'Nearby: runes kindle down both staves, top first. Move closer.',
+   readyPh:'Ready · the runes answer',nearPh:'Nearby · runes kindle',
+   liftPh:'Sliding · the runes slip out of match',lifting:'GitDiscuss\'s half-runes slide out of match. Slide one rune further to break the seal.',settle:'The half-runes slide back into match and the seal holds.'},
+  phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.44?'Joining · the staves meet ':jt<.81?'Joining · the runes turn to match ':jt<.9?'Joining · the seal draws round ':'Joining · the runes fade '):(jt>.9?'Releasing · the runes flare ':jt>.8?'Releasing · the seal unwrites ':jt>.56?'Releasing · the runes scramble ':jt>.5?'Releasing · the staves draw in ':'Releasing · the casings part '),
+  about:'A lock made of writing. Each joining end carries a rune stave: a slim half-lens of night glass on the silver stem, with four invented runes cut into it, split down the middle. Jarvis holds the left halves, GitDiscuss the right, and GitDiscuss\'s halves start out scrambled. <b>Near:</b> the runes kindle down both staves, top first, brighter the closer you come. <b>Ready:</b> every rune burns, threads of light link each pair across the gap, and a dashed ghost of the seal hangs between them. Joining: the casings close to a narrow gap and the staves slide out until their faces meet with a flash, so the seam is a shared stave line through every rune. Then GitDiscuss\'s half-runes turn over on the seam like little hinged pages, top to bottom, each passing two wrong glyphs before it lands on the half that completes its partner, and each match flares. When all four match, light runs round the two staves, which together make one pointed seal, a star glints at its tips, and the moonstone set at its heart kindles as the join light. Then the runes fade to a faint engraving. <b>Hover</b> the seam (or focus it with the keyboard) and they light up again to be read. <b>Release:</b> slide the seal up or down: GitDiscuss\'s half-runes slip along their stave out of match, and past half a rune the seal breaks (let go sooner and they slide back). Clicking the seal, or focusing it and pressing Enter, also breaks it. The runes flare, the rim unwrites, the halves turn back to a scramble, the staves draw in and the casings part. Shaded, the seal keeps its two inner runes and the moonstone. Drag a nameplate to move the pair.',
+  over:c=>drawRunes(c)
  }
 };
 /* ---------- Moonlight bridge drawing ---------- */
@@ -591,6 +604,75 @@ function forkDial(K,bd,k,op,s,hh){const RD=112*k,pt=(t,r)=>{const a=(90+t/2)*PI/
  o+=`<g transform="translate(${P(c)})"><rect x="-45" y="-16" width="90" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-43" y="-14" width="86" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>`+
   `<text y="0" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${n.num}</text><text y="10" text-anchor="middle" ${font} font-size="8.5" letter-spacing="1.3" fill="${n.gold?'#8a6414':'#5d6584'}">${n.cap.toUpperCase()}</text></g>`;
  return o+'</g>'}
+/* ---------- Runic seal drawing ---------- */
+// Four invented runes, each split on the seam (x = 0): Jarvis carries the left halves, GitDiscuss the right.
+// The halves' strokes meet the seam at the same heights, so only a matched pair reads as one glyph.
+const RUNES=[
+ ['M0 -8L-5 -3L0 2M-2.6 5.4L-.6 7.4','M0 -8L5 -3L0 2M0 2L4.5 7'],
+ ['M0 -7Q-7 0 0 7','M0 -7L5 -2M0 7L5 2'],
+ ['M0 -4L-5 -8M0 3L-5 -1M0 3L-4 8','M0 -4L5 1M0 3L5 8'],
+ ['M0 0L-5 -6M0 0L-5 6','M0 -8Q6 -3 0 0Q6 3 0 8']];
+let rsHov=0,rsPtr=false,rsKbd=false,rsRaf=0,rsT=0,rsRect=null,rsFrom=0;
+const rsWant=()=>model.join==='runes'&&model.jt===1&&(rsPtr||(rsKbd&&document.activeElement&&document.activeElement.id==='seamHit'))?1:0;
+function rsKick(){if(rsRaf||rsHov===rsWant())return;if(reduce.matches){rsHov=rsWant();render();return}rsT=performance.now();rsRaf=requestAnimationFrame(rsStep)}
+function rsStep(now){const dt=Math.max(0,now-rsT),w=rsWant();rsT=now;rsHov=w>rsHov?Math.min(w,rsHov+dt/280):Math.max(w,rsHov-dt/900);render();rsRaf=rsHov!==w?requestAnimationFrame(rsStep):0}
+// A stave: half a pointed lens, flat face on the seam side (x = fx), bulging back over the stem by bw.
+function staveD(fx,cy,a,bw,sg,open){let d='';for(let i=0;i<=18;i++){const t=-1+i/9,x=fx-sg*bw*(1-t*t);d+=(i?'L':'M')+f(x)+' '+f(cy+t*a)}return open?d:d+'Z'}
+function runeG(x,y,s,d,L,sx=1){
+ const tr=`translate(${f(x)} ${f(y)}) scale(${f(sx*s*100)/100} ${f(s*100)/100})`;
+ let o=`<g transform="${tr}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="${NIGHT}" stroke-width="2.7"/><path d="${d}" stroke="#6a77a6" stroke-width="1.15"/>`;
+ if(L>.01)o+=`<path d="${d}" stroke="#a8c4ff" stroke-width="3.6" opacity="${f(L*.5*100)/100}" filter="url(#soft)"/><path d="${d}" stroke="#f4f8ff" stroke-width="1.3" opacity="${f(L*100)/100}"/>`;
+ return o+'</g>'}
+function drawRunes(c){
+ const h=c.h,jt=c.jt,kk=clamp((h-HS)/(H-HS)),dir=model.dir,m=h/2;
+ const A={x:model.a.x+W-11.5,y:model.a.y+m},B={x:model.b.x+11.5,y:model.b.y+m},D=B.x-A.x;
+ const a=m-lerp(5,9,kk),bw=lerp(12,19,kk),sp=lerp(16,26,kk),s=lerp(.62,1,kk),EXT=14;
+ const ys=[0,1,2,3].map(i=>(i-1.5)*sp),vis=i=>i===0||i===3?seg(kk,.4,.85):1;
+ // Phase values: staves out (out), each half-rune's turn (p[i], 1 = matched), the rim (rim), the heart stone (gem), rune light (L).
+ let out,p,fl=[0,0,0,0],rim,gem,L,LB,clack=0,glint=0,shift=0;
+ // A join started from Ready keeps the runes burning (doJoin clears the glow before its first frame).
+ if(jt===0&&!model.busy)rsFrom=c.glow;
+ const g=jt===0?(model.busy&&dir>0?rsFrom:c.glow):0,lift=jt===1?model.lift:dir<0?model.lift*seg(jt,.78,1):0;
+ if(jt===0){out=0;p=[0,0,0,0];rim=0;gem=0;L=[0,1,2,3].map(i=>clamp(g*1.5-i*.17));LB=L}
+ else if(dir>0){out=ease(seg(jt,.3,.42));clack=Math.sin(PI*seg(jt,.41,.47));
+  p=[0,1,2,3].map(i=>seg(jt,.44+i*.075,.58+i*.075));fl=[0,1,2,3].map(i=>Math.sin(PI*seg(jt,.575+i*.075,.635+i*.075)));
+  rim=seg(jt,.8,.9);glint=Math.sin(PI*seg(jt,.88,.95));gem=ease(seg(jt,.86,.97));
+  const fade=Math.max(rsFrom,ease(seg(jt,0,.1)))*(1-.82*ease(seg(jt,.9,1))),base=jt===1?.18+.82*rsHov:fade;L=[1,1,1,1].map(()=>Math.max(base,jt===1?lift:0));LB=L.map((l,i)=>p[i]<1?l*.62:Math.min(1,l+fl[i]*.5))}
+ else{const r=1-jt;out=1-ease(seg(r,.44,.5));p=[0,1,2,3].map(i=>1-seg(r,.2+(3-i)*.04,.32+(3-i)*.04));
+  rim=1-seg(r,.08,.2);gem=1-ease(seg(r,0,.1));const l=Math.max(lift,lerp(.18+.82*rsHov,1,ease(seg(r,0,.1))))*(1-ease(seg(r,.5,.95)));L=[l,l,l,l];LB=L.map((v,i)=>p[i]<1?v*.62:v)}
+ if(jt===1||dir<0)shift=lift*(model.sdir||1)*sp;
+ const eA=lerp(EXT,D/2,out),eB=lerp(EXT,D/2,out),fA=A.x+eA,fB=B.x-eB;
+ const dA=staveD(fA,A.y,a,bw,1),dB=staveD(fB,B.y,a,bw,-1);
+ let o='';
+ // Near: a soft glow on each stave; ready adds threads of light and a ghost of the seal.
+ if(g>0)o+=[[fA,A.y],[fB,B.y]].map(([x,y])=>`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(10+8*g)}" ry="${f(a*.9)}" fill="url(#halo)" opacity="${f(g*.7)}"/>`).join('');
+ // Each stave: night glass with a pearl sheen and a silver rim; the flat face is the shared stave line once they meet.
+ for(const [d,fx,cy] of [[dA,fA,A.y],[dB,fB,B.y]])
+  o+=`<path d="${d}" fill="url(#night)" stroke="${NIGHT}" stroke-width="2.4"/><path d="${d}" fill="url(#pearl)" opacity=".16"/><path d="${d}" fill="none" stroke="url(#silver)" stroke-width="1.2"/><path d="M${f(fx)} ${f(cy-a+3)}V${f(cy+a-3)}" stroke="#eef2fc" stroke-width="1" opacity=".8"/>`;
+ if(g>=1){const mx=(fA+fB)/2,my=(A.y+B.y)/2;
+  ys.forEach((y,i)=>{if(vis(i)>.05)o+=`<path d="M${f(fA)} ${f(A.y+y)}L${f(fB)} ${f(B.y+y)}" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="2 3" opacity="${f(.7*vis(i))}"/>`});
+  o+=`<path d="${staveD(mx,my,a,bw,1)}" fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" opacity=".45"/><path d="${staveD(mx,my,a,bw,-1)}" fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" opacity=".45"/>`+star(mx,my-a-6,5,.9)}
+ // Jarvis's left halves stay put.
+ ys.forEach((y,i)=>{const v=vis(i);if(v>.02)o+=`<g opacity="${f(v)}">${runeG(fA,A.y+y,s,RUNES[i][0],L[i])}</g>`});
+ // GitDiscuss's right halves turn over on the seam like hinged pages, past two wrong glyphs, and slide out of match when the seal is pushed.
+ o+=`<clipPath id="rsClip"><path d="${dB}"/></clipPath><g clip-path="url(#rsClip)">`;
+ ys.forEach((y,i)=>{const v=vis(i);if(v<=.02)return;const q=p[i]*3,k=Math.min(3,Math.floor(q+.5)),idx=[(i+1)%4,(i+2)%4,(i+3)%4,i][k],sx=Math.max(.04,Math.abs(Math.cos(PI*q)));
+  o+=`<g opacity="${f(v)}">${runeG(fB,B.y+y+shift,s,RUNES[idx][1],LB[i],sx)}</g>`});
+ o+='</g>';
+ // A match flares across the seam.
+ ys.forEach((y,i)=>{if(fl[i]>0&&vis(i)>.05)o+=`<circle cx="${f((fA+fB)/2)}" cy="${f(B.y+y)}" r="${f(14*s)}" fill="url(#halo)" opacity="${f(fl[i]*vis(i))}"/>`+star((fA+fB)/2,B.y+y,6*s*fl[i],fl[i]*vis(i))});
+ if(clack>0)o+=`<path d="M${f((fA+fB)/2)} ${f(B.y-a)}V${f(B.y+a)}" stroke="#fff" stroke-width="${f(1+3*clack)}" opacity="${f(clack*.8)}" filter="url(#soft)"/>`;
+ // The seal: light runs round both staves from the top tip to the bottom one; the moonstone at its heart is the join light.
+ if(rim>0){const op=1-lift*.55,da=`pathLength="1" stroke-dasharray="${f(rim*100)/100} 1"`;
+  for(const d of [staveD(fA,A.y,a,bw,1,1),staveD(fB,B.y,a,bw,-1,1)])o+=`<path d="${d}" fill="none" stroke="#a8c4ff" stroke-width="4" ${da} opacity="${f(.55*op)}" filter="url(#soft)"/><path d="${d}" fill="none" stroke="#f6f9ff" stroke-width="1.3" ${da} opacity="${f(op)}"/>`}
+ if(glint>0){const x=(fA+fB)/2;o+=star(x,B.y-a,7*glint,glint)+star(x,B.y+a,5*glint,glint*.8)}
+ {const x=(fA+fB)/2,y=(A.y+B.y)/2,r=lerp(2.4,3.3,kk),gl=gem*(1-lift*.7);
+  if(out>.5){if(gl>0)o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r*3+10*gl)}" fill="url(#halo)" opacity="${f(gl)}"/>`;
+   o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r+1.3)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8" opacity="${f(seg(out,.5,1))}"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="url(#moonstone)" opacity="${f(seg(out,.5,1))}"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="#eef4ff" opacity="${f(gl*.8)}"/>`}}
+ rsRect=null;
+ if(jt===1){const x0=fA-bw-4,y0=A.y-a-6,wd=fB+bw+4-x0,hd=2*a+12;rsRect={x:x0,y:y0,w:wd,h:hd};
+  o+=`<g class="hit slide" id="seamHit" tabindex="0" role="button" aria-label="Runic seal: slide it up or down, click it, or press Enter, to break the match and separate the widgets"><title>Slide the seal a rune up or down to break it</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(hd)}" rx="10" fill="transparent"/><path class="ringfocus" d="M${f(x0+4)} ${f(y0)}H${f(x0+wd-4)}V${f(y0+hd)}H${f(x0+4)}Z" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 3"/></g>`}
+ return o}
 /* ---------- Leaf brooch drawing ---------- */
 // Brooch coordinates: the midrib runs along x from the base (-40) to the tip (46); the pin hangs below it on y = 12.
 const BLADE='M-40 0C-30 -10 -8 -13.5 10 -10C26 -7 38 -3 46 0C38 3 26 7 10 10C-8 13.5 -30 10 -40 0Z';
@@ -637,7 +719,7 @@ function eyeFronts(S,th,sc,e){if(e<=.05)return '';const r=clamp(e,0,1.3);
  return eyePts(S,th,sc).map(p=>`<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(th*180/PI)}) scale(${f(sc*r*100)/100})"><path d="M0 -4.8A2 4.8 0 0 1 0 4.8" fill="none" stroke="${NIGHT}" stroke-width="3"/><path d="M0 -4.8A2 4.8 0 0 1 0 4.8" fill="none" stroke="url(#silver)" stroke-width="1.5"/><circle cx="1.6" cy="-2.6" r=".7" fill="#fff"/></g>`).join('')}
 const SHADES={
  narrow:{label:'Plain narrow',kind:'Page baseline',
-  about:'Not a brainstorm item. The casing narrows to a slim leaf holding the script nameplate and one moonstone value; the crescent crest, the pendant and the tip filigree stay, drawn smaller. It was the first shade here, kept as a plain reference beside the elven shade modes (constellation, leaf furl and lantern sleep so far; wing fold and mist to come). Shading while joined keeps the join: the vine braids flatter, the brooch draws smaller and the moonlight bridge flattens to a low rail and arch.'},
+  about:'Not a brainstorm item. The casing narrows to a slim leaf holding the script nameplate and one moonstone value; the crescent crest, the pendant and the tip filigree stay, drawn smaller. It was the first shade here, kept as a plain reference beside the elven shade modes (constellation, leaf furl and lantern sleep so far; wing fold and mist to come). Shading while joined keeps the join: the vine braids flatter, the brooch draws smaller, the moonlight bridge flattens to a low rail and arch, and the runic seal keeps its two inner runes and its moonstone.'},
  constellation:{label:'Constellation',kind:'Distil',linear:true,msIn:2600,msOut:1700,custom:true,
   draw:s=>ease(seg(s,.25,.62)),casingOp:s=>1-seg(s,.08,.3),
   sayIn:'The leaf is read as a constellation: its outline settles into one silver line, and the stars kindle one by one.',
@@ -991,7 +1073,7 @@ function morphTo(id){
 }
 
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,busy:false,angle:-42.5,angTo:undefined,dial:0,morph:'growth',size:'bud',g:0,mdir:1,restore:null,cMoved:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,sdir:1,busy:false,angle:-42.5,angTo:undefined,dial:0,morph:'growth',size:'bud',g:0,mdir:1,restore:null,cMoved:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -1109,6 +1191,7 @@ function render(){
  }
  $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
  const focused=document.activeElement&&document.activeElement.id==='seamHit';
+ if(j!==JOINS.runes)rsRect=null;
  $('#under').innerHTML=j.under?j.under(c):'';$('#over').innerHTML=j.over(c);
  const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}
   else if(j.angled&&(e.key==='ArrowUp'||e.key==='ArrowDown')){e.preventDefault();stepAngle(e.key==='ArrowDown'?1:-1,e.shiftKey)}};if(focused)hit.focus()}
@@ -1126,8 +1209,8 @@ function render(){
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
  const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+forkName(model.angle).num:'')};
- $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?'Lifting · the brooch rises':drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?model.mdir>0?' · Checks grows':' · autumn on Checks':'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
- wakeKick();
+ $('#phase').textContent=(drag&&drag.bend?'Bending · '+forkName(model.angle).num+(forkName(model.angle).cap==='fork'?'':' · '+forkName(model.angle).cap):drag&&drag.strain>0?'Pulling · the braid strains':drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?model.mdir>0?' · Checks grows':' · autumn on Checks':'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
+ wakeKick();rsKick();
 }
 
 /* ---------- Controls ---------- */
@@ -1182,7 +1265,7 @@ stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
  if(e.target.closest('#seamHit')&&model.jt===1&&!model.busy){e.preventDefault();$('#a .grip').focus();
   // The brooch is lifted off: it follows the pointer up, and past a short distance (or on a plain click) it lets go.
-  if(J().lift){drag={lift:true,start:local(e),moved:0};stage.setPointerCapture(e.pointerId);render();return}
+  if(J().lift||J().slide){drag={lift:true,start:local(e),moved:0};stage.setPointerCapture(e.pointerId);render();return}
   doSeparate();return}
  const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
@@ -1199,9 +1282,11 @@ stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
  if(drag.bend){const K=forkKnot(),a=Math.atan2(p.y-K.y,p.x-K.x);let dd=(a-drag.prev)*180/PI;dd=((dd+540)%360)-180;drag.prev=a;
   drag.raw=clamp(drag.raw+dd,-AMAX,AMAX);if(Math.abs(drag.raw-drag.th0)>1)drag.moved=true;model.angle=magnet(drag.raw);refitPair();render();return}
- if(drag.lift){const up=drag.start.y-p.y;drag.moved=Math.max(drag.moved,Math.hypot(p.x-drag.start.x,up));model.lift=clamp(up/40);
+ if(drag.lift){const j=J(),up=drag.start.y-p.y;drag.moved=Math.max(drag.moved,Math.hypot(p.x-drag.start.x,up));
+  // The runic seal slides either way along the seam, one rune step to break; the brooch only lifts.
+  if(j.slide){if(Math.abs(up)>1)model.sdir=up>0?-1:1;model.lift=clamp(Math.abs(up)/30)}else model.lift=clamp(up/40);
   if(model.lift>=1){drag=null;doSeparate();return}
-  if(model.lift>0)say('The brooch rises with your finger and its pin starts to open. Keep lifting to take it off.');render();return}
+  if(model.lift>0)say(j.txt.lifting||'The brooch rises with your finger and its pin starts to open. Keep lifting to take it off.');render();return}
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
  if(drag.id==='c'){const[cw,chh]=cDims();model.cMoved=true;model.c.x=clamp(s.c.x+dx,30,1170-cw);model.c.y=clamp(s.c.y+dy,TOP-10,590-chh);render();return}
  if(drag.group){const g=J().gap,ay=clamp(s.a.y+dy,...pairY()),away=drag.id==='a'?-dx:dx;
@@ -1230,7 +1315,7 @@ function endDrag(){
   if(dn!==undefined)animateAngle(dn,380);else{model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon()}
   say(forkSay(dn??model.angle));return}
  if(d.lift){if(model.lift>=.5||d.moved<5){doSeparate();return}
-  tween(model.lift,0,320,v=>model.lift=v);say('The brooch settles back onto the seam.');return}
+  tween(model.lift,0,320,v=>model.lift=v);say(J().txt.settle||'The brooch settles back onto the seam.');return}
  if(d.group&&d.strain>0){springBack(d.id);say('The braid holds and draws the casing back.');return}
  if(d.state==='ready'){doJoin(d.id==='b'?'a':'b',2700)}else{model.glow=0;render()}
 }
@@ -1243,7 +1328,11 @@ function cancelDrag(){
 }
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const id=lampAt(local(e));if(id!==hoverId){hoverId=id;wakeKick()}});
-stage.addEventListener('pointerleave',()=>{hoverId=null;wakeKick()});
+stage.addEventListener('pointerleave',()=>{hoverId=null;wakeKick();rsPtr=false;rsKick()});
+// Hovering a runic seal (or focusing it from the keyboard) lights its runes so they can be read.
+stage.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const p=local(e),r=rsRect,i=!!r&&p.x>=r.x-6&&p.x<=r.x+r.w+6&&p.y>=r.y-6&&p.y<=r.y+r.h+6;if(i!==rsPtr){rsPtr=i;rsKick()}});
+document.addEventListener('keydown',()=>{rsKbd=true},true);document.addEventListener('pointerdown',()=>{rsKbd=false},true);
+document.addEventListener('focusin',()=>rsKick());document.addEventListener('focusout',()=>setTimeout(rsKick));
 stage.addEventListener('pointerdown',e=>{if(e.pointerType!=='touch')return;const id=lampAt(local(e));if(id&&model.shade==='lantern'){touchUntil[id]=performance.now()+3200;wakeKick();setTimeout(wakeKick,3250)}});
 document.addEventListener('focusin',e=>{const g=e.target.closest&&e.target.closest('[data-drag]');focusId=g&&g.matches(':focus-visible')?g.dataset.drag:null;wakeKick()});
 document.addEventListener('focusout',()=>{focusId=null;wakeKick()});
