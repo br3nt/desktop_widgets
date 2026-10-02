@@ -1657,7 +1657,7 @@ const MORPHS={
  bays:{label:'Build by bays',kind:'Grow',sizes:[['lancet','Lancet',0,'a lancet'],['triple','Triple lancet',1,'a triple lancet'],['nave','Nave',2,'a nave']],ms:[4800,3800],
   box:g=>dimsOf(Math.ceil(g-1e-9)),dims:k=>dimsOf(k),render:el=>bayRender(el),phase:()=>bayPhase(),at:(g,d)=>bayAt(g,d),vec:o=>bayVec(o),
   say:(d,S)=>(d>0?'Scaffolding goes up: Checks is built out to ':'Scaffolding goes up: Checks is taken down to ')+S[3]+'.',
-  about:'Checks grows the way a cathedral does, a bay at a time. <b>Lancet</b> is the single bay it starts as. <b>Triple lancet</b> adds a bay each side under a crocketed gable with a small rose: the passed count in the left light, the total in the centre, the two waiting in the right. <b>Nave</b> is a full elevation in three storeys under a taller gable and a larger rose: a clerestory with the last ten runs as lancet bars, a triforium gallery of fourteen lit lancets (one per check, green passed, red waiting; hover or tap one to read it), and an arcade with the passed count, the total and the two waiting checks by name. <b>Growing:</b> the windows go dark and timber scaffolding goes up round the old building pole by pole, lashed with ledgers, boards and braces. The new walls rise round it course by course, fresh mortar and grit on each, while a gin wheel at the top hoists stones up on a lewis. Then the windows are glazed, the rose and the triforium kindle, and the scaffold is struck: the boards and ledgers drop away and the poles lean out and fall in a puff of dust. <b>Shrinking</b> runs it the other way: scaffold up, the walls taken down course by course from the finial, the smaller building inside lit again, scaffold struck. Pick a size, press M, or scrub the slider. Checks moves clear of the pair first when there is room. Shading a grown Checks takes it down to a lancet first, and unshading builds it back.'}
+  about:'Checks grows the way a cathedral does, a bay at a time. <b>Lancet</b> is the single bay it starts as. <b>Triple lancet</b> adds a bay each side under a crocketed gable with a small rose: the passed count in the left light, the total in the centre, the two waiting in the right. <b>Nave</b> is a full elevation in three storeys under a taller gable and a larger rose: a clerestory with the last ten runs as lancet bars, a triforium gallery of fourteen lit lancets (one per check, green passed, red waiting; hover or tap one to read it), and an arcade with the passed count, the total and the two waiting checks by name. <b>Growing:</b> the windows go dark and timber scaffolding goes up round the old building pole by pole, lashed with ledgers, boards and braces. The new walls rise round it course by course, fresh mortar and grit on each, while a gin wheel at the top hoists stones up on a lewis. Then the windows are glazed, the rose and the triforium kindle, and the scaffold is struck: the boards and ledgers drop away and the poles lean out and fall in a puff of dust. <b>Shrinking</b> runs it the other way: scaffold up, the walls taken down course by course from the finial, the smaller building inside lit again, scaffold struck. Pick a size, press M, or scrub the slider. Checks moves clear of the pair first when there is room. When there isn\'t (the nave beside a pair spread across the stage), Checks takes the floor and the pair rises just enough to clear its gable, then settles back once Checks is taken down. Move the pair by hand and it stays where you put it. Shading a grown Checks takes it down to a lancet first, and unshading builds it back.'}
 };
 const BL=[null,
  {w:330,h:200,E:60,ga:2,gab:[103,227],rose:17,ry:38,piers:[13,100,230,317],win:[[26,102,64,62],[110,102,110,62],[240,102,64,62]],hd:18,str:[174],shaft:[100,170],qf:181},
@@ -1835,14 +1835,39 @@ function bayRender(el){
 const cDims=()=>MO().box(model.g);
 function cBase(){const[w,h]=model.cBox;return{x:model.c.x+w/2,y:model.c.y+h}}
 function placeBase(bx,by){const[w,h]=cDims();model.cBox=[w,h];model.c.x=clamp(bx-w/2,10,1190-w);model.c.y=clamp(by-h,TOP-20,590-h)}
+// The pair's box with a margin, measured where it stands before any lift it was given to make room for Checks.
+function pairBox(){const L=model.lift;return{x0:Math.min(model.a.x,model.b.x)-8,x1:Math.max(model.a.x,model.b.x)+W+8,y0:Math.min(model.a.y,model.b.y)+L-8,y1:Math.max(model.a.y,model.b.y)+L+ctx().h+8}}
+// How far the pair has to rise (from where it stood) to clear a w×h Checks with its foot at bx,by; 0 if they don't meet. Never past the top of the stage.
+// A grown building gets headroom for the finial and the scaffold's gin wheel, which stand above its box.
+function clearLift(w,h,bx,by){
+ const p=pairBox(),head=h>CH?20:0;if(bx+w/2<=p.x0||bx-w/2>=p.x1||by<=p.y1)return 0;
+ return clamp(p.y1+head-(by-h),0,Math.max(0,p.y0+8-pairY()[0]));
+}
 // Where Checks's foot should end up at size `to`: on the stage, and clear of the pair when there is room.
+// When there is none (a nave beside a pair spread across the stage), Checks takes the floor and the pair is nudged up to make way.
 function morphSpot(to){
  const[w,h]=MO().dims(to),b=cBase();let bx=clamp(b.x,10+w/2,1190-w/2),by=clamp(b.y,TOP-20+h,590);
- const x0=Math.min(model.a.x,model.b.x)-8,x1=Math.max(model.a.x,model.b.x)+W+8,y0=Math.min(model.a.y,model.b.y)-8,y1=Math.max(model.a.y,model.b.y)+ctx().h+8;
+ const{x0,x1,y0,y1}=pairBox();
  if(bx+w/2>x0&&bx-w/2<x1&&by-h<y1&&by>y0){
   if(x1+w<=1190)bx=x1+w/2;else if(x0-w>=10)bx=x0-w/2;else if(y1+h<=590)by=y1+h;else if(y0-h>=TOP-20)by=y0;else by=590}
- return{x:bx,y:by};
+ return{x:bx,y:by,lift:clearLift(w,h,bx,by)};
 }
+// Eases the pair's lift to L over ms after a delay; the pair moves as one, with any running join path.
+let liftAnim=0;
+function liftTo(L,ms,delay=0){
+ // Already heading there: keep it, unless that move is still waiting and this one is wanted now.
+ if(L===model.liftGoal&&model.lifting&&!(delay===0&&performance.now()<model.liftAt))return;
+ const tok=++liftAnim,L0=model.lift,t0=performance.now()+delay;model.liftGoal=L;model.liftAt=t0;
+ if(Math.abs(L-L0)<.5&&!model.lifting)return;
+ model.lifting=true;
+ (function step(now){
+  if(tok!==liftAnim)return;
+  const t=reduce.matches||ms<=0?1:clamp((now-t0)/ms),v=lerp(L0,L,ease(t));
+  shiftFeet(model.lift-v,0);model.lift=v;
+  if(t>0)render();
+  if(t<1)requestAnimationFrame(step);else model.lifting=false})(performance.now());
+}
+const stopLift=()=>{++liftAnim;model.lifting=false};
 let morphAnim=0;
 const bayVec=o=>[o.p,o.up*(1-o.fall),o.vOld,o.vNew];
 function morphTo(id,fast){
@@ -1863,6 +1888,8 @@ function morphTo(id,fast){
  model.noChalk=from%1&&dir!==model.mDir?Math.floor(from):-1;
  model.mDir=dir;model.cMoved=false;
  const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*mo.ms[dir>0?0:1]*(fast?.45:1),b0=cBase(),b1=morphSpot(to),t0=performance.now();
+ // The pair makes way as Checks slides over, before the scaffold goes up; on the way down it waits until the walls are down.
+ const lm=Math.min(700,ms);if(b1.lift>model.lift)liftTo(b1.lift,lm);else liftTo(b1.lift,lm,ms-lm);
  say(mo.say(dir,S));
  return new Promise(res=>{(function step(now){
   if(tok!==morphAnim)return res(false);
@@ -1871,7 +1898,8 @@ function morphTo(id,fast){
   if(drag&&drag.id==='c'||model.cMoved){const b=cBase();placeBase(b.x,b.y)}
   else{const e=ms?ease(clamp(el/Math.min(700,ms))):1;placeBase(lerp(b0.x,b1.x,e),lerp(b0.y,b1.y,e))}
   render();
-  if(t<1)requestAnimationFrame(step);else{say('Checks is '+S[3]+'.');res(true)}
+  // Checks may have been moved while it was built: settle the pair against the finished building.
+  if(t<1)requestAnimationFrame(step);else{const[w,h]=model.cBox,c=cBase();liftTo(clearLift(w,h,c.x,c.y),450);say('Checks is '+S[3]+'.');res(true)}
  })(t0)});
 }
 
@@ -2079,7 +2107,7 @@ function winRender(el){
 }
 MORPHS.windows={label:'Window types',kind:'Recut',sizes:[['facade','Facade',0,'a facade'],['oculus','Oculus',1,'an oculus'],['lanc','Lancet',2,'a lancet'],['rose','Rose',3,'a rose window'],['perp','Perpendicular',4,'a Perpendicular window']],ms:[2800,2500],
  box:wBox,dims:wDims,render:winRender,phase:winPhase,say:(d,S)=>'The mason sets out the new window in chalk: Checks is recut as '+S[3]+'.',
- about:'Checks changes form by changing window, each suited to what it shows. <b>Oculus</b>: a small round window with just the count in its cusped pane, ringed by fourteen glass jewels (green passed, red waiting). <b>Lancet</b>: a tall pointed window that reads top to bottom, run 418, the count, the pass rate and the two waiting, with the fourteen checks as status quarries up its jambs and a gold trefoil in its head. <b>Rose</b>: a round display in a wheel of fourteen petals, one per check, ringed with ball-flowers; hover or tap a petal to read it. <b>Perpendicular</b>: a wide window under battlements and a square label, its Tudor arch over four lights that hold a table of every check by name, with the totals in the lights under the transom. <b>Changing form:</b> the glass dims and the old tracery is cut out. The mason sets the new window out on the stone in chalk: centre lines first, then each arc struck with an iron compass from its true centres (a lancet\'s from its springing points, the Tudor arch\'s from four). The stone then flows to the new outline, shedding grit, the new tracery is cut along the chalk, and the glass goes in piece by piece and kindles. Pick a form, press M, or scrub the slider. Checks moves clear of the pair when there is room. Shading takes it back to the facade first, and unshading recuts it.'};
+ about:'Checks changes form by changing window, each suited to what it shows. <b>Oculus</b>: a small round window with just the count in its cusped pane, ringed by fourteen glass jewels (green passed, red waiting). <b>Lancet</b>: a tall pointed window that reads top to bottom, run 418, the count, the pass rate and the two waiting, with the fourteen checks as status quarries up its jambs and a gold trefoil in its head. <b>Rose</b>: a round display in a wheel of fourteen petals, one per check, ringed with ball-flowers; hover or tap a petal to read it. <b>Perpendicular</b>: a wide window under battlements and a square label, its Tudor arch over four lights that hold a table of every check by name, with the totals in the lights under the transom. <b>Changing form:</b> the glass dims and the old tracery is cut out. The mason sets the new window out on the stone in chalk: centre lines first, then each arc struck with an iron compass from its true centres (a lancet\'s from its springing points, the Tudor arch\'s from four). The stone then flows to the new outline, shedding grit, the new tracery is cut along the chalk, and the glass goes in piece by piece and kindles. Pick a form, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first, and unshading recuts it.'};
 /* Rose petals: hover, focus or tap one to read its check. */
 CHK.forEach((n,j)=>{const b=document.createElement('button'),need=j>11,t=`Check ${j+1} of 14 · ${n} · ${need?'waiting for your approval':'passed'}`,[x,y]=xy(122,114,73,(-90+j*360/14)*D2R);
  b.style.cssText=`left:${f(x-11)}px;top:${f(y-11)}px;width:22px;height:22px`;b.setAttribute('aria-label',t);b.dataset.tip=t;b.dataset.c=need?'need':'pass';
@@ -2087,7 +2115,7 @@ CHK.forEach((n,j)=>{const b=document.createElement('button'),need=j>11,t=`Check 
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH]};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -2264,7 +2292,9 @@ $('#grow').oninput=e=>{if(drag)cancelDrag();
  if(model.st>0){e.target.value=Math.round(model.g*100);if(model.st>.5&&model.shTo!==0)toggleShade(0);return}
  ++morphAnim;hideTip();model.restore=null;
  const b=cBase(),v=e.target.value/100;if(!slideDir)slideDir=v>=model.g?1:-1;model.mDir=slideDir;model.g=v;
- const S=SZ().find(x=>x[2]===v);model.size=S?S[0]:null;placeBase(b.x,b.y);render()};
+ const S=SZ().find(x=>x[2]===v);model.size=S?S[0]:null;placeBase(b.x,b.y);
+ // Scrubbed bigger over the pair, the pair rises out of the way; scrubbed back, it comes down.
+ const[w,h]=model.cBox,c=cBase();liftTo(clearLift(w,h,c.x,c.y),450);render()};
 /* Triforium lights: hover, focus or tap one to read its check. */
 CHK.forEach((n,j)=>{const b=document.createElement('button'),need=j>11,t=`Check ${j+1} of 14 · ${n} · ${need?'waiting for your approval':'passed'}`;
  b.style.cssText=`left:${triX(j)-7}px;top:157px;width:14px;height:35px`;b.setAttribute('aria-label',t);b.dataset.tip=t;b.dataset.c=need?'need':'pass';
@@ -2313,6 +2343,8 @@ stage.addEventListener('pointerdown',e=>{
  drag={id,start:p,cb:cBase(),saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
  // On the rose dial, GitDiscuss's nameplate swings it about the rose (Jarvis still moves the pair).
  if(id==='b'&&model.jt===1&&AJ()){stopAngle();const C=model.join==='apse'?JOINS.apse.geo(ctx(),model.angle).M:model.join==='fan'?JOINS.fan.geo(ctx()).P:JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
+ // The pair is in the hand: any lift making room for Checks pauses (turning the dial doesn't move it, so that leaves the lift running).
+ if(id!=='c'&&drag.mode!=='angle')stopLift();
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
@@ -2337,6 +2369,9 @@ function endDrag(){
  if(d.dial||d.mode==='angle'){const st=(AJ()||JOINS.dial).step,to=Math.round(model.angle/st)*st;if(d.moved||model.angle!==to)animateAngle(to,420);else render();
   say(d.dial&&!d.moved?(J().say.tap||(model.join==='apse'?'Drag the canted wall to set the angle; tap the finial on its gablet to release.':'Turn the rose to set the angle; tap the gilded pawl at its top to release.')):'GitDiscuss set at '+signed(to)+'.');return}
  if(d.hit){if(J().letGo(d))doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;model.dir=1;say(J().say.back||(model.join==='rose'?'The rose settles back; still joined.':'The keystone drops back into place; still joined.'))}});return}
+ // A pair put somewhere by hand stays there; a Checks moved off the pair lets it back down (never further).
+ if(d.id!=='c'){if(['a','b'].some(k=>d.saved[k].x!==model[k].x||d.saved[k].y!==model[k].y))model.lift=model.liftGoal=0;else liftTo(model.liftGoal,450)}
+ else if(model.lift>0){const[w,h]=model.cBox,c=cBase();liftTo(Math.min(model.lift,clearLift(w,h,c.x,c.y)),450)}
  const ready=d.state==='ready';
  if(ready){startJoinFrom({a:0,b:0},.55);model.ready=true;model.path=null;doJoin(d.id==='b'?'a':'b',1500)}else{model.glow=0;render()}
 }
@@ -2345,7 +2380,7 @@ function cancelDrag(){
  if(d.dial||d.mode==='angle'){++angAnim;model.angle=model.angTo=d.th0;model.turnUntil=0;render();say('Turn cancelled.');return}
  if(d.hit){++anim;model.busy=false;setJt(1);model.path=null;model.dir=1;render();say('Release cancelled.');return}
  // Checks goes back by its foot: it may have changed size while it was held.
- const s=d.saved;for(const id of ['a','b'])Object.assign(model[id],s[id]);placeBase(d.cb.x,d.cb.y);model.glow=0;render();say('Move cancelled.');
+ const s=d.saved;for(const id of ['a','b'])Object.assign(model[id],s[id]);placeBase(d.cb.x,d.cb.y);model.glow=0;if(d.id!=='c')liftTo(model.liftGoal,450);render();say('Move cancelled.');
 }
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
@@ -2354,10 +2389,14 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const id=b.dataset.drag;
  if(id==='b'&&model.jt===1&&AJ()&&k[1]){stepDial(Math.sign(k[1]));return}
  if(model.jt>0&&model.jt<1&&id!=='c')return;
- const[top,bottom]=pairY();
+ const[top,bottom]=pairY(),was=[model.a.x,model.a.y,model.b.x,model.b.y]+'';
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10-(J().xPad||0)),ay=clamp(model.a.y+k[1],top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else if(id==='c'){const b=cBase();placeBase(b.x+k[0],b.y+k[1]);if(model.g%1)model.cMoved=true}
- else{const m=model[id],w=W;m.x=clamp(m.x+k[0],14,1200-w-14);m.y=clamp(m.y+k[1],TOP,bottom)}render();
+ else{const m=model[id],w=W;m.x=clamp(m.x+k[0],14,1200-w-14);m.y=clamp(m.y+k[1],TOP,bottom)}
+ // As with the pointer: a pair moved by hand stays put; a Checks moved off the pair lets it back down.
+ if(id!=='c'){if([model.a.x,model.a.y,model.b.x,model.b.y]+''!==was){stopLift();model.lift=model.liftGoal=0}}
+ else if(model.lift>0){const[w,h]=model.cBox,c=cBase();liftTo(Math.min(model.lift,clearLift(w,h,c.x,c.y)),450)}
+ render();
 }));
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
