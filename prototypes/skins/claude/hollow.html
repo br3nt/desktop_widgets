@@ -94,13 +94,37 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .mlabel span{font:italic 11.5px/1 Georgia,serif;color:#3a2c1e}
 .mlabel em{font-style:normal;font-weight:700;color:#8f1c22;margin-right:3px}
 .small .mlabel b{font-size:11.5px}.small .mlabel span{font-size:11px}
+/* Map unfurl morph: Checks' sheet is one corner of a larger map, rolled up along the bottom and folded under on the right */
+.map{position:absolute;left:40px;top:30px;width:368px;height:118px;pointer-events:none;display:none}
+.leaf,.flap{position:absolute;top:0;width:184px;overflow:hidden;color:#4a3b2b;border-radius:3px 6px 2px 5px/5px 2px 6px 3px;
+ background:radial-gradient(ellipse 26% 50% at 4% 92%,#7a582a38,transparent 70%),radial-gradient(ellipse 22% 46% at 97% 8%,#7a582a30,transparent 70%),radial-gradient(ellipse 90% 140% at 46% 40%,#f5eedb,#e8dbbb 66%,#cfba8f);
+ box-shadow:inset 0 0 9px #6e4f2650,0 0 0 1.3px #05070b,1.5px 3px 0 1px #05070b99}
+.leaf{left:0;height:34px}
+.leaf:before{content:"";position:absolute;top:3px;left:3px;width:5px;height:5px;border-radius:50%;z-index:2;background:radial-gradient(circle at 35% 30%,#fff,#c3c8d0 50%,#565c66);box-shadow:0 1px 1px #0009}
+.flap{left:184px;height:118px;transform-origin:0 50%;backface-visibility:hidden;border-radius:2px 5px 3px 2px/3px 6px 2px 4px}
+.fshade{position:absolute;inset:0;background:linear-gradient(90deg,#2a1c0e,#2a1c0e00 90%);opacity:0}
+.r1{position:absolute;left:0;top:0;width:184px;height:34px;padding:3px 11px;font-size:10px;line-height:1.35}
+.r1 .num,.r2 em{font-size:12px;margin-right:4px}
+.r2{position:absolute;left:0;top:34px;width:184px;height:84px;padding:0 11px}
+.r2 .coast{position:absolute;left:4px;top:1px}
+.rt{font:italic 10px/1.3 Georgia,serif;color:#5c4a36;letter-spacing:.5px}
+.r2 .rt{position:absolute;top:7px}.r2 .trail{position:absolute;left:11px;top:21px}
+.rb{position:absolute;top:58px;font-size:10.5px;color:#4a3b2b;white-space:nowrap}
+.r2 em{font:700 12px Georgia,serif;color:#8f1c22;font-style:normal}
+.r3{position:absolute;inset:0;padding:6px 12px}
+.wait{display:grid;grid-template-columns:15px 1fr;margin-top:7px;line-height:1.25}
+.wait i{grid-row:span 2;width:7px;height:7px;margin-top:4px;border:1.4px solid #8f1c22;border-radius:50%}
+.wait b{font:400 13px/1.25 Georgia,serif;color:#231b14}
+.wait span{font:italic 10.5px/1.3 Georgia,serif;color:#5c4a36}
+.rose{position:absolute;right:15px;bottom:9px}
+.mmorph{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 .hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.platehit{cursor:w-resize}.hit .pinhit{cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0;pointer-events:none}
-.about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
+.about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
 .about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#eef1f4}.about h2 small{font:11px -apple-system,sans-serif;color:#7d8aa0;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
 .about p{margin:0 0 6px}
-.hint{color:#7d8798;font-size:12px}
+.hint{color:#7d8798;font-size:12px;grid-column:1/-1}
 @media(max-width:800px){.about{grid-template-columns:1fr}}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -121,6 +145,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="rollG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#bfa679"/><stop offset=".22" stop-color="#f7f0dd"/><stop offset=".5" stop-color="#e9dbb8"/><stop offset=".85" stop-color="#b3966a"/><stop offset="1" stop-color="#7d6240"/></linearGradient>
  <linearGradient id="slipG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e9e2cf"/><stop offset=".25" stop-color="#fdf9ee"/><stop offset=".75" stop-color="#f1e8d2"/><stop offset="1" stop-color="#cdbf9e"/></linearGradient>
  <filter id="wobW" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <radialGradient id="pinG" cx=".35" cy=".3" r=".7"><stop stop-color="#fff"/><stop offset=".5" stop-color="#c3c8d0"/><stop offset="1" stop-color="#565c66"/></radialGradient>
  <filter id="blur3"x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
 </defs></svg>
 <header><div><h1>Hollow mood <span>/ Claude skin study</span></h1><p>Dark carapace shells with brush-ink outlines, scalloped belly plates, wrought-iron scrolls with small lanterns, and parchment map sheets pinned on as displays. <a href="index.html">All pages</a></p></div>
@@ -129,6 +154,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="joinRow"><span>Join</span></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
  <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-30" max="30" step="10" value="20" aria-label="Bracket angle in degrees"><output id="angleOut">+20°</output></div>
+ <div class="row" id="morphRow"><span>Morph</span></div>
+ <div class="row" id="sizeRow"><span>Checks</span><input type="range" id="grow" min="0" max="200" value="0" aria-label="Checks size, sheet to atlas"><output id="growOut">sheet</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Hollow skin stage">
@@ -166,6 +193,18 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
  <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="orn" aria-hidden="true">◆</span></button>
  <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="lampdot" aria-hidden="true"></span>
+ <div class="map" aria-hidden="true">
+  <div class="flap"><div class="r3"><div class="rt">iii · awaiting approval</div>
+   <div class="wait"><i></i><b>deploy-preview</b><span>waiting for Brent</span></div>
+   <div class="wait"><i></i><b>e2e-safari</b><span>waiting for Brent</span></div>
+   <svg class="rose" width="28" height="28" viewBox="-14 -14 28 28"><circle r="9.5" fill="none" stroke="#5c4a36" stroke-width=".7" stroke-dasharray="1.2 1.6"/><path d="M0 -13L2.4 -2.4L9 0L2.4 2.4L0 13L-2.4 2.4L-9 0L-2.4 -2.4Z" fill="#2b241d"/><path d="M0 -13L2.4 -2.4H-2.4Z" fill="#8f1c22"/><path d="M0 -13L0 13M-9 0H9" stroke="#f1e6cc" stroke-width=".5"/><circle r="1.3" fill="#f1e6cc" stroke="#2b241d" stroke-width=".6"/></svg>
+  </div><div class="fshade"></div></div>
+  <div class="leaf"><div class="r1"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div>
+   <div class="r2"><svg class="coast" width="176" height="6" viewBox="0 0 176 6"><path d="M0 3q8 -3 16 0t16 0q6 2 12 -1t14 1q9 2 18 -1t16 0q7 3 14 0t16 0q8 -2 16 1t18 -1q6 -1 10 1" fill="none" stroke="#3b2c1c" stroke-width=".9" stroke-dasharray="1.4 2" stroke-linecap="round"/></svg>
+    <div class="rt">ii · main branch, run 418</div><svg class="trail" width="162" height="34" viewBox="0 0 162 34"></svg>
+    <div class="rb"><em>86%</em>passed · 2 waiting</div></div></div>
+ </div>
+ <svg class="mmorph" aria-hidden="true"></svg>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="cocoon" aria-hidden="true"></svg><div class="cseam" aria-hidden="true"><b>Checks</b><i>◆</i><span><em>12 / 14</em>passed</span></div>
  <svg class="mroll" aria-hidden="true"></svg><div class="mlabel" aria-hidden="true"><b>Checks</b><i>—</i><span><em>12 / 14</em></span></div>
@@ -173,8 +212,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
-<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -236,7 +275,10 @@ function casing(id,w,h,lit){
  o+=`<g fill="none" stroke-linecap="round"><path d="M30 ${top+21}Q${w/2} ${top+14} ${E} ${top+21}" stroke="${INK}" stroke-width="1.5" opacity=".8"/><path d="M30 ${top+22.4}Q${w/2} ${top+15.4} ${E} ${top+22.4}" stroke="#c9d6e6" stroke-width=".8" opacity=".28"/>`;
  o+=`<path d="M19 ${h-9}C11 ${f(h*.72)} 11 ${f(h*.42)} 21 ${top+17}" stroke="${INK}" stroke-width="1.6" opacity=".85"/><path d="M20.4 ${h-10}C12.6 ${f(h*.72)} 12.6 ${f(h*.42)} 22.4 ${top+18}" stroke="#c9d6e6" stroke-width=".8" opacity=".25"/>`;
  if(!join)o+=`<path d="M${w-19} ${h-9}C${w-11} ${f(h*.72)} ${w-11} ${f(h*.42)} ${w-21} ${top+17}" stroke="${INK}" stroke-width="1.6" opacity=".85"/>`;
- o+=`<path d="${bl.lips}" stroke="#c9d6e6" stroke-width=".9" opacity=".22"/><path d="${bl.notch}" stroke="${INK}" stroke-width="1.4"/></g>`;
+ o+=`<path d="${bl.lips}" stroke="#c9d6e6" stroke-width=".9" opacity=".22"/><path d="${bl.notch}" stroke="${INK}" stroke-width="1.4"/>`;
+ // A grown Checks shell gains abdomen segments down its length.
+ if(small)for(let y=top+60;y<h-28;y+=38)o+=`<path d="M17 ${y}Q${f(w/2)} ${y-7} ${w-17} ${y}" stroke="${INK}" stroke-width="1.5" opacity=".8"/><path d="M18 ${y+1.4}Q${f(w/2)} ${y-5.6} ${w-18} ${y+1.4}" stroke="#c9d6e6" stroke-width=".8" opacity=".25"/>`;
+ o+='</g>';
  o+=`<path d="${body}" fill="none" stroke="${INK}" stroke-width="2.3" stroke-linejoin="round" filter="url(#wob)"/></g>`;
  // Iron scroll and its lantern.
  o+=`<g filter="url(#wob)"><path d="${taper(SCROLL,6,1.4)}" fill="#0b0e14"/><circle cx="${f(SCROLL[44][0])}" cy="${f(SCROLL[44][1])}" r="1.5" fill="#0b0e14"/></g>`;
@@ -749,9 +791,97 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined){model.angle=model.ang
 function stepAngle(k){const base=model.angTo??model.angle,to=clamp(Math.round(base/10)*10+10*k,-30,30);animateAngle(to);say('The bracket swings a notch '+(k>0?'down':'up')+'; GitDiscuss at '+signed(to)+'.')}
 function setBracketAngle(v){v=Math.round(clamp(v,-30,30)/10)*10;if(bracketOn())animateAngle(v);else{stopAngle();model.angle=v;render()}}
 
+/* ---------- Morph: map unfurl (Checks) ---------- */
+// g runs 0 sheet, 1 folio, 2 atlas. Every frame is drawn from g alone, so shrinking plays the growth backwards.
+const SIZES=[['sheet','Sheet',0],['folio','Folio',1],['atlas','Atlas',2]];
+const MORPHS={
+ unfurl:{label:'Map unfurl',kind:'Unroll',
+  about:'The parchment on Checks is only one corner of a larger map: the rest is rolled up along its bottom edge, tied with red thread, and folded under on the right. <b>Folio:</b> the shell darts down to a longer body with new abdomen segments, the thread slips off the roll, and the map unrolls down in one quick pass, the roll thinning to nothing. A second region is revealed under a dotted coastline: run 418 drawn as a route of fourteen waymarks, twelve inked and two open red rings for the checks still waiting, and the pass rate. Two pins drop into the new corners. <b>Atlas:</b> the shell widens, the fold lifts, and the folded half of the map swings out from behind on its crease in perspective and slaps flat with a puff of paper dust. Its region names the two waiting checks beside matching red rings, with a small compass rose; pins fix its corners and the crease stays. <b>Shrinking</b> rolls the map back up and folds it under. Pick a size, press M to step through them, or scrub the slider. Checks grows from where it stands and only moves to stay on the stage and clear of the pair. Shading a grown Checks rolls it back to a sheet first, and unshading unfurls it again.'}
+};
+const MDIM=[[CW,CH],[CW,162],[460,162]];
+const backSoft=t=>{const u=t-1;return 1+2.2*u*u*u+1.2*u*u};
+function geo(g){
+ g=clamp(g,0,2);const t1=clamp(g),t2=clamp(g-1),p=dart(seg(t1,.3,.72));
+ return{g,h:Math.round(lerp(CH,162,backSoft(seg(t1,0,.26)))),w:Math.round(lerp(CW,460,backSoft(seg(t2,0,.26)))),
+  tie:seg(t1,.18,.3),vis:lerp(34,118,p),r:lerp(5,2,p),rollOp:1-seg(t1,.7,.76),
+  lift:seg(t2,.24,.36),th:180*(1-backSoft(seg(t2,.34,.8))),crease:seg(t2,.6,.8),dust:seg(t2,.66,.86),
+  pins:[[45.5,142.5,seg(t1,.78,.9)],[218.5,142.5,seg(t1,.82,.94)],[402.5,35.5,seg(t2,.8,.9)],[402.5,142.5,seg(t2,.84,.94)]]}}
+const cDims=()=>{if(model.g<=0)return[CW,model.st>0?Math.round(lerp(CH,CHS,cinch())):CH];const G=geo(model.g);return[G.w,G.h]};
+// Run 418 as a route: twelve inked waymarks, then two open red rings for the checks still waiting.
+(function(){const y=x=>17+8*Math.sin(x*.05+.5);let d='M2 '+f(y(2)),o='';for(let x=6;x<=158;x+=4)d+=`L${x} ${f(y(x))}`;
+ o+=`<path d="${d}" fill="none" stroke="#5c4a36" stroke-width=".9" stroke-dasharray="2 2.2" stroke-linecap="round"/>`;
+ for(let i=0;i<14;i++){const x=8+i*11,yy=y(x);o+=i<12?`<path d="M${x-2.2} ${f(yy-2.2)}l4.4 4.4m0 -4.4l-4.4 4.4" stroke="#231b14" stroke-width="1.5" stroke-linecap="round"/>`:`<circle cx="${x}" cy="${f(yy)}" r="3.2" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.4"/>`}
+ const fx=8+13*11,fy=y(fx);o+=`<path d="M${fx} ${f(fy-3.5)}V${f(fy-13)}l6 2.4l-6 2.4" fill="#8f1c22" stroke="#231b14" stroke-width=".8" stroke-linejoin="round"/>`;
+ $('#c .trail').innerHTML=o})();
+function pin(x,y,k){if(k<=0)return '';const d=dart(clamp(k/.6)),yy=y-16*(1-d),sp=seg(k,.55,.95);
+ return (sp>0&&sp<1?spark({x,y},Math.sin(Math.PI*sp)*.85,7):'')+`<ellipse cx="${x+.8}" cy="${y+2}" rx="2.6" ry="1.3" fill="${INK}" opacity="${f(.4*d)}"/><circle cx="${x}" cy="${f(yy)}" r="2.6" fill="url(#pinG)" stroke="${INK}" stroke-width=".8" opacity="${f(Math.min(1,k*4))}"/>`}
+function unfurl(el,w,h,show){
+ const g=model.g,G=geo(g),map=el.querySelector('.map'),svg=el.querySelector('.mmorph'),leaf=map.querySelector('.leaf'),flap=map.querySelector('.flap');
+ el.style.width=w+'px';el.querySelector('.lampdot').style.left=g>0?(w-38)+'px':'';
+ map.style.display=g>0?'block':'none';map.style.opacity=svg.style.opacity=f(show);
+ if(g>0){el.querySelector('.mini').style.visibility='hidden';leaf.style.height=f(G.vis)+'px';
+  flap.style.visibility=G.th>=89?'hidden':'visible';flap.style.transform=`perspective(560px) rotateY(${f(G.th)}deg)`;
+  flap.querySelector('.fshade').style.opacity=f(Math.abs(Math.sin(G.th*Math.PI/180))*.75)}
+ const S=SIZES.find(x=>x[2]===g),lab='Checks widget, '+(S?S[1].toLowerCase():'unfurling')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.k===key)return;svg.dataset.k=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ let o='';
+ // The rest of the map, rolled along the sheet's bottom edge; it thins as it unrolls and the last turn flattens out.
+ if(G.rollOp>0){const r=G.r,yc=30+G.vis+r*.55,xa=39,xb=225,re=Math.max(1.2,r*.3);
+  const body=`M${xa} ${f(yc-r)}H${xb}A${f(re)} ${f(r)} 0 0 1 ${xb} ${f(yc+r)}H${xa}Z`;
+  o+=`<g opacity="${f(G.rollOp)}"><ellipse cx="132" cy="${f(yc+r+1)}" rx="94" ry="${f(1.2+r*.25)}" fill="${INK}" opacity=".45" filter="url(#blur3)"/>`+
+   `<path d="${body}" fill="url(#rollG)"/><path d="M${xa+4} ${f(yc-r*.6)}H${xb-4}" stroke="#fffaf0" stroke-width="${f(Math.max(.5,r*.14))}" stroke-linecap="round" opacity=".7"/>`+
+   `<path d="${body}" fill="none" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round" filter="url(#wob)"/>`+
+   `<ellipse cx="${xa}" cy="${f(yc)}" rx="${f(re)}" ry="${f(r)}" fill="#dccaa1" stroke="${INK}" stroke-width="1.1"/><ellipse cx="${xa+.3}" cy="${f(yc)}" rx="${f(re*.35)}" ry="${f(r*.35)}" fill="#4a3826"/>`;
+  // Red thread tied round the roll; growing, it slips loose and drops away.
+  if(G.tie<1){const u=G.tie,dy=14*u*u,th=d=>`<path d="${d}" stroke="#3a070b" stroke-width="2.2"/><path d="${d}" stroke="${RED}" stroke-width="1.3"/>`;
+   o+=`<g fill="none" stroke-linecap="round" opacity="${f(1-u)}" transform="translate(0 ${f(dy)})">`;
+   for(const x of [128,132.4])o+=th(`M${x+1.4} ${f(yc-r)}L${x-1.4} ${f(yc+r)}`);
+   o+=`<g transform="translate(130 ${f(yc+r)}) rotate(${f(-18*u)})">${th(`M0 0q-3 3 -2 ${f(7+6*u)}M0 0q3 4 3 ${f(6+7*u)}`)}<circle r="2.2" fill="${RED}" stroke="#3a070b" stroke-width=".8"/></g></g>`}
+  o+='</g>'}
+ // The fold: its edge lifts before the flap swings out, and the crease stays.
+ const cr=Math.max(G.lift*(1-G.crease)*.9,G.crease*.5);
+ if(cr>0&&g>1)o+=`<path d="M224 31.5V147" stroke="#4a3826" stroke-width="1.3" opacity="${f(cr)}"/><path d="M225.3 32V146.5" stroke="#fffaf0" stroke-width=".7" opacity="${f(cr*.8)}"/>`;
+ // Paper dust puffs off the flap's edges as it slaps flat.
+ if(G.dust>0&&G.dust<1){const k=G.dust;
+  for(const[x,y,dx,dy]of[[408,40,1,-.6],[408,70,1,0],[408,104,1,.2],[408,140,1,.7],[300,30,.2,-1],[350,148,.3,1],[260,148,-.2,1]])o+=`<circle cx="${f(x+dx*18*dart(k))}" cy="${f(y+dy*14*dart(k))}" r="${f(1.6-k)}" fill="#efe5cc" opacity="${f((1-k)*.85)}"/>`}
+ for(const[x,y,k]of G.pins)o+=pin(x,y,k);
+ svg.innerHTML=o;
+}
+// Where Checks's top-left should land at size `to`: the map grows from where it stands, kept on the stage and clear of the pair.
+function morphSpot(to){
+ const[w,h]=MDIM[to];let x=clamp(model.c.x,30,1170-w),y=clamp(model.c.y,TOP-10,590-h);
+ const x0=Math.min(model.a.x,model.b.x)-8,x1=Math.max(model.a.x,model.b.x)+W+8,y0=Math.min(model.a.y,model.b.y)-8,yb=Math.max(model.a.y,model.b.y)+ctx().h+8;
+ if(x+w>x0&&x<x1&&y<yb&&y+h>y0){if(yb+h<=590)y=yb;else if(y0-h>=TOP-10)y=y0-h}
+ return{x,y};
+}
+let morphAnim=0;
+function morphTo(id){
+ if(drag&&drag.id==='c')cancelDrag();
+ const S=SIZES.find(x=>x[0]===id),to=S[2],from=model.g;
+ // A shaded Checks comes out of its shade first, then unfurls.
+ if(model.st>0&&to>0){model.restore=id;model.size=id;toggleShade(0);render();return Promise.resolve(false)}
+ if(to===0)model.restore=null;
+ model.size=id;
+ if(to===from){say('Checks is already a '+S[1].toLowerCase()+'.');render();return Promise.resolve(true)}
+ const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(to>from?2000:1500),p0={x:model.c.x,y:model.c.y},p1=morphSpot(to),t0=performance.now();
+ model.cMoved=false;
+ say(to>from?(to===2?'The folded half of the map swings out: Checks is an atlas.':'The map unrolls: Checks is a folio.'):'The map is rolled back up and folded under: Checks shrinks to a '+S[1].toLowerCase()+'.');
+ return new Promise(res=>{(function step(now){
+  if(tok!==morphAnim)return res(false);
+  const t=ms?clamp((now-t0)/ms):1;model.g=t<1?lerp(from,to,t):to;
+  const[w,h]=cDims();
+  if(model.cMoved){model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h)}
+  else{const e=ease(t);model.c.x=lerp(p0.x,p1.x,e);model.c.y=lerp(p0.y,p1.y,e)}
+  render();
+  if(t<1)requestAnimationFrame(step);else{say('Checks is '+(to===2?'an ':'a ')+S[1].toLowerCase()+'.');res(true)}
+ })(t0)});
+}
+
 /* ---------- Model ---------- */
-const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angTo:undefined};
+const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:700,y:420}};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angTo:undefined,morph:'unfurl',size:'sheet',g:0,restore:null,cMoved:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -804,9 +934,13 @@ function holdJoining(){
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
  setJt(J().holdAt);render();say(J().text.hold);
 }
-function toggleShade(){
- const sh=SHADES[model.shade],to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||520)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;model.sdir=to?1:-1;
- (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));refitPair();render();if(t<1)requestAnimationFrame(step)})(t0);
+function toggleShade(force){
+ const sh=SHADES[model.shade],to=force!==undefined?force:model.st>.5?0:1,start=model.st;
+ // A grown Checks rolls its map back to a sheet first, and unfurls again once unshaded.
+ if(to===1&&model.g>0){const keep=model.size&&model.size!=='sheet'?model.size:SIZES[Math.max(1,Math.round(model.g))][0];++shadeAnim;
+  morphTo('sheet').then(ok=>{if(ok){model.restore=keep;toggleShade(1)}});return}
+ const token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||520)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;model.sdir=to?1:-1;
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));refitPair();render();if(t<1)requestAnimationFrame(step);else if(to===0&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}})(t0);
  say(to?sh.sayIn:sh.sayOut);
 }
 // How far the shell has cinched toward its shaded height.
@@ -819,7 +953,7 @@ function render(){
  const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,cinch())),coc=model.shade==='cocoon',mr=model.shade==='mroll',s=model.st;
  $$('#a .runText').forEach(n=>n.textContent=model.a.run?'agents running':'agents paused');
  for(const id of ['a','b','c']){
-  const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
+  const el=$('#'+id),m=model[id],small=id==='c',G=small&&model.g>0?geo(model.g):null,w=small?(G?G.w:CW):W,h=small?(G?G.h:ch):c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   // GitDiscuss turns about the bracket's knuckle, in the middle of the gap.
   if(id==='b'){const bd=model.join==='bracket'?JOINS.bracket.bend(model.jt):0;el.style.transformOrigin=`${-JOINS.bracket.gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
@@ -833,7 +967,7 @@ function render(){
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):mr?1-seg(s,.34,.46):1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
   svg.querySelector('.body').style.opacity=coc?f(1-seg(s,.42,.74)):'';
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);if(small)unfurl(el,w,h,show);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
@@ -848,6 +982,10 @@ function render(){
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
+ $$('#morphRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.morph)));
+ $$('#sizeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===model.size)));
+ if(document.activeElement!==$('#grow'))$('#grow').value=Math.round(model.g*100);
+ const SZ=SIZES.find(x=>x[2]===model.g);$('#growOut').textContent=SZ?SZ[1].toLowerCase():'…';$('#grow').setAttribute('aria-valuetext',SZ?SZ[1]:'between sizes');
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),T=j.text;
  const ph={separate:'Separate · two shells',joining:j.phase(model.dir,model.jt)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+signed(model.angle):'')};
@@ -863,14 +1001,23 @@ function pick(key,id){
  if(drag)cancelDrag();
  if(key==='join'&&id!==model.join){stopAngle();lamp.on=false;const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;model.peal=model.armed=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
+ if(key==='morph')model.morph=id;
  describe();render();
 }
 function describe(){
  const j=J(),s=SHADES[model.shade];
  $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
+ const mo=MORPHS[model.morph];$('#morphAbout').innerHTML=`<h2>${mo.label}<small>morph · ${mo.kind}</small></h2><p>${mo.about}</p>`;
 }
-options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
+options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#morphRow',MORPHS,'morph');
+SIZES.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size=id;b.textContent=l;b.onclick=()=>morphTo(id);$('#grow').before(b)});
+// Scrubbing size: while shaded, the slider unshades first (unfurling back to any size it had) and ignores the move.
+$('#grow').oninput=e=>{if(drag&&drag.id==='c')cancelDrag();
+ if(model.st>0){toggleShade(0);e.target.value=0;render();return}
+ ++morphAnim;model.restore=null;model.g=e.target.value/100;const S=SIZES.find(x=>x[2]===model.g);model.size=S?S[0]:null;
+ const[w,h]=cDims();model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h);render()};
+$('#grow').onchange=()=>render();
 $('#angle').oninput=e=>{if(drag)cancelDrag();setBracketAngle(+e.target.value)};
 $('#scrub').oninput=e=>{stopAngle();++anim;model.busy=false;model.poised=false;model.glow=0;
  if(model.dir<0){model.dir=1;model.cut=null}
@@ -881,6 +1028,7 @@ document.addEventListener('keydown',e=>{
  const key=e.key.toLowerCase();
  if(e.key==='Escape')cancelDrag();
  const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
+ if(key==='m')morphTo((SIZES.find(x=>x[2]>model.g+.001)||SIZES[0])[0]);
  if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
 });
 ['a','b'].forEach(id=>{
@@ -910,7 +1058,7 @@ stage.addEventListener('pointermove',e=>{
  if(drag.seam){J().seamMove(drag,p);return}
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
  drag.moved=Math.max(drag.moved||0,Math.hypot(dx,dy));
- if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
+ if(drag.id==='c'){const[cw,chh]=cDims();model.c.x=clamp(s.c.x+dx,30,1200-cw-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-chh-10);model.cMoved=true;render();return}
  if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,30,1200-2*W-g-30),ay=clamp(s.a.y+dy,...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,30,1200-W-30),y:clamp(s[id].y+dy,TOP,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
@@ -942,10 +1090,10 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const bottom=600-(model.st>.5?HS:H)-14;
  if(id==='b'&&bracketOn()&&k[1]){stepAngle(k[1]>0?1:-1);return}
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
- else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-CH-10:bottom)}render();
+ else{const m=model[id],[cw,chh]=cDims(),w=id==='c'?cw:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-chh-10:bottom);if(id==='c')model.cMoved=true}render();
 }));
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
 addEventListener('resize',fit);fit();describe();render();
-window.hollowSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade};
+window.hollowSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade,morphTo};
 </script></body></html>
