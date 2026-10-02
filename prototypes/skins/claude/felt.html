@@ -167,7 +167,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the button tab, tug the tab to unbutton it. On the drawstring shade, pull a toggle down to open it. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the drawstring shade, pull a toggle down to open it. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -563,6 +563,35 @@ function hornButton(x,y,s,lift=0){
 // Bits of fluff knocked loose as the button pops through.
 const FLUFF=[[-.2,-1,.3],[.5,-.9,-.6],[-.7,-.6,1.1],[.25,1,.5],[-.45,.85,-1],[.8,.4,.2]];
 
+/* ---------- Ribbon bow geometry ---------- */
+// A column of brass grommets is set 10 px in from each joining edge. A crimson satin ribbon with brass aglets
+// laces across them like a shoelace (a bar along the bottom, then criss-cross up) and ties a bow at the top.
+const RB={gap:14-2*EDGE,inset:10,col:'#b3243a',dk:'#4d0b16',hi:'#ff9aa4',w:5,tugMax:44};
+function rbRows(h){const y0=Math.min(22,h*.32),y1=h-Math.min(16,h*.3),n=Math.max(2,Math.round((y1-y0)/23)+1);return Array.from({length:n},(_,i)=>lerp(y0,y1,i/(n-1)))}
+// Satin ribbon along a centre line: drop shadow, dark selvedge, crimson face, satin weave and a sheen along the top.
+const ribbon=(d,w=RB.w)=>d?`<g fill="none" stroke-linejoin="round"><path d="${d}" stroke="#1c0306" stroke-opacity=".4" stroke-width="${f(w+1)}" transform="translate(.6 1.3)"/><path d="${d}" stroke="${RB.dk}" stroke-width="${f(w+1)}"/><path d="${d}" stroke="${RB.col}" stroke-width="${f(w-.4)}"/><path d="${d}" stroke="url(#satin)" stroke-width="${f(w-.4)}"/><path d="${d}" stroke="${RB.hi}" stroke-opacity=".6" stroke-width="1.1" transform="translate(-.3 -.7)"/></g>`:'';
+// A brass aglet capping a ribbon end at p, pointing along d. len shortens it as it goes into a grommet.
+function aglet(p,d,len=6){
+ if(len<.4)return '';const k=f(len/6*100)/100;
+ return `<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(angOf(d.x,d.y))}) scale(${k} 1)"><path d="M-.5 -2.2H4.4L6 -1.1V1.1L4.4 2.2H-.5Z" fill="#000" opacity=".35" transform="translate(.5 1.1)"/><path d="M-.5 -2.2H4.4L6 -1.1V1.1L4.4 2.2H-.5Z" fill="url(#brass)" stroke="#4a3008" stroke-width=".5"/><path d="M1.6 -2.1V2.1" stroke="#4a3008" stroke-opacity=".6" stroke-width=".5"/><path d="M0 -1.2H5" stroke="#fff6d0" stroke-opacity=".75" stroke-width=".5"/></g>`;
+}
+// The first s of a quadratic curve: its path, end point and direction there.
+function qPart(P0,C,P1,s){const Q0=V.mix(P0,C,s),Q1=V.mix(C,P1,s),R=V.mix(Q0,Q1,s);return{d:`M${pt(P0)}Q${pt(Q0)} ${pt(R)}`,R,dir:unit(V.sub(Q1,Q0))}}
+// One run of ribbon between grommets, sagging while it is slack.
+const laceRun=(P0,P1,s,slack)=>qPart(P0,V.add(V.mix(P0,P1,.5),{x:0,y:1+6*slack}),P1,s);
+// A brass grommet punched through the felt, with a glint that brightens as a partner comes near.
+function grommet(p,gl,spark){
+ let s=`<g transform="translate(${f(p.x)} ${f(p.y)})"><circle r="5.3" fill="#000" opacity=".35" transform="translate(.5 1.1)"/><circle r="4.5" fill="url(#brassR)" stroke="#4a3008" stroke-width=".6"/><circle r="2.2" fill="#160b05"/>`+
+  `<path d="M-3.4 -1.2A3.6 3.6 0 0 1 .9 -3.5" fill="none" stroke="#fff6d0" stroke-opacity="${f(.45+.5*gl)}" stroke-width="${f(.8+.5*gl)}" stroke-linecap="round"/>`;
+ if(spark>0)s+=`<path d="M3.6 -7.4l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z" fill="#fff6dc" opacity="${f(spark)}"/>`;
+ return s+'</g>';
+}
+// A bow loop of ribbon out of the knot, scaled by q (0 tucked away, 1 full; a little more on the overshoot).
+function bowLoop(K,sd,q,span){
+ if(q<.03)return '';const P=(x,y)=>pt({x:K.x+sd*x*q,y:K.y+y*q});
+ return `M${pt(K)}C${P(5,-11)} ${P(span,-14)} ${P(span-1,-4)}C${P(span-2,4)} ${P(8,4)} ${pt(K)}`;
+}
+
 const mixHex=(a,b,t)=>'#'+[0,2,4].map(i=>Math.round(lerp(parseInt(a.substr(i+1,2),16),parseInt(b.substr(i+1,2),16),t)).toString(16).padStart(2,'0')).join('');
 
 /* ---------- Options ---------- */
@@ -843,6 +872,103 @@ const JOINS={
    if(c.jt===1)s+=`<g class="hit" id="pullHit" tabindex="0" role="button" aria-label="Felt button tab: tug it, click it or press Enter to unbutton and separate the widgets"><title>Tug the tab to unbutton it</title><path d="${S}" fill="transparent" stroke="transparent" stroke-width="16"/><path class="ringfocus" d="${S}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
    return s;
   }
+ },
+ bow:{label:'Ribbon bow',kind:'Bind',gap:RB.gap,ms:4200,msDrag:3800,relMs:2600,moveEnd:.25,hold:.56,tug:true,snip:true,tugMax:RB.tugMax,
+  ph:[[0,.25,.33,.7,.8,1],[0,.13,.21,.6,.7,1]],
+  about:'Each joining edge has a column of brass grommets punched through the felt. A crimson satin ribbon with brass aglets on its ends is threaded through Jarvis\'s bottom grommet, its two ends hanging off the cushion. <b>Near:</b> the ends lift and reach toward GitDiscuss and the grommets catch the light. <b>Ready:</b> the ends point across the gap, the grommets glint and a ghost of the lacing shows. Joining: the cushions close to a finger\'s width. One end runs across the bottom as a bar, then both ends lace up the seam shoelace-fashion, one row a frame or two, each aglet leading and diving into its grommet, crossing over and under in turn. At the top they pull tight: the slack goes out of every run, the cushions squeeze and the felt creases round each grommet. Then the ends cross, knot, and the bow is tied: one loop, then the other, popping out with an overshoot, and the tails drop and swing. <b>Release:</b> pull a tail of the bow. It stretches toward your hand and the loops shrink through the knot; let go early and it holds. Pull far enough and the bow slips undone, the ribbon unlaces from the top down and the ends drop back to hang off Jarvis before the cushions part. A click, or Enter on the focused bow, also undoes it.',
+  sayJoin:'The cushions close and the ribbon laces up the seam.',
+  sayJoined:'Laced and tied. Drag either nameplate to move the pair. Pull a tail of the bow to untie it.',
+  sayRelease:'The bow slips undone, the ribbon unlaces from the top and the cushions part.',
+  sayUnpick:'The ribbon backs out of the grommets and the cushions part.',
+  sayReady:'Ready: the ribbon ends point across the gap. Release to lace them together.',
+  sayNear:'Nearby: the ribbon ends lift and the grommets catch the light. Move closer.',
+  sayHold:'Held mid-lacing. Use the scrubber to step through it row by row.',
+  sayTugHold:'The bow holds. Pull the tail further to untie it.',
+  phReady:'Ready · release to lace',
+  pose:jt=>({th:0,ys:0,sq:model.dir>0?.014*Math.sin(Math.PI*seg(jt,.72,.84)):0}),
+  phase(jt){
+   if(model.dir<0&&model.snip){const u=1-jt;return u<.22?'Releasing · the bow slips undone':u<.66?'Releasing · unlacing':'Releasing · parting'}
+   if(model.dir<0&&model.busy)return 'Unlacing';
+   const n=rbRows(ctx().h).length-1;
+   return jt<.25?'Joining · closing in':jt<.33?'Joining · lacing the bottom bar':jt<.7?`Joining · lacing row ${Math.min(n,Math.floor(seg(jt,.33,.7)*n)+1)} of ${n}`:jt<.8?'Joining · pulling it tight':'Joining · tying the bow';
+  },
+  // Every moving part, from join progress. side is the tail being pulled (−1 left, +1 right).
+  state(c,side){
+   const jt=c.jt;
+   if(jt===0&&!(model.busy&&model.dir>0))return{e:Math.pow(c.glow,.85),bp:0,Lp:0,eu:0,knot:0,loopL:0,loopR:0,tl:0,slack:1,swing:0};
+   if(model.dir<0&&model.snip){
+    // Releasing: the pulled loop slips through first, then the other; the ends unlace from the top down and drop back.
+    const u=1-jt,lp=1-ease(seg(u,0,.13)),lo=1-ease(seg(u,.04,.18));
+    return{e:1-seg(u,.66,.76),bp:1-seg(u,.56,.66),Lp:1-seg(u,.26,.56),eu:1-seg(u,.22,.27),knot:1-seg(u,.1,.22),loopL:side<0?lp:lo,loopR:side<0?lo:lp,tl:1-seg(u,.08,.2),slack:seg(u,.1,.24),swing:0};
+   }
+   const q=seg(jt,.9,1);
+   return{e:model.fast?1:ease(seg(jt,0,.22)),bp:seg(jt,.25,.33),Lp:seg(jt,.33,.7),eu:seg(jt,.7,.74),slack:1-seg(jt,.74,.8),knot:seg(jt,.8,.86),
+    loopL:backOut(seg(jt,.85,.92)),loopR:backOut(seg(jt,.89,.96)),tl:seg(jt,.86,.94),swing:model.dir>0?9*Math.sin(3*Math.PI*q)*Math.pow(1-q,2):0};
+  },
+  over(c){
+   const a=model.a,b=model.b,jt=c.jt,ys=rbRows(c.h),n=ys.length,xa=a.x+W-EDGE-RB.inset,xb=b.x+EDGE+RB.inset;
+   const Jg=ys.map(y=>({x:xa,y:a.y+y})),Gg=ys.map(y=>({x:xb,y:b.y+y}));
+   // Where GitDiscuss's grommets will be once joined, so the ends can reach for them before it arrives.
+   const Gv=jt>0?Gg:ys.map(y=>({x:a.x+W+RB.gap+EDGE+RB.inset,y:a.y+y}));
+   const tugging=drag&&drag.tug,T=model.tug&&(tugging||(model.dir<0&&model.busy))?V.mul(model.tug,tugging?1:1-seg(1-jt,0,.08)):null,tk=T?Math.hypot(T.x,T.y)/RB.tugMax:0;
+   const K0={x:(xa+xb)/2,y:Math.min(a.y,b.y)+ys[0]-15},side=model.tugAt&&model.tugAt.x<K0.x?-1:1;
+   const r=this.state(c,side),slack=r.slack;
+   let s=`<defs><linearGradient id="brass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff1b8"/><stop offset=".45" stop-color="#c9952e"/><stop offset="1" stop-color="#6b4a12"/></linearGradient><radialGradient id="brassR" cx=".38" cy=".32" r=".75"><stop stop-color="#fff0b0"/><stop offset=".5" stop-color="#c8922c"/><stop offset="1" stop-color="#5e400e"/></radialGradient></defs>`;
+   // Ready: a warm ghost of the lacing across the gap.
+   if(c.ghost>0&&jt===0){let d=`M${pt(Jg[n-1])}L${pt(Gv[n-1])}`;for(let i=n-1;i>0;i--)d+=`M${pt(Jg[i])}L${pt(Gv[i-1])}M${pt(Gv[i])}L${pt(Jg[i-1])}`;
+    s+=`<rect x="${f(xa-6)}" y="${f(a.y+ys[0]-10)}" width="${f(Gv[0].x-xa+12)}" height="${f(ys[n-1]-ys[0]+20)}" rx="10" fill="#ffc36a" opacity="${f(c.ghost*.4)}" filter="url(#soft)"/><path d="${d}" fill="none" stroke="#ffe2b0" stroke-opacity="${f(.8*c.ghost)}" stroke-width="1.4" stroke-dasharray="3 3" stroke-linecap="round"/>`}
+   // Creases in the felt round each grommet once the ribbon is pulled tight, pointing away from the seam.
+   const tight=jt>0&&(r.bp>0||r.Lp>0)?1-slack:0;
+   if(tight>.02){let d='';for(const[G,sd]of [...Jg.map(p=>[p,-1]),...Gg.map(p=>[p,1])])for(const k of [-1,0,1])d+=`M${f(G.x+sd*5.8)} ${f(G.y+k*2.6)}l${f(sd*(5+2*(k===0)))} ${f(k*2.4)}`;
+    s+=`<g fill="none" stroke-linecap="round" opacity="${f(tight)}"><path d="${d}" stroke="#1a0c05" stroke-opacity=".42" stroke-width="1.1"/><path d="${d}" stroke="#fff6e4" stroke-opacity=".28" stroke-width="1.3" transform="translate(-.5 -.9)"/></g>`}
+   let tips='',top='';
+   const gl=jt===0?c.glow:0;
+   if(r.bp<=0&&r.Lp<=0){
+    // The ends hang off Jarvis's bottom grommet; near and ready, they lift and reach for GitDiscuss.
+    for(const[tgt,hang,hl,curl]of [[Gv[n-1],72,21,22],[Gv[n-2],104,15,-28]]){
+     const P=Jg[n-1],reach=angOf(tgt.x-P.x,tgt.y-P.y),a0=lerp(hang,reach,r.e),L=lerp(hl,14,r.e),cu=lerp(curl,0,r.e);let p={...P},d=`M${pt(P)}`,dir={x:1,y:0};
+     for(let i=1;i<=8;i++){const an=(a0+cu*i/8)*Math.PI/180;dir={x:Math.cos(an),y:Math.sin(an)};p=V.add(p,V.mul(dir,L/8));d+=`L${pt(p)}`}
+     s+=ribbon(d)+aglet(p,dir)}
+   }else{
+    // Each end's route through the grommets: B lays the bottom bar first, then both criss-cross up a row at a time.
+    const A=[Jg[n-1]],B=[Jg[n-1],Gg[n-1]];
+    for(let k=1;k<n;k++){A.push(k%2?Gg[n-1-k]:Jg[n-1-k]);B.push(k%2?Jg[n-1-k]:Gg[n-1-k])}
+    const progA=A.slice(1).map((_,k)=>r.Lp*(n-1)-k),progB=[r.bp,...A.slice(1).map((_,k)=>r.Lp*(n-1)-k)];
+    const run=(pts,prog)=>{const out=[];let tip=null,done=true;
+     for(let k=0;k<prog.length;k++){const P0=pts[k],P1=pts[k+1],p=clamp(prog[k]);let sv=p,sl=slack;
+      // The first run starts from the straight 14 px stub the end was reaching with, and only sags once it moves.
+      if(k===0){sv=lerp(Math.min(.45,14/Math.hypot(P1.x-P0.x,P1.y-P0.y)),1,p);sl=slack*Math.min(1,p/.3)}else if(sv<=0){done=false;break}
+      const q=laceRun(P0,P1,sv,sl);out.push(q.d);if(sv<1){tip={...q,P1};done=false;break}}
+     return{out,tip,done,end:pts[pts.length-1]}};
+    const ra=run(A,progA),rb=run(B,progB);
+    s+=ribbon(rb.out[0]||'');
+    for(let k=0;k<n-1;k++){const pa=ribbon(ra.out[k]||''),pb=ribbon(rb.out[k+1]||'');s+=k%2?pb+pa:pa+pb}
+    for(const R of [ra,rb])if(R.tip)tips+=aglet(R.tip.R,R.tip.dir,Math.min(6,Math.hypot(R.tip.P1.x-R.tip.R.x,R.tip.P1.y-R.tip.R.y)));
+    // Out of the top grommets the ends rise, cross and knot, then the bow is tied.
+    if(ra.done&&rb.done&&r.eu>0){
+     const K=T?V.add(K0,V.mul(T,.12)):K0,su=.55*r.eu+.45*r.knot;
+     for(const R of [ra,rb]){const P=R.end,q=qPart(P,{x:P.x,y:K.y+3},K,su);top+=ribbon(q.d);if(r.knot<1)top+=aglet(q.R,q.dir,Math.min(6,Math.hypot(K.x-q.R.x,K.y-q.R.y)+6*(1-r.knot)))}
+     if(r.tl>.06){
+      // Tails: the pulled one stretches toward the pointer.
+      for(const[sd,ex,ey,cx,cy]of [[-1,-12,24,-6,10],[1,15,27,7,9]]){const sw=r.swing*(sd<0?1:.8),L=r.tl,pull=T&&sd===side;
+       let E={x:K.x+(ex+sw)*L,y:K.y+ey*L},C={x:K.x+cx*L,y:K.y+cy*L};if(pull){E=V.add(E,T);C=V.add(C,V.mul(T,.45))}
+       top+=ribbon(`M${pt(K)}Q${pt(C)} ${pt(E)}`)+aglet(E,unit(V.sub(E,C)))}}
+     const lL=r.loopL*(1-(side<0?.6:.15)*tk),lR=r.loopR*(1-(side>0?.6:.15)*tk);
+     top+=ribbon(bowLoop(K,-1,lL,23))+ribbon(bowLoop(K,1,lR,25));
+     // A gleam runs over the loops as the bow settles.
+     const gleam=model.dir>0?Math.sin(Math.PI*seg(jt,.94,1)):0;
+     if(gleam>.02)top+=`<path d="${bowLoop(K,-1,lL,23)}${bowLoop(K,1,lR,25)}" fill="none" stroke="#fff" stroke-opacity="${f(.55*gleam)}" stroke-width="1.6" stroke-dasharray="6 40" stroke-dashoffset="${f(-46*seg(jt,.94,1))}"/>`;
+     if(r.knot>.5){const kk=seg(r.knot,.5,1);
+      top+=`<g transform="translate(${f(K.x)} ${f(K.y)}) rotate(-8) scale(${f(kk*100)/100})"><rect x="-4.4" y="-3.9" width="8.8" height="7.8" rx="2.6" fill="#000" opacity=".35" transform="translate(.6 1.2)"/><rect x="-4.4" y="-3.9" width="8.8" height="7.8" rx="2.6" fill="${RB.col}" stroke="${RB.dk}" stroke-width=".9"/><rect x="-4.4" y="-3.9" width="8.8" height="7.8" rx="2.6" fill="url(#satin)"/><path d="M-2.6 -2.2Q0 -3.2 2.6 -2.2M-1.2 1.4Q.4 2.4 2 1.3" fill="none" stroke="${RB.hi}" stroke-opacity=".7" stroke-width=".8" stroke-linecap="round"/></g>`}
+    }
+   }
+   for(const G of Jg)s+=grommet(G,gl,c.ghost);
+   for(const G of Gg)s+=grommet(G,gl,c.ghost);
+   s+=tips+top;
+   if(jt===1){const K=K0;
+    s+=`<g class="hit" id="pullHit" tabindex="0" role="button" aria-label="Ribbon bow: pull a tail, click it or press Enter to untie it and separate the widgets"><title>Pull a tail of the bow to untie it</title><rect x="${f(K.x-30)}" y="${f(K.y-18)}" width="60" height="50" rx="14" fill="transparent"/><rect class="ringfocus" x="${f(K.x-30)}" y="${f(K.y-18)}" width="60" height="50" rx="14" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -1086,7 +1212,7 @@ async function doSeparate(){
  model.dir=-1;
  if(model.jt===1||!model.path)model.path={s:separatePose(),j:here()};
  say(model.snip||!j.sayUnpick?j.sayRelease:j.sayUnpick);
- if(await tween(model.jt,0,(j.relMs||1300)*model.jt,setJt)){model.path=null;model.snip=false;say('Separate. Displays and pages were not touched.')}
+ if(await tween(model.jt,0,(j.relMs||1300)*model.jt,setJt)){model.path=null;model.snip=false;model.tug=null;model.tugAt=null;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
  model.fast=false;++anim;model.busy=false;model.dir=1;model.snip=false;
@@ -1138,7 +1264,7 @@ function render(){
  $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
  const focused=document.activeElement&&document.activeElement.id==='pullHit';
  $('#over').innerHTML=j.over(c);
- const hit=$('#pullHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ const hit=$('#pullHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();model.tug=model.tugAt=null;$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
@@ -1149,7 +1275,7 @@ function render(){
  $('#angleRow').style.display=model.join==='hinge'?'':'none';$('#angle').value=Math.round(model.angle);$('#angleOut').textContent=signed(model.angle);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const ph={separate:'Separate · two cushions',joining:j.phase(model.jt),joined:'Joined · '+j.label.toLowerCase()+(model.join==='hinge'?' · '+signed(model.angle):'')};
- $('#phase').textContent=(drag&&drag.tug?'Tugging · '+Math.round(Math.hypot(model.tug.x,model.tug.y)/(BT.tugMax*.9)*100)+'%':drag&&drag.pull?'Unzipping · '+Math.round(model.jt*100)+'%':drag&&drag.mode==='angle'?'Bending · '+signed(model.angle):drag&&drag.state==='ready'?(j.phReady||'Ready · release to zip'):drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
+ $('#phase').textContent=(drag&&drag.tug?'Tugging · '+Math.round(Math.hypot(model.tug.x,model.tug.y)/((J().tugMax||BT.tugMax)*.9)*100)+'%':drag&&drag.pull?'Unzipping · '+Math.round(model.jt*100)+'%':drag&&drag.mode==='angle'?'Bending · '+signed(model.angle):drag&&drag.state==='ready'?(j.phReady||'Ready · release to zip'):drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -1213,7 +1339,7 @@ function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
  if(e.target.closest('#pullHit')&&model.jt===1){
-  if(J().tug){e.preventDefault();model.tug={x:0,y:0};drag={tug:true,start:local(e),moved:false};stage.setPointerCapture(e.pointerId);render();return}
+  if(J().tug){e.preventDefault();model.tug={x:0,y:0};model.tugAt=local(e);drag={tug:true,start:local(e),moved:false};stage.setPointerCapture(e.pointerId);render();return}
   if(!J().pullDrag){e.preventDefault();doSeparate();return}
   e.preventDefault();++anim;model.busy=false;model.dir=-1;model.path={s:separatePose(),j:here()};
   drag={pull:true,start:local(e),moved:false};stage.setPointerCapture(e.pointerId);render();return;
@@ -1221,7 +1347,7 @@ stage.addEventListener('pointerdown',e=>{
  const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
- if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null}
+ if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;model.tug=null;if(model.jt<.5){model.dir=1;model.snip=false}if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null}
  drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c},angle:model.angle},group:model.jt===1&&id!=='c',state:'idle'};
  if(id==='b'&&hingeOn()){
   // Bend GitDiscuss about the strip rather than moving the pair.
@@ -1235,8 +1361,8 @@ stage.addEventListener('pointermove',e=>{
  if(drag.tug){
   // The felt gives a little, then the button pops free once the tug goes far enough.
   const d=Math.hypot(dx,dy);if(d>4)drag.moved=true;
-  const k=Math.min(1,BT.tugMax/(d||1))*.9;model.tug={x:dx*k,y:dy*k};
-  if(d*.9>=BT.tugMax){drag=null;try{stage.releasePointerCapture(e.pointerId)}catch(_){}doSeparate();return}
+  const tm=J().tugMax||BT.tugMax,k=Math.min(1,tm/(d||1))*.9;model.tug={x:dx*k,y:dy*k};
+  if(d>=tm){drag=null;try{stage.releasePointerCapture(e.pointerId)}catch(_){}doSeparate();return}
   render();return;
  }
  if(drag.pull){
@@ -1260,7 +1386,7 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
- if(d.tug){if(!d.moved)doSeparate();else{model.tug=null;render();say('The button holds. Tug the tab further to unbutton it.')}return}
+ if(d.tug){if(!d.moved)doSeparate();else{model.tug=null;render();say(J().sayTugHold||'The button holds. Tug the tab further to unbutton it.')}return}
  if(d.pull){if(!d.moved||model.jt<.75)doSeparate();else{model.dir=1;tween(model.jt,1,260,setJt).then(ok=>{if(ok){model.path=null;say('Zipped back up.')}})}return}
  if(d.mode==='angle'){model.turning=false;setAngle(model.angle);say(J().sayJoined);return}
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
