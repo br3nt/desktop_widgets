@@ -143,7 +143,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -152,7 +152,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 /* ---------- Wire drawing kit ---------- */
-const METAL={copper:['#1f110a','#9b5b35','#f3bd92'],brass:['#2a1d08','#b68b34','#fde9a8'],hot:['#3a1a06','#e08a3c','#fff0c8'],dim:['#120a06','#5e3820','#a8724e']};
+const METAL={copper:['#1f110a','#9b5b35','#f3bd92'],brass:['#2a1d08','#b68b34','#fde9a8'],hot:['#3a1a06','#e08a3c','#fff0c8'],dim:['#120a06','#5e3820','#a8724e'],dimbrass:['#140e04','#6e5420','#b39552']};
 function wire(d,m='copper',w=3,op=1){
  const c=METAL[m];
  return `<g opacity="${op}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="${c[0]}" stroke-width="${w+1.7}"/><path d="${d}" stroke="${c[1]}" stroke-width="${w}"/><path d="${d}" stroke="${c[2]}" stroke-width="${f(w*.32)}" stroke-opacity=".85" transform="translate(-.5 -.6)"/></g>`;
@@ -407,13 +407,108 @@ const JOINS={
    }
    return s;
   }
+ },
+ trunk:{label:'Twisted trunk',kind:'Fuse',gap:96,slow:1.9,pull:true,held:0,lastJt:0,
+  about:'Like the trunk of a hoop tree, where many wires are twisted into one rope. Each joinable end has three wires bound onto its frame that fan in to a coil collar and stop in curled ends: copper on Jarvis, brass on GitDiscuss. <b>Near:</b> the curls straighten and the wire ends reach for each other, warming. <b>Ready:</b> the tips meet in the middle and a dashed ghost of the finished rope appears. Joining: the six wire ends run across the gap past each other like fingers lacing, hot at the tips, until each reaches the far collar with a spark. Then the bundle is twisted from both ends: the strands roll round each other, crossing over and under, and the rope draws tight with a springy overshoot. Halfway through, an amber chip drops into the middle and the strands close round it like a cage. The collars wind on extra turns to lock all six wires, a wave of heat runs along the rope as it anneals, and the amber chip stays lit as the join light. The seam is one cable that frays into each frame. <b>Release:</b> grab the rope and pull in any direction; the chip lifts out and the rope untwists as you pull, and past halfway the wires slide home and curl up. Let go sooner and it twists back tight. A click, or Enter on the focused rope, untwists it in one go.',
+  sayJoin:'Six wire ends run across and lace past each other, then the bundle twists into one rope round an amber chip.',
+  sayJoined:'Fused by a twisted wire rope. Drag either nameplate to move the pair. Grab the rope and pull to untwist it, or click it.',
+  sayRelease:'The chip lifts out, the rope untwists and the wires slide home and curl up.',
+  sayReady:'Ready: the wire ends meet. Release to twist them into one rope.',sayNear:'Nearby: the wire ends straighten and reach. Move closer.',
+  sayKeep:'Untwisting cancelled; the rope stays twisted.',
+  end(side,lit,h){
+   let s='';
+   trunkAnchors(h).forEach(ly=>{const ry=frameY(ly,h),x=side>0?W-frameIn(ry,h):frameIn(ry,h);
+    if(lit>0)s+=`<circle cx="${f(x)}" cy="${f(ry)}" r="7" fill="#ffb15e" opacity="${f(lit*.5)}" filter="url(#soft)"/>`;
+    s+=wire(band(x,ry,true,3,6.5,2.1),lit>.5?'hot':'copper',1.05)});
+   return s;
+  },
+  under(){return ''},
+  over(c){
+   const g=trunkGeo(c),jt=c.jt,T=trunkT(jt);let s='';
+   // How far each side's wires reach across the gap (0 = a short curled stub, 1 = into the far collar).
+   // Held through the join's first frame (which still has jt 0 but has cleared the drag glow) so ready tips don't snap back.
+   // Any backward step (separating, scrubbing back) drops the hold so the stubs draw back smoothly.
+   if(jt<this.lastJt)this.held=0;this.lastJt=jt;
+   if(jt===0&&!model.busy)this.held=.5*model.glow;else if(jt===1)this.held=0;
+   const reach=jt===0?this.held:Math.max(ease(seg(jt,0,.42)),this.held),curl=clamp(1-reach*3);
+   // Pendants dragged past or onto each other: each stub keeps its own short span so it never reaches backwards.
+   const GS=jt===0&&g.D<40?{a:{...g,xR:g.xL+40,D:40,yB:g.yA},b:{...g,xL:g.xR-40,D:40,yA:g.yB}}:{a:g,b:g},uOwn=k=>clamp((7+reach*(GS[k].D-7))/GS[k].D);
+   const tw=T.twist,P={T:2*backOut(tw),Rc:lerp(4.5,3,ease(tw)),Rm:lerp(8,3.3,ease(tw)),bulge:3.6*ease(T.bead)};
+   const hot=reach>.3&&jt<.5;
+   // Glow under the amber chip once it is lit, and the anneal glow travelling along the rope.
+   const mid=trunkPt(g,0,.5,{...P,Rc:0,Rm:0,bulge:0});
+   if(T.light>0)s+=`<circle cx="${f(mid.x)}" cy="${f(mid.y)}" r="13" fill="#ffb15e" opacity="${f(.65*T.light)}" filter="url(#soft)"/>`;
+   if(T.heat>0&&T.heat<1){const q=trunkPt(g,0,T.heat,{...P,Rc:0,Rm:0,bulge:0});s+=`<ellipse cx="${f(q.x)}" cy="${f(q.y)}" rx="12" ry="9" fill="#ff9a4a" opacity="${f(.55*Math.sin(Math.PI*T.heat))}" filter="url(#soft)"/>`}
+   // Fray: each side's own wires run from their frame wraps into its collar.
+   for(const side of [1,-1]){
+    const own=TRUNK_ORDER[side>0?'a':'b'],h=c.h,o=side>0?c.a:c.b,uc=side>0?0:1;
+    trunkAnchors(h).forEach((ly,k)=>{const ry=frameY(ly,h),ax=o.x+(side>0?W-frameIn(ry,h):frameIn(ry,h)),ay=o.y+ry,q=trunkPt(g,own[k],uc,P),cx=side>0?g.xL:g.xR;
+     s+=wire(`M${f(ax)} ${f(ay)}C${f(ax+side*11)} ${f(ay)} ${f(cx-side*9)} ${f(q.y)} ${f(cx)} ${f(q.y)}`,side>0?'copper':'brass',1.5)});
+   }
+   // Strands: back halves first, then the chip, then front halves.
+   const runs=[];
+   for(let i=0;i<6;i++){const a=i%2===0,u=uOwn(a?'a':'b');runs.push({i,a,R:trunkRuns(GS[a?'a':'b'],i,a?0:1,a?u:1-u,P)})}
+   runs.forEach(r=>{if(r.R.b.length)s+=wire(r.R.b.map(poly).join(''),r.a?'dim':'dimbrass',1.5)});
+   if(T.bead>0){const y=mid.y-30*(1-ease(T.bead)),on=T.light;
+    s+=`<g opacity="${f(clamp(T.bead*4))}"><ellipse cx="${f(mid.x)}" cy="${f(y)}" rx="4.8" ry="4" fill="url(#st-amber)" stroke="#2a170d" stroke-width=".6"/>`+
+     `<path d="M${f(mid.x-2.6)} ${f(y-.6)}L${f(mid.x-.4)} ${f(y-3)}L${f(mid.x+2.4)} ${f(y-1.6)}" fill="none" stroke="#fff1c4" stroke-width=".7" opacity=".55"/>`+
+     `<circle cx="${f(mid.x-1.5)}" cy="${f(y-1.6)}" r="${f(.9+.5*on)}" fill="#fff6dc" opacity="${f(.55+.4*on)}"/></g>`}
+   runs.forEach(r=>{
+    const side=r.a?1:-1;let d=r.R.f.map(poly).join('');
+    s+=wire(d,r.a?'copper':'brass',1.5);
+    const E=r.R.end;if(!E||reach>=1)return;
+    // Free ends: a small curl at rest, straightening as the wires reach; hot at the tip while they run across.
+    if(curl>0){const up=r.i%3===0;s+=wire(`M${f(E[0])} ${f(E[1])}`+curlD(E[0],E[1],side,up,2.2,1.1*curl),r.a?'copper':'brass',1.3)}
+    if(hot)s+=`<circle cx="${f(E[0])}" cy="${f(E[1])}" r="4.5" fill="#ffb15e" opacity=".5" filter="url(#soft)"/><circle cx="${f(E[0])}" cy="${f(E[1])}" r="1.1" fill="#fff0c8"/>`;
+   });
+   // The tips reach the far collars.
+   const sp=Math.sin(Math.PI*seg(jt,.4,.52));if(sp>.03){s+=sparkle(g.xL,g.yA-4,sp*.6)+sparkle(g.xR,g.yB+4,sp*.6)}
+   // Collars: two turns at rest, winding on to five to lock all six wires.
+   for(const side of [1,-1]){
+    const x0=side>0?g.xL:g.xR,y=side>0?g.yA:g.yB,nf=2+3*T.col,n=Math.floor(nf),span=2*(P.Rc+2.6),cx=x0+side*(n-1)*1.15;
+    s+=wire(band(cx,y,false,n,span,2.3),'copper',1.15);
+    if(T.col>0&&T.col<1){const wx=x0+side*n*2.3;s+=wire(band(wx,y,false,1,span*(.6+.4*(nf-n)),2.3),'hot',1.15)+`<circle cx="${f(wx)}" cy="${f(y)}" r="5" fill="#ffb15e" opacity=".45" filter="url(#soft)"/>`}
+   }
+   if(c.ghost>0&&jt===0){const G={T:2,Rc:3,Rm:3.3,bulge:3.6};let d='';for(let i=0;i<6;i++)d+=trunkRuns(g,i,0,1,G).f.map(poly).join('');
+    s+=`<path d="${d}" fill="none" stroke="#f3c96a" stroke-width="1.1" stroke-dasharray="2 2.2" stroke-linecap="round" opacity="${f(c.ghost*.9)}"/><ellipse cx="${f(mid.x)}" cy="${f(mid.y)}" rx="4.8" ry="4" fill="none" stroke="#f3c96a" stroke-width="1" stroke-dasharray="2 2" opacity="${f(c.ghost*.8)}"/>`}
+   if(jt===1){const y0=Math.min(g.yA,g.yB)-13,y1=Math.max(g.yA,g.yB)+13;
+    s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Twisted trunk: pull the rope, or press Enter, to untwist it and separate the widgets"><title>Grab the rope and pull to untwist it</title><rect x="${f(g.xL-4)}" y="${f(y0)}" width="${f(g.xR-g.xL+8)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(g.xL-6)}" y="${f(y0-2)}" width="${f(g.xR-g.xL+12)}" height="${f(y1-y0+4)}" rx="10" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
+   return s;
+  }
  }
 };
+/* ---------- Twisted trunk geometry ---------- */
+// Six strands round a common axis, 60° apart (offset so no two sit at the same height untwisted). Even strands are Jarvis's copper, odd GitDiscuss's brass.
+const TRUNK_TH=[0,1,2,3,4,5].map(i=>i*Math.PI/3+Math.PI/12);
+// Each side's strands, top to bottom by where they sit in the collar, matched to its three frame anchors top to bottom.
+const TRUNK_ORDER={a:[4,0,2],b:[5,3,1]};
+const trunkAnchors=h=>{const sp=lerp(7,22,clamp((h-HS)/(H-HS)));return[-1,0,1].map(k=>h/2+k*sp)};
+function trunkGeo(c){
+ const xL=c.a.x+W-5+18,xR=c.b.x+5-18;
+ return{xL,xR,D:Math.max(1,xR-xL),yA:c.a.y+c.h/2,yB:c.b.y+c.h/2};
+}
+// The bundle pinches at both collars and opens in the middle; twisting turns both ends in opposite directions about the middle, so T=2 brings each strand back to its own collar slot.
+function trunkPt(g,i,u,P){
+ const th=TRUNK_TH[i]+2*Math.PI*P.T*(u-.5),R=lerp(P.Rc,P.Rm,Math.sin(Math.PI*clamp(u)))+P.bulge*Math.exp(-Math.pow((u-.5)/.09,2));
+ return{x:lerp(g.xL,g.xR,u),y:lerp(g.yA,g.yB,u)+R*Math.sin(th),z:Math.cos(th)};
+}
+// One strand from u0 to u1, split into the runs in front of the axis and behind it.
+function trunkRuns(g,i,u0,u1,P){
+ const n=Math.max(2,Math.ceil(Math.abs(u1-u0)*g.D/1.6)),fr=[],bk=[];let run=null,side=null,prev=null;
+ for(let k=0;k<=n;k++){const q=trunkPt(g,i,lerp(u0,u1,k/n),P),pt=[q.x,q.y],s=q.z>=0;
+  if(s!==side){if(run&&run.length>1)(side?fr:bk).push(run);run=prev?[prev]:[];side=s}run.push(pt);prev=pt}
+ if(run&&run.length>1)(side?fr:bk).push(run);
+ return{f:fr,b:bk,end:prev};
+}
+// The beat sheet: wires run across while the casings close, twist, chip drops in, collars wind, anneal, light.
+const trunkT=jt=>({twist:seg(jt,.5,.86),bead:seg(jt,.6,.74),col:seg(jt,.8,.93),heat:seg(jt,.86,.99),light:seg(jt,.93,1)});
+// A wire end curling up or down off a tip heading toward side.
+function curlD(x,y,side,up,r,turns){let d='';const n=20,cy=y+(up?-r:r),a0=up?Math.PI/2:-Math.PI/2,dir=up?-1:1;for(let i=1;i<=n;i++){const t=i/n,a=a0+dir*t*turns*2*Math.PI,rr=r*(1-t*.8);d+='L'+f(x+side*Math.cos(a)*rr)+' '+f(cy+Math.sin(a)*rr)}return d}
 /* ---------- Coil wrap geometry ---------- */
 // How far in from a pendant's outer edge its frame wire sits at height y (the frame's corners are rounded).
 // The bead strand and coil band shades squeeze the frame toward the middle, so the frame's height follows the shade.
 function frameH(h){const k=shadeK();return model.shade==='strand'?(h-10)*(1-seg(k,.35,1)):model.shade==='coil'?lerp(h-10,20,k):h-10}
-const frameY=(y,h)=>{const fh=frameH(h);return clamp(y,h/2-fh/2+2,h/2+fh/2-2)};
+const frameY=(y,h)=>{const fh=frameH(h);return fh<4?h/2:clamp(y,h/2-fh/2+2,h/2+fh/2-2)};
 function frameIn(y,h){const fh=frameH(h),r=Math.min(26,fh/2),dy=Math.max(0,h/2-fh/2+r-y,y-(h/2+fh/2-r));return 5+r-Math.sqrt(Math.max(0,r*r-dy*dy))}
 // Spine extent, turns per band, pitch and band centres for a pendant of height h; shading drops the bands to two turns.
 function coilLocal(h){
@@ -932,7 +1027,7 @@ function render(){
  $('#grow').value=Math.round(model.g*100);$('#growOut').textContent=(model.g>=0?'+':'')+model.g.toFixed(2);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()+(model.join==='pivot'?' · '+$('#angleOut').textContent:'')};
- $('#phase').textContent=(drag&&drag.unwind?'Unwinding · '+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'')+(model.g>-1?' · Checks: '+(SIZES.find(x=>x[0]===model.size)||[0,'growing'])[1].toLowerCase():'');
+ $('#phase').textContent=(drag&&drag.unwind?(model.join==='trunk'?'Untwisting · ':'Unwinding · ')+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'')+(model.g>-1?' · Checks: '+(SIZES.find(x=>x[0]===model.size)||[0,'growing'])[1].toLowerCase():'');
 }
 
 /* ---------- Controls ---------- */
@@ -984,7 +1079,7 @@ stage.addEventListener('pointerdown',e=>{
  if(e.button===0&&model.jt===1&&J().pull&&e.target.closest('#joinHit')){
   e.preventDefault();++anim;model.busy=false;const p=local(e);
   model.path={s:separatePose(),j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}};
-  drag={unwind:true,x0:p.x,y0:p.y,deg:0,moved:false};stage.setPointerCapture(e.pointerId);say('Unwinding: pull further to let go.');render();return;
+  drag={unwind:true,x0:p.x,y0:p.y,deg:0,moved:false};stage.setPointerCapture(e.pointerId);say(model.join==='trunk'?'Untwisting: pull further to let go.':'Unwinding: pull further to let go.');render();return;
  }
  const g=e.target.closest('[data-drag]');if(!g||e.button!==0)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
@@ -1029,7 +1124,7 @@ function endDrag(){
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
 }
-function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say('Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
+function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
