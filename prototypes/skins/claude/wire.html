@@ -146,7 +146,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -737,8 +737,72 @@ const JOINS={
    if(jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Wire nest: tap the stone, or press Enter, to pull the nest apart and separate the widgets"><title>Tap the stone to pull the nest apart</title><circle cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(SR+10)}" fill="transparent"/><circle class="ringfocus" cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(SR+6)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
    return s;
   }
+ },
+ hoops:{label:'Overlapping hoops',kind:'Interlock',gap:96,slow:1.8,
+  about:'Each joinable end carries a heavy wire hoop on a short wrapped stem, as if each pendant were the start of a hoop tree: copper on Jarvis, brass on GitDiscuss, each with a fine coil wrapped round its lower curve. The brass hoop has a cut in it, like a split ring. <b>Near:</b> both hoops warm and the cut in the brass one cracks open. <b>Ready:</b> a dashed ghost of the brass hoop shows where it will overlap the copper one. Joining: the cut springs wide and the brass hoop turns edge-on on its stem; the pendants close in, then the brass hoop swings face-on again, its open end sweeping through the copper ring, and the cut twists shut with a spark. The two rings are now linked, the copper over the brass at the top crossing and under it at the bottom. The lens shape where they overlap fills with glass from the bottom up and kindles: it is the status lamp, split down the middle, its left half amber while Jarvis runs and its right half amber while GitDiscuss runs, each turning labradorite when paused. <b>Release:</b> tap the lens, or focus it and press Enter: the lamp drains, the cut springs open, the brass hoop turns edge-on and slips out, and the pendants part.',
+  sayJoin:'The brass hoop springs open and turns edge-on, swings back through the copper hoop and twists shut; the lens between the rings fills with glass and lights.',
+  sayJoined:'Joined by two linked hoops. Drag either nameplate to move the pair. Tap the lens lamp to unlink them.',
+  sayRelease:'The lamp drains, the brass hoop springs open, turns edge-on and slips out of the copper one.',
+  sayReady:'Ready: release to link the hoops.',sayNear:'Nearby: the hoops warm and the brass one cracks open. Move closer.',
+  end(){return ''},
+  under(){return ''},
+  over(c){
+   const jt=c.jt,lit=Math.max(model.glow,jt>0&&jt<1?seg(jt,.04,.25)*(1-seg(jt,.86,1)):0),hot=lit>.5;
+   // The beat sheet: the cut opens and the hoop turns edge-on while the pendants close, then it swings face-on through the copper ring and the cut shuts.
+   const tilt=ease(seg(jt,.08,.3))*(1-ease(seg(jt,.5,.66))),cut=Math.max(.32*lit*(jt===0?1:0),1.15*ease(seg(jt,.04,.2))*(1-ease(seg(jt,.66,.78)))),fill=ease(seg(jt,.78,.93)),light=seg(jt,.86,1);
+   const G=hoopGeo(c,tilt),{A,B,R}=G;let s='';
+   if(c.ghost>0&&jt===0)s+=`<g fill="none" stroke="#f3c96a" stroke-width="1.2" stroke-dasharray="3 3" opacity="${f(c.ghost*.85)}"><path d="${circ(A.cx+R,A.cy,R)}"/></g>`;
+   // The rings' shadows, then the lamp, so the ring wires bound its edges and no shadow falls on the glass.
+   const ringA=hoopArc(A,0,2*Math.PI),ringB=hoopArc(B,Math.PI+cut/2,3*Math.PI-cut/2);
+   s+=`<path d="${ringA+ringB}" transform="translate(2 6)" fill="none" stroke="#000" stroke-opacity=".24" stroke-width="3.4"/>`;
+   const L=fill>0?hoopLens(A,B,R):null;
+   if(L){
+    const on=model.a.run||model.b.run,ga=model.a.run?'hpAm':'hpLb',gb=model.b.run?'hpAm':'hpLb';
+    if(light>0)s+=`<path d="${L.d}" fill="${on?'#ffb15e':'#7f9cff'}" opacity="${f(.55*light)}" filter="url(#soft)" transform="translate(${f(L.m[0])} ${f(L.m[1])}) scale(1.5) translate(${f(-L.m[0])} ${f(-L.m[1])})"/>`;
+    const top=L.t[1],bot=L.b[1],x0=L.m[0]-R,x1=L.m[0]+R,lv=bot-fill*(bot-top+3),amp=2.2*(1-fill)*Math.sin(Math.PI*fill);
+    let surf=`M${f(x0)} ${f(bot+2)}`;for(let i=0;i<=12;i++){const x=lerp(x0,x1,i/12);surf+=`L${f(x)} ${f(lv+amp*Math.sin(i*1.3+jt*40))}`}surf+=`L${f(x1)} ${f(bot+2)}Z`;
+    const grad=(id,c0,c1,c2)=>`<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="${f(top)}" x2="0" y2="${f(bot)}"><stop stop-color="${c0}"/><stop offset=".5" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient>`;
+    s+=`<defs><clipPath id="hpClip"><path d="${L.d}"/></clipPath><clipPath id="hpL"><rect x="${f(x0)}" y="${f(top-4)}" width="${f(L.m[0]-x0)}" height="${f(bot-top+8)}"/></clipPath>${grad('hpAm','#ffe6a6','#e8962e','#7a3a08')}${grad('hpLb','#c6d3dd','#55667a','#1b242e')}</defs>`;
+    s+=`<path d="${L.d}" fill="#0c0705" opacity=".8"/><g clip-path="url(#hpClip)"><path d="${surf}" fill="url(#${gb})"/><g clip-path="url(#hpL)"><path d="${surf}" fill="url(#${ga})"/></g>`+
+     `<path d="M${f(L.m[0])} ${f(top)}V${f(bot)}" stroke="#2a1606" stroke-width=".9" opacity="${f(.5*fill)}"/>`+
+     `<ellipse cx="${f(L.m[0]-R*.12)}" cy="${f(lerp(top,bot,.3))}" rx="${f(R*.13)}" ry="${f(R*.32)}" fill="#fff" opacity="${f(.45*seg(fill,.6,1))}" transform="rotate(12 ${f(L.m[0]-R*.12)} ${f(lerp(top,bot,.3))})"/>`+
+     `<path d="${L.d}" fill="none" stroke="#000" stroke-opacity=".4" stroke-width="4"/></g>`;
+   }
+   // Stems from each frame to its hoop, bound with a band.
+   s+=wire(`M${f(G.ax)} ${f(A.cy)}H${f(A.cx-R)}`,hot?'hot':'copper',2.4)+wire(`M${f(G.bx)} ${f(B.cy)}H${f(B.cx+B.rx)}`,hot?'hot':'brass',2.4);
+   if(G.stem>7)s+=wire(band((G.ax+A.cx-R)/2,A.cy,false,3,7.5,2.3)+band((G.bx+B.cx+B.rx)/2,B.cy,false,3,7.5,2.3),'brass',1.1);
+   if(lit>0)s+=`<circle cx="${f(A.cx)}" cy="${f(A.cy)}" r="${f(R+6)}" fill="none" stroke="#ffb15e" stroke-width="8" opacity="${f(lit*.35)}" filter="url(#soft)"/><ellipse cx="${f(B.cx)}" cy="${f(B.cy)}" rx="${f(B.rx+6)}" ry="${f(R+6)}" fill="none" stroke="#ffb15e" stroke-width="8" opacity="${f(lit*.35)}" filter="url(#soft)"/>`;
+   const w=lerp(2.6,3.4,G.hs);
+   // Copper ring, then brass over it (the bottom crossing), then the copper's top crossing laid back over the brass.
+   s+=wire(ringA,'copper',w)+wire(coilsAlong(hoopArc(A,Math.PI*.58,Math.PI*.9),2.2,lerp(2,2.6,G.hs)),'brass',.85);
+   s+=wire(ringB,'brass',w)+wire(coilsAlong(hoopArc(B,Math.PI*.1,Math.PI*.42),2.2,lerp(2,2.6,G.hs)),'copper',.85);
+   if(cut<=.05){const p=hoopPt(B,Math.PI);s+=`<path d="M${f(p[0]-w*.9)} ${f(p[1]-1.2)}L${f(p[0]+w*.9)} ${f(p[1]+1.2)}" stroke="#2a1d08" stroke-width=".9"/>`}
+   else [Math.PI+cut/2,Math.PI-cut/2].forEach(a=>{const p=hoopPt(B,a);s+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="${f(w*.62)}" fill="url(#st-gold)" stroke="#2a1d08" stroke-width=".7"/>`});
+   if(jt>.3){const M=METAL.copper,d=hoopArc(A,-Math.PI*.56,Math.PI*.02);
+    s+=`<g fill="none" stroke-linecap="butt"><path d="${d}" stroke="${M[0]}" stroke-width="${f(w+1.7)}"/><path d="${d}" stroke="${M[1]}" stroke-width="${w}"/><path d="${d}" stroke="${M[2]}" stroke-width="${f(w*.32)}" stroke-opacity=".85" transform="translate(-.5 -.6)"/></g>`}
+   // The spark as the cut twists shut, and a glint round the lamp once it lights.
+   const sp=Math.sin(Math.PI*seg(jt,.68,.8));if(sp>.03){const p=hoopPt(B,Math.PI);s+=sparkle(p[0],p[1],sp*.65)}
+   if(L){const gl=Math.sin(Math.PI*seg(jt,.92,1));if(gl>.03)s+=sparkle(L.m[0]-R*.18,lerp(L.t[1],L.b[1],.28),gl*.6)}
+   if(jt===1&&L)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Overlapping hoops: tap the lens lamp, or press Enter, to unlink the hoops and separate the widgets"><title>Tap the lamp to unlink the hoops</title><circle cx="${f(L.m[0])}" cy="${f(L.m[1])}" r="${f(R*.62+6)}" fill="transparent"/><path class="ringfocus" d="${L.d}" fill="none" stroke="#f0c08f" stroke-width="1.5" transform="translate(${f(L.m[0])} ${f(L.m[1])}) scale(1.3) translate(${f(-L.m[0])} ${f(-L.m[1])})"/></g>`;
+   return s;
+  }
  }
 };
+/* ---------- Overlapping hoops geometry ---------- */
+// The hoops shrink with the casing; each centre sits so that, joined, the two centres are one radius apart (a vesica lens).
+// GitDiscuss's hoop turns edge-on about its stem, so its centre slides toward the stem as it narrows.
+function hoopGeo(c,tilt){
+ const hs=clamp((c.h-HS)/(H-HS)),R=lerp(18,27,hs),off=(JOINS.hoops.gap+10-R)/2,ax=c.a.x+W-5,bx=c.b.x+5,rxB=R*(1-.7*tilt);
+ return{hs,R,ax,bx,stem:off-R,A:{cx:ax+off,cy:c.a.y+c.h/2,rx:R,ry:R},B:{cx:bx-(off-R)-rxB,cy:c.b.y+c.h/2,rx:rxB,ry:R}};
+}
+const hoopPt=(g,a)=>[g.cx+g.rx*Math.cos(a),g.cy+g.ry*Math.sin(a)];
+function hoopArc(g,a0,a1){const n=Math.max(6,Math.ceil(Math.abs(a1-a0)*14)),P=[];for(let i=0;i<=n;i++)P.push(hoopPt(g,lerp(a0,a1,i/n)));return poly(P)}
+// The lens where two equal circles overlap: top and bottom crossing points, midpoint and its outline.
+function hoopLens(A,B,R){
+ const dx=B.cx-A.cx,dy=B.cy-A.cy,d=Math.hypot(dx,dy);if(d>=2*R-.5||d<1)return null;
+ const m=[(A.cx+B.cx)/2,(A.cy+B.cy)/2],k=Math.sqrt(R*R-d*d/4),n=[-dy/d,dx/d],t=[m[0]-n[0]*k,m[1]-n[1]*k],b=[m[0]+n[0]*k,m[1]+n[1]*k];
+ return{m,t,b,d:`M${f(t[0])} ${f(t[1])}A${f(R)} ${f(R)} 0 0 1 ${f(b[0])} ${f(b[1])}A${f(R)} ${f(R)} 0 0 1 ${f(t[0])} ${f(t[1])}Z`};
+}
 /* ---------- Wire nest geometry ---------- */
 // Seeded so the tangle is the same on every load. Even strands grow from Jarvis, odd ones from GitDiscuss.
 const NEST=(()=>{let a=0x2f6e2b1;const rnd=()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
