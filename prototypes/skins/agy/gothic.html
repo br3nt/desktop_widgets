@@ -926,6 +926,50 @@ header {
   transition: transform 60ms linear;
 }
 
+/* Mortise & Forged Tie-Rod Cotter Wedge Release (Option 9) */
+.tierod-release {
+  position: absolute;
+  width: 32px;
+  height: 48px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 160ms ease;
+}
+.tierod-release[hidden] { display: none; }
+.tierod-release::before {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 36px;
+  border-radius: 3px 3px 2px 2px;
+  background: linear-gradient(180deg, #62746a 0%, #2f3a34 40%, #151a17 100%);
+  border: 1.5px solid #0d120f;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.85), inset 0 1px rgba(255, 255, 255, 0.4);
+  transform: translateY(calc(var(--tension, 0) * -8px)) rotate(calc(var(--tension, 0) * 8deg));
+  transition: transform 60ms linear;
+}
+.tierod-release:hover::before {
+  border-color: var(--gold-glow);
+  box-shadow: 0 0 12px rgba(230, 180, 71, 0.85);
+}
+.tierod-release::after {
+  content: "⌾";
+  position: absolute;
+  top: 4px;
+  font-size: 15px;
+  color: var(--gold-glow);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  transform: translateY(calc(var(--tension, 0) * -8px));
+  transition: transform 60ms linear;
+}
+
 /* Port Overlay for Design Mode */
 #portOverlay { position: absolute; inset: 0; pointer-events: none; }
 .socket-port {
@@ -990,8 +1034,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Gothic Basilica <span>/ nave vaulting, keystone, triptych, buttress, pillars, gargoyle &amp; rose window oculus</span></h1>
-    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld · Triptych altar fold · Flying buttress arm swing · Pillar telescoping shade · Bronze gargoyle clench · Rose window oculus collapse shade</p>
+    <h1>Gothic Basilica <span>/ nave vaulting, keystone, triptych, buttress, pillars, gargoyle, oculus &amp; tie-rod</span></h1>
+    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld · Triptych altar fold · Flying buttress arm swing · Pillar telescoping shade · Bronze gargoyle clench · Rose window oculus collapse shade · Mortise &amp; forged tie-rod pin join</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -1005,6 +1049,7 @@ footer .note-highlight {
         <option value="pillar">6. Pillar Telescoping (Capital to Plinth) shade</option>
         <option value="gargoyle">7. Bronze Gargoyle Clench join</option>
         <option value="oculus">8. Rose Window Oculus Collapse shade</option>
+        <option value="tierod">9. Mortise &amp; Forged Tie-Rod Pin join</option>
       </select>
     </div>
     <div class="control-group">
@@ -1314,6 +1359,31 @@ footer .note-highlight {
           <stop offset="70%" stop-color="#e6b447" stop-opacity="0.2"/>
           <stop offset="100%" stop-color="#e6b447" stop-opacity="0"/>
         </radialGradient>
+
+        <!-- Option 9: Mortise & Forged Tie-Rod Pin Gradients -->
+        <linearGradient id="fleurDeLisGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#4e5d54"/>
+          <stop offset="25%" stop-color="#2c3731"/>
+          <stop offset="60%" stop-color="#18201c"/>
+          <stop offset="100%" stop-color="#0a0e0c"/>
+        </linearGradient>
+        <linearGradient id="tieRodShaftGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#607166"/>
+          <stop offset="30%" stop-color="#2e3832"/>
+          <stop offset="70%" stop-color="#18201c"/>
+          <stop offset="100%" stop-color="#3d4a42"/>
+        </linearGradient>
+        <linearGradient id="cotterWedgeGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#1a221e"/>
+          <stop offset="40%" stop-color="#55665b"/>
+          <stop offset="70%" stop-color="#8ba092"/>
+          <stop offset="100%" stop-color="#1a221e"/>
+        </linearGradient>
+        <radialGradient id="boreShadowGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#050807"/>
+          <stop offset="70%" stop-color="#0c110f"/>
+          <stop offset="100%" stop-color="#2a3630"/>
+        </radialGradient>
       </defs>
 
       <!-- Shared arch, keystone and decorative joints -->
@@ -1506,6 +1576,12 @@ footer .note-highlight {
             title="Pull right to unclasp gargoyle claws · Enter to separate" hidden>
     </button>
 
+    <!-- Mortise & Forged Tie-Rod Cotter Wedge Release (Option 9) -->
+    <button id="tierodRelease" class="tierod-release" data-drag="release"
+            aria-label="Release Tie-Rod Pin: pull right or press Enter"
+            title="Pull right to withdraw cotter wedge and release tie rod · Enter to separate" hidden>
+    </button>
+
     <!-- Socket Overlay for Design Mode -->
     <div id="portOverlay" aria-hidden="true">
       <div class="socket-port" id="portA" data-label="Pointed Arch Springer · A"></div>
@@ -1515,7 +1591,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade, Lead-Came Solder, Triptych Altar, Flying Buttress, Telescoping Pillars, Bronze Gargoyle &amp; Rose Window Oculus</h3>
+  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade, Lead-Came Solder, Triptych Altar, Flying Buttress, Telescoping Pillars, Bronze Gargoyle, Rose Window Oculus &amp; Mortise Tie-Rod</h3>
   <p>
     In this aesthetic, modules are carved from dressed ashlar limestone. Pointed lancet arches frame the clerestory displays, supported by fluted colonnettes. When separate, each module's mating end forms one half of a monumental pointed arch (a voussoir springer).
   </p>
@@ -1542,6 +1618,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 8 — Rose Window Oculus Collapse [Shade]:</span> An ornamental circular stone tracery diaphragm iris at the center of the capsule rotates clockwise through a 54° arc, causing 8 curved ashlar tracery blades to glide inward along logarithmic spiral paths like a cathedral camera iris. Each blade features a chiseled stone relief housing an authentic stained glass lancet quarry (liturgical ruby, celestial sapphire, cathedral emerald, and radiant topaz). As the aperture narrows, volumetric light streams through the opening before the blades lock with millimeter precision into a cast-bronze quatrefoil hub with a central glowing amber sanctuary jewel. The casing compresses to 44px height, forming a dense architectural lintel frieze flanked by miniature trefoil blind arcades and featuring three glowing 3D stained-glass cabochon gems (ruby, topaz, emerald). Expanding the rose window rotates the diaphragm counter-clockwise, sliding the stone leaves outward and restoring the full clerestory display.
+  </p>
+  <p>
+    <span class="note-highlight">Option 9 — Mortise &amp; Forged Tie-Rod Pin [Join]:</span> The meeting flanks feature alternating castellated stone teeth (ashlar mortise and tenons) with precision horizontal cylindrical bore channels. As the modules enter the magnetic capture radius, the stone crenellations interleave into an interlocking masonry bond. A heavy square-headed wrought-iron tie rod shoots horizontally through the aligned bores from left to right, flanked by decorative forged fleur-de-lis anchor washers on both walls. As the rod tip penetrates the far anchor plate, exposing a slotted eyelet, a tapered iron cotter wedge plunges down through the eyelet with a metallic clatter and radiant friction sparks, locking the entire assembly under compressive masonry tension. The cotter wedge head and ring serve as the release pin: pulling the cotter pin right or pressing Enter unseats the wedge and retracts the tie rod.
   </p>
 </footer>
 
@@ -1571,7 +1650,8 @@ const model = {
   pillarTelescope: 0, // 0 = fully extended columns, 1 = compressed into molded plinths
   gargoyleSpring: 0, // 0 = perched in crouch on corbel, 1 = clenched over iron ring
   oculusCollapse: 0, // 0 = open rose window, 1 = rotating tracery iris collapsed into jeweled frieze
-  option: 'keystone', // 'keystone', 'portcullis', 'leadcame', 'triptych', 'buttress', 'pillar', 'gargoyle', or 'oculus'
+  tieRodProgress: 0, // 0 = retracted in module A, 1 = fully through bores & cotter wedge locked
+  option: 'keystone', // 'keystone', 'portcullis', 'leadcame', 'triptych', 'buttress', 'pillar', 'gargoyle', 'oculus', or 'tierod'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -2065,6 +2145,188 @@ function drawGargoyleEndCap(x, y, isRight, isModuleA, retract = 0, isShade = fal
   return drawGothicCap(x, y, isRight, retract, isShade);
 }
 
+// Option 9: Mortise & Forged Tie-Rod Pin End-Cap (Castellated ashlar teeth & fleur-de-lis anchor plates)
+function drawMortiseEndCap(x, y, isRight, isModuleA, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const scaleX = 1 - retract;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  if (isModuleA && isRight) {
+    // Module A (Jarvis) right mating end: castellated stone teeth & left fleur-de-lis anchor washer
+    const base = x + W - 36;
+    return `
+      <g class="mortise-cap-assembly a-mortise" transform="translate(${base}, 0)" opacity="${scaleX}">
+        <!-- Ashlar stone pier backing -->
+        <rect x="0" y="${y + 16}" width="34" height="106" rx="2" fill="url(#gothStone)" stroke="#111614" stroke-width="1.4"/>
+        <path d="M 0 ${y + 16} H 34 V ${y + 122} H 0 Z" fill="url(#ashlarPattern)" opacity="0.7"/>
+
+        <!-- Alternating Castellated Ashlar Teeth (Tenons) & Recesses (Mortises) -->
+        <!-- Tenon A1 (y: 20..44, height 24) projecting rightward by 22px -->
+        <path d="M 26 ${y + 20} H 48 V ${y + 44} H 26 Z" fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.4"/>
+        <line x1="26" y1="${y + 21}" x2="47" y2="${y + 21}" stroke="#8ca193" stroke-width="1"/>
+        <line x1="48" y1="${y + 20}" x2="48" y2="${y + 44}" stroke="#607267" stroke-width="1.2"/>
+        <line x1="26" y1="${y + 44}" x2="47" y2="${y + 44}" stroke="#141a17" stroke-width="1.2"/>
+        <line x1="31" y1="${y + 26}" x2="43" y2="${y + 26}" stroke="#7e9185" stroke-width="0.8" opacity="0.6"/>
+        <line x1="29" y1="${y + 36}" x2="45" y2="${y + 36}" stroke="#252e29" stroke-width="0.8"/>
+
+        <!-- Mortise Pocket A1 (y: 44..68, height 24) deep recessed shadow embrasure -->
+        <rect x="20" y="${y + 44}" width="12" height="24" fill="#0c100e" stroke="#161e1a" stroke-width="1"/>
+        <line x1="20" y1="${y + 44}" x2="20" y2="${y + 68}" stroke="#060907" stroke-width="2"/>
+
+        <!-- Tenon A2 (y: 68..92, height 24) projecting rightward by 22px -->
+        <path d="M 26 ${y + 68} H 48 V ${y + 92} H 26 Z" fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.4"/>
+        <line x1="26" y1="${y + 69}" x2="47" y2="${y + 69}" stroke="#8ca193" stroke-width="1"/>
+        <line x1="48" y1="${y + 68}" x2="48" y2="${y + 92}" stroke="#607267" stroke-width="1.2"/>
+        <line x1="26" y1="${y + 92}" x2="47" y2="${y + 92}" stroke="#141a17" stroke-width="1.2"/>
+        <line x1="30" y1="${y + 74}" x2="44" y2="${y + 74}" stroke="#7e9185" stroke-width="0.8" opacity="0.6"/>
+        <line x1="32" y1="${y + 86}" x2="42" y2="${y + 86}" stroke="#252e29" stroke-width="0.8"/>
+
+        <!-- Mortise Pocket A2 (y: 92..116, height 24) deep recessed shadow embrasure -->
+        <rect x="20" y="${y + 92}" width="12" height="24" fill="#0c100e" stroke="#161e1a" stroke-width="1"/>
+        <line x1="20" y1="${y + 92}" x2="20" y2="${y + 116}" stroke="#060907" stroke-width="2"/>
+
+        <!-- Horizontal Cylindrical Bore Channel on Tenon A2 face (at y + 78) -->
+        <ellipse cx="48" cy="${y + 78}" rx="3.5" ry="5" fill="url(#boreShadowGrad)" stroke="#101512" stroke-width="1"/>
+        <ellipse cx="48" cy="${y + 78}" rx="2" ry="3.5" fill="#070a08"/>
+        <path d="M 48 ${y + 72} A 3.5 5 0 0 1 48 ${y + 84}" fill="none" stroke="#7e9185" stroke-width="1"/>
+
+        <!-- Forged Wrought-Iron Fleur-de-lis Anchor Plate on Module A wall (at x = 10, y = 78) -->
+        <g class="fleur-anchor-a" transform="translate(10, ${y + 78})">
+          <circle cx="0" cy="0" r="16" fill="#000000" opacity="0.4" filter="url(#stoneShadowBlur)"/>
+          <!-- Central upright petal -->
+          <path d="M 0 -18 Q 4 -9 3 0 Q -3 0 -4 -9 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+          <line x1="0" y1="-17" x2="0" y2="0" stroke="#7e9185" stroke-width="0.7"/>
+
+          <!-- Left curling floriated petal -->
+          <path d="M -2 0 Q -11 -6 -14 1 Q -11 9 -3 4 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+          <!-- Right curling floriated petal -->
+          <path d="M 2 0 Q 11 -6 14 1 Q 11 9 3 4 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+
+          <!-- Horizontal forged cross-band with dome rivets -->
+          <rect x="-8" y="2" width="16" height="5" rx="1.2" fill="#2d3731" stroke="#0e1310" stroke-width="0.9"/>
+          <circle cx="-5" cy="4.5" r="1" fill="#7e9185"/>
+          <circle cx="5" cy="4.5" r="1" fill="#7e9185"/>
+
+          <!-- Lower floriated stem -->
+          <path d="M -3 7 Q -6 14 0 17 Q 6 14 3 7 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.8"/>
+
+          <!-- Heavy Square Pyramidal Forged Bolt Head -->
+          <rect x="-5" y="-5" width="10" height="10" rx="1" fill="url(#ironBarGrad)" stroke="#0e1310" stroke-width="1.2"/>
+          <polygon points="-5,-5 0,-1 5,-5" fill="#586b5f" opacity="0.7"/>
+          <polygon points="-5,-5 -1,0 -5,5" fill="#252f29" opacity="0.8"/>
+          <polygon points="-5,5 0,1 5,5" fill="#141a17" opacity="0.9"/>
+          <polygon points="5,-5 1,0 5,5" fill="#3c4c41" opacity="0.6"/>
+          <circle cx="0" cy="0" r="1.5" fill="#7e9185"/>
+        </g>
+      </g>
+    `;
+  } else if (!isModuleA && !isRight) {
+    // Module B (GitDiscuss) left mating end: complementary crenellations & right fleur-de-lis washer
+    const base = x + 2;
+    return `
+      <g class="mortise-cap-assembly b-mortise" transform="translate(${base}, 0)" opacity="${scaleX}">
+        <!-- Ashlar stone pier backing -->
+        <rect x="0" y="${y + 16}" width="34" height="106" rx="2" fill="url(#gothStone)" stroke="#111614" stroke-width="1.4"/>
+        <path d="M 0 ${y + 16} H 34 V ${y + 122} H 0 Z" fill="url(#ashlarPattern)" opacity="0.7"/>
+
+        <!-- Complementary Castellated Teeth & Mortises -->
+        <!-- Mortise Pocket B1 (y: 20..44, height 24) deep recessed shadow embrasure -->
+        <rect x="0" y="${y + 20}" width="12" height="24" fill="#0c100e" stroke="#161e1a" stroke-width="1"/>
+        <line x1="12" y1="${y + 20}" x2="12" y2="${y + 44}" stroke="#060907" stroke-width="2"/>
+
+        <!-- Tenon B1 (y: 44..68, height 24) projecting leftward by 22px -->
+        <path d="M 6 ${y + 44} H -16 V ${y + 68} H 6 Z" fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.4"/>
+        <line x1="-16" y1="${y + 45}" x2="5" y2="${y + 45}" stroke="#8ca193" stroke-width="1"/>
+        <line x1="-16" y1="${y + 44}" x2="-16" y2="${y + 68}" stroke="#607267" stroke-width="1.2"/>
+        <line x1="-16" y1="${y + 68}" x2="5" y2="${y + 68}" stroke="#141a17" stroke-width="1.2"/>
+        <line x1="-12" y1="${y + 50}" x2="0" y2="${y + 50}" stroke="#7e9185" stroke-width="0.8" opacity="0.6"/>
+        <line x1="-14" y1="${y + 62}" x2="-2" y2="${y + 62}" stroke="#252e29" stroke-width="0.8"/>
+
+        <!-- Mortise Pocket B2 (y: 68..92, height 24) deep recessed shadow embrasure -->
+        <rect x="0" y="${y + 68}" width="12" height="24" fill="#0c100e" stroke="#161e1a" stroke-width="1"/>
+        <line x1="12" y1="${y + 68}" x2="12" y2="${y + 92}" stroke="#060907" stroke-width="2"/>
+
+        <!-- Tenon B2 (y: 92..116, height 24) projecting leftward by 22px -->
+        <path d="M 6 ${y + 92} H -16 V ${y + 116} H 6 Z" fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.4"/>
+        <line x1="-16" y1="${y + 93}" x2="5" y2="${y + 93}" stroke="#8ca193" stroke-width="1"/>
+        <line x1="-16" y1="${y + 92}" x2="-16" y2="${y + 116}" stroke="#607267" stroke-width="1.2"/>
+        <line x1="-16" y1="${y + 116}" x2="5" y2="${y + 116}" stroke="#141a17" stroke-width="1.2"/>
+        <line x1="-12" y1="${y + 98}" x2="0" y2="${y + 98}" stroke="#7e9185" stroke-width="0.8" opacity="0.6"/>
+        <line x1="-14" y1="${y + 110}" x2="-2" y2="${y + 110}" stroke="#252e29" stroke-width="0.8"/>
+
+        <!-- Horizontal Cylindrical Bore Channel on Tenon B1 left face -->
+        <ellipse cx="-16" cy="${y + 78}" rx="3.5" ry="5" fill="url(#boreShadowGrad)" stroke="#101512" stroke-width="1"/>
+        <ellipse cx="-16" cy="${y + 78}" rx="2" ry="3.5" fill="#070a08"/>
+        <path d="M -16 ${y + 72} A 3.5 5 0 0 0 -16 ${y + 84}" fill="none" stroke="#7e9185" stroke-width="1"/>
+
+        <!-- Forged Wrought-Iron Fleur-de-lis Anchor Plate on Module B wall (at x = 24, y = 78) -->
+        <g class="fleur-anchor-b" transform="translate(24, ${y + 78})">
+          <circle cx="0" cy="0" r="16" fill="#000000" opacity="0.4" filter="url(#stoneShadowBlur)"/>
+          <!-- Central upright petal -->
+          <path d="M 0 -18 Q 4 -9 3 0 Q -3 0 -4 -9 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+          <line x1="0" y1="-17" x2="0" y2="0" stroke="#7e9185" stroke-width="0.7"/>
+
+          <!-- Left curling floriated petal -->
+          <path d="M -2 0 Q -11 -6 -14 1 Q -11 9 -3 4 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+          <!-- Right curling floriated petal -->
+          <path d="M 2 0 Q 11 -6 14 1 Q 11 9 3 4 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+
+          <!-- Horizontal forged cross-band with dome rivets -->
+          <rect x="-8" y="2" width="16" height="5" rx="1.2" fill="#2d3731" stroke="#0e1310" stroke-width="0.9"/>
+          <circle cx="-5" cy="4.5" r="1" fill="#7e9185"/>
+          <circle cx="5" cy="4.5" r="1" fill="#7e9185"/>
+
+          <!-- Lower floriated stem -->
+          <path d="M -3 7 Q -6 14 0 17 Q 6 14 3 7 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.8"/>
+
+          <!-- Open Receiving Bore Socket Collar (Iron Ring awaiting the tie rod tip) -->
+          <rect x="-6" y="-6" width="12" height="12" rx="2" fill="#141a17" stroke="#0e1310" stroke-width="1.2"/>
+          <circle cx="0" cy="0" r="4.5" fill="url(#boreShadowGrad)" stroke="#607267" stroke-width="1"/>
+          <circle cx="0" cy="0" r="2.8" fill="#040605"/>
+        </g>
+      </g>
+    `;
+  }
+  return drawGothicCap(x, y, isRight, retract, isShade);
+}
+
+// Option 9: Interlocking Ashlar Seam Blocks
+function drawMortiseSeamBlocks(midX, y, opacity = 1) {
+  return `
+    <g class="mortise-seam-masonry" opacity="${opacity}">
+      <!-- Ashlar interlocked stone course teeth -->
+      <path d="
+        M ${midX} ${y + 16}
+        L ${midX} ${y + 20}
+        H ${midX + 16}
+        V ${y + 44}
+        H ${midX - 16}
+        V ${y + 68}
+        H ${midX + 16}
+        V ${y + 92}
+        H ${midX - 16}
+        V ${y + 116}
+        H ${midX}
+        V ${y + 122}
+      " fill="none" stroke="#121714" stroke-width="2.2"/>
+      <path d="
+        M ${midX} ${y + 16}
+        L ${midX} ${y + 20}
+        H ${midX + 16}
+        V ${y + 44}
+        H ${midX - 16}
+        V ${y + 68}
+        H ${midX + 16}
+        V ${y + 92}
+        H ${midX - 16}
+        V ${y + 116}
+        H ${midX}
+        V ${y + 122}
+      " fill="none" stroke="#6b7e72" stroke-width="0.9" opacity="0.75"/>
+    </g>
+  `;
+}
+
 // Option 5: Architectural Shadow Gap Niche between the two clerestory walls
 function drawButtressShadowGap(midX, y, opacity = 1) {
   return `
@@ -2514,6 +2776,125 @@ function drawLeadCameWeld(midX, y, solderProgress = 0, isJoined = false, opacity
         <circle cx="0" cy="0" r="2" fill="#dbe4dc"/>
       </g>
     `;
+  }
+  return s + '</g>';
+}
+
+// Option 9: Mortise & Forged Tie-Rod Pin Mechanism (Horizontal Tie Rod, Fleur-de-lis Washers, and Cotter Wedge)
+function drawMortiseTieRodPin(ax, ay, bx, by, tieRodRatio = 0, isJoined = false, opacity = 1, glow = 0) {
+  const currentRatio = isJoined ? 1 : tieRodRatio;
+  const anchorAX = ax + 310;
+  const anchorAY = ay + 78;
+  const anchorBX = bx + 64;
+  const anchorBY = by + 78;
+
+  let s = `<g class="mortise-tierod-system" opacity="${opacity}">`;
+
+  // 1. Dynamic Shadow along Wall
+  const shadowLength = (anchorBX + 20) - anchorAX;
+  s += `
+    <rect x="${anchorAX}" y="${anchorAY + 6}" width="${Math.max(10, shadowLength * Math.min(1, currentRatio / 0.8))}" height="10" rx="3" fill="#000000" opacity="0.45" filter="url(#stoneShadowBlur)"/>
+  `;
+
+  // 2. Fleur-de-lis Anchor Washer on Module A (Left)
+  s += `
+    <g class="tierod-washer-a" transform="translate(${anchorAX}, ${anchorAY})">
+      <circle cx="0" cy="0" r="16" fill="#000000" opacity="0.4" filter="url(#stoneShadowBlur)"/>
+      <path d="M 0 -18 Q 4 -9 3 0 Q -3 0 -4 -9 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+      <line x1="0" y1="-17" x2="0" y2="0" stroke="#7e9185" stroke-width="0.7"/>
+      <path d="M -2 0 Q -11 -6 -14 1 Q -11 9 -3 4 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+      <path d="M 2 0 Q 11 -6 14 1 Q 11 9 3 4 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+      <rect x="-8" y="2" width="16" height="5" rx="1.2" fill="#2d3731" stroke="#0e1310" stroke-width="0.9"/>
+      <circle cx="-5" cy="4.5" r="1" fill="#7e9185"/>
+      <circle cx="5" cy="4.5" r="1" fill="#7e9185"/>
+      <path d="M -3 7 Q -6 14 0 17 Q 6 14 3 7 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.8"/>
+      <!-- Square Pyramidal Bolt Head -->
+      <rect x="-5" y="-5" width="10" height="10" rx="1" fill="url(#ironBarGrad)" stroke="#0e1310" stroke-width="1.2"/>
+      <polygon points="-5,-5 0,-1 5,-5" fill="#586b5f" opacity="0.7"/>
+      <polygon points="-5,-5 -1,0 -5,5" fill="#252f29" opacity="0.8"/>
+      <polygon points="-5,5 0,1 5,5" fill="#141a17" opacity="0.9"/>
+      <polygon points="5,-5 1,0 5,5" fill="#3c4c41" opacity="0.6"/>
+      <circle cx="0" cy="0" r="1.5" fill="#7e9185"/>
+    </g>
+  `;
+
+  // 3. Fleur-de-lis Anchor Washer on Module B (Right)
+  s += `
+    <g class="tierod-washer-b" transform="translate(${anchorBX}, ${anchorBY})">
+      <circle cx="0" cy="0" r="16" fill="#000000" opacity="0.4" filter="url(#stoneShadowBlur)"/>
+      <path d="M 0 -18 Q 4 -9 3 0 Q -3 0 -4 -9 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+      <line x1="0" y1="-17" x2="0" y2="0" stroke="#7e9185" stroke-width="0.7"/>
+      <path d="M -2 0 Q -11 -6 -14 1 Q -11 9 -3 4 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+      <path d="M 2 0 Q 11 -6 14 1 Q 11 9 3 4 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.9"/>
+      <rect x="-8" y="2" width="16" height="5" rx="1.2" fill="#2d3731" stroke="#0e1310" stroke-width="0.9"/>
+      <circle cx="-5" cy="4.5" r="1" fill="#7e9185"/>
+      <circle cx="5" cy="4.5" r="1" fill="#7e9185"/>
+      <path d="M -3 7 Q -6 14 0 17 Q 6 14 3 7 Z" fill="url(#fleurDeLisGrad)" stroke="#0e1310" stroke-width="0.8"/>
+      <rect x="-6" y="-6" width="12" height="12" rx="2" fill="#141a17" stroke="#0e1310" stroke-width="1.2"/>
+    </g>
+  `;
+
+  // 4. The Horizontal Forged Wrought-Iron Tie Rod Shaft
+  const fullSpan = (anchorBX + 22) - anchorAX;
+  const currentSpan = currentRatio >= 0.85 ? fullSpan : fullSpan * (currentRatio / 0.85);
+  const rodEnd = anchorAX + currentSpan;
+
+  if (currentSpan > 4) {
+    s += `
+      <!-- Tie Rod Body -->
+      <rect x="${anchorAX}" y="${anchorAY - 4}" width="${currentSpan}" height="8" rx="1.5" fill="url(#tieRodShaftGrad)" stroke="#0e1310" stroke-width="1.2"/>
+      <line x1="${anchorAX}" y1="${anchorAY - 2}" x2="${rodEnd}" y2="${anchorAY - 2}" stroke="#8ea294" stroke-width="1" opacity="0.8"/>
+      <line x1="${anchorAX}" y1="${anchorAY + 2}" x2="${rodEnd}" y2="${anchorAY + 2}" stroke="#101512" stroke-width="1" opacity="0.9"/>
+    `;
+  }
+
+  // 5. Protruding Rod Tip with Slotted Eyelet & Tapered Cotter Wedge
+  if (currentRatio >= 0.75) {
+    const eyeletX = anchorBX + 8;
+    // Slotted rectangular eyelet in protruding rod
+    s += `
+      <rect x="${eyeletX - 2.5}" y="${anchorBY - 5}" width="5" height="10" rx="1" fill="#080c0a" stroke="#000000" stroke-width="0.8"/>
+    `;
+
+    // Cotter Wedge Drop Physics
+    const wedgeProgress = Math.min(1, Math.max(0, (currentRatio - 0.75) / 0.25));
+    const aloftWedgeY = anchorBY - 36;
+    const seatedWedgeY = anchorBY;
+    const tensionLift = (model.tension || 0) * -10;
+    const cotterY = aloftWedgeY + (seatedWedgeY - aloftWedgeY) * Math.pow(wedgeProgress, 2.2) + tensionLift;
+    const cotterAlpha = Math.min(1, wedgeProgress * 2.5);
+
+    s += `
+      <g class="cotter-wedge-assembly" opacity="${cotterAlpha}" transform="translate(${eyeletX}, ${cotterY})">
+        <!-- Tapered Wrought-Iron Wedge Body -->
+        <polygon points="-3,-20 3,-20 1.6,18 -1.6,18" fill="url(#cotterWedgeGrad)" stroke="#0e1310" stroke-width="1.2"/>
+        <line x1="0" y1="-19" x2="0" y2="16" stroke="#9bb1a3" stroke-width="0.8" opacity="0.7"/>
+
+        <!-- Rounded Wedge Head -->
+        <circle cx="0" cy="-20" r="4.2" fill="url(#ironPinGrad)" stroke="#0e1310" stroke-width="1.1"/>
+        <circle cx="0" cy="-20" r="1.5" fill="#9bb1a3"/>
+
+        <!-- Dangling Iron Split Ring / Pull Handle -->
+        <g transform="rotate(${Math.sin(wedgeProgress * Math.PI * 4) * 8})">
+          <ellipse cx="0" cy="-27" rx="5.5" ry="4.5" fill="none" stroke="url(#ironRingGrad)" stroke-width="2"/>
+          <ellipse cx="0" cy="-27" rx="5.5" ry="4.5" fill="none" stroke="#9bb1a3" stroke-width="0.6" opacity="0.6"/>
+        </g>
+      </g>
+    `;
+
+    // 6. Impact Sparks when wedge drives down into compressive lock
+    if (currentRatio > 0.92) {
+      const sparkT = (currentRatio - 0.92) / 0.08;
+      const sparkAlpha = (1 - sparkT) * 1.2;
+      const sparkSpread = sparkT * 22;
+      s += `
+        <circle cx="${eyeletX}" cy="${anchorBY}" r="${sparkSpread}" fill="#ffd885" opacity="${sparkAlpha}" filter="url(#votiveGlow)"/>
+        <line x1="${eyeletX}" y1="${anchorBY}" x2="${eyeletX - 6}" y2="${anchorBY - 7}" stroke="#e6b447" stroke-width="1.2" opacity="${sparkAlpha}"/>
+        <line x1="${eyeletX}" y1="${anchorBY}" x2="${eyeletX + 8}" y2="${anchorBY - 5}" stroke="#e6b447" stroke-width="1.2" opacity="${sparkAlpha}"/>
+        <line x1="${eyeletX}" y1="${anchorBY}" x2="${eyeletX + 4}" y2="${anchorBY + 8}" stroke="#ffd885" stroke-width="1.2" opacity="${sparkAlpha}"/>
+        <line x1="${eyeletX}" y1="${anchorBY}" x2="${eyeletX - 5}" y2="${anchorBY + 6}" stroke="#ffd885" stroke-width="1" opacity="${sparkAlpha}"/>
+      `;
+    }
   }
 
   s += `</g>`;
@@ -3200,6 +3581,9 @@ function renderHardware() {
       } else if (model.option === 'gargoyle') {
         // Option 7: Architectural shadow gap niche behind clenching gargoyle
         shared += drawButtressShadowGap(midX, a.y, p);
+      } else if (model.option === 'tierod') {
+        // Option 9: Interlocking castellated ashlar seam blocks
+        shared += drawMortiseSeamBlocks(midX, a.y, p);
       } else {
         // Option 1 & 2: United nave pointed arch ribbing at the seam
         shared += `<g opacity="${p}">
@@ -3213,7 +3597,7 @@ function renderHardware() {
   }
 
   // Draw Keystone for Option 1
-  if (!isShade && model.option !== 'leadcame' && model.option !== 'buttress' && model.option !== 'gargoyle' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
+  if (!isShade && model.option !== 'leadcame' && model.option !== 'buttress' && model.option !== 'gargoyle' && model.option !== 'tierod' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
     const drop = model.joined ? 1 : model.keystoneDrop || Math.max(0, (glow - 0.3) / 0.7 * 0.7);
     const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 18 + b.x + 18) / 2;
     shared += drawKeystone(kMidX, a.y, drop, Math.max(p, glow > 0.3 ? 0.9 : drop));
@@ -3237,6 +3621,12 @@ function renderHardware() {
     shared += drawGargoyleClench(a.x, a.y, b.x, b.y, spring, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow);
   }
 
+  // Draw Mortise & Forged Tie-Rod Pin for Option 9
+  if (!isShade && model.option === 'tierod') {
+    const rodRatio = model.joined ? 1 : model.tieRodProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.5);
+    shared += drawMortiseTieRodPin(a.x, a.y, b.x, b.y, rodRatio, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow);
+  }
+
   if (model.joined && model.design) {
     shared += `<line x1="${a.x + JOIN_DISTANCE}" y1="${a.y + 10}" x2="${a.x + JOIN_DISTANCE}" y2="${a.y + 120}"
                      stroke="#e6b447" stroke-dasharray="4 3" stroke-width="1.5"/>`;
@@ -3257,6 +3647,9 @@ function renderHardware() {
     } else if (model.option === 'gargoyle') {
       capL = drawGargoyleEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
       capR = drawGargoyleEndCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+    } else if (model.option === 'tierod') {
+      capL = drawMortiseEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
+      capR = drawMortiseEndCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
     } else {
       capL = drawGothicCap(0, 0, false, isA ? 0 : model.cap, isShade);
       capR = drawGothicCap(0, 0, true, isA ? model.cap : 0, isShade);
@@ -3314,7 +3707,7 @@ function renderHardware() {
 function updateStateButtons() {
   const isShade = model.shade;
   const isJoined = model.joined;
-  const isJoining = ((model.option === 'leadcame' ? model.solderProgress > 0.05 && model.solderProgress < 0.95 : model.option === 'buttress' ? model.buttressSwing > 0.05 && model.buttressSwing < 0.95 : model.option === 'gargoyle' ? model.gargoyleSpring > 0.05 && model.gargoyleSpring < 0.95 : model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95)) && !isJoined && !isShade;
+  const isJoining = ((model.option === 'leadcame' ? model.solderProgress > 0.05 && model.solderProgress < 0.95 : model.option === 'buttress' ? model.buttressSwing > 0.05 && model.buttressSwing < 0.95 : model.option === 'gargoyle' ? model.gargoyleSpring > 0.05 && model.gargoyleSpring < 0.95 : model.option === 'tierod' ? model.tieRodProgress > 0.05 && model.tieRodProgress < 0.95 : model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95)) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -3447,7 +3840,18 @@ function render() {
   const solderRel = $('#solderRelease');
   const buttressRel = $('#buttressRelease');
   const gargoyleRel = $('#gargoyleRelease');
-  if (model.option === 'gargoyle') {
+  const tierodRel = $('#tierodRelease');
+  if (model.option === 'tierod') {
+    release.hidden = true;
+    solderRel.hidden = true;
+    buttressRel.hidden = true;
+    gargoyleRel.hidden = true;
+    tierodRel.hidden = !model.joined || model.busy || model.shade;
+    tierodRel.style.left = (model.b.x + 58) + 'px';
+    tierodRel.style.top = (model.b.y + 44) + 'px';
+    tierodRel.style.setProperty('--tension', model.tension);
+  } else if (model.option === 'gargoyle') {
+    tierodRel.hidden = true;
     release.hidden = true;
     solderRel.hidden = true;
     buttressRel.hidden = true;
@@ -3456,6 +3860,7 @@ function render() {
     gargoyleRel.style.top = (model.a.y + 10) + 'px';
     gargoyleRel.style.setProperty('--tension', model.tension);
   } else if (model.option === 'leadcame') {
+    tierodRel.hidden = true;
     release.hidden = true;
     buttressRel.hidden = true;
     gargoyleRel.hidden = true;
@@ -3464,6 +3869,7 @@ function render() {
     solderRel.style.top = (model.a.y + 55) + 'px';
     solderRel.style.setProperty('--tension', model.tension);
   } else if (model.option === 'buttress') {
+    tierodRel.hidden = true;
     release.hidden = true;
     solderRel.hidden = true;
     gargoyleRel.hidden = true;
@@ -3472,6 +3878,7 @@ function render() {
     buttressRel.style.top = (model.b.y + 4) + 'px';
     buttressRel.style.setProperty('--tension', model.tension);
   } else {
+    tierodRel.hidden = true;
     solderRel.hidden = true;
     buttressRel.hidden = true;
     gargoyleRel.hidden = true;
@@ -3499,6 +3906,8 @@ function render() {
         $('#phase').textContent = 'Joined / Flying buttress bridge seated';
       } else if (model.option === 'gargoyle') {
         $('#phase').textContent = 'Joined / Bronze gargoyle claws clenched over iron ring';
+      } else if (model.option === 'tierod') {
+        $('#phase').textContent = 'Joined / Interlocking ashlar pinned by tie rod & cotter wedge';
       } else {
         $('#phase').textContent = 'Joined / One monolithic basilica';
       }
@@ -3508,6 +3917,8 @@ function render() {
       $('#phase').textContent = 'Joining / Flying buttress arm swinging across gap';
     } else if (model.option === 'gargoyle' && model.gargoyleSpring > 0.05) {
       $('#phase').textContent = 'Joining / Gargoyle springing forward & lunging claws across gap';
+    } else if (model.option === 'tierod' && model.tieRodProgress > 0.05) {
+      $('#phase').textContent = 'Joining / Tie rod shooting through castellated stone bores';
     } else if (model.keystoneDrop > 0.1) {
       $('#phase').textContent = 'Joining / Keystone poised in descent';
     } else {
@@ -4159,6 +4570,116 @@ async function gargoyleSeparate() {
   say('Separated. Independent cathedral housings restored.');
 }
 
+// Option 9 Join Animation: Castellated ashlar teeth mesh, tie rod shoots through bores, cotter wedge drops
+async function tieRodJoin(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Interlocking ashlar crenellations! Modules align to mesh castellated teeth.');
+
+  // 1. Proximity pulse
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 80 : 200, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    renderHardware();
+  }, token)) return;
+
+  // 2. Align casings flush into castellated mesh
+  $('#phase').textContent = 'Meshing castellated ashlar stone teeth';
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.undercroft ? 305 : 385, model.a.y));
+
+  if (!await tween(fromDrag ? 240 : 440, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.cap = t;
+    model.tieRodProgress = Math.max(model.tieRodProgress, t * 0.4);
+    render();
+  }, token)) return;
+
+  // 3. Wrought-iron tie rod shoots horizontally through aligned bores
+  $('#phase').textContent = 'Tie rod shooting through stone bores';
+  say('Square-headed wrought-iron tie rod shoots horizontally through the aligned ashlar bores from left to right.');
+  const initialRod = model.tieRodProgress;
+  if (!await tween(fromDrag ? 220 : 380, t => {
+    const rodT = Math.pow(t, 2);
+    model.tieRodProgress = initialRod + (0.85 - initialRod) * rodT;
+    renderHardware();
+  }, token)) return;
+
+  // 4. Cotter wedge plunges down through tie-rod eyelet with clatter & sparks
+  $('#phase').textContent = 'Cotter wedge plunging into tie-rod eyelet';
+  say('Tapered iron cotter wedge plunges down through the tie-rod eyelet with a metallic clatter and friction sparks, locking the stone under compressive tension.');
+  if (!await tween(fromDrag ? 140 : 220, t => {
+    model.tieRodProgress = 0.85 + 0.15 * Math.pow(t, 2.5);
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.tieRodProgress = 1;
+  model.light = 0;
+  render();
+  say('Castellated ashlar blocks locked solid by forged iron tie rod & cotter wedge. Pull cotter pin right to unseat & separate.');
+}
+
+async function tieRodSeparate() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Withdrawing cotter wedge. Tapered iron key unseats from tie-rod eyelet.');
+
+  // 1. Lift cotter wedge out of eyelet
+  $('#phase').textContent = 'Withdrawing cotter wedge';
+  if (!await tween(200, t => {
+    model.tieRodProgress = 1 - 0.25 * t;
+    renderHardware();
+  }, token)) return;
+
+  // 2. Retract tie rod horizontally from stone bores
+  $('#phase').textContent = 'Retracting tie rod from stone bores';
+  say('Tie rod retracts through the ashlar bores.');
+  if (!await tween(240, t => {
+    model.tieRodProgress = 0.75 * (1 - t);
+    renderHardware();
+  }, token)) return;
+
+  // 3. Separate housings
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Separating cathedral housings';
+  if (!await tween(520, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.6);
+    model.cap = 1 - Math.max(0, (t - 0.4) / 0.6);
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.tieRodProgress = 0;
+  model.light = 0;
+  render();
+  say('Separated. Independent castellated stone housings restored.');
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -4172,7 +4693,8 @@ async function applyState(stateName) {
       else await liftPortcullis();
     }
     if (model.joined) {
-      if (model.option === 'gargoyle') await gargoyleSeparate();
+      if (model.option === 'tierod') await tieRodSeparate();
+      else if (model.option === 'gargoyle') await gargoyleSeparate();
       else if (model.option === 'buttress') await buttressSeparate();
       else if (model.option === 'leadcame') await meltSeparate();
       else await separate();
@@ -4184,6 +4706,7 @@ async function applyState(stateName) {
       model.pillarTelescope = 0;
       model.gargoyleSpring = 0;
       model.oculusCollapse = 0;
+      model.tieRodProgress = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -4204,11 +4727,20 @@ async function applyState(stateName) {
     model.light = 0.8;
     model.a.x = 240;
     model.b.x = 240 + W + 44; // near each other
-    if (model.option === 'gargoyle') {
+    if (model.option === 'tierod') {
+      model.tieRodProgress = 0.52; // mid-flight slide through stone bores, cotter wedge suspended
+      model.keystoneDrop = 0;
+      model.solderProgress = 0;
+      model.buttressSwing = 0;
+      model.gargoyleSpring = 0;
+      render();
+      say('State: Joining — Mid-animation view with castellated stone teeth meshing and iron tie rod sliding through aligned bores.');
+    } else if (model.option === 'gargoyle') {
       model.gargoyleSpring = 0.52; // mid-flight spring across divide, claws open, wings spread
       model.solderProgress = 0;
       model.buttressSwing = 0;
       model.keystoneDrop = 0;
+      model.tieRodProgress = 0;
       render();
       say('State: Joining — Mid-animation view with bronze gargoyle springing forward with wings spread and claws lunging toward the iron ring.');
     } else if (model.option === 'buttress') {
@@ -4216,6 +4748,7 @@ async function applyState(stateName) {
       model.solderProgress = 0;
       model.keystoneDrop = 0;
       model.gargoyleSpring = 0;
+      model.tieRodProgress = 0;
       render();
       say('State: Joining — Mid-animation view with arched stone buttress arm swinging across the divide toward the corbel.');
     } else if (model.option === 'leadcame') {
@@ -4223,6 +4756,7 @@ async function applyState(stateName) {
       model.keystoneDrop = 0;
       model.buttressSwing = 0;
       model.gargoyleSpring = 0;
+      model.tieRodProgress = 0;
       render();
       say('State: Joining — Mid-animation view with molten silver solder flowing down the lead came channel.');
     } else {
@@ -4230,6 +4764,7 @@ async function applyState(stateName) {
       model.solderProgress = 0;
       model.buttressSwing = 0;
       model.gargoyleSpring = 0;
+      model.tieRodProgress = 0;
       render();
       say('State: Joining — Mid-animation view with keystone descending into the arch apex.');
     }
@@ -4247,11 +4782,20 @@ async function applyState(stateName) {
       model.blend = 1;
       model.cap = 1;
       model.light = 0;
-      if (model.option === 'gargoyle') {
+      if (model.option === 'tierod') {
+        model.tieRodProgress = 1;
+        model.gargoyleSpring = 0;
+        model.solderProgress = 0;
+        model.buttressSwing = 0;
+        model.keystoneDrop = 0;
+        render();
+        say('State: Joined — Interlocking ashlar stone blocks pinned by forged iron tie rod and fleur-de-lis anchor plates with cotter wedge.');
+      } else if (model.option === 'gargoyle') {
         model.gargoyleSpring = 1;
         model.solderProgress = 0;
         model.buttressSwing = 0;
         model.keystoneDrop = 0;
+        model.tieRodProgress = 0;
         render();
         say('State: Joined — Bronze gargoyle claws clamped tight around forged iron tether ring.');
       } else if (model.option === 'buttress') {
@@ -4259,6 +4803,7 @@ async function applyState(stateName) {
         model.solderProgress = 0;
         model.keystoneDrop = 0;
         model.gargoyleSpring = 0;
+        model.tieRodProgress = 0;
         render();
         say('State: Joined — Flying buttress arm firmly seated into corbel, bridging open-air shadow gap.');
       } else if (model.option === 'leadcame') {
@@ -4266,6 +4811,7 @@ async function applyState(stateName) {
         model.keystoneDrop = 0;
         model.buttressSwing = 0;
         model.gargoyleSpring = 0;
+        model.tieRodProgress = 0;
         render();
         say('State: Joined — Seamless lead-came solder seam with stained glass frieze.');
       } else {
@@ -4273,6 +4819,7 @@ async function applyState(stateName) {
         model.solderProgress = 0;
         model.buttressSwing = 0;
         model.gargoyleSpring = 0;
+        model.tieRodProgress = 0;
         render();
         say('State: Joined — Monolithic basilican arch locked by granite keystone.');
       }
@@ -4348,13 +4895,15 @@ $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
 $('#btnJoinAnim').onclick = () => {
-  if (model.option === 'gargoyle') gargoyleJoin();
+  if (model.option === 'tierod') tieRodJoin();
+  else if (model.option === 'gargoyle') gargoyleJoin();
   else if (model.option === 'buttress') buttressJoin();
   else if (model.option === 'leadcame') solderWeld();
   else join();
 };
 $('#btnSeparateAnim').onclick = () => {
-  if (model.option === 'gargoyle') gargoyleSeparate();
+  if (model.option === 'tierod') tieRodSeparate();
+  else if (model.option === 'gargoyle') gargoyleSeparate();
   else if (model.option === 'buttress') buttressSeparate();
   else if (model.option === 'leadcame') meltSeparate();
   else separate();
@@ -4376,7 +4925,15 @@ $('#btnPortcullisAnim').onclick = () => {
 };
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
-  if (model.option === 'oculus') {
+  if (model.option === 'tierod') {
+    say('Option 9: Mortise & Forged Tie-Rod Pin join selected. Interlocking ashlar crenellations with horizontal wrought-iron tie rod & cotter wedge.');
+    if (model.shade) {
+      if (model.oculusCollapse > 0.05) await expandOculus();
+      else if (model.pillarTelescope > 0.05) await extendPillars();
+      else if (model.triptychFold > 0.05) await unfoldTriptych();
+      else await liftPortcullis();
+    }
+  } else if (model.option === 'oculus') {
     say('Option 8: Rose Window Oculus Collapse shade selected. Rotating stone tracery diaphragm iris collapses into jeweled frieze with 3 glowing stained-glass gems.');
     if (!model.shade) {
       await collapseOculus();
@@ -4442,7 +4999,7 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, undercroft: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, buttressSwing: 0, pillarTelescope: 0, gargoyleSpring: 0, oculusCollapse: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, buttressSwing: 0, pillarTelescope: 0, gargoyleSpring: 0, oculusCollapse: 0, tieRodProgress: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   $('#optionSelect').value = 'keystone';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
@@ -4486,12 +5043,12 @@ function snapshot() {
   return {
     a: { ...model.a }, b: { ...model.b }, meter: { ...model.meter },
     joined: model.joined, docked: model.docked, cap: model.cap, blend: model.blend,
-    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, buttressSwing: model.buttressSwing, pillarTelescope: model.pillarTelescope, gargoyleSpring: model.gargoyleSpring, oculusCollapse: model.oculusCollapse, option: model.option, front: model.front
+    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, buttressSwing: model.buttressSwing, pillarTelescope: model.pillarTelescope, gargoyleSpring: model.gargoyleSpring, oculusCollapse: model.oculusCollapse, tieRodProgress: model.tieRodProgress, option: model.option, front: model.front
   };
 }
 function restore(s) {
   for (const id of ['a', 'b', 'meter']) Object.assign(model[id], s[id]);
-  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'buttressSwing', 'pillarTelescope', 'gargoyleSpring', 'oculusCollapse', 'option', 'front']) model[k] = s[k];
+  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'buttressSwing', 'pillarTelescope', 'gargoyleSpring', 'oculusCollapse', 'tieRodProgress', 'option', 'front']) model[k] = s[k];
 }
 function cancelDrag() {
   if (!drag) return;
@@ -4573,6 +5130,8 @@ function magneticGoal(raw, target, id) {
       model.buttressSwing = p.brightness * 0.7; // buttress arm swings downward as you approach!
     } else if (model.option === 'gargoyle') {
       model.gargoyleSpring = p.brightness * 0.7; // gargoyle springs forward as you approach!
+    } else if (model.option === 'tierod') {
+      model.tieRodProgress = p.brightness * 0.7; // tie-rod pin begins sliding across bores!
     } else {
       model.keystoneDrop = p.brightness * 0.7; // keystone hovers downward as you approach!
     }
@@ -4581,6 +5140,7 @@ function magneticGoal(raw, target, id) {
     model.solderProgress = 0;
     model.buttressSwing = 0;
     model.gargoyleSpring = 0;
+    model.tieRodProgress = 0;
   }
 
   return target ? { x: raw.x + (target.x - raw.x) * strength, y: raw.y + (target.y - raw.y) * strength } : raw;
@@ -4635,7 +5195,14 @@ stage.addEventListener('pointermove', e => {
   if (Math.abs(dx) + Math.abs(dy) > 3) d.moved = true;
 
   if (d.kind === 'shellLatch') {
-    if (model.option === 'gargoyle') {
+    if (model.option === 'tierod') {
+      model.tension = clamp(dx / 60, 0, 1);
+      model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
+      model.tieRodProgress = 1 - model.tension * 0.4;
+      if (dx < 60) { render(); return; }
+      tieRodSeparate();
+      return;
+    } else if (model.option === 'gargoyle') {
       model.tension = clamp(dx / 64, 0, 1);
       model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
       model.gargoyleSpring = 1 - model.tension * 0.6; // gargoyle claws unseat and recoil!
@@ -4713,6 +5280,7 @@ stage.addEventListener('pointerup', () => {
   $('#cryptBay').classList.remove('hot');
   if (ready) {
     if (d.id === 'meter') insertChecks();
+    else if (model.option === 'tierod') tieRodJoin(true);
     else if (model.option === 'gargoyle') gargoyleJoin(true);
     else if (model.option === 'buttress') buttressJoin(true);
     else if (model.option === 'leadcame') solderWeld(true);
@@ -4728,6 +5296,7 @@ stage.addEventListener('pointerup', () => {
     model.solderProgress = 0;
     model.buttressSwing = 0;
     model.gargoyleSpring = 0;
+    model.tieRodProgress = 0;
   }
   render();
 });
@@ -4737,6 +5306,7 @@ $('#keystoneRelease').onclick = e => { if (e.detail === 0) separate(); };
 $('#solderRelease').onclick = e => { if (e.detail === 0) meltSeparate(); };
 $('#buttressRelease').onclick = e => { if (e.detail === 0) buttressSeparate(); };
 $('#gargoyleRelease').onclick = e => { if (e.detail === 0) gargoyleSeparate(); };
+$('#tierodRelease').onclick = e => { if (e.detail === 0) tieRodSeparate(); };
 
 window.addEventListener('keydown', e => {
   if (e.target.matches('input, select, textarea')) return;
@@ -4752,18 +5322,23 @@ window.addEventListener('keydown', e => {
     applyState('shade');
   } else if (e.key === 'j' || e.key === 'J') {
     if (!model.joined) {
-      if (model.option === 'gargoyle') gargoyleJoin();
+      if (model.option === 'tierod') tieRodJoin();
+      else if (model.option === 'gargoyle') gargoyleJoin();
       else if (model.option === 'buttress') buttressJoin();
       else if (model.option === 'leadcame') solderWeld();
       else join();
     }
   } else if (e.key === 's' || e.key === 'S') {
     if (model.joined) {
-      if (model.option === 'gargoyle') gargoyleSeparate();
+      if (model.option === 'tierod') tieRodSeparate();
+      else if (model.option === 'gargoyle') gargoyleSeparate();
       else if (model.option === 'buttress') buttressSeparate();
       else if (model.option === 'leadcame') meltSeparate();
       else separate();
     }
+  } else if (e.key === 'm' || e.key === 'M') {
+    if (!model.joined) tieRodJoin();
+    else tieRodSeparate();
   } else if (e.key === 'g' || e.key === 'G') {
     if (!model.joined) gargoyleJoin();
     else gargoyleSeparate();
@@ -4787,6 +5362,7 @@ window.addEventListener('keydown', e => {
     else if (document.activeElement === $('#solderRelease') && model.joined) meltSeparate();
     else if (document.activeElement === $('#buttressRelease') && model.joined) buttressSeparate();
     else if (document.activeElement === $('#gargoyleRelease') && model.joined) gargoyleSeparate();
+    else if (document.activeElement === $('#tierodRelease') && model.joined) tieRodSeparate();
   }
 });
 
