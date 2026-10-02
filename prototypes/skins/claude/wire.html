@@ -92,6 +92,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="st-pearl" cx=".36" cy=".3" r=".8"><stop stop-color="#fffdf6"/><stop offset=".3" stop-color="#efe3d6"/><stop offset=".7" stop-color="#c7b3b4"/><stop offset="1" stop-color="#6e5d63"/></radialGradient>
  <linearGradient id="st-slab" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#1b343b"/><stop offset=".55" stop-color="#0c1a1e"/><stop offset="1" stop-color="#060d10"/></linearGradient>
  <linearGradient id="cb-brass" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#fbe9b4"/><stop offset=".4" stop-color="#d7ad5e"/><stop offset=".85" stop-color="#9a6b2a"/><stop offset="1" stop-color="#6b4517"/></linearGradient>
+ <radialGradient id="st-jet" cx=".36" cy=".3" r=".8"><stop stop-color="#8a7480"/><stop offset=".3" stop-color="#2e2129"/><stop offset=".8" stop-color="#0e080b"/><stop offset="1" stop-color="#3a2216"/></radialGradient>
+ <linearGradient id="st-leaf" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="#1d3a2c"/><stop offset=".55" stop-color="#0d1d16"/><stop offset="1" stop-color="#06100b"/></linearGradient>
  <linearGradient id="rim-cu" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe0c0"/><stop offset=".45" stop-color="#e2a06c"/><stop offset="1" stop-color="#9b5b35"/></linearGradient>
  <linearGradient id="cb-tube"x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".55"/><stop offset=".28" stop-color="#000" stop-opacity="0"/><stop offset=".38" stop-color="#fff2d8" stop-opacity=".16"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/></linearGradient>
 </defs><path id="probe" fill="none"/></svg>
@@ -143,7 +145,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -620,7 +622,7 @@ function curlD(x,y,side,up,r,turns){let d='';const n=20,cy=y+(up?-r:r),a0=up?Mat
 /* ---------- Coil wrap geometry ---------- */
 // How far in from a pendant's outer edge its frame wire sits at height y (the frame's corners are rounded).
 // The bead strand and coil band shades squeeze the frame toward the middle, so the frame's height follows the shade.
-function frameH(h){const k=shadeK();return model.shade==='strand'?(h-10)*(1-seg(k,.35,1)):model.shade==='coil'?lerp(h-10,20,k):model.shade==='fold'?lerp(h-10,6,seg(model.st,.6,.72)):h-10}
+function frameH(h){const k=shadeK();return model.shade==='strand'||model.shade==='cat'?(h-10)*(1-seg(k,.35,1)):model.shade==='coil'?lerp(h-10,20,k):model.shade==='fold'?lerp(h-10,6,seg(model.st,.6,.72)):h-10}
 const frameY=(y,h)=>{const fh=frameH(h);return fh<4?h/2:clamp(y,h/2-fh/2+2,h/2+fh/2-2)};
 function frameIn(y,h){const fh=frameH(h),r=Math.min(26,fh/2),dy=Math.max(0,h/2-fh/2+r-y,y-(h/2+fh/2-r));return 5+r-Math.sqrt(Math.max(0,r*r-dy*dy))}
 // Spine extent, turns per band, pitch and band centres for a pendant of height h; shading drops the bands to two turns.
@@ -733,8 +735,126 @@ const SHADES={
   about:'The pendant turns into a wire tree lying on its side, then closes like an umbrella. The display fades and the plate falls away, and a three-strand copper trunk twists across the empty frame from end to end, brass ferrules at both ends. Branches sprout from it one after another, alternating up and down, hot at the tips, each bound on with a small coil collar and carrying a stone at its tip, so for a moment the frame holds an open fern of wire. Then the branches fold toward the crown end like umbrella ribs, the crown-end ones first, each overshooting a little and springing back, while the frame closes in and herds the slower ones down before it fades away. The stones end up lined along the trunk, alternating above and below it: <b>amber</b> per running Jarvis agent (labradorite when paused) and two <b>pearls</b> for its queued checks; <b>carnelian</b> per GitDiscuss decision and four pearls for the comments; for Checks, fourteen twigs with <b>malachite</b> for the 12 passed and carnelian for the 2 waiting. Brass wraps cinch the bundle at both ends with a spark, then the name slab and the value cabochon flip up onto the trunk. Unshading plays it backwards: the wraps loosen, the branches spring open, the frame returns and the tree withdraws. Join ends stay on the trunk, so folded pendants still join.',
   sayOn:'Shaded: a wire tree sprouts in the frame, then its branches fold down along the trunk like an umbrella, stones lined along it.',
   hk:st=>ease(seg(st,.3,.7)),show:st=>1-ease(seg(st,0,.2)),
-  draw(id,w,h,small,st){return foldBranches(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return foldBranches(id,w,h,small,st)}},
+ cat:{label:'Caterpillar',kind:'Distil · character',ms:2500,ownStrip:true,
+  about:'The pendant turns into a small beaded caterpillar walking a wire. The plate and display fade and the copper frame squeezes flat into one taut wire. The name slab flips up at the left end, and a leaf bead grows at the right end with the one key value inside it. The caterpillar threads on through the name slab head first: a jet-glass head, then its body segments one at a time, each pushing the ones in front along. Then it comes alive: wire legs push it up off the wire, its antennae unfurl, its eye opens and a tail horn curls. It inches along the wire to the leaf with a hump running from tail to head on each stride, then takes a nibble. The segments are the statuses, read from the head back: <b>amber</b> per running Jarvis agent and two <b>pearls</b> for its queued checks; <b>carnelian</b> per GitDiscuss decision and four pearls for the comments; for Checks, one segment per two checks, <b>carnelian</b> for the pair waiting and <b>malachite</b> for the rest. Paused widgets turn their stones to <b>labradorite</b>. <b>On change</b> the head nods twice and the new colour runs down the body from the head, a segment at a time. Tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; tapping Checks just makes it look up. The join ends stay on the wire, so caterpillars still join.',
+  sayOn:'Shaded: the frame flattens into a wire and a beaded caterpillar threads on, stands up and inches along to its value leaf.',
+  hk:st=>ease(seg(st,0,.3)),show:st=>1-ease(seg(st,0,.2)),
+  draw(id,w,h,small,st){return caterpillar(id,w,h,small,st)}}
 };
+
+/* ---------- Caterpillar pieces ---------- */
+// Segments read from the head back. Checks gets one segment per two checks.
+function catStones(id,run=model[id].run){
+ if(id==='a')return[...Array(3).fill(run?'amber':'lab'),'pearl','pearl'];
+ if(id==='b')return[...Array(2).fill(run?'carn':'lab'),...Array(4).fill('pearl')];
+ return['carn',...Array(6).fill('mal')];
+}
+function catLayout(id,w,small){
+ const P=plaqueData(id),name=RIM_NAME[id],word=id==='c'?'':P.word;
+ const tw=Math.ceil(measure(name,NAME_F))+(small?16:20),e0=18,e1=w-18;
+ // Sized for the wider of the live and paused words, so a pause doesn't shift the leaf or the caterpillar.
+ const txt=measure(P.num,NUM_F)+(word?Math.max(measure(word,WORD_F),measure('paused',WORD_F),measure(id==='a'?'running':'to decide',WORD_F))+5:0),lw=Math.ceil(txt)+34,lh=small?21:25;
+ const r=small?4.4:6,rh=small?5.8:7.8,pitch=small?7:9.6,ph=(r+rh)*.78,stones=catStones(id),N=stones.length;
+ const tagR=e0+tw-(small?2:3),lx0=e1-lw,body=ph+(N-1)*pitch+r;
+ const hf=lx0-3-rh*.9,hs=Math.min(hf,tagR+4+body);
+ return{name,num:P.num,word,tw,lw,lh,lx0,lx1:e1,tagX:e0+tw/2,tagR,r,rh,pitch,ph,stones,N,hs,hf};
+}
+// A leaf bead strung on the wire: pointed at the tip, fullest just behind the middle.
+function catLeaf(x0,x1,cy,lh){
+ const n=22,up=[],dn=[];
+ for(let i=0;i<=n;i++){const u=i/n,hh=lh/2*Math.pow(Math.sin(Math.PI*Math.pow(u,.85)),.62),x=lerp(x0,x1,u);up.push([x,cy-hh]);dn.unshift([x,cy+hh])}
+ return poly(up.concat(dn))+'Z';
+}
+function caterpillar(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const hk=ease(seg(st,0,.3)),cy=h/2,L=catLayout(id,w,small),m=model[id],now=performance.now();
+ let s=`<g opacity="${f(1-seg(hk,.15,.85))}">${casing(w,h,small,true)}</g>`;
+ // The frame squeezes flat into the wire the caterpillar walks.
+ const fh=Math.max(0,(h-10)*(1-seg(hk,.35,1))),fr=Math.min(small?20:26,fh/2);
+ s+=wire(rrect(5,cy-fh/2,w-10,fh,fr),'copper',fh<2?2:3.1-1.1*seg(hk,.35,1));
+ if(st<.3)return s;
+ s+=wire(band(13,cy,false,3,7,2.2)+band(w-13,cy,false,3,7,2.2),'brass',1.1,seg(st,.3,.36));
+ // Change: the head nods twice and the new colour runs down from the head.
+ let nt=m.nod?Math.min(1,(now-m.nod.t0)/1300):-1;if(nt>=1)nt=-1;
+ // Threading: the chain comes out from behind the name slab head first.
+ const q=ease(seg(st,.38,.58)),rise=ease(seg(st,.58,.66)),p=seg(st,.66,.94),{r,rh,pitch,ph,N}=L;
+ const D=L.hf-L.hs,nS=D>1?Math.max(1,Math.round(D/(pitch*2.4))):0,stride=nS?D/nS:0,amp=r*.75;
+ const hx0=lerp(L.tagR-rh,L.hs,q),pS=p*nS,full=Math.min(Math.floor(pS),nS),frac=pS-full;
+ const items=[];
+ for(let j=0;j<=N;j++){
+  const k=N-j,a0=k/N*.45,a=nS&&full<nS?ease(seg(frac,a0,a0+.55)):0;
+  items.push({x:hx0-(j?ph+(j-1)*pitch:0)+stride*(full+a),lift:Math.sin(Math.PI*a)*amp*rise,a});
+ }
+ const standY=r+1.6,legs=[],beads=[];
+ let tailEnd=null;
+ for(let j=N;j>=1;j--){
+  const it=items[j],by=cy-rise*standY-it.lift;
+  if(q<=0||it.x<L.tagR-r*2)continue;
+  if(rise>0){const lf=it.lift/amp||0,end=lerp(by+r*.6,lerp(cy+1.6,by+r+2.6,lf),rise);
+   legs.push(`M${f(it.x-r*.45)} ${f(by+r*.55)}L${f(it.x-r*.6)} ${f(end)}M${f(it.x+r*.45)} ${f(by+r*.55)}L${f(it.x+r*.3)} ${f(end)}`)}
+  let stone=L.stones[j-1],spark=0;
+  if(nt>=0){const thr=.14+(j-1)*.08,was=m.nod.old[j-1];if(was&&was!==stone){if(nt<thr)stone=was;spark=Math.max(0,1-Math.abs(nt-thr)/.06)}}
+  beads.push(strandItem({k:'bead',r:j===N?f(r*.82):r,stone},it.x,by));
+  if(spark>.05)beads.push(sparkle(it.x+r*.4,by-r*.7,spark*.7));
+  if(j===N)tailEnd={x:it.x,y:by};
+ }
+ if(legs.length)s+=wire(legs.join(''),'dim',small?.8:.95);
+ // A tail horn curls up off the last segment.
+ if(tailEnd&&rise>0){const R=r*.82,t=tailEnd,hx=t.x-R*1.5,hy=t.y-R*1.5;
+  s+=wire(`M${f(t.x-R*.3)} ${f(t.y-R*.7)}Q${f(t.x-R*1.2)} ${f(t.y-R*1.9)} ${f(lerp(t.x-R*.4,hx,rise))} ${f(lerp(t.y-R,hy,rise))}`,'copper',small?.8:1,rise)+
+   `<circle cx="${f(lerp(t.x-R*.4,hx,rise))}" cy="${f(lerp(t.y-R,hy,rise))}" r="${small?1.1:1.4}" fill="url(#st-gold)" opacity="${f(rise)}"/>`}
+ s+=beads.join('');
+ // Head: jet glass with a copper collar, a gold seed eye, wire antennae and a small wire mouth.
+ const H0=items[0];
+ if(q>0&&H0.x>L.tagR-rh*2){
+  const hy=cy-rise*(standY+1.5)-H0.lift,hx=H0.x;
+  let nod=10*Math.sin(Math.PI*seg(st,.95,1))-9*H0.lift/amp*(rise?1:0),bob=0;
+  if(nt>=0){nod+=20*Math.abs(Math.sin(nt*2*Math.PI))*(1-nt);bob=14*Math.sin(nt*4*Math.PI-1)*(1-nt)}
+  const nx=hx-rh*.7,ny=hy+rh*.3,eye=ease(seg(st,.6,.68)),an=rise;
+  let g=`<g transform="rotate(${f(nod)} ${f(nx)} ${f(ny)})">`;
+  for(const [ox,dim] of [[-.35,1],[.1,0]]){
+   const x0=hx+rh*ox,y0=hy-rh*.8,tip=[hx+rh*(ox+.9*an+.1),hy-rh*(.9+1.2*an)],c=[hx+rh*(ox+.1),hy-rh*(1+1.3*an)];
+   g+=`<g transform="rotate(${f(bob*(dim?.7:1))} ${f(x0)} ${f(y0)})">`+wire(`M${f(x0)} ${f(y0)}Q${f(c[0])} ${f(c[1])} ${f(tip[0])} ${f(tip[1])}`,dim?'dim':'copper',small?.8:1,clamp(an*2))+
+    `<circle cx="${f(tip[0])}" cy="${f(tip[1])}" r="${small?1.2:1.6}" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".5" opacity="${f(an)}"/></g>`;
+  }
+  g+=`<circle cx="${f(hx)}" cy="${f(hy)}" r="${rh}" fill="url(#st-jet)" stroke="#0a0507" stroke-width=".8"/>`+
+   `<ellipse cx="${f(hx-rh*.3)}" cy="${f(hy-rh*.45)}" rx="${f(rh*.32)}" ry="${f(rh*.18)}" fill="#fff" opacity=".5"/>`+
+   wire(`M${f(hx-rh*.95)} ${f(hy-rh*.45)}Q${f(hx-rh*.6)} ${f(hy)} ${f(hx-rh*.95)} ${f(hy+rh*.45)}`,'copper',small?.8:1);
+  if(eye>0)g+=`<circle cx="${f(hx+rh*.4)}" cy="${f(hy-rh*.2)}" r="${f((small?1.3:1.8)*eye)}" fill="url(#st-gold)" stroke="#1a0d05" stroke-width=".5"/><circle cx="${f(hx+rh*.36)}" cy="${f(hy-rh*.3)}" r="${f(.55*eye)}" fill="#fff"/>`+
+   wire(`M${f(hx+rh*.55)} ${f(hy+rh*.45)}q${f(rh*.22)} ${f(rh*.18)} ${f(rh*.4)} ${f(-rh*.05)}`,'copper',small?.6:.8,eye);
+  s+=g+'</g>';
+ }
+ // The value leaf grows from its stem end, then its words come up.
+ const lq=seg(st,.4,.56);
+ if(lq>0){const sx=Math.max(.01,springOut(lq)),{lx0,lx1,lh}=L,leaf=catLeaf(lx0,lx1,cy,lh),tx=lerp(lx0,lx1,.47),to=seg(st,.5,.6);
+  const tW=measure(L.num,NUM_F)+(L.word?measure(L.word,WORD_F)+5:0),vx=tx+tW/2+5;
+  s+=`<g opacity="${f(clamp(lq*4))}" transform="translate(${f(lx0)} ${f(cy)}) scale(${f(sx*1000)/1000} ${f(Math.min(1,sx)*1000)/1000}) translate(${f(-lx0)} ${f(-cy)})">`+
+   `<path d="${leaf}" fill="url(#st-leaf)" stroke="#120906" stroke-width="2.2"/>`+wire(leaf,'copper',1.1)+
+   (vx<lx1-8?wire(`M${f(vx)} ${f(cy)}L${f(lx1-4)} ${f(cy)}M${f(vx+4)} ${f(cy)}l4 -3M${f(vx+4)} ${f(cy)}l4 3`,'dim',.8):'')+
+   wire(band(lx0-1,cy,false,2,lh*.45,2.2),'brass',1.1)+
+   `<text x="${f(tx)}" y="${f(cy+.5)}" text-anchor="middle" dominant-baseline="central" opacity="${f(to)}"><tspan font-family="Georgia,serif" font-size="15" fill="#f2b866">${L.num}</tspan>${L.word?`<tspan dx="5" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#d9e4df">${L.word}</tspan>`:''}</text></g>`;
+ }
+ // The name slab flips up last in the stack, so the chain threads out from behind it.
+ const tq=seg(st,.32,.46);
+ if(tq>0){const sy=Math.max(.01,springOut(tq));
+  s+=`<g opacity="${f(clamp(tq*4))}" transform="translate(0 ${f(cy)}) scale(1 ${f(sy*1000)/1000}) translate(0 ${f(-cy)})">${strandItem({k:'tag',wd:L.tw,text:L.name},L.tagX,cy,small)}</g>`;
+ }
+ return s;
+}
+// Nods run on their own short clock; the page is still again once they finish.
+let nodRaf=0;
+function catNod(id,old){
+ if(reduce.matches)return;
+ model[id].nod={t0:performance.now(),old:old||catStones(id)};
+ if(!nodRaf)(function step(){const now=performance.now();for(const k of ['a','b','c'])if(model[k].nod&&now-model[k].nod.t0>=1300)model[k].nod=null;render();nodRaf=model.a.nod||model.b.nod||model.c.nod?requestAnimationFrame(step):0})();
+}
+const catOn=()=>model.shade==='cat'&&model.st>.95;
+function catTap(id){
+ if(id==='c'){catNod('c');say('Checks looks up: 12 of 14 passed, 2 waiting.');return}
+ const m=model[id],old=catStones(id),name=id==='a'?'Jarvis':'GitDiscuss';
+ m.run=!m.run;catNod(id,old);render();say(name+(m.run?' resumed':' paused')+': the caterpillar nods and its colour changes from the head back.');
+}
 
 /* ---------- Folded branches pieces ---------- */
 // A small overshoot (about 4%) for ribs and tags settling.
@@ -1380,6 +1500,7 @@ stage.addEventListener('pointerdown',e=>{
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
  if(drag.unwind){const d=Math.hypot(p.x-drag.x0,p.y-drag.y0);if(d>3)drag.moved=true;drag.deg=clamp(d/70);setJt(1-.5*drag.deg);render();return}
+ if(!(drag.mode==='angle'&&drag.tap)&&Math.hypot(p.x-drag.start.x,p.y-drag.start.y)>4)drag.moved=true;
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
  if(drag.mode==='angle'){
   // The pair may have shifted to stay on stage, so measure from where Jarvis's loop is now.
@@ -1407,13 +1528,16 @@ stage.addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.unwind){if(!d.moved||d.deg>.5)doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;say(J().sayJoined)}});return}
- if(d.mode==='angle'){model.turning=false;if(d.tap&&!d.moved){++settleTok;doSeparate();return}settleAngle();render();say(J().sayJoined);return}
+ if(d.mode==='angle'){model.turning=false;if(d.tap&&!d.moved){++settleTok;doSeparate();return}if(!d.tap&&!d.moved&&catOn()){catTap(d.id);return}settleAngle();render();say(J().sayJoined);return}
+ // Caterpillar shade: a tap on the nameplate pauses or resumes the widget (Checks just looks up).
+ if(!d.moved&&catOn()){for(const k of ['a','b','c'])Object.assign(model[k],d.saved[k]);model.glow=model.ghost=0;catTap(d.id);return}
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
 }
 function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;if(J().angle)model.angles[model.join]=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
+$$('[data-drag]').forEach(b=>b.addEventListener('click',e=>{if(e.detail===0&&catOn())catTap(b.dataset.drag)}));
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
