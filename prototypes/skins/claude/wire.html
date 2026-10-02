@@ -146,7 +146,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the wire nest, tap the stone to pull the nest apart. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -159,6 +159,11 @@ const METAL={copper:['#1f110a','#9b5b35','#f3bd92'],brass:['#2a1d08','#b68b34','
 function wire(d,m='copper',w=3,op=1){
  const c=METAL[m];
  return `<g opacity="${op}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="${c[0]}" stroke-width="${w+1.7}"/><path d="${d}" stroke="${c[1]}" stroke-width="${w}"/><path d="${d}" stroke="${c[2]}" stroke-width="${f(w*.32)}" stroke-opacity=".85" transform="translate(-.5 -.6)"/></g>`;
+}
+// Twisted square wire: the drawn wire with alternating light and dark facets along it.
+function twisted(d,m='brass',w=3.4){
+ const c=METAL[m];
+ return `<g fill="none" stroke-linejoin="round"><path d="${d}" stroke="${c[0]}" stroke-width="${f(w+1.7)}" stroke-linecap="round"/><path d="${d}" stroke="${c[1]}" stroke-width="${w}" stroke-linecap="round"/><path d="${d}" stroke="${c[2]}" stroke-width="${f(w*.62)}" stroke-dasharray="1.4 1.8" opacity=".8"/><path d="${d}" stroke="${c[0]}" stroke-width="${f(w*.62)}" stroke-dasharray=".6 2.6" stroke-dashoffset="-1.6" opacity=".45"/></g>`;
 }
 function rrect(x,y,w,h,r){r=Math.min(r,h/2,w/2);return `M${f(x+r)} ${f(y)}H${f(x+w-r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+w)} ${f(y+r)}V${f(y+h-r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+w-r)} ${f(y+h)}H${f(x+r)}A${f(r)} ${f(r)} 0 0 1 ${f(x)} ${f(y+h-r)}V${f(y+r)}A${f(r)} ${f(r)} 0 0 1 ${f(x+r)} ${f(y)}Z`}
 const circ=(cx,cy,r)=>`M${f(cx-r)} ${f(cy)}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0 ${-2*r} 0`;
@@ -574,6 +579,92 @@ const JOINS={
    return s;
   }
  },
+ bent:{label:'Bent wire',kind:'Angle · bend',gap:64,slow:1.8,
+  // Angle setup: GitDiscuss turns about the middle of the rod (the corner the bend is filleted round); no ring offset.
+  angle:{def:30,swing:.78,x0:32,ring:0,R:446,origin:c=>({x:c.a.x+W+32,y:c.a.y+c.h/2})},
+  lk:1,lkWant:1,lkTok:0,glint:0,
+  about:'One heavy rod of twisted square brass wire, bent to the angle and locked with a coil, the way a wire-wrapper sets a bend. Each joinable end carries a short ferrule of tight wraps on two bail wires from the frame: copper on Jarvis, brass on GitDiscuss. <b>Near:</b> the ferrules warm and the tip of the rod peeks out of Jarvis\'s. <b>Ready:</b> a dashed ghost rod and coil appear. Joining: the rod feeds out of Jarvis\'s ferrule across the gap with a hot tip and threads GitDiscuss\'s with a spark. A fine copper wire winds a loose coil round the middle, turn by turn from a hot point, and tucks its ends into little curls. GitDiscuss then bends down on the rod and overshoots once; the rod bends with a visible radius, its outer face catching the light, and the coil follows the bend, its turns crowding on the inside of the curve and opening on the outside. Last, the coil cinches tight with a glint: that is the lock. <b>Set the angle:</b> drag GitDiscuss\'s nameplate up or down, use the Angle slider, or press ↑ ↓ on the focused coil or nameplate. While you bend it the coil slackens and runs hot, then cinches again when you let go. The copper dial and its seed-bead detents (15°, 30° or off) show the angle; off, any angle from −40° to +40° holds. The joint keeps its own angle when you switch joins, and the pair shifts up or down to stay on the desktop. <b>Release:</b> tap the coil, or press Enter on it. The rod straightens, the coil unwinds and the rod draws back into Jarvis\'s ferrule.',
+  sayJoin:'The rod feeds across and threads GitDiscuss\'s ferrule, a coil winds round it, then the rod bends to the set angle and the coil cinches tight.',
+  sayJoined:'Joined by a bent wire. Drag GitDiscuss\'s nameplate to bend it; drag Jarvis to move the pair. Tap the coil to release.',
+  sayTurn:'Bending the rod: the locking coil slackens while it moves.',
+  sayRelease:'The rod straightens, the coil unwinds and the rod draws back.',
+  sayReady:'Ready: release to bridge them with a bent wire.',sayNear:'Nearby: the ferrules warm and the rod peeks out. Move closer.',
+  end(side,lit,h){
+   const x=side>0?W-5:5,y=h/2,m=side>0?'copper':'brass',hot=lit>.5,yy=Math.min(16,frameH(h)/2-4);let s='';
+   if(lit>0)s+=`<circle cx="${x+side*10}" cy="${y}" r="13" fill="#ffb15e" opacity="${f(lit*.7)}" filter="url(#soft)"/>`;
+   // Two bail wires from the frame converge on the ferrule.
+   if(yy>3)s+=wire(`M${x} ${f(y-yy)}Q${x+side*6} ${f(y-yy*.45)} ${x+side*12} ${f(y-2.8)}M${x} ${f(y+yy)}Q${x+side*6} ${f(y+yy*.45)} ${x+side*12} ${f(y+2.8)}`,hot?'hot':m,1.4);
+   // The ferrule: a dark socket wrapped tight, with a gold collar at its mouth.
+   s+=`<rect x="${Math.min(x,x+side*14)}" y="${f(y-3.6)}" width="14" height="7.2" rx="2.2" fill="#160b05"/>`+wire(band(x+side*7,y,false,6,8.6,2.2),hot?'hot':m,1.15);
+   s+=`<ellipse cx="${x+side*14.5}" cy="${y}" rx="1.9" ry="4.6" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".6"/><ellipse cx="${x+side*14.9}" cy="${y}" rx=".7" ry="2" fill="#1a0e06"/>`;
+   return s;
+  },
+  // The rod as a centreline: straight from Jarvis's ferrule, a fillet of radius RHO round the corner at O, straight on to GitDiscuss's at angle th.
+  geo(c,th){
+   const O={x:c.a.x+W+32,y:c.a.y+c.h/2},hl=22,RHO=28,r=th*Math.PI/180,sg=r<0?-1:1,ar=Math.abs(r),bent=ar>.003;
+   const t=bent?RHO*Math.tan(ar/2):0,L1=hl-t,La=bent?RHO*ar:0,L=2*L1+La,cs=Math.cos(r),sn=Math.sin(r);
+   const A0={x:O.x-t,y:O.y},C={x:O.x-t,y:O.y+sg*RHO},A1={x:O.x+t*cs,y:O.y+t*sn};
+   const at=s=>{s=clamp(s,0,L);let p;
+    if(s<=L1)p={x:O.x-hl+s,y:O.y,tx:1,ty:0};
+    else if(s<L1+La){const ph=sg*(s-L1)/RHO;p={x:C.x+sg*RHO*Math.sin(ph),y:C.y-sg*RHO*Math.cos(ph),tx:Math.cos(ph),ty:Math.sin(ph)}}
+    else{const u=s-L1-La;p={x:A1.x+u*cs,y:A1.y+u*sn,tx:cs,ty:sn}}
+    p.nx=-p.ty;p.ny=p.tx;return p};
+   const end=at(L);
+   const d=`M${f(O.x-hl)} ${f(O.y)}L${f(A0.x)} ${f(A0.y)}`+(bent?`A${RHO} ${RHO} 0 0 ${sg>0?1:0} ${f(A1.x)} ${f(A1.y)}`:'')+`L${f(end.x)} ${f(end.y)}`;
+   return{O,L,L1,La,sg,bent,at,d};
+  },
+  // The coil slackens while the rod is being bent and cinches again (with a glint) once it is let go.
+  lockTo(v){
+   if(this.lkWant===v)return;this.lkWant=v;const tok=++this.lkTok,from=this.lk,t0=performance.now(),ms=reduce.matches?0:v?340:170;
+   const step=now=>{if(tok!==this.lkTok)return;const t=ms?clamp((now-t0)/ms):1;this.lk=v?lerp(from,1,backOut(t)):lerp(from,0,ease(t));this.glint=v?Math.sin(Math.PI*seg(t,.45,1)):0;render();if(t<1)requestAnimationFrame(step);else{this.glint=0;render()}};
+   requestAnimationFrame(step);
+  },
+  under(){return ''},
+  over(c){
+   const jt=c.jt,th=swingAt(jt),turn=model.turning&&pivotOn(),pa={x:c.a.x+W+10,y:c.a.y+c.h/2},pb={x:c.b.x-10,y:c.b.y+c.h/2};
+   const tw=d=>`<path d="${d}" transform="translate(2 6)" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="4.5" stroke-linecap="round"/>`+twisted(d,'brass',3.4);
+   let s='';
+   if(jt===0){
+    if(c.ghost>0){const mx=(pa.x+pb.x)/2,my=(pa.y+pb.y)/2;
+     s+=`<g fill="none" stroke="#ffe3a8" stroke-width="1.2" stroke-dasharray="3 3" opacity="${f(c.ghost*.85)}"><path d="M${f(pa.x)} ${f(pa.y)}L${f(pb.x)} ${f(pb.y)}"/><rect x="${f(mx-13)}" y="${f(my-5.5)}" width="26" height="11" rx="3"/></g>`}
+    if(model.glow>0){const l=3+9*model.glow;s+=twisted(`M${f(pa.x-2)} ${f(pa.y)}H${f(pa.x+l)}`,model.glow>.5?'hot':'brass',3.4)}
+    this.lk=1;this.lkWant=1;++this.lkTok;this.glint=0;return s;
+   }
+   // Feed: the rod runs straight out of Jarvis's ferrule while the casings are still closing in.
+   const feed=ease(seg(jt,.26,.56));
+   if(feed<1){
+    const x=lerp(pa.x,pb.x,feed),y=lerp(pa.y,pb.y,feed);
+    s+=tw(`M${f(pa.x)} ${f(pa.y)}L${f(x)} ${f(y)}`)+`<circle cx="${f(x)}" cy="${f(y)}" r="5" fill="#ffd28a" opacity=".75" filter="url(#soft)"/><circle cx="${f(x)}" cy="${f(y)}" r="1.9" fill="#fff0c8"/>`;
+    this.lk=1;this.lkWant=1;++this.lkTok;this.glint=0;return s;
+   }
+   // A release started while the coil is slack carries on from slack rather than snapping tight.
+   const G=this.geo(c,th),wind=seg(jt,.58,.8),cinch=jt<1?Math.min(this.lk,ease(seg(jt,.93,1))):this.lk;
+   if(jt<1){if(jt<.93)this.lk=1;this.lkWant=1;++this.lkTok;this.glint=0}else this.lockTo(turn?0:1);
+   const N=11,p=lerp(3.3,2.05,cinch),h=3.5,s0=G.L/2-N*p/2,hotC=turn||jt<.93,cm=hotC?'hot':'copper';
+   const P=(s,o=0)=>{const q=G.at(s);return[q.x+q.nx*o,q.y+q.ny*o]},pt=a=>f(a[0])+' '+f(a[1]);
+   let back='',front='';const n=Math.min(N,Math.ceil(N*wind-1e-6)),last=wind<1?N*wind-(n-1):1;
+   for(let k=0;k<n;k++){const a=s0+k*p,fr=k===n-1?last:1;
+    front+=`M${pt(P(a,h))}Q${pt(P(a+p*.25,-.4))} ${pt(P(a+p*.5*fr,-h*(2*fr-1)))}`;
+    if(fr===1&&k<N-1)back+=`M${pt(P(a+p*.5,-h))}L${pt(P(a+p,h))}`}
+   s+=wire(back,'dim',1.05)+tw(G.d);
+   // The outer face of the bend catches the light.
+   if(G.bent&&Math.abs(th)>1.5){let d='';const m=10;for(let i=0;i<=m;i++){const q=P(G.L1+G.La*i/m,-G.sg*1.25);d+=(i?'L':'M')+pt(q)}
+    s+=`<path d="${d}" fill="none" stroke="#fff6dc" stroke-width=".9" stroke-linecap="round" opacity="${f(clamp(Math.abs(th)/30)*.75)}"/>`}
+   s+=wire(front,cm,1.25);
+   // While winding, a hot point and the free end running off to the spool; once wound, the ends tuck into curls.
+   if(wind>0&&wind<1){const e=P(s0+(n-1)*p+p*.5*last,-h*(2*last-1));
+    s+=wire(`M${pt(e)}q4 -9 12 -16`,'copper',1.05,.8)+`<circle cx="${f(e[0])}" cy="${f(e[1])}" r="4" fill="#ffd28a" opacity=".7" filter="url(#soft)"/><circle cx="${f(e[0])}" cy="${f(e[1])}" r="1.5" fill="#fff0c8"/>`}
+   const tuck=ease(seg(jt,.79,.88));
+   if(tuck>0)for(const [sa,o,dir] of [[s0,h,-1],[s0+N*p-p*.5,-h,1]]){const q=G.at(sa),e=P(sa,o),r0=3.3,sn=Math.sign(o),cx=e[0]+q.nx*sn*r0,cy=e[1]+q.ny*sn*r0;
+    s+=wire(spiral(cx,cy,r0,.95*tuck,dir,Math.atan2(e[1]-cy,e[0]-cx)),cm,1.05)}
+   // Threading spark at GitDiscuss's ferrule, and the glint as the coil locks.
+   const sp=Math.sin(Math.PI*seg(jt,.56,.68));if(sp>.03){const e=G.at(G.L);s+=sparkle(e.x,e.y,sp*.6)}
+   const gl=jt<1?Math.sin(Math.PI*seg(jt,.93,1)):this.glint;if(gl>.03){const q=P(G.L/2,-G.sg*(h+1));s+=sparkle(q[0],q[1],gl*.7)}
+   if(jt===1){const q=G.at(G.L/2);
+    s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Bent wire: press the arrow keys to bend GitDiscuss; tap or press Enter to unwind the coil and separate the widgets"><title>Tap the coil to release; drag GitDiscuss's nameplate to bend</title><circle cx="${f(q.x)}" cy="${f(q.y)}" r="18" fill="transparent"/><circle class="ringfocus" cx="${f(q.x)}" cy="${f(q.y)}" r="17" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
+   return s;
+  }
+ },
  nest:{label:'Wire nest',kind:'Grow',gap:64,slow:1.9,rel:false,lastJt:0,
   about:'A wild nest of fine dark wire round a small lapis cabochon. Each joinable end carries a tuft of seven fine wire ends bound into its frame: copper on Jarvis, brass on GitDiscuss. <b>Near:</b> the tufts bristle and warm. <b>Ready:</b> a dashed ghost of the nest and its stone appears in the gap. Joining: the fine wires grow out from both edges one after another, hot at the tips, each looping wildly round the middle of the gap so the two sides tangle into each other, some reaching all the way to hook the far frame. The tangle draws in tighter, a lapis cabochon flecked with pyrite drops into the middle and bounces, a fine brass coil winds round it to hold it, and a curl unwinds below the nest. The stone is the join light: its halo is warm while either widget is running. <b>Release:</b> tap the stone, or focus it and press Enter. The coil unwinds and the stone lifts out, the loops pull straight and hum with tension as the pendants part, then the wires snap mid-gap with a spark and whip back to their own frames with a twang.',
   sayJoin:'Fine wires grow from both edges and tangle into a nest; a lapis cabochon drops in and a coil winds round it.',
@@ -722,7 +813,7 @@ function coilGeo(c){
 const coilT=(jt,i)=>({leap:ease(seg(jt,.12+.05*i,.27+.05*i)),taut:ease(seg(jt,.3+.04*i,.48)),wrap:seg(jt,.5+.05*i,.76+.05*i),tail:backOut(seg(jt,.78+.04*i,.86+.04*i)),heat:seg(jt,.86+.03*i,.97+.01*i)});
 /* ---------- Pivot geometry ---------- */
 // Displayed swing in degrees: level until the ring is shut, then a damped swing that lands exactly on model.angle.
-// Shared by every angled join (JOINS[...].angle): Jump-ring pivot and Caged ball joint.
+// Shared by every angled join (JOINS[...].angle): Jump-ring pivot, Caged ball joint and Bent wire.
 function swingAt(jt){
  const A=J().angle;if(!A)return 0;
  const u=seg(jt,A.swing,1);if(u<=0)return 0;const k=Math.pow(1-u,2);
@@ -1395,7 +1486,7 @@ function bezelRender(el,svg){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -1486,7 +1577,7 @@ function render(){
  $('#angleRow').style.display=j.angle?'':'none';
  const ang=Math.round(model.angle);$('#angle').value=ang;$('#angleOut').textContent=(ang>0?'+':ang<0?'−':'')+Math.abs(ang)+'°';
  $('#detent').textContent=model.detent?'Detents '+model.detent+'°':'Detents off';$('#detent').setAttribute('aria-pressed',String(!!model.detent));
- const hit=$('#joinHit');if(hit){hit.onclick=j.pull||model.join==='ball'?(e=>{if(e.detail===0)doSeparate()}):doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}else if(model.join==='ball'){const k={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(k){e.preventDefault();stepAngle(k)}}};if(focused)hit.focus()}
+ const hit=$('#joinHit');if(hit){hit.onclick=j.pull||model.join==='ball'?(e=>{if(e.detail===0)doSeparate()}):doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}else if(model.join==='ball'||model.join==='bent'){const k={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(k){e.preventDefault();stepAngle(k)}}};if(focused)hit.focus()}
  // Controls reflect state
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
@@ -1511,7 +1602,7 @@ function options(row,set,key,aboutEl){
 }
 function pick(key,id){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}if(JOINS[id].phase){JOINS[id].rel=false;JOINS[id].lastJt=model.jt}}
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}if(JOINS[id].phase){JOINS[id].rel=false;JOINS[id].lastJt=model.jt}if(id==='bent')Object.assign(JOINS.bent,{lk:1,lkWant:1,lkTok:JOINS.bent.lkTok+1,glint:0})}
  if(key==='shade')model.shade=id;
  if(key==='morph'&&id!==model.morph){
   // A grown Checks shrinks back to the pendant in its old morph before the new one takes over.
