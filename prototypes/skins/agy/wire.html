@@ -131,6 +131,67 @@ header {
   border-color: var(--copper-bright);
 }
 
+.hinge-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1c120c;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #4a2919;
+}
+.hinge-controls label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #c4a799;
+}
+.hinge-controls label span {
+  color: var(--turquoise-bright);
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 12px;
+}
+.hinge-controls input[type="range"] {
+  width: 95px;
+  height: 5px;
+  accent-color: var(--turquoise-bright);
+  cursor: ew-resize;
+  background: #33190f;
+  border-radius: 3px;
+}
+.hinge-controls .detent-buttons {
+  display: flex;
+  gap: 3px;
+}
+.hinge-controls .detent-btn {
+  padding: 2px 5px;
+  font-size: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", monospace;
+  background: #2b180f;
+  border: 1px solid #4a2919;
+  color: #dfbaaa;
+  border-radius: 3px;
+  cursor: pointer;
+  line-height: 1.2;
+  transition: all 100ms ease;
+}
+.hinge-controls .detent-btn:hover {
+  background: #3d2215;
+  color: #ffffff;
+  border-color: var(--copper-light);
+}
+.hinge-controls .detent-btn.active {
+  background: linear-gradient(180deg, #174f46, #092e27);
+  color: var(--turquoise-bright);
+  border-color: var(--turquoise-bright);
+  box-shadow: 0 0 6px rgba(82, 240, 222, 0.4);
+  font-weight: 700;
+}
+
 /* Stage Viewport */
 #viewport {
   width: 100%;
@@ -1167,8 +1228,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Wire, Beads &amp; Stones <span>/ unfolding wire sculpture, wild nest clamp &amp; coiled spring spindle</span></h1>
-    <p>Raw &amp; oxidized copper wire · Unfolding wire sculpture · Beaded strands &amp; parallel copper guide rails · Wild nest cabochon clamp · Polished lapis lazuli · Coiled spring spindle · Shepherd's crook · Tree of Life root braid</p>
+    <h1>Wire, Beads &amp; Stones <span>/ gemstone bead hinge, unfolding wire sculpture &amp; wild nest clamp</span></h1>
+    <p>Raw &amp; oxidized copper wire · Gemstone Bead Hinge angled connection (-45° to +45°) · Drilled spherical lapis bead axle &amp; wire detents · Unfolding wire sculpture · Beaded strands &amp; parallel copper guide rails · Wild nest cabochon clamp · Polished lapis lazuli · Coiled spring spindle · Shepherd's crook · Tree of Life root braid</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -1183,8 +1244,22 @@ footer .note-highlight {
         <option value="shepherds_crook">7. Shepherd's Crook &amp; Spiral Eyelet join</option>
         <option value="spring_spindle">8. Coiled Spring Spindle Wind-Up shade</option>
         <option value="wild_nest">9. Wild Nest Cabochon Clamp join (Oxidized Wire Nest &amp; Lapis Cabochon)</option>
-        <option value="unfolding_sculpture" selected>10. Unfolding Wire Sculpture morph (Beaded Strands, Copper Guide Rails &amp; Auxiliary Bay)</option>
+        <option value="unfolding_sculpture">10. Unfolding Wire Sculpture morph (Beaded Strands, Copper Guide Rails &amp; Auxiliary Bay)</option>
+        <option value="bead_hinge" selected>11. Gemstone Bead Hinge angled connection (-45° to +45° with drilled spherical bead axle &amp; wire detents)</option>
       </select>
+    </div>
+    <div id="hingeControls" class="control-group hinge-controls" aria-label="Gemstone bead hinge angle control">
+      <label for="hingeAngleSlider">Hinge <span id="hingeAngleReadout">+15°</span></label>
+      <input type="range" id="hingeAngleSlider" min="-45" max="45" step="5" value="15" aria-label="Gemstone bead hinge angle">
+      <div class="detent-buttons">
+        <button type="button" class="detent-btn" data-angle="-45" title="Boreal Zenith (-45°)">-45°</button>
+        <button type="button" class="detent-btn" data-angle="-30" title="Steep Diagonal (-30°)">-30°</button>
+        <button type="button" class="detent-btn" data-angle="-15" title="Gentle Cant (-15°)">-15°</button>
+        <button type="button" class="detent-btn" data-angle="0" title="Straight Axis (0°)">0°</button>
+        <button type="button" class="detent-btn active" data-angle="15" title="Gentle Cant (+15°)">+15°</button>
+        <button type="button" class="detent-btn" data-angle="30" title="Steep Diagonal (+30°)">+30°</button>
+        <button type="button" class="detent-btn" data-angle="45" title="Austral Nadir (+45°)">+45°</button>
+      </div>
     </div>
     <div class="control-group">
       <label>State</label>
@@ -1193,7 +1268,8 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnUnfoldAnim" class="primary-btn">Unfold wire sculpture</button>
+    <button id="btnHingeAnim" class="primary-btn">Seat gemstone bead hinge</button>
+    <button id="btnUnfoldAnim">Unfold wire sculpture</button>
     <button id="btnJoinAnim">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnAbacusAnim">Compress abacus</button>
@@ -1370,6 +1446,41 @@ footer .note-highlight {
           <stop offset="70%" stop-color="#8c3b17"/>
           <stop offset="100%" stop-color="#381305"/>
         </linearGradient>
+
+        <!-- Spherical 3D Drilled Lapis Lazuli Gemstone Bead (Option 11) -->
+        <radialGradient id="sphericalLapis" cx="30%" cy="25%" r="72%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="12%" stop-color="#70adff"/>
+          <stop offset="30%" stop-color="#246be6"/>
+          <stop offset="60%" stop-color="#103d8f"/>
+          <stop offset="85%" stop-color="#071d47"/>
+          <stop offset="100%" stop-color="#020a1c"/>
+        </radialGradient>
+
+        <!-- Vertical Wire Axle Pin Gradient (Option 11) -->
+        <linearGradient id="wireAxleGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="25%" stop-color="#d6e3ea"/>
+          <stop offset="55%" stop-color="#8ba2b2"/>
+          <stop offset="85%" stop-color="#465863"/>
+          <stop offset="100%" stop-color="#243038"/>
+        </linearGradient>
+
+        <!-- Engraved Copper Wire Protractor Degree Arc (Option 11) -->
+        <linearGradient id="beadHingeArcGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffd4b8"/>
+          <stop offset="30%" stop-color="#f9a979"/>
+          <stop offset="65%" stop-color="#b05327"/>
+          <stop offset="100%" stop-color="#54210a"/>
+        </linearGradient>
+
+        <!-- Faceted Peridot Indicator Jewel Gradient (Option 11) -->
+        <radialGradient id="peridotPointer" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="25%" stop-color="#dbff85"/>
+          <stop offset="60%" stop-color="#8dc427"/>
+          <stop offset="100%" stop-color="#345407"/>
+        </radialGradient>
       </defs>
 
       <!-- Shared Wire Stage (Unified Casing & Seam) -->
@@ -1680,6 +1791,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 10 — Unfolding Wire Sculpture Morph [Morph]:</span> Inspired by kinetic wire craft sculptures and articulated bead looms. Jarvis expands laterally by 142px on parallel 12-gauge polished and oxidized copper wire guide rails. The guide rails extend horizontally along the top and bottom of the casing, capped by faceted amethyst and turquoise gemstone end-stops with wire cotter loops. The expansion reveals an auxiliary display bay—the Wire Loom &amp; Matrix Spectrometer—housed on a recessed oxidized copper chassis plate with high-contrast, crystal-clear digital readouts (4.8 N spring tension, 48 beads strung, 99.2% matrix integrity, and live gemstone tuning). Delicate hanging strands of stone beads (faceted amethyst, turquoise rondelles, carnelian beads, peridot chips, and freshwater pearls) swing downward from articulated wire loop pivot hinges, draping in graceful catenary swags with authentic wire elasticity. Above the top rail, a Tree of Life wire gem tree canopy unfurls with perched gemstone chips, while an interactive dangling feather charm triggers folding and unfolding. Under the neighbor clearance rule, lateral growth smoothly nudges adjacent modules aside without overlap, restoring their relative offset upon retraction.
   </p>
+  <p>
+    <span class="note-highlight">Option 11 — Gemstone Bead Hinge Angled Connection [Angled Connection]:</span> Handcrafted jewelry findings and articulated wire sculpture join. Module A carries a sturdy vertical sterling silver wire axle pin anchored by coiled copper gudgeons, threaded through the cylindrical bore of a drilled spherical deep royal lapis lazuli gemstone bead speckled with golden pyrite flecks and polished highlights. Module B features a spring-tempered oxidized copper collar clasp with fine wire-wound sleeves and curled terminal loops. An engraved 58px semi-circular copper degree arc spans -45° to +45°, punctuated by 7 gemstone seed-bead detent nodes (amethyst rondelles at ±45°, lapis beads at ±30°, turquoise rondelles at ±15°, and a central carnelian sun bead at 0°). As the modules dock, the spring collar deflects and securely grips the spherical lapis axle, seating an articulated pointer needle tipped with a luminous peridot jewel into the detent arc. GitDiscuss smoothly pivots around the bead center (-45° upward to +45° downward) in real-time, controllable via direct stage pointer dragging, 15° detent presets, an angle slider, and keyboard bracket keys. In 44px shade mode, the hinge compresses into a compact jeweled rod pivot maintaining full angle rotation and unclipped display metrics.
+  </p>
 </footer>
 
 <script>
@@ -1705,7 +1819,7 @@ const model = {
   extended: false,   // Option 10: 0 = standard casing, 1 = extended unfolding wire sculpture
   morphProgress: 0,  // Option 10: 0 = folded, 1.0 = fully unfolded sculpture
   bNudge: 0,         // Option 10: clearance displacement for GitDiscuss neighbor
-  option: 'unfolding_sculpture', // Default to Option 10
+  option: 'bead_hinge', // Default to Option 11 Gemstone Bead Hinge
   blend: 0,
   cap: 0,
   bayonetProgress: 0, // Option 1: 0 = separate, 0.5 = sleeve entry, 1.0 = 30-deg twist locked
@@ -1713,6 +1827,8 @@ const model = {
   poptabProgress: 0,   // Option 5: 0 = separate, 0.5 = coaxial alignment, 0.85 = pin drop, 1.0 = prongs split & locked
   crookProgress: 0,    // Option 7: 0 = separate, 0.55 = crook tip deflecting over spiral rim, 0.85 = snapped in cradle, 1.0 = guard locked
   nestProgress: 0,     // Option 9: 0 = separate, 0.6 = fingers deflecting over lapis dome, 0.9 = snapped around girdle, 1.0 = locked with settle & spark
+  hingeProgress: 0,    // Option 11: 0 = separate, 1 = seated in gemstone bead hinge
+  angle: 15,           // Option 11: active hinge angle: -45° to +45°
   light: 0,
   limit: 3,
   feel: 'free',
@@ -2916,6 +3032,14 @@ function drawWireCap(x, y, isRight, isMaleCage = false, retract = 0, isShade = f
   const startX = isRight ? x + (customW || W) - 14 : x + 14;
   const scaleX = (1 - retract) * dir;
   if (Math.abs(scaleX) < 0.05) return '';
+
+  if (model.option === 'bead_hinge') {
+    if (isRight) {
+      return drawBeadHingeFlankA(startX, y, scaleX);
+    } else {
+      return drawBeadHingeFlankB(startX, y, scaleX);
+    }
+  }
 
   if (model.option === 'wild_nest' || model.option === 'unfolding_sculpture') {
     if (isRight) {
@@ -4274,6 +4398,351 @@ function drawUnfoldingWireSculpture(extraW, morphProgress, isShade = false) {
   return s;
 }
 
+// Option 11: Gemstone Bead Hinge Angled Connection (-45° to +45° with drilled spherical bead axle & wire detents)
+function drawBeadHingeFlankA(startX, y, scaleX) {
+  return `
+    <g transform="translate(${startX}, ${y + 64}) scale(${scaleX}, 1)" id="beadHingeFlankA">
+      <!-- Structural Frame Anchor Collar -->
+      <path d="M -4 -48 C 8 -44 14 -26 14 0 C 14 26 8 44 -4 48"
+            fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>
+
+      <!-- Base Coiled Wire Sleeves & Mounting Anchor -->
+      <rect x="0" y="-24" width="8" height="48" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>
+      <line x1="2" y1="-24" x2="2" y2="24" stroke="#ffd4b8" stroke-width="0.8"/>
+      <line x1="5" y1="-24" x2="5" y2="24" stroke="#381406" stroke-width="0.8"/>
+
+      <!-- Structural 12-gauge Bent Copper Wire Gudgeon Hoop Lugs -->
+      <!-- Upper Gudgeon Loop -->
+      <path d="M 6 -32 C 14 -38 20 -38 24 -36 C 28 -34 30 -30 26 -28 C 22 -26 14 -28 6 -24"
+            fill="none" stroke="url(#copperGrad)" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M 6 -32 C 14 -38 20 -38 24 -36" fill="none" stroke="#ffd4b8" stroke-width="0.8"/>
+      <!-- Lower Gudgeon Loop -->
+      <path d="M 6 32 C 14 38 20 38 24 36 C 28 34 30 30 26 28 C 22 26 14 28 6 24"
+            fill="none" stroke="url(#copperGrad)" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M 6 32 C 14 38 20 38 24 36" fill="none" stroke="#ffd4b8" stroke-width="0.8"/>
+
+      <!-- Vertical 14-gauge Sterling Silver Wire Axle Pin -->
+      <line x1="24" y1="-44" x2="24" y2="44" stroke="url(#wireAxleGrad)" stroke-width="2.4" stroke-linecap="round"/>
+      <line x1="23.5" y1="-44" x2="23.5" y2="44" stroke="#ffffff" stroke-width="0.8" opacity="0.85"/>
+
+      <!-- Top and Bottom Coiled Beehive Finials & Silver Spacer Beads -->
+      <circle cx="24" cy="-44" r="3.2" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.7"/>
+      <circle cx="24" cy="-40" r="2.2" fill="url(#silverCraftWire)" stroke="#1a252c" stroke-width="0.6"/>
+      <circle cx="24" cy="44" r="3.2" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.7"/>
+      <circle cx="24" cy="40" r="2.2" fill="url(#silverCraftWire)" stroke="#1a252c" stroke-width="0.6"/>
+
+      <!-- Turquoise Spacer Beads flanking gemstone sphere -->
+      <circle cx="24" cy="-18" r="2.6" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.7"/>
+      <circle cx="23.3" cy="-18.7" r="0.7" fill="#ffffff" opacity="0.9"/>
+      <circle cx="24" cy="18" r="2.6" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.7"/>
+      <circle cx="23.3" cy="17.3" r="0.7" fill="#ffffff" opacity="0.9"/>
+
+      <!-- Drilled Spherical Lapis Lazuli Gemstone Bead -->
+      <circle cx="24" cy="0" r="14" fill="#040a14" filter="url(#gemGlow)"/>
+      <circle cx="24" cy="0" r="13.5" fill="url(#sphericalLapis)" stroke="#081c3c" stroke-width="1.2"/>
+
+      <!-- Natural Golden Pyrite Specks -->
+      <circle cx="20" cy="-6" r="1.3" fill="url(#pyriteGlint)" opacity="0.95"/>
+      <circle cx="27" cy="-3" r="1.6" fill="url(#pyriteGlint)" opacity="0.95"/>
+      <circle cx="19" cy="4" r="1.1" fill="url(#pyriteGlint)" opacity="0.9"/>
+      <circle cx="26" cy="7" r="1.4" fill="url(#pyriteGlint)" opacity="0.95"/>
+      <circle cx="23" cy="-9" r="0.9" fill="url(#pyriteGlint)" opacity="0.85"/>
+
+      <!-- Drilled Cylindrical Axle Bore Hole & Silver Bushing -->
+      <rect x="22.2" y="-13.5" width="3.6" height="27" rx="1.2" fill="url(#silverCraftWire)" stroke="#0a1824" stroke-width="0.6" opacity="0.85"/>
+      <line x1="23.8" y1="-13.5" x2="23.8" y2="13.5" stroke="#ffffff" stroke-width="0.7" opacity="0.9"/>
+
+      <!-- Specular Highlight Reflections -->
+      <ellipse cx="20" cy="-6" rx="4" ry="2.5" transform="rotate(-30 20 -6)" fill="#ffffff" opacity="0.75"/>
+      <circle cx="19" cy="-5" r="1.4" fill="#ffffff" opacity="0.95"/>
+    </g>
+  `;
+}
+
+function drawBeadHingeFlankB(startX, y, scaleX) {
+  return `
+    <g transform="translate(${startX}, ${y + 64}) scale(${scaleX}, 1)" id="beadHingeFlankB">
+      <!-- Structural Frame Receiving Collar -->
+      <path d="M -4 -48 C 8 -44 14 -26 14 0 C 14 26 8 44 -4 48"
+            fill="none" stroke="url(#copperGrad)" stroke-width="3.5" stroke-linecap="round"/>
+
+      <!-- Base Coiled Wire Mounting Block -->
+      <rect x="0" y="-24" width="8" height="48" rx="2" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.8"/>
+
+      <!-- Turquoise Seed-Bead Pivot Stops -->
+      <circle cx="4" cy="-28" r="3.2" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.8"/>
+      <circle cx="3.2" cy="-28.8" r="0.8" fill="#ffffff" opacity="0.85"/>
+      <circle cx="4" cy="28" r="3.2" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.8"/>
+      <circle cx="3.2" cy="27.2" r="0.8" fill="#ffffff" opacity="0.85"/>
+
+      <!-- Springy 14-gauge Copper Wire Collar Arms -->
+      <!-- Upper Collar Arm -->
+      <path d="M 6 -16 C 14 -20 22 -22 28 -18 C 34 -14 36 -6 32 0"
+            fill="none" stroke="url(#copperGrad)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M 28 -18 C 34 -14 36 -6 32 0" fill="none" stroke="#ffd4b8" stroke-width="0.8"/>
+      <!-- Lower Collar Arm -->
+      <path d="M 6 16 C 14 20 22 22 28 18 C 34 14 36 6 32 0"
+            fill="none" stroke="url(#copperGrad)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M 28 18 C 34 14 36 6 32 0" fill="none" stroke="#ffd4b8" stroke-width="0.8"/>
+
+      <!-- Coiled Wire Sleeves on Collar Arms -->
+      <rect x="10" y="-22" width="10" height="6" rx="1.5" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.6"/>
+      <rect x="10" y="16" width="10" height="6" rx="1.5" fill="url(#copperGrad)" stroke="#381406" stroke-width="0.6"/>
+
+      <!-- Curled Terminal Loops -->
+      <circle cx="32" cy="0" r="2.2" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.7"/>
+    </g>
+  `;
+}
+
+function drawBeadHingeJoin(a, b, angle = 0, hingeProgress = 1, isJoined = false, opacity = 1, glow = 0, isShade = false, tension = 0) {
+  const extraW = Math.round((model.morphProgress || 0) * 142);
+  const cx = a.x + extraW + 353;
+  const cy = a.y + (isShade ? 22 : 65);
+  const progress = isJoined ? 1 : hingeProgress;
+  const activeAngle = angle * progress;
+  const rad = activeAngle * Math.PI / 180;
+
+  let s = `<g class="gemstone-bead-hinge-join" opacity="${opacity}">`;
+
+  if (!isShade) {
+    // 1. Module A Structural Gudgeon Hoops & Wire Cross-Braces (Jarvis Anchor)
+    s += `
+      <!-- Structural Copper Wire Gudgeons -->
+      <path d="M ${cx - 36} ${cy - 36} C ${cx - 20} ${cy - 40}, ${cx - 10} ${cy - 40}, ${cx} ${cy - 36}"
+            fill="none" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round"/>
+      <path d="M ${cx - 36} ${cy + 36} C ${cx - 20} ${cy + 40}, ${cx - 10} ${cy + 40}, ${cx} ${cy + 36}"
+            fill="none" stroke="url(#copperGrad)" stroke-width="3" stroke-linecap="round"/>
+      <!-- Diagonal Wire Braces -->
+      <path d="M ${cx - 32} ${cy - 20} L ${cx} ${cy - 36} M ${cx - 32} ${cy + 20} L ${cx} ${cy + 36}"
+            fill="none" stroke="url(#copperGrad)" stroke-width="1.8" opacity="0.8"/>
+
+      <!-- Vertical 14-gauge Sterling Silver Wire Axle Pin -->
+      <line x1="${cx}" y1="${cy - 48}" x2="${cx}" y2="${cy + 48}"
+            stroke="url(#wireAxleGrad)" stroke-width="2.6" stroke-linecap="round"/>
+      <line x1="${cx - 0.5}" y1="${cy - 48}" x2="${cx - 0.5}" y2="${cy + 48}"
+            stroke="#ffffff" stroke-width="0.8" opacity="0.9"/>
+
+      <!-- Top and Bottom Coiled Beehive Finials & Silver Spacer Beads -->
+      <circle cx="${cx}" cy="${cy - 48}" r="3.6" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.8"/>
+      <circle cx="${cx}" cy="${cy - 43}" r="2.4" fill="url(#silverCraftWire)" stroke="#1a252c" stroke-width="0.6"/>
+      <circle cx="${cx}" cy="${cy + 48}" r="3.6" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.8"/>
+      <circle cx="${cx}" cy="${cy + 43}" r="2.4" fill="url(#silverCraftWire)" stroke="#1a252c" stroke-width="0.6"/>
+
+      <!-- Amethyst Spacer Rondelles flanking bead -->
+      <circle cx="${cx}" cy="${cy - 20}" r="3.0" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="0.8"/>
+      <circle cx="${cx - 0.8}" cy="${cy - 20.8}" r="0.8" fill="#ffffff" opacity="0.9"/>
+      <circle cx="${cx}" cy="${cy + 20}" r="3.0" fill="url(#facetedAmethyst)" stroke="#38094d" stroke-width="0.8"/>
+      <circle cx="${cx - 0.8}" cy="${cy + 19.2}" r="0.8" fill="#ffffff" opacity="0.9"/>
+
+      <!-- Drilled Spherical Lapis Lazuli Gemstone Bead -->
+      <circle cx="${cx}" cy="${cy}" r="15" fill="#040a14" filter="url(#gemGlow)"/>
+      <circle cx="${cx}" cy="${cy}" r="14" fill="url(#sphericalLapis)" stroke="#081c3c" stroke-width="1.3"/>
+
+      <!-- Pyrite Gold Flecks in Lapis Bead Matrix -->
+      <circle cx="${cx - 4}" cy="${cy - 7}" r="1.4" fill="url(#pyriteGlint)" opacity="0.95"/>
+      <circle cx="${cx + 4}" cy="${cy - 4}" r="1.7" fill="url(#pyriteGlint)" opacity="0.95"/>
+      <circle cx="${cx - 5}" cy="${cy + 4}" r="1.2" fill="url(#pyriteGlint)" opacity="0.9"/>
+      <circle cx="${cx + 3}" cy="${cy + 7}" r="1.5" fill="url(#pyriteGlint)" opacity="0.95"/>
+      <circle cx="${cx}" cy="${cy - 10}" r="1.0" fill="url(#pyriteGlint)" opacity="0.85"/>
+
+      <!-- Drilled Silver Axle Tube Core -->
+      <rect x="${cx - 2}" y="${cy - 14}" width="4" height="28" rx="1.5"
+            fill="url(#silverCraftWire)" stroke="#091b28" stroke-width="0.7"/>
+      <line x1="${cx}" y1="${cy - 14}" x2="${cx}" y2="${cy + 14}"
+            stroke="#ffffff" stroke-width="0.8" opacity="0.9"/>
+
+      <!-- Polished Specular Highlight -->
+      <ellipse cx="${cx - 4.5}" cy="${cy - 5}" rx="4.5" ry="3" transform="rotate(-30 ${cx - 4.5} ${cy - 5})"
+               fill="#ffffff" opacity="0.8"/>
+      <circle cx="${cx - 4.5}" cy="${cy - 5}" r="1.5" fill="#ffffff"/>
+
+      <!-- Interactive Grabbing Hitbox on Central Gemstone Bead -->
+      <circle cx="${cx}" cy="${cy}" r="18" fill="transparent" data-drag="beadHingeAngle"
+              style="cursor: grab; pointer-events: auto;" title="Drag gemstone bead to rotate angle (-45° to +45°)"/>
+    `;
+
+    // 2. Rotating Springy Wire Collar Clasping Bead Equator (GitDiscuss Connector)
+    const prongSpread = (1 - progress) * 8;
+    s += `
+      <g class="bead-hinge-collar-assembly" transform="rotate(${activeAngle}, ${cx}, ${cy})">
+        <!-- Connecting Wire Stems -->
+        <path d="M ${cx + 14} ${cy - 22} L ${cx + 32} ${cy - 26}"
+              stroke="url(#copperGrad)" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M ${cx + 14} ${cy + 22} L ${cx + 32} ${cy + 26}"
+              stroke="url(#copperGrad)" stroke-width="2.2" stroke-linecap="round"/>
+
+        <!-- Spring-Tempered Clasp Jaws around Bead Equator -->
+        <path d="M ${cx + 16} ${cy - 18 - prongSpread}
+                 C ${cx + 4} ${cy - 18 - prongSpread}, ${cx - 8} ${cy - 14}, ${cx - 14} ${cy - 4}
+                 C ${cx - 16} ${cy - 2}, ${cx - 16} ${cy + 2}, ${cx - 14} ${cy + 4}
+                 C ${cx - 8} ${cy + 14}, ${cx + 4} ${cy + 18 + prongSpread}, ${cx + 16} ${cy + 18 + prongSpread}"
+              fill="none" stroke="url(#copperGrad)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M ${cx + 16} ${cy - 18 - prongSpread}
+                 C ${cx + 4} ${cy - 18 - prongSpread}, ${cx - 8} ${cy - 14}, ${cx - 14} ${cy - 4}"
+              fill="none" stroke="#ffd4b8" stroke-width="0.8"/>
+
+        <!-- Coiled Wire Sleeves on Collar -->
+        <rect x="${cx + 8}" y="${cy - 24 - prongSpread}" width="8" height="6" rx="1.5"
+              fill="url(#copperGrad)" stroke="#381406" stroke-width="0.6"/>
+        <rect x="${cx + 8}" y="${cy + 18 + prongSpread}" width="8" height="6" rx="1.5"
+              fill="url(#copperGrad)" stroke="#381406" stroke-width="0.6"/>
+
+        <!-- Faceted Turquoise Pivot Stops at Base -->
+        <circle cx="${cx + 18}" cy="${cy - 20}" r="2.8" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.7"/>
+        <circle cx="${cx + 18}" cy="${cy + 20}" r="2.8" fill="url(#turquoiseBead)" stroke="#083832" stroke-width="0.7"/>
+
+        ${isJoined ? `
+          <!-- Contact Sparks on Locked Clasp -->
+          <circle cx="${cx - 14}" cy="${cy}" r="1.8" fill="#ffd4b8" filter="url(#gemGlow)"/>
+          <line x1="${cx - 16}" y1="${cy}" x2="${cx - 12}" y2="${cy}" stroke="#ffffff" stroke-width="1.2"/>
+        ` : ''}
+      </g>
+    `;
+
+    // 3. Sweeping Copper Wire Degree Arc Track (-45° to +45°)
+    const arcR = 58;
+    const arcStartAngle = -45;
+    const arcEndAngle = 45;
+    const arcX1 = cx + arcR * Math.cos(arcStartAngle * Math.PI / 180);
+    const arcY1 = cy + arcR * Math.sin(arcStartAngle * Math.PI / 180);
+    const arcX2 = cx + arcR * Math.cos(arcEndAngle * Math.PI / 180);
+    const arcY2 = cy + arcR * Math.sin(arcEndAngle * Math.PI / 180);
+
+    s += `
+      <!-- Engraved Protractor Degree Arc Track -->
+      <g class="bead-hinge-degree-arc" data-drag="beadHingeAngle" style="cursor: pointer;" title="Drag to adjust hinge angle (-45° to +45°)">
+        <!-- Broad hit area for dragging -->
+        <path d="M ${arcX1} ${arcY1} A ${arcR} ${arcR} 0 0 1 ${arcX2} ${arcY2}"
+              fill="none" stroke="transparent" stroke-width="28"/>
+
+        <!-- Outer Heavy Copper Rail -->
+        <path d="M ${cx + (arcR + 6) * Math.cos(arcStartAngle * Math.PI / 180)} ${cy + (arcR + 6) * Math.sin(arcStartAngle * Math.PI / 180)}
+                 A ${arcR + 6} ${arcR + 6} 0 0 1
+                 ${cx + (arcR + 6) * Math.cos(arcEndAngle * Math.PI / 180)} ${cy + (arcR + 6) * Math.sin(arcEndAngle * Math.PI / 180)}"
+              fill="none" stroke="url(#copperGrad)" stroke-width="1.8" opacity="0.85"/>
+
+        <!-- Inset Scale Arc -->
+        <path d="M ${arcX1} ${arcY1} A ${arcR} ${arcR} 0 0 1 ${arcX2} ${arcY2}"
+              fill="none" stroke="url(#beadHingeArcGrad)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M ${arcX1} ${arcY1} A ${arcR} ${arcR} 0 0 1 ${arcX2} ${arcY2}"
+              fill="none" stroke="#2b0e03" stroke-width="0.8"/>
+
+        <!-- Graduation Ticks every 5° -->
+        ${Array.from({ length: 19 }, (_, i) => {
+          const deg = -45 + i * 5;
+          const isMajor = deg % 15 === 0;
+          const r0 = arcR - (isMajor ? 5 : 2.5);
+          const r1 = arcR + (isMajor ? 5 : 2.5);
+          const tr = deg * Math.PI / 180;
+          const x0 = cx + r0 * Math.cos(tr), y0 = cy + r0 * Math.sin(tr);
+          const x1 = cx + r1 * Math.cos(tr), y1 = cy + r1 * Math.sin(tr);
+          return `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}"
+                        stroke="${isMajor ? '#ffd4b8' : 'url(#copperGrad)'}"
+                        stroke-width="${isMajor ? 1.4 : 0.8}" stroke-linecap="round"/>`;
+        }).join('')}
+
+        <!-- 7 Gemstone Seed-Bead Detent Nodes (-45°, -30°, -15°, 0°, +15°, +30°, +45°) -->
+        ${[-45, -30, -15, 0, 15, 30, 45].map(d => {
+          const tr = d * Math.PI / 180;
+          const bx = cx + arcR * Math.cos(tr);
+          const by = cy + arcR * Math.sin(tr);
+          const isCenter = d === 0;
+          const isNear = Math.abs(d) === 15;
+          const isMid = Math.abs(d) === 30;
+          const grad = isCenter ? 'url(#carnelianBead)' :
+                       isNear ? 'url(#turquoiseBead)' :
+                       isMid ? 'url(#sphericalLapis)' : 'url(#facetedAmethyst)';
+          const stroke = isCenter ? '#421203' :
+                         isNear ? '#083832' :
+                         isMid ? '#081c3c' : '#300742';
+          const r = isCenter ? 4.0 : 3.4;
+          const isActive = Math.abs(activeAngle - d) < 2.5;
+
+          return `
+            <g class="detent-node" transform="translate(${bx}, ${by})">
+              ${isActive ? `
+                <circle cx="0" cy="0" r="${r + 3.5}" fill="none" stroke="#52f0de" stroke-width="1.4" opacity="0.9" filter="url(#gemGlow)"/>
+              ` : ''}
+              <circle cx="0" cy="0" r="${r}" fill="${grad}" stroke="${stroke}" stroke-width="0.8"/>
+              <circle cx="-0.8" cy="-0.8" r="0.8" fill="#ffffff" opacity="0.9"/>
+              <circle cx="0" cy="0" r="1.0" fill="#1b120d"/>
+            </g>
+          `;
+        }).join('')}
+      </g>
+    `;
+
+    // 4. Sweeping Articulated Wire Pointer Needle
+    const needleR = arcR + 5;
+    const nx = cx + needleR * Math.cos(rad);
+    const ny = cy + needleR * Math.sin(rad);
+
+    s += `
+      <!-- Articulated Wire Pointer Needle -->
+      <g class="bead-hinge-pointer-needle" data-drag="beadHingeAngle" style="cursor: grab;">
+        <!-- Needle Shaft (Twisted Wire with Copper Shimmer) -->
+        <line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}"
+              stroke="url(#copperGrad)" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="${cx}" y1="${cy}" x2="${nx}" y2="${ny}"
+              stroke="#ffd4b8" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.85"/>
+
+        <!-- Pointer Arrow Head & Peridot Indicator Jewel -->
+        <circle cx="${nx}" cy="${ny}" r="4.2" fill="url(#peridotPointer)" stroke="#2b4703" stroke-width="1"
+                filter="url(#gemGlow)"/>
+        <circle cx="${nx - 1}" cy="${ny - 1}" r="1.2" fill="#ffffff" opacity="0.95"/>
+
+        <!-- Directional Arrow Barb -->
+        <path d="M ${nx + 4 * Math.cos(rad)} ${ny + 4 * Math.sin(rad)}
+                 L ${nx + 2 * Math.cos(rad + 2.4)} ${ny + 2 * Math.sin(rad + 2.4)}
+                 L ${nx} ${ny}
+                 L ${nx + 2 * Math.cos(rad - 2.4)} ${ny + 2 * Math.sin(rad - 2.4)} Z"
+              fill="#ffffff" stroke="#381406" stroke-width="0.6"/>
+      </g>
+    `;
+
+  } else {
+    // SHADE MODE: Compact 44px Jeweled Rod Hinge
+    s += `
+      <!-- Shade Mode Axle Pin & Coiled Washers -->
+      <line x1="${cx}" y1="${cy - 18}" x2="${cx}" y2="${cy + 18}"
+            stroke="url(#wireAxleGrad)" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="${cx}" cy="${cy - 18}" r="2.5" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.6"/>
+      <circle cx="${cx}" cy="${cy + 18}" r="2.5" fill="url(#copperRondelle)" stroke="#381406" stroke-width="0.6"/>
+
+      <!-- Compact Spherical Lapis Gemstone Bead -->
+      <circle cx="${cx}" cy="${cy}" r="10" fill="#040a14" filter="url(#gemGlow)"/>
+      <circle cx="${cx}" cy="${cy}" r="9.2" fill="url(#sphericalLapis)" stroke="#081c3c" stroke-width="1"/>
+      <circle cx="${cx - 3}" cy="${cy - 3}" r="1" fill="#ffffff" opacity="0.95"/>
+
+      <!-- Compact Collar Clasp in Shade Mode -->
+      <g transform="rotate(${activeAngle}, ${cx}, ${cy})">
+        <path d="M ${cx + 8} ${cy - 8} C ${cx} ${cy - 10}, ${cx - 10} ${cy - 5}, ${cx - 10} ${cy} C ${cx - 10} ${cy + 5}, ${cx} ${cy + 10}, ${cx + 8} ${cy + 8}"
+              fill="none" stroke="url(#copperGrad)" stroke-width="2" stroke-linecap="round"/>
+      </g>
+
+      <!-- Compact Degree Arc in Shade Mode -->
+      <path d="M ${cx + 20 * Math.cos(-45 * Math.PI / 180)} ${cy + 20 * Math.sin(-45 * Math.PI / 180)}
+               A 20 20 0 0 1
+               ${cx + 20 * Math.cos(45 * Math.PI / 180)} ${cy + 20 * Math.sin(45 * Math.PI / 180)}"
+            fill="none" stroke="url(#beadHingeArcGrad)" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- Shade Pointer Needle -->
+      <line x1="${cx}" y1="${cy}" x2="${cx + 19 * Math.cos(rad)}" y2="${cy + 19 * Math.sin(rad)}"
+            stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="${cx + 19 * Math.cos(rad)}" cy="${cy + 19 * Math.sin(rad)}" r="2.2"
+              fill="url(#peridotPointer)" stroke="#2b4703" stroke-width="0.6"/>
+
+      <!-- Interactive Hitbox in Shade Mode -->
+      <circle cx="${cx}" cy="${cy}" r="21" fill="transparent" data-drag="beadHingeAngle"
+              style="cursor: grab; pointer-events: auto;" title="Drag bead hinge in shade mode (-45° to +45°)"/>
+    `;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 function updateExtensionLayout() {
   const morph = model.morphProgress || 0;
   const extraW = Math.round(morph * 142);
@@ -4333,7 +4802,7 @@ function renderHardware() {
 
   const midX = (a.x + W - 22 + b.x + 22) / 2;
 
-  if (p > 0) {
+  if (p > 0 && model.option !== 'bead_hinge') {
     // Seamless Monolithic Copper Wire Frame
     shared += drawWireCasing(a.x, a.y, (b.x + W) - a.x, p, isShade, compress, fold, elytra, spindle);
     if (!isShade) {
@@ -4352,9 +4821,19 @@ function renderHardware() {
     }
   }
 
+  // Option 11: Gemstone Bead Hinge Angled Connection
+  if (model.option === 'bead_hinge') {
+    const hingeProg = model.joined ? 1 : (model.hingeProgress || Math.max(0, (glow - 0.2) / 0.8 * 0.7));
+    if (model.joined || hingeProg > 0.02 || glow > 0.15) {
+      shared += drawBeadHingeJoin(a, b, model.angle, hingeProg, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow, isShade);
+    }
+  }
+
   // Draw join seam based on active option
   if (!isShade) {
-    if (model.option === 'wild_nest' || model.option === 'unfolding_sculpture') {
+    if (model.option === 'bead_hinge') {
+      // Handled above for both normal and shade modes
+    } else if (model.option === 'wild_nest' || model.option === 'unfolding_sculpture') {
       if (model.joined || model.nestProgress > 0.02 || (glow > 0.25 && !model.joined)) {
         const prog = model.joined ? 1 : model.nestProgress || Math.max(0, (glow - 0.25) / 0.75 * 0.7);
         const kMidX = model.joined ? a.x + JOIN_DISTANCE + extraW : midX;
@@ -4436,7 +4915,8 @@ function updateStateButtons() {
                      (model.treeRootProgress > 0.1 && model.treeRootProgress < 0.95) ||
                      (model.poptabProgress > 0.1 && model.poptabProgress < 0.95) ||
                      (model.crookProgress > 0.1 && model.crookProgress < 0.95) ||
-                     (model.nestProgress > 0.1 && model.nestProgress < 0.95)) && !isJoined;
+                     (model.nestProgress > 0.1 && model.nestProgress < 0.95) ||
+                     (model.hingeProgress > 0.1 && model.hingeProgress < 0.95)) && !isJoined;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -4453,7 +4933,41 @@ function updateStateButtons() {
 }
 
 function updateOptionControls() {
-  if (model.option === 'unfolding_sculpture') {
+  const hingeControls = $('#hingeControls');
+  if (hingeControls) {
+    hingeControls.style.display = model.option === 'bead_hinge' ? 'flex' : 'none';
+    const slider = $('#hingeAngleSlider');
+    if (slider) slider.value = model.angle;
+    const readout = $('#hingeAngleReadout');
+    if (readout) readout.textContent = (model.angle >= 0 ? '+' : '') + model.angle + '°';
+    document.querySelectorAll('#hingeControls .detent-btn').forEach(btn => {
+      btn.classList.toggle('active', +btn.dataset.angle === model.angle);
+    });
+  }
+
+  const btnHinge = $('#btnHingeAnim');
+  if (btnHinge) {
+    btnHinge.style.display = model.option === 'bead_hinge' ? 'inline-block' : 'none';
+    btnHinge.textContent = model.joined ? 'Unseat gemstone bead hinge' : 'Seat gemstone bead hinge';
+    btnHinge.disabled = model.busy;
+  }
+
+  if (model.option === 'bead_hinge') {
+    if (btnHinge) btnHinge.className = 'primary-btn';
+    $('#btnUnfoldAnim').className = '';
+    $('#btnJoinAnim').textContent = model.joined ? 'Hinge locked' : 'Seat gemstone bead hinge';
+    $('#btnSeparateAnim').textContent = 'Unseat bead hinge';
+    $('#btnJoinAnim').className = '';
+    $('#btnAccordionAnim').className = '';
+    $('#btnAbacusAnim').className = '';
+    $('#btnElytraAnim').className = '';
+    $('#btnSpindleAnim').className = '';
+    $('#portA').dataset.label = 'Drilled Bead Axle · A';
+    $('#portB').dataset.label = 'Spring Wire Collar · B';
+    $('#wireRelease').setAttribute('title', 'Pull right to release gemstone bead collar · Enter to separate');
+    $('#wireRelease').setAttribute('aria-label', 'Release GitDiscuss: pull right to release gemstone bead collar or press Enter');
+  } else if (model.option === 'unfolding_sculpture') {
+    if (btnHinge) btnHinge.className = '';
     $('#btnUnfoldAnim').className = 'primary-btn';
     $('#btnJoinAnim').textContent = 'Clamp wild nest';
     $('#btnSeparateAnim').textContent = 'Release nest clamp';
@@ -4605,6 +5119,15 @@ function render() {
                            (model.option === 'elytra_shade') ? 'elytra' :
                            (model.option === 'spring_spindle') ? 'spindle' : 'abacus';
 
+    if (id === 'b' && model.option === 'bead_hinge' && (model.joined || (model.hingeProgress && model.hingeProgress > 0))) {
+      const activeAngle = model.angle * (model.joined ? 1 : model.hingeProgress);
+      el.style.transformOrigin = `37px ${model.shade ? 22 : 65}px`;
+      el.style.transform = `rotate(${activeAngle}deg)`;
+    } else if (id === 'b') {
+      el.style.transformOrigin = '';
+      el.style.transform = '';
+    }
+
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.wire-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
 
@@ -4683,7 +5206,9 @@ function render() {
 
   if (!model.busy) {
     if (model.shade) {
-      if (model.option === 'elytra_shade') {
+      if (model.option === 'bead_hinge') {
+        $('#phase').textContent = `Shade mode / Gemstone bead hinge compressed at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
+      } else if (model.option === 'elytra_shade') {
         $('#phase').textContent = 'Shade mode / Beaded pull-tab insect elytra';
       } else if (model.option === 'wire_accordion') {
         $('#phase').textContent = 'Shade mode / Wire hoop folded accordion';
@@ -4693,7 +5218,9 @@ function render() {
         $('#phase').textContent = 'Shade mode / Compressed abacus jeweled rod';
       }
     } else if (model.joined) {
-      if (model.option === 'wild_nest') {
+      if (model.option === 'bead_hinge') {
+        $('#phase').textContent = `Joined / Gemstone bead hinge locked at ${model.angle >= 0 ? '+' : ''}${model.angle}° with wire detents`;
+      } else if (model.option === 'wild_nest') {
         $('#phase').textContent = 'Joined / Wild wire nest & sculpted roses clamped over lapis cabochon';
       } else if (model.option === 'shepherds_crook') {
         $('#phase').textContent = 'Joined / Hand-bent shepherd\'s crook snapped into double-spiral cradle';
@@ -4704,8 +5231,10 @@ function render() {
       } else {
         $('#phase').textContent = 'Joined / One unified handcrafted instrument';
       }
-    } else if (model.crookProgress > 0.1 || model.poptabProgress > 0.1 || model.treeRootProgress > 0.1 || model.bayonetProgress > 0.1 || model.nestProgress > 0.1) {
-      if (model.option === 'wild_nest') {
+    } else if (model.crookProgress > 0.1 || model.poptabProgress > 0.1 || model.treeRootProgress > 0.1 || model.bayonetProgress > 0.1 || model.nestProgress > 0.1 || (model.hingeProgress && model.hingeProgress > 0.1)) {
+      if (model.option === 'bead_hinge') {
+        $('#phase').textContent = 'Joining / Springy wire collar sliding over drilled gemstone bead';
+      } else if (model.option === 'wild_nest') {
         $('#phase').textContent = 'Joining / Springy wire fingers deflecting over lapis cabochon dome';
       } else if (model.option === 'shepherds_crook') {
         $('#phase').textContent = 'Joining / Crook tip deflecting past spiral eyelet rim';
@@ -4719,6 +5248,8 @@ function render() {
     } else {
       if (model.extended) {
         $('#phase').textContent = 'Separate / Unfolded wire sculpture display bay on beaded copper rails';
+      } else if (model.option === 'bead_hinge') {
+        $('#phase').textContent = 'Separate / Drilled gemstone bead axle & spring wire collar';
       } else if (model.option === 'unfolding_sculpture') {
         $('#phase').textContent = 'Separate / Unfolding wire sculpture morph · beaded strands & copper rails';
       } else if (model.option === 'wild_nest') {
@@ -5264,8 +5795,127 @@ async function separateWildNest() {
   say('Separated. Wild copper wire nest and lapis lazuli cabochon disengaged.');
 }
 
+// Option 11: Gemstone Bead Hinge Angled Connection Functions
+function setHingeAngle(deg, announce = true) {
+  deg = Math.max(-45, Math.min(45, Math.round(deg)));
+  model.angle = deg;
+  const slider = $('#hingeAngleSlider');
+  if (slider) slider.value = deg;
+  const readout = $('#hingeAngleReadout');
+  if (readout) readout.textContent = (deg >= 0 ? '+' : '') + deg + '°';
+
+  document.querySelectorAll('#hingeControls .detent-btn').forEach(btn => {
+    btn.classList.toggle('active', +btn.dataset.angle === deg);
+  });
+
+  render();
+
+  if (announce) {
+    const detents = {
+      '-45': 'Boreal Zenith (-45° amethyst rondelle)',
+      '-30': 'Steep Diagonal (-30° lapis bead)',
+      '-15': 'Gentle Cant (-15° turquoise rondelle)',
+      '0': 'Straight Axis (0° carnelian sun bead)',
+      '15': 'Gentle Cant (+15° turquoise rondelle)',
+      '30': 'Steep Diagonal (+30° lapis bead)',
+      '45': 'Austral Nadir (+45° amethyst rondelle)'
+    };
+    const name = detents[deg] || 'Interpolated Degree';
+    say(`Gemstone bead hinge angle set to ${(deg >= 0 ? '+' : '')}${deg}° (${name}). Wire needle aligned.`);
+  }
+}
+
+async function joinBeadHinge(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say(`Guiding springy copper wire collar over drilled gemstone bead axle at ${model.angle >= 0 ? '+' : ''}${model.angle}°...`);
+  $('#phase').textContent = 'Clasping spring collar around gemstone bead';
+
+  const extraW = Math.round((model.morphProgress || 0) * 142);
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + extraW + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.cradle ? 305 : 385, model.a.y));
+
+  // 1. Approach and dock
+  if (!await tween(fromDrag ? 240 : 440, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE + extraW - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.cap = t;
+    model.hingeProgress = Math.max(model.hingeProgress || 0, t * 0.7);
+    render();
+  }, token)) return;
+
+  // 2. Seating collar around gemstone bead & snapping onto degree arc
+  $('#phase').textContent = 'Snapping springy wire collar & seating needle into detents';
+  if (!await tween(320, t => {
+    const ease = 1 - Math.pow(1 - t, 3);
+    model.hingeProgress = 0.7 + ease * 0.3;
+    render();
+  }, token)) return;
+
+  model.joined = true;
+  model.hingeProgress = 1;
+  model.blend = 1;
+  model.cap = 1;
+  model.light = 0;
+  model.busy = false;
+  render();
+  say(`Gemstone bead hinge locked at ${model.angle >= 0 ? '+' : ''}${model.angle}°! Spherical lapis bead axle gripped & wire pointer seated.`);
+  $('#phase').textContent = `Joined / Gemstone bead hinge at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
+}
+
+async function separateBeadHinge() {
+  if (!model.joined || model.busy) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Deflecting springy copper wire collar and releasing gemstone bead axle...');
+  $('#phase').textContent = 'Unclasping gemstone bead hinge';
+
+  // 1. Unseat collar
+  if (!await tween(220, t => {
+    model.hingeProgress = 1 - t * 0.6;
+    render();
+  }, token)) return;
+
+  // 2. Separate armatures
+  const extraW = Math.round((model.morphProgress || 0) * 142);
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(240, model.a.x));
+  const targetB = Math.min(780, targetA + W + extraW + 120);
+
+  $('#phase').textContent = 'Separating copper wire armatures';
+  if (!await tween(480, t => {
+    const ease = 1 - Math.pow(1 - t, 3);
+    model.a.x = startA.x + (targetA - startA.x) * ease;
+    model.b.x = startB.x + (targetB - startB.x) * ease;
+    model.hingeProgress = Math.max(0, (1 - ease) * 0.4);
+    model.blend = Math.max(0, 1 - ease * 2);
+    model.cap = Math.max(0, 1 - ease);
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.hingeProgress = 0;
+  model.blend = 0;
+  model.cap = 0;
+  model.tension = 0;
+  model.busy = false;
+  render();
+  say('Gemstone bead hinge disengaged. Independent copper wire armatures restored.');
+  $('#phase').textContent = 'Separate / Two handcrafted copper wire armatures';
+}
+
 // Unified join & separate dispatches based on active option
 async function join(fromDrag = false) {
+  if (model.option === 'bead_hinge') return joinBeadHinge(fromDrag);
   if (model.option === 'wild_nest' || model.option === 'unfolding_sculpture') return joinWildNest(fromDrag);
   if (model.option === 'shepherds_crook') return joinShepherdsCrook(fromDrag);
   if (model.option === 'poptab_hinge') return joinPopTab(fromDrag);
@@ -5274,6 +5924,7 @@ async function join(fromDrag = false) {
 }
 
 async function separate() {
+  if (model.option === 'bead_hinge') return separateBeadHinge();
   if (model.option === 'wild_nest' || model.option === 'unfolding_sculpture') return separateWildNest();
   if (model.option === 'shepherds_crook') return separateShepherdsCrook();
   if (model.option === 'poptab_hinge') return separatePopTab();
@@ -5652,13 +6303,16 @@ async function applyState(stateName) {
       model.crookProgress = 0;
       model.nestProgress = 0;
       model.spindleWind = 0;
+      model.hingeProgress = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
       const extraW = Math.round((model.morphProgress || 0) * 142);
       model.b.x = Math.max(680, 140 + W + extraW + 30);
       render();
-      if (model.option === 'unfolding_sculpture') {
+      if (model.option === 'bead_hinge') {
+        say('State: Separate — Two independent capsules with drilled lapis bead axle gudgeons and copper collar clasp.');
+      } else if (model.option === 'unfolding_sculpture') {
         say('State: Separate — Two independent capsules with unfolding wire sculpture and auxiliary gemstone loom.');
       } else if (model.option === 'wild_nest') {
         say('State: Separate — Two independent capsules with wild oxidized copper wire nest and polished lapis lazuli cabochon.');
@@ -5695,7 +6349,15 @@ async function applyState(stateName) {
     model.a.x = 240;
     const extraW = Math.round((model.morphProgress || 0) * 142);
     model.b.x = 240 + W + extraW + 50; // approaching each other
-    if (model.option === 'unfolding_sculpture') {
+    if (model.option === 'bead_hinge') {
+      model.hingeProgress = 0.55;
+      model.nestProgress = 0;
+      model.treeRootProgress = 0;
+      model.bayonetProgress = 0;
+      model.poptabProgress = 0;
+      model.crookProgress = 0;
+      say('State: Joining — Mid-animation view with springy copper wire collar advancing toward drilled spherical lapis bead axle.');
+    } else if (model.option === 'unfolding_sculpture') {
       model.nestProgress = 0.6;
       model.treeRootProgress = 0;
       model.bayonetProgress = 0;
@@ -5755,7 +6417,15 @@ async function applyState(stateName) {
       model.blend = 1;
       model.cap = 1;
       model.light = 0;
-      if (model.option === 'unfolding_sculpture') {
+      if (model.option === 'bead_hinge') {
+        model.hingeProgress = 1;
+        model.nestProgress = 0;
+        model.treeRootProgress = 0;
+        model.bayonetProgress = 0;
+        model.poptabProgress = 0;
+        model.crookProgress = 0;
+        say(`State: Joined — Gemstone bead hinge locked at ${model.angle >= 0 ? '+' : ''}${model.angle}° with drilled spherical lapis axle, protractor detent arc, and articulated pointer needle.`);
+      } else if (model.option === 'unfolding_sculpture') {
         model.nestProgress = 1;
         model.treeRootProgress = 0;
         model.bayonetProgress = 0;
@@ -5909,6 +6579,21 @@ $('#btnSpindleAnim').onclick = () => {
 $('#btnUnfoldAnim').onclick = () => {
   toggleUnfoldSculpture();
 };
+const btnHingeAnim = $('#btnHingeAnim');
+if (btnHingeAnim) {
+  btnHingeAnim.onclick = () => {
+    if (model.joined) separate();
+    else join();
+  };
+}
+const hingeAngleSlider = $('#hingeAngleSlider');
+if (hingeAngleSlider) {
+  hingeAngleSlider.oninput = e => setHingeAngle(+e.target.value, false);
+  hingeAngleSlider.onchange = e => setHingeAngle(+e.target.value, true);
+}
+document.querySelectorAll('#hingeControls .detent-btn').forEach(btn => {
+  btn.onclick = () => setHingeAngle(+btn.dataset.angle, true);
+});
 
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
@@ -5931,7 +6616,9 @@ $('#btnReset').onclick = () => {
   model.spindleWind = 0;
   model.crookProgress = 0;
   model.nestProgress = 0;
-  model.option = 'unfolding_sculpture';
+  model.hingeProgress = 0;
+  model.angle = 15;
+  model.option = 'bead_hinge';
   model.extended = false;
   model.morphProgress = 0;
   model.bNudge = 0;
@@ -5947,7 +6634,8 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
-  $('#optionSelect').value = 'unfolding_sculpture';
+  $('#optionSelect').value = 'bead_hinge';
+  setHingeAngle(15, false);
   updateAbacusButtonText();
   updateAccordionButtonText();
   updateElytraButtonText();
@@ -5961,7 +6649,16 @@ $('#btnReset').onclick = () => {
 
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
-  if (model.option === 'unfolding_sculpture') {
+  if (model.option === 'bead_hinge') {
+    say('Option 11: Gemstone Bead Hinge angled connection (-45° to +45°) selected. Drilled spherical lapis lazuli bead axle, spring copper collar, and wire detent arc.');
+    if (model.extended) await retractWireSculpture();
+    if (model.shade) {
+      if (model.spindleWind > 0) await unwindSprings();
+      else if (model.accordionFold > 0) await unfoldWireAccordion();
+      else if (model.elytraProgress > 0) await openElytra();
+      else await expandAbacus();
+    }
+  } else if (model.option === 'unfolding_sculpture') {
     say('Option 10: Unfolding Wire Sculpture morph selected. Auxiliary display bays swing down on beaded strands along copper rails.');
     if (!model.extended) {
       await unfoldWireSculpture();
@@ -6184,6 +6881,8 @@ function cancelDrag() {
   } else if (drag.kind === 'meter') {
     model.meter.x = drag.startX;
     model.meter.y = drag.startY;
+  } else if (drag.kind === 'beadHingeAngle') {
+    setHingeAngle(drag.startAngle, true);
   }
   stopDrag();
   render();
@@ -6244,6 +6943,17 @@ function onPointerDown(e) {
       kind: 'release',
       pointerId: e.pointerId,
       originX: e.clientX
+    };
+  } else if (kind === 'beadHingeAngle') {
+    const extraW = Math.round(model.morphProgress * 142);
+    const cx = model.a.x + extraW + 353;
+    const cy = model.a.y + (model.shade ? 22 : 65);
+    drag = {
+      kind: 'beadHingeAngle',
+      pointerId: e.pointerId,
+      cx,
+      cy,
+      startAngle: model.angle
     };
   }
 
@@ -6345,6 +7055,24 @@ function onPointerMove(e) {
       stopDrag();
       separate();
     }
+
+  } else if (drag.kind === 'beadHingeAngle') {
+    const rect = stage.getBoundingClientRect();
+    const scale = rect.width / 1200;
+    const px = (e.clientX - rect.left) / scale;
+    const py = (e.clientY - rect.top) / scale;
+    const dx = px - drag.cx;
+    const dy = py - drag.cy;
+    let deg = Math.atan2(dy, dx) * 180 / Math.PI;
+    deg = Math.max(-45, Math.min(45, Math.round(deg)));
+    const detents = [-45, -30, -15, 0, 15, 30, 45];
+    for (const d of detents) {
+      if (Math.abs(deg - d) <= 3.5) {
+        deg = d;
+        break;
+      }
+    }
+    setHingeAngle(deg, false);
   }
 }
 
@@ -6367,6 +7095,8 @@ function onPointerUp(e) {
     drag.deflect = { x: 0, y: 0 };
   } else if (drag.kind === 'release') {
     model.tension = 0;
+  } else if (drag.kind === 'beadHingeAngle') {
+    setHingeAngle(model.angle, true);
   }
 
   stopDrag();
@@ -6403,6 +7133,39 @@ window.addEventListener('keydown', e => {
   else if (e.key === 'u' || e.key === 'U' || e.key === 'm' || e.key === 'M') {
     toggleUnfoldSculpture();
     e.preventDefault();
+  }
+  else if (e.key === '[' || e.key === '{') {
+    const detents = [-45, -30, -15, 0, 15, 30, 45];
+    const curIdx = detents.indexOf(model.angle);
+    let targetDeg;
+    if (curIdx > 0) targetDeg = detents[curIdx - 1];
+    else if (curIdx === 0) targetDeg = detents[0];
+    else {
+      const prev = detents.filter(d => d < model.angle);
+      targetDeg = prev.length ? prev[prev.length - 1] : detents[0];
+    }
+    setHingeAngle(targetDeg, true);
+    e.preventDefault();
+  }
+  else if (e.key === ']' || e.key === '}') {
+    const detents = [-45, -30, -15, 0, 15, 30, 45];
+    const curIdx = detents.indexOf(model.angle);
+    let targetDeg;
+    if (curIdx >= 0 && curIdx < detents.length - 1) targetDeg = detents[curIdx + 1];
+    else if (curIdx === detents.length - 1) targetDeg = detents[detents.length - 1];
+    else {
+      const next = detents.find(d => d > model.angle);
+      targetDeg = next !== undefined ? next : detents[detents.length - 1];
+    }
+    setHingeAngle(targetDeg, true);
+    e.preventDefault();
+  }
+  else if (e.key === 'h' || e.key === 'H') {
+    if (model.option === 'bead_hinge') {
+      if (model.joined) separate();
+      else join();
+      e.preventDefault();
+    }
   }
   else if (e.key === 'c' || e.key === 'C' || e.key === 'n' || e.key === 'N') {
     if (model.joined) separate();
