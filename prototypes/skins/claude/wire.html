@@ -71,11 +71,11 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit{pointer-events:all;cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
-.about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#bba997;font-size:13px}
+.about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:26px;color:#bba997;font-size:13px}
 .about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#f0d6bd}.about h2 small{font:11px -apple-system,sans-serif;color:#9c8573;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
 .about p{margin:0 0 6px}
-.hint{color:#8f7d6f;font-size:12px}
-@media(max-width:800px){.about{grid-template-columns:1fr}}
+.hint{color:#8f7d6f;font-size:12px;grid-column:1/-1}
+.w.tree .grip{left:0;right:auto;width:72px;height:26px;padding:0;border-radius:5px}.w.tree .grip>span{visibility:hidden}
 </style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
  <linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#33211a"/><stop offset=".5" stop-color="#1d130e"/><stop offset="1" stop-color="#140c08"/></linearGradient>
@@ -87,7 +87,9 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="st-mal" cx=".38" cy=".32" r=".75"><stop stop-color="#dcffe6"/><stop offset=".35" stop-color="#3fae6a"/><stop offset=".8" stop-color="#145a33"/><stop offset="1" stop-color="#0a321c"/></radialGradient>
  <linearGradient id="st-flash" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#5fe0ff" stop-opacity="0"/><stop offset=".5" stop-color="#5fe0ff" stop-opacity=".7"/><stop offset=".75" stop-color="#9dff9a" stop-opacity=".35"/><stop offset="1" stop-color="#9dff9a" stop-opacity="0"/></linearGradient>
  <linearGradient id="st-gold" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff2b8"/><stop offset=".45" stop-color="#d4a640"/><stop offset="1" stop-color="#5c3f0c"/></linearGradient>
- <radialGradient id="st-pearl" cx=".36" cy=".3" r=".8"><stop stop-color="#fffdf6"/><stop offset=".3" stop-color="#efe3d6"/><stop offset=".7" stop-color="#c7b3b4"/><stop offset="1" stop-color="#6e5d63"/></radialGradient>
+ <radialGradient id="st-amet" cx=".4" cy=".3" r=".8"><stop stop-color="#e6c8f2"/><stop offset=".35" stop-color="#8a55a6"/><stop offset=".8" stop-color="#3e1f52"/><stop offset="1" stop-color="#22102e"/></radialGradient>
+ <linearGradient id="tr-glass" x1="0" y1="0" x2=".4" y2="1"><stop stop-color="#16303a"/><stop offset=".55" stop-color="#0b171b"/><stop offset="1" stop-color="#071013"/></linearGradient>
+ <radialGradient id="st-pearl"cx=".36" cy=".3" r=".8"><stop stop-color="#fffdf6"/><stop offset=".3" stop-color="#efe3d6"/><stop offset=".7" stop-color="#c7b3b4"/><stop offset="1" stop-color="#6e5d63"/></radialGradient>
  <linearGradient id="st-slab" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#1b343b"/><stop offset=".55" stop-color="#0c1a1e"/><stop offset="1" stop-color="#060d10"/></linearGradient>
  <linearGradient id="cb-brass" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#fbe9b4"/><stop offset=".4" stop-color="#d7ad5e"/><stop offset=".85" stop-color="#9a6b2a"/><stop offset="1" stop-color="#6b4517"/></linearGradient>
  <linearGradient id="cb-tube" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".55"/><stop offset=".28" stop-color="#000" stop-opacity="0"/><stop offset=".38" stop-color="#fff2d8" stop-opacity=".16"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/></linearGradient>
@@ -98,6 +100,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="joinRow"><span>Join</span></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
  <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-40" max="40" value="15" aria-label="Pivot angle in degrees"><output id="angleOut">+15°</output><button id="detent" aria-pressed="true">Detents 15°</button></div>
+ <div class="row" id="morphRow"><span>Morph</span></div>
+ <div class="row" id="sizeRow"><span>Checks</span><input type="range" id="grow" min="-100" max="200" value="-100" aria-label="Checks growth, pendant to hoop tree"><output id="growOut"></output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Wire skin stage">
@@ -137,8 +141,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="dial" class="layer" viewBox="0 0 1200 600" aria-hidden="true"></svg>
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
-<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -622,9 +626,158 @@ function strandItem(it,x,cy,small){
   `<text x="${f(x)}" y="${f(cy+.5)}" text-anchor="middle" dominant-baseline="central"><tspan font-family="Georgia,serif" font-size="15" fill="#f2b866">${it.num}</tspan>${it.word?`<tspan dx="5" font-family="-apple-system,BlinkMacSystemFont,sans-serif" font-size="11" fill="#d9e4df">${it.word}</tspan>`:''}</text>`;
 }
 
+/* ---------- Morph: tree growth (Checks) ---------- */
+// g runs -1 pendant, 0 cabochon, 1 branch with two displays, 2 hoop tree. Every frame is drawn from g alone, so shrinking is growth played backwards.
+const SIZES=[['pendant','Pendant',-1],['cab','Cabochon',0],['branch','Branch',1],['hoop','Hoop tree',2]];
+const MORPHS={
+ tree:{label:'Tree growth',kind:'Grow',
+  about:'Checks grows like a wire tree of life. <b>Cabochon:</b> the pendant\'s frame closes in on its stone, the plate falls away, and the coils wind round the stone from the bottom up, leaving one cabochon hanging from a bail with the name on a slab tag below it. <b>Branch:</b> a twisted trunk grows down into a tumbled amethyst, the stone slides out along a branch to one side, and a second branch reaches the other way. A bezel coils round at its tip and a second stone fills it, so the two values each get a display. <b>Hoop tree:</b> the trunk\'s five wires fan out into roots, a copper hoop draws round from the bottom to meet them, and each root wraps onto it. A third branch grows up to a crown display, then fourteen twigs push out from behind the displays with a bead riding each tip, one per check: malachite for the 12 passed, carnelian for the 2 waiting. Shrinking plays it all backwards: the beads slide home, the branches draw in and the hoop unwinds. Pick a size, press M to step through them, or scrub the slider. Checks moves clear of the pair when there is room. Shading a tree folds it back to its cabochon, which carries the name and the count.'}
+};
+const TC=[0,-44],TRR=120,FORK=[0,-12],TAG_Y=18;
+// Rects as [x,y,w,h,r] round Checks's centre: the pendant frame and screen, the cabochon's frame and stone, and the left, right and crown displays.
+const RC={pend:[-133,-34,266,68,20],mini:[-124,-17,220,44,9],cabF:[-76,-64,152,68,34],cab:[-70,-58,140,56,28],L:[-105,-63,98,46,23],R:[7,-63,98,46,23],T:[-60,-132,120,44,22]};
+const SETS={cab:{tiny:'CHECKS',big:'12 / 14',small:'2 waiting for approval'},L:{tiny:'CHECKS',big:'12 / 14'},L2:{tiny:'GREEN',big:'12',em:'passed'},R:{tiny:'APPROVAL',big:'02',em:'waiting'},T:{tiny:'CHECKS · 86%',big:'12 / 14'}};
+// How far each form reaches from Checks's centre: [left, right, top, bottom].
+const EXT=[[-138,138,-39,39],[-92,92,-90,35],[-108,108,-66,72],[-125,125,-178,79]];
+const lerpR=(a,b,e)=>a.map((v,i)=>lerp(v,b[i],e));
+const ringPt=(a,r=TRR)=>[TC[0]+r*Math.cos(a*Math.PI/180),TC[1]+r*Math.sin(a*Math.PI/180)];
+function arcD(a0,a1,r=TRR){let d='';const n=Math.max(2,Math.ceil(Math.abs(a1-a0)/3));for(let i=0;i<=n;i++){const p=ringPt(a0+(a1-a0)*i/n,r);d+=(i?'L':'M')+f(p[0])+' '+f(p[1])}return d}
+function quadD(a,c,b,t=1){const n=Math.max(2,Math.ceil(16*t)),pts=[];for(let k=0;k<=n;k++)pts.push(quad(a,c,b,t*k/n));return poly(pts)}
+// A branch as a twisted pair of wires, grown to t.
+function pairD(a,c,b,t){
+ const d0=[],d1=[],n=Math.max(3,Math.ceil(22*t));
+ for(let k=0;k<=n;k++){const u=t*k/n,p=quad(a,c,b,u),q=quad(a,c,b,Math.min(1,u+.01));let nx=p[1]-q[1],ny=q[0]-p[0];const m=Math.hypot(nx,ny)||1,o=1.7*Math.sin(u*Math.PI*5);d0.push([p[0]+nx/m*o,p[1]+ny/m*o]);d1.push([p[0]-nx/m*o,p[1]-ny/m*o])}
+ return poly(d0)+poly(d1);
+}
+// The trunk is five wires twisted into a rope.
+const sx=(i,y)=>3.6*Math.sin(y*.21+i*1.2566);
+function ropeD(y0,y1){let d='';const n=Math.max(2,Math.ceil((y1-y0)/2.5));for(let i=0;i<5;i++)for(let k=0;k<=n;k++){const y=y0+(y1-y0)*k/n;d+=(k?'L':'M')+f(sx(i,y))+' '+f(y)}return d}
+// Each strand leaves the rope at its foot and roots onto the hoop, leftmost strand furthest left.
+const ROOTS=(()=>{const xs=[0,1,2,3,4].map(i=>({i,x:sx(i,40)})).sort((a,b)=>a.x-b.x),A=[122,106,90,74,58],r=[];xs.forEach((o,k)=>r[o.i]={x:o.x,a:A[k],p:ringPt(A[k])});return r})();
+const ROOTWRAP=ROOTS.map(R=>coilsAlong(arcD(R.a-4,R.a+4),2.2,3.4)).join('');
+// Fourteen twig tips, one bead per check. Twigs start behind a display (s) and end inside the hoop (e); the clusters are interleaved so the canopy fills evenly.
+const TIPS=(()=>{const t=[];
+ [247,256.2,265.4,274.6,283.8,293].forEach(a=>{const e=ringPt(a,108);t.push({e,s:[e[0]*.45,-116],st:'mal'})});
+ [196,207,218,229].forEach(a=>t.push({e:ringPt(a,106),s:[-62,-44],st:'mal'}));
+ [344,333,322,311].forEach((a,i)=>t.push({e:ringPt(a,106),s:[62,-44],st:i<2?'carn':'mal'}));
+ return [0,6,10,1,7,11,2,8,12,3,9,13,4,5].map(i=>t[i]);
+})();
+// Coil turns round a pill-shaped bezel, ordered outward from the bottom centre so a partial bezel winds up both sides at once.
+const bzCache={};
+function bezelCoils(w,h,frac){
+ if(frac<=0)return '';w=Math.round(w);h=Math.round(h);const k=w+'x'+h;let L=bzCache[k];
+ if(!L){const r=Math.min(h,w)/2,p=$('#probe');p.setAttribute('d',rrect(0,0,w,h,r));const len=p.getTotalLength(),sb=1.5*(w-2*r)+Math.PI*r+(h-2*r),arr=[];
+  for(let s=0;s<len;s+=2.35){const a=p.getPointAtLength(s),b=p.getPointAtLength(Math.min(len,s+.5));let tx=b.x-a.x,ty=b.y-a.y;const n=Math.hypot(tx,ty)||1;tx/=n;ty/=n;const nx=-ty,ny=tx,dd=Math.abs(s-sb);
+   arr.push([Math.min(dd,len-dd),`M${f(a.x-nx*2.4-tx*.7)} ${f(a.y-ny*2.4-ty*.7)}Q${f(a.x+tx*.9)} ${f(a.y+ty*.9)} ${f(a.x+nx*2.4-tx*.7)} ${f(a.y+ny*2.4-ty*.7)}`])}
+  arr.sort((x,y)=>x[0]-y[0]);L=bzCache[k]=arr.map(x=>x[1]);}
+ return frac>=1?L.join(''):L.slice(0,Math.ceil(L.length*frac)).join('');
+}
+function tStone(R,coil,fill){
+ if(coil<=0&&fill<=0)return '';const [x,y,w,h]=R,r=Math.min(h,w)/2;
+ return `<g opacity="${f(fill)}"><rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${f(r)}" fill="url(#tr-glass)"/><ellipse cx="${f(x+w*.78)}" cy="${f(y+h*.24)}" rx="${f(w*.2)}" ry="${f(h*.22)}" fill="#4fa5ae" opacity=".16"/><ellipse cx="${f(x+w*.2)}" cy="${f(y+h*.8)}" rx="${f(w*.16)}" ry="${f(h*.18)}" fill="#6d52a6" opacity=".14"/></g>`+
+  `<path d="${rrect(x,y,w,h,r)}" fill="none" stroke="#120906" stroke-width="5" opacity="${f(clamp(coil*3))}"/><g transform="translate(${f(x)} ${f(y)})">${wire(bezelCoils(w,h,coil),'copper',1.15)}</g>`;
+}
+function tText(R,S,o){
+ if(o<.02)return '';const [x,y,w,h]=R,cx=x+w/2,three=!!S.small;
+ return `<g opacity="${f(o)}" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,sans-serif"><text x="${f(cx)}" y="${f(y+h*(three?.27:.33))}" font-size="9.5" letter-spacing="1.3" fill="#9fbcb8">${S.tiny}</text>`+
+  `<text x="${f(cx)}" y="${f(y+h*(three?.62:.77))}" font-family="Georgia,serif" font-size="${three?21:19}" fill="#f2f5ef">${S.big}${S.em?`<tspan dx="4" font-size="11" font-style="italic" fill="#f2b866">${S.em}</tspan>`:''}</text>`+
+  (three?`<text x="${f(cx)}" y="${f(y+h*.86)}" font-size="10" fill="#c9d6d1">${S.small}</text>`:'')+'</g>';
+}
+function tTag(y,o){
+ if(o<.02)return '';const y0=y-11;
+ return `<g opacity="${f(o)}"><rect x="-35" y="${f(y0)}" width="70" height="22" rx="4" fill="url(#st-slab)"/><rect x="-34" y="${f(y0+1)}" width="68" height="9" rx="3" fill="#bfe8ec" opacity=".05"/>`+wire(rrect(-35,y0,70,22,4),'copper',1.2)+
+  wire(band(0,y0-3,true,2,9,2.2)+band(0,y0+25,true,2,9,2.2),'brass',1.1)+`<text x="0" y="${f(y+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="14" fill="#f6d2ac">Checks</text></g>`;
+}
+function nugget(sc){
+ if(sc<=.01)return '';
+ return `<g transform="translate(0 56) scale(${f(sc)})"><ellipse cx="2" cy="10" rx="30" ry="5" fill="#000" opacity=".4" filter="url(#soft)"/><path d="M-27 4C-29 -5 -18 -12 -6 -11C4 -14 18 -11 25 -4C31 2 26 10 14 11C2 13 -14 13 -22 10C-26 9 -27 7 -27 4Z" fill="url(#st-amet)" stroke="#1a0d1c" stroke-width="1"/>`+
+  `<path d="M-6 -11L-2 2L14 11M-2 2L-22 10M-2 2L25 -4" stroke="#000" stroke-opacity=".2" stroke-width=".8" fill="none"/><path d="M-17 -6C-9 -9 1 -9 7 -8" stroke="#f3dcff" stroke-opacity=".5" stroke-width="2" fill="none" stroke-linecap="round"/></g>`;
+}
+const tagY=g=>g<0?lerp(-10,TAG_Y,backOut(seg(g+1,.55,1))):TAG_Y;
+function treeSvg(g){
+ const u=clamp(g+1),v=clamp(g),w=clamp(g-1);let s='',twigs='',beads='';
+ // Pendant to cabochon: the plate, inner wire, scrolls and screen coils fade while the outer frame closes in on the stone.
+ if(g<0)s+=`<g transform="translate(${-CW/2} ${-CH/2})" opacity="${f(1-seg(u,0,.45))}">${casing(CW,CH,true,true)}</g>`;
+ // The hoop draws round from the bottom, both ways at once, and the roots wrap onto it.
+ const ring=ease(seg(w,.15,.5));
+ if(ring>0){const a=180*ring,d=arcD(90-a,90+a);
+  s+=`<path d="${d}" transform="translate(2 6)" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="4"/>`+wire(d,'copper',3.1);
+  if(ring<1)for(const e of [90-a,90+a]){const p=ringPt(e);s+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="6" fill="#ffb15e" opacity=".5" filter="url(#soft)"/>`}
+  const lo=seg(w,.48,.56);if(lo>0){const ly=TC[1]-TRR-5;s+=wire(circ(0,ly,4.6),'copper',2,lo)+wire(band(0,TC[1]-TRR+1.5,false,3,8,2.2),'brass',1.1,lo)}
+ }
+ const tR=g<1?.2*ease(seg(v,.3,.45)):lerp(.2,1,ease(seg(w,.05,.35)));
+ if(tR>0)ROOTS.forEach(R=>{const d=quadD([R.x,40],[R.x*2.2+R.p[0]*.15,64],R.p,tR);s+=wire(d,'copper',1.3)});
+ if(w>.35)s+=wire(ROOTWRAP,'copper',1.05,seg(w,.35,.45));
+ // Twigs push out from behind the displays, each carrying a bead to a new tip.
+ if(w>.6)TIPS.forEach((T,i)=>{const p=seg(w,.6+i*.02,.74+i*.02);if(p<=0)return;const k=backOut(p),q=[lerp(T.s[0],T.e[0],k),lerp(T.s[1],T.e[1],k)];
+  let nx=T.s[1]-q[1],ny=q[0]-T.s[0];const m=Math.hypot(nx,ny)||1,c=[(T.s[0]+q[0])/2+nx/m*5,(T.s[1]+q[1])/2+ny/m*5];
+  twigs+=wire(quadD(T.s,c,q),'copper',1.05);
+  beads+=`<g opacity="${f(clamp(p*5))}">${strandItem({k:'bead',r:5,stone:T.st},q[0],q[1])}</g>`;
+  if(p>.72&&p<1)beads+=sparkle(q[0]+2,q[1]-3,Math.sin(Math.PI*seg(p,.72,1))*.55)});
+ s+=twigs;
+ // Trunk: grows down out of the stone, then splits into branches at the fork.
+ const yEnd=g>=1?40:lerp(-6,40,ease(seg(v,0,.4)));
+ if(v>0){s+=`<path d="M0 -8V${f(yEnd)}" stroke="#160c07" stroke-width="11" stroke-linecap="round"/>`+wire(ropeD(-10,yEnd),'copper',1.3)}
+ const hang=seg(u,.55,.7)*(1-seg(v,0,.15));if(hang>0)s+=wire('M0 -2V7','copper',1.4,hang);
+ const A=g<0?lerpR(RC.mini,RC.cab,ease(seg(u,.1,.75))):g<1?lerpR(RC.cab,RC.L,ease(seg(v,.2,.6))):RC.L,Ac=[A[0]+A[2]/2,A[1]+A[3]/2];
+ if(v>0)s+=wire(pairD(FORK,[Ac[0]*.55,-14],Ac,1),'copper',1.25);
+ const tRb=ease(seg(v,.5,.72));if(tRb>0)s+=wire(pairD(FORK,[30,-14],[56,-40],tRb),'copper',1.25);
+ const tM=ease(seg(w,.42,.58));if(tM>0)s+=wire(pairD(FORK,[0,-60],[0,-110],tM),'copper',1.25);
+ s+=nugget(g<1?backOut(seg(v,.25,.5)):1-ease(seg(w,0,.3)));
+ // The cabochon's outer frame, side scrolls and bail.
+ const fo=g<0?1:1-seg(v,0,.22);
+ if(fo>0){const F=g<0?lerpR(RC.pend,RC.cabF,ease(seg(u,.1,.75))):RC.cabF;s+=wire(rrect(...F),'copper',lerp(3.1,2.4,seg(u,.1,.75)),fo);
+  const so=seg(u,.6,1)*fo;
+  if(so>0)s+=wire(spiral(-84,-30,6.5,1.6,1,0)+spiral(84,-30,6.5,1.6,-1,Math.PI),'copper',1.8,so)+wire('M0 -64V-76','copper',1.8,so)+wire(band(0,-70,true,3,7,2.2),'brass',1.1,so)+wire(circ(0,-82,5),'copper',2,so)}
+ // Displays: the original stone, the second branch's stone, the crown.
+ s+=tStone(A,g<0?seg(u,.3,.75):1,1);
+ s+=tText(A,SETS.cab,g<0?seg(u,.65,1):1-seg(v,.2,.4))+tText(A,SETS.L,g<1?seg(v,.35,.55):1-seg(w,.6,.75))+tText(A,SETS.L2,seg(w,.68,.85));
+ if(v>.62){s+=tStone(RC.R,seg(v,.62,.85),seg(v,.7,.9))+tText(RC.R,SETS.R,seg(v,.82,1))}
+ if(w>.55){s+=tStone(RC.T,seg(w,.55,.7),seg(w,.6,.75))+tText(RC.T,SETS.T,seg(w,.7,.85))}
+ s+=beads;
+ // The pendant's status lens rides up onto the bail, then down into the fork; a carnelian joins it when the second display opens.
+ let lp,lr=6;
+ if(g<0){const p=ease(seg(u,.3,.85));lp=[lerp(113.5,0,p),lerp(3.5,-70,p)-22*Math.sin(Math.PI*p)];lr=lerp(8.5,6,p)}
+ else{const p=ease(seg(v,.05,.35));lp=[lerp(0,-15,p)-34*Math.sin(Math.PI*p),lerp(-70,-6,p)];lr=lerp(6,5,p)}
+ s+=strandItem({k:'bead',r:lr,stone:'mal'},lp[0],lp[1]);
+ const cb=seg(v,.85,1);if(cb>0){s+=`<g transform="translate(15 -6) scale(${f(backOut(cb))})">${strandItem({k:'bead',r:5,stone:'carn'},0,0)}</g>`;if(cb<1)s+=sparkle(17,-9,Math.sin(Math.PI*cb)*.5)}
+ return s+tTag(tagY(g),g<0?seg(u,.55,.7):1);
+}
+const gEff=()=>model.g>=0?model.g*(1-shadeK()):model.g;
+// The hoop is drawn early in its step, so that step's reach is front-loaded.
+function ext(g){const i=clamp(Math.floor(g+1),0,2),t=i===2?seg(g-1,0,.5):clamp(g+1-i);return EXT[i].map((v,k)=>lerp(v,EXT[i+1][k],t))}
+function clampC(){const e=ext(gEff());model.c.x=clamp(model.c.x+CW/2,10-e[0],1190-e[1])-CW/2;model.c.y=clamp(model.c.y+CH/2,46-e[2],590-e[3])-CH/2}
+// Where Checks should end up for form g: on the stage, and below the pair when it would grow into it and there is room.
+function morphSpot(to){
+ const e=ext(to);let ax=clamp(model.c.x+CW/2,10-e[0],1190-e[1]),ay=clamp(model.c.y+CH/2,46-e[2],590-e[3]);
+ const x0=Math.min(model.a.x,model.b.x),x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(model.a.y,model.b.y),yb=Math.max(model.a.y,model.b.y)+ctx().h;
+ if(ax+e[1]>x0&&ax+e[0]<x1&&ay+e[2]<yb+10&&ay+e[3]>y0){const y=yb+10-e[2];if(y<=590-e[3])ay=y}
+ return{x:ax-CW/2,y:ay-CH/2};
+}
+let morphAnim=0;
+function morphTo(id){
+ if(drag)cancelDrag();model.cMoved=false;
+ // A shaded tree is showing its cabochon, so start from that rather than regrowing while it unshades.
+ if(model.st>.5&&model.g>-1)model.g=gEff();
+ const S=SIZES.find(x=>x[0]===id),to=S[2],from=model.g;model.size=id;
+ if(model.st>.5&&(to>-1||from>-1))toggleShade();
+ const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(to>from?1900:1250),a0={x:model.c.x,y:model.c.y},a1=morphSpot(to),t0=performance.now();
+ say(to>from?'Checks grows into a '+S[1].toLowerCase()+'.':to<from?'Checks shrinks back to a '+S[1].toLowerCase()+'.':'Checks is already a '+S[1].toLowerCase()+'.');
+ (function step(now){if(tok!==morphAnim)return;const t=ms?clamp((now-t0)/ms):1,e=ease(t);model.g=t<1?lerp(from,to,t):to;if(drag&&drag.id==='c'||model.cMoved){model.cMoved=false;a0.x=a1.x=model.c.x;a0.y=a1.y=model.c.y}else{model.c.x=lerp(a0.x,a1.x,e);model.c.y=lerp(a0.y,a1.y,e)}render();if(t<1)requestAnimationFrame(step)})(t0);
+}
+function treeRender(el,svg){
+ const g=gEff(),u=clamp(g+1),out=1-seg(u,0,.35),mini=el.querySelector('.mini'),gr=el.querySelector('.grip');
+ svg.innerHTML=`<g transform="translate(${CW/2} ${CH/2})">${treeSvg(g)}</g>`;
+ mini.style.opacity=f(out);mini.style.visibility=out<.02?'hidden':'visible';
+ el.querySelector('.lens').style.visibility='hidden';el.querySelector('.strip').style.opacity=0;
+ const tree=u>=.5;el.classList.toggle('tree',tree);
+ if(tree){gr.style.opacity=1;gr.style.left=f(CW/2-36)+'px';gr.style.top=f(CH/2+tagY(g)-13)+'px'}else{gr.style.opacity=f(1-seg(u,0,.3));gr.style.left=gr.style.top=''}
+ const S=SIZES.find(x=>x[0]===model.size);el.setAttribute('aria-label','Checks widget, '+(S?S[1].toLowerCase():'growing')+': 12 of 14 checks passed, 2 waiting for approval');
+}
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',jt:0,angle:15,detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -684,6 +837,7 @@ function render(){
  const lit=Math.max(model.glow,model.jt>0&&model.jt<1?seg(model.jt,.04,.25)*(1-seg(model.jt,.86,1)):0,model.turning&&pivotOn()?.4:0);
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
+  if(small)clampC();
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=f(h)+'px';
   if(id==='b'){
    // Pivot: GitDiscuss turns the full swing about its own eye loop, which rides half the swing round the ring.
@@ -691,6 +845,8 @@ function render(){
    el.style.transformOrigin=`-14px ${f(h/2)}px`;el.style.transform=th?`translate(${f(28*Math.cos(ph)-28)}px,${f(28*Math.sin(ph))}px) rotate(${f(th)}deg)`:'';
   }
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
+  if(small&&model.g>-1){treeRender(el,svg);continue}
+  if(small){el.classList.remove('tree');const gr=el.querySelector('.grip');gr.style.left=gr.style.top='';el.setAttribute('aria-label','Checks widget')}
   let s=sh.draw?sh.draw(id,w,h,small,model.st):casing(w,h,small);
   if(id==='a')s+=j.end(1,lit,h);if(id==='b')s+=j.end(-1,lit,h);
   svg.innerHTML=s;
@@ -715,9 +871,12 @@ function render(){
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
+ $$('#morphRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.morph)));
+ $$('#sizeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===model.size)));
+ $('#grow').value=Math.round(model.g*100);$('#growOut').textContent=(model.g>=0?'+':'')+model.g.toFixed(2);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()+(model.join==='pivot'?' · '+$('#angleOut').textContent:'')};
- $('#phase').textContent=(drag&&drag.unwind?'Unwinding · '+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'');
+ $('#phase').textContent=(drag&&drag.unwind?'Unwinding · '+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'')+(model.g>-1?' · Checks: '+(SIZES.find(x=>x[0]===model.size)||[0,'growing'])[1].toLowerCase():'');
 }
 
 /* ---------- Controls ---------- */
@@ -731,14 +890,18 @@ function pick(key,id){
  if(drag)cancelDrag();
  if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
+ if(key==='morph')model.morph=id;
  describe();render();
 }
 function describe(){
- const j=J(),s=SHADES[model.shade];
+ const j=J(),s=SHADES[model.shade],m=MORPHS[model.morph];
+ $('#morphAbout').innerHTML=`<h2>${m.label}<small>morph · ${m.kind}</small></h2><p>${m.about}</p>`;
  $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
 }
-options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
+options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#morphRow',MORPHS,'morph');
+SIZES.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size=id;b.textContent=l;b.onclick=()=>morphTo(id);$('#grow').before(b)});
+$('#grow').oninput=e=>{++morphAnim;model.g=e.target.value/100;const S=SIZES.find(x=>Math.abs(x[2]-model.g)<.001);model.size=S?S[0]:null;if(model.st>.5&&model.g>-1)toggleShade();render()};
 $('#scrub').oninput=e=>{++anim;model.busy=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:{a:{...model.a},b:{...model.b}}}:{s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0)model.path=null;render()};
 $('#angle').oninput=e=>{++settleTok;flashTurning();setAngle(nearestDetent(+e.target.value))};
 $('#detent').onclick=()=>{const ds=[15,30,0];model.detent=ds[(ds.indexOf(model.detent)+1)%ds.length];flashTurning();render();settleAngle();say(model.detent?'Detents every '+model.detent+'°: the pendant clicks into the nearest seed bead.':'Detents off: any angle from −40° to +40° holds.')};
@@ -747,6 +910,7 @@ document.addEventListener('keydown',e=>{
  const key=e.key.toLowerCase();
  if(e.key==='Escape')cancelDrag();
  const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
+ if(key==='m')morphTo((SIZES.find(x=>x[2]>model.g+.001)||SIZES[0])[0]);
  if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
 });
 ['a','b'].forEach(id=>{
@@ -790,7 +954,7 @@ stage.addEventListener('pointermove',e=>{
   drag.raw=clamp(drag.th0+dp*180/Math.PI,-lim(),lim());drag.last=p;
   const was=model.angle;setAngle(snapAngle(drag.raw));
   if(model.detent&&model.angle%model.detent===0&&was!==model.angle)say('Caught on the '+$('#angleOut').textContent+' detent.');return}
- if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,10,1200-CW-10);model.c.y=clamp(s.c.y+dy,top,600-CH-10);render();return}
+ if(drag.id==='c'){model.c.x=s.c.x+dx;model.c.y=s.c.y+dy;clampC();render();return}
  if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,10,1200-2*W-g-10),ay=pivotOn()?fitY(s.a.y+dy,model.angle,ctx().h):clamp(s.a.y+dy,top,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,top,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
@@ -809,7 +973,7 @@ function endDrag(){
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
 }
-function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say('Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
+function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say('Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
@@ -819,12 +983,13 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  if(id==='b'&&pivotOn()&&k[1]){const st=Math.min(model.detent||5,lim());++settleTok;flashTurning();setAngle((Math.round(model.angle/st)+Math.sign(k[1]))*st);say('GitDiscuss at '+$('#angleOut').textContent+'.');return}
  const bottom=600-(model.st>.5?HS:H)-14;
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=pivotOn()?fitY(model.a.y+k[1],model.angle,ctx().h):clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
- else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],10,1200-w-10);m.y=clamp(m.y+k[1],46,id==='c'?600-CH-10:bottom)}render();
+ else if(id==='c'){model.c.x+=k[0];model.c.y+=k[1];clampC();model.cMoved=true}
+ else{const m=model[id];m.x=clamp(m.x+k[0],10,1200-W-10);m.y=clamp(m.y+k[1],46,bottom)}render();
 }));
 
 /* Bead meter columns */
 $$('.beads i').forEach(i=>{i.innerHTML='<b></b>'.repeat(+i.dataset.n)});
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
 addEventListener('resize',fit);fit();describe();render();
-window.wireSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade};
+window.wireSkin={model,render,doJoin,doSeparate,holdJoining,toggleShade,morphTo};
 </script></body></html>
