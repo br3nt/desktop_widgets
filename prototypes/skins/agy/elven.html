@@ -276,6 +276,19 @@ header {
 .module.shade .harp-overlay {
   height: 44px;
 }
+.sliver-overlay {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 3;
+  transition: height 260ms cubic-bezier(0.1, 0.9, 0.2, 1);
+}
+.module.shade .sliver-overlay {
+  height: 44px;
+}
 
 /* Star-Silver Grip: Curved Filigree Bow with Carved Jade Accents */
 .elven-grip {
@@ -411,7 +424,7 @@ header {
   z-index: 4;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8), 0 0 8px rgba(123, 242, 198, 0.2);
 }
-.module.shade:not(.scabbard-active):not(.harp-active) .shade-diadem {
+.module.shade:not(.scabbard-active):not(.harp-active):not(.sliver-active) .shade-diadem {
   display: flex;
 }
 .shade-title {
@@ -573,6 +586,77 @@ header {
 .harp-pips i.jade { background: var(--nephrite-jade-bright); color: var(--nephrite-jade-bright); }
 .harp-pips i.moon { background: var(--moonstone-blue); color: var(--moonstone-blue); }
 .harp-pips i.gold { background: var(--electrum-gold); color: var(--electrum-gold); }
+
+/* Option 8: Prismatic Light Sliver Strip */
+.sliver-strip {
+  position: absolute;
+  left: 48px;
+  right: 48px;
+  top: 10px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: linear-gradient(90deg, rgba(7, 18, 24, 0.95) 0%, rgba(14, 34, 46, 0.9) 30%, rgba(19, 48, 64, 0.85) 50%, rgba(14, 34, 46, 0.9) 70%, rgba(7, 18, 24, 0.95) 100%);
+  border: 1.5px solid #8ebddc;
+  border-radius: 6px;
+  z-index: 5;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 3px rgba(0, 0, 0, 0.7),
+    0 0 14px rgba(123, 242, 198, 0.45),
+    0 0 24px rgba(165, 216, 255, 0.3);
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+.module.shade.sliver-active .sliver-strip {
+  display: flex;
+}
+.sliver-title {
+  font: 10px/1 "Courier New", monospace;
+  color: var(--star-silver-bright);
+  letter-spacing: 0.8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sliver-title .sliver-icon {
+  color: var(--nephrite-jade-bright);
+  font-size: 13px;
+  text-shadow: 0 0 6px var(--nephrite-jade-bright), 0 0 12px rgba(123, 242, 198, 0.8);
+}
+.sliver-title .sliver-sep {
+  color: #648da5;
+}
+.sliver-title .sliver-metric {
+  color: #7bf2c6;
+  font-weight: bold;
+  text-shadow: 0 0 8px rgba(123, 242, 198, 0.6);
+}
+.sliver-caustics {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.sliver-beam-line {
+  width: 18px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ffffff 50%, #7bf2c6 100%);
+  border-radius: 1px;
+  margin-right: 2px;
+  box-shadow: 0 0 6px #7bf2c6;
+}
+.sliver-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+}
+.sliver-pip.spectral-cyan { background: #38d9a9; color: #38d9a9; }
+.sliver-pip.spectral-white { background: #ffffff; color: #ffffff; box-shadow: 0 0 8px #ffffff; }
+.sliver-pip.spectral-gold { background: #f5e4a8; color: #f5e4a8; }
+.sliver-pip.spectral-jade { background: #7bf2c6; color: #7bf2c6; }
 
 /* Tabs & Interactive Controls */
 .tab-row {
@@ -1109,8 +1193,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Elven &amp; Intricate <span>/ tendril braid, lotus, crystal, scabbard, quicksilver, harp &amp; willow blades</span></h1>
-    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Quicksilver meniscus bridge · Sylvan scabbard slide · Filigree harp compression · Willow-blade bayonet sheath</p>
+    <h1>Elven &amp; Intricate <span>/ tendril braid, lotus, crystal, scabbard, quicksilver, harp, willow &amp; prismatic sliver</span></h1>
+    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Quicksilver meniscus bridge · Sylvan scabbard slide · Filigree harp compression · Willow-blade bayonet sheath · Prismatic light sliver</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -1122,7 +1206,8 @@ footer .note-highlight {
         <option value="scabbard_slide">4. Sylvan Scabbard Slide shade</option>
         <option value="liquid_ithildin">5. Liquid Ithildin Meniscus (Quicksilver Bridge) join</option>
         <option value="harp_compression">6. Filigree Harp Compression shade</option>
-        <option value="willow_blade" selected>7. Willow-Blade Bayonet Sheath join</option>
+        <option value="willow_blade">7. Willow-Blade Bayonet Sheath join</option>
+        <option value="prismatic_sliver" selected>8. Prismatic Light Sliver shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -1132,13 +1217,14 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnWillowAnim" class="primary-btn">Sheathe willow blades</button>
+    <button id="btnSliverAnim" class="primary-btn">Dissolve into light sliver</button>
+    <button id="btnWillowAnim">Sheathe willow blades</button>
     <button id="btnHarpAnim">Compress harp ribs</button>
     <button id="btnJoinAnim">Join capsules</button>
     <button id="btnScabbardAnim">Slide into scabbard</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnLotusAnim">Close lotus petals</button>
-    <button id="btnChimeAnim" title="Trigger crisp bayonet jewel lock click">Jewel click</button>
+    <button id="btnChimeAnim" title="Pulse refractive prismatic caustics across the light beam">Pulse light beam</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -1399,6 +1485,53 @@ footer .note-highlight {
             <feMergeNode in="SourceGraphic"/>
           </feMerge>
         </filter>
+
+        <!-- Option 8: Prismatic Light Sliver Gradients & Filters -->
+        <linearGradient id="prismaticBeamGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#38d9a9"/>
+          <stop offset="20%" stop-color="#a5d8ff"/>
+          <stop offset="50%" stop-color="#ffffff"/>
+          <stop offset="80%" stop-color="#f5e4a8"/>
+          <stop offset="100%" stop-color="#38d9a9"/>
+        </linearGradient>
+
+        <linearGradient id="prismaticSpectralAuraGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#38d9a9" stop-opacity="0.1"/>
+          <stop offset="20%" stop-color="#a5d8ff" stop-opacity="0.45"/>
+          <stop offset="50%" stop-color="#ffffff" stop-opacity="0.75"/>
+          <stop offset="80%" stop-color="#f5e4a8" stop-opacity="0.45"/>
+          <stop offset="100%" stop-color="#38d9a9" stop-opacity="0.1"/>
+        </linearGradient>
+
+        <linearGradient id="prismaticConeLeftGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+          <stop offset="40%" stop-color="#7bf2c6" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#a5d8ff" stop-opacity="0"/>
+        </linearGradient>
+
+        <linearGradient id="prismaticConeRightGrad" x1="1" y1="0" x2="0" y2="0">
+          <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+          <stop offset="40%" stop-color="#7bf2c6" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#a5d8ff" stop-opacity="0"/>
+        </linearGradient>
+
+        <radialGradient id="jadeFinialCarveGrad" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stop-color="#c8faea"/>
+          <stop offset="25%" stop-color="#64edc4"/>
+          <stop offset="60%" stop-color="#148263"/>
+          <stop offset="90%" stop-color="#09382b"/>
+          <stop offset="100%" stop-color="#041a14"/>
+        </radialGradient>
+
+        <filter id="prismaticBeamGlow" x="-30%" y="-150%" width="160%" height="400%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="blur1"/>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur2"/>
+          <feMerge>
+            <feMergeNode in="blur1"/>
+            <feMergeNode in="blur2"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
       <!-- Shared Hull & Intertwined Tendril Weave -->
@@ -1439,6 +1572,7 @@ footer .note-highlight {
       <svg class="lotus-overlay" id="lotus-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="scabbard-overlay" id="scabbard-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="harp-overlay" id="harp-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <svg class="sliver-overlay" id="sliver-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <button class="elven-grip" data-drag="a" aria-label="Move Jarvis capsule">
         <span><span class="rune-mark">✧</span> Jarvis / Sylvan Regent</span>
         <span>⋮⋮</span>
@@ -1497,6 +1631,18 @@ footer .note-highlight {
         </div>
       </div>
 
+      <!-- Compact Prismatic Light Sliver Strip for Option 8 Shade Mode -->
+      <div class="sliver-strip" aria-label="Jarvis prismatic light sliver summary">
+        <span class="sliver-title"><span class="sliver-icon">✧</span> JARVIS <span class="sliver-sep">·</span> <strong class="sliver-metric">03 AGENTS</strong></span>
+        <div class="sliver-caustics">
+          <span class="sliver-beam-line" title="Refracted spectral beam"></span>
+          <i class="sliver-pip spectral-cyan" title="Cyan spectral ray"></i>
+          <i class="sliver-pip spectral-white" title="Moonlight focal point"></i>
+          <i class="sliver-pip spectral-gold" title="Electrum refraction"></i>
+          <i class="sliver-pip spectral-jade" title="Nephrite jade resonance"></i>
+        </div>
+      </div>
+
       <div class="tab-row" role="tablist" aria-label="Jarvis screens">
         <button class="elven-tab" role="tab" aria-selected="true" data-page="0">Status</button>
         <button class="elven-tab" role="tab" aria-selected="false" data-page="1">Task</button>
@@ -1514,6 +1660,7 @@ footer .note-highlight {
       <svg class="lotus-overlay" id="lotus-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="scabbard-overlay" id="scabbard-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <svg class="harp-overlay" id="harp-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+      <svg class="sliver-overlay" id="sliver-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
       <button class="elven-grip" data-drag="b" aria-label="Move GitDiscuss capsule">
         <span><span class="rune-mark">✧</span> GitDiscuss / Archive Weaver</span>
         <span>⋮⋮</span>
@@ -1567,6 +1714,18 @@ footer .note-highlight {
         </div>
       </div>
 
+      <!-- Compact Prismatic Light Sliver Strip for Option 8 Shade Mode -->
+      <div class="sliver-strip" aria-label="GitDiscuss prismatic light sliver summary">
+        <span class="sliver-title"><span class="sliver-icon">✧</span> GITDISCUSS <span class="sliver-sep">·</span> <strong class="sliver-metric">02 QUEUED</strong></span>
+        <div class="sliver-caustics">
+          <span class="sliver-beam-line" title="Refracted spectral beam"></span>
+          <i class="sliver-pip spectral-cyan" title="Cyan spectral ray"></i>
+          <i class="sliver-pip spectral-white" title="Moonlight focal point"></i>
+          <i class="sliver-pip spectral-gold" title="Electrum refraction"></i>
+          <i class="sliver-pip spectral-jade" title="Nephrite jade resonance"></i>
+        </div>
+      </div>
+
       <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
         <button class="elven-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
         <button class="elven-tab" role="tab" aria-selected="false" data-page="1">Thread</button>
@@ -1607,7 +1766,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade, Crystalline Cleavage Join, Sylvan Scabbard Slide Shade, Liquid Ithildin Meniscus Join, Filigree Harp Compression Shade &amp; Willow-Blade Bayonet Sheath Join</h3>
+  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade, Crystalline Cleavage Join, Sylvan Scabbard Slide Shade, Liquid Ithildin Meniscus Join, Filigree Harp Compression Shade, Willow-Blade Bayonet Sheath Join &amp; Prismatic Light Sliver Shade</h3>
   <p>
     Forged from spun star-silver (Ithildin), white birchwood inlays, and mother-of-pearl bezels. Contours follow swept aerodynamic swan-wing curves and delicate botanical filigree crowns, preserving high contrast and uncompromised display readability.
   </p>
@@ -1631,6 +1790,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 7 — Willow-Blade Bayonet Sheath join:</span> Three spring-tempered silver willow leaves mounted on Module A glide silently into velvet-lined scabbard slots along iridescent mother-of-pearl guide rails on Module B. Each lanceolate blade features delicate engraved botanical leaf veins, a spring-flex spine, and a micro-beveled waist locking notch. Upon full docking, spring bayonet catches seat into the blade notches with a crisp jewel click and radiating starlight wavefront, leaving an overlapping cascade of engraved silver leaves laying completely flat against the casing surface crowned with three nephrite jade locking gems. Pressing the spring leaf bayonet release catch unseats the jewel clasps and draws the blades cleanly.
+  </p>
+  <p>
+    <span class="note-highlight">Option 8 — Prismatic Light Sliver shade:</span> The entire star-silver casing and digital display dissolve into an ultra-minimal floating beam of concentrated refracted light suspended between two intricately carved nephrite jade finials. Each jade finial is set in an electrum filigree claw mount with star-silver bracket foliage and moonstone cabochons, housing an optical emitter that collimates spectral dispersion bands across the 24px high-contrast status strip. The widget name and key metric remain razor-sharp and instantly glanceable against the deep obsidian-sapphire channel, accented by living prismatic caustics and spectral dispersion pips.
   </p>
 </footer>
 
@@ -1664,7 +1826,9 @@ const model = {
   harpShimmer: 0,      // 0 to 1 = starlight harmonic shimmer wavefront
   bladeProgress: 0,    // 0 = blades extended outside scabbards, 1 = fully sheathed & locked
   bladeClick: 0,       // 0 to 1 = expanding starlight jewel click wavefront
-  option: 'willow_blade',
+  sliverDissolve: 0,   // 0 = solid star-silver hull, 1 = dissolved into horizontal prismatic light beam
+  sliverShimmer: 0,    // 0 to 1 = starlight caustic ripple & spectral shimmer
+  option: 'prismatic_sliver',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -2877,6 +3041,145 @@ function drawHarpOverlay(f, width = W, shimmer = 0) {
   return s;
 }
 
+// Option 8: Prismatic Light Sliver Shade Mode (Body dissolves into concentrated horizontal light beam between carved jade finials)
+function drawPrismaticSliverOverlay(f, width = W, shimmer = 0) {
+  if (model.option !== 'prismatic_sliver' && f <= 0.001) return '';
+  const midX = width / 2;
+  const yBeam = 65 - f * 43; // Center of beam slides from 65 to 22
+  const beamOpacity = Math.min(1, f * 1.25);
+  const finialOpacity = Math.min(1, 0.35 + f * 0.75);
+
+  let s = `<g class="sylvan-prismatic-sliver-overlay">`;
+
+  // 1. Two Carved Nephrite Jade Finials at Left & Right Ends
+  [-1, 1].forEach(side => {
+    const isLeft = side === -1;
+    const xFinial = isLeft ? 28 : width - 28;
+    const inwardDir = -side; // points toward center of beam: +1 for left, -1 for right
+
+    s += `
+      <g class="jade-finial" transform="translate(${xFinial}, ${yBeam})" opacity="${finialOpacity}">
+        <!-- Ethereal Jade Finial Glow Aura -->
+        <circle cx="0" cy="0" r="16" fill="url(#nephriteJadeGrad)" opacity="${0.2 + f * 0.3 + shimmer * 0.4}" filter="url(#prismaticBeamGlow)"/>
+
+        <!-- Outer Star-Silver Acanthus Mounting Bracket -->
+        <path d="M ${-inwardDir * 12} -14
+                 C ${-inwardDir * 4} -16 0 -12 0 0
+                 C 0 12 ${-inwardDir * 4} 16 ${-inwardDir * 12} 14
+                 C ${-inwardDir * 8} 8 ${-inwardDir * 8} -8 ${-inwardDir * 12} -14 Z"
+              fill="url(#starSilverGrad)" stroke="#14242f" stroke-width="1.2"/>
+        <path d="M ${-inwardDir * 10} -10 C ${-inwardDir * 3} -12 0 -6 0 0 C 0 6 ${-inwardDir * 3} 12 ${-inwardDir * 10} 10"
+              fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.85"/>
+
+        <!-- Carved Nephrite Jade Lotus Pedestal (Fluted column with carved relief ribs) -->
+        <path d="M ${-inwardDir * 6} -11
+                 C ${inwardDir * 6} -11 ${inwardDir * 10} -6 ${inwardDir * 10} 0
+                 C ${inwardDir * 10} 6 ${inwardDir * 6} 11 ${-inwardDir * 6} 11
+                 C ${-inwardDir * 2} 6 ${-inwardDir * 2} -6 ${-inwardDir * 6} -11 Z"
+              fill="url(#jadeFinialCarveGrad)" stroke="#09382b" stroke-width="1.2"/>
+        <!-- Fluted Jade Relief Chutes -->
+        <path d="M ${-inwardDir * 4} -8 Q ${inwardDir * 5} -5 ${inwardDir * 8} 0 Q ${inwardDir * 5} 5 ${-inwardDir * 4} 8"
+              fill="none" stroke="#7bf2c6" stroke-width="0.9" opacity="0.85"/>
+        <path d="M ${-inwardDir * 4} -4 Q ${inwardDir * 4} -2 ${inwardDir * 7} 0 Q ${inwardDir * 4} 2 ${-inwardDir * 4} 4"
+              fill="none" stroke="#ffffff" stroke-width="0.7" opacity="0.9"/>
+
+        <!-- Electrum Filigree Claw Setting (Prongs holding optical emitter) -->
+        <path d="M ${inwardDir * 2} -9 L ${inwardDir * 9} -5 L ${inwardDir * 6} -3 Z"
+              fill="url(#electrumSettingGrad)" stroke="#45350d" stroke-width="0.6"/>
+        <path d="M ${inwardDir * 2} 9 L ${inwardDir * 9} 5 L ${inwardDir * 6} 3 Z"
+              fill="url(#electrumSettingGrad)" stroke="#45350d" stroke-width="0.6"/>
+
+        <!-- Central Moonstone Emitter Lens / Starlight Focus Jewel -->
+        <circle cx="${inwardDir * 4}" cy="0" r="4.2" fill="url(#moonstoneGrad)" stroke="#162732" stroke-width="0.8"/>
+        <circle cx="${inwardDir * 3}" cy="-1" r="1.5" fill="#ffffff" opacity="0.95"/>
+
+        <!-- Star-Silver Collimating Nozzle / Optical Emitter Cone casting inward -->
+        <path d="M ${inwardDir * 8} -5 L ${inwardDir * 14} -2.5 L ${inwardDir * 14} 2.5 L ${inwardDir * 8} 5 Z"
+              fill="url(#starSilverGrad)" stroke="#14232c" stroke-width="0.8"/>
+        <!-- Intense Focus Spark Emitter -->
+        <circle cx="${inwardDir * 14}" cy="0" r="2.2" fill="#ffffff" filter="url(#crystalOpticalGlow)"/>
+        <circle cx="${inwardDir * 14}" cy="0" r="1.2" fill="#dffff5"/>
+      </g>
+    `;
+  });
+
+  // 2. The Concentrated Horizontal Prismatic Refraction Beam
+  if (beamOpacity > 0.01) {
+    const xBeamStart = 42;
+    const xBeamEnd = width - 42;
+    const beamLen = xBeamEnd - xBeamStart;
+
+    s += `
+      <g class="prismatic-beam" opacity="${beamOpacity}">
+        <!-- Broad Spectral Chromatic Dispersion Aura -->
+        <rect x="${xBeamStart - 4}" y="${yBeam - 12}" width="${beamLen + 8}" height="24" rx="12"
+              fill="url(#prismaticSpectralAuraGrad)" opacity="${0.4 + f * 0.45 + shimmer * 0.35}"
+              filter="url(#prismaticBeamGlow)"/>
+
+        <!-- Emitter Inward Expanding Light Cones (Left & Right) -->
+        <polygon points="42,${yBeam} 64,${yBeam - 10} 64,${yBeam + 10}" fill="url(#prismaticConeLeftGrad)" opacity="${0.75 * f}"/>
+        <polygon points="${width - 42},${yBeam} ${width - 64},${yBeam - 10} ${width - 64},${yBeam + 10}" fill="url(#prismaticConeRightGrad)" opacity="${0.75 * f}"/>
+
+        <!-- Multi-Wavelength Harmonic Dispersion Ribbons -->
+        <!-- 1. Electrum Amber Gold Ray -->
+        <path d="M ${xBeamStart} ${yBeam - 7} Q ${midX} ${yBeam - 9} ${xBeamEnd} ${yBeam - 7}"
+              fill="none" stroke="#f5e4a8" stroke-width="1.2" opacity="0.85"/>
+
+        <!-- 2. Celestial Cyan Ray -->
+        <path d="M ${xBeamStart} ${yBeam - 3.5} Q ${midX} ${yBeam - 4.5} ${xBeamEnd} ${yBeam - 3.5}"
+              fill="none" stroke="#a5d8ff" stroke-width="1.5" opacity="0.9"/>
+
+        <!-- 3. Concentrated Starlight Laser Core (Laser-bright central beam) -->
+        <path d="M ${xBeamStart - 6} ${yBeam} H ${xBeamEnd + 6}"
+              fill="none" stroke="#7bf2c6" stroke-width="4" opacity="${0.6 + shimmer * 0.4}"
+              filter="url(#prismaticBeamGlow)"/>
+        <path d="M ${xBeamStart - 4} ${yBeam} H ${xBeamEnd + 4}"
+              fill="none" stroke="url(#prismaticBeamGrad)" stroke-width="2.6" opacity="0.95"/>
+        <path d="M ${xBeamStart} ${yBeam} H ${xBeamEnd}"
+              fill="none" stroke="#ffffff" stroke-width="1.2" opacity="1"/>
+
+        <!-- 4. Nephrite Jade Emerald Ray -->
+        <path d="M ${xBeamStart} ${yBeam + 3.5} Q ${midX} ${yBeam + 4.5} ${xBeamEnd} ${yBeam + 3.5}"
+              fill="none" stroke="#38d9a9" stroke-width="1.5" opacity="0.9"/>
+
+        <!-- 5. Moonstone Violet-Blue Ray -->
+        <path d="M ${xBeamStart} ${yBeam + 7} Q ${midX} ${yBeam + 9} ${xBeamEnd} ${yBeam + 7}"
+              fill="none" stroke="#b6e3f9" stroke-width="1.2" opacity="0.85"/>
+
+        <!-- Prismatic Diamond Starlight Caustics (5 Spectral Nodes) -->
+        ${[midX - 95, midX - 48, midX, midX + 48, midX + 95].map((cx, idx) => {
+          const starScale = 1 + (shimmer > 0 ? Math.sin(shimmer * Math.PI * 2 + idx) * 0.4 : 0);
+          return `
+            <g transform="translate(${cx}, ${yBeam}) scale(${starScale})">
+              <!-- 4-point Diamond Starlight Flare -->
+              <path d="M 0 -7 Q 0 0 7 0 Q 0 0 0 7 Q 0 0 -7 0 Q 0 0 0 -7 Z"
+                    fill="#ffffff" opacity="${0.85 + shimmer * 0.15}" filter="url(#crystalOpticalGlow)"/>
+              <circle cx="0" cy="0" r="1.4" fill="${idx % 2 === 0 ? '#7bf2c6' : '#a5d8ff'}"/>
+            </g>
+          `;
+        }).join('')}
+      </g>
+    `;
+  }
+
+  // 3. Starlight Caustic Wavefront Shimmer (during pulse / transition)
+  if (shimmer > 0.02) {
+    const waveR = shimmer * 120;
+    const waveAlpha = Math.sin(shimmer * Math.PI) * 0.75;
+    s += `
+      <g class="sliver-shimmer-wave" opacity="${waveAlpha}">
+        <ellipse cx="${midX}" cy="${yBeam}" rx="${waveR}" ry="${waveR * 0.25}"
+                 fill="none" stroke="url(#prismaticBeamGrad)" stroke-width="2" filter="url(#prismaticBeamGlow)"/>
+        <line x1="${midX - waveR}" y1="${yBeam}" x2="${midX + waveR}" y2="${yBeam}"
+              stroke="#ffffff" stroke-width="1.5" opacity="0.8"/>
+      </g>
+    `;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Option 5: Shared Liquid Ithildin Meniscus (Quicksilver Bridge) Join
 function drawLiquidIthildinJoin(a, b, progress, isJoined, light, snapWave, isShade = false, tension = 0) {
   if (isShade) return '';
@@ -3357,18 +3660,22 @@ function renderHardware() {
   const midX = (a.x + W - 22 + b.x + 22) / 2;
 
   if (p > 0) {
+    const isSliver = model.option === 'prismatic_sliver' || model.sliverDissolve > 0.001;
+    const sharedOpacity = isSliver ? Math.max(0, p * (1 - model.sliverDissolve * 0.96)) : p;
     // Seamless Monolithic Star-Silver Hull
-    shared += drawElvenCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
-    if (!isShade && model.option !== 'crystal_cleavage' && model.option !== 'liquid_ithildin' && model.option !== 'willow_blade') {
-      // Connecting Botanical Crest along seam
-      shared += `
-        <g opacity="${p}">
-          <path d="M ${midX - 44} ${a.y + 10} Q ${midX} ${a.y + 16} ${midX + 44} ${a.y + 10}"
-                fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.6"/>
-          <path d="M ${midX - 40} ${a.y + 124} Q ${midX} ${a.y + 120} ${midX + 40} ${a.y + 124}"
-                fill="none" stroke="#7e9bb0" stroke-width="1.4"/>
-        </g>
-      `;
+    if (sharedOpacity > 0.01) {
+      shared += drawElvenCasing(a.x, a.y, (b.x + W) - a.x, sharedOpacity, isShade);
+      if (!isShade && model.option !== 'crystal_cleavage' && model.option !== 'liquid_ithildin' && model.option !== 'willow_blade') {
+        // Connecting Botanical Crest along seam
+        shared += `
+          <g opacity="${sharedOpacity}">
+            <path d="M ${midX - 44} ${a.y + 10} Q ${midX} ${a.y + 16} ${midX + 44} ${a.y + 10}"
+                  fill="none" stroke="url(#vineSilverGrad)" stroke-width="1.6"/>
+            <path d="M ${midX - 40} ${a.y + 124} Q ${midX} ${a.y + 120} ${midX + 40} ${a.y + 124}"
+                  fill="none" stroke="#7e9bb0" stroke-width="1.4"/>
+          </g>
+        `;
+      }
     }
   }
 
@@ -3412,10 +3719,12 @@ function renderHardware() {
         drawElvenTendrilCap(0, 0, true, isA ? model.cap : 0, isShade);
     }
 
-    const individual = drawElvenCasing(0, 0, W, 1, isShade) + endCaps;
+    const isSliver = model.option === 'prismatic_sliver' || model.sliverDissolve > 0.001;
+    const casingOpacity = isSliver ? Math.max(0, 1 - model.sliverDissolve * 0.96) : 1;
+    const individual = drawElvenCasing(0, 0, W, casingOpacity, isShade) + endCaps;
 
     $('#shell-' + id).innerHTML = `
-      <g opacity="${1 - p}">
+      <g opacity="${(1 - p) * (isSliver ? casingOpacity : 1)}">
         ${individual}
         ${(model.option === 'crystal_cleavage' || model.option === 'liquid_ithildin' || model.option === 'willow_blade') ? '' : drawElvenProximityAura(isA ? W - 22 : 22, 0, glow)}
       </g>
@@ -3446,6 +3755,14 @@ function renderHardware() {
     }
   }
 
+  // Prismatic Light Sliver in each module
+  for (const id of ['a', 'b']) {
+    const slEl = $('#sliver-' + id);
+    if (slEl) {
+      slEl.innerHTML = drawPrismaticSliverOverlay(model.sliverDissolve, W, model.sliverShimmer);
+    }
+  }
+
   // Active Proximity Aura (for Tendril Braid)
   if (model.option !== 'crystal_cleavage' && model.option !== 'liquid_ithildin' && !isShade && glow > 0.05 && p < 0.98) {
     $('#elvenLightAura').innerHTML = `
@@ -3460,7 +3777,7 @@ function renderHardware() {
 }
 
 function updateStateButtons() {
-  const isShade = model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5;
+  const isShade = model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5 || model.sliverDissolve > 0.5;
   const isJoined = model.joined;
   const isJoining = ((model.option === 'crystal_cleavage'
     ? (model.crystalGlide > 0.1 && model.crystalGlide < 0.95)
@@ -3496,6 +3813,7 @@ function render() {
     el.classList.toggle('shade', model.shade);
     el.classList.toggle('scabbard-active', (model.option === 'scabbard_slide' || model.scabbardSlide > 0.5) && (model.shade || model.scabbardSlide > 0.5));
     el.classList.toggle('harp-active', (model.option === 'harp_compression' || model.harpCompression > 0.5) && (model.shade || model.harpCompression > 0.5));
+    el.classList.toggle('sliver-active', (model.option === 'prismatic_sliver' || model.sliverDissolve > 0.5) && (model.shade || model.sliverDissolve > 0.5));
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.elven-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
@@ -3504,12 +3822,37 @@ function render() {
     const tabRow = el.querySelector('.tab-row');
     const canopyBtn = el.querySelector('.canopy-btn');
     const jewelBtns = el.querySelectorAll('.sylvan-jewel-btn');
+    const sliver = model.sliverDissolve;
+    const isSliver = model.option === 'prismatic_sliver' || sliver > 0.001;
     const harp = model.harpCompression;
     const isHarp = model.option === 'harp_compression' || harp > 0.001;
     const slide = model.scabbardSlide;
     const isScabbard = model.option === 'scabbard_slide' || slide > 0.001;
 
-    if (isHarp && harp > 0.001) {
+    if (isSliver && sliver > 0.001) {
+      const dy = -sliver * 43;
+      const opacity = Math.max(0, 1 - sliver * 1.6);
+      if (screenEl) {
+        screenEl.style.transform = `translateY(${dy}px)`;
+        screenEl.style.opacity = String(opacity);
+        screenEl.style.pointerEvents = sliver > 0.2 ? 'none' : 'auto';
+      }
+      if (tabRow) {
+        tabRow.style.transform = `translateY(${dy}px)`;
+        tabRow.style.opacity = String(opacity);
+        tabRow.style.pointerEvents = sliver > 0.2 ? 'none' : 'auto';
+      }
+      if (canopyBtn) {
+        canopyBtn.style.transform = `translateY(${dy}px)`;
+        canopyBtn.style.opacity = String(opacity);
+        canopyBtn.style.pointerEvents = sliver > 0.2 ? 'none' : 'auto';
+      }
+      jewelBtns.forEach(b => {
+        b.style.transform = `translateY(${dy}px)`;
+        b.style.opacity = String(opacity);
+        b.style.pointerEvents = sliver > 0.2 ? 'none' : 'auto';
+      });
+    } else if (isHarp && harp > 0.001) {
       const dy = -harp * 84;
       const opacity = Math.max(0, 1 - harp * 1.5);
       if (screenEl) {
@@ -3634,6 +3977,12 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
+  const btnSliver = $('#btnSliverAnim');
+  if (btnSliver) {
+    btnSliver.textContent = (model.shade || model.sliverDissolve > 0.5) ? 'Materialize body' : 'Dissolve into light sliver';
+    btnSliver.disabled = model.busy;
+  }
+
   const btnWillow = $('#btnWillowAnim');
   if (btnWillow) {
     btnWillow.textContent = model.joined ? 'Unsheathe willow blades' : 'Sheathe willow blades';
@@ -3693,8 +4042,10 @@ function render() {
   }
 
   if (!model.busy) {
-    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5) {
-      if (model.option === 'harp_compression' || model.harpCompression > 0.5) {
+    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5 || model.sliverDissolve > 0.5) {
+      if (model.option === 'prismatic_sliver' || model.sliverDissolve > 0.5) {
+        $('#phase').textContent = 'Shade mode / Prismatic Light Sliver (floating beam)';
+      } else if (model.option === 'harp_compression' || model.harpCompression > 0.5) {
         $('#phase').textContent = 'Shade mode / Filigree Harp Compression (44px wand)';
       } else if (model.option === 'scabbard_slide' || model.scabbardSlide > 0.5) {
         $('#phase').textContent = 'Shade mode / Sylvan Scabbard Slide (22px rim)';
@@ -4335,14 +4686,84 @@ async function strumHarpStrings() {
   renderHardware();
 }
 
+// Option 8: Prismatic Light Sliver Shade Mode Animations
+async function dissolveSliver() {
+  if (model.busy || (model.shade && model.sliverDissolve >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Dissolving body into prismatic light sliver: Spun star-silver hull dematerializes into concentrated horizontal refracted beam between carved jade finials.');
+  $('#phase').textContent = 'Dissolving into prismatic light sliver';
+
+  model.shade = true;
+  render();
+
+  await tween(480, t => {
+    const d = t === 1 ? 1 : 1 - Math.pow(1 - t, 2.6);
+    model.sliverDissolve = d;
+    if (t > 0.72) {
+      model.sliverShimmer = (t - 0.72) / 0.28;
+    }
+    render();
+  }, token);
+
+  model.sliverDissolve = 1;
+  model.sliverShimmer = 0;
+  model.busy = false;
+  render();
+  say('Body fully dissolved. Floating prismatic light sliver beam active between carved nephrite jade finials. High-contrast status strip illuminated.');
+  $('#phase').textContent = 'Shade mode / Prismatic Light Sliver (floating beam)';
+}
+
+async function materializeSliver() {
+  if (model.busy || (!model.shade && model.sliverDissolve <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Materializing elven body: Concentrated light expands back into solid star-silver hull and crystalline obsidian screen.');
+  $('#phase').textContent = 'Materializing star-silver casing';
+
+  model.shade = false;
+  render();
+
+  await tween(440, t => {
+    const m = 1 - (t === 1 ? 1 : 1 - Math.pow(1 - t, 2.4));
+    model.sliverDissolve = m;
+    render();
+  }, token);
+
+  model.sliverDissolve = 0;
+  model.busy = false;
+  render();
+  say('Star-silver body fully materialized. Full crystalline obsidian screen and sylvan controls restored.');
+  $('#phase').textContent = model.joined
+    ? (model.option === 'crystal_cleavage' ? 'Joined / Monolithic moonstone prism' : (model.option === 'liquid_ithildin' ? 'Joined / Quicksilver meniscus in jade chalice' : (model.option === 'willow_blade' ? 'Joined / Cascading silver willow leaves' : 'Joined / One unified sylvan instrument')))
+    : 'Separate / Two sylvan star-silver hulls';
+}
+
+async function pulsePrismaticBeam() {
+  if (model.busy) return;
+  const token = ++animationToken;
+  say('Pulsing prismatic light beam: Spectral refraction caustics ripple across the suspended laser-fine starlight filament.');
+  await tween(560, t => {
+    model.sliverShimmer = Math.sin(t * Math.PI);
+    renderHardware();
+  }, token);
+  model.sliverShimmer = 0;
+  renderHardware();
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05) {
-      if (model.harpCompression > 0.05) await openHarpFrame();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05 || model.sliverDissolve > 0.05) {
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
       else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else await bloomLotusPetals();
     }
@@ -4366,8 +4787,9 @@ async function applyState(stateName) {
       say('State: Separate — Two independent star-silver capsules with exposed mating collars.');
     }
   } else if (stateName === 'joining') {
-    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05) {
-      if (model.harpCompression > 0.05) await openHarpFrame();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05 || model.sliverDissolve > 0.05) {
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
       else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else await bloomLotusPetals();
     }
@@ -4417,8 +4839,9 @@ async function applyState(stateName) {
       say('State: Joining — Mid-animation view with silver tendrils uncoiling across the chasm.');
     }
   } else if (stateName === 'joined') {
-    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05) {
-      if (model.harpCompression > 0.05) await openHarpFrame();
+    if (model.shade || model.petalFold > 0.05 || model.scabbardSlide > 0.05 || model.harpCompression > 0.05 || model.sliverDissolve > 0.05) {
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
       else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else await bloomLotusPetals();
     }
@@ -4464,12 +4887,14 @@ async function applyState(stateName) {
       }
     }
   } else if (stateName === 'shade') {
-    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5) {
-      if (model.harpCompression > 0.5) await openHarpFrame();
+    if (model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5 || model.harpCompression > 0.5 || model.sliverDissolve > 0.5) {
+      if (model.sliverDissolve > 0.5) await materializeSliver();
+      else if (model.harpCompression > 0.5) await openHarpFrame();
       else if (model.scabbardSlide > 0.5) await drawScabbardBlade();
       else await bloomLotusPetals();
     } else {
-      if (model.option === 'harp_compression') await compressHarpFrame();
+      if (model.option === 'prismatic_sliver') await dissolveSliver();
+      else if (model.option === 'harp_compression') await compressHarpFrame();
       else if (model.option === 'scabbard_slide') await slideScabbardBlade();
       else await closeLotusPetals();
     }
@@ -4531,6 +4956,10 @@ $('#btnStateSeparate').onclick = () => applyState('separate');
 $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState('shade');
+$('#btnSliverAnim').onclick = () => {
+  if (model.shade || model.sliverDissolve > 0.5) materializeSliver();
+  else dissolveSliver();
+};
 $('#btnWillowAnim').onclick = () => {
   if (model.joined) separateWillow();
   else joinWillow();
@@ -4560,7 +4989,8 @@ $('#btnScabbardAnim').onclick = () => {
   else slideScabbardBlade();
 };
 $('#btnChimeAnim').onclick = () => {
-  if (model.option === 'harp_compression') strumHarpStrings();
+  if (model.option === 'prismatic_sliver') pulsePrismaticBeam();
+  else if (model.option === 'harp_compression') strumHarpStrings();
   else if (model.option === 'liquid_ithildin') triggerMeniscusRipple();
   else if (model.option === 'willow_blade') triggerJewelClick();
   else triggerHarmonicChime();
@@ -4579,31 +5009,54 @@ $('#btnReset').onclick = () => {
     blend: 0, cap: 0, tendrilProgress: 0, petalFold: 0, crystalGlide: 0, chimeWave: 0,
     scabbardSlide: 0, scabbardFlash: 0, meniscusProgress: 0, meniscusSnap: 0,
     harpCompression: 0, harpShimmer: 0, bladeProgress: 0, bladeClick: 0,
-    option: 'willow_blade', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    sliverDissolve: 0, sliverShimmer: 0,
+    option: 'prismatic_sliver', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
-  $('#btnWillowAnim').textContent = 'Sheathe willow blades';
-  $('#btnWillowAnim').classList.add('primary-btn');
+  $('#btnSliverAnim').textContent = 'Dissolve into light sliver';
+  $('#btnSliverAnim').classList.add('primary-btn');
+  $('#btnWillowAnim').classList.remove('primary-btn');
   $('#btnHarpAnim').classList.remove('primary-btn');
   $('#btnJoinAnim').classList.remove('primary-btn');
   $('#btnLotusAnim').classList.remove('primary-btn');
   $('#btnScabbardAnim').classList.remove('primary-btn');
   if ($('#btnChimeAnim')) {
-    $('#btnChimeAnim').textContent = 'Jewel click';
-    $('#btnChimeAnim').setAttribute('title', 'Trigger crisp bayonet jewel lock click');
+    $('#btnChimeAnim').textContent = 'Pulse light beam';
+    $('#btnChimeAnim').setAttribute('title', 'Pulse refractive prismatic caustics across the light beam');
   }
-  $('#optionSelect').value = 'willow_blade';
+  $('#optionSelect').value = 'prismatic_sliver';
   render();
-  say('Reset to initial Elven study configuration with Willow-Blade Bayonet Sheath join.');
+  say('Reset to initial Elven study configuration with Prismatic Light Sliver shade.');
 };
 
 $('#optionSelect').onchange = async (e) => {
   model.option = e.target.value;
-  if (model.option === 'willow_blade') {
+  if (model.option === 'prismatic_sliver') {
+    say('Option 8: Prismatic Light Sliver shade selected. Body dissolves into concentrated horizontal light beam between carved jade finials.');
+    $('#btnSliverAnim').classList.add('primary-btn');
+    $('#btnWillowAnim').classList.remove('primary-btn');
+    $('#btnHarpAnim').classList.remove('primary-btn');
+    $('#btnJoinAnim').classList.remove('primary-btn');
+    $('#btnLotusAnim').classList.remove('primary-btn');
+    $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Pulse light beam';
+      $('#btnChimeAnim').setAttribute('title', 'Pulse refractive prismatic caustics across the light beam');
+    }
+    if (model.shade) {
+      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      else if (model.harpCompression > 0.05) await openHarpFrame();
+      else if (model.petalFold > 0.05) await bloomLotusPetals();
+      await dissolveSliver();
+    } else {
+      await dissolveSliver();
+    }
+  } else if (model.option === 'willow_blade') {
     say('Option 7: Willow-Blade Bayonet Sheath join selected. Spring-tempered silver willow leaves glide silently into velvet scabbards.');
     $('#btnWillowAnim').classList.add('primary-btn');
+    $('#btnSliverAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
@@ -4613,12 +5066,14 @@ $('#optionSelect').onchange = async (e) => {
       $('#btnChimeAnim').setAttribute('title', 'Trigger crisp bayonet jewel lock click');
     }
     if (model.shade) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else if (model.harpCompression > 0.05) await openHarpFrame();
     }
   } else if (model.option === 'harp_compression') {
     say('Option 6: Filigree Harp Compression shade selected. Tracery ribs flex into parabolic curves, drawing rails together.');
     $('#btnHarpAnim').classList.add('primary-btn');
+    $('#btnSliverAnim').classList.remove('primary-btn');
     $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
@@ -4628,7 +5083,8 @@ $('#optionSelect').onchange = async (e) => {
       $('#btnChimeAnim').setAttribute('title', 'Strum harmonic starlight harp strings');
     }
     if (model.shade) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else if (model.petalFold > 0.05) await bloomLotusPetals();
       await compressHarpFrame();
     } else {
@@ -4638,6 +5094,7 @@ $('#optionSelect').onchange = async (e) => {
     say('Option 5: Liquid Ithildin Meniscus (Quicksilver Bridge) join selected. Liquid star-silver droplets snap by surface tension.');
     $('#btnJoinAnim').textContent = 'Snap quicksilver meniscus';
     $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnSliverAnim').classList.remove('primary-btn');
     $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
@@ -4647,12 +5104,14 @@ $('#optionSelect').onchange = async (e) => {
       $('#btnChimeAnim').setAttribute('title', 'Agitate quicksilver meniscus to trigger fluid surface tension ripple');
     }
     if (model.shade) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else if (model.harpCompression > 0.05) await openHarpFrame();
     }
   } else if (model.option === 'scabbard_slide') {
     say('Option 4: Sylvan Scabbard Slide shade selected. Display bay glides upward into overhead repoussé star-silver canopy.');
     $('#btnScabbardAnim').classList.add('primary-btn');
+    $('#btnSliverAnim').classList.remove('primary-btn');
     $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
@@ -4662,7 +5121,8 @@ $('#optionSelect').onchange = async (e) => {
       $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
     }
     if (model.shade) {
-      if (model.petalFold > 0.05) await bloomLotusPetals();
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.petalFold > 0.05) await bloomLotusPetals();
       else if (model.harpCompression > 0.05) await openHarpFrame();
       await slideScabbardBlade();
     } else {
@@ -4672,6 +5132,7 @@ $('#optionSelect').onchange = async (e) => {
     say('Option 3: Crystalline Cleavage & Harmonic Chime join selected. 30° moonstone prism planes glide flush.');
     $('#btnJoinAnim').textContent = 'Seat crystal prisms';
     $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnSliverAnim').classList.remove('primary-btn');
     $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
@@ -4681,12 +5142,14 @@ $('#optionSelect').onchange = async (e) => {
       $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
     }
     if (model.shade) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else if (model.harpCompression > 0.05) await openHarpFrame();
     }
   } else if (model.option === 'lotus_petals') {
     say('Option 2: Lotus Petal Nocturne shade selected. Curved filigree plates fold upward across the screen.');
     $('#btnLotusAnim').classList.add('primary-btn');
+    $('#btnSliverAnim').classList.remove('primary-btn');
     $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
@@ -4696,7 +5159,8 @@ $('#optionSelect').onchange = async (e) => {
       $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
     }
     if (model.shade) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else if (model.harpCompression > 0.05) await openHarpFrame();
       await closeLotusPetals();
     } else {
@@ -4706,6 +5170,7 @@ $('#optionSelect').onchange = async (e) => {
     say('Option 1: Living Tendril Braid (Sylvan Weave) join selected. Tendrils reach and intertwine across the gap.');
     $('#btnJoinAnim').textContent = 'Weave silver tendrils';
     $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnSliverAnim').classList.remove('primary-btn');
     $('#btnWillowAnim').classList.remove('primary-btn');
     $('#btnHarpAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
@@ -4715,7 +5180,8 @@ $('#optionSelect').onchange = async (e) => {
       $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
     }
     if (model.shade) {
-      if (model.scabbardSlide > 0.05) await drawScabbardBlade();
+      if (model.sliverDissolve > 0.05) await materializeSliver();
+      else if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else if (model.harpCompression > 0.05) await openHarpFrame();
       else await bloomLotusPetals();
     }
@@ -4975,6 +5441,10 @@ window.addEventListener('keydown', e => {
     if (model.shade || model.harpCompression > 0.5) openHarpFrame();
     else compressHarpFrame();
   }
+  if (e.key === 'p' || e.key === 'P' || e.key === 'l' || e.key === 'L') {
+    if (model.shade || model.sliverDissolve > 0.5) materializeSliver();
+    else dissolveSliver();
+  }
   if (e.key === 'Enter' && document.activeElement === $('#sylvanRelease')) {
     if (model.option === 'crystal_cleavage') separateCrystal();
     else if (model.option === 'liquid_ithildin') separateMeniscus();
@@ -5000,7 +5470,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Elven & Intricate skin loaded: Spun star-silver with Willow-Blade Bayonet Sheath join.');
+say('Elven & Intricate skin loaded: Spun star-silver with Prismatic Light Sliver shade.');
 </script>
 </body>
 </html>
