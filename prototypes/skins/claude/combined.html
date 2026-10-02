@@ -497,6 +497,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="expRow"><span>Mix</span></div>
  <div class="row" id="heldRow" hidden><span>Held</span></div>
  <div class="row" id="matchRow" hidden><span>Groups</span></div>
+ <div class="row" id="motionRow" hidden><span>Motion</span></div>
  <div class="row" id="angleRow" hidden><span>Angle</span><input type="range" id="ang" min="-30" max="30" step="10" value="20" aria-label="Angle of GitDiscuss on the pivot, in degrees"><output id="angOut">+20°</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
@@ -3427,6 +3428,83 @@ function fcNod(id,old){
  for(const k of ks.slice(at+1)){const v=MIXES[k];delete MIXES[k];MIXES[k]=v}
 }
 
+/* ---------- Mix: layer stack, the motion layer alone. Silver filigree's casing, join and shade, retimed by a swappable motion. ---------- */
+// Each motion is a time map: g(u) over each phase of the join (and over the whole shade), tr(p) over the leaves' travel,
+// plus how the casings seat. ok: 'native' and 'valid' stacks pass the builder; 'refused' fails its requires check; 'fallback' is the builder's answer.
+const springU=(u,w=10.5)=>u>=1?1:1-Math.exp(-6*u)*Math.cos(w*u)*(1-u*u);
+const MV={
+ grow:{label:'Growing',ok:'native',slow:1,g:u=>u,tr:p=>ease(p),
+  row:['Elven, growing','the stack\'s own motion, and it <i>requires</i> nothing of the material: smooth growth and unfurling, each part easing in as the last one finishes'],
+  say:'Growing: the stack\'s own motion. Smooth, continuous growth.'},
+ spring:{label:'Springy',ok:'valid',slow:1.15,g:u=>springU(u),tr:p=>springU(p,9),
+  row:['Wire, springy','<i>requires</i> a material that stores spring, and silver wire <i>provides</i> it: every step overshoots and rings back, so the leaves overshoot their gap and recoil, the wires reach past their mark and pull back, and the leaves bounce open'],
+  say:'Springy: valid, silver wire stores spring. Every step overshoots and rings back.'},
+ heavy:{label:'Heavy',ok:'valid',slow:1.6,g:u=>u<.8?Math.pow(u/.8,2.6):1,tr:p=>p<.85?Math.pow(p/.85,2.4):1,seat:[.85,1,1],lift:4,
+  row:['Gothic, heavy','<i>requires</i> mass, and silver <i>provides</i> it, a dense metal: each step gathers speed and stops dead, then pauses, and the leaves lift, travel and set down with a squash, the way stone seats. Valid, though a filigree this fine reads heavier than it looks'],
+  say:'Heavy: valid, silver has mass. Each step gathers speed, stops dead and pauses.'},
+ dart:{label:'Darting',ok:'valid',slow:.95,g:u=>u<.3?dart(u/.3):1+.06*Math.sin(PI*seg(u,.3,.55)),tr:p=>p<.4?dart(p/.4):1+.025*Math.sin(PI*seg(p,.4,.6)),
+  row:['Hollow, darting','<i>requires</i> nothing of the material: every step is a dart, a small overshoot and a pause, so the wires cross in three quick strokes, like a needle'],
+  say:'Darting: valid on any material. A dart, a pause, a settle.'},
+ stop:{label:'Stop-motion',ok:'refused',slow:1.3,raw:true,g:u=>u,tr:p=>ease(p),seat:[.8,1,1.2],
+  row:['Felt, stop-motion · refused','<i>requires</i> a matte material that holds a pose between frames (felt, clay), and silver <i>provides</i> a bright, reflective one. The builder refuses this stack and offers the fallback; it is shown anyway so the reason can be seen. Everything redraws on 12 fps steps and the felt boil shakes the leaves, and on silver the steps read as dropped frames and the boil as a glitch'],
+  say:'Stop-motion: refused by the builder (silver does not hold a pose between frames). Shown anyway: watch it stutter.'},
+ fall:{label:'Stop-motion fallback',ok:'fallback',slow:1.2,g:u=>u,tr:p=>ease(Math.floor(p*12)/12),sg:u=>Math.floor(u*8)/8,seat:[.8,1,1.2],
+  row:['Felt, with its declared fallback','stop-motion is kept only where the material can carry it: the leaves travel and shade on 12 fps steps and squash as they seat, which reads as weight, not as dropped frames. The growth, glints and blooms stay smooth, and nothing boils'],
+  say:'Stop-motion fallback: the leaves move and seat on 12 fps steps; the growth stays smooth.'}};
+const MV_MARK={native:'✓',valid:'✓',refused:'✕',fallback:'↺'};
+let mvKind='grow',mvTok=0,mvPrev=0,mvDir=1;
+const mv=()=>MV[mvKind];
+// Where the silver vine's join changes what it is doing: springs, reach, three strokes of twist, leaves, flower; then the release, read backwards.
+const MV_PF=[0,.16,.42,.66,.84,1],MV_PR=[0,.16,.5,.88,1];
+function mvWarp(jt){
+ if(jt<=0||jt>=1)return jt;
+ const fw=model.dir>0,P=fw?MV_PF:MV_PR,r=fw?jt:1-jt;let i=0;while(i<P.length-2&&r>=P[i+1])i++;
+ const w=P[i]+(P[i+1]-P[i])*mv().g(seg(r,P[i],P[i+1]));
+ return clamp(fw?w:1-w,1e-4,1-1e-4);
+}
+const MV_JIT=[[0,0],[.9,-.7],[-.8,.6]];
+// The travel's direction is fixed per path, so reversing mid-way runs the same curve back instead of jumping to the other one.
+function mvD(){const P=model.path;if(P&&P.mvDir==null)P.mvDir=model.dir;return P?P.mvDir:model.dir}
+function mvSeat(c){const S=mv().seat;if(!S||c.jt<=0||c.jt>=1)return 0;const p=seg(c.jt,0,.4),q=mvD()>0?p:1-p;return S[2]*Math.sin(PI*seg(q,S[0],S[1]))}
+async function pickMotion(k){
+ if(!MV[k])return;mvKind=k;const tok=++mvTok;describe();render();say(mv().say);
+ // Picking a motion plays the join in it: release first if joined, then join again.
+ if(drag)return;
+ if(model.jt>0){await doSeparate();if(tok!==mvTok||model.jt!==0)return}
+ await doJoin();
+}
+Object.entries(MV).forEach(([k,o])=>{const b=document.createElement('button');b.dataset.mv=k;b.innerHTML=`<kbd>${MV_MARK[o.ok]}</kbd>${o.label}`;
+ b.title=o.ok==='refused'?'Refused by the builder: shown anyway':o.ok==='fallback'?'The builder\'s declared fallback for stop-motion':o.ok==='native'?'The stack\'s own motion':'A valid stack';b.onclick=()=>pickMotion(k);$('#motionRow').append(b)});
+// Placed straight after Silver filigree in the Mix row.
+{const ks=Object.keys(MIXES),at=ks.indexOf('filigree'),FG0=MIXES.filigree;
+ MIXES.motion={label:'Motion layer',kind:'Layer stack',pair:'silver',motions:true,
+  get smooth(){return !mv().raw},get slow(){return mv().slow},get sepMs(){return 1800*mv().slow},get shadeMs(){return 600*mv().slow},
+  get stack(){return FG0.stack.map(r=>r[0]==='Motion'?['Motion',...mv().row]:r)},
+  about:'The same stack as Silver filigree, with only the motion layer swapped. Pick one in the Motion row and the join plays in it: the parts are drawn exactly as before, only retimed. The brainstorm\'s layer-stack model warns that "stop-motion motion on elven growth looks broken, not stylised", so each layer declares what it <i>requires</i> and <i>provides</i> and the builder offers only valid stacks or a declared fallback. Here that is tried on the motion layer: <b>✓</b> marks a valid stack, <b>✕</b> one the builder refuses (shown anyway, so you can see why) and <b>↺</b> its fallback. Each motion is a time map over the join\'s phases (springs, reach, three strokes of twist, leaves, flower), over the shade, and over how the leaves travel and seat. The scrubber stays on raw time, so scrubbing shows the map.',
+  join:{label:'Vine, in silver wire, retimed',kind:'Grow',gap:FG.gap,
+   about:'Silver filigree\'s vine join, unchanged in what it draws: the springs uncoil, the wires grow across and twist, moonstone beads ride out, four enamelled leaves open and the flower blooms. <b>Growing</b> eases through it. <b>Springy</b> overshoots every step and rings back, the leaves included. <b>Heavy</b> lifts the leaves, carries them and sets them down with a squash; each step stops dead and pauses. <b>Darting</b> crosses the gap in three quick strokes with pauses between. <b>Stop-motion</b> (refused) stutters on 12 fps frames and shakes. Its <b>fallback</b> steps only the travel and the seat. <b>Release:</b> pull the flower (or click it, or press Enter); the release runs backwards in the same motion.'},
+  shade:{label:'Plain narrow, in silver, retimed',kind:'Page baseline',
+   about:'Silver filigree\'s baseline shade, retimed by the motion: springy bounces off the stop, heavy drops and settles, darting snaps shut and holds, stop-motion steps (and shakes, refused), the fallback steps cleanly.'},
+  casing:fgCasing,readyPose:{},state:()=>({}),
+  // Overshoot (springy, darting) is capped at 14 px, so a long travel never runs into the partner or off the stage.
+  travel(t){const p=seg(t,0,.4),P=model.path;let e=mvD()>0?mv().tr(p):1-mv().tr(1-p);
+   if(P&&(e>1||e<0)){const D=Math.max(...Object.keys(P.s).map(id=>Math.hypot(P.j[id].x-P.s[id].x,P.j[id].y-P.s[id].y))),k=D>0?Math.min(1,14/(.14*D)):1;e=e>1?1+(e-1)*k:e*k}
+   return e},
+  // The shade's direction is set only when it leaves an end, so a reversal runs the current map back.
+  shK(st){if(st!==mvPrev){if(mvPrev<=0||mvPrev>=1)mvDir=st>mvPrev?1:-1;mvPrev=st}if(st<=0||st>=1)return st;const g=mv().sg||mv().g;return clamp(mvDir>0?g(st):1-g(1-st))},
+  squash(c){const s=mvSeat(c);return s>.01?s:0},
+  lift(c,id){const m=mv();let y=0;
+   if(m.lift&&c.jt>0&&c.jt<1){const p=seg(c.jt,0,.4),q=mvD()>0?p:1-p;if(q<.85)y=-m.lift*Math.sin(PI*q/.85)}
+   if(m.raw&&bf)y+=MV_JIT[bf][1]*(id==='a'?1:-1);return y},
+  over(c){const s=FG0.over({...c,jt:mvWarp(c.jt)});return mv().raw&&bf?`<g transform="translate(${MV_JIT[bf][0]} ${MV_JIT[bf][1]})">${s}</g>`:s},
+  grab:FG0.grab,pull:FG0.pull,
+  text:{...FG0.text,intro:'Silver filigree with a swappable motion layer. Pick a motion (or press V) to play the join in it.',
+   join:'The leaves close in and the silver vine grows across, in the chosen motion.',
+   hold:'Held mid-join. Use the scrubber to step through raw time and see how the motion maps it.',
+   mid:(jt,dir)=>FG0.text.mid(mvWarp(jt),dir)}};
+ for(const k of ks.slice(at+1)){const v=MIXES[k];delete MIXES[k];MIXES[k]=v}
+}
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1};
@@ -3447,7 +3525,7 @@ function joinedPose(fixed='a'){
 const RX=()=>X().room?X().room.x:0,RT=()=>X().room?X().room.top:0,RBOT=()=>X().room?X().room.bottom:0;
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y},...(DOCK()?{c:{x:model.c.x,y:model.c.y}}:{})});
 function setJt(t){
- model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.4));
+ model.jt=t;const p=model.path;if(!p)return;const e=X().travel?X().travel(t):ease(seg(t,0,.4)); // a mix with its own motion layer times the travel itself
  for(const id in p.s){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
 }
 function startJoinFrom(th,lit){model.dir=1;model.th0=th;model.lit0=lit}
@@ -3545,6 +3623,7 @@ function render(){
  $$('#expRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.mix)));
  $$('#heldRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.held===hpHeld)));
  $$('#matchRow button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.match==='1')===model.match)));
+ $$('#motionRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mv===mvKind)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
  const t=x.text,ph={separate:t.sepPh,joining:t.mid(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()};
@@ -3573,7 +3652,7 @@ function pick(id){
   // Checks tucked under Jarvis clear of GitDiscuss's swing), or the usual layout.
   if(wasDock||wasHome||X().home){const H0=X().home||HOME;for(const k of ['a','b','c'])if(H0[k])Object.assign(model[k],{x:H0[k].x,y:H0[k].y});if(DOCK())Object.assign(model.c,sepSpot())}
   if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
- document.body.dataset.mix=model.mix;document.body.dataset.pair=X().pair||'';$('#heldRow').hidden=!X().held;$('#matchRow').hidden=!X().pref;$('#angleRow').hidden=!X().angle;describe();say(T().intro);render();
+ document.body.dataset.mix=model.mix;document.body.dataset.pair=X().pair||'';$('#heldRow').hidden=!X().held;$('#matchRow').hidden=!X().pref;$('#motionRow').hidden=!X().motions;$('#angleRow').hidden=!X().angle;describe();say(T().intro);render();
 }
 function describe(){
  const x=X();
@@ -3590,6 +3669,7 @@ document.addEventListener('keydown',e=>{
  if(e.key==='Escape')cancelDrag();
  const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
  if(e.key.toLowerCase()==='g'&&X().pref)setMatch(!model.match);
+ if(e.key.toLowerCase()==='v'&&X().motions){const ks=Object.keys(MV);pickMotion(ks[(ks.indexOf(mvKind)+1)%ks.length])}
  if(e.key.toLowerCase()==='h'&&X().held){const ks=Object.keys(HELD);pickHeld(ks[(ks.indexOf(hpHeld)+1)%ks.length])}
  if(e.key.toLowerCase()==='m'){const ks=Object.keys(MIXES);pick(ks[(ks.indexOf(model.mix)+1)%ks.length])}
 });
