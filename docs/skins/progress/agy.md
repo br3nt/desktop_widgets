@@ -30,7 +30,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 
 ### Cycle 4: Secondary Shades
 - [x] Gothic: Triptych Altar Fold shade — Hinged stone-relief shutters swing 90° inward over display face (Built in prototypes/skins/agy/gothic.html with twin lancet-relief shutters, 3D perspective swing, bronze strap hinges, reliquary clasp with amber sanctuary jewel, Option 4 switcher, and fixed unclipped readable shade strips)
-- [ ] Felt: The Artist's Tool-Roll (Felt Scroll) shade — Lower sections roll upward like canvas brush roll held by button
+- [x] Felt: The Artist's Tool-Roll (Felt Scroll) shade — Lower sections roll upward like canvas brush roll held by button (Built in prototypes/skins/agy/felt.html with sewn tool organizer pockets, Archimedean spiral cross-section ends, longitudinal roll seams, turned olive-wood craft button with braided cord loop, glanceable unclipped shade strip, and Option 4 switcher)
 - [ ] Elven: Sylvan Scabbard Slide shade — Display bay glides upward into overhead repoussé silver canopy
 - [ ] Wire: Wire Hoop Folding Accordion shade — Outer circular wire hoop pivots 180° upward along hinge beads
 - [ ] Hollow: Silk Cocoon Wrap shade — Silk threads wind rapidly around lower body into compact bundle
