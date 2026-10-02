@@ -1539,16 +1539,60 @@ function plants(el,s){
  const gl=Math.sin(PI*seg(u,.84,1));for(let n=0;n<(i===1?3:1);n++)o+=pGlint(pRect(i+1,n),gl);
  svg.innerHTML=o;
 }
-// Where Checks's top-left should land at size `to`: it grows from where it stands, kept on the stage and clear of the pair.
-function morphSpot(to){
- const[w,h]=(model.morph==='plants'?PD:GD)[to];let x=clamp(model.c.x,30,1170-w),y=clamp(model.c.y,TOP-10,590-h);
- const x0=Math.min(model.a.x,model.b.x)-8,x1=Math.max(model.a.x,model.b.x)+W+8,y0=Math.min(model.a.y,model.b.y)-8,yb=Math.max(model.a.y,model.b.y)+ctx().h+8;
- if(x+w>x0&&x<x1&&y<yb&&y+h>y0){if(yb+h<=590)y=yb;else if(y0-h>=TOP-10)y=y0-h}
- return{x,y};
+// The pair's box with a margin, measured where it stood before any rise it was given to make room for Checks.
+// On a fork it takes in GitDiscuss bent round the knot, turned the same way the page draws it.
+function pairBox(){
+ const R=model.rise,h=ctx().h,j=J();let x0=Math.min(model.a.x,model.b.x),x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(model.a.y,model.b.y),y1=Math.max(model.a.y,model.b.y)+h;
+ const bd=j.angled?j.bend(model.jt)*PI/180:0;
+ if(bd){const ox=model.b.x-forkS(model.angle,h/2),oy=model.b.y+h/2,co=Math.cos(bd),si=Math.sin(bd);
+  for(const u of[0,W])for(const v of[0,h]){const dx=model.b.x+u-ox,dy=model.b.y+v-oy,x=ox+dx*co-dy*si,y=oy+dx*si+dy*co;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}}
+ // The fork's parent branch hangs from the knot below the casings, with its leaves and curl.
+ if(j.angled&&model.jt>0){const L=h/2>40?156:118,td=(90+j.bend(model.jt)/2)*PI/180,kx=model.a.x+W+forkS(model.angle,h/2),ky=model.a.y+h/2,tx=kx+Math.cos(td)*L;
+  x0=Math.min(x0,tx-20);x1=Math.max(x1,tx+20);y1=Math.max(y1,ky+Math.sin(td)*L)}
+ return{x0:x0-8,x1:x1+8,y0:y0+R-22,y1:y1+R+16};
 }
+// How far the pair has to rise (from where it stood) to clear a w×h Checks at x,y that reaches below it; never past the top of its range.
+function clearRise(w,h,x,y){
+ const p=pairBox();
+ if(x+w<=p.x0||x>=p.x1||y>=p.y1||y+h<=p.y1)return 0;
+ return clamp(p.y1-y,0,Math.max(0,Math.min(model.a.y,model.b.y)+model.rise-pairY()[0]));
+}
+// Where Checks's top-left should land at size `to`: it grows from where it stands, kept on the stage and clear of the pair on the nearest side
+// (below, beside or above) with room. A spot on the far side of the pair is left out, so Checks never drifts across it. When no side has room
+// (a bough or branch beside a pair across the middle of the stage), Checks takes the floor and the pair drifts up just enough to clear it.
+function morphSpot(to){
+ const[w,h]=(model.morph==='plants'?PD:GD)[to],X0=30,X1=1170,Y0=TOP-10,Y1=590;let x=clamp(model.c.x,X0,X1-w),y=clamp(model.c.y,Y0,Y1-h);
+ const p=pairBox();
+ if(x+w>p.x0&&x<p.x1&&y<p.y1&&y+h>p.y0){
+  const mx=(p.x0+p.x1)/2,my=(p.y0+p.y1)/2,cx=x+w/2,cy=y+h/2;
+  const C=[[x,p.y1],[p.x1,y],[p.x0-w,y],[x,p.y0-h]].filter(([u,v])=>u>=X0&&u<=X1-w&&v>=Y0&&v<=Y1-h&&(u+w/2-mx)*(cx-mx)>=0&&(v+h/2-my)*(cy-my)>=0);
+  if(C.length)[x,y]=C.reduce((q,r)=>Math.hypot(r[0]-x,r[1]-y)<Math.hypot(q[0]-x,q[1]-y)?r:q);else y=Y1-h;
+ }
+ return{x,y,rise:clearRise(w,h,x,y)};
+}
+// Eases the pair's rise to R over ms. The pair moves as one, along with any running join path.
+let riseAnim=0;
+function shiftPair(d){for(const id of['a','b'])model[id].y-=d;const p=model.path;if(p)for(const k of['s','j'])for(const id of['a','b'])p[k][id].y-=d}
+function riseTo(R,ms){
+ const tok=++riseAnim,R0=model.rise;
+ if(Math.abs(R-R0)<.5||reduce.matches||ms<=0){shiftPair(R-R0);model.rise=R;render();return}
+ const t0=performance.now();(function step(now){if(tok!==riseAnim)return;const t=clamp((now-t0)/ms),v=lerp(R0,R,ease(t));shiftPair(v-model.rise);model.rise=v;render();if(t<1)requestAnimationFrame(step)})(t0);
+}
+const stopRise=()=>++riseAnim;
+// The rise Checks needs where it stands now; `keep` only lets the pair down, never raises it (for when Checks is moved by hand).
+// The pair never settles below the bottom of its range. A delayed settle is dropped if a rise or morph has started since.
+function settleRise(ms=450,keep=false,delay=0){
+ const rt=riseAnim,mt=morphAnim;
+ const go=()=>{if(pairHeld()||delay>0&&(rt!==riseAnim||mt!==morphAnim))return;const[w,h]=cDims();let R=clearRise(w,h,model.c.x,model.c.y);if(keep)R=Math.min(model.rise,R);
+  R=Math.max(R,Math.min(model.a.y,model.b.y)+model.rise-pairY()[1]);riseTo(R,ms)};
+ delay>0?setTimeout(go,delay):go();
+}
+// The pair was moved by hand: it stays where it was put, and any rise is forgotten.
+function pairPlaced(){stopRise();model.rise=0;model.placed++}
+const pairHeld=()=>!!(drag&&(drag.id&&drag.id!=='c'||drag.bend));
 let morphAnim=0;
 function morphTo(id){
- if(drag&&drag.id==='c')cancelDrag();
+ if(drag)cancelDrag();
  const S=SIZES.find(x=>x[0]===id),to=S[2],from=model.g;
  // A shaded Checks comes out of its shade first, then grows.
  if(model.st>0&&to>0){model.restore=id;model.size=id;toggleShade(0);render();return Promise.resolve(false)}
@@ -1559,6 +1603,8 @@ function morphTo(id){
  const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(to>from?2600:2300),p0={x:model.c.x,y:model.c.y},p1=morphSpot(to),t0=performance.now();
  model.cMoved=false;
  say(MORPHS[model.morph].say(to,from,sizeName(to).toLowerCase()));
+ // Growing: the pair drifts up out of the way first. Shrinking: it settles back once Checks is smaller (below).
+ const placed=model.placed;if(p1.rise>model.rise+.5){riseTo(p1.rise,Math.min(800,ms||800));say(MORPHS[model.morph].say(to,from,sizeName(to).toLowerCase()).replace(/\.$/,'; the pair drifts up to make room.'))}
  return new Promise(res=>{(function step(now){
   if(tok!==morphAnim)return res(false);
   const t=ms?clamp((now-t0)/ms):1;model.g=t<1?lerp(from,to,t):to;
@@ -1566,12 +1612,12 @@ function morphTo(id){
   if(model.cMoved){model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h)}
   else{const e=ease(t);model.c.x=lerp(p0.x,p1.x,e);model.c.y=lerp(p0.y,p1.y,e)}
   render();
-  if(t<1)requestAnimationFrame(step);else{say('Checks is a '+sizeName(to).toLowerCase()+'.');res(true)}
+  if(t<1)requestAnimationFrame(step);else{if(model.placed===placed)settleRise();say('Checks is a '+sizeName(to).toLowerCase()+'.');res(true)}
  })(t0)});
 }
 
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,sdir:1,busy:false,angle:-42.5,angTo:undefined,dial:0,morph:'growth',size:'bud',g:0,mdir:1,restore:null,cMoved:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'vine',shade:'narrow',jt:0,st:0,dir:1,path:null,glow:0,lift:0,sdir:1,busy:false,angle:-42.5,angTo:undefined,dial:0,morph:'growth',size:'bud',g:0,mdir:1,restore:null,cMoved:false,rise:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -1587,17 +1633,18 @@ function joinedPose(fixed='a'){
 let angAnim=0,dialTok=0,dialTimer=0;
 const branchOn=()=>!!J().angled&&model.jt===1;
 const forkKnot=()=>{const hh=ctx().h/2;return{x:model.a.x+W+forkS(model.angle,hh),y:model.a.y+hh}};
-function refitPair(){if(!branchOn())return;const[lo,hi]=forkFit(model.angle,ctx().h/2);model.a.y=model.b.y=clamp(model.a.y,lo,hi)}
+// A raised pair pushed down by the fit gives up that much of its rise, so it settles back to where it stood.
+function refitPair(){if(!branchOn())return;const[lo,hi]=forkFit(model.angle,ctx().h/2),ny=clamp(model.a.y,lo,hi),d=ny-model.a.y;if(d>0)model.rise=Math.max(0,model.rise-d);model.a.y=model.b.y=ny}
 function pairY(){return branchOn()?forkFit(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
 function dialOn(){clearTimeout(dialTimer);++dialTok;model.dial=1}
 function dialOff(){clearTimeout(dialTimer);++dialTok;model.dial=0}
 function dialSoon(ms=1500){clearTimeout(dialTimer);dialTimer=setTimeout(()=>{const tok=++dialTok,t0=performance.now();
  (function st(now){if(tok!==dialTok)return;const t=reduce.matches?1:clamp((now-t0)/450);model.dial=1-t;render();if(t<1)requestAnimationFrame(st)})(t0)},ms)}
 function animateAngle(to,ms=700){
- to=clamp(to,-AMAX,AMAX);model.angTo=to;dialOn();const from=model.angle,tok=++angAnim,t0=performance.now();
+ stopRise();to=clamp(to,-AMAX,AMAX);model.angTo=to;dialOn();const from=model.angle,tok=++angAnim,t0=performance.now();
  (function step(now){if(tok!==angAnim)return;if(!branchOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
   model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*PI*t)),-AMAX-3,AMAX+3);refitPair();render();
-  if(t<1)requestAnimationFrame(step);else{model.angTo=undefined;dialSoon()}})(t0);
+  if(t<1)requestAnimationFrame(step);else{model.angTo=undefined;dialSoon();settleRise(300)}})(t0);
 }
 function stopAngle(){++angAnim;if(model.angTo!==undefined){model.angle=model.angTo;model.angTo=undefined;refitPair()}}
 function forkSay(a){const n=forkName(a);return n.cap==='golden angle'?'The fork settles on the golden angle, 137.5°: the turn between one leaf and the next round a stem.':n.cap==='⅖ turn'?'The fork settles at 144°, two fifths of a turn.':n.cap==='straight bough'?'The bough runs straight.':'The fork rests at '+n.num+'. Branches fork at any angle; growth angles only pull softly.'}
@@ -1633,7 +1680,7 @@ async function doJoin(fixed='a',ms=3200){
  model.glow=0;model.lift=0;if(J().angled)dialOn();
  say(J().txt.join);
  const ok=await tween(model.jt,1,ms*(J().slow||1)*(1-model.jt),setJt);
- if(ok){model.path=null;refitPair();if(J().angled)dialSoon(1800);render();say(J().txt.joined)}
+ if(ok){model.path=null;refitPair();if(J().angled)dialSoon(1800);render();settleRise();say(J().txt.joined)}
 }
 async function doSeparate(sPose){
  if(model.jt===0)return;
@@ -1641,7 +1688,7 @@ async function doSeparate(sPose){
  if(model.jt===1){model.dir=-1;model.path={s:sPose||separatePose(),j:here()};say(J().txt.release)}
  else{if(model.dir>0)model.lift=0;if(!model.path)model.path={s:separatePose(),j:here()};if(model.dir>0)say(J().txt.stop)}
  const ms=model.dir<0?(J().msOut||2300)*model.jt:1400*model.jt;
- if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.lift=0;say('Separate. Displays and pages were not touched.')}
+ if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.lift=0;settleRise();say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
  stopAngle();dialOff();++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
@@ -1726,7 +1773,7 @@ function pick(key,id){
  if(key==='morph'&&id!==model.morph&&model.g>0){const keep=model.size||SIZES[Math.max(1,Math.round(model.g))][0];
   morphTo('bud').then(ok=>{if(ok){model.morph=id;describe();render();morphTo(keep)}});return}
  if(key==='morph')model.morph=id;
- describe();render();
+ describe();render();if(key==='join')settleRise();
 }
 function describe(){
  const j=J(),s=SHADES[model.shade];
@@ -1741,7 +1788,7 @@ SIZES.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size
 $('#grow').oninput=e=>{if(drag&&drag.id==='c')cancelDrag();
  if(model.st>0){toggleShade(0);e.target.value=0;render();return}
  ++morphAnim;model.restore=null;const v=e.target.value/100;if(v!==model.g)model.mdir=v>model.g?1:-1;model.g=v;const S=SIZES.find(x=>x[2]===v);model.size=S?S[0]:null;
- const[w,h]=cDims();model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h);render()};
+ const[w,h]=cDims();model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h);render();settleRise(120)};
 $('#grow').onchange=()=>render();
 $('#angle').oninput=e=>{if(drag)cancelDrag();setForkAngle(+e.target.value)};
 $('#scrub').oninput=e=>{stopAngle();dialOff();++anim;model.busy=false;model.glow=0;model.dir=1;model.lift=0;
@@ -1778,8 +1825,9 @@ stage.addEventListener('pointerdown',e=>{
  if(id!=='c'&&((model.jt>0&&model.jt<1)||model.busy)){++anim;model.busy=false;model.lift=0;if(model.jt>0&&model.jt<1){if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0)}model.path=null;model.dir=1;if(model.jt===1){const j=joinedPose('a');Object.assign(model.a,j.a);Object.assign(model.b,j.b)}if(J().angled){if(model.jt===1)dialSoon(600);else dialOff()}}
  if(id==='a'&&model.jt===1&&J().angled)stopAngle();
  // GitDiscuss's nameplate on a joined fork bends it round the knot.
- if(id==='b'&&model.jt===1&&J().angled){++angAnim;model.angTo=undefined;const K=forkKnot();drag={bend:true,prev:Math.atan2(p.y-K.y,p.x-K.x),raw:model.angle,th0:model.angle,moved:false};dialOn();stage.setPointerCapture(e.pointerId);render();return}
- drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle',strain:0};
+ if(id==='b'&&model.jt===1&&J().angled){++angAnim;stopRise();model.angTo=undefined;const K=forkKnot();drag={bend:true,prev:Math.atan2(p.y-K.y,p.x-K.x),raw:model.angle,th0:model.angle,moved:false};dialOn();stage.setPointerCapture(e.pointerId);render();return}
+ if(id!=='c')stopRise();
+ drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c},rise:model.rise},group:model.jt===1&&id!=='c',state:'idle',strain:0};
  stage.setPointerCapture(e.pointerId);
 });
 stage.addEventListener('pointermove',e=>{
@@ -1800,7 +1848,7 @@ stage.addEventListener('pointermove',e=>{
    if(held==='a'){model.b.x=s.b.x;model.a.x=s.a.x-st}else{model.a.x=s.a.x;model.b.x=s.b.x+st}
    if(st>=SNAP){const d=drag;drag=null;const pose=here();
     if(held==='a')pose.a.x=clamp(pose.a.x-110,30,1200-W-30);else pose.b.x=clamp(pose.b.x+110,30,1200-W-30);
-    doSeparate(pose);return}
+    if(d.saved.a.y!==model.a.y)pairPlaced();doSeparate(pose);return}
    say(J().txt.strain||'The braid strains. Pull further to make it let go, or release to let it spring back.');render();return}
   drag.strain=0;const ax=clamp(s.a.x+dx,30,1200-2*W-g-30);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,30,1200-W-30),y:clamp(s[id].y+dy,TOP,bottom)};
@@ -1816,19 +1864,20 @@ function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.bend){if(!d.moved){dialSoon(600);render();say(J().txt.joined);return}
   const dn=DET.find(x=>Math.abs(model.angle-x)<DWIN);
-  if(dn!==undefined)animateAngle(dn,380);else{model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon()}
+  if(dn!==undefined)animateAngle(dn,380);else{model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon();settleRise(300)}
   say(forkSay(dn??model.angle));return}
  if(d.lift){if(model.lift>=.5||d.moved<5){doSeparate();return}
   tween(model.lift,0,320,v=>model.lift=v);say(J().txt.settle||'The brooch settles back onto the seam.');return}
- if(d.group&&d.strain>0){springBack(d.id);say(J().txt.springBack||'The braid holds and draws the casing back.');return}
+ if(d.group&&d.strain>0){if(d.saved.a.y!==model.a.y)pairPlaced();springBack(d.id);say(J().txt.springBack||'The braid holds and draws the casing back.');return}
+ if(d.id==='c')settleRise(450,true);else if(['a','b'].some(k=>d.saved[k].x!==model[k].x||d.saved[k].y!==model[k].y))pairPlaced();else settleRise();
  if(d.state==='ready'){doJoin(d.id==='b'?'a':'b',2700)}else{model.glow=0;render()}
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
- if(d.bend){model.angle=d.th0;refitPair();dialSoon(300);render();return}
+ if(d.bend){model.angle=d.th0;refitPair();dialSoon(300);render();settleRise(300);return}
  if(d.lift){model.lift=0;render();return}
- const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);
- {const[w,h]=cDims();model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h)}model.glow=0;render();say('Move cancelled.');
+ const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);stopRise();model.rise=s.rise;
+ {const[w,h]=cDims();model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h)}model.glow=0;render();settleRise();say('Move cancelled.');
 }
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const id=lampAt(local(e));if(id!==hoverId){hoverId=id;wakeKick()}});
@@ -1847,9 +1896,11 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  if((model.jt>0&&model.jt<1||model.busy)&&id!=='c')return;
  const bottom=600-(model.st>.5?HS:H)-14;
  if(model.jt===1&&id==='b'&&J().angled&&k[1]){stepAngle(k[1]>0?1:-1,e.shiftKey);return}
+ const was=[model.a.x,model.a.y,model.b.x,model.b.y]+'';
  if(model.jt===1&&id!=='c'){stopAngle();const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else if(id==='c'){const[cw,chh]=cDims();model.cMoved=true;model.c.x=clamp(model.c.x+k[0],30,1170-cw);model.c.y=clamp(model.c.y+k[1],TOP-10,590-chh)}
- else{const m=model[id];m.x=clamp(m.x+k[0],30,1200-W-30);m.y=clamp(m.y+k[1],TOP,bottom)}render();
+ else{const m=model[id];m.x=clamp(m.x+k[0],30,1200-W-30);m.y=clamp(m.y+k[1],TOP,bottom)}
+ if(id==='c')settleRise(300,true);else if(was!==[model.a.x,model.a.y,model.b.x,model.b.y]+'')pairPlaced();else settleRise();render();
 }));
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
