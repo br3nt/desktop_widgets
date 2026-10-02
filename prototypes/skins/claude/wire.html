@@ -97,6 +97,9 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="st-leaf" x1="0" y1="0" x2=".3" y2="1"><stop stop-color="#1d3a2c"/><stop offset=".55" stop-color="#0d1d16"/><stop offset="1" stop-color="#06100b"/></linearGradient>
  <linearGradient id="rim-cu" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffe0c0"/><stop offset=".45" stop-color="#e2a06c"/><stop offset="1" stop-color="#9b5b35"/></linearGradient>
  <linearGradient id="cb-tube"x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".55"/><stop offset=".28" stop-color="#000" stop-opacity="0"/><stop offset=".38" stop-color="#fff2d8" stop-opacity=".16"/><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".62"/></linearGradient>
+ <linearGradient id="rs-roll" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1d0f07"/><stop offset=".14" stop-color="#6b3a1d"/><stop offset=".3" stop-color="#e9b386"/><stop offset=".37" stop-color="#f6cfa6"/><stop offset=".46" stop-color="#d0956a"/><stop offset=".64" stop-color="#b97a4c"/><stop offset=".84" stop-color="#6b3a1d"/><stop offset="1" stop-color="#1d0f07"/></linearGradient>
+ <linearGradient id="rs-drop" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".55"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+ <pattern id="rs-ham" width="17" height="13" patternUnits="userSpaceOnUse"><ellipse cx="4" cy="4" rx="3.4" ry="2.2" fill="#3b1d0c" fill-opacity=".16"/><ellipse cx="12.5" cy="9.5" rx="3.6" ry="2.4" fill="#3b1d0c" fill-opacity=".13"/><ellipse cx="13" cy="2.6" rx="2" ry="1.3" fill="#fff0dc" fill-opacity=".14"/><ellipse cx="4.5" cy="10.6" rx="2.2" ry="1.3" fill="#fff0dc" fill-opacity=".1"/></pattern>
 </defs><path id="probe" fill="none"/></svg>
 <header><div><h1>Wire, beads &amp; stones <span>/ Claude skin study</span></h1><p>Oxidised copper frames, coil-bound cabochon displays, bead buttons. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -1051,8 +1054,63 @@ const SHADES={
   about:'The pendant turns into a small beaded caterpillar walking a wire. The plate and display fade and the copper frame squeezes flat into one taut wire. The name slab flips up at the left end, and a leaf bead grows at the right end with the one key value inside it. The caterpillar threads on through the name slab head first: a jet-glass head, then its body segments one at a time, each pushing the ones in front along. Then it comes alive: wire legs push it up off the wire, its antennae unfurl, its eye opens and a tail horn curls. It inches along the wire to the leaf with a hump running from tail to head on each stride, then takes a nibble. The segments are the statuses, read from the head back: <b>amber</b> per running Jarvis agent and two <b>pearls</b> for its queued checks; <b>carnelian</b> per GitDiscuss decision and four pearls for the comments; for Checks, one segment per two checks, <b>carnelian</b> for the pair waiting and <b>malachite</b> for the rest. Paused widgets turn their stones to <b>labradorite</b>. <b>On change</b> the head nods twice and the new colour runs down the body from the head, a segment at a time. Tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; tapping Checks just makes it look up. The join ends stay on the wire, so caterpillars still join.',
   sayOn:'Shaded: the frame flattens into a wire and a beaded caterpillar threads on, stands up and inches along to its value leaf.',
   hk:st=>ease(seg(st,0,.3)),show:st=>1-ease(seg(st,0,.2)),
-  draw(id,w,h,small,st){return caterpillar(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return caterpillar(id,w,h,small,st)}},
+ roll:{label:'Rolled sheet',kind:'Roll',ms:2000,ownStrip:true,
+  about:'The pendant rolls up like a sheet of copper on a jeweller\'s bench, top edge first, like a blind. The display fades, the top edge curls over, and the hammered plate winds onto itself while the bottom edge rises, carrying the empty coiled bezel up into the roll. The roll grows fatter with every lap, the planishing marks run up its face as it turns, its ends show the spiral of the laps, and it shades the plate still hanging below it. When the bottom edge is wound in, the roll turns on a little further, and the outer lap brings the name round from underneath, engraved and darkened into the copper, with the value cabochon set beside it; the sheet\'s edge wire comes to rest just under them. Last, two brass ties wind on near the ends, going on loose and snapping tight with a glint, and a status bead is threaded onto the left one: <b>amber</b> running, <b>labradorite</b> paused, <b>carnelian</b> needs a decision, <b>malachite</b> passing. Unshading unties it and lets the sheet unroll. The roll keeps the frame wire at its ends, so rolled pendants still join.',
+  sayOn:'Shaded: the copper sheet rolls up from the top, then turns to show the name and value; brass ties and a status bead hold it.',
+  hk:st=>ease(seg(st,.08,.64)),show:st=>1-ease(seg(st,0,.16)),slide:(h,small)=>h-(small?CH:H),
+  draw(id,w,h,small,st){return rolledSheet(id,w,h,small,st)}}
 };
+
+/* ---------- Rolled sheet pieces ---------- */
+// A spiral squashed into an ellipse: the laps seen at the end of the roll.
+function ellSpiral(cx,cy,rx,ry,turns,inner){let d='';const n=Math.max(12,Math.ceil(turns*28));for(let i=0;i<=n;i++){const t=i/n,a=-Math.PI/2+t*turns*2*Math.PI,k=lerp(1,inner,t);d+=(i?'L':'M')+f(cx+Math.cos(a)*rx*k)+' '+f(cy+Math.sin(a)*ry*k)}return d}
+function rolledSheet(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ // The roll stays on the strip's centre line; the sheet's bottom edge rises into it as the widget shortens.
+ const full=small?CH:H,flat=small?CHS:HS,Rf=small?12:13.5,r0=3,Lt=full-10,th=(Rf*Rf-r0*r0)*Math.PI/Lt;
+ // The sheet rises a little faster than the widget shortens, so its bottom edge reaches the roll's axis just as the strip is reached.
+ const kk=(full-h)/(full-flat),dy=h-full-(flat/2-5)*kk;
+ const c=ease(seg(st,0,.1)),u=seg(st,.64,.8),rolled=(flat/2-5)*c-dy,R=Math.sqrt(r0*r0*c+rolled*th/Math.PI);
+ // The top edge curls over first, so the roll starts at the top and settles onto the strip's centre line.
+ const yc=lerp(5+R,flat/2,c),x0=5,x1=w-5;
+ let s='';
+ if(full-5+dy>yc+.5)s+=`<clipPath id="rsclip-${id}"><rect x="0" y="${f(yc)}" width="${w}" height="${f(Math.max(0,h-yc))}"/></clipPath><g clip-path="url(#rsclip-${id})"><g transform="translate(0 ${f(dy)})">${casing(w,full,small)}</g>`+
+  `<rect x="${x0}" y="${f(yc+R-1)}" width="${w-10}" height="10" fill="url(#rs-drop)" opacity="${f(clamp(R/6))}"/></g>`;
+ if(R<.6)return s;
+ const ry0=yc-R,body=`<rect x="${x0}" y="${f(ry0)}" width="${w-10}" height="${f(2*R)}" rx="${f(Math.min(3,R*.3))}"/>`;
+ // The planishing marks run up the face as it turns; the last turn carries on past the end of the sheet.
+ const T0=Math.PI/2+.05,tt=T0-(T0+.05)*springOut(u),te=Math.min(Math.PI/2,tt+.85),scroll=rolled+R*(T0-tt);
+ s+=`<ellipse cx="${w/2}" cy="${f(yc+R+2)}" rx="${f(w*.46)}" ry="3" fill="#000" opacity="${f(.45*seg(st,.4,.7))}" filter="url(#soft)"/>`+
+  `<clipPath id="rsroll-${id}">${body}</clipPath><g clip-path="url(#rsroll-${id})"><rect x="${x0}" y="${f(ry0-2)}" width="${w-10}" height="${f(2*R+4)}" fill="url(#rs-roll)"/>`+
+  `<rect x="${x0}" y="${f(ry0-13)}" width="${w-10}" height="${f(2*R+26)}" fill="url(#rs-ham)" transform="translate(0 ${f(-(scroll%13))})"/>`;
+ // The outer lap: the sheet's bottom edge wire comes round from underneath and stops just below the name.
+ if(te<Math.PI/2-.02){const ye=yc+R*Math.sin(te),k=Math.cos(te);
+  s+=`<path d="M${x0} ${f(ye+1.3)}H${x1}" stroke="#1a0c05" stroke-opacity=".55" stroke-width="1.8"/>`+wire(`M${x0+3} ${f(ye)}H${x1-3}`,'copper',f(1.2+.9*k))+wire(band(w/2,ye,false,small?5:7,f(9*k)),'copper',1)}
+ // The name and value ride the same lap, foreshortened until they face out.
+ const xL=x0+(small?12:14),xR=x1-(small?12:14);
+ if(tt<Math.PI/2-.02){
+  const P=plaqueData(id),word=P.word,name=RIM_NAME[id],nx=xL+(small?10:12);
+  const vw=Math.ceil(measure(P.num,NUM_F)+measure(word,WORD_F)+5)+(small?18:22),vx=xR-(small?9:11)-vw/2;
+  const txt=(dx,dy,fill,o)=>`<text x="${f(nx+dx)}" y="${f(yc+.5+dy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="15" fill="${fill}" opacity="${o}">${name}</text>`;
+  s+=`<g transform="translate(0 ${f(yc+R*Math.sin(tt))}) scale(1 ${f(Math.max(.02,Math.cos(tt))*1000)/1000}) translate(0 ${f(-yc)})">`+
+   txt(.6,.9,'#ffe6c8',.5)+txt(0,0,'#1c0c04',1)+strandItem({k:'val',wd:vw,num:P.num,word},vx,yc,small)+'</g>';
+ }
+ s+='</g>';
+ // The wound frame wire at each end, and the spiral of the laps.
+ const turns=Math.max(.4,(R-r0)/2.4);
+ for(const x of [x0+1.5,x1-1.5])s+=`<ellipse cx="${x}" cy="${f(yc)}" rx="${f(Math.max(1.2,R*.26))}" ry="${f(R*.96)}" fill="#1a0e07"/>`+wire(ellSpiral(x,yc,R*.22,R*.86,turns,Math.min(1,r0/R)),'copper',.6);
+ s+=wire(`M${x0+3.5} ${f(ry0+2)}V${f(yc+R-2)}M${x1-3.5} ${f(ry0+2)}V${f(yc+R-2)}`,'copper',1.6,clamp(R/5));
+ // Brass ties wind on loose and snap tight, then the status bead is threaded on the left one.
+ for(const [x,t0] of [[xL,.78],[xR,.82]]){const t=seg(st,t0,t0+.1);if(t<=0)continue;
+  const sp=lerp(2*R+12,2*R+3,ease(t));s+=wire(band(x,yc,false,3,f(sp),2.3),'brass',1.2,clamp(t*3));
+  const g=Math.sin(Math.PI*seg(st,t0+.07,t0+.15));if(g>.03)s+=sparkle(x+3,yc-R+1,g*.7)}
+ const bt=seg(st,.9,1);
+ if(bt>0){const P=plaqueData(id),sc=Math.max(.01,backOut(bt));
+  s+=`<circle cx="${xL}" cy="${f(yc)}" r="10" fill="${RIM_GLOW[P.stone]}" opacity="${f(.55*clamp(bt*2))}" filter="url(#soft)"/>`+
+   `<g transform="translate(${xL} ${f(yc)}) scale(${f(sc*100)/100}) translate(${-xL} ${f(-yc)})">${strandItem({k:'bead',r:small?4.4:5,stone:P.stone},xL,yc)}</g>`}
+ return s;
+}
 
 /* ---------- Caterpillar pieces ---------- */
 // Segments read from the head back. Checks gets one segment per two checks.
@@ -1945,10 +2003,11 @@ function render(){
   let s=sh.draw?sh.draw(id,w,h,small,model.st):casing(w,h,small);
   if(id==='a')s+=j.end(1,lit,h);if(id==='b')s+=j.end(-1,lit,h);
   svg.innerHTML=s;
-  const k=hk,show=sh.show?sh.show(model.st):1-clamp(k*2.2),strip=sh.ownStrip?0:seg(k,.55,1),sk=sh.sink?sh.sink(model.st):0;
+  const k=hk,show=sh.show?sh.show(model.st):1-clamp(k*2.2),strip=sh.ownStrip?0:seg(k,.55,1),sk=sh.sink?sh.sink(model.st):0,sl=sh.slide?sh.slide(h,small):0;
   el.querySelectorAll('.screen,.tabline,.bead,.mini,.lens').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible';
-   // Sink shades let the display drop back into the frame as it fades.
-   if(n.matches('.screen,.mini'))n.style.transform=sk?`translateY(${f(6*sk)}px) scale(${Math.round((1-.16*sk)*1000)/1000})`:''});
+   // Sink shades let the display drop back into the frame as it fades; Roll shades carry it up with the sheet.
+   if(n.matches('.screen,.mini'))n.style.transform=sk?`translateY(${f(6*sk)}px) scale(${Math.round((1-.16*sk)*1000)/1000})`:sl?`translateY(${f(sl)}px)`:'';
+   else n.style.transform=sl?`translateY(${f(sl)}px)`:''});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
   el.querySelector('.strip').style.opacity=f(strip);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
