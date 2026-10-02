@@ -1325,7 +1325,9 @@ const MORPHS={
  tree:{label:'Tree growth',kind:'Grow',sizes:[['pendant','Pendant',-1],['cab','Cabochon',0],['branch','Branch',1],['hoop','Hoop tree',2]],slider:'Checks growth, pendant to hoop tree',
   about:'Checks grows like a wire tree of life. <b>Cabochon:</b> the pendant\'s frame closes in on its stone, the plate falls away, and the coils wind round the stone from the bottom up, leaving one cabochon hanging from a bail with the name on a slab tag below it. <b>Branch:</b> a twisted trunk grows down into a tumbled amethyst, the stone slides out along a branch to one side, and a second branch reaches the other way. A bezel coils round at its tip and a second stone fills it, so the two values each get a display. <b>Hoop tree:</b> the trunk\'s five wires fan out into roots, a copper hoop draws round from the bottom to meet them, and each root wraps onto it. A third branch grows up to a crown display, then fourteen twigs push out from behind the displays with a bead riding each tip, one per check: malachite for the 12 passed, carnelian for the 2 waiting. Shrinking plays it all backwards: the beads slide home, the branches draw in and the hoop unwinds. Pick a size, press M to step through them, or scrub the slider. Checks never grows over the pair: it moves below, beside or above it, whichever has room. When none does (the hoop beside a pair across the middle of the stage), Checks takes the floor and the pair rises just enough to clear it, then settles back as Checks shrinks. Move the pair by hand and it stays where you put it. Shading a tree folds it back to its cabochon, which carries the name and the count; with the Hoop rim · tree shade, a hoop tree instead goes down into its own rim (see that shade).'},
  bezel:{label:'Bezel resize',kind:'Resize',sizes:[['pendant','Pendant',-1],['brooch','Brooch',0],['slab','Slab',1]],slider:'Checks size, pendant to slab',
-  about:'Checks stays one stone in one coiled bezel; only the stone changes size. Each step plays in three beats. <b>Loosen:</b> the tight coil turns spread apart and stand off the stone, so you see the spring\'s back turns and a dark gap all round. <b>Grow:</b> the stone and the copper frame swell together with a small spring, while the old text fades. <b>Tighten:</b> the coils close up onto the new edge, glint where they bite, and the new layout fades in. <b>Brooch:</b> the run number, a large 12 / 14, the 86% and a row of fourteen beads, one per check. <b>Slab:</b> adds the checks themselves, four rows with a stone each (malachite passed, carnelian waiting on Brent), and a tally strand of fourteen beads hangs under the status lens. Shrinking plays the same three beats in reverse. Pick a size, press M or scrub the slider; Checks never grows over the pair: it moves below, beside or above it, and when none has room it takes the floor and the pair rises to clear it, settling back as Checks shrinks. Shading a grown Checks first shrinks it to the pendant, then shades it as usual.'}
+  about:'Checks stays one stone in one coiled bezel; only the stone changes size. Each step plays in three beats. <b>Loosen:</b> the tight coil turns spread apart and stand off the stone, so you see the spring\'s back turns and a dark gap all round. <b>Grow:</b> the stone and the copper frame swell together with a small spring, while the old text fades. <b>Tighten:</b> the coils close up onto the new edge, glint where they bite, and the new layout fades in. <b>Brooch:</b> the run number, a large 12 / 14, the 86% and a row of fourteen beads, one per check. <b>Slab:</b> adds the checks themselves, four rows with a stone each (malachite passed, carnelian waiting on Brent), and a tally strand of fourteen beads hangs under the status lens. Shrinking plays the same three beats in reverse. Pick a size, press M or scrub the slider; Checks never grows over the pair: it moves below, beside or above it, and when none has room it takes the floor and the pair rises to clear it, settling back as Checks shrinks. Shading a grown Checks first shrinks it to the pendant, then shades it as usual.'},
+ detail:{label:'Scale and detail',kind:'Level of detail',sizes:[['pendant','Pendant',-1],['charm','Charm',0],['amulet','Amulet',1],['talisman','Talisman',2]],slider:'Checks size and detail, pendant to talisman',
+  about:'Checks is one stone in one wire frame at every size, carrying only as much wirework as that size can hold. The wire keeps its gauge and every ornament keeps its pixel size, so a smaller form drops pieces rather than shrinking them into grey fuzz. <b>Charm</b> (smaller than the pendant): the plate, inner wire, scrolls and coiled bezel fall away and the frame closes in to one heavy wire round a small oval stone, with the name, 12/14 and 2 waiting. A bail rises and loops shut over the top, and the status lens drops to hang underneath. <b>Amulet:</b> the frame grows with a small spring, then coils wind round the stone from the bail both ways, two side scrolls curl out, and a fine wire is strung across the stone with fourteen check beads sliding on one at a time. <b>Talisman:</b> a twisted brass wire winds on outside the copper and is bound to it, three corner scrolls curl out, a nest of fine wire tangles round the fourth corner and an amethyst settles into it, and a fringe of fourteen drops hangs from the bottom, one per check: malachite for the 12 passed, with the two carnelians that are waiting on Brent at the middle. Its stone lists the checks. Shrinking sheds the finest level first. Pick a size, press M or scrub the slider. Checks never grows over the pair: it moves below, beside or above it, and when none has room it takes the floor and the pair rises to clear it, settling back as Checks shrinks. Shading first shrinks Checks to the pendant.'}
 };
 let SIZES=MORPHS.tree.sizes;
 const TC=[0,-44],TRR=120,FORK=[0,-12],TAG_Y=18;
@@ -1525,11 +1527,11 @@ function rimTreeSvg(s){
  return out+lens;
 }
 // A shaded tree shows its cabochon (with the Hoop rim · tree shade, a hoop tree goes down into its rim instead); the bezel always shrinks to the pendant before it shades.
-const gEff=()=>model.morph==='bezel'||rimHoop()?model.g:model.g>=0?model.g*(1-shadeK()):model.g;
+const gEff=()=>model.morph!=='tree'||rimHoop()?model.g:model.g>=0?model.g*(1-shadeK()):model.g;
 const shadeMs=()=>rimHoop()?2600:SHADES[model.shade].ms||520;
 // The hoop is drawn early in its step, so that step's reach is front-loaded.
 // k is how far a hoop tree has gone into its rim strip (the Hoop rim · tree shade).
-function ext(g,k=g>1.999?rimK():0){if(model.morph==='bezel'){const F=bzAt(g+1).F;return[F[0]-6,F[0]+F[2]+6,F[1]-6,F[1]+F[3]+6]}if(k>0&&g>1.999)return EXT[3].map((v,j)=>lerp(v,RIMX[j],k));const i=clamp(Math.floor(g+1),0,2),t=i===2?seg(g-1,0,.5):clamp(g+1-i);return EXT[i].map((v,j)=>lerp(v,EXT[i+1][j],t))}
+function ext(g,k=g>1.999?rimK():0){if(model.morph==='detail')return dtAt(g+1).X;if(model.morph==='bezel'){const F=bzAt(g+1).F;return[F[0]-6,F[0]+F[2]+6,F[1]-6,F[1]+F[3]+6]}if(k>0&&g>1.999)return EXT[3].map((v,j)=>lerp(v,RIMX[j],k));const i=clamp(Math.floor(g+1),0,2),t=i===2?seg(g-1,0,.5):clamp(g+1-i);return EXT[i].map((v,j)=>lerp(v,EXT[i+1][j],t))}
 function clampC(){const e=ext(gEff());model.c.x=clamp(model.c.x+CW/2,10-e[0],1190-e[1])-CW/2;model.c.y=clamp(model.c.y+CH/2,46-e[2],590-e[3])-CH/2}
 // The pair's box with a margin, measured where it stood before any lift it was given to make room for Checks.
 // It is measured unshaded (a grown Checks unshades the pair first) and includes GitDiscuss's swing on an angled join.
@@ -1575,8 +1577,8 @@ function morphTo(id,then){
  // The bezel, and a hoop tree lying in its rim, unshade fully before they change size.
  // A hoop tree anywhere in its rim (even mid-shade) comes back up first, so it never jumps to the cabochon fold.
  const rimHold=rimHoop()&&model.st>0;
- let wait=0;if(rimHold||model.st>.5&&(to>-1||from>-1)){const hold=model.morph==='bezel'||rimHold,ms=shadeMs()*model.st;toggleShade(0);if(hold&&!reduce.matches)wait=ms}
- const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(model.morph==='bezel'?(to>from?2300:1900):to>from?1900:1250),a0={x:model.c.x,y:model.c.y},a1=morphSpot(to),t0=performance.now()+wait;
+ let wait=0;if(rimHold||model.st>.5&&(to>-1||from>-1)){const hold=model.morph!=='tree'||rimHold,ms=shadeMs()*model.st;toggleShade(0);if(hold&&!reduce.matches)wait=ms}
+ const tok=++morphAnim,ms=reduce.matches?0:Math.abs(to-from)*(model.morph!=='tree'?(to>from?2300:1900):to>from?1900:1250),a0={x:model.c.x,y:model.c.y},a1=morphSpot(to),t0=performance.now()+wait;
  say(to>from?'Checks grows into a '+S[1].toLowerCase()+'.':to<from?'Checks shrinks back to a '+S[1].toLowerCase()+'.':'Checks is already a '+S[1].toLowerCase()+'.');
  // Growing: the pair rises out of the way first. Shrinking: it settles back once Checks is smaller (below).
  // Coming up out of the rim, the pair rises with the regrowing hoop (this replaces the unshade's own rise rather than cancelling it).
@@ -1640,9 +1642,9 @@ function bzBrooch(S,o){
  for(let i=0;i<14;i++)s+=strandItem({k:'bead',r:3,stone:i<12?'mal':'carn'},x+18+i*8.6,y+83);
  return s+'</g>';
 }
-function bzSlab(S,o){
+function bzSlab(S,o,head){
  if(o<.02)return '';const [x,y,w]=S;
- let s=`<g opacity="${f(o)}" font-family="${BZF}"><text x="${f(x+14)}" y="${f(y+18)}" font-size="9.5" letter-spacing="1.3" fill="#9fbcb8">CHECKS · RUN 418 ON MAIN</text>`+
+ let s=`<g opacity="${f(o)}" font-family="${BZF}">`+(head?head(x+14,y+18):`<text x="${f(x+14)}" y="${f(y+18)}" font-size="9.5" letter-spacing="1.3" fill="#9fbcb8">CHECKS · RUN 418 ON MAIN</text>`)+
   `<text x="${f(x+14)}" y="${f(y+52)}" font-family="Georgia,serif" font-size="30" fill="#f2f5ef">12 / 14<tspan dx="6" font-size="12" font-style="italic" fill="#f2b866">passed</tspan></text>`+
   `<text x="${f(x+w-14)}" y="${f(y+51)}" text-anchor="end" font-family="Georgia,serif" font-size="18" fill="#f2b866">86%</text>`+
   `<path d="M${f(x+14)} ${f(y+63)}H${f(x+w-14)}" stroke="#4fa5ae" stroke-opacity=".28" stroke-width=".8"/>`;
@@ -1677,6 +1679,122 @@ function bezelRender(el,svg){
  // The nameplate rides the top of the growing frame.
  gr.style.opacity=1;gr.style.left=f(CW/2+F[0]+21)+'px';gr.style.top=f(CH/2+F[1]-3)+'px';gr.style.width=f(F[2]-42)+'px';gr.style.right='auto';
  const S=SIZES.find(x=>x[0]===model.size);el.setAttribute('aria-label','Checks widget, '+(S?S[1].toLowerCase():'resizing')+': 12 of 14 checks passed, 2 waiting for approval'+(u>=1.5?'; run 418 on main, deploy-preview and e2e-safari waiting on Brent':''));
+}
+
+/* ---------- Morph: scale and detail (Checks) ---------- */
+// u = g+1 runs 0 pendant, 1 charm, 2 amulet, 3 talisman: one stone in one wire frame, carrying only as much wirework as its size can hold.
+// Wire keeps its gauge and ornament keeps its pixel size at every size; a smaller form drops pieces instead of shrinking them into grey fuzz.
+// Frame F and stone S as [x,y,w,h,r] round Checks's centre; X is the reach [left, right, top, bottom] with every piece of that level in place.
+const DT=[{F:[-133,-34,266,68,20],S:[-124,-17,220,44,9],X:[-138,138,-39,39]},{F:[-62,-44,124,88,44],S:[-55,-37,110,74,37],X:[-68,68,-70,72]},
+ {F:[-118,-70,236,140,30],S:[-110,-62,220,124,24],X:[-146,146,-96,98]},{F:[-165,-100,330,200,40],S:[-155,-90,310,180,32],X:[-192,192,-128,140]}];
+const pl=t=>t.toFixed(4);
+function dtAt(u){
+ u=clamp(u,0,3);const i=Math.min(2,Math.floor(u)),p=u-i,e=i?springOut(seg(p,.15,.6)):ease(seg(p,.1,.6));
+ // Pendant to charm, the sides of the reach close in late: the fading plate and the lens travelling in from the margin still reach out.
+ const ex=i?Math.min(1,e):ease(seg(p,.45,.9)),X=lerpR(DT[i].X,DT[i+1].X,Math.min(1,e));X[0]=lerp(DT[i].X[0],DT[i+1].X[0],ex);X[1]=lerp(DT[i].X[1],DT[i+1].X[1],ex);
+ return{i,p,F:lerpR(DT[i].F,DT[i+1].F,e),S:lerpR(DT[i].S,DT[i+1].S,e),X};
+}
+// A rounded rect that starts and ends at its top centre, so a loop drawn from its middle both ways grows out of the bail.
+function rrTop(x,y,w,h,r){r=Math.min(r,h/2,w/2);const A=`A${f(r)} ${f(r)} 0 0 1 `;
+ return `M${f(x+w/2)} ${f(y)}H${f(x+w-r)}${A}${f(x+w)} ${f(y+r)}V${f(y+h-r)}${A}${f(x+w-r)} ${f(y+h)}H${f(x+r)}${A}${f(x)} ${f(y+h-r)}V${f(y+r)}${A}${f(x+r)} ${f(y)}Z`}
+// Wire drawn on to t, from its start or (mid) from its start point both ways round a closed loop.
+function wireOn(d,m,w,t,mid){
+ if(t<=.002)return '';if(t>=.998)return wire(d,m,w);
+ const c=METAL[m],p=`pathLength="1" stroke-dasharray="${mid?pl(t/2)+' '+pl(1-t)+' '+pl(t/2):pl(t)+' 2'}"`;
+ return `<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" ${p} stroke="${c[0]}" stroke-width="${w+1.7}"/><path d="${d}" ${p} stroke="${c[1]}" stroke-width="${w}"/><path d="${d}" ${p} stroke="${c[2]}" stroke-width="${f(w*.32)}" stroke-opacity=".85" transform="translate(-.5 -.6)"/></g>`;
+}
+// Anything wound along a closed loop (coils, twisted wire) is revealed by a mask drawn round the loop both ways from the top.
+function maskOn(id,d,t,sw,content){
+ if(t<=.002)return '';if(t>=.998)return content;
+ return `<mask id="${id}" maskUnits="userSpaceOnUse" x="-320" y="-260" width="640" height="520"><path d="${d}" fill="none" stroke="#fff" stroke-width="${sw}" pathLength="1" stroke-dasharray="${pl(t/2)} ${pl(1-t)} ${pl(t/2)}"/></mask><g mask="url(#${id})">${content}</g>`;
+}
+// A scroll: a short lead from the frame at (ax,ay), curling inward round a centre `out` px further along (ux,uy).
+function scrollD(ax,ay,ux,uy,out,r,turns,dir){const cx=ax+ux*out,cy=ay+uy*out;return `M${f(ax)} ${f(ay)}L`+spiral(cx,cy,r,turns,dir,Math.atan2(-uy,-ux)).slice(1)}
+// The nest on the talisman's top corner: wobbly loops of fine wire, each a little over one turn so its ends tuck under.
+const DTNEST=(()=>{let s=11;const r=()=>(s=s*16807%2147483647)/2147483647,out=[];
+ for(let i=0;i<12;i++){const a=r()*Math.PI,rx=7+r()*9,ry=4+r()*6,ox=(r()-.5)*7,oy=(r()-.5)*7,a0=r()*6.3,ph=r()*6.3,pts=[];
+  for(let k=0;k<=34;k++){const t=a0+k/34*Math.PI*2.25,w=1+.16*Math.sin(t*3+ph),x=Math.cos(t)*rx*w,y=Math.sin(t)*ry*w;pts.push([ox+x*Math.cos(a)-y*Math.sin(a),oy+x*Math.sin(a)+y*Math.cos(a)])}
+  out.push({pts,m:['copper','brass','copper','dim'][i%4]})}
+ return out})();
+function dtStone([x,y,w,h,r]){
+ return `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(h)}" rx="${f(r)}" fill="url(#tr-glass)"/><ellipse cx="${f(x+w*.82)}" cy="${f(y+h*.2)}" rx="${f(w*.11)}" ry="${f(h*.13)}" fill="#4fa5ae" opacity=".13"/>`+
+  `<path d="${rrect(x+1.5,y+1.5,w-3,h-3,r-1.5)}" fill="none" stroke="#000" stroke-opacity=".45" stroke-width="3"/><path d="${rrect(x,y,w,h,r)}" fill="none" stroke="#120906" stroke-width="2.4"/>`;
+}
+function dtCharm(S,o){
+ if(o<.02)return '';const [x,y,w,h]=S,cx=x+w/2,cy=y+h/2;
+ return `<g opacity="${f(o)}" text-anchor="middle"><text x="${f(cx)}" y="${f(cy-12)}" font-family="Georgia,serif" font-style="italic" font-size="13" fill="#f6d2ac">Checks</text>`+
+  `<text x="${f(cx)}" y="${f(cy+10)}" font-family="Georgia,serif" font-size="22" fill="#f2f5ef">12/14</text><text x="${f(cx)}" y="${f(cy+25)}" font-family="${BZF}" font-size="10" fill="#f2b866">2 waiting</text></g>`;
+}
+const dtHead=(x,y)=>`<text x="${f(x)}" y="${f(y+1)}"><tspan font-family="Georgia,serif" font-style="italic" font-size="14" fill="#f6d2ac">Checks</tspan><tspan dx="8" font-size="9.5" letter-spacing="1.3" fill="#9fbcb8">RUN 418</tspan></text>`;
+function dtAmulet(S,u){
+ const o=seg(u,1.74,1.92)*(1-seg(u,2.02,2.16)),[x,y,w]=S;let s='';
+ if(o>.02)s+=`<g opacity="${f(o)}" font-family="${BZF}">${dtHead(x+16,y+22)}`+
+  `<text x="${f(x+16)}" y="${f(y+60)}" font-family="Georgia,serif" font-size="30" fill="#f2f5ef">12 / 14<tspan dx="6" font-size="12" font-style="italic" fill="#f2b866">passed</tspan></text>`+
+  `<text x="${f(x+w-16)}" y="${f(y+60)}" text-anchor="end" font-family="Georgia,serif" font-size="15" fill="#f2b866">86%</text>`+
+  `<text x="${f(x+16)}" y="${f(y+80)}" font-size="10.5" fill="#c9d6d1">2 waiting for approval</text></g>`;
+ // The tally: a fine wire strung across the stone, and fourteen beads slide on one at a time (malachite passed, carnelian waiting).
+ const ws=seg(u,1.6,1.7),wo=1-seg(u,2.06,2.16),by=y+100;
+ if(ws>0&&wo>0){s+=`<g opacity="${f(wo)}">`+wireOn(`M${f(x+12)} ${f(by)}H${f(x+150)}`,'copper',.8,ws);
+  for(let i=0;i<14;i++){const t=seg(u,1.66+i*.012,1.76+i*.012);if(t<=0)continue;const bx=lerp(x+12,x+22+i*9,ease(t));s+=`<g opacity="${f(clamp(t*4))}">${strandItem({k:'bead',r:3.3,stone:i<12?'mal':'carn'},bx,by)}</g>`}
+  s+='</g>'}
+ return s;
+}
+function detailSvg(u){
+ u=clamp(u,0,3);const D=dtAt(u),F=D.F,S=D.S,[fx,fy,fw,fh,fr]=F,fb=fy+fh;let s='';
+ // Pendant to charm: the pendant's plate, inner wire, scrolls and coils fade while its frame closes in to a single heavy wire.
+ const po=1-seg(u,0,.45);
+ s+=`<path d="${rrect(...F)}" fill="url(#plate)"/><path d="${rrect(...F)}" fill="url(#hammer)"/><path d="${rrect(fx+3,fy+3,fw-6,fh-6,fr-3)}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="3"/>`;
+ if(po>0)s+=`<g transform="translate(${-CW/2} ${-CH/2})" opacity="${f(po)}">${casing(CW,CH,true,true,true)}</g>`;
+ // The twisted brass outer wire (talisman), wound on from the bail and bound to the frame top and bottom.
+ const tw=seg(u,2.46,2.7),T=[fx-5.5,fy-5.5,fw+11,fh+11,fr+5.5];
+ if(tw>0){const d=rrTop(...T);s+=maskOn('dt-tw',d,tw,9,twisted(d,'brass',2.2));
+  const bo=seg(u,2.68,2.78);if(bo>0)s+=wire([-1,1].map(k=>band(k*fw*.3,fy-2.7,false,3,11,2.2)+band(k*fw*.3,fb+2.7,false,3,11,2.2)).join(''),'brass',1.1,f(bo))}
+ s+=wire(rrTop(...F),'copper',3.1);
+ s+=dtStone(S);
+ // The pendant's coiled bezel rides the shrinking stone as it fades.
+ if(po>0)s+=`<g opacity="${f(po)}">${bzCoils(S,0)}</g>`;
+ // Coils bind the stone from the amulet up; the charm is too small for them, so its stone sits in a plain bezel.
+ const co=seg(u,1.48,1.7);if(co>0)s+=maskOn('dt-co',rrTop(...S),co,10,bzCoils(S,0));
+ // Side scrolls (amulet up): they ride the frame's sides as it grows.
+ const sc=seg(u,1.56,1.8),side=fy+fh/2;
+ if(sc>0)for(const k of [-1,1]){const ex=k>0?fx+fw:fx;s+=wireOn(scrollD(ex,side,k,0,13,8.5,1.7,k),'copper',1.8,sc);
+  if(sc>.85)s+=wire(band(ex+k*3.2,side,false,2,9,2.2),'brass',1.1,f(seg(sc,.85,1)))}
+ // Corner scrolls (talisman), each leading off the twisted wire; the top right corner holds the nest instead.
+ [[-1,-1],[1,1],[-1,1]].forEach(([sx,sy],k)=>{const t=seg(u,2.58+k*.03,2.8+k*.03);if(t<=0)return;const R=T[4],c=[sx>0?T[0]+T[2]-R:T[0]+R,sy>0?T[1]+T[3]-R:T[1]+R],a=[c[0]+R*.7071*sx,c[1]+R*.7071*sy];
+  s+=wireOn(scrollD(a[0],a[1],.7071*sx,.7071*sy,13,9,2.1,sx*sy>0?1:-1),'copper',1.6,t)});
+ // The nest: fine wires tangle round the corner, then a small amethyst cabochon settles into it.
+ if(u>2.6){const R=T[4],nx=T[0]+T[2]-R+R*.7071,ny=T[1]+R-R*.7071;
+  DTNEST.forEach((L,i)=>{const t=seg(u,2.62+i*.014,2.74+i*.014);if(t>0)s+=wireOn(poly(L.pts.map(p=>[nx+p[0],ny+p[1]])),L.m,.75,t)});
+  const am=seg(u,2.84,2.96);if(am>0){const k=backOut(am);s+=`<g transform="translate(${f(nx)} ${f(ny)}) scale(${f(k*100)/100})"><ellipse cx="1" cy="3" rx="8" ry="3" fill="#000" opacity=".45" filter="url(#soft)"/><ellipse cx="0" cy="0" rx="8" ry="6.5" fill="url(#st-amet)" stroke="#1a0d1c" stroke-width=".8"/><ellipse cx="-2.6" cy="-2.4" rx="2.6" ry="1.6" fill="#fff" opacity=".55"/></g>`;
+   if(am<1)s+=sparkle(nx+3,ny-4,Math.sin(Math.PI*am)*.7)}}
+ // Contents: each size has its own layout; the old one fades before the frame moves and the new one comes in once the wire has settled.
+ s+=dtCharm(S,seg(u,.74,.94)*(1-seg(u,1.02,1.16)))+dtAmulet(S,u)+bzSlab([S[0]+2,S[1]+12,S[2]-4],seg(u,2.74,2.94),dtHead);
+ // The bail: a stem rises from the frame top, a loop closes over it and a brass wrap binds it. It rides the top of the frame from the charm on.
+ const bl=seg(u,.52,.82);
+ if(bl>0)s+=wireOn(`M0 ${f(fy)}V${f(fy-12)}`,'copper',2,seg(bl,0,.35))+wireOn(circ(0,fy-17.5,5.5),'copper',2,seg(bl,.3,.8))+(bl>.75?wire(band(0,fy-6,true,3,8,2.2),'brass',1.1,f(seg(bl,.75,1))):'');
+ // The pendant's status lens leaves its margin and drops to hang under the frame; the talisman's fringe takes over from it.
+ const lo=1-seg(u,2.5,2.62);
+ if(lo>0){let lx=0,ly=fb+16,lr=7;
+  if(u<1){const p=ease(seg(u,.3,.85));lx=lerp(113.5,0,p);ly=lerp(3.5,fb+16,p)+18*Math.sin(Math.PI*p);lr=lerp(8.5,7,p)}
+  const st=seg(u,.78,.92);if(st>0)s+=`<g opacity="${f(lo)}">${wireOn(`M0 ${f(fb)}V${f(fb+9)}`,'copper',1.4,st)}</g>`+wire(band(0,fb+4,true,2,7,2.2),'brass',1.1,f(st*lo));
+  s+=`<g opacity="${f(lo)}">${strandItem({k:'bead',r:f(lr),stone:'mal'},lx,ly)}</g>`}
+ // The fringe (talisman): fourteen drops from the twisted wire, one per check, longest at the middle where the two waiting hang.
+ if(u>2.58){const yb=fb+5.5;for(let i=0;i<14;i++){const off=Math.abs(i-6.5),dl=(off-.5)*.012,x=(i-6.5)*13,L=7+17*(1-off/6.5),w=seg(u,2.6+dl,2.7+dl),p=seg(u,2.66+dl,2.8+dl);
+  if(w>0)s+=wireOn(`M${f(x)} ${f(yb)}V${f(yb+L-3)}`,'copper',.9,w);
+  if(p>0){const y=lerp(yb,yb+L,backOut(p));s+=`<g opacity="${f(clamp(p*5))}">${strandItem({k:'bead',r:4.2,stone:i===6||i===7?'carn':'mal'},x,y)}</g>`;if(p>.6&&p<1)s+=sparkle(x+2,y-3,Math.sin(Math.PI*seg(p,.6,1))*.45)}}}
+ // A glint where each new level's wire bites home.
+ const gl=Math.sin(Math.PI*seg(D.p,.86,.98));if(D.i&&gl>.03)s+=sparkle(S[0]+S[2]-S[4]*.3,S[1]+S[4]*.3,gl*.8)+sparkle(S[0]+S[4]*.3,S[1]+S[3]-S[4]*.3,gl*.55);
+ return s;
+}
+function detailRender(el,svg){
+ const u=clamp(model.g+1,0,3),D=dtAt(u),mini=el.querySelector('.mini'),gr=el.querySelector('.grip');
+ svg.innerHTML=`<g transform="translate(${CW/2} ${CH/2})">${detailSvg(u)}</g>`;
+ const out=1-seg(u,0,.35);mini.style.opacity=f(out);mini.style.visibility=out<.02?'hidden':'visible';mini.style.transform='';
+ el.querySelector('.lens').style.visibility='hidden';el.querySelector('.strip').style.opacity=0;
+ // From the charm on, the nameplate's hit box sits over the bail and the top of the frame.
+ const sm=u>=.5;el.classList.toggle('tree',sm);gr.style.width=gr.style.right='';
+ if(sm){gr.style.opacity=1;gr.style.left=f(CW/2-36)+'px';gr.style.top=f(CH/2+D.F[1]-16)+'px'}else{gr.style.opacity=f(1-seg(u,0,.3));gr.style.left=gr.style.top=''}
+ const S=SIZES.find(x=>x[0]===model.size);el.setAttribute('aria-label','Checks widget, '+(S?S[1].toLowerCase():'resizing')+': 12 of 14 checks passed, 2 waiting for approval'+(u>=2.5?'; run 418 on main, deploy-preview and e2e-safari waiting on Brent':''));
 }
 
 /* ---------- Model ---------- */
@@ -1754,7 +1872,7 @@ function render(){
    el.style.transformOrigin=`-${A.x0}px ${f(h/2)}px`;el.style.transform=th?`translate(${f(A.ring*Math.cos(ph)-A.ring)}px,${f(A.ring*Math.sin(ph))}px) rotate(${f(th)}deg)`:'';
   }
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
-  if(small&&model.g>-1){(model.morph==='bezel'?bezelRender:treeRender)(el,svg);continue}
+  if(small&&model.g>-1){({bezel:bezelRender,detail:detailRender}[model.morph]||treeRender)(el,svg);continue}
   if(small){el.classList.remove('tree');const gr=el.querySelector('.grip');gr.style.left=gr.style.top=gr.style.width=gr.style.right='';el.setAttribute('aria-label','Checks widget')}
   let s=sh.draw?sh.draw(id,w,h,small,model.st):casing(w,h,small);
   if(id==='a')s+=j.end(1,lit,h);if(id==='b')s+=j.end(-1,lit,h);
@@ -1787,7 +1905,7 @@ function render(){
  $('#grow').value=Math.round(model.g*100);$('#growOut').textContent=(model.g>=0?'+':'')+model.g.toFixed(2);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angle?' · '+$('#angleOut').textContent:'')};
- $('#phase').textContent=(drag&&drag.unwind?(model.join==='trunk'?'Untwisting · ':'Unwinding · ')+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'')+(model.g>-1?' · Checks: '+(SIZES.find(x=>x[0]===model.size)||[0,model.morph==='bezel'?'resizing':'growing'])[1].toLowerCase():'');
+ $('#phase').textContent=(drag&&drag.unwind?(model.join==='trunk'?'Untwisting · ':'Unwinding · ')+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'')+(model.g>-1?' · Checks: '+(SIZES.find(x=>x[0]===model.size)||[0,model.morph!=='tree'?'resizing':'growing'])[1].toLowerCase():'');
 }
 
 /* ---------- Controls ---------- */
@@ -1796,8 +1914,8 @@ STATES.forEach(([k,l,key])=>{const b=document.createElement('button');b.dataset.
 function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k==='joining')holdJoining();else if(k==='joined')doJoin();
  // A hoop tree still growing (Hoop rim · tree picked) finishes growing, then goes down into its rim.
  else if(model.morph==='tree'&&model.shade==='rimtree'&&model.size==='hoop'&&model.g<2&&model.st<.5)morphTo('hoop',()=>toggleShade(1));
- else if(model.morph!=='bezel')toggleShade();
- // The bezel shrinks to its pendant before it shades; a grow still waiting on an unshade is called off.
+ else if(model.morph==='tree')toggleShade();
+ // The bezel and the scale-and-detail forms shrink to the pendant before they shade; a grow still waiting on an unshade is called off.
  else if(model.g>-1&&model.st<.5)morphTo('pendant',toggleShade);else{if(model.g===-1){++morphAnim;model.size='pendant'}toggleShade()}}
 function options(row,set,key,aboutEl){
  Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id,true);$(row).append(b)});
@@ -1834,7 +1952,7 @@ options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#m
 $('#grow').oninput=e=>{
  // A shaded bezel unshades before it grows, so the slider hands over to the nearest size.
  // A hoop tree lying in its rim comes back up first, then goes to the nearest size.
- if((model.morph==='bezel'&&model.g===-1&&model.st>.5)||(rimHoop()&&model.st>0)){const v=e.target.value/100;if(v>-1||model.g>-1)morphTo(SIZES.reduce((a,b)=>Math.abs(b[2]-v)<Math.abs(a[2]-v)?b:a)[0]);return}
+ if((model.morph!=='tree'&&model.g===-1&&model.st>.5)||(rimHoop()&&model.st>0)){const v=e.target.value/100;if(v>-1||model.g>-1)morphTo(SIZES.reduce((a,b)=>Math.abs(b[2]-v)<Math.abs(a[2]-v)?b:a)[0]);return}
  ++morphAnim;model.g=e.target.value/100;const S=SIZES.find(x=>Math.abs(x[2]-model.g)<.001);model.size=S?S[0]:null;if(model.st>.5&&model.g>-1)toggleShade();render();settleLift(0)};
 $('#scrub').oninput=e=>{++anim;model.busy=false;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:{a:{...model.a},b:{...model.b}}}:{s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0)model.path=null;render()};
 $('#angle').oninput=e=>{++settleTok;flashTurning();setAngle(nearestDetent(+e.target.value))};
