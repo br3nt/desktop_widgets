@@ -151,6 +151,11 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .msheet small em{font:700 11.5px Georgia,serif;font-style:normal;color:#8f1c22;margin-right:4px}
 .msheet .wait{margin-top:6px}
 .mmolt{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+/* Scale and detail morph: the whole Checks is drawn in its casing svg; type and brush weight keep their size */
+.gsub{font-style:inherit}
+.dtx{font:10px/1 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;fill:#4a3b2b}
+.dtx .dn{font:700 12px Georgia,serif;fill:#8f1c22}
+.dser{font-family:Georgia,serif}
 .hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.shellhit{cursor:ns-resize}.hit.platehit{cursor:w-resize}.hit.inkhit{cursor:s-resize}.hit.inkhit .wet{opacity:0}.hit.inkhit:hover .wet,.hit.inkhit:focus-visible .wet{opacity:.5}.hit .pinhit{cursor:pointer}.hit.lamphit{cursor:pointer}.hit.mychit{cursor:s-resize}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0;pointer-events:none}
@@ -178,6 +183,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="rollG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#bfa679"/><stop offset=".22" stop-color="#f7f0dd"/><stop offset=".5" stop-color="#e9dbb8"/><stop offset=".85" stop-color="#b3966a"/><stop offset="1" stop-color="#7d6240"/></linearGradient>
  <linearGradient id="slipG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e9e2cf"/><stop offset=".25" stop-color="#fdf9ee"/><stop offset=".75" stop-color="#f1e8d2"/><stop offset="1" stop-color="#cdbf9e"/></linearGradient>
  <filter id="wobW" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter>
+ <radialGradient id="parchG" cx=".46" cy=".4" r=".8"><stop stop-color="#f5eedb"/><stop offset=".66" stop-color="#e8dbbb"/><stop offset="1" stop-color="#cfba8f"/></radialGradient>
+ <radialGradient id="tealG" cx=".38" cy=".32" r=".7"><stop stop-color="#f2fff9"/><stop offset=".45" stop-color="#8fe0cf"/><stop offset="1" stop-color="#2a7b70"/></radialGradient>
  <radialGradient id="pinG" cx=".35" cy=".3" r=".7"><stop stop-color="#fff"/><stop offset=".5" stop-color="#c3c8d0"/><stop offset="1" stop-color="#565c66"/></radialGradient>
  <linearGradient id="signG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#efe6cf"/><stop offset=".55" stop-color="#ddd0ae"/><stop offset="1" stop-color="#b9a47b"/></linearGradient>
  <radialGradient id="leakA"><stop stop-color="#fff1cc" stop-opacity=".95"/><stop offset=".35" stop-color="#ffc861" stop-opacity=".45"/><stop offset="1" stop-color="#ffc861" stop-opacity="0"/></radialGradient>
@@ -239,7 +246,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 </section>
 
 <section class="w small" id="c" aria-label="Checks widget"><svg class="casing" aria-hidden="true"></svg>
- <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b>independent</span><span class="orn" aria-hidden="true">◆</span></button>
+ <button class="grip" data-drag="c" aria-label="Move Checks"><span><b>Checks</b><i class="gsub">independent</i></span><span class="orn" aria-hidden="true">◆</span></button>
  <div class="mini"><span class="num">12 / 14</span>checks passed<br>2 waiting for approval</div><span class="lampdot" aria-hidden="true"></span>
  <div class="map" aria-hidden="true">
   <div class="flap"><div class="r3"><div class="rt">iii · awaiting approval</div>
@@ -1665,9 +1672,16 @@ const MORPHS={
  molt:{label:'Moult',kind:'Shed',
   about:'Each size of Checks is its own shell, and every resize sheds one. <b>Nymph:</b> the small smooth shell. <b>Instar:</b> a taller shell with two thorns on its back, a spur at its far shoulder and abdomen segments, carrying one larger parchment: run 418 on main, the count, a row of fourteen marks (twelve inked crosses and two open red rings for the checks still waiting) and the pass rate. <b>Imago:</b> a broad shell with three thorns, a long swept horn and a seam down the middle like closed wing cases, with the teal lamp set in the seam between two parchments; the second names deploy-preview and e2e-safari waiting for Brent. <b>The moult:</b> the parchment is taken down and the shell trembles; a white crack runs along the seam under the nameplate, and the plate above it pops up and peels back, throwing off flecks of shell. The new shell swells out of the split, pale and soft, steps out with a small overshoot and settles. The empty husk goes hollow and brittle, lets go and falls into the fog. The iron scroll and its lantern are lifted across onto the new shell, which darkens to navy chitin as it hardens; a glint runs along its back, the pins drop in and the parchment comes back. Shrinking is a moult too: the smaller shell climbs out of the big one, which is shed the same way. Going two sizes sheds two shells. Pick a size, press M to step through them, or scrub the slider. Checks moults where it stands, growing out evenly from the middle of its back. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks moults it back to a nymph first, and unshading grows it again.',
   sizes:['Nymph','Instar','Imago'],slider:'Checks size, nymph to imago',ms:[2600,2300],ax:.5,dims:g=>moltDims(g),
-  say:(to,from,n)=>to>from?(to-from>1?'Checks sheds two shells: it cracks along its back, steps out as an instar, then again as an imago.':to===2?'The instar cracks along its back and a broad, horned imago steps out; the husk falls into the fog.':'The nymph trembles and cracks along its back; a taller instar steps out and hardens.'):(from-to>1?'Checks sheds two shells, stepping out smaller each time, back to a '+n+'.':'The shell cracks along its back and a smaller '+n+' climbs out; the empty husk falls away.')}
+  say:(to,from,n)=>to>from?(to-from>1?'Checks sheds two shells: it cracks along its back, steps out as an instar, then again as an imago.':to===2?'The instar cracks along its back and a broad, horned imago steps out; the husk falls into the fog.':'The nymph trembles and cracks along its back; a taller instar steps out and hardens.'):(from-to>1?'Checks sheds two shells, stepping out smaller each time, back to a '+n+'.':'The shell cracks along its back and a smaller '+n+' climbs out; the empty husk falls away.')},
+ detail:{label:'Scale and detail',kind:'Level of detail',sz:[['pip','Pip',-1],['sheet','Shell',0],['chart','Chart',1],['survey','Survey',2]],slider:'Checks size and detail, pip to survey',ms:[1500,1300],ax:.5,dims:g=>{const d=detDims(g);return[d.w,d.h]},
+  about:'Checks is drawn the way a cartographer draws a map: the scale decides how much detail there is room for. The brush keeps its weight, the type keeps its size and every piece of ironwork keeps its pixel size at every scale, so a smaller Checks drops pieces rather than shrinking them into grey fuzz. <b>Pip</b> (smaller than the shell): the iron scroll and its lantern are gone, and the parchment keeps only what matters, 12 / 14 and 2 waiting, under the name. <b>Shell:</b> the scroll curls back on and the words return. <b>Chart:</b> a coastline and the route of run 418 are inked in by a pale quill, waymark by waymark (twelve crosses, two open red rings for the checks still waiting), with the pass rate; a smaller scroll curls out at the far shoulder, a pin drops in and red thread stitches the sheet down. <b>Survey:</b> an iron railing of spikes rises along the back, a second lantern is hung from the far scroll, a legend slip is pinned beside the map, the two red rings get place names (deploy-preview and e2e-safari, waiting for Brent), a compass rose spins in, and last of all, the finest detail: contour lines. <b>Every step:</b> the shell darts to its new size, pauses, then the new level is inked in, coarse to fine. Shrinking runs it backwards, so the finest detail goes first, sinking into a passing fog before the shell darts in. Pick a size, press M or scrub the slider. Checks grows out evenly to both sides. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a pip, chart or survey brings it back to a shell first, and unshading returns it to that size.',
+  say:(to,from,n)=>to>from?(to===2?'Survey scale: an iron railing rises along the back, a second lantern is hung, and the map gains a legend, place names, a compass rose and contour lines.':to===1?'Chart scale: the shell darts out and a quill inks in the coast and the route of run 418, waymark by waymark.':'The pip darts out to a shell: the iron scroll curls back on and the words return.'):(to===-1?'Pip scale: the scroll and every word that will not fit sink into the fog; the name, 12 / 14 and 2 waiting stay.':'The finest detail sinks into the fog and the shell darts in: Checks is '+article(n)+'.')}
 };
-const MO=()=>MORPHS[model.morph],sizeName=i=>MO().sizes[i],article=s=>(/^[aeiou]/i.test(s)?'an ':'a ')+s;
+// Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
+for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
+const MO=()=>MORPHS[model.morph],SZ=()=>MO().sz,sizeName=i=>(SZ().find(x=>x[2]===i)||[0,''])[1],article=s=>(/^[aeiou]/i.test(s)?'an ':'a ')+s;
+// The size to come back to: the one picked, else the nearest whole size away from the base.
+const keepSize=()=>model.size&&model.size!=='sheet'?model.size:(SZ().find(x=>x[2]===(Math.round(model.g)||Math.sign(model.g)))||SZ()[0])[0];
 const backSoft=t=>{const u=t-1;return 1+2.2*u*u*u+1.2*u*u};
 function geo(g){
  g=clamp(g,0,2);const t1=clamp(g),t2=clamp(g-1),p=dart(seg(t1,.3,.72));
@@ -1675,7 +1689,7 @@ function geo(g){
   tie:seg(t1,.18,.3),vis:lerp(34,118,p),r:lerp(5,2,p),rollOp:1-seg(t1,.7,.76),
   lift:seg(t2,.24,.36),th:180*(1-backSoft(seg(t2,.34,.8))),crease:seg(t2,.6,.8),dust:seg(t2,.66,.86),
   pins:[[45.5,142.5,seg(t1,.78,.9)],[218.5,142.5,seg(t1,.82,.94)],[402.5,35.5,seg(t2,.8,.9)],[402.5,142.5,seg(t2,.84,.94)]]}}
-const cDims=()=>{if(model.g<=0)return[CW,model.st>0?Math.round(lerp(CH,CHS,cinch())):CH];return MO().dims(model.g)};
+const cDims=()=>{if(model.g===0)return[CW,model.st>0?Math.round(lerp(CH,CHS,cinch())):CH];return MO().dims(model.g)};
 // Run 418 as a route: twelve inked waymarks, then two open red rings for the checks still waiting.
 (function(){const y=x=>17+8*Math.sin(x*.05+.5);let d='M2 '+f(y(2)),o='';for(let x=6;x<=158;x+=4)d+=`L${x} ${f(y(x))}`;
  o+=`<path d="${d}" fill="none" stroke="#5c4a36" stroke-width=".9" stroke-dasharray="2 2.2" stroke-linecap="round"/>`;
@@ -1826,6 +1840,100 @@ function moult(el,w,h){
  cas.innerHTML=o;
  ov.innerHTML=(O>0&&outOp>0?`<g opacity="${f(outOp)}">${mPins(O,ox,1)}</g>`:'')+(N>0?mPins(N,nx,j=>seg(u,.82+.03*j,.92+.03*j)):'');
 }
+/* ---------- Morph: scale and detail (Checks) ---------- */
+// g runs -1 pip, 0 shell, 1 chart, 2 survey. Per level: the widget's size, its parchment sheet [x, y, w, h], the teal lamp's centre and the nameplate's inset.
+// Type, brush weight and ironwork keep their pixel size at every level; only the room for them changes.
+const DL=[{w:176,h:74,s:[30,28,112,34],l:[157,45],gi:28},{w:CW,h:CH,s:[40,30,184,34],l:[244.5,45.5],gi:40},
+ {w:364,h:140,s:[36,32,254,88],l:[322,48],gi:40},{w:484,h:206,s:[34,32,344,152],l:[428,44],gi:40}];
+const detOn=()=>model.morph==='detail'&&model.g!==0;
+// Within a step the shell darts to its new size early (t .08-.42) with a small overshoot, pauses, and the rest of the step (t .5-1) inks in the detail.
+// Shrinking plays the step backwards: the detail goes first, then the shell darts in, overshooting inward.
+function detDims(g){g=clamp(g,-1,2);const i=Math.min(1,Math.floor(g)),q=seg(g-i,.08,.42),z=model.mdir<0?1-backSoft(1-q):backSoft(q),A=DL[i+1],B=DL[i+2];
+ return{z,A,B,w:Math.round(lerp(A.w,B.w,z)),h:Math.round(lerp(A.h,B.h,z))}}
+// How far level L's detail has come in (0..1), over the window a..b of the step that brings it.
+const dk=(L,a,b)=>{const g=model.g;return g>=L?1:g<=L-1?0:seg(g-L+1,a,b)};
+const SCRT=taper(SCROLL,6,1.4);
+const ROSE='<circle r="9.5" fill="none" stroke="#5c4a36" stroke-width=".7" stroke-dasharray="1.2 1.6"/><path d="M0 -13L2.4 -2.4L9 0L2.4 2.4L0 13L-2.4 2.4L-9 0L-2.4 -2.4Z" fill="#2b241d"/><path d="M0 -13L2.4 -2.4H-2.4Z" fill="#8f1c22"/><path d="M0 -13L0 13M-9 0H9" stroke="#f1e6cc" stroke-width=".5"/><circle r="1.3" fill="#f1e6cc" stroke="#2b241d" stroke-width=".6"/>';
+const lanternSvg=(lx,ly)=>`<circle cx="${f(lx)}" cy="${f(ly+19)}" r="22" fill="url(#lamp)"/><path d="M${f(lx)} ${f(ly)}V${f(ly+11)}" stroke="#0b0e14" stroke-width="1.3" stroke-dasharray="2.2 1.1"/><path d="M${f(lx-4.8)} ${f(ly+15)}L${f(lx)} ${f(ly+10.5)}L${f(lx+4.8)} ${f(ly+15)}Z" fill="#0b0e14"/>`+
+ `<rect x="${f(lx-3.7)}" y="${f(ly+15)}" width="7.4" height="9" rx="1.2" fill="#ffd581" stroke="${INK}"/><path d="M${f(lx)} ${f(ly+15)}V${f(ly+24)}" stroke="${INK}" stroke-width=".8"/><path d="M${f(lx-4.4)} ${f(ly+24)}H${f(lx+4.4)}L${f(lx+1.6)} ${f(ly+27)}H${f(lx-1.6)}Z" fill="#0b0e14"/>`;
+// A scroll curls on about its foot: it swings round and grows from a small coil with a little overshoot.
+const curlIn=(body,bx,by,k)=>`<g opacity="${f3(seg(k,0,.35))}" transform="translate(${f(bx)} ${f(by)}) rotate(${f(-55*(1-dart(k)))}) scale(${f3(Math.max(.05,lerp(.2,1,backSoft(k))))}) translate(${f(-bx)} ${f(-by)})">${body}</g>`;
+// The pale quill that inks a line, drawn at the line's growing tip.
+const nib=p=>`<g transform="translate(${P(p)}) rotate(28)"><path d="M0 0L1.7 -3.4L2.4 -21L.2 -21.4L-.6 -3.4Z" fill="#e8eef6" stroke="${INK}" stroke-width=".7" stroke-linejoin="round"/></g>`;
+function detail(el,w,h){
+ const svg=el.querySelector('.casing'),grip=el.querySelector('.grip'),sub=grip.querySelector('.gsub'),orn=grip.querySelector('.orn');
+ if(!detOn()){if(el.dataset.det){delete el.dataset.det;svg.dataset.dk='';grip.style.left=grip.style.right=sub.style.opacity=sub.style.display=orn.style.opacity=''}return}
+ el.dataset.det='1';
+ for(const n of el.querySelectorAll('.mini,.lampdot'))n.style.visibility='hidden';
+ const g=model.g,{z,A,B}=detDims(g),L=(a,b)=>lerp(a,b,z),[sx,sy,sw,sh]=A.s.map((v,j)=>L(v,B.s[j])),lp=[L(A.l[0],B.l[0]),L(A.l[1],B.l[1])],still=g===Math.round(g),back=model.mdir<0&&!still;
+ // The nameplate narrows on a pip, dropping its subtitle and diamond.
+ grip.style.left=grip.style.right=f(L(A.gi,B.gi))+'px';
+ const ks=dk(0,.55,.72);sub.style.opacity=orn.style.opacity=f(ks);sub.style.display=ks<=0?'none':'';
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'changing scale')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h,model.mdir].join();if(svg.dataset.dk===key)return;svg.dataset.dk=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ // Growing, lines are inked from their start by the quill and marks are stamped on; shrinking, everything just fades into the fog.
+ const op=k=>`opacity="${f3(k)}"`,nibs=[];
+ const ink=(pts,k,a,quill=true)=>{if(k<=0)return '';if(back||k>=1)return `<path d="M${pts.map(P).join('L')}" ${a} ${back?op(k):''}/>`;const q=partial(pts,k);if(quill)nibs.push(q.tip);return `<path d="${q.d}" ${a}/>`};
+ const rise=k=>`${op(back?k:seg(k,0,.6))} transform="translate(0 ${f(back?0:3*(1-dart(k)))})"`;
+ let o=`<defs><clipPath id="dClip"><rect x="${f(sx)}" y="${f(sy)}" width="${f(sw)}" height="${f(sh)}" rx="3"/></clipPath></defs>`;
+ // Survey: an iron rail is drawn along the back, then spikes are raised on it left to right. Drawn before the shell, which covers their feet.
+ const kr=dk(2,.5,.6);
+ if(kr>0){const R=[];for(let t=.1;t<=.901;t+=.02){const p=arcPt(w,t);R.push({x:p.x,y:p.y-4.5})}
+  o+=ink(R,kr,`fill="none" stroke="#0b0e14" stroke-width="1.6" stroke-linecap="round"`);
+  const n=Math.max(2,Math.round((w-100)/24));
+  for(let j=0;j<n;j++){const p=arcPt(w,.1+.8*j/(n-1)),k=dk(2,.56+.2*j/n,.62+.2*j/n);if(k<=0)continue;
+   o+=`<g ${op(back?k:seg(k,0,.25))} transform="translate(${f(p.x)} ${f(p.y+3)}) scale(1 ${f3(back?1:backSoft(k))})"><path d="M-1.8 0L0 -15L1.8 0Z" fill="#0b0e14"/><circle cy="-7.5" r="1.7" fill="#0b0e14"/><path d="M-.5 -2L-.1 -12" stroke="#7d8ca3" stroke-width=".6" opacity=".6"/></g>`}}
+ o+=casing('c',w,h,true,'body');
+ // Shell: the iron scroll and its lantern. Chart: a smaller scroll at the far shoulder. Survey: a second lantern hung from it.
+ const ki=dk(0,.5,.74);if(ki>0)o+=curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,ki);
+ const kc=dk(1,.52,.7);if(kc>0)o+=curlIn(`<g transform="translate(${w} 0) scale(-.8 .8)"><g filter="url(#wob)"><path d="${SCRT}" fill="#0b0e14"/></g><path d="${taper(SCROLL.slice(0,20),1.4,.3)}" fill="#7d8ca3" opacity=".55" transform="translate(-.6 -.8)"/></g>`,w-20.8,11.2,kc);
+ const kl=dk(2,.6,.74);if(kl>0)o+=`<g ${op(back?kl:seg(kl,0,.3))} transform="translate(0 ${f(back?0:-10*(1-dart(kl)))})">${lanternSvg(w-.8*HANG[0],.8*HANG[1]+2)}</g>`;
+ // The parchment sheet, with darker blotches at two corners.
+ const sp=`M${f(sx+3)} ${f(sy)}H${f(sx+sw-5)}Q${f(sx+sw)} ${f(sy)} ${f(sx+sw)} ${f(sy+3)}V${f(sy+sh-5)}Q${f(sx+sw)} ${f(sy+sh)} ${f(sx+sw-2)} ${f(sy+sh)}H${f(sx+5)}Q${f(sx)} ${f(sy+sh)} ${f(sx)} ${f(sy+sh-3)}V${f(sy+5)}Q${f(sx)} ${f(sy)} ${f(sx+3)} ${f(sy)}Z`;
+ o+=`<path d="${sp}" fill="${INK}" opacity=".6" transform="translate(1.5 3)"/><path d="${sp}" fill="url(#parchG)"/>`+
+  `<g clip-path="url(#dClip)"><ellipse cx="${f(sx+4)}" cy="${f(sy+sh*.92)}" rx="${f(sw*.26)}" ry="${f(sh*.5)}" fill="#7a582a" opacity=".12" filter="url(#blur3)"/><ellipse cx="${f(sx+sw*.97)}" cy="${f(sy+sh*.08)}" rx="${f(sw*.22)}" ry="${f(sh*.46)}" fill="#7a582a" opacity=".1" filter="url(#blur3)"/></g>`+
+  `<path d="${sp}" fill="none" stroke="${INK}" stroke-width="1.3"/>`;
+ // Every level: the name (on the nameplate), 12 / 14 and 2 waiting. The shell adds the words.
+ let c=`<text class="dtx" x="${f(sx+11)}" y="${f(sy+13.5)}"><tspan class="dn">12 / 14</tspan><tspan dx="4" fill-opacity="${f3(dk(0,.6,.8))}">checks passed</tspan></text>`+
+  `<text class="dtx" x="${f(sx+11)}" y="${f(sy+27)}">2 waiting<tspan fill-opacity="${f3(dk(0,.68,.88))}"> for approval</tspan></text>`;
+ // Chart: a coastline, then the route of run 418 with its fourteen waymarks stamped on as the quill passes, then the pass rate.
+ const kco=dk(1,.5,.62);if(kco>0){const C=[];for(let x=sx+5;x<=sx+sw-5;x+=4)C.push({x,y:sy+37+1.3*Math.sin((x-sx)*.31)+.8*Math.sin((x-sx)*.09)});c+=ink(C,kco,`fill="none" stroke="#3b2c1c" stroke-width=".9" stroke-dasharray="1.4 2" stroke-linecap="round"`)}
+ const ry=x=>sy+53+6*Math.sin((x-sx)*.045+.5),x0=sx+16,dx=(sw-40)/13;
+ const kro=dk(1,.55,.9);if(kro>0){const R=[];for(let x=sx+10;x<=x0+13*dx+4;x+=4)R.push({x,y:ry(x)});c+=ink(R,kro,`fill="none" stroke="#5c4a36" stroke-width=".9" stroke-dasharray="2 2.2" stroke-linecap="round"`)}
+ for(let i=0;i<14;i++){const k=dk(1,.57+.025*i,.61+.025*i);if(k<=0)continue;const x=x0+i*dx;
+  c+=`<g ${op(back?k:seg(k,0,.4))} transform="translate(${f(x)} ${f(ry(x))}) scale(${f3(back?1:lerp(1.7,1,dart(k)))})">`+(i<12?`<path d="M-2.2 -2.2l4.4 4.4m0 -4.4l-4.4 4.4" stroke="#231b14" stroke-width="1.5" stroke-linecap="round"/>`:`<circle r="3.2" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.4"/>`)+'</g>'}
+ const k3=dk(1,.8,.92);if(k3>0)c+=`<text class="dtx" x="${f(sx+11)}" y="${f(sy+sh-9)}" ${rise(k3)}>run 418 · main · <tspan class="dn" style="font-size:11.5px">86%</tspan> passed</text>`;
+ // Survey: the two red rings get place names on leader lines, a compass rose spins in, and last, the finest detail: contour lines.
+ const kn=dk(2,.7,.8),kt=dk(2,.74,.86);
+ for(const[i,ly,name]of[[12,94,'deploy-preview'],[13,122,'e2e-safari']]){const x=x0+i*dx;
+  c+=ink([{x,y:ry(x)+4.5},{x,y:sy+ly-11}],kn,`stroke="#8f1c22" stroke-width=".9" stroke-dasharray="1.2 1.6"`);
+  if(kt>0)c+=`<g ${rise(kt)}><text class="dser" x="${f(x+3)}" y="${f(sy+ly)}" text-anchor="end" font-size="12.5" fill="#231b14">${name}</text><text class="dser" x="${f(x+3)}" y="${f(sy+ly+12)}" text-anchor="end" font-size="10.5" font-style="italic" fill="#5c4a36">waiting for Brent</text></g>`}
+ const kq=dk(2,.78,.9);if(kq>0)c+=`<g ${op(back?kq:seg(kq,0,.3))} transform="translate(${f(sx+38)} ${f(sy+101)}) rotate(${f(back?0:-120*(1-dart(kq)))}) scale(${f3(back?1:lerp(.4,1,backSoft(kq)))})">${ROSE}</g>`;
+ const kct=dk(2,.86,1);if(kct>0)for(const[d,a]of[[12,.75],[19,.5]]){const C=[];for(let x=sx+62;x<=sx+196;x+=4)C.push({x,y:ry(x)+d+2*Math.sin((x-sx)*.07+d)});c+=ink(C,kct,`fill="none" stroke="#8a7656" stroke-width=".8" stroke-dasharray="3 2" stroke-opacity="${a}"`)}
+ o+=`<g clip-path="url(#dClip)">${c}</g>`;
+ // Pins: one always; chart adds a second, dropped in, and red thread stitched across the bottom corners.
+ o+=`<circle cx="${f(sx+5.5)}" cy="${f(sy+5.5)}" r="2.5" fill="url(#pinG)" stroke="${INK}" stroke-width=".6"/>`+pin(sx+sw-5.5,sy+5.5,dk(1,.5,.62));
+ const kst=dk(1,.88,.98);if(kst>0)for(const x of[sx+3,sx+sw-3])for(const s of[1,-1]){const pts=[{x:x-3*s,y:sy+sh-6},{x:x+3*s,y:sy+sh}];o+=ink(pts,kst,`stroke="#3a070b" stroke-width="2.2" stroke-linecap="round"`,false)+ink(pts,kst,`stroke="${RED}" stroke-width="1.3" stroke-linecap="round"`,false)}
+ // Survey: a legend slip pinned beside the map, under the lamp.
+ const kg=dk(2,.62,.76);
+ if(kg>0){const lx=sx+sw+14,ly=sy+34,lw=72,lh=58,s2=`M${f(lx+2)} ${f(ly)}H${f(lx+lw-3)}Q${f(lx+lw)} ${f(ly)} ${f(lx+lw)} ${f(ly+3)}V${f(ly+lh-2)}Q${f(lx+lw)} ${f(ly+lh)} ${f(lx+lw-3)} ${f(ly+lh)}H${f(lx+3)}Q${f(lx)} ${f(ly+lh)} ${f(lx)} ${f(ly+lh-3)}V${f(ly+2)}Q${f(lx)} ${f(ly)} ${f(lx+2)} ${f(ly)}Z`;
+  o+=`<g ${op(back?kg:seg(kg,0,.3))} transform="translate(0 ${f(back?0:-14*(1-dart(kg)))}) rotate(${f(back?0:-7*(1-dart(kg)))} ${f(lx+lw/2)} ${f(ly)})">`+
+   `<path d="${s2}" fill="${INK}" opacity=".6" transform="translate(1.5 3)"/><path d="${s2}" fill="url(#parchG)" stroke="${INK}" stroke-width="1.2"/>`+
+   `<path d="M${f(lx+8)} ${f(ly+13)}l4.4 4.4m0 -4.4l-4.4 4.4" stroke="#231b14" stroke-width="1.4" stroke-linecap="round"/><circle cx="${f(lx+10.2)}" cy="${f(ly+31.5)}" r="3" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.3"/><path d="M${f(lx+5)} ${f(ly+46.5)}h10" stroke="#5c4a36" stroke-width=".9" stroke-dasharray="2 2"/>`+
+   `<g class="dser" font-size="10.5" fill="#3a2c1e"><text x="${f(lx+19)}" y="${f(ly+19)}"><tspan font-weight="700" fill="#231b14">12</tspan> passed</text><text x="${f(lx+19)}" y="${f(ly+35)}"><tspan font-weight="700" fill="#8f1c22">2</tspan> waiting</text><text x="${f(lx+19)}" y="${f(ly+50)}" font-style="italic">run 418</text></g></g>`+
+   pin(lx+lw/2,ly+5,dk(2,.74,.84))}
+ // The teal lamp rides with the sheet.
+ o+=`<circle cx="${f(lp[0])}" cy="${f(lp[1])}" r="12" fill="#8fe0cf" opacity=".28" filter="url(#blur3)"/><circle cx="${f(lp[0])}" cy="${f(lp[1])}" r="7.6" fill="${INK}"/><circle cx="${f(lp[0])}" cy="${f(lp[1])}" r="6.2" fill="url(#tealG)" stroke="#b8934a" stroke-width="1.5"/>`;
+ // Growing: a glint runs over the back as the shell lands. Shrinking: fog drifts across and takes the detail.
+ const t=g-Math.floor(g);
+ if(!still&&!back){const q=seg(t,.4,.52);if(q>0&&q<1){const p=arcPt(w,.2+.6*q);o+=spark({x:p.x,y:p.y+3},Math.sin(Math.PI*q)*.9,7)}}
+ if(back){const p=1-seg(t,.5,1);if(p>0&&p<1){const a=Math.sin(Math.PI*p);for(let j=0;j<5;j++)o+=`<ellipse cx="${f(sx+sw*(1.25-1.55*p)+j*37-74)}" cy="${f(lerp(-2,sy+sh,j/4))}" rx="${46+8*(j%3)}" ry="${9+3*(j%2)}" fill="#c9d6e6" opacity="${f3(.38*a)}" filter="url(#blur3)"/>`}}
+ // One quill: it sits on the line inked most recently.
+ const tip=nibs.filter(Boolean).pop();if(tip)o+=nib(tip);
+ svg.innerHTML=o;
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -1878,9 +1986,9 @@ const pairHeld=()=>!!(drag&&drag.id&&drag.id!=='c'&&!drag.seam);
 let morphAnim=0;
 function morphTo(id){
  if(drag)cancelDrag();
- const S=SIZES.find(x=>x[0]===id),to=S[2],from=model.g;
+ const S=SZ().find(x=>x[0]===id);if(!S)return Promise.resolve(false);const to=S[2],from=model.g;
  // A shaded Checks comes out of its shade first, then unfurls.
- if(model.st>0&&to>0){model.restore=id;model.size=id;toggleShade(0);render();return Promise.resolve(false)}
+ if(model.st>0&&to!==0){model.restore=id;model.size=id;toggleShade(0);render();return Promise.resolve(false)}
  if(to===0)model.restore=null;
  model.size=id;
  const name=sizeName(to).toLowerCase();
@@ -1960,7 +2068,7 @@ function holdJoining(){
 function toggleShade(force){
  const sh=SHADES[model.shade],to=force!==undefined?force:model.st>.5?0:1,start=model.st;
  // A grown Checks rolls its map back to a sheet first, and unfurls again once unshaded.
- if(to===1&&model.g>0){const keep=model.size&&model.size!=='sheet'?model.size:SIZES[Math.max(1,Math.round(model.g))][0];++shadeAnim;
+ if(to===1&&model.g!==0){const keep=keepSize();++shadeAnim;
   morphTo('sheet').then(ok=>{if(ok){model.restore=keep;toggleShade(1)}});return}
  const token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||520)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;model.sdir=to?1:-1;
  (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms),[h0,c0]=footOff();model.st=lerp(start,to,e(t));const[h1,c1]=footOff();shiftFeet(h1-h0,c1-c0);refitPair();render();if(t<1)requestAnimationFrame(step);else if(to===0&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}})(t0);
@@ -1970,7 +2078,7 @@ function toggleShade(force){
 const cinch=()=>{const s=SHADES[model.shade];return s.cinch?s.cinch(model.st):ease(model.st)};
 // A foot-anchored shade (the fog sink) keeps each widget's foot where it stood, so the shell visibly goes down.
 // footOff is how far it has moved the widgets at the current progress; shiftFeet moves them (and any join path or drag origin).
-const footOff=()=>SHADES[model.shade].foot?[H-Math.round(lerp(H,HS,cinch())),model.g>0?0:CH-Math.round(lerp(CH,CHS,cinch()))]:[0,0];
+const footOff=()=>SHADES[model.shade].foot?[H-Math.round(lerp(H,HS,cinch())),model.g!==0?0:CH-Math.round(lerp(CH,CHS,cinch()))]:[0,0];
 function shiftFeet(d,dc){
  if(!d&&!dc)return;
  // Rising out of the fog near the top of the stage stops at the top margin.
@@ -1987,7 +2095,7 @@ function render(){
  const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,cinch())),coc=model.shade==='cocoon',mr=model.shade==='mroll',sg=model.shade==='sign',cu=model.shade==='curl',fg=model.shade==='fog',s=model.st;
  $$('#a .runText').forEach(n=>n.textContent=model.a.run?'agents running':'agents paused');
  for(const id of ['a','b','c']){
-  const el=$('#'+id),m=model[id],small=id==='c',D=small&&model.g>0?MO().dims(model.g):null,w=small?(D?D[0]:CW):W,h=small?(D?D[1]:ch):c.h,lit=small?true:m.run;
+  const el=$('#'+id),m=model[id],small=id==='c',D=small&&model.g!==0?MO().dims(model.g):null,w=small?(D?D[0]:CW):W,h=small?(D?D[1]:ch):c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   // On an angled join GitDiscuss turns: about the bracket's knuckle, or on the end of the shell plates.
   if(id==='b'){const t=j.place?j.place(h):null;el.style.transformOrigin=t?t.o:'';el.style.transform=t?t.t:''}
@@ -1995,8 +2103,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(key[0]!=='M'){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(key[0]!=='M'&&key[0]!=='D'){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):mr||cu||fg?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -2006,7 +2114,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);if(small){unfurl(el,w,h,show);moult(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h)}
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
@@ -2024,7 +2132,7 @@ function render(){
  $$('#morphRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.morph)));
  $$('#sizeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===model.size)));
  if(document.activeElement!==$('#grow'))$('#grow').value=Math.round(model.g*100);
- const SZ=SIZES.find(x=>x[2]===model.g);$('#growOut').textContent=SZ?sizeName(SZ[2]).toLowerCase():'…';$('#grow').setAttribute('aria-valuetext',SZ?sizeName(SZ[2]):'between sizes');
+ const Z=SZ().find(x=>x[2]===model.g);$('#growOut').textContent=Z?Z[1].toLowerCase():'…';$('#grow').setAttribute('aria-valuetext',Z?Z[1]:'between sizes');
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),T=j.text;
  const ph={separate:'Separate · two shells',joining:j.phase(model.dir,model.jt)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+signed(model.angle):'')};
@@ -2040,9 +2148,11 @@ function pick(key,id){
  if(drag)cancelDrag();
  if(key==='join'&&id!==model.join){stopAngle();if(J().angled)model.angs[model.join]=model.angle;if(JOINS[id].angled)model.angle=model.angs[id];lamp.on=false;const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;model.peal=model.armed=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade'){const[o0,c0]=footOff();model.shade=id;const[o1,c1]=footOff();shiftFeet(o1-o0,c1-c0);refitPair()}
- // A grown Checks goes back to its smallest form, changes morph, then grows to the same size in the new one.
- if(key==='morph'&&id!==model.morph&&model.g>0){const keep=model.size||SIZES[Math.max(1,Math.round(model.g))][0];
-  morphTo('sheet').then(ok=>{if(ok){model.morph=id;describe();render();morphTo(keep)}});return}
+ // A resized Checks goes back to its base size, changes morph, then goes to the same size in the new one (if it was already heading to the base, it stays there).
+ // Sizes match across morphs by step (g), so a pip has no match in the other morphs and stays at the base. A size waiting to be restored after a shade is mapped the same way.
+ if(key==='morph'&&id!==model.morph&&model.g!==0){const kg=model.size==='sheet'?0:(SZ().find(x=>x[0]===keepSize())||[0,0,0])[2];
+  morphTo('sheet').then(ok=>{if(ok){model.morph=id;describe();render();const n=SZ().find(x=>x[2]===kg);if(n&&kg!==0)morphTo(n[0])}});return}
+ if(key==='morph'&&id!==model.morph&&model.restore){const r=SZ().find(x=>x[0]===model.restore);model.restore=r&&r[2]!==0?(MORPHS[id].sz.find(x=>x[2]===r[2])||[null])[0]:null}
  if(key==='morph')model.morph=id;
  describe();render();if(key==='join')settleLift();
 }
@@ -2051,14 +2161,18 @@ function describe(){
  $('#joinAbout').innerHTML=`<h2>${j.label}<small>join · ${j.kind}</small></h2><p>${j.about}</p>`;
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
  const mo=MORPHS[model.morph];$('#morphAbout').innerHTML=`<h2>${mo.label}<small>morph · ${mo.kind}</small></h2><p>${mo.about}</p>`;
- $$('#sizeRow button').forEach((b,i)=>b.textContent=mo.sizes[i]);$('#grow').setAttribute('aria-label',mo.slider);
+ // Each morph has its own size buttons and slider range.
+ // Rebuilt only when the morph changes, so a focused size button survives join and shade changes.
+ const row=$('#sizeRow');if(row.dataset.m!==model.morph){row.dataset.m=model.morph;
+  $$('#sizeRow button').forEach(b=>b.remove());
+  mo.sz.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size=id;b.textContent=l;b.onclick=()=>morphTo(id);$('#grow').before(b)});
+  const gs=mo.sz.map(x=>x[2]),r=$('#grow');r.min=Math.min(...gs)*100;r.max=Math.max(...gs)*100;r.setAttribute('aria-label',mo.slider)}
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');options('#morphRow',MORPHS,'morph');
-SIZES.forEach(([id,l])=>{const b=document.createElement('button');b.dataset.size=id;b.textContent=l;b.onclick=()=>morphTo(id);$('#grow').before(b)});
 // Scrubbing size: while shaded, the slider unshades first (unfurling back to any size it had) and ignores the move.
 $('#grow').oninput=e=>{if(drag&&drag.id==='c')cancelDrag();
  if(model.st>0){toggleShade(0);e.target.value=0;render();return}
- ++morphAnim;model.restore=null;const v=e.target.value/100,[wp]=cDims();setG(v);const S=SIZES.find(x=>x[2]===v);model.size=S?S[0]:null;
+ ++morphAnim;model.restore=null;const v=e.target.value/100,[wp]=cDims();setG(v);const S=SZ().find(x=>x[2]===v);model.size=S?S[0]:null;
  const[w,h]=cDims();model.c.x=clamp(model.c.x+MO().ax*(wp-w),30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h);render();settleLift(0)};
 $('#grow').onchange=()=>render();
 $('#angle').oninput=e=>{if(drag)cancelDrag();setAngle(+e.target.value);settleLift(300,false,760)};
@@ -2071,7 +2185,7 @@ document.addEventListener('keydown',e=>{
  const key=e.key.toLowerCase();
  if(e.key==='Escape')cancelDrag();
  const i='1234'.indexOf(e.key);if(i>=0)act(STATES[i][0]);
- if(key==='m')morphTo((SIZES.find(x=>x[2]>model.g+.001)||SIZES[0])[0]);
+ if(key==='m')morphTo((SZ().find(x=>x[2]>model.g+.001)||SZ()[0])[0]);
  if(key==='j'||key==='s'){const set=key==='j'?JOINS:SHADES,ks=Object.keys(set),cur=key==='j'?model.join:model.shade;pick(key==='j'?'join':'shade',ks[(ks.indexOf(cur)+1)%ks.length])}
 });
 ['a','b'].forEach(id=>{
