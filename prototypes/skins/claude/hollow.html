@@ -94,9 +94,9 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .mlabel span{font:italic 11.5px/1 Georgia,serif;color:#3a2c1e}
 .mlabel em{font-style:normal;font-weight:700;color:#8f1c22;margin-right:3px}
 .small .mlabel b{font-size:11.5px}.small .mlabel span{font-size:11px}
-.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}
+.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit .pinhit{cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
-.ringfocus{opacity:0}
+.ringfocus{opacity:0;pointer-events:none}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
 .about h2{margin:0 0 4px;font:400 16px Georgia,serif;color:#eef1f4}.about h2 small{font:11px -apple-system,sans-serif;color:#7d8aa0;letter-spacing:1px;text-transform:uppercase;margin-left:6px}
 .about p{margin:0 0 6px}
@@ -120,6 +120,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="bellG" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#4f3712"/><stop offset=".22" stop-color="#c99b4a"/><stop offset=".34" stop-color="#fff0c2"/><stop offset=".46" stop-color="#d9ab55"/><stop offset=".8" stop-color="#6e4c1a"/><stop offset="1" stop-color="#3a280c"/></linearGradient>
  <linearGradient id="rollG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#bfa679"/><stop offset=".22" stop-color="#f7f0dd"/><stop offset=".5" stop-color="#e9dbb8"/><stop offset=".85" stop-color="#b3966a"/><stop offset="1" stop-color="#7d6240"/></linearGradient>
  <linearGradient id="slipG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e9e2cf"/><stop offset=".25" stop-color="#fdf9ee"/><stop offset=".75" stop-color="#f1e8d2"/><stop offset="1" stop-color="#cdbf9e"/></linearGradient>
+ <filter id="wobW" x="-30%" y="-30%" width="160%" height="160%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="5"/><feDisplacementMap in="SourceGraphic" scale="2.2" xChannelSelector="R" yChannelSelector="G"/></filter>
  <filter id="blur3"x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter>
 </defs></svg>
 <header><div><h1>Hollow mood <span>/ Claude skin study</span></h1><p>Dark carapace shells with brush-ink outlines, scalloped belly plates, wrought-iron scrolls with small lanterns, and parchment map sheets pinned on as displays. <a href="index.html">All pages</a></p></div>
@@ -127,6 +128,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="stateRow"><span>State</span></div>
  <div class="row" id="joinRow"><span>Join</span></div>
  <div class="row" id="shadeRow"><span>Shade</span></div>
+ <div class="row" id="angleRow" style="display:none"><span>Angle</span><input type="range" id="angle" min="-30" max="30" step="10" value="20" aria-label="Bracket angle in degrees"><output id="angleOut">+20°</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
 <div id="viewport"><main id="stage" aria-label="Hollow skin stage">
@@ -172,7 +174,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -367,6 +369,109 @@ const JOINS={
     s+=`<g class="hit bellhit" id="seamHit" tabindex="0" role="button" aria-label="Bell and chain: tap the bell twice, or pull the chain down, to separate the widgets. Enter rings it."><title>Tap the bell twice, or pull the chain down, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" rx="6" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
    return s;
   }
+ },
+ bracket:{label:'Hanging bracket',kind:'Angle',gap:44,holdAt:.68,msOut:2600,slow:1.35,angled:true,
+  about:'The two shells meet on an iron hinge and GitDiscuss can hang at an angle to Jarvis, from −30° to +30°. Joining: the shells close to a lantern\'s width apart, two hinge leaves reach out from the middle eyelets and meet on an iron knuckle, and its brass pin drops home with a spark. A notched iron quadrant sweeps up out of Jarvis\'s strap and arcs over the gap. From GitDiscuss\'s strap a lamp bracket rises through the quadrant, its arm reaching back over the gap on a curled brace. A brass pawl on the bracket drops into the middle notch, and a lantern is hung on the arm\'s hook, swings and kindles as the join light. Then GitDiscuss swings on the knuckle to its angle, the pawl clicking over each notch, and the lantern lags behind, swings back and settles plumb. Whatever the angle, the lantern hangs straight down. <b>Angle:</b> swing the bracket or the lantern (or drag GitDiscuss\'s nameplate), use the slider, or focus the bracket and press the arrow keys. The notches are 10° detents: the pawl rides up between them and drops in at each, and on letting go it settles into the nearest. The pair moves up or down to stay on the stage. <b>Near:</b> the middle eyelets catch the light. <b>Ready:</b> a dotted ghost of the knuckle, quadrant, bracket and lantern. <b>Release:</b> tap the brass knuckle pin (or press Enter on the bracket). GitDiscuss swings level, the pin is drawn, the lantern is lifted off, the bracket and quadrant fold back into their straps and the shells part.',
+  text:{join:'The shells close; a hinge, a notched quadrant and a lamp bracket are forged across the gap, and GitDiscuss swings to its angle.',
+   joined:'Joined on a hanging bracket. Swing the bracket or the lantern, or drag GitDiscuss\'s nameplate, to set the angle; tap the brass knuckle pin to release.',
+   release:'The pin is drawn: GitDiscuss swings level, the lantern is lifted off and the ironwork folds away.',back:'The ironwork folds back into the straps.',
+   hold:'Held mid-join: the bracket rising through the quadrant. Use the scrubber to step through the animation.',
+   ready:'Ready: the hinge, quadrant and bracket are ghosted in the gap. Release to join.',near:'Nearby: the middle eyelets catch the light. Move closer.',
+   phReady:'Ready · the bracket is ghosted',phNear:'Nearby · the eyelets catch the light',get phDrag(){return drag&&drag.pin?'Tap the pin to draw it':'Swinging GitDiscuss · '+signed(model.angle)}},
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.3?'Joining · closing in ':jt<.47?'Joining · pinning the hinge ':jt<.6?'Joining · raising the quadrant ':jt<.76?'Joining · the bracket rises ':jt<.86?'Joining · hanging the lantern ':'Joining · swinging to '+signed(model.angle)+' · '):(r<.14?'Releasing · swinging level ':r<.24?'Releasing · drawing the pin ':r<.46?'Releasing · the ironwork folds away ':'Releasing · parting ')},
+  // GitDiscuss's rotation about the knuckle: one heavy overshoot on the way in, level first on the way out.
+  bend(jt){const A=model.angle;if(jt>=1)return A;if(model.dir>0){const u=seg(jt,.86,1);return A*(1-Math.pow(1-u,3)*Math.cos(1.6*Math.PI*u))}return A*(1-ease(seg(1-jt,0,.14)))},
+  // Geometry relative to the knuckle K (the middle of the gap, at mid-height). The bracket parts are in GitDiscuss's level frame.
+  geo(hh){const g=this.gap,RQ=Math.max(hh+15,50),yTop=-(RQ+46),p0={x:g/2+9.5,y:-hh+6},p1={x:g/2+3,y:yTop},hx=-6;
+   let lo=0,hi=1;for(let i=0;i<22;i++){const m=(lo+hi)/2;if(Math.hypot(lerp(p0.x,p1.x,m),lerp(p0.y,p1.y,m))<RQ)lo=m;else hi=m}
+   const c0=Math.atan2(lerp(p0.y,p1.y,lo),lerp(p0.x,p1.x,lo))*180/Math.PI;
+   return{g,hh,RQ,yTop,p0,p1,hx,c0,K:{x:model.a.x+W+g/2,y:model.a.y+hh}}},
+  parts(jt){if(jt>=1)return{leaf:1,knuckle:1,pin:1,quad:1,post:1,arm:1,pawl:1,lantern:1,lit:1};
+   if(model.dir>0)return{leaf:seg(jt,.3,.42),knuckle:seg(jt,.39,.45),pin:seg(jt,.43,.47),quad:dart(seg(jt,.46,.6)),post:dart(seg(jt,.58,.67)),arm:dart(seg(jt,.64,.74)),pawl:seg(jt,.72,.77),lantern:seg(jt,.76,.84),lit:seg(jt,.8,.9)};
+   const r=1-jt;return{pin:1-seg(r,.14,.22),lit:1-seg(r,.16,.26),lantern:1-seg(r,.2,.3),pawl:1-seg(r,.22,.26),arm:1-seg(r,.24,.31),post:1-seg(r,.28,.35),quad:1-seg(r,.3,.4),knuckle:1-seg(r,.38,.43),leaf:1-seg(r,.38,.46)}},
+  // The range of Jarvis's y that keeps the whole pair, bracket and lantern on the stage at this angle.
+  fitRange(ang,hh){const G=this.geo(hh),g=this.gap,a=ang*1.12;
+   const ys=[[g/2,-hh+6],[g/2,hh],[g/2+W,-hh+6],[g/2+W,hh],[G.p1.x,G.yTop-10],[G.hx-14,G.yTop-6]].map(p=>rot(p,a)[1]);
+   ys.push(rot([G.hx,G.yTop-2],a)[1]+40,-hh-36,hh+4,-G.RQ-6);
+   const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,40-mn-hh),hi=594-mx-hh;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]},
+  fit(y){return clamp(y,...this.fitRange(model.angle,ctx().h/2))},
+  releaseStart(){stopAngle()},
+  key(){$('#a .grip').focus();doSeparate()},
+  arrow(k){stepAngle(k)},
+  seamDown(p,t){++angAnim;model.angTo=undefined;if(t&&t.closest('[data-part=pin]'))return{seam:true,pin:true,p0:p,moved:0};
+   const C=this.geo(ctx().h/2).K;return{seam:true,angle:true,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle,moved:false}},
+  seamMove(d,p){if(d.pin){d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));return}
+   const C=this.geo(ctx().h/2).K,a=Math.atan2(p.y-C.y,p.x-C.x);let dd=(a-d.prev)*180/Math.PI;dd=((dd+540)%360)-180;d.prev=a;
+   d.raw=clamp(d.raw+dd,-30,30);if(Math.abs(d.raw-d.th0)>1.5)d.moved=true;model.angle=magnet(d.raw);refitPair();render()},
+  seamUp(d){if(d.pin){if(d.moved<10){$('#a .grip').focus();doSeparate()}else render();return}
+   if(d.moved){const to=Math.round(model.angle/10)*10;animateAngle(to,420);say('GitDiscuss set at '+signed(to)+'; the pawl drops into its notch.')}
+   else{const el=$('#b');if(d.fromGrip&&d.touch&&el.classList.contains('cocooned'))el.classList.toggle('loose');
+    render();say('Swing the bracket or the lantern to set the angle; tap the brass knuckle pin to release.')}},
+  seamCancel(d){if(d.angle){model.angle=d.th0;refitPair()}},
+  over(c){
+   const G=this.geo(c.h/2),{K,hh,RQ,yTop,p0,p1,hx,c0,g}=G,jt=c.jt,now=performance.now();
+   const pa=(deg,r)=>({x:K.x+r*Math.cos(deg*Math.PI/180),y:K.y+r*Math.sin(deg*Math.PI/180)}),w=(x,y)=>f(K.x+x)+' '+f(K.y+y);
+   const a0=c0-50,a1=c0+31;
+   const quadD=`M${w(-g/2-9.5,-hh+8)}L${P(pa(a0,RQ))}A${RQ} ${RQ} 0 0 1 ${P(pa(a1,RQ))}${spiral(pa(a1,RQ),a1+90,4.5,1)}`;
+   const rootD=`M${P(pa(a0,RQ))}${spiral(pa(a0,RQ),a0-90,4,-1,1.2)}`;
+   const postD=`M${w(p0.x,p0.y)}L${w(p1.x,yTop-7)}`;
+   const armD=`M${w(p1.x+1,yTop)}C${w(p1.x-10,yTop-7)} ${w(hx+14,yTop-7)} ${w(hx-6,yTop-1.5)}${spiral({x:K.x+hx-6,y:K.y+yTop-1.5},165,4,-1)}`;
+   const bp={x:lerp(p0.x,p1.x,.6),y:lerp(p0.y,p1.y,.6)};
+   const braceD=`M${w(bp.x,bp.y)}C${w(bp.x-3,bp.y-12)} ${w(hx+24,yTop+8)} ${w(hx+12,yTop+2)}${spiral({x:K.x+hx+12,y:K.y+yTop+2},202,3.6,1)}`;
+   if(jt===0){const gl=c.glow;this.live=false;swingLamp(null,false);if(gl<=0)return '';
+    let s=glints([{x:model.a.x+W-9.5,y:model.a.y+hh},{x:model.b.x+9.5,y:model.b.y+hh}],gl);
+    if(gl>=1){const gh=d=>`<path d="${d}" fill="none" stroke="#e9edf1" stroke-width="1.5" stroke-dasharray="2.5 4" stroke-linecap="round" opacity=".5"/>`;
+     s+=gh(quadD)+gh(postD)+gh(armD)+gh(braceD)+`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="7.6" fill="none" stroke="#ffe7a8" stroke-width="1.2" stroke-dasharray="2 2"/>`+
+      `<rect x="${f(K.x+hx-6)}" y="${f(K.y+yTop+15)}" width="12" height="14" rx="1.6" fill="none" stroke="#ffe7a8" stroke-width="1" stroke-dasharray="2 2" opacity=".75"/>`}
+    return s}
+   const k=this.parts(jt),bd=this.bend(jt),R=(x,y)=>{const r=rot([x,y],bd);return{x:K.x+r[0],y:K.y+r[1]}},rg=`rotate(${f(bd)} ${f(K.x)} ${f(K.y)})`;
+   const rivet=(x,y)=>`<circle cx="${f(K.x+x)}" cy="${f(K.y+y)}" r="3.6" fill="url(#brass)" stroke="${INK}" stroke-width="1"/><circle cx="${f(K.x+x)}" cy="${f(K.y+y)}" r="1" fill="${INK}"/>`;
+   // The lantern hangs from the arm's hook, plumb: a pendulum on the moving bracket.
+   const hook=R(hx,yTop-2.5),dy=model.dir>0&&jt<1?-14*(1-backOut(k.lantern)):-16*(1-k.lantern),Hs={x:hook.x,y:hook.y+dy};
+   const phi=swingLamp(Hs,k.lantern>0),lc={x:Hs.x+Math.sin(phi)*24,y:Hs.y+Math.cos(phi)*24};
+   let s='';
+   if(k.lit>0)s+=`<circle cx="${f(lc.x)}" cy="${f(lc.y)}" r="46" fill="url(#lamp)" opacity="${f(k.lit*k.lantern)}"/>`;
+   // Jarvis's notched quadrant, fixed; notches every 10° where the pawl can sit.
+   if(k.quad>0){let q=`<g filter="url(#wobW)" fill="none" stroke-linecap="round" stroke-linejoin="round">${iron(quadD,4.4,k.quad)}${k.quad>=1?iron(rootD,2.6):''}</g>`;
+    const no=seg(k.quad,.85,1);
+    if(no>0){let n='';for(let i=-3;i<=3;i++){const an=c0+10*i;n+=`M${P(pa(an-1.7,RQ+3.4))}L${P(pa(an,RQ+.4))}L${P(pa(an+1.7,RQ+3.4))}`}
+     const z=pa(c0,RQ-1.2);q+=`<g opacity="${f(no)}"><path d="${n}" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/><circle cx="${f(z.x)}" cy="${f(z.y)}" r="1.3" fill="#d6b066"/></g>`}
+    s+=q}
+   // GitDiscuss's half: its hinge leaf and the lamp bracket, turning with it.
+   let b='';
+   if(k.leaf>0)b+=iron(`M${w(g/2+9.5,0)}L${w(5,0)}`,4.4,k.leaf)+rivet(g/2+9.5,0);
+   let br='';
+   if(k.post>0)br+=iron(postD,3.6,k.post);
+   if(k.arm>0)br+=iron(braceD,2.4,k.arm)+iron(armD,3.2,k.arm);
+   if(k.post>=1)br+=`<circle cx="${f(K.x+p1.x)}" cy="${f(K.y+yTop-9)}" r="2.7" fill="#2c3440" stroke="${INK}" stroke-width="1.3"/>`;
+   if(br)b+=`<g filter="url(#wobW)" fill="none" stroke-linecap="round" stroke-linejoin="round">${br}</g>`;
+   if(b)s+=`<g transform="${rg}" fill="none" stroke-linecap="round">${b}</g>`;
+   // Jarvis's leaf, the knuckle and its pin.
+   if(k.leaf>0)s+=`<g fill="none" stroke-linecap="round">${iron(`M${w(-g/2-9.5,0)}L${w(-5,0)}`,4.4,k.leaf)}</g>`+rivet(-g/2-9.5,0);
+   if(k.knuckle>0){const ks=backOut(k.knuckle);
+    s+=`<g transform="translate(${f(K.x)} ${f(K.y)}) scale(${f(ks*100)/100})"><circle r="7.8" fill="url(#iron)" stroke="${INK}" stroke-width="1.7"/><path d="M-5.4 -2.6A6 6 0 0 1 2.4 -5.8" fill="none" stroke="#9aa8bc" stroke-width=".9" opacity=".6"/></g>`}
+   if(k.pin>0&&k.knuckle>0){const off=-18*(1-k.pin),op=clamp(k.pin*3);
+    if(off<-1)s+=`<path d="M${w(0,0)}L${w(0,off)}" stroke="${INK}" stroke-width="2.6" opacity="${f(op)}"/><path d="M${w(0,0)}L${w(0,off)}" stroke="#9aa6b6" stroke-width="1" opacity="${f(op)}"/>`;
+    s+=`<g opacity="${f(op)}" transform="translate(${w(0,off)}) rotate(${f(bd*2)})"><circle r="3.4" fill="url(#brass)" stroke="${INK}" stroke-width=".9"/><path d="M-2.2 0H2.2" stroke="${INK}" stroke-width="1"/></g>`}
+   // The brass pawl on the bracket: rides up between notches and drops into each.
+   if(k.pawl>0){const nk=Math.round(bd/10),hop=2.8*seg(Math.abs(bd-10*nk),0,2.2),drop=model.dir>0&&jt<1?7*(1-backOut(k.pawl)):7*(1-k.pawl),ca=c0+bd,at=pa(ca,RQ+8+hop+drop);
+    s+=`<g opacity="${f(clamp(k.pawl*3))}" transform="translate(${P(at)}) rotate(${f(ca+90)})"><path d="M-3.3 -2.7H3.3L1.1 5.6H-1.1Z" fill="url(#brass)" stroke="${INK}" stroke-width=".9" stroke-linejoin="round"/><circle cy="-.7" r="1.2" fill="${INK}"/></g>`;
+    if(k.pawl>=1){if(this.nk!=null&&nk!==this.nk)this.flash={k:nk,t:now};this.nk=nk}else this.nk=null}
+   else this.nk=null;
+   if(k.lantern>0)s+=drawLantern(Hs,phi,k.lit,clamp(k.lantern*3));
+   // Sparks: the pin seating, the pawl seating, each notch passed, the pin drawn.
+   if(model.dir>0&&jt>.47&&jt<.53){const u=seg(jt,.47,.53);s+=spark(K,1-u,5+6*u)}
+   if(model.dir>0&&jt>.76&&jt<.82){const u=seg(jt,.76,.82);s+=spark(pa(c0,RQ+2),1-u,4+5*u)}
+   if(model.dir<0&&jt<1){const u=seg(1-jt,.14,.2);if(u>0&&u<1)s+=spark(K,1-u,5+6*u)}
+   const fl=this.flash&&now-this.flash.t<240;if(fl){const u=(now-this.flash.t)/240;s+=spark(pa(c0+10*this.flash.k,RQ+2),1-u,3+6*u)}
+   this.live=lamp.moving||fl;
+   if(jt===1){
+    s+=`<g class="hit brackethit" id="seamHit" tabindex="0" role="group" aria-label="Hanging bracket: GitDiscuss at ${signed(model.angle)}. Up and down arrows swing it a notch (10°) up or down; Enter draws the knuckle pin to separate the widgets"><title>Swing the bracket or the lantern to set the angle; tap the knuckle pin to release</title>`+
+     `<g transform="${rg}"><rect x="${f(K.x+hx-26)}" y="${f(K.y+yTop-14)}" width="${f(p0.x-hx+36)}" height="${f(-hh-yTop+22)}" fill="transparent"/></g><circle cx="${f(lc.x)}" cy="${f(lc.y)}" r="20" fill="transparent"/>`+
+     `<circle class="ringfocus" cx="${f(K.x)}" cy="${f(K.y)}" r="${f(RQ+16)}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/>`+
+     `<circle class="pinhit" data-part="pin" cx="${f(K.x)}" cy="${f(K.y)}" r="13" fill="transparent"><title>Tap the knuckle pin to release</title></circle></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -518,16 +623,68 @@ function cutThreads(LACE,r){
  return s;
 }
 
+/* ---------- Hanging bracket: ironwork, the plumb lantern, angle setting ---------- */
+const rot=(p,deg)=>{const r=deg*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return[p[0]*c-p[1]*s,p[0]*s+p[1]*c]};
+const signed=v=>{v=Math.round(v);return(v>0?'+':v<0?'−':'')+Math.abs(v)+'°'};
+// Sticky 10° detents: the angle lingers near each notch, then lets go.
+const magnet=raw=>{const k=Math.round(raw/10)*10,d=raw-k;return k+d*Math.pow(Math.abs(d)/5,1.5)};
+// A tightening curl that continues a stroke from `p`, heading `tan` degrees; sg 1 curls clockwise.
+function spiral(p,tan,r0,sg,turn=1.4){const tr=tan*Math.PI/180,cx=p.x-Math.sin(tr)*sg*r0,cy=p.y+Math.cos(tr)*sg*r0,a0=Math.atan2(p.y-cy,p.x-cx);let d='';
+ for(let i=1;i<=16;i++){const t=i/16,a=a0+sg*t*turn*2*Math.PI,r=r0*(1-.72*t);d+=`L${f(cx+r*Math.cos(a))} ${f(cy+r*Math.sin(a))}`}return d}
+// Wrought iron: an ink edge, the iron and a cold highlight. `u` draws it part-way along its length.
+function iron(d,wd,u=1){if(u<=0)return '';const da=u<1?` pathLength="1" stroke-dasharray="${f(u*1000)/1000} 2"`:'';
+ return `<path d="${d}" stroke="${INK}" stroke-width="${f(wd+2.4)}"${da}/><path d="${d}" stroke="#2c3440" stroke-width="${wd}"${da}/><path d="${d}" stroke="#8b9ab0" stroke-width=".8" opacity=".5" transform="translate(-.5 -.7)"${da}/>`}
+// The lantern is a pendulum (Verlet, with substeps) hung from a pivot that moves with GitDiscuss.
+const lamp={on:false,x:0,y:0,px:0,py:0,hx:0,hy:0,t:0,moving:false};
+function swingLamp(Hp,show){
+ if(!show)lamp.on=false;
+ if(!show||reduce.matches){lamp.moving=false;return 0}
+ const L=22,now=performance.now();
+ if(!lamp.on||Math.hypot(Hp.x-lamp.hx,Hp.y-lamp.hy)>40){const kick=lamp.on?0:7;Object.assign(lamp,{on:true,x:Hp.x+kick,y:Hp.y+L,px:Hp.x+kick,py:Hp.y+L,hx:Hp.x,hy:Hp.y,t:now})}
+ else{const dt=Math.min(.034,(now-lamp.t)/1000);lamp.t=now;
+  if(dt>0){const n=Math.ceil(dt/.004),h=dt/n,damp=Math.exp(-2.4*h);
+   for(let i=1;i<=n;i++){const hx=lerp(lamp.hx,Hp.x,i/n),hy=lerp(lamp.hy,Hp.y,i/n),vx=(lamp.x-lamp.px)*damp,vy=(lamp.y-lamp.py)*damp;
+    lamp.px=lamp.x;lamp.py=lamp.y;lamp.x+=vx;lamp.y+=vy+2100*h*h;
+    const dx=lamp.x-hx,dy=lamp.y-hy,d=Math.hypot(dx,dy)||1;lamp.x=hx+dx/d*L;lamp.y=hy+dy/d*L}
+   lamp.hx=Hp.x;lamp.hy=Hp.y}}
+ const phi=Math.atan2(lamp.x-Hp.x,lamp.y-Hp.y);lamp.moving=Math.abs(phi)>.003||Math.hypot(lamp.x-lamp.px,lamp.y-lamp.py)>.01;
+ return phi}
+function drawLantern(Hp,phi,lit,op){
+ return `<g opacity="${f(op)}" transform="translate(${P(Hp)}) rotate(${f(-phi*180/Math.PI)})">`+
+  `<circle r="2.6" fill="none" stroke="${INK}" stroke-width="2.4"/><circle r="2.6" fill="none" stroke="#9aa6b6" stroke-width=".9"/>`+
+  `<path d="M0 2.8V10" stroke="${INK}" stroke-width="1.7" stroke-dasharray="2.4 1.2"/>`+
+  `<path d="M-8.4 17.2L0 9.4L8.4 17.2Z" fill="#0b0e14" stroke="${INK}" stroke-width="1" stroke-linejoin="round"/><path d="M-3.6 13.6L-.4 10.8" stroke="#8b9ab0" stroke-width=".8"/>`+
+  `<rect x="-6.2" y="17" width="12.4" height="14" rx="1.6" fill="#3c3022"/><rect x="-6.2" y="17" width="12.4" height="14" rx="1.6" fill="#ffd581" opacity="${f(lit)}"/>`+
+  (lit>0?`<ellipse cy="25" rx="2.2" ry="3.6" fill="#fff6d8" opacity="${f(lit)}"/>`:'')+
+  `<rect x="-6.2" y="17" width="12.4" height="14" rx="1.6" fill="none" stroke="${INK}" stroke-width="1.3"/><path d="M0 17V31M-6.2 24H6.2" stroke="${INK}" stroke-width=".8"/>`+
+  `<path d="M-7.8 31H7.8L4.2 35H-4.2Z" fill="#0b0e14" stroke="${INK}" stroke-width=".8" stroke-linejoin="round"/><circle cy="37" r="1.3" fill="#0b0e14"/></g>`}
+// Rendering keeps ticking while the lantern swings or a notch spark fades.
+let tickRAF=0,lastRender=0;
+function keepTicking(){if(!tickRAF)tickRAF=requestAnimationFrame(()=>{tickRAF=0;if(performance.now()-lastRender>12)render();else keepTicking()})}
+let angAnim=0;
+const bracketOn=()=>model.join==='bracket'&&model.jt===1;
+function refitPair(){if(!bracketOn())return;const[lo,hi]=JOINS.bracket.fitRange(model.angle,ctx().h/2);model.a.y=model.b.y=clamp(model.a.y,lo,hi)}
+function pairY(){return bracketOn()?JOINS.bracket.fitRange(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
+function animateAngle(to,ms=750){
+ to=clamp(to,-30,30);model.angTo=to;const from=model.angle,y0=model.a.y,y1=clamp(y0,...JOINS.bracket.fitRange(to,ctx().h/2)),tok=++angAnim,t0=performance.now();
+ (function step(now){if(tok!==angAnim)return;if(!bracketOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
+  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*Math.PI*t)),-32,32);model.a.y=model.b.y=lerp(y0,y1,ease(t));render();
+  if(t<1)requestAnimationFrame(step);else model.angTo=undefined})(t0);
+}
+function stopAngle(){++angAnim;if(model.angTo!==undefined){model.angle=model.angTo;model.angTo=undefined;refitPair()}}
+function stepAngle(k){const base=model.angTo??model.angle,to=clamp(Math.round(base/10)*10+10*k,-30,30);animateAngle(to);say('The bracket swings a notch '+(k>0?'down':'up')+'; GitDiscuss at '+signed(to)+'.')}
+function setBracketAngle(v){v=Math.round(clamp(v,-30,30)/10)*10;if(bracketOn())animateAngle(v);else{stopAngle();model.angle=v;render()}}
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angTo:undefined};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
 function joinedPose(fixed='a'){
- const g=J().gap;
- if(fixed==='b'){let bx=clamp(model.b.x,W+g+34,1200-W-34);return{a:{x:bx-W-g,y:model.b.y},b:{x:bx,y:model.b.y}}}
- let ax=clamp(model.a.x,34,1200-2*W-g-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g,y:model.a.y}};
+ const j=J(),g=j.gap,fy=y=>j.fit?j.fit(y):y;
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+34,1200-W-34),y=fy(model.b.y);return{a:{x:bx-W-g,y},b:{x:bx,y}}}
+ let ax=clamp(model.a.x,34,1200-2*W-g-34),y=fy(model.a.y);return{a:{x:ax,y},b:{x:ax+W+g,y}};
 }
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
@@ -554,12 +711,12 @@ async function doJoin(fixed='a',ms=2600){
  else if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};
  model.ready=false;model.glow=0;
  say(J().text.join);
- const ok=await tween(model.jt,1,ms*(1-model.jt),setJt);
- if(ok){model.poised=false;model.path=null;say(J().text.joined)}
+ const ok=await tween(model.jt,1,ms*(J().slow||1)*(1-model.jt),setJt);
+ if(ok){model.poised=false;model.path=null;refitPair();render();say(J().text.joined)}
 }
 async function doSeparate(){
  if(model.jt===0)return;
- model.poised=false;
+ model.poised=false;stopAngle();
  // From joined, the threads are cut; part-way through a join the needle simply backs out.
  const j=J();
  if(model.jt===1){model.dir=-1;j.releaseStart();model.path={s:separatePose(),j:here()};say(j.text.release)}
@@ -568,14 +725,14 @@ async function doSeparate(){
  if(await tween(model.jt,0,ms,setJt)){model.path=null;model.dir=1;model.cut=null;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
- ++anim;model.busy=false;model.poised=false;model.glow=0;
+ stopAngle();++anim;model.busy=false;model.poised=false;model.glow=0;
  if(model.dir<0){model.dir=1;model.cut=null}
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
  setJt(J().holdAt);render();say(J().text.hold);
 }
 function toggleShade(){
  const sh=SHADES[model.shade],to=model.st>.5?0:1,start=model.st,token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||520)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;model.sdir=to?1:-1;
- (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));render();if(t<1)requestAnimationFrame(step)})(t0);
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));refitPair();render();if(t<1)requestAnimationFrame(step)})(t0);
  say(to?sh.sayIn:sh.sayOut);
 }
 // How far the shell has cinched toward its shaded height.
@@ -584,11 +741,14 @@ const cinch=()=>{const s=SHADES[model.shade];return s.cinch?s.cinch(model.st):ea
 /* ---------- Rendering ---------- */
 function ctx(){return{a:model.a,b:model.b,h:Math.round(lerp(H,HS,cinch())),jt:model.jt,glow:model.glow}}
 function render(){
+ lastRender=performance.now();
  const c=ctx(),j=J(),ch=Math.round(lerp(CH,CHS,cinch())),coc=model.shade==='cocoon',mr=model.shade==='mroll',s=model.st;
  $$('#a .runText').forEach(n=>n.textContent=model.a.run?'agents running':'agents paused');
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
+  // GitDiscuss turns about the bracket's knuckle, in the middle of the gap.
+  if(id==='b'){const bd=model.join==='bracket'?JOINS.bracket.bend(model.jt):0;el.style.transformOrigin=`${-JOINS.bracket.gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
   const k=ease(s),show=coc?1-seg(s,0,.2):mr?1-seg(s,0,.12):1-clamp(k*2.2),strip=coc||mr?0:seg(k,.55,1);
@@ -602,14 +762,18 @@ function render(){
  }
  const focused=document.activeElement&&document.activeElement.id==='seamHit';
  $('#over').innerHTML=j.over(c);
- const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();J().key()}};if(focused)hit.focus()}
+ if(j.live)keepTicking();
+ const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{const ar={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();J().key()}else if(ar&&J().arrow){e.preventDefault();J().arrow(ar)}};if(focused)hit.focus()}
+ const ang=model.join==='bracket';$('#angleRow').style.display=ang?'':'none';
+ if(ang){$('#angle').value=Math.round(model.angTo??model.angle);$('#angleOut').textContent=signed(model.angTo??model.angle)}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
  $$('#shadeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.shade)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),T=j.text;
- const ph={separate:'Separate · two shells',joining:j.phase(model.dir,model.jt)+p+'%',joined:'Joined · '+j.label.toLowerCase()};
+ const ph={separate:'Separate · two shells',joining:j.phase(model.dir,model.jt)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+signed(model.angle):'')};
  $('#phase').textContent=(drag&&drag.seam?T.phDrag:drag&&drag.state==='ready'?T.phReady:drag&&drag.state==='near'?T.phNear:ph[state])+(model.st>.5?' · shaded':'');
 }
 
@@ -620,7 +784,7 @@ function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k===
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;model.peal=model.armed=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='join'&&id!==model.join){stopAngle();lamp.on=false;const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;model.peal=model.armed=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  describe();render();
 }
@@ -630,7 +794,8 @@ function describe(){
  $('#shadeAbout').innerHTML=`<h2>${s.label}<small>shade · ${s.kind}</small></h2><p>${s.about}</p>`;
 }
 options('#joinRow',JOINS,'join');options('#shadeRow',SHADES,'shade');
-$('#scrub').oninput=e=>{++anim;model.busy=false;model.poised=false;model.glow=0;
+$('#angle').oninput=e=>{if(drag)cancelDrag();setBracketAngle(+e.target.value)};
+$('#scrub').oninput=e=>{stopAngle();++anim;model.busy=false;model.poised=false;model.glow=0;
  if(model.dir<0){model.dir=1;model.cut=null}
  if(model.jt===0||model.jt===1||!model.path)model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};
  setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
@@ -653,9 +818,11 @@ function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:
 function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
- if(e.target.closest('#seamHit')&&model.jt===1){e.preventDefault();drag=J().seamDown(local(e));stage.setPointerCapture(e.pointerId);render();return}
+ if(e.target.closest('#seamHit')&&model.jt===1){e.preventDefault();drag=J().seamDown(local(e),e.target);stage.setPointerCapture(e.pointerId);render();return}
  const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
+ // On the hanging bracket, GitDiscuss's nameplate swings it about the knuckle instead of moving the pair.
+ if(id==='b'&&bracketOn()){drag=Object.assign(JOINS.bracket.seamDown(p,null),{fromGrip:true,touch:e.pointerType!=='mouse'});stage.setPointerCapture(e.pointerId);render();return}
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1;model.cut=null}
  drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle',touch:e.pointerType!=='mouse'};
@@ -667,7 +834,7 @@ stage.addEventListener('pointermove',e=>{
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
  drag.moved=Math.max(drag.moved||0,Math.hypot(dx,dy));
  if(drag.id==='c'){model.c.x=clamp(s.c.x+dx,30,1200-CW-30);model.c.y=clamp(s.c.y+dy,TOP-10,600-CH-10);render();return}
- if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,30,1200-2*W-g-30),ay=clamp(s.a.y+dy,TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
+ if(drag.group){const g=J().gap,ax=clamp(s.a.x+dx,30,1200-2*W-g-30),ay=clamp(s.a.y+dy,...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay});render();return}
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,30,1200-W-30),y:clamp(s[id].y+dy,TOP,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
  drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
@@ -686,7 +853,7 @@ function endDrag(){
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
- if(d.seam){render();return}
+ if(d.seam){if(J().seamCancel)J().seamCancel(d);render();return}
  const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.glow=0;render();say('Move cancelled.');
 }
 stage.addEventListener('pointerup',endDrag);
@@ -696,7 +863,8 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
  const bottom=600-(model.st>.5?HS:H)-14;
- if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],TOP,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
+ if(id==='b'&&bracketOn()&&k[1]){stepAngle(k[1]>0?1:-1);return}
+ if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-CH-10:bottom)}render();
 }));
 
