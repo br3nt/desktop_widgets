@@ -44,7 +44,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 
 ### Cycle 6: Tertiary Shades
 - [x] Gothic: Pillar Telescoping (Capital to Plinth) shade — Fluted side columns compress into molded stone plinths (Built in prototypes/skins/agy/gothic.html with three concentric fluted limestone drums, bronze guide sleeves, carved acanthus capitals, molded torus plinths, stone friction dust particles, lateral locking detents, unclipped readable status strip, Option 6 switcher, and 'C' keyboard shortcut)
-- [ ] Felt: Envelope Flap Tuck shade — Lower half folds up on embroidered hinge and tucks into felt clutch slot
+- [x] Felt: Envelope Flap Tuck shade — Lower half folds up on embroidered hinge and tucks into felt clutch slot (Built in prototypes/skins/agy/felt.html with scored wool hinge welt, ivory running stitches & chevron corner gussets, 180° upward flap fold, saddle-leather tongue tab with brass eyelet rivet, reinforced horizontal clutch slot with gold bar tacks, unclipped readable shade strip, Option 6 switcher, and 'E' keyboard shortcut)
 - [ ] Elven: Filigree Harp Compression shade — Tracery ribs flex into parabolic curves drawing rails together
 - [ ] Wire: Beaded Pull-Tab Insect Elytra shade — Pull-tab wing covers with seed-bead mosaic pivot over screen
 - [ ] Hollow: Layered Shale Slabs (Roof Shingle Retraction) shade — Stepped slate slabs slide behind primary mask plate

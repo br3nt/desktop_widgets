@@ -225,6 +225,18 @@ header {
 .module.shade {
   height: 44px;
 }
+.module.shade .felt-grip {
+  opacity: 0;
+  pointer-events: none;
+}
+.envelope-tongue-tab {
+  cursor: pointer;
+  pointer-events: auto;
+  transition: filter 140ms ease;
+}
+.envelope-tongue-tab:hover {
+  filter: brightness(1.22);
+}
 .module-svg {
   position: absolute;
   inset: 0;
@@ -371,7 +383,10 @@ header {
   color: var(--wool-cream);
   z-index: 5;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  cursor: grab;
+  touch-action: none;
 }
+.shade-strip:active { cursor: grabbing; }
 .module.shade .shade-strip {
   display: flex;
 }
@@ -782,8 +797,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat, duffel toggle, tool-roll &amp; cross-stitch zipper</span></h1>
-    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Artist's felt tool-roll · Running cross-stitch zipper</p>
+    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat, duffel toggle, tool-roll, cross-stitch zipper &amp; envelope flap</span></h1>
+    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Artist's felt tool-roll · Running cross-stitch zipper · Envelope clutch flap tuck</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -793,7 +808,8 @@ footer .note-highlight {
         <option value="bellows">2. Accordion Bellows Pleat shade</option>
         <option value="duffel">3. Duffel Toggle &amp; Braid Cord join</option>
         <option value="toolroll">4. The Artist's Tool-Roll (Felt Scroll) shade</option>
-        <option value="zipper" selected>5. Running Cross-Stitch Zipper join</option>
+        <option value="zipper">5. Running Cross-Stitch Zipper join</option>
+        <option value="envelope" selected>6. Envelope Flap Tuck shade</option>
       </select>
     </div>
     <div class="control-group">
@@ -803,9 +819,10 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnJoinAnim">Lace cross-stitch zipper</button>
+    <button id="btnJoinAnim">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
-    <button id="btnZipperAnim" class="primary-btn">Lace cross-stitch zipper</button>
+    <button id="btnEnvelopeAnim" class="primary-btn">Fold envelope flap</button>
+    <button id="btnZipperAnim">Lace cross-stitch zipper</button>
     <button id="btnBellowsAnim">Fold accordion pleats</button>
     <button id="btnToolRollAnim">Roll tool scroll</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
@@ -978,6 +995,28 @@ footer .note-highlight {
           <stop offset="70%" stop-color="#28170c"/>
           <stop offset="100%" stop-color="#180c05"/>
         </linearGradient>
+
+        <!-- Option 6: Envelope Flap Shading Gradients -->
+        <linearGradient id="envelopeSageGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#557060"/>
+          <stop offset="20%" stop-color="#42574a"/>
+          <stop offset="60%" stop-color="#2c3a32"/>
+          <stop offset="100%" stop-color="#1d2721"/>
+        </linearGradient>
+
+        <linearGradient id="envelopeTerracottaGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#845344"/>
+          <stop offset="20%" stop-color="#694033"/>
+          <stop offset="60%" stop-color="#4a2d24"/>
+          <stop offset="100%" stop-color="#2d1a14"/>
+        </linearGradient>
+
+        <linearGradient id="envelopeUnifiedGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#5a5242"/>
+          <stop offset="20%" stop-color="#443d31"/>
+          <stop offset="60%" stop-color="#302b23"/>
+          <stop offset="100%" stop-color="#1e1b16"/>
+        </linearGradient>
       </defs>
 
       <!-- Shared Wool Casing and Entangled Fiber Seam -->
@@ -1045,7 +1084,7 @@ footer .note-highlight {
       </div>
 
       <!-- Shade Strip Display -->
-      <div class="shade-strip">
+      <div class="shade-strip" data-drag="a" aria-label="Jarvis shade strip (drag to move)">
         <span class="shade-tag"><span>●</span> JARVIS · 03 AGENTS</span>
         <div class="shade-pips">
           <i class="gold"></i><i class="mint"></i><i class="gold"></i>
@@ -1091,7 +1130,7 @@ footer .note-highlight {
       </div>
 
       <!-- Shade Strip Display -->
-      <div class="shade-strip">
+      <div class="shade-strip" data-drag="b" aria-label="GitDiscuss shade strip (drag to move)">
         <span class="shade-tag"><span>●</span> GITDISCUSS · 02 DECISIONS</span>
         <div class="shade-pips">
           <i style="background:var(--stitch-coral)"></i><i class="gold"></i>
@@ -1137,7 +1176,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Tactile Felt Architecture, Fiber Entanglement, Accordion Bellows, Duffel Toggle, Tool-Roll &amp; Cross-Stitch Zipper</h3>
+  <h3>Tactile Felt Architecture, Fiber Entanglement, Accordion Bellows, Duffel Toggle, Tool-Roll, Cross-Stitch Zipper &amp; Envelope Flap</h3>
   <p>
     This skin explores dense compressed wool felt (3mm–5mm thickness) with hand-sewn cotton embroidery stitches and turned boxwood fittings. The casing has pillowy, bevelled contours, diffuse ambient occlusion shadows, and visible needle-punched fiber texture.
   </p>
@@ -1155,6 +1194,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 5 — Running Cross-Stitch Zipper [Join]:</span> The joining flanks of both wool capsules feature pre-punched antique brass eyelets mounted on stiffened bridle-leather reinforcement welts. A thick, vibrant 6-strand scarlet embroidery floss threads through the eyelets from bottom to top, guided by a polished bone bodkin needle. As the modules draw together, the floss cinches tight into a continuous vertical column of interlocking cross-stitches (X X X), pulling the pillowy wool edges into a tight, dimpled seam. At the summit, the twin scarlet cords are tied into a hand-tied butterfly bow knot with turned brass aglet ferrules, and the bone needle seats beside it as an interactive release latch.
+  </p>
+  <p>
+    <span class="note-highlight">Option 6 — Envelope Flap Tuck [Shade]:</span> Inspired by handcrafted artisan wool envelope clutches and travel wallets, the lower half of the widget features an embroidered hinge line reinforced by ivory running stitches and chevron corner gussets. When collapsing to shade mode, the lower envelope panel swings 180° upward around the hinge line, folding over the recessed display. At the peak of the fold, a shaped saddle-leather tongue tab with a polished brass eyelet rivet glides cleanly into a stitched horizontal clutch slot beneath the upper header with a cushioned fiber thwump. The widget collapses into an ultra-compact 44px felt envelope clutch displaying an unclipped, high-contrast status readout (Jarvis 03 Agents, GitDiscuss 02 Decisions), with the folded flap and tucked leather tongue proudly visible across the face. Clicking the tucked tongue or pressing 'E' smoothly untucks and unfolds the casing back to its full instrument height.
   </p>
 </footer>
 
@@ -1179,11 +1221,12 @@ const model = {
   entangle: 0, // 0 = wispy free fringes, 1 = fully interwoven & compressed
   bellowsFold: 0, // 0 = expanded full 130px height, 1 = folded flat accordion bellows (44px)
   toolRoll: 0, // 0 = unrolled flat full height (130px), 1 = rolled tightly into 44px cylinder
+  envelopeFlap: 0, // 0 = unshaded open flap, 1 = folded upward 180deg & tucked into clutch slot (44px)
   duffelLoop: 0, // 0 = resting relaxed loop, 0.65 = reaching open eyelet, 1 = cinched taut on toggle
   duffelTension: 0, // cord tension
   zipperProg: 0, // 0 = unlaced / parked needle, 1 = fully laced X-crosses with tied bow
   zipperTension: 0, // thread cinch tension
-  option: 'zipper', // 'entanglement', 'bellows', 'duffel', 'toolroll', or 'zipper'
+  option: 'envelope', // 'entanglement', 'bellows', 'duffel', 'toolroll', 'zipper', or 'envelope'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1199,13 +1242,185 @@ const connectionGlow = { socket: { value: 0, target: 0 }, bay: { value: 0, targe
 function say(text) { $('#status').textContent = text; }
 
 // Draw Authentic 3D Hand-Crafted Wool Felt Casing with Scalloped Base, Blanket Stitching, Layered Applique, Ribbon Tag, Accordion Bellows Pleats & Artist's Tool-Roll
-function drawFeltCasing(x, y, width, fillGrad, opacity = 1, bellowsFold = 0, toolRoll = 0, isToolRollOption = false) {
+function drawFeltCasing(x, y, width, fillGrad, opacity = 1, bellowsFold = 0, toolRoll = 0, isToolRollOption = false, envelopeFlap = 0, isEnvelopeOption = false) {
   const f = Math.max(0, Math.min(1, typeof bellowsFold === 'number' ? bellowsFold : (bellowsFold ? 1 : 0)));
   const rProg = Math.max(0, Math.min(1, typeof toolRoll === 'number' ? toolRoll : (toolRoll ? 1 : 0)));
+  const envProg = Math.max(0, Math.min(1, typeof envelopeFlap === 'number' ? envelopeFlap : (envelopeFlap ? 1 : 0)));
   const midX = x + width / 2;
   let s = `<g opacity="${opacity}" class="felt-casing">`;
 
-  if (rProg > 0.02) {
+  if (envProg > 0.02) {
+    // === OPTION 6: ENVELOPE FLAP TUCK SHADE (envProg > 0): Folded Felt Clutch with Tucked Tongue ===
+    const t = envProg;
+    const curH = 130 - 86 * t; // from 130 down to 44
+    const headerH = Math.min(curH, 44);
+    const leftX = x + 16;
+    const rightX = x + width - 16;
+    const casingW = rightX - leftX;
+    const yFold = y + curH;
+
+    const envGrad = fillGrad.includes('terracotta') ? 'url(#envelopeTerracottaGrad)' :
+                    (fillGrad.includes('unified') ? 'url(#envelopeUnifiedGrad)' : 'url(#envelopeSageGrad)');
+
+    // 1. Soft pillowy drop shadow behind folded clutch
+    s += `<rect x="${leftX + 2}" y="${y + 4}" width="${casingW - 4}" height="${curH - 2}" rx="8"
+                fill="#050806" opacity="${0.45 + 0.35 * t}" filter="url(#woolPillowShadow)"/>`;
+
+    // 2. Upper Scalloped Wool Backing Layer
+    s += `<path d="M ${x + 24} ${y + 2}
+                    Q ${x + 60} ${y - 10} ${x + 96} ${y + 2}
+                    Q ${x + 132} ${y - 10} ${x + 168} ${y + 2}
+                    Q ${x + 204} ${y - 10} ${x + 240} ${y + 2}
+                    Q ${x + 276} ${y - 10} ${x + 312} ${y + 2}
+                    Q ${x + 348} ${y - 10} ${x + width - 24} ${y + 2}
+                    Q ${x + width + 8} ${y + 14} ${x + width + 8} ${y + headerH / 2}
+                    Q ${x + width + 8} ${y + headerH - 4} ${x + width - 24} ${y + headerH}
+                    H ${x + 24}
+                    Q ${x - 8} ${y + headerH - 4} ${x - 8} ${y + headerH / 2}
+                    Q ${x - 8} ${y + 14} ${x + 24} ${y + 2} Z"
+                  fill="#16201a" stroke="#0e1511" stroke-width="2.5"/>`;
+
+    // Blanket stitches along top scallop
+    for (let bx = x + 30; bx <= x + width - 30; bx += 18) {
+      s += `<line x1="${bx}" y1="${y + 1}" x2="${bx}" y2="${y + 6}" stroke="#faf6eb" stroke-width="1.6" stroke-linecap="round" opacity="0.75"/>`;
+    }
+
+    // 3. Maker's Woven Twill Ribbon Tag at Top Left
+    s += `<g transform="translate(${x + 16}, ${y - 12}) rotate(-7)">
+      <rect x="0" y="0" width="30" height="16" rx="3" fill="#e2b13c" stroke="#875f12" stroke-width="1.2"/>
+      <line x1="3" y1="3" x2="27" y2="3" stroke="#faf6eb" stroke-width="1" stroke-dasharray="2 2"/>
+      <circle cx="7" cy="8" r="2.2" fill="#38260b"/>
+      <text x="12" y="11" fill="#2d1d07" font-size="6.5" font-family="sans-serif" font-weight="bold">AGY</text>
+    </g>`;
+
+    // 4. Header Faceplate
+    s += `<path d="M ${x + 20} ${y + 6} H ${x + width - 20} Q ${x + width - 6} ${y + 6} ${x + width - 6} ${y + 16} V ${y + headerH - 6} H ${x + 6} V ${y + 16} Q ${x + 6} ${y + 6} ${x + 20} ${y + 6} Z"
+                fill="${fillGrad}" stroke="#141c17" stroke-width="2"/>`;
+    s += `<path d="M ${x + 20} ${y + 6} H ${x + width - 20} Q ${x + width - 6} ${y + 6} ${x + width - 6} ${y + 16} V ${y + headerH - 6} H ${x + 6} V ${y + 16} Q ${x + 6} ${y + 6} ${x + 20} ${y + 6} Z"
+                fill="url(#needlePunchPat)"/>`;
+
+    // 5. Recessed Dark Pressed Felt Embrasure Frame for the Shade Display
+    if (width > W) {
+      s += `<rect x="${x + 44}" y="${y + 6}" width="288" height="26" rx="5" fill="#0c120f" stroke="#16221b" stroke-width="2"/>`;
+      s += `<rect x="${x + 46}" y="${y + 8}" width="284" height="22" rx="3" fill="none" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.6"/>`;
+      s += `<rect x="${x + width - 332}" y="${y + 6}" width="288" height="26" rx="5" fill="#0c120f" stroke="#16221b" stroke-width="2"/>`;
+      s += `<rect x="${x + width - 330}" y="${y + 8}" width="284" height="22" rx="3" fill="none" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.6"/>`;
+    } else {
+      s += `<rect x="${x + 44}" y="${y + 6}" width="${width - 88}" height="26" rx="5" fill="#0c120f" stroke="#16221b" stroke-width="2"/>`;
+      s += `<rect x="${x + 46}" y="${y + 8}" width="${width - 92}" height="22" rx="3" fill="none" stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.6"/>`;
+    }
+
+    // 6. Stitched Horizontal Clutch Slot & Dynamic Folded Envelope Flap
+    const centers = width > W ? [x + W / 2, x + width - W / 2] : [midX];
+    const unitW = width > W ? W : width;
+    const ySlot = y + 33; // directly below the 26px shade display
+
+    centers.forEach(cMid => {
+      const slotHalfW = 30;
+      // Stitched Horizontal Clutch Slot Welt
+      s += `<!-- Stitched Horizontal Clutch Slot Welt -->
+        <rect x="${cMid - slotHalfW - 4}" y="${ySlot - 3.5}" width="${2 * slotHalfW + 8}" height="7" rx="2"
+              fill="url(#eyeletStayGrad)" stroke="#1a1109" stroke-width="1"/>
+        <line x1="${cMid - slotHalfW}" y1="${ySlot - 2}" x2="${cMid + slotHalfW}" y2="${ySlot - 2}"
+              stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2.5 1.5" opacity="0.85"/>
+        <line x1="${cMid - slotHalfW}" y1="${ySlot + 2}" x2="${cMid + slotHalfW}" y2="${ySlot + 2}"
+              stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2.5 1.5" opacity="0.85"/>
+        <!-- Dark Slot Cavity -->
+        <rect x="${cMid - slotHalfW + 2}" y="${ySlot - 1.2}" width="${2 * slotHalfW - 4}" height="2.4" rx="1"
+              fill="#060907"/>
+        <!-- Gold Reinforcement Bar Tacks -->
+        <line x1="${cMid - slotHalfW - 1.5}" y1="${ySlot - 3}" x2="${cMid - slotHalfW - 1.5}" y2="${ySlot + 3}"
+              stroke="#e2b13c" stroke-width="1.8" stroke-linecap="round"/>
+        <line x1="${cMid + slotHalfW + 1.5}" y1="${ySlot - 3}" x2="${cMid + slotHalfW + 1.5}" y2="${ySlot + 3}"
+              stroke="#e2b13c" stroke-width="1.8" stroke-linecap="round"/>
+      `;
+
+      // Flap geometry swinging from 0 to 180 deg
+      const flapBaseHalfW = Math.min(145, (unitW - 60) / 2);
+      const cosA = Math.cos(t * Math.PI);
+      const isPastVertical = t > 0.5;
+      const flapLen = 14 + 10 * t; // length of flap tongue
+      const tipY = yFold - cosA * flapLen;
+      const shoulderY = yFold - cosA * (flapLen * 0.45);
+
+      // Flap drop shadow onto casing face (when folded forward, t > 0.35)
+      if (t > 0.35) {
+        const shadowAlpha = Math.min(0.6, (t - 0.35) * 1.1);
+        s += `<polygon points="${cMid - flapBaseHalfW + 8},${yFold} ${cMid - 16},${tipY - 2} ${cMid + 16},${tipY - 2} ${cMid + flapBaseHalfW - 8},${yFold}"
+                       fill="#060a08" opacity="${shadowAlpha}" filter="url(#feltDiffuseGlow)"/>`;
+      }
+
+      // Flap Wool Body
+      const flapPath = `M ${cMid - flapBaseHalfW} ${yFold}
+                        Q ${cMid - 40} ${shoulderY} ${cMid - 16} ${tipY}
+                        H ${cMid + 16}
+                        Q ${cMid + 40} ${shoulderY} ${cMid + flapBaseHalfW} ${yFold}
+                        Z`;
+
+      s += `<path d="${flapPath}" fill="${envGrad}" stroke="#141c17" stroke-width="1.8"/>`;
+      s += `<path d="${flapPath}" fill="url(#needlePunchPat)"/>`;
+
+      // Ivory running stitches along sloping flap edges
+      s += `<path d="M ${cMid - flapBaseHalfW + 10} ${yFold - cosA * 2}
+                      Q ${cMid - 36} ${shoulderY} ${cMid - 14} ${tipY - cosA * 1.5}"
+                    fill="none" stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.85"/>`;
+      s += `<path d="M ${cMid + flapBaseHalfW - 10} ${yFold - cosA * 2}
+                      Q ${cMid + 36} ${shoulderY} ${cMid + 14} ${tipY - cosA * 1.5}"
+                    fill="none" stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.85"/>`;
+
+      // Hand-sewn gold cross stitches on flap face
+      if (t > 0.3) {
+        for (let k = -2; k <= 2; k++) {
+          if (k === 0) continue;
+          const kx = cMid + k * 22;
+          const ky = yFold - cosA * (flapLen * 0.4);
+          s += `<path d="M ${kx - 2} ${ky - 2} L ${kx + 2} ${ky + 2} M ${kx + 2} ${ky - 2} L ${kx - 2} ${ky + 2}"
+                      stroke="#e2b13c" stroke-width="1.2" stroke-linecap="round" opacity="${Math.min(0.9, t * 1.2)}"/>`;
+        }
+      }
+
+      // 7. Saddle-Leather Tongue Tab with Polished Brass Rivet
+      const tongueW = 24;
+      const tongueTipY = isPastVertical ? tipY - 5 : tipY + 5;
+      const tongueBaseY = tipY;
+      const isTucked = t >= 0.85;
+      const tuckedDepth = isTucked ? Math.min(5, (t - 0.85) / 0.15 * 5) : 0;
+      const adjustedTipY = isPastVertical ? tongueTipY - tuckedDepth : tongueTipY;
+
+      s += `<!-- Saddle-Leather Tongue Tab -->
+        <g class="envelope-tongue-tab" data-flap-toggle="true">
+          <path d="M ${cMid - tongueW / 2} ${tongueBaseY}
+                   L ${cMid - tongueW / 2} ${adjustedTipY + (isPastVertical ? 3 : -3)}
+                   Q ${cMid} ${adjustedTipY + (isPastVertical ? -2 : 2)} ${cMid + tongueW / 2} ${adjustedTipY + (isPastVertical ? 3 : -3)}
+                   L ${cMid + tongueW / 2} ${tongueBaseY}
+                   Z"
+                fill="url(#leatherTabGrad)" stroke="#1a1109" stroke-width="1.2"/>
+          <line x1="${cMid - tongueW / 2 + 2.5}" y1="${tongueBaseY}"
+                x2="${cMid - tongueW / 2 + 2.5}" y2="${adjustedTipY + (isPastVertical ? 3 : -3)}"
+                stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.85"/>
+          <line x1="${cMid + tongueW / 2 - 2.5}" y1="${tongueBaseY}"
+                x2="${cMid + tongueW / 2 - 2.5}" y2="${adjustedTipY + (isPastVertical ? 3 : -3)}"
+                stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.85"/>
+          <!-- Polished Brass Rivet -->
+          <circle cx="${cMid}" cy="${tongueBaseY + (isPastVertical ? -5 : 5)}" r="3"
+                  fill="url(#eyeletBrassGrad)" stroke="#3a2507" stroke-width="0.8"/>
+          <circle cx="${cMid}" cy="${tongueBaseY + (isPastVertical ? -5 : 5)}" r="1.2"
+                  fill="#140a02"/>
+        </g>
+      `;
+
+      // 8. Bottom Folded Embroidered Hinge Welt
+      s += `<!-- Bottom Folded Embroidered Hinge Welt -->
+        <line x1="${cMid - flapBaseHalfW - 8}" y1="${yFold - 1}" x2="${cMid + flapBaseHalfW + 8}" y2="${yFold - 1}"
+              stroke="#0a0f0c" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="${cMid - flapBaseHalfW - 6}" y1="${yFold}" x2="${cMid + flapBaseHalfW + 6}" y2="${yFold}"
+              stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.85"/>
+        <line x1="${cMid - flapBaseHalfW - 4}" y1="${yFold - 2.5}" x2="${cMid + flapBaseHalfW + 4}" y2="${yFold - 2.5}"
+              stroke="#e2b13c" stroke-width="1" stroke-dasharray="2 4" stroke-linecap="round" opacity="0.6"/>
+      `;
+    });
+
+  } else if (rProg > 0.02) {
     // === THE ARTIST'S TOOL-ROLL (FELT SCROLL) SHADE (rProg > 0): Rolled Padded Cylinder ===
     const curH = 130 - 86 * rProg; // from 130 down to 44
     const rollRadius = 4 + 7.5 * rProg; // from 4px up to 11.5px
@@ -1642,6 +1857,89 @@ function drawFeltCasing(x, y, width, fillGrad, opacity = 1, bellowsFold = 0, too
             <circle cx="0" cy="8" r="4.5" fill="url(#toggleWoodGrad)" stroke="#2d1d07" stroke-width="1.1"/>
             <path d="M -1.5 6.5 L 1.5 9.5 M 1.5 6.5 L -1.5 9.5" stroke="#faf6eb" stroke-width="0.9"/>
             <path d="M -8 16 Q 0 26 8 16" fill="none" stroke="url(#braidCordGrad)" stroke-width="2" stroke-linecap="round"/>
+          </g>
+        `;
+      });
+    }
+
+    if (isEnvelopeOption) {
+      // === OPTION 6: ENVELOPE FLAP TUCK (Open 130px state) ===
+      const centers = width > W ? [x + W / 2, x + width - W / 2] : [midX];
+      const unitW = width > W ? W : width;
+
+      centers.forEach(cMid => {
+        const slotHalfW = 30;
+        const ySlot = y + 26;
+
+        // 1. Stitched Horizontal Clutch Slot Welt (Ready to receive tongue)
+        s += `<!-- Horizontal Clutch Slot Welt (Ready) -->
+          <rect x="${cMid - slotHalfW - 4}" y="${ySlot - 3.5}" width="${2 * slotHalfW + 8}" height="7" rx="2"
+                fill="url(#eyeletStayGrad)" stroke="#1a1109" stroke-width="1"/>
+          <line x1="${cMid - slotHalfW}" y1="${ySlot - 2}" x2="${cMid + slotHalfW}" y2="${ySlot - 2}"
+                stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2.5 1.5" opacity="0.85"/>
+          <line x1="${cMid - slotHalfW}" y1="${ySlot + 2}" x2="${cMid + slotHalfW}" y2="${ySlot + 2}"
+                stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2.5 1.5" opacity="0.85"/>
+          <rect x="${cMid - slotHalfW + 2}" y="${ySlot - 1.2}" width="${2 * slotHalfW - 4}" height="2.4" rx="1"
+                fill="#060907"/>
+          <line x1="${cMid - slotHalfW - 1.5}" y1="${ySlot - 3}" x2="${cMid - slotHalfW - 1.5}" y2="${ySlot + 3}"
+                stroke="#e2b13c" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="${cMid + slotHalfW + 1.5}" y1="${ySlot - 3}" x2="${cMid + slotHalfW + 1.5}" y2="${ySlot + 3}"
+                stroke="#e2b13c" stroke-width="1.8" stroke-linecap="round"/>
+        `;
+
+        // 2. Embroidered Hinge Line across lower section (y + 96)
+        const yHinge = y + 96;
+        const flapBaseHalfW = Math.min(145, (unitW - 60) / 2);
+        s += `<!-- Embroidered Hinge Line -->
+          <line x1="${cMid - flapBaseHalfW - 8}" y1="${yHinge}" x2="${cMid + flapBaseHalfW + 8}" y2="${yHinge}"
+                stroke="#0c120f" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="${cMid - flapBaseHalfW - 6}" y1="${yHinge - 1}" x2="${cMid + flapBaseHalfW + 6}" y2="${yHinge - 1}"
+                stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.85"/>
+          <line x1="${cMid - flapBaseHalfW - 4}" y1="${yHinge + 1.5}" x2="${cMid + flapBaseHalfW + 4}" y2="${yHinge + 1.5}"
+                stroke="#e2b13c" stroke-width="1.2" stroke-dasharray="3 3" stroke-linecap="round" opacity="0.75"/>
+          <circle cx="${cMid - flapBaseHalfW - 4}" cy="${yHinge}" r="2.8" fill="url(#eyeletBrassGrad)" stroke="#3a2507" stroke-width="0.8"/>
+          <circle cx="${cMid + flapBaseHalfW + 4}" cy="${yHinge}" r="2.8" fill="url(#eyeletBrassGrad)" stroke="#3a2507" stroke-width="0.8"/>
+        `;
+
+        // 3. Hanging Envelope Flap resting at bottom
+        const yTip = y + 122;
+        const flapPath = `M ${cMid - flapBaseHalfW} ${yHinge}
+                          Q ${cMid - 36} ${yHinge + 14} ${cMid - 16} ${yTip}
+                          H ${cMid + 16}
+                          Q ${cMid + 36} ${yHinge + 14} ${cMid + flapBaseHalfW} ${yHinge}
+                          Z`;
+        const envGrad = fillGrad.includes('terracotta') ? 'url(#envelopeTerracottaGrad)' :
+                        (fillGrad.includes('unified') ? 'url(#envelopeUnifiedGrad)' : 'url(#envelopeSageGrad)');
+
+        s += `<path d="${flapPath}" fill="${envGrad}" stroke="#141c17" stroke-width="1.8"/>`;
+        s += `<path d="${flapPath}" fill="url(#needlePunchPat)"/>`;
+
+        // Diagonal stitches along flap
+        s += `<path d="M ${cMid - flapBaseHalfW + 10} ${yHinge + 2}
+                        Q ${cMid - 34} ${yHinge + 14} ${cMid - 14} ${yTip - 2}"
+                      fill="none" stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.85"/>`;
+        s += `<path d="M ${cMid + flapBaseHalfW - 10} ${yHinge + 2}
+                        Q ${cMid + 34} ${yHinge + 14} ${cMid + 14} ${yTip - 2}"
+                      fill="none" stroke="#faf6eb" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.85"/>`;
+
+        // 4. Saddle-Leather Tongue Tab pointing downward
+        const tongueW = 24;
+        s += `<!-- Saddle-Leather Tongue Tab (Resting) -->
+          <g class="envelope-tongue-tab">
+            <path d="M ${cMid - tongueW / 2} ${yTip}
+                     L ${cMid - tongueW / 2} ${yTip + 9}
+                     Q ${cMid} ${yTip + 13} ${cMid + tongueW / 2} ${yTip + 9}
+                     L ${cMid + tongueW / 2} ${yTip}
+                     Z"
+                  fill="url(#leatherTabGrad)" stroke="#1a1109" stroke-width="1.2"/>
+            <line x1="${cMid - tongueW / 2 + 2.5}" y1="${yTip + 1}"
+                  x2="${cMid - tongueW / 2 + 2.5}" y2="${yTip + 9}"
+                  stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.85"/>
+            <line x1="${cMid + tongueW / 2 - 2.5}" y1="${yTip + 1}"
+                  x2="${cMid + tongueW / 2 - 2.5}" y2="${yTip + 9}"
+                  stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.85"/>
+            <circle cx="${cMid}" cy="${yTip + 6}" r="3" fill="url(#eyeletBrassGrad)" stroke="#3a2507" stroke-width="0.8"/>
+            <circle cx="${cMid}" cy="${yTip + 6}" r="1.2" fill="#140a02"/>
           </g>
         `;
       });
@@ -2245,7 +2543,8 @@ function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
   const f = model.bellowsFold;
   const r = model.toolRoll;
-  const isShade = model.shade || f > 0.5 || r > 0.5;
+  const env = model.envelopeFlap;
+  const isShade = model.shade || f > 0.5 || r > 0.5 || env > 0.5;
   const glow = model.busy ? model.light : connectionGlow.socket.value;
   let shared = '';
 
@@ -2253,18 +2552,18 @@ function renderHardware() {
 
   if (p > 0) {
     // Continuous Monolithic Plush Felt Chassis
-    shared += drawFeltCasing(a.x, a.y, (b.x + W) - a.x, 'url(#unifiedFeltGrad)', p, f, r, model.option === 'toolroll');
+    shared += drawFeltCasing(a.x, a.y, (b.x + W) - a.x, 'url(#unifiedFeltGrad)', p, f, r, model.option === 'toolroll', env, model.option === 'envelope');
   }
 
   if (!isShade) {
     if (model.option === 'zipper') {
       // Option 5: Running Cross-Stitch Zipper Join
       const zProg = model.joined ? 1 : (model.zipperProg || (glow > 0.25 ? (glow - 0.25) / 0.75 : 0));
-      shared += drawZipperJoin(a, b, model.joined, zProg, model.zipperTension, p, Math.max(f, r));
+      shared += drawZipperJoin(a, b, model.joined, zProg, model.zipperTension, p, Math.max(f, r, env));
     } else if (model.option === 'duffel') {
       // Option 3: Duffel Toggle & Braid Cord Join
       const dLoop = model.joined ? 1 : (model.duffelLoop || (glow > 0.25 ? (glow - 0.25) / 0.75 : 0));
-      shared += drawDuffelJoin(a, b, model.joined, dLoop, model.duffelTension, p, Math.max(f, r));
+      shared += drawDuffelJoin(a, b, model.joined, dLoop, model.duffelTension, p, Math.max(f, r, env));
     } else {
       // Option 1: Entangled Fiber Seam (or default)
       if (model.joined || model.entangle > 0.02 || (glow > 0.3 && !model.joined)) {
@@ -2286,12 +2585,12 @@ function renderHardware() {
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
     const grad = isA ? 'url(#sageWoolGrad)' : 'url(#terracottaWoolGrad)';
-    let individual = drawFeltCasing(0, 0, W, grad, 1, f, r, model.option === 'toolroll');
+    let individual = drawFeltCasing(0, 0, W, grad, 1, f, r, model.option === 'toolroll', env, model.option === 'envelope');
 
     // Only draw roving fringe caps if NOT in duffel or zipper option
     if (model.option !== 'duffel' && model.option !== 'zipper') {
-      individual += drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, Math.max(f, r)) +
-                    drawRovingCap(0, 0, true, !isA, isA ? model.cap : 0, Math.max(f, r));
+      individual += drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, Math.max(f, r, env)) +
+                    drawRovingCap(0, 0, true, !isA, isA ? model.cap : 0, Math.max(f, r, env));
     }
 
     $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawFeltSocketLight(isA ? W - 22 : 22, 0, glow)}</g>`;
@@ -2311,11 +2610,12 @@ function renderHardware() {
 }
 
 function updateStateButtons() {
-  const isShade = model.shade || model.bellowsFold > 0.5 || model.toolRoll > 0.5;
+  const isShade = model.shade || model.bellowsFold > 0.5 || model.toolRoll > 0.5 || model.envelopeFlap > 0.5;
   const isJoined = model.joined;
   const isJoining = ((model.entangle > 0.1 && model.entangle < 0.95) ||
                      (model.option === 'duffel' && model.duffelLoop > 0.1 && model.duffelLoop < 0.95) ||
                      (model.option === 'zipper' && model.zipperProg > 0.1 && model.zipperProg < 0.95) ||
+                     (model.option === 'envelope' && model.envelopeFlap > 0.1 && model.envelopeFlap < 0.95) ||
                      (model.option === 'toolroll' && model.toolRoll > 0.1 && model.toolRoll < 0.95) ||
                      (model.option === 'bellows' && model.bellowsFold > 0.1 && model.bellowsFold < 0.95)) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
@@ -2403,6 +2703,14 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
+  const envelopeBtn = $('#btnEnvelopeAnim');
+  if (envelopeBtn) {
+    envelopeBtn.textContent = model.shade ? 'Unfold envelope flap' : 'Fold envelope flap';
+    envelopeBtn.disabled = model.busy;
+    const isEnvelopeOption = model.option === 'envelope';
+    envelopeBtn.classList.toggle('primary-btn', isEnvelopeOption);
+  }
+
   const bellowsBtn = $('#btnBellowsAnim');
   if (bellowsBtn) {
     bellowsBtn.textContent = model.shade ? 'Unfold accordion pleats' : 'Fold accordion pleats';
@@ -2464,7 +2772,9 @@ function render() {
   }
 
   if (!model.busy) {
-    if (model.shade || model.toolRoll > 0.8) {
+    if (model.shade || model.envelopeFlap > 0.8) {
+      $('#phase').textContent = 'Shade mode / Envelope flap tucked into clutch slot';
+    } else if (model.shade || model.toolRoll > 0.8) {
       $('#phase').textContent = 'Shade mode / Felt tool scroll rolled & fastened';
     } else if (model.shade || model.bellowsFold > 0.8) {
       $('#phase').textContent = 'Shade mode / Accordion bellows folded flat';
@@ -2476,6 +2786,8 @@ function render() {
       } else {
         $('#phase').textContent = 'Joined / Interwoven fiber chassis';
       }
+    } else if (model.option === 'envelope' && model.envelopeFlap > 0.05) {
+      $('#phase').textContent = 'Joining / Envelope flap swinging toward clutch slot';
     } else if (model.option === 'zipper' && model.zipperProg > 0.05) {
       $('#phase').textContent = 'Joining / Needle lacing cross-stitch zipper';
     } else if (model.option === 'toolroll' && model.toolRoll > 0.05) {
@@ -3054,13 +3366,127 @@ async function unrollToolScroll() {
   $('#phase').textContent = model.joined ? 'Joined / Interwoven fiber chassis' : 'Separate / Two wool housings';
 }
 
+// Option 6: Envelope Flap Tuck Shade Animations
+async function foldEnvelopeFlap() {
+  if (model.busy || (model.shade && model.envelopeFlap >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Folding envelope clutch flap! Lower half swings upward on embroidered hinge toward clutch slot.');
+  $('#phase').textContent = 'Folding envelope clutch flap';
+
+  if (model.pocket) togglePocket(false);
+
+  model.shade = true;
+  render();
+
+  await tween(460, t => {
+    // Textile fold curve: cushioned upward swing & snap into slot
+    const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    model.envelopeFlap = ease;
+    renderHardware();
+    ['a', 'b'].forEach(id => {
+      const el = $('#' + id);
+      el.style.height = `${130 - 86 * ease}px`;
+      const screen = el.querySelector('.felt-screen');
+      if (screen) {
+        screen.style.opacity = Math.max(0, 1 - ease * 2.2);
+        screen.style.transform = `translateY(-${12 * ease}px) scaleY(${Math.max(0.1, 1 - ease)})`;
+      }
+      const strip = el.querySelector('.shade-strip');
+      if (strip) {
+        strip.style.display = ease > 0.15 ? 'flex' : 'none';
+        strip.style.opacity = Math.max(0, (ease - 0.15) / 0.85);
+        strip.style.transform = `translateY(${(1 - ease) * 8}px)`;
+      }
+      const grip = el.querySelector('.felt-grip');
+      if (grip) grip.style.opacity = Math.max(0, 1 - ease * 1.8);
+      const tabRow = el.querySelector('.tab-row');
+      if (tabRow) tabRow.style.opacity = Math.max(0, 1 - ease * 2.5);
+      el.querySelectorAll('.felt-btn, .pocket-btn').forEach(b => {
+        b.style.opacity = Math.max(0, 1 - ease * 2.5);
+      });
+    });
+  }, token);
+
+  model.envelopeFlap = 1;
+  model.busy = false;
+  render();
+  say('Envelope flap tucked into stitched clutch slot! Glanceable display active.');
+  $('#phase').textContent = 'Shade mode / Envelope flap tucked into clutch slot';
+}
+
+async function unfoldEnvelopeFlap() {
+  if (model.busy || (!model.shade && model.envelopeFlap <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Releasing leather tongue from clutch slot. Flap swings downward on embroidered hinge.');
+  $('#phase').textContent = 'Unfolding envelope clutch flap';
+
+  model.shade = false;
+  render();
+
+  await tween(480, t => {
+    const inv = 1 - t;
+    const ease = inv * inv;
+    model.envelopeFlap = ease;
+    renderHardware();
+    ['a', 'b'].forEach(id => {
+      const el = $('#' + id);
+      el.style.height = `${130 - 86 * ease}px`;
+      const screen = el.querySelector('.felt-screen');
+      if (screen) {
+        screen.style.opacity = Math.max(0, 1 - ease * 2.2);
+        screen.style.transform = `translateY(-${12 * ease}px) scaleY(${Math.max(0.1, 1 - ease)})`;
+      }
+      const strip = el.querySelector('.shade-strip');
+      if (strip) {
+        strip.style.display = ease > 0.15 ? 'flex' : 'none';
+        strip.style.opacity = Math.max(0, (ease - 0.15) / 0.85);
+        strip.style.transform = `translateY(${(1 - ease) * 8}px)`;
+      }
+      const grip = el.querySelector('.felt-grip');
+      if (grip) grip.style.opacity = Math.max(0, 1 - ease * 1.8);
+      const tabRow = el.querySelector('.tab-row');
+      if (tabRow) tabRow.style.opacity = Math.max(0, 1 - ease * 2.5);
+      el.querySelectorAll('.felt-btn, .pocket-btn').forEach(b => {
+        b.style.opacity = Math.max(0, 1 - ease * 2.5);
+      });
+    });
+  }, token);
+
+  model.envelopeFlap = 0;
+  model.busy = false;
+  ['a', 'b'].forEach(id => {
+    const el = $('#' + id);
+    el.style.height = '';
+    const screen = el.querySelector('.felt-screen');
+    if (screen) { screen.style.opacity = ''; screen.style.transform = ''; }
+    const strip = el.querySelector('.shade-strip');
+    if (strip) { strip.style.display = ''; strip.style.opacity = ''; strip.style.transform = ''; }
+    const grip = el.querySelector('.felt-grip');
+    if (grip) grip.style.opacity = '';
+    const tabRow = el.querySelector('.tab-row');
+    if (tabRow) tabRow.style.opacity = '';
+    el.querySelectorAll('.felt-btn, .pocket-btn').forEach(b => { b.style.opacity = ''; });
+  });
+  render();
+  say('Envelope flap fully unfolded. Full plush felt casing and screen controls restored.');
+  $('#phase').textContent = model.joined ? 'Joined / Interwoven fiber chassis' : 'Separate / Two wool housings';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
   ++animationToken;
 
   if (stateName === 'separate') {
-    if (model.shade || model.toolRoll > 0.05) {
+    if (model.shade || model.envelopeFlap > 0.05) {
+      await unfoldEnvelopeFlap();
+    } else if (model.shade || model.toolRoll > 0.05) {
       await unrollToolScroll();
     } else if (model.shade || model.bellowsFold > 0.05) {
       await unfoldBellows();
@@ -3074,6 +3500,7 @@ async function applyState(stateName) {
       model.zipperProg = 0;
       model.zipperTension = 0;
       model.toolRoll = 0;
+      model.envelopeFlap = 0;
       model.bellowsFold = 0;
       model.cap = 0;
       model.blend = 0;
@@ -3083,7 +3510,9 @@ async function applyState(stateName) {
       say('State: Separate — Two independent tactile felt capsules.');
     }
   } else if (stateName === 'joining') {
-    if (model.shade || model.toolRoll > 0.05) {
+    if (model.shade || model.envelopeFlap > 0.05) {
+      await unfoldEnvelopeFlap();
+    } else if (model.shade || model.toolRoll > 0.05) {
       await unrollToolScroll();
     } else if (model.shade || model.bellowsFold > 0.05) {
       await unfoldBellows();
@@ -3091,13 +3520,23 @@ async function applyState(stateName) {
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.5;
-    if (model.option === 'zipper') {
+    if (model.option === 'envelope') {
+      model.envelopeFlap = 0.55; // mid-flight flap poised upward at ~90-100deg
+      model.zipperProg = 0;
+      model.zipperTension = 0;
+      model.duffelLoop = 0;
+      model.duffelTension = 0;
+      model.entangle = 0;
+      model.toolRoll = 0;
+      model.bellowsFold = 0;
+    } else if (model.option === 'zipper') {
       model.zipperProg = 0.58; // mid-flight lacing with needle threading tier 3-4
       model.zipperTension = 0.4;
       model.duffelLoop = 0;
       model.duffelTension = 0;
       model.entangle = 0;
       model.toolRoll = 0;
+      model.envelopeFlap = 0;
       model.bellowsFold = 0;
     } else if (model.option === 'duffel') {
       model.duffelLoop = 0.65;
@@ -3106,6 +3545,7 @@ async function applyState(stateName) {
       model.zipperTension = 0;
       model.entangle = 0;
       model.toolRoll = 0;
+      model.envelopeFlap = 0;
       model.bellowsFold = 0;
     } else if (model.option === 'toolroll') {
       model.toolRoll = 0.52; // mid-flight scroll curled halfway upward
@@ -3114,6 +3554,7 @@ async function applyState(stateName) {
       model.zipperProg = 0;
       model.zipperTension = 0;
       model.entangle = 0;
+      model.envelopeFlap = 0;
       model.bellowsFold = 0;
     } else if (model.option === 'bellows') {
       model.bellowsFold = 0.5;
@@ -3123,6 +3564,7 @@ async function applyState(stateName) {
       model.zipperTension = 0;
       model.entangle = 0;
       model.toolRoll = 0;
+      model.envelopeFlap = 0;
     } else {
       model.entangle = 0.55; // mid-flight fibers reaching and crossing
       model.duffelLoop = 0;
@@ -3130,13 +3572,16 @@ async function applyState(stateName) {
       model.zipperProg = 0;
       model.zipperTension = 0;
       model.toolRoll = 0;
+      model.envelopeFlap = 0;
       model.bellowsFold = 0;
     }
     model.light = 0.75;
     model.a.x = 240;
     model.b.x = 240 + W + 50; // near each other
     render();
-    if (model.option === 'zipper') {
+    if (model.option === 'envelope') {
+      say('State: Joining — Mid-animation view with envelope flap swinging upward on embroidered hinge toward clutch slot.');
+    } else if (model.option === 'zipper') {
       say('State: Joining — Mid-animation view with needle actively lacing scarlet cross-stitches through brass eyelets.');
     } else if (model.option === 'toolroll') {
       say('State: Joining — Mid-animation view with artist\'s tool scroll curled halfway upward.');
@@ -3148,7 +3593,9 @@ async function applyState(stateName) {
       say('State: Joining — Mid-animation view with roving fibers interweaving.');
     }
   } else if (stateName === 'joined') {
-    if (model.shade || model.toolRoll > 0.05) {
+    if (model.shade || model.envelopeFlap > 0.05) {
+      await unfoldEnvelopeFlap();
+    } else if (model.shade || model.toolRoll > 0.05) {
       await unrollToolScroll();
     } else if (model.shade || model.bellowsFold > 0.05) {
       await unfoldBellows();
@@ -3160,6 +3607,7 @@ async function applyState(stateName) {
       model.blend = 1;
       model.cap = 1;
       model.toolRoll = 0;
+      model.envelopeFlap = 0;
       model.bellowsFold = 0;
       if (model.option === 'zipper') {
         model.zipperProg = 1;
@@ -3191,12 +3639,14 @@ async function applyState(stateName) {
       }
     }
   } else if (stateName === 'shade') {
-    if (model.shade || model.toolRoll > 0.5 || model.bellowsFold > 0.5) {
+    if (model.shade || model.toolRoll > 0.5 || model.bellowsFold > 0.5 || model.envelopeFlap > 0.5) {
       if (model.option === 'bellows') await unfoldBellows();
-      else await unrollToolScroll();
+      else if (model.option === 'toolroll') await unrollToolScroll();
+      else await unfoldEnvelopeFlap();
     } else {
       if (model.option === 'bellows') await foldBellows();
-      else await rollToolScroll();
+      else if (model.option === 'toolroll') await rollToolScroll();
+      else await foldEnvelopeFlap();
     }
   }
 }
@@ -3272,6 +3722,12 @@ $('#btnToolRollAnim').onclick = () => {
   if (model.shade || model.toolRoll > 0.5) unrollToolScroll();
   else rollToolScroll();
 };
+if ($('#btnEnvelopeAnim')) {
+  $('#btnEnvelopeAnim').onclick = () => {
+    if (model.shade || model.envelopeFlap > 0.5) unfoldEnvelopeFlap();
+    else foldEnvelopeFlap();
+  };
+}
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
   render();
@@ -3283,8 +3739,8 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, pocket: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, entangle: 0, bellowsFold: 0, toolRoll: 0, duffelLoop: 0, duffelTension: 0,
-    zipperProg: 0, zipperTension: 0, option: 'zipper', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, entangle: 0, bellowsFold: 0, toolRoll: 0, envelopeFlap: 0, duffelLoop: 0, duffelTension: 0,
+    zipperProg: 0, zipperTension: 0, option: 'envelope', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
@@ -3341,7 +3797,9 @@ $('#optionSelect').onchange = (e) => {
     model.duffelTension = 0;
   }
   render();
-  if (model.option === 'zipper') {
+  if (model.option === 'envelope') {
+    say('Option 6: Envelope Flap Tuck shade selected. Lower half folds up on embroidered hinge and tucks into felt clutch slot.');
+  } else if (model.option === 'zipper') {
     say('Option 5: Running Cross-Stitch Zipper join selected. Thick scarlet embroidery floss laces through brass eyelets in tight X-stitches.');
   } else if (model.option === 'toolroll') {
     say('Option 4: The Artist\'s Tool-Roll (Felt Scroll) shade selected. Lower sections roll upward like a canvas brush roll held by button.');
@@ -3586,12 +4044,29 @@ function cancelDrag() {
 }
 
 // Global listeners
+stage.addEventListener('click', e => {
+  const tongue = e.target.closest('[data-flap-toggle]');
+  if (tongue) {
+    if (model.shade || model.envelopeFlap > 0.5) unfoldEnvelopeFlap();
+    else foldEnvelopeFlap();
+  }
+});
+
 window.addEventListener('pointerdown', startDrag);
 window.addEventListener('pointermove', onPointerMove);
 window.addEventListener('pointerup', onPointerUp);
 window.addEventListener('pointercancel', onPointerUp);
 window.addEventListener('keydown', e => {
+  if (e.target.matches('input, select, textarea')) return;
   if (e.key === 'Escape') cancelDrag();
+  if (e.key === '1') applyState('separate');
+  if (e.key === '2') applyState('joining');
+  if (e.key === '3') applyState('joined');
+  if (e.key === '4') applyState('shade');
+  if (e.key === 'e' || e.key === 'E') {
+    if (model.shade || model.envelopeFlap > 0.5) unfoldEnvelopeFlap();
+    else foldEnvelopeFlap();
+  }
   if (e.key === 'Enter' && document.activeElement === $('#toggleRelease')) triggerSeparate();
 });
 
@@ -3613,7 +4088,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat, Duffel Toggle, Tool-Roll & Cross-Stitch Zipper.');
+say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat, Duffel Toggle, Tool-Roll, Cross-Stitch Zipper & Envelope Flap.');
 </script>
 </body>
 </html>
