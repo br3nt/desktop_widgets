@@ -441,6 +441,36 @@ header {
   box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 14px rgba(252, 192, 66, 0.45);
 }
 
+/* Layered Shale Slabs (Roof Shingle Retraction) SVG Overlay */
+.shale-svg {
+  position: absolute;
+  inset: 0;
+  width: 390px;
+  height: 130px;
+  pointer-events: none;
+  z-index: 5;
+  overflow: visible;
+}
+.module.shade.shale-mode .shade-strip {
+  background: linear-gradient(180deg, #182329 0%, #0b1012 100%);
+  border-color: #556c7a;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 14px rgba(85, 108, 122, 0.45), 0 3px 8px rgba(0, 0, 0, 0.85);
+}
+.module.shade.shale-mode .shade-strip .shade-title em {
+  color: #8bb2c9;
+}
+.module.shade.shale-mode .shade-strip .shade-eyes::before {
+  content: "🪨 3-TIER SHALE";
+  font: 700 9px/1 "Courier New", monospace;
+  color: #9cbacf;
+  background: rgba(14, 21, 26, 0.9);
+  padding: 2px 5px;
+  border-radius: 3px;
+  border: 1px solid #3d4f59;
+  letter-spacing: 0.5px;
+  margin-right: 8px;
+}
+
 /* Tabs & Interactive Controls */
 .tab-row {
   position: absolute;
@@ -928,8 +958,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Hollow Knight &amp; Silksong <span>/ silk lash, elytra shield, mandible interlock, silk cocoon &amp; nail-blade sheath</span></h1>
-    <p>Bleached chitin shell silhouette · Cold-forged iron nail-blade &amp; bone peg · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Silk cocoon wrap</p>
+    <h1>Hollow Knight &amp; Silksong <span>/ silk lash, elytra shield, mandible interlock, silk cocoon, nail-blade sheath &amp; shale slabs</span></h1>
+    <p>Bleached chitin shell silhouette · Cold-forged iron nail-blade &amp; bone peg · Golden weaver-silk rigging · Elytra wing-case shield · Carapace mandible interlock · Silk cocoon wrap · Layered shale slabs shingle retraction</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -939,7 +969,8 @@ footer .note-highlight {
         <option value="elytra_shield">2. Elytra Wing-Case Shield shade (Folding Beetle Wings)</option>
         <option value="mandible_interlock">3. Chitinous Carapace Mandible Interlock join (Serrated Stag-Beetle Shell Teeth)</option>
         <option value="cocoon_wrap">4. Silk Cocoon Wrap shade (Rapid Thread Winding &amp; Bundled Silk)</option>
-        <option value="nail_blade" selected>5. Nail-Blade Sheath &amp; Bone Peg join (Cold-Forged Blade &amp; Bronze Scabbard)</option>
+        <option value="nail_blade">5. Nail-Blade Sheath &amp; Bone Peg join (Cold-Forged Blade &amp; Bronze Scabbard)</option>
+        <option value="shale_slabs" selected>6. Layered Shale Slabs (Roof Shingle Retraction shade)</option>
       </select>
     </div>
     <div class="control-group">
@@ -952,7 +983,8 @@ footer .note-highlight {
     <button id="btnJoinAnim">Interlock mandibles</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnElytraAnim">Fold elytra</button>
-    <button id="btnCocoonAnim" class="primary-btn">Wrap cocoon</button>
+    <button id="btnCocoonAnim">Wrap cocoon</button>
+    <button id="btnShaleAnim" class="primary-btn">Retract shale slabs</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -1070,6 +1102,28 @@ footer .note-highlight {
           <stop offset="85%" stop-color="#4d360f"/>
           <stop offset="100%" stop-color="#1f1403"/>
         </linearGradient>
+
+        <!-- Layered Fungal Wastes Slate/Shale Slabs Gradients -->
+        <linearGradient id="shaleSlabGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#34434c"/>
+          <stop offset="12%" stop-color="#232d34"/>
+          <stop offset="55%" stop-color="#141a1e"/>
+          <stop offset="85%" stop-color="#0d1114"/>
+          <stop offset="100%" stop-color="#080b0d"/>
+        </linearGradient>
+
+        <linearGradient id="shaleBevelGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#556c7a"/>
+          <stop offset="25%" stop-color="#3b4b54"/>
+          <stop offset="75%" stop-color="#1f272c"/>
+          <stop offset="100%" stop-color="#121618"/>
+        </linearGradient>
+
+        <linearGradient id="shaleChiselEdge" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#b8ccd8"/>
+          <stop offset="40%" stop-color="#657d8c"/>
+          <stop offset="100%" stop-color="#243038"/>
+        </linearGradient>
       </defs>
 
       <g id="sharedHollowStage"></g>
@@ -1152,6 +1206,9 @@ footer .note-highlight {
       <!-- Silk Cocoon Wrap Layer -->
       <svg class="cocoon-svg" id="cocoon-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
+      <!-- Layered Shale Slabs Retraction Layer -->
+      <svg class="shale-svg" id="shale-a" viewBox="0 0 390 130" aria-hidden="true"></svg>
+
       <div class="tab-row" role="tablist" aria-label="Jarvis screens">
         <button class="hollow-tab" role="tab" aria-selected="true" data-page="0">Status</button>
         <button class="hollow-tab" role="tab" aria-selected="false" data-page="1">Task</button>
@@ -1204,6 +1261,9 @@ footer .note-highlight {
 
       <!-- Silk Cocoon Wrap Layer -->
       <svg class="cocoon-svg" id="cocoon-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
+
+      <!-- Layered Shale Slabs Retraction Layer -->
+      <svg class="shale-svg" id="shale-b" viewBox="0 0 390 130" aria-hidden="true"></svg>
 
       <div class="tab-row" role="tablist" aria-label="GitDiscuss screens">
         <button class="hollow-tab" role="tab" aria-selected="true" data-page="0">Queue</button>
@@ -1264,6 +1324,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 5 — Nail-Blade Sheath &amp; Bone Peg join:</span> Module A features a cold-forged iron nail-blade protruding from its right flank, complete with tapered chisel tip, central blood groove fuller, Pharloom brass crossguard quillons, silk ferrule wrap, and an eyelet bore. Module B features a dark slate scabbard throat lined with polished Pharloom brass and an overhead spring-loaded bleached bone locking peg. On docking or selecting Joining state, the blade slides smoothly into the scabbard with metallic friction scrape trails and bright white slash glints. Once fully seated, the spring-loaded bone peg decisively snaps down through the blade eyelet with a sharp bone-and-metal "tink" shockwave, pinning the modules into a continuous monolithic casing. Pulling the spring bone peg lift lever upward disengages the peg, allowing the nail-blade to draw cleanly from the scabbard.
   </p>
+  <p>
+    <span class="note-highlight">Option 6 — Layered Shale Slabs (Roof Shingle Retraction) shade:</span> The casing is constructed of three stepped, chiseled slabs of dark Fungal Wastes slate/shale layered like architectural roof shingles or insect abdominal tergites. Retracting into shade mode slides the lower slabs upward in staggered succession behind the primary bleached bone-white horn-crest mask plate, accompanied by dry stone friction scrapes, white chalk dust puffs, and detent micro-vibrations. At full retraction, a cold-forged iron latch bar with twin Pharloom brass guide pins drops firmly across the under-sill, locking the three stepped, chiseled slate rims into a tight 44px eaves stack directly under the horn-crest diadem. The widget title and key metric remain 100% readable on the deep subterranean slate plaque.
+  </p>
 </footer>
 
 <script>
@@ -1292,7 +1355,10 @@ const model = {
   cocoonProgress: 0,   // 0 = unwrapped full, 1.0 = tightly wound golden silk cocoon pod
   bladeSheathProgress: 0, // 0 = separate, 0.5 = blade sliding in scabbard, 1.0 = sheathed & bone peg locked
   bladeScrapeVibe: 0,     // metallic friction scrape vibration
-  option: 'nail_blade',
+  shaleProgress: 0,       // 0 = extended full casing, 1.0 = retracted behind mask plate like roof shingles
+  shaleFrictionVibe: 0,   // dry stone friction jitter
+  shaleDust: 0,           // chalk spore puff intensity
+  option: 'shale_slabs',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -2284,6 +2350,220 @@ function drawSilkCocoonWrap(progress = 0, width = W) {
   return s;
 }
 
+// Option 6: Layered Shale Slabs (Roof Shingle Retraction) shade
+function drawShaleSlabs(progress = 0, width = W) {
+  if (progress <= 0.01) return '';
+  const p = Math.min(1, Math.max(0, progress));
+  const midX = width / 2;
+  const vibeX = (p > 0.05 && p < 0.92) ? Math.sin(p * Math.PI * 16) * 1.5 : 0;
+
+  // Staggered retraction: Slab 3 (bottom) leads, Slab 2 follows, Slab 1 slides behind mask plate
+  const p3Raw = Math.min(1, p / 0.82);
+  const ease3 = p3Raw < 1 ? 1 - Math.pow(1 - p3Raw, 2.5) : 1;
+  const y3_top = 88 - 82 * ease3;
+  const y3_bot = 126 - 88 * ease3; // slides from 126 up to 38
+
+  const p2Raw = Math.max(0, Math.min(1, (p - 0.1) / 0.8));
+  const ease2 = p2Raw < 1 ? 1 - Math.pow(1 - p2Raw, 2.5) : 1;
+  const y2_top = 58 - 54 * ease2;
+  const y2_bot = 96 - 62 * ease2;  // slides from 96 up to 34
+
+  const p1Raw = Math.max(0, Math.min(1, (p - 0.18) / 0.82));
+  const ease1 = p1Raw < 1 ? 1 - Math.pow(1 - p1Raw, 2.5) : 1;
+  const y1_top = 28 - 26 * ease1;
+  const y1_bot = 66 - 36 * ease1;  // slides from 66 up to 30
+
+  let s = `<g class="shale-slabs-assembly" opacity="${Math.min(1, p * 1.8)}">`;
+
+  // 1. Subterranean Ambient Occlusion & Guide Grooves
+  s += `<rect x="${10 + vibeX}" y="${Math.min(y1_top, 4)}" width="${width - 20}" height="${Math.max(10, y3_bot - y1_top + 4)}" rx="6" fill="#000000" opacity="0.82" filter="url(#chitinShadow)"/>`;
+
+  // Lateral stone guide tracks on left and right borders
+  s += `<line x1="12" y1="8" x2="12" y2="124" stroke="#12181c" stroke-width="3" stroke-linecap="round"/>
+        <line x1="12" y1="8" x2="12" y2="124" stroke="#25323a" stroke-width="1" stroke-linecap="round"/>
+        <line x1="${width - 12}" y1="8" x2="${width - 12}" y2="124" stroke="#12181c" stroke-width="3" stroke-linecap="round"/>
+        <line x1="${width - 12}" y1="8" x2="${width - 12}" y2="124" stroke="#25323a" stroke-width="1" stroke-linecap="round"/>`;
+
+  // 2. SLAB 3: Bottom Foundation Slate Slab (Deepest Layer in Shingle Stack)
+  s += `<g class="shale-tier-3">
+    <!-- Slab 3 Body with Chiseled Scalloped Bottom Edge -->
+    <path d="M ${14 + vibeX} ${y3_top}
+             L ${width - 14 + vibeX} ${y3_top}
+             L ${width - 14 + vibeX} ${y3_bot - 6}
+             L ${width - 22 + vibeX} ${y3_bot}
+             L ${midX + 78 + vibeX} ${y3_bot}
+             L ${midX + 70 + vibeX} ${y3_bot - 2.5}
+             L ${midX - 70 + vibeX} ${y3_bot - 2.5}
+             L ${midX - 78 + vibeX} ${y3_bot}
+             L ${22 + vibeX} ${y3_bot}
+             L ${14 + vibeX} ${y3_bot - 6} Z"
+          fill="url(#shaleSlabGrad)" stroke="#11171a" stroke-width="1.8" stroke-linejoin="round"/>
+    <!-- Slab 3 Bevel Highlight & Chisel Cleavage -->
+    <path d="M ${16 + vibeX} ${y3_top + 2} L ${width - 16 + vibeX} ${y3_top + 2}"
+          stroke="#42535e" stroke-width="1.2" opacity="0.6"/>
+    <path d="M ${18 + vibeX} ${y3_bot - 2}
+             L ${midX - 78 + vibeX} ${y3_bot - 1}
+             L ${midX - 70 + vibeX} ${y3_bot - 3.5}
+             L ${midX + 70 + vibeX} ${y3_bot - 3.5}
+             L ${midX + 78 + vibeX} ${y3_bot - 1}
+             L ${width - 22 + vibeX} ${y3_bot - 1}"
+          fill="none" stroke="url(#shaleChiselEdge)" stroke-width="1.2" opacity="0.85"/>
+    <!-- Polished Bone Stop-Pegs at Bottom Corners -->
+    <circle cx="${24 + vibeX}" cy="${y3_bot - 4}" r="2.8" fill="#e8ead8" stroke="#2a3023" stroke-width="0.8"/>
+    <circle cx="${24 + vibeX}" cy="${y3_bot - 4}" r="1.2" fill="#8d947f"/>
+    <circle cx="${width - 24 + vibeX}" cy="${y3_bot - 4}" r="2.8" fill="#e8ead8" stroke="#2a3023" stroke-width="0.8"/>
+    <circle cx="${width - 24 + vibeX}" cy="${y3_bot - 4}" r="1.2" fill="#8d947f"/>
+    <!-- Hallownest Slate Drainage Cuts & Glyphs -->
+    <line x1="${midX - 110 + vibeX}" y1="${y3_top + 4}" x2="${midX - 105 + vibeX}" y2="${y3_bot - 3}" stroke="#1f2b33" stroke-width="1.4"/>
+    <line x1="${midX + 110 + vibeX}" y1="${y3_top + 4}" x2="${midX + 105 + vibeX}" y2="${y3_bot - 3}" stroke="#1f2b33" stroke-width="1.4"/>
+  </g>`;
+
+  // 3. SLAB 2: Mid Tier Slate Slab (Overlapping Slab 3 like a roof shingle)
+  s += `<g class="shale-tier-2">
+    <!-- Slab 2 Body with Stepped Chisel Teeth -->
+    <path d="M ${18 + vibeX} ${y2_top}
+             L ${width - 18 + vibeX} ${y2_top}
+             L ${width - 18 + vibeX} ${y2_bot - 5}
+             L ${width - 26 + vibeX} ${y2_bot}
+             L ${midX + 44 + vibeX} ${y2_bot}
+             L ${midX + 36 + vibeX} ${y2_bot - 3}
+             L ${midX - 36 + vibeX} ${y2_bot - 3}
+             L ${midX - 44 + vibeX} ${y2_bot}
+             L ${26 + vibeX} ${y2_bot}
+             L ${18 + vibeX} ${y2_bot - 5} Z"
+          fill="url(#shaleSlabGrad)" stroke="#11171a" stroke-width="1.8" stroke-linejoin="round"/>
+    <!-- Slab 2 Bevel Highlight -->
+    <path d="M ${20 + vibeX} ${y2_top + 2} L ${width - 20 + vibeX} ${y2_top + 2}"
+          stroke="#4f6370" stroke-width="1.2" opacity="0.65"/>
+    <path d="M ${22 + vibeX} ${y2_bot - 2}
+             L ${midX - 44 + vibeX} ${y2_bot - 1}
+             L ${midX - 36 + vibeX} ${y2_bot - 4}
+             L ${midX + 36 + vibeX} ${y2_bot - 4}
+             L ${midX + 44 + vibeX} ${y2_bot - 1}
+             L ${width - 26 + vibeX} ${y2_bot - 1}"
+          fill="none" stroke="url(#shaleChiselEdge)" stroke-width="1.2" opacity="0.9"/>
+    <!-- Cold-Forged Iron Corner Bracket Clasps with Brass Rivets -->
+    <rect x="${20 + vibeX}" y="${y2_bot - 9}" width="10" height="7" rx="1.5"
+          fill="url(#ironNailGrad)" stroke="#151d21" stroke-width="0.8"/>
+    <circle cx="${25 + vibeX}" cy="${y2_bot - 5.5}" r="1.5" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.5"/>
+    <rect x="${width - 30 + vibeX}" y="${y2_bot - 9}" width="10" height="7" rx="1.5"
+          fill="url(#ironNailGrad)" stroke="#151d21" stroke-width="0.8"/>
+    <circle cx="${width - 25 + vibeX}" cy="${y2_bot - 5.5}" r="1.5" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.5"/>
+    <!-- Carved Hallownest Chevron Line Glyphs -->
+    <path d="M ${midX - 16 + vibeX} ${y2_bot - 6} L ${midX + vibeX} ${y2_bot - 14} L ${midX + 16 + vibeX} ${y2_bot - 6}"
+          fill="none" stroke="#68808f" stroke-width="1.3" opacity="0.75"/>
+    <!-- Moss / Fungal Lichen Stippling -->
+    <circle cx="${48 + vibeX}" cy="${y2_bot - 4}" r="1.2" fill="#3f5a4a"/>
+    <circle cx="${52 + vibeX}" cy="${y2_bot - 6}" r="0.9" fill="#52785e"/>
+    <circle cx="${width - 50 + vibeX}" cy="${y2_bot - 4}" r="1.2" fill="#3f5a4a"/>
+  </g>`;
+
+  // 4. SLAB 1: Upper Tier Slate Slab (Overlapping Slab 2)
+  s += `<g class="shale-tier-1">
+    <!-- Slab 1 Body -->
+    <path d="M ${22 + vibeX} ${y1_top}
+             L ${width - 22 + vibeX} ${y1_top}
+             L ${width - 22 + vibeX} ${y1_bot - 4}
+             L ${width - 32 + vibeX} ${y1_bot}
+             L ${midX + 22 + vibeX} ${y1_bot}
+             L ${midX + 14 + vibeX} ${y1_bot - 2}
+             L ${midX - 14 + vibeX} ${y1_bot - 2}
+             L ${midX - 22 + vibeX} ${y1_bot}
+             L ${32 + vibeX} ${y1_bot}
+             L ${22 + vibeX} ${y1_bot - 4} Z"
+          fill="url(#shaleSlabGrad)" stroke="#11171a" stroke-width="1.8" stroke-linejoin="round"/>
+    <!-- Slab 1 Highlight & Fissure Scratch Lines -->
+    <path d="M ${24 + vibeX} ${y1_top + 2} L ${width - 24 + vibeX} ${y1_top + 2}"
+          stroke="#556d7d" stroke-width="1.2" opacity="0.7"/>
+    <path d="M ${26 + vibeX} ${y1_bot - 2}
+             L ${midX - 22 + vibeX} ${y1_bot - 1}
+             L ${midX - 14 + vibeX} ${y1_bot - 3}
+             L ${midX + 14 + vibeX} ${y1_bot - 3}
+             L ${midX + 22 + vibeX} ${y1_bot - 1}
+             L ${width - 30 + vibeX} ${y1_bot - 1}"
+          fill="none" stroke="url(#shaleChiselEdge)" stroke-width="1.2" opacity="0.95"/>
+    <line x1="${midX - 60 + vibeX}" y1="${y1_bot - 8}" x2="${midX - 25 + vibeX}" y2="${y1_bot - 6}"
+          stroke="#7e97a6" stroke-width="0.8" opacity="0.55"/>
+    <line x1="${midX + 28 + vibeX}" y1="${y1_bot - 7}" x2="${midX + 72 + vibeX}" y2="${y1_bot - 9}"
+          stroke="#7e97a6" stroke-width="0.8" opacity="0.55"/>
+  </g>`;
+
+  // 5. PRIMARY HORN-CREST MASK PLATE (Bleached Bone-White Chitin, y: 0 to 28)
+  // Overlapping all three slabs at the top!
+  s += `<g class="primary-mask-plate">
+    <path d="M ${24 + vibeX} 8
+             Q ${midX + vibeX} 12 ${width - 24 + vibeX} 8
+             Q ${width - 10 + vibeX} 2 ${width - 6 + vibeX} -6
+             Q ${width - 8 + vibeX} 14 ${width - 12 + vibeX} 28
+             Q ${midX + vibeX} 30 ${12 + vibeX} 28
+             Q ${8 + vibeX} 14 ${6 + vibeX} -6
+             Q ${10 + vibeX} 2 ${24 + vibeX} 8 Z"
+          fill="url(#chitinGrad)" stroke="#2d3029" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M ${30 + vibeX} 12 Q ${midX + vibeX} 15 ${width - 30 + vibeX} 12"
+          fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0.85"/>
+    <!-- Amber Lumafly Eye Slits on Mask Plate -->
+    <ellipse cx="${midX - 18 + vibeX}" cy="18" rx="5" ry="2.5" fill="#ffff94" filter="url(#lumaflyGlow)"/>
+    <ellipse cx="${midX + 18 + vibeX}" cy="18" rx="5" ry="2.5" fill="#ffff94" filter="url(#lumaflyGlow)"/>
+    <circle cx="${midX - 18 + vibeX}" cy="18" r="1.5" fill="#ffffff"/>
+    <circle cx="${midX + 18 + vibeX}" cy="18" r="1.5" fill="#ffffff"/>
+  </g>`;
+
+  // 6. Dynamic White Chalk Spore & Dust Puffs during slide
+  if (p > 0.05 && p < 0.95) {
+    const dustOp = Math.sin(p * Math.PI) * 0.85;
+    const puffs = [
+      [16, y3_bot, 4.5], [width - 16, y3_bot, 4.5],
+      [22, y2_bot, 3.8], [width - 22, y2_bot, 3.8],
+      [midX - 85, y3_bot + 2, 3.2], [midX + 85, y3_bot + 2, 3.2],
+      [midX - 40, y2_bot + 1, 2.8], [midX + 40, y2_bot + 1, 2.8]
+    ];
+    s += `<g class="shale-dust-puffs" opacity="${dustOp}">`;
+    puffs.forEach(([px, py, pr]) => {
+      s += `<circle cx="${px + Math.sin(p * 20) * 2}" cy="${py}" r="${pr}" fill="#e8edf0" filter="url(#silkBoom)"/>
+            <circle cx="${px}" cy="${py}" r="${pr * 0.5}" fill="#ffffff"/>`;
+    });
+    s += `</g>`;
+  }
+
+  // 7. Cold-Forged Iron Latch Bar & Brass Guide Pins on Full Retraction
+  if (p > 0.72) {
+    const latchAlpha = Math.min(1, (p - 0.72) / 0.28);
+    const barY = 38;
+    s += `<g class="shale-lock-bar" opacity="${latchAlpha}">
+      <!-- Cold-Forged Iron Latch Bar spanning under-sill -->
+      <rect x="${midX - 100}" y="${barY - 3}" width="200" height="6" rx="2"
+            fill="url(#ironNailGrad)" stroke="#11171a" stroke-width="1.2"/>
+      <line x1="${midX - 98}" y1="${barY}" x2="${midX + 98}" y2="${barY}"
+            stroke="#cfdce3" stroke-width="0.8" opacity="0.75"/>
+      <!-- Twin Pharloom Brass Guide Pins -->
+      <circle cx="${midX - 76}" cy="${barY}" r="3.2" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>
+      <circle cx="${midX - 76}" cy="${barY}" r="1.2" fill="#fffde6"/>
+      <circle cx="${midX + 76}" cy="${barY}" r="3.2" fill="url(#brassGrad)" stroke="#241703" stroke-width="0.8"/>
+      <circle cx="${midX + 76}" cy="${barY}" r="1.2" fill="#fffde6"/>
+      <!-- Central Brass Clasp with Amber Lumafly Droplet -->
+      <circle cx="${midX}" cy="${barY}" r="5.2" fill="url(#brassGrad)" stroke="#241703" stroke-width="1"/>
+      <circle cx="${midX}" cy="${barY}" r="3" fill="#ffff94" filter="url(#lumaflyGlow)"/>
+      <circle cx="${midX}" cy="${barY}" r="1.2" fill="#ffffff"/>
+    </g>`;
+  }
+
+  // 8. Impact Sparks & Chalk Spore Burst at Full Lock
+  if (p > 0.88) {
+    const flashScale = (p - 0.88) / 0.12;
+    const sparkR = flashScale * 35;
+    const sparkAlpha = (1 - flashScale) * 5;
+    s += `<g opacity="${sparkAlpha}">
+      <circle cx="${midX}" cy="38" r="${sparkR}" fill="none" stroke="#d6e4ec" stroke-width="2" filter="url(#silkBoom)"/>
+      <circle cx="${midX}" cy="${sparkR * 0.6}" fill="none" stroke="#fcc042" stroke-width="2.5"/>
+      <line x1="${midX - sparkR}" y1="38" x2="${midX + sparkR}" y2="38" stroke="#ffffff" stroke-width="1.5"/>
+      <line x1="${midX}" y1="${38 - sparkR * 0.7}" x2="${midX}" y2="${38 + sparkR * 0.7}" stroke="#ffffff" stroke-width="1.5"/>
+    </g>`;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -2373,6 +2653,12 @@ function renderHardware() {
     if (coc) {
       coc.innerHTML = drawSilkCocoonWrap(model.cocoonProgress, W);
     }
+
+    // Render Layered Shale Slabs Retraction Layer
+    const sha = $('#shale-' + id);
+    if (sha) {
+      sha.innerHTML = drawShaleSlabs(model.shaleProgress, W);
+    }
   }
 
   // Active Proximity Lumafly Bioluminescence Aura
@@ -2420,6 +2706,7 @@ function render() {
     el.style.zIndex = model.front === id ? '4' : '2';
     el.classList.toggle('shade', model.shade);
     el.classList.toggle('cocoon-mode', model.shade && model.option === 'cocoon_wrap');
+    el.classList.toggle('shale-mode', model.shade && model.option === 'shale_slabs');
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.hollow-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
@@ -2521,6 +2808,14 @@ function render() {
     cocoonBtn.classList.toggle('primary-btn', isCocoonOption);
   }
 
+  const shaleBtn = $('#btnShaleAnim');
+  if (shaleBtn) {
+    shaleBtn.textContent = model.shade ? 'Extend shale slabs' : 'Retract shale slabs';
+    shaleBtn.disabled = model.busy;
+    const isShaleOption = model.option === 'shale_slabs';
+    shaleBtn.classList.toggle('primary-btn', isShaleOption);
+  }
+
   $('#spoolValue').textContent = model.limit;
   $('#spoolDial').style.setProperty('--angle', `${(model.limit - 1) * 36 - 90}deg`);
 
@@ -2544,7 +2839,9 @@ function render() {
 
   if (!model.busy) {
     if (model.shade) {
-      if (model.option === 'cocoon_wrap') {
+      if (model.option === 'shale_slabs') {
+        $('#phase').textContent = 'Shade mode / Layered shale slabs retracted behind mask plate';
+      } else if (model.option === 'cocoon_wrap') {
         $('#phase').textContent = 'Shade mode / Golden silk cocoon bundle locked';
       } else {
         $('#phase').textContent = 'Shade mode / Bleached chitin horn-crest diadem';
@@ -2994,6 +3291,67 @@ async function unwrapCocoon() {
   $('#phase').textContent = model.joined ? 'Joined / Monolithic chitin carapace' : 'Separate / Two independent chitin instruments';
 }
 
+// Option 6: Layered Shale Slabs (Roof Shingle Retraction) Animations
+async function retractShale() {
+  if (model.busy || (model.shade && model.shaleProgress >= 0.98)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Stone scrapes against stone. Layered slate slabs slide upward behind the primary chitin mask plate like roof shingles.');
+  $('#phase').textContent = 'Shale slabs sliding upward in stepped shingle retraction';
+
+  await tween(420, t => {
+    // Realistic stone inertia: smooth acceleration and heavy settle
+    const p = t === 1 ? 1 : 1 - Math.pow(2, -9 * t);
+    model.shaleProgress = p;
+    model.shaleFrictionVibe = (p > 0.08 && p < 0.9) ? Math.sin(p * Math.PI * 14) * 1.5 : 0;
+    model.shaleDust = (p > 0.1 && p < 0.88) ? Math.sin((p - 0.1) / 0.78 * Math.PI) : 0;
+    if (t >= 0.45 && !model.shade) {
+      model.shade = true;
+    }
+    renderHardware();
+  }, token);
+
+  model.shaleProgress = 1;
+  model.shaleFrictionVibe = 0;
+  model.shaleDust = 0;
+  model.shade = true;
+  model.busy = false;
+  render();
+  say('Shale slabs locked. Stepped slate roof shingles seated behind primary bone-white horn-crest mask plate.');
+  $('#phase').textContent = 'Shade mode / Layered shale slabs retracted behind mask plate';
+}
+
+async function extendShale() {
+  if (model.busy || (!model.shade && model.shaleProgress <= 0.02)) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Latch bar disengages with a stone clack. Stepped slate slabs slide downward to full casing height.');
+  $('#phase').textContent = 'Shale slabs extending downward';
+
+  model.shade = false;
+  render();
+
+  await tween(380, t => {
+    const extend = 1 - (t === 1 ? 1 : 1 - Math.pow(2, -8 * t));
+    model.shaleProgress = extend;
+    model.shaleFrictionVibe = (extend > 0.08 && extend < 0.9) ? Math.sin(extend * Math.PI * 14) * 1.2 : 0;
+    model.shaleDust = (extend > 0.1 && extend < 0.88) ? Math.sin((extend - 0.1) / 0.78 * Math.PI) * 0.7 : 0;
+    renderHardware();
+  }, token);
+
+  model.shaleProgress = 0;
+  model.shaleFrictionVibe = 0;
+  model.shaleDust = 0;
+  model.busy = false;
+  render();
+  say('Shale slabs extended. Full subterranean slate displays and controls restored.');
+  $('#phase').textContent = model.joined ? 'Joined / Monolithic chitin carapace' : 'Separate / Two independent chitin instruments';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -3001,7 +3359,8 @@ async function applyState(stateName) {
 
   if (stateName === 'separate') {
     if (model.shade) {
-      if (model.cocoonProgress > 0) await unwrapCocoon();
+      if (model.shaleProgress > 0) await extendShale();
+      else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     if (model.joined) {
@@ -3013,6 +3372,9 @@ async function applyState(stateName) {
       model.mandibleChitter = 0;
       model.bladeSheathProgress = 0;
       model.bladeScrapeVibe = 0;
+      model.shaleProgress = 0;
+      model.shaleFrictionVibe = 0;
+      model.shaleDust = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -3022,7 +3384,8 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'joining') {
     if (model.shade) {
-      if (model.cocoonProgress > 0) await unwrapCocoon();
+      if (model.shaleProgress > 0) await extendShale();
+      else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     model.joined = false;
@@ -3062,7 +3425,8 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'joined') {
     if (model.shade) {
-      if (model.cocoonProgress > 0) await unwrapCocoon();
+      if (model.shaleProgress > 0) await extendShale();
+      else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     if (!model.joined) {
@@ -3104,13 +3468,17 @@ async function applyState(stateName) {
     }
   } else if (stateName === 'shade') {
     if (!model.shade) {
-      if (model.option === 'cocoon_wrap') {
+      if (model.option === 'shale_slabs') {
+        await retractShale();
+      } else if (model.option === 'cocoon_wrap') {
         await wrapCocoon();
       } else {
         await foldElytra();
       }
     } else {
-      if (model.option === 'cocoon_wrap') {
+      if (model.option === 'shale_slabs') {
+        await extendShale();
+      } else if (model.option === 'cocoon_wrap') {
         await unwrapCocoon();
       } else {
         await spreadElytra();
@@ -3192,6 +3560,10 @@ $('#btnCocoonAnim').onclick = () => {
   if (model.shade) unwrapCocoon();
   else wrapCocoon();
 };
+$('#btnShaleAnim').onclick = () => {
+  if (model.shade) extendShale();
+  else retractShale();
+};
 
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
@@ -3218,7 +3590,10 @@ $('#btnReset').onclick = () => {
   model.cocoonProgress = 0;
   model.bladeSheathProgress = 0;
   model.bladeScrapeVibe = 0;
-  model.option = 'nail_blade';
+  model.shaleProgress = 0;
+  model.shaleFrictionVibe = 0;
+  model.shaleDust = 0;
+  model.option = 'shale_slabs';
   model.light = 0;
   model.limit = 3;
   model.tension = 0;
@@ -3226,7 +3601,7 @@ $('#btnReset').onclick = () => {
   model.a = { x: 140, y: 220, page: 0, running: true };
   model.b = { x: 680, y: 220, page: 0, running: true };
   model.meter = { x: 805, y: 510 };
-  $('#optionSelect').value = 'nail_blade';
+  $('#optionSelect').value = 'shale_slabs';
   render();
   say('Reset to initial experiment layout.');
 };
@@ -3234,37 +3609,39 @@ $('#btnReset').onclick = () => {
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
   say('Selected option: ' + e.target.options[e.target.selectedIndex].text);
-  if (model.option === 'nail_blade') {
+  if (model.option === 'shale_slabs') {
+    if (model.elytraGlide > 0) await spreadElytra();
+    if (model.cocoonProgress > 0) await unwrapCocoon();
+    if (!model.shade) await retractShale();
+    say('Option 6: Layered Shale Slabs (Roof Shingle Retraction) shade selected. Stepped slate slabs slide upward behind primary mask plate.');
+  } else if (model.option === 'nail_blade') {
     if (model.shade) {
-      if (model.cocoonProgress > 0) await unwrapCocoon();
+      if (model.shaleProgress > 0) await extendShale();
+      else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     say('Option 5: Nail-Blade Sheath & Bone Peg join selected. Cold-forged iron nail-blade, bronze scabbard, and spring-loaded bone locking peg.');
   } else if (model.option === 'cocoon_wrap') {
-    if (model.elytraGlide > 0) {
-      await spreadElytra();
-    }
-    if (!model.shade) {
-      await wrapCocoon();
-    }
+    if (model.shaleProgress > 0) await extendShale();
+    if (model.elytraGlide > 0) await spreadElytra();
+    if (!model.shade) await wrapCocoon();
     say('Option 4: Silk Cocoon Wrap shade selected. Rapid golden weaver-silk winding & bundled lower casing.');
   } else if (model.option === 'elytra_shield') {
-    if (model.cocoonProgress > 0) {
-      await unwrapCocoon();
-    }
-    if (!model.shade) {
-      await foldElytra();
-    }
+    if (model.shaleProgress > 0) await extendShale();
+    if (model.cocoonProgress > 0) await unwrapCocoon();
+    if (!model.shade) await foldElytra();
     say('Option 2: Elytra Wing-Case Shield shade selected. Folding beetle wing-cases & lumafly clasp.');
   } else if (model.option === 'mandible_interlock') {
     if (model.shade) {
-      if (model.cocoonProgress > 0) await unwrapCocoon();
+      if (model.shaleProgress > 0) await extendShale();
+      else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     say('Option 3: Chitinous Carapace Mandible Interlock join selected. Serrated stag-beetle shell teeth & zig-zag suture.');
   } else if (model.option === 'silk_lash') {
     if (model.shade) {
-      if (model.cocoonProgress > 0) await unwrapCocoon();
+      if (model.shaleProgress > 0) await extendShale();
+      else if (model.cocoonProgress > 0) await unwrapCocoon();
       else await spreadElytra();
     }
     say('Option 1: Weaver\'s Silk Lash join selected. Golden silk thread rigging & tension twang.');
@@ -3592,11 +3969,17 @@ window.addEventListener('keydown', e => {
     applyState('joined');
   } else if (e.key === '4') {
     applyState('shade');
+  } else if (e.key === 'r' || e.key === 'R') {
+    if (model.shade) extendShale();
+    else retractShale();
   } else if (e.key === 'c' || e.key === 'C') {
     if (model.shade) unwrapCocoon();
     else wrapCocoon();
   } else if (e.key === 'e' || e.key === 'E') {
-    if (model.option === 'cocoon_wrap') {
+    if (model.option === 'shale_slabs') {
+      if (model.shade) extendShale();
+      else retractShale();
+    } else if (model.option === 'cocoon_wrap') {
       if (model.shade) unwrapCocoon();
       else wrapCocoon();
     } else {
