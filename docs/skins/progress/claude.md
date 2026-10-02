@@ -72,7 +72,8 @@ One item per run, in this order. Aesthetics are interleaved so none waits long. 
   - Built: three thorned plates lift off Jarvis's strap, telescope across and click over a collar from GitDiscuss (jolt, sparks, chalk ticks, glint down the seam); push them back toward Jarvis or tap to release.
 - [x] **elven** · Join: moonlight bridge (Bridge). A span of light draws across and solidifies into filigree
   - Added to `elven.html` as the "Moonlight bridge" option: casings 120 px apart, a moonbeam from the backdrop moon (new under-layer), light arches from both stems and meets with a flare, frosts into a silver rail and arch with spiral filigree, then a crescent-cradled moonstone keystone kindles; click it, the bridge or Enter to release. Reviewer's hit-area fix applied. Not yet checked in a browser (browser and node access were blocked this run).
-- [ ] **combined** · Dominant skin: felt Checks turns to stone in a gothic group
+- [x] **combined** · Dominant skin: felt Checks turns to stone in a gothic group
+  - Added to `combined.html` as the "Turned to stone" mix: Jarvis and GitDiscuss are one fused stone group with an oriel bay under their seam. Felt Checks docks into the bay, and a ripple from the touch point turns it into a limestone predella with plum quarry glass (its felt colour) and its ✤ glyph. Pull the ring under the bay and the shell cracks and bursts off, leaving the felt. The engine gained a dock mode (Checks as the joining partner). Not yet checked in a browser (browser and node access were blocked this run).
 - [ ] **wire** · Morph: tree growth. Cabochon, then branch with two displays, then hoop tree; beads slide out to new tips
 - [ ] **felt** · Morph: stuffing. Growing inflates like a cushion; shrinking deflates with wrinkles; squash on landing
 - [ ] **gothic** · Morph: build by bays. Scaffolding appears, stones rise, scaffold falls away
