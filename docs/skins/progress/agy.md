@@ -79,7 +79,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 
 ### Cycle 11: Angled Connections
 - [x] Gothic: Masonry Rotunda Crossing Socket angled connection (-45° to +45° with voussoir detents & bronze scales) — Cylindrical ashlar rotunda crossing turret, 7 radial stone voussoir detents (-45° to +45°), flexible canopy of 7 overlapping articulated bronze scales with stained-glass lozenges, rotary dial angle dragging, detent presets & keyboard controls (Built in prototypes/skins/agy/gothic.html)
-- [ ] Felt: Stitched Accordion Bellows Gusset angled connection (-45° to +45° with flexible ribbed wool elbow)
+- [x] Felt: Stitched Accordion Bellows Gusset angled connection (-45° to +45° with flexible ribbed wool elbow) — 5-tier concertina bellows gusset with heather wool blend, dynamic outside stretch with tensioned golden cross-stitches and inside pillowy squash rolls, bridle-leather corner stays with brass eyelets, turned boxwood toggle pivot with interactive rotary angle dragging, embossed protractor arc with 8 detent ticks (-45° to +45°) and glowing French knot indicator bead, 44px compressed articulated elbow in shade mode, and full keyboard navigation (Built in prototypes/skins/agy/felt.html)
 - [ ] Elven: Armillary Sphere Gimbal angled connection (-45° to +45° with jade socket, silver ball and degree arc)
 - [ ] Wire: Gemstone Bead Hinge angled connection (-45° to +45° with drilled spherical bead axle & wire detents)
 - [ ] Hollow: Arthropod Coxa/Trochanter Ball-and-Socket angled connection (-45° to +45° with bone sphere & silk cords)

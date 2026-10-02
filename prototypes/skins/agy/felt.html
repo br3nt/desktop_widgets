@@ -851,6 +851,80 @@ header {
   vertical-align: middle;
 }
 
+/* Option 11: Stitched Accordion Bellows Gusset Angle Controls */
+.gusset-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #232c25;
+  border: 1px solid rgba(226, 177, 60, 0.35);
+  border-radius: 8px;
+  padding: 3px 10px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.gusset-controls input[type="range"] {
+  width: 90px;
+  accent-color: #e2b13c;
+  cursor: pointer;
+}
+.gusset-angle-readout {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 11px;
+  color: #e2b13c;
+  min-width: 30px;
+  text-align: center;
+}
+.gusset-detents {
+  display: flex;
+  gap: 3px;
+}
+.gusset-detents .detent-btn {
+  padding: 2px 5px;
+  font-size: 10px;
+  line-height: 1.2;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cad8ce;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.gusset-detents .detent-btn:hover {
+  background: rgba(226, 177, 60, 0.2);
+  border-color: #e2b13c;
+  color: #fff;
+}
+.gusset-detents .detent-btn.active {
+  background: #e2b13c;
+  border-color: #f7d57f;
+  color: #1a221b;
+  font-weight: 700;
+  box-shadow: 0 0 6px rgba(226, 177, 60, 0.4);
+}
+/* Boxwood Toggle Button & Saddle-Leather Stay Release (Option 11) */
+.gusset-release {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  z-index: 12;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f0d5a0, #c99752 45%, #8c5825 78%, #502d0d 100%);
+  border: 1.5px solid #ffd57a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  touch-action: none;
+  transform: translateY(calc(var(--tension, 0) * -6px));
+  transition: transform 60ms linear, box-shadow 0.15s ease;
+}
+.gusset-release:hover {
+  box-shadow: 0 0 10px rgba(226, 177, 60, 0.7);
+}
+.gusset-release:focus-visible {
+  outline: 2px solid #e2b13c;
+  outline-offset: 2px;
+}
+
 /* Footer and Aesthetic Notes */
 footer {
   padding: 20px 28px 30px;
@@ -880,8 +954,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat, duffel toggle, tool-roll, cross-stitch zipper, envelope flap, brass popper, lozenge squash, velcro micro-peel &amp; craft bag unroll morph</span></h1>
-    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Artist's felt tool-roll · Running cross-stitch zipper · Envelope clutch flap · Heavy brass popper snap · High-damp wool lozenge squash · Concealed velcro hook-and-loop micro-peel · Craft bag / sewing kit unroll morph</p>
+    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat, duffel toggle, tool-roll, cross-stitch zipper, envelope flap, brass popper, lozenge squash, velcro micro-peel, craft bag unroll morph &amp; accordion bellows gusset angled connection</span></h1>
+    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Artist's felt tool-roll · Running cross-stitch zipper · Envelope clutch flap · Heavy brass popper snap · High-damp wool lozenge squash · Concealed velcro hook-and-loop micro-peel · Craft bag / sewing kit unroll morph · Stitched accordion bellows gusset (-45° to +45°)</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -896,7 +970,8 @@ footer .note-highlight {
         <option value="popper">7. Heavy Brass Press-Stud (Popper) Snap join</option>
         <option value="lozenge">8. High-Damp Wool Squeeze (Lozenge Squash) shade</option>
         <option value="velcro">9. Velcro Hook-and-Loop Micro-Peel join</option>
-        <option value="morph" selected>10. Craft Bag / Sewing Kit Unroll morph</option>
+        <option value="morph">10. Craft Bag / Sewing Kit Unroll morph</option>
+        <option value="gusset" selected>11. Stitched Accordion Bellows Gusset (-45° to +45° angled connection)</option>
       </select>
     </div>
     <div class="control-group">
@@ -908,7 +983,23 @@ footer .note-highlight {
     </div>
     <button id="btnJoinAnim">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
-    <button id="btnUnrollAnim" class="primary-btn">Unroll craft bag</button>
+    <div id="gussetControls" class="gusset-controls" style="display: none;">
+      <label for="gussetAngleSlider" style="font-size:11px;font-weight:700;color:#e8ede4;">Angle</label>
+      <input id="gussetAngleSlider" type="range" min="-45" max="45" step="1" value="20" aria-label="Gusset angle in degrees">
+      <span id="gussetAngleReadout" class="gusset-angle-readout">+20°</span>
+      <div class="gusset-detents">
+        <button type="button" class="detent-btn" data-angle="-45" title="-45° Upward Cant">-45°</button>
+        <button type="button" class="detent-btn" data-angle="-30" title="-30° Steep Diagonal">-30°</button>
+        <button type="button" class="detent-btn" data-angle="-15" title="-15° Gentle Lean">-15°</button>
+        <button type="button" class="detent-btn" data-angle="0" title="0° Straight Axis">0°</button>
+        <button type="button" class="detent-btn" data-angle="15" title="+15° Gentle Pitch">+15°</button>
+        <button type="button" class="detent-btn active" data-angle="20" title="+20° Standard Gusset">+20°</button>
+        <button type="button" class="detent-btn" data-angle="30" title="+30° Steep Pitch">+30°</button>
+        <button type="button" class="detent-btn" data-angle="45" title="+45° Downward Fold">+45°</button>
+      </div>
+    </div>
+    <button id="btnGussetAnim" class="primary-btn">Flex accordion gusset</button>
+    <button id="btnUnrollAnim">Unroll craft bag</button>
     <button id="btnVelcroAnim">Peel &amp; crunch Velcro</button>
     <button id="btnLozengeAnim">Squash wool lozenge</button>
     <button id="btnPopperAnim">Snap brass poppers</button>
@@ -1265,6 +1356,52 @@ footer .note-highlight {
           <stop offset="75%" stop-color="#b8860b"/>
           <stop offset="100%" stop-color="#5c4018"/>
         </linearGradient>
+
+        <!-- Option 11: Stitched Accordion Bellows Gusset Gradients & Filters -->
+        <linearGradient id="bellowsRibSageGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#34483d"/>
+          <stop offset="25%" stop-color="#557060"/>
+          <stop offset="50%" stop-color="#6e8f7c"/>
+          <stop offset="75%" stop-color="#465e50"/>
+          <stop offset="100%" stop-color="#2a3930"/>
+        </linearGradient>
+        <linearGradient id="bellowsRibTerracottaGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#6a3022"/>
+          <stop offset="25%" stop-color="#9a4d3b"/>
+          <stop offset="50%" stop-color="#c46a53"/>
+          <stop offset="75%" stop-color="#8b4030"/>
+          <stop offset="100%" stop-color="#4d2015"/>
+        </linearGradient>
+        <linearGradient id="bellowsRibUnifiedGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#557060"/>
+          <stop offset="35%" stop-color="#4a5a4a"/>
+          <stop offset="65%" stop-color="#7a5542"/>
+          <stop offset="100%" stop-color="#9a4d3b"/>
+        </linearGradient>
+        <linearGradient id="gussetLeatherGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#73471c"/>
+          <stop offset="40%" stop-color="#543010"/>
+          <stop offset="100%" stop-color="#2d1705"/>
+        </linearGradient>
+        <radialGradient id="boxwoodPivotGrad" cx="38%" cy="35%" r="62%">
+          <stop offset="0%" stop-color="#f0d5a0"/>
+          <stop offset="40%" stop-color="#c99752"/>
+          <stop offset="78%" stop-color="#8c5825"/>
+          <stop offset="100%" stop-color="#502d0d"/>
+        </radialGradient>
+        <filter id="gussetShadowBlur" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.65 0"/>
+          <feOffset dx="0" dy="2"/>
+          <feBlend in="SourceGraphic" in2="blurOut" mode="normal"/>
+        </filter>
+        <filter id="stitchGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
       <!-- Shared Wool Casing and Entangled Fiber Seam -->
@@ -1422,6 +1559,12 @@ footer .note-highlight {
       <button id="ejectPouch" aria-label="Eject Checks widget" title="Eject from pocket" hidden>↗</button>
     </section>
 
+    <!-- Turned Boxwood Toggle Button & Saddle-Leather Stay Release (Option 11) -->
+    <button id="gussetRelease" class="gusset-release" data-drag="release"
+            aria-label="Release Accordion Bellows Gusset: click or pull right, or press Enter"
+            title="Click or pull right to release accordion bellows gusset · Enter to separate" hidden>
+    </button>
+
     <!-- Turned Wood Toggle & Pull-Tab Release Grip -->
     <button id="toggleRelease" class="felt-toggle-release" data-drag="release"
             aria-label="Release GitDiscuss: pull right or press Enter"
@@ -1437,7 +1580,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Tactile Felt Architecture, Fiber Entanglement, Accordion Bellows, Duffel Toggle, Tool-Roll, Cross-Stitch Zipper &amp; Envelope Flap</h3>
+  <h3>Tactile Felt Architecture, Fiber Entanglement, Accordion Bellows, Duffel Toggle, Tool-Roll, Cross-Stitch Zipper, Envelope Flap &amp; Accordion Bellows Gusset</h3>
   <p>
     This skin explores dense compressed wool felt (3mm–5mm thickness) with hand-sewn cotton embroidery stitches and turned boxwood fittings. The casing has pillowy, bevelled contours, diffuse ambient occlusion shadows, and visible needle-punched fiber texture.
   </p>
@@ -1470,6 +1613,8 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 10 — Craft Bag / Sewing Kit Unroll Morph [Morph]:</span> Inspired by roll-up artisan craft pouches and multi-compartment needlework sewing kits, Jarvis expands laterally by 138px, transforming from a standard compact felt capsule into an unrolled master craft bag. An embroidered twill pull-tab on the right flank releases a saddle-leather strap and unrolls the compartment along two horizontal natural cotton twill ribbon stays with woven tailor's measurement hashmarks. The unrolled bay reveals an authentic artisan sewing kit interior lined in soft oatmeal melange felt with needle-punch dimples, featuring a 3-tier embroidery floss bobbin rack (scarlet, gold, and mint stranded floss), a padded heather-wool pin cushion with stainless-steel tailor pins, and an auxiliary sewing notions telemetry panel. In full alignment with neighbor clearance rules, lateral unrolling smoothly nudges adjacent modules aside without overlap, restoring their relative offset upon retraction. Clicking the pull-tab or pressing 'U'/'M' unrolls or re-rolls the craft kit.
+  <p>
+    <span class="note-highlight">Option 11 — Stitched Accordion Bellows Gusset [Angled Connection]:</span> A handcrafted 5-tier concertina bellows gusset crafted from dense carded heather wool (sage green on Module A, rust terracotta on Module B, blending in a heathered transition) bridges the gap between capsules. GitDiscuss rotates smoothly from -45° to +45° around a turned boxwood toggle pivot. Dynamic textile flexing brings the joint to life: tensile outside pleats expand outward to reveal the dark melange charcoal lining beneath, laced with tensioned golden cross-stitches; compressive inside pleats squash into dense, pillowy contact rolls with deep drop-shadow contact creases. Heavy bridle-leather corner stays with brass eyelet grommets absorb shear loads at the top and bottom shoulders. An embossed saddle-leather protractor arc features running-stitch detent marks (-45°, -30°, -15°, 0°, +15°, +20°, +30°, +45°) with a luminous golden French knot embroidery bead indicating the active angle, pointed to by an artisan stitched leather tongue. In shade mode, the bellows compresses vertically to 44px into an articulated ribbed wool elbow band with unclipped, glanceable high-contrast telemetry.
   </p>
 </footer>
 
@@ -1508,7 +1653,9 @@ const model = {
   morphProgress: 0, // 0 = standard compact 390px capsule, 1 = unrolled craft bag & sewing kit (528px)
   extended: false,
   bNudge: 0,
-  option: 'morph', // 'entanglement', 'bellows', 'duffel', 'toolroll', 'zipper', 'envelope', 'popper', 'lozenge', 'velcro', or 'morph'
+  angle: 20, // -45 to +45 degrees for Option 11
+  gussetProgress: 0, // 0 = separate, 1 = locked accordion bellows gusset
+  option: 'gusset', // 'entanglement', 'bellows', 'duffel', 'toolroll', 'zipper', 'envelope', 'popper', 'lozenge', 'velcro', 'morph', or 'gusset'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -3662,6 +3809,300 @@ function updateExtensionLayout() {
   }
 }
 
+// Option 11: Stitched Accordion Bellows Gusset End-Caps (Ribbed Wool Accordion Collar & Saddle-Leather Corner Stays)
+function drawGussetEndCap(x, y, isRight, isModuleA, retract = 0, isShade = false) {
+  if (!((isRight && isModuleA) || (!isRight && !isModuleA))) return '';
+  const scaleX = Math.max(0, 1 - retract);
+  if (scaleX < 0.05) return '';
+
+  const H = isShade ? 44 : 130;
+  const topY = y;
+  const grad = isModuleA ? 'url(#bellowsRibSageGrad)' : 'url(#bellowsRibTerracottaGrad)';
+  const leatherGrad = 'url(#gussetLeatherGrad)';
+  let s = `<g class="gusset-end-cap" opacity="${scaleX}">`;
+
+  if (isModuleA && isRight) {
+    // Right flank of Module A (Jarvis output collar)
+    const collarX = x + 390 - 24;
+    // 1. Ribbed wool accordion collar tab
+    s += `<path d="M ${collarX} ${topY + 6}
+                    L ${collarX + 22} ${topY + 10}
+                    L ${collarX + 24} ${topY + H - 10}
+                    L ${collarX} ${topY + H - 6} Z"
+                fill="${grad}" stroke="#1b251d" stroke-width="1.2"/>`;
+
+    // 2. Accordion pleat fold ridge lines
+    s += `<line x1="${collarX + 11}" y1="${topY + 8}" x2="${collarX + 11}" y2="${topY + H - 8}"
+                stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+    s += `<line x1="${collarX + 22}" y1="${topY + 10}" x2="${collarX + 22}" y2="${topY + H - 10}"
+                stroke="#162018" stroke-width="1.5"/>`;
+
+    // 3. Top and bottom bridle-leather reinforcement corner stays with brass eyelets
+    s += `<polygon points="${collarX - 4},${topY + 4} ${collarX + 20},${topY + 4} ${collarX + 16},${topY + 24} ${collarX - 4},${topY + 16}"
+                   fill="${leatherGrad}" stroke="#2a1405" stroke-width="1"/>`;
+    s += `<line x1="${collarX - 2}" y1="${topY + 6}" x2="${collarX + 18}" y2="${topY + 6}"
+                stroke="#fdfbf7" stroke-width="1" stroke-dasharray="2 1.5"/>`;
+    s += `<circle cx="${collarX + 8}" cy="${topY + 11}" r="3" fill="#ffd57a" stroke="#4a2505" stroke-width="0.8"/>`;
+    s += `<circle cx="${collarX + 8}" cy="${topY + 11}" r="1.3" fill="#201004"/>`;
+
+    if (!isShade) {
+      s += `<polygon points="${collarX - 4},${topY + H - 4} ${collarX + 20},${topY + H - 4} ${collarX + 16},${topY + H - 24} ${collarX - 4},${topY + H - 16}"
+                     fill="${leatherGrad}" stroke="#2a1405" stroke-width="1"/>`;
+      s += `<line x1="${collarX - 2}" y1="${topY + H - 6}" x2="${collarX + 18}" y2="${topY + H - 6}"
+                  stroke="#fdfbf7" stroke-width="1" stroke-dasharray="2 1.5"/>`;
+      s += `<circle cx="${collarX + 8}" cy="${topY + H - 11}" r="3" fill="#ffd57a" stroke="#4a2505" stroke-width="0.8"/>`;
+      s += `<circle cx="${collarX + 8}" cy="${topY + H - 11}" r="1.3" fill="#201004"/>`;
+    }
+  } else {
+    // Left flank of Module B (GitDiscuss receiving collar)
+    const collarX = x + 2;
+    // 1. Ribbed wool receiving collar
+    s += `<path d="M ${collarX} ${topY + 10}
+                    L ${collarX + 22} ${topY + 6}
+                    L ${collarX + 22} ${topY + H - 6}
+                    L ${collarX} ${topY + H - 10} Z"
+                fill="${grad}" stroke="#2d150b" stroke-width="1.2"/>`;
+
+    // 2. Accordion pleat fold ridge lines
+    s += `<line x1="${collarX + 11}" y1="${topY + 8}" x2="${collarX + 11}" y2="${topY + H - 8}"
+                stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-dasharray="4 2"/>`;
+    s += `<line x1="${collarX + 2}" y1="${topY + 10}" x2="${collarX + 2}" y2="${topY + H - 10}"
+                stroke="#1a0b06" stroke-width="1.5"/>`;
+
+    // 3. Top and bottom bridle-leather stays
+    s += `<polygon points="${collarX + 26},${topY + 4} ${collarX + 2},${topY + 4} ${collarX + 6},${topY + 24} ${collarX + 26},${topY + 16}"
+                   fill="${leatherGrad}" stroke="#2a1405" stroke-width="1"/>`;
+    s += `<line x1="${collarX + 24}" y1="${topY + 6}" x2="${collarX + 4}" y2="${topY + 6}"
+                stroke="#fdfbf7" stroke-width="1" stroke-dasharray="2 1.5"/>`;
+    s += `<circle cx="${collarX + 14}" cy="${topY + 11}" r="3" fill="#ffd57a" stroke="#4a2505" stroke-width="0.8"/>`;
+    s += `<circle cx="${collarX + 14}" cy="${topY + 11}" r="1.3" fill="#201004"/>`;
+
+    if (!isShade) {
+      s += `<polygon points="${collarX + 26},${topY + H - 4} ${collarX + 2},${topY + H - 4} ${collarX + 6},${topY + H - 24} ${collarX + 26},${topY + H - 16}"
+                     fill="${leatherGrad}" stroke="#2a1405" stroke-width="1"/>`;
+      s += `<line x1="${collarX + 24}" y1="${topY + H - 6}" x2="${collarX + 4}" y2="${topY + H - 6}"
+                  stroke="#fdfbf7" stroke-width="1" stroke-dasharray="2 1.5"/>`;
+      s += `<circle cx="${collarX + 14}" cy="${topY + H - 11}" r="3" fill="#ffd57a" stroke="#4a2505" stroke-width="0.8"/>`;
+      s += `<circle cx="${collarX + 14}" cy="${topY + H - 11}" r="1.3" fill="#201004"/>`;
+    }
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Option 11: Stitched Accordion Bellows Gusset Angled Connection (-45° to +45° with ribbed concertina & boxwood pivot)
+function drawAccordionBellowsGusset(ax, ay, bx, by, angle = 0, gussetProgress = 1, isJoined = false, opacity = 1, glow = 0, isShade = false) {
+  const extraW = Math.round((model.morphProgress || 0) * 138);
+  const cx = ax + JOIN_DISTANCE + extraW + 37;
+  const cy = ay + (isShade ? 22 : 65);
+  const progress = isJoined ? 1 : gussetProgress;
+  const activeAngle = angle * progress;
+  const rad = activeAngle * Math.PI / 180;
+
+  const H = isShade ? 44 : 124;
+  const halfH = H / 2;
+  const leftX = ax + JOIN_DISTANCE + extraW - 22;
+  const rightX = cx + 2;
+
+  let s = `<g class="accordion-bellows-gusset" opacity="${opacity}">`;
+
+  // 1. Dark melange backing shadow / interior lining (revealed when pleats stretch open)
+  const stretchTop = Math.max(0, activeAngle * 0.9);
+  const stretchBot = Math.max(0, -activeAngle * 0.9);
+  const squashTop = Math.max(0, -activeAngle * 0.6);
+  const squashBot = Math.max(0, activeAngle * 0.6);
+
+  s += `<path d="M ${leftX} ${cy - halfH + 4}
+                  Q ${cx - 10} ${cy - halfH + 4 - (activeAngle > 0 ? stretchTop * 0.5 : -squashTop * 0.4)},
+                    ${cx + 30 * Math.cos(rad) - (-halfH + 4) * Math.sin(rad)}
+                    ${cy + 30 * Math.sin(rad) + (-halfH + 4) * Math.cos(rad)}
+                  L ${cx + 30 * Math.cos(rad) - (halfH - 4) * Math.sin(rad)}
+                    ${cy + 30 * Math.sin(rad) + (halfH - 4) * Math.cos(rad)}
+                  Q ${cx - 10} ${cy + halfH - 4 + (activeAngle < 0 ? stretchBot * 0.5 : -squashBot * 0.4)},
+                    ${leftX} ${cy + halfH - 4} Z"
+              fill="#181f1a" stroke="#0e1310" stroke-width="1"/>`;
+
+  // 2. 5-Tier Concertina Pleats (Ribs)
+  const ribCount = 5;
+  for (let i = 0; i < ribCount; i++) {
+    const t0 = i / ribCount;
+    const t1 = (i + 1) / ribCount;
+
+    const segX0 = leftX + (cx - leftX) * t0;
+    const segX1 = leftX + (cx - leftX) * t1;
+
+    const isPeak = (i % 2 === 0);
+
+    const topOffset0 = (activeAngle > 0 ? -stretchTop * t0 : squashTop * t0 * 0.5);
+    const topOffset1 = (activeAngle > 0 ? -stretchTop * t1 : squashTop * t1 * 0.5);
+    const botOffset0 = (activeAngle < 0 ? stretchBot * t0 : -squashBot * t0 * 0.5);
+    const botOffset1 = (activeAngle < 0 ? stretchBot * t1 : -squashBot * t1 * 0.5);
+
+    const yT0 = cy - halfH + topOffset0;
+    const yT1 = cy - halfH + topOffset1;
+    const yB0 = cy + halfH + botOffset0;
+    const yB1 = cy + halfH + botOffset1;
+
+    let ribFill = 'url(#bellowsRibSageGrad)';
+    if (i === 1) ribFill = '#485f50';
+    else if (i === 2) ribFill = 'url(#bellowsRibUnifiedGrad)';
+    else if (i === 3) ribFill = '#854d38';
+    else if (i === 4) ribFill = 'url(#bellowsRibTerracottaGrad)';
+
+    const pleatShade = isPeak ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.35)';
+
+    s += `<polygon points="${segX0},${yT0} ${segX1},${yT1} ${segX1},${yB1} ${segX0},${yB0}"
+                   fill="${ribFill}" stroke="#162018" stroke-width="1.2"/>`;
+
+    s += `<polygon points="${segX0},${yT0} ${segX1},${yT1} ${segX1},${yB1} ${segX0},${yB0}"
+                   fill="${pleatShade}"/>`;
+
+    const stitchX = (segX0 + segX1) / 2;
+    const stitchYT = (yT0 + yT1) / 2 + (isShade ? 3 : 6);
+    const stitchYB = (yB0 + yB1) / 2 - (isShade ? 3 : 6);
+    s += `<line x1="${stitchX}" y1="${stitchYT}" x2="${stitchX}" y2="${stitchYB}"
+                stroke="#fdfbf7" stroke-width="1.3" stroke-dasharray="3 2.5" opacity="0.85"/>`;
+
+    if (Math.abs(activeAngle) > 10) {
+      if ((activeAngle > 0 && isPeak) || (activeAngle < 0 && !isPeak)) {
+        const crossY = (yT0 + yT1) / 2 + (isShade ? 6 : 12);
+        s += `<line x1="${segX0 + 2}" y1="${crossY - 3}" x2="${segX1 - 2}" y2="${crossY + 3}"
+                    stroke="#e2b13c" stroke-width="1.4" opacity="0.9"/>`;
+        s += `<line x1="${segX0 + 2}" y1="${crossY + 3}" x2="${segX1 - 2}" y2="${crossY - 3}"
+                    stroke="#e2b13c" stroke-width="1.4" opacity="0.9"/>`;
+      }
+      if ((activeAngle < 0 && isPeak) || (activeAngle > 0 && !isPeak)) {
+        const crossY = (yB0 + yB1) / 2 - (isShade ? 6 : 12);
+        s += `<line x1="${segX0 + 2}" y1="${crossY - 3}" x2="${segX1 - 2}" y2="${crossY + 3}"
+                    stroke="#e2b13c" stroke-width="1.4" opacity="0.9"/>`;
+        s += `<line x1="${segX0 + 2}" y1="${crossY + 3}" x2="${segX1 - 2}" y2="${crossY - 3}"
+                    stroke="#e2b13c" stroke-width="1.4" opacity="0.9"/>`;
+      }
+    }
+  }
+
+  // 3. Top and Bottom Saddle-Leather Bridge Stays
+  const stayH = isShade ? 8 : 16;
+  s += `<path d="M ${leftX + 2} ${cy - halfH + 4}
+                  Q ${cx - 10} ${cy - halfH + (activeAngle > 0 ? -stretchTop * 0.4 : 4)},
+                    ${cx + 26 * Math.cos(rad) - (-halfH + 4) * Math.sin(rad)}
+                    ${cy + 26 * Math.sin(rad) + (-halfH + 4) * Math.cos(rad)}
+                  L ${cx + 26 * Math.cos(rad) - (-halfH + 4 + stayH) * Math.sin(rad)}
+                    ${cy + 26 * Math.sin(rad) + (-halfH + 4 + stayH) * Math.cos(rad)}
+                  Q ${cx - 10} ${cy - halfH + stayH},
+                    ${leftX + 2} ${cy - halfH + 4 + stayH} Z"
+              fill="url(#gussetLeatherGrad)" stroke="#2b1405" stroke-width="1"/>`;
+  s += `<path d="M ${leftX + 4} ${cy - halfH + 6}
+                  Q ${cx - 10} ${cy - halfH + (activeAngle > 0 ? -stretchTop * 0.4 + 2 : 6)},
+                    ${cx + 24 * Math.cos(rad) - (-halfH + 6) * Math.sin(rad)}
+                    ${cy + 24 * Math.sin(rad) + (-halfH + 6) * Math.cos(rad)}"
+              fill="none" stroke="#fdfbf7" stroke-width="1" stroke-dasharray="2.5 2"/>`;
+
+  if (!isShade) {
+    s += `<path d="M ${leftX + 2} ${cy + halfH - 4}
+                    Q ${cx - 10} ${cy + halfH + (activeAngle < 0 ? stretchBot * 0.4 : -4)},
+                      ${cx + 26 * Math.cos(rad) - (halfH - 4) * Math.sin(rad)}
+                      ${cy + 26 * Math.sin(rad) + (halfH - 4) * Math.cos(rad)}
+                    L ${cx + 26 * Math.cos(rad) - (halfH - 4 - stayH) * Math.sin(rad)}
+                      ${cy + 26 * Math.sin(rad) + (halfH - 4 - stayH) * Math.cos(rad)}
+                    Q ${cx - 10} ${cy + halfH - stayH},
+                      ${leftX + 2} ${cy + halfH - 4 - stayH} Z"
+                fill="url(#gussetLeatherGrad)" stroke="#2b1405" stroke-width="1"/>`;
+    s += `<path d="M ${leftX + 4} ${cy + halfH - 6}
+                    Q ${cx - 10} ${cy + halfH + (activeAngle < 0 ? stretchBot * 0.4 - 2 : -6)},
+                      ${cx + 24 * Math.cos(rad) - (halfH - 6) * Math.sin(rad)}
+                      ${cy + 24 * Math.sin(rad) + (halfH - 6) * Math.cos(rad)}"
+                fill="none" stroke="#fdfbf7" stroke-width="1" stroke-dasharray="2.5 2"/>`;
+  }
+
+  // 4. Stitched Protractor / Angle Gauge Arc & Embroidered Detents
+  const arcR = isShade ? 30 : 54;
+  const startAng = -45 * Math.PI / 180;
+  const endAng = 45 * Math.PI / 180;
+  const xA1 = cx + arcR * Math.cos(startAng), yA1 = cy + arcR * Math.sin(startAng);
+  const xA2 = cx + arcR * Math.cos(endAng), yA2 = cy + arcR * Math.sin(endAng);
+
+  s += `<path d="M ${xA1} ${yA1} A ${arcR} ${arcR} 0 0 1 ${xA2} ${yA2}"
+              fill="none" stroke="#543010" stroke-width="${isShade ? 10 : 16}" stroke-linecap="round"/>`;
+  s += `<path d="M ${xA1} ${yA1} A ${arcR} ${arcR} 0 0 1 ${xA2} ${yA2}"
+              fill="none" stroke="#331905" stroke-width="${isShade ? 12 : 18}" stroke-linecap="round" opacity="0.3"/>`;
+  s += `<path d="M ${xA1} ${yA1} A ${arcR} ${arcR} 0 0 1 ${xA2} ${yA2}"
+              fill="none" stroke="#99632d" stroke-width="1" stroke-dasharray="2 2" stroke-linecap="round"/>`;
+
+  const detents = [-45, -30, -15, 0, 15, 20, 30, 45];
+  detents.forEach(d => {
+    const dRad = d * Math.PI / 180;
+    const isCurrent = Math.abs(angle - d) < 2.5;
+    const rIn = arcR - (isShade ? 4 : 7);
+    const rOut = arcR + (isShade ? 4 : 7);
+    const tx1 = cx + rIn * Math.cos(dRad);
+    const ty1 = cy + rIn * Math.sin(dRad);
+    const tx2 = cx + rOut * Math.cos(dRad);
+    const ty2 = cy + rOut * Math.sin(dRad);
+
+    if (isCurrent) {
+      const knotX = cx + arcR * Math.cos(dRad);
+      const knotY = cy + arcR * Math.sin(dRad);
+      s += `<circle cx="${knotX}" cy="${knotY}" r="${isShade ? 4 : 5.5}" fill="#ffd57a" filter="url(#stitchGlow)"/>`;
+      s += `<circle cx="${knotX}" cy="${knotY}" r="${isShade ? 3 : 4}" fill="#e2b13c" stroke="#8c5825" stroke-width="1"/>`;
+      s += `<circle cx="${knotX}" cy="${knotY}" r="1.5" fill="#fff9eb"/>`;
+      if (!isShade && (d === -45 || d === 0 || d === 45 || d === 20)) {
+        const textR = arcR + 18;
+        const lx = cx + textR * Math.cos(dRad);
+        const ly = cy + textR * Math.sin(dRad) + 4;
+        s += `<text x="${lx}" y="${ly}" font-family="system-ui, -apple-system, sans-serif"
+                    font-size="9" font-weight="700" fill="#ffd57a" text-anchor="middle"
+                    stroke="#1a140d" stroke-width="2" paint-order="stroke">${d > 0 ? '+' : ''}${d}°</text>`;
+      }
+    } else {
+      s += `<line x1="${tx1}" y1="${ty1}" x2="${tx2}" y2="${ty2}"
+                  stroke="#fdfbf7" stroke-width="1.4" opacity="0.75"/>`;
+    }
+  });
+
+  // Stitched Saddle-Leather Pointer Tongue
+  const ptrLen = arcR + (isShade ? 8 : 12);
+  const px0 = cx + 8 * Math.cos(rad + Math.PI / 2);
+  const py0 = cy + 8 * Math.sin(rad + Math.PI / 2);
+  const px1 = cx + ptrLen * Math.cos(rad);
+  const py1 = cy + ptrLen * Math.sin(rad);
+  const px2 = cx + 8 * Math.cos(rad - Math.PI / 2);
+  const py2 = cy + 8 * Math.sin(rad - Math.PI / 2);
+
+  s += `<polygon points="${px0},${py0} ${px1},${py1} ${px2},${py2}"
+                 fill="url(#gussetLeatherGrad)" stroke="#3a1b06" stroke-width="1"/>`;
+  s += `<line x1="${cx + 10 * Math.cos(rad)}" y1="${cy + 10 * Math.sin(rad)}"
+              x2="${cx + (ptrLen - 4) * Math.cos(rad)}" y2="${cy + (ptrLen - 4) * Math.sin(rad)}"
+              stroke="#ffd57a" stroke-width="1" stroke-dasharray="2 1.5"/>`;
+
+  // 5. Turned Boxwood Toggle Button Pivot Disk
+  const pivotR = isShade ? 13 : 18;
+  s += `<circle cx="${cx}" cy="${cy}" r="${pivotR + 3}" fill="#c99752" stroke="#5a3814" stroke-width="1.2"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${pivotR + 2}" fill="none" stroke="#ffd57a" stroke-width="0.8" stroke-dasharray="2 1.5"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${pivotR}" fill="url(#boxwoodPivotGrad)" stroke="#502d0d" stroke-width="1.5"
+                filter="url(#gussetShadowBlur)" data-drag="gussetAngle" style="cursor: grab;"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${pivotR * 0.72}" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.8"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${pivotR * 0.45}" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="0.8"/>`;
+
+  const holeOffset = pivotR * 0.32;
+  const hx1 = cx - holeOffset * Math.cos(rad);
+  const hy1 = cy - holeOffset * Math.sin(rad);
+  const hx2 = cx + holeOffset * Math.cos(rad);
+  const hy2 = cy + holeOffset * Math.sin(rad);
+
+  s += `<circle cx="${hx1}" cy="${hy1}" r="${isShade ? 1.6 : 2.2}" fill="#2a1506"/>`;
+  s += `<circle cx="${hx2}" cy="${hy2}" r="${isShade ? 1.6 : 2.2}" fill="#2a1506"/>`;
+
+  s += `<line x1="${hx1}" y1="${hy1}" x2="${hx2}" y2="${hy2}" stroke="#ffd57a" stroke-width="${isShade ? 1.5 : 2.2}" stroke-linecap="round"/>`;
+  s += `<line x1="${cx - holeOffset * Math.sin(rad)}" y1="${cy + holeOffset * Math.cos(rad)}"
+              x2="${cx + holeOffset * Math.sin(rad)}" y2="${cy - holeOffset * Math.cos(rad)}"
+              stroke="#e2b13c" stroke-width="${isShade ? 1.5 : 2.2}" stroke-linecap="round"/>`;
+
+  s += `</g>`;
+  return s;
+}
+
 // Render the entire hardware layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -3678,9 +4119,17 @@ function renderHardware() {
 
   const midX = (a.x + curWA - 22 + b.x + 22) / 2;
 
-  if (p > 0) {
+  if (p > 0 && model.option !== 'gusset') {
     // Continuous Monolithic Plush Felt Chassis
     shared += drawFeltCasing(a.x, a.y, (b.x + W) - a.x, 'url(#unifiedFeltGrad)', p, f, r, model.option === 'toolroll', env, model.option === 'envelope', sq, model.option === 'lozenge');
+  }
+
+  // Option 11: Stitched Accordion Bellows Gusset Angled Connection
+  if (model.option === 'gusset') {
+    const gussetProg = model.joined ? 1 : (model.gussetProgress || Math.max(0, (glow - 0.2) / 0.8 * 0.7));
+    if (model.joined || gussetProg > 0.02 || glow > 0.15) {
+      shared += drawAccordionBellowsGusset(a.x, a.y, b.x, b.y, model.angle, gussetProg, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow, isShade);
+    }
   }
 
   if (!isShade) {
@@ -3729,13 +4178,20 @@ function renderHardware() {
       individual += drawCraftBagExtension(extraW, morph, isShade);
     }
 
-    // Only draw roving fringe caps if NOT in duffel, zipper, popper, or velcro option
-    if (model.option !== 'duffel' && model.option !== 'zipper' && model.option !== 'popper' && model.option !== 'velcro') {
+    // Only draw roving fringe caps if NOT in duffel, zipper, popper, velcro, or gusset option
+    if (model.option !== 'duffel' && model.option !== 'zipper' && model.option !== 'popper' && model.option !== 'velcro' && model.option !== 'gusset') {
       individual += drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, Math.max(f, r, env, sq)) +
                     drawRovingCap(rightOffset, 0, true, !isA, isA ? model.cap : 0, Math.max(f, r, env, sq));
     }
 
-    if (model.option === 'velcro') {
+    if (model.option === 'gusset') {
+      // Option 11: Accordion bellows ribbed collar on A, receiving collar & pivot on B
+      if (isA) {
+        individual += drawGussetEndCap(rightOffset, 0, true, true, model.joined ? 0 : (1 - (model.gussetProgress || 0)), isShade);
+      } else {
+        individual += drawGussetEndCap(0, 0, false, false, model.joined ? 0 : (1 - (model.gussetProgress || 0)), isShade);
+      }
+    } else if (model.option === 'velcro') {
       // Option 9: Concealed hook flange on Module A, microfiber loop socket on Module B
       if (isA) {
         individual += drawVelcroEndCap(rightOffset, 0, true, false, model.joined ? 1 : (model.velcroProg * 0.7), Math.max(f, r, env, sq));
@@ -3751,7 +4207,11 @@ function renderHardware() {
       }
     }
 
-    $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawFeltSocketLight(isA ? curWA - 22 : 22, 0, glow)}</g>`;
+    let shellOpacity = 1 - p;
+    if (model.option === 'gusset' && (model.joined || p > 0)) {
+      shellOpacity = 1; // Keep wool casings rendered since GitDiscuss rotates!
+    }
+    $('#shell-' + id).innerHTML = `<g opacity="${shellOpacity}">${individual}${drawFeltSocketLight(isA ? curWA - 22 : 22, 0, glow)}</g>`;
   }
 
   // Socket proximity aura
@@ -3808,6 +4268,15 @@ function render() {
     el.style.top = m.y + 'px';
     el.style.zIndex = model.front === id ? '4' : '2';
     el.classList.toggle('shade', model.shade);
+
+    if (id === 'b' && model.option === 'gusset' && (model.joined || (model.gussetProgress || 0) > 0)) {
+      const activeAngle = model.angle * (model.joined ? 1 : (model.gussetProgress || 0));
+      el.style.transformOrigin = `37px ${model.shade ? 22 : 65}px`;
+      el.style.transform = `rotate(${activeAngle}deg)`;
+    } else if (id === 'b') {
+      el.style.transformOrigin = '';
+      el.style.transform = '';
+    }
 
     el.querySelector('.screen-pages').style.transform = `translateX(-${m.page * (100 / 3)}%)`;
     el.querySelectorAll('.felt-tab').forEach((t, i) => t.setAttribute('aria-selected', String(i === m.page)));
@@ -3869,6 +4338,40 @@ function render() {
 
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
+
+  const gussetControls = $('#gussetControls');
+  if (gussetControls) {
+    gussetControls.style.display = model.option === 'gusset' ? 'flex' : 'none';
+    const slider = $('#gussetAngleSlider');
+    if (slider) slider.value = model.angle;
+    const readout = $('#gussetAngleReadout');
+    if (readout) readout.textContent = (model.angle >= 0 ? '+' : '') + model.angle + '°';
+    document.querySelectorAll('.gusset-detents .detent-btn').forEach(btn => {
+      btn.classList.toggle('active', +btn.dataset.angle === model.angle);
+    });
+  }
+
+  const gussetBtn = $('#btnGussetAnim');
+  if (gussetBtn) {
+    gussetBtn.textContent = model.joined ? 'Flex accordion gusset' : 'Fasten bellows gusset';
+    gussetBtn.disabled = model.busy;
+    const isGussetOption = model.option === 'gusset';
+    gussetBtn.classList.toggle('primary-btn', isGussetOption);
+  }
+
+  const gussetRel = $('#gussetRelease');
+  if (gussetRel) {
+    if (model.option === 'gusset' && model.joined && !model.busy && !model.shade) {
+      const extraW = Math.round((model.morphProgress || 0) * 138);
+      const cx = model.a.x + JOIN_DISTANCE + extraW + 37;
+      const cy = model.a.y + (model.shade ? 22 : 65);
+      gussetRel.style.left = `${cx - 16}px`;
+      gussetRel.style.top = `${cy - 16}px`;
+      gussetRel.hidden = false;
+    } else {
+      gussetRel.hidden = true;
+    }
+  }
 
   const unrollBtn = $('#btnUnrollAnim');
   if (unrollBtn) {
@@ -3970,7 +4473,9 @@ function render() {
   }
 
   if (!model.busy) {
-    if (model.shade || model.lozengeSquash > 0.8) {
+    if (model.shade && model.option === 'gusset') {
+      $('#phase').textContent = `Shade mode / Articulated ribbed wool elbow at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
+    } else if (model.shade || model.lozengeSquash > 0.8) {
       $('#phase').textContent = 'Shade mode / High-damp wool lozenge squash';
     } else if (model.shade || model.envelopeFlap > 0.8) {
       $('#phase').textContent = 'Shade mode / Envelope flap tucked into clutch slot';
@@ -3979,7 +4484,9 @@ function render() {
     } else if (model.shade || model.bellowsFold > 0.8) {
       $('#phase').textContent = 'Shade mode / Accordion bellows folded flat';
     } else if (model.joined) {
-      if (model.option === 'popper') {
+      if (model.option === 'gusset') {
+        $('#phase').textContent = `Joined / Bellows gusset at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
+      } else if (model.option === 'popper') {
         $('#phase').textContent = 'Joined / Heavy brass popper studs seated with wool dimples';
       } else if (model.option === 'zipper') {
         $('#phase').textContent = 'Joined / Cinched cross-stitch zipper & bow knot';
@@ -3988,6 +4495,8 @@ function render() {
       } else {
         $('#phase').textContent = 'Joined / Interwoven fiber chassis';
       }
+    } else if (model.option === 'gusset' && model.gussetProgress > 0.05) {
+      $('#phase').textContent = `Joining / Aligning bellows gusset at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
     } else if (model.option === 'lozenge' && model.lozengeSquash > 0.05) {
       $('#phase').textContent = 'Joining / Wool body compressing into lozenge pill';
     } else if (model.option === 'envelope' && model.envelopeFlap > 0.05) {
@@ -4555,6 +5064,7 @@ async function separateVelcro() {
 }
 
 function triggerJoin(fromDrag = false) {
+  if (model.option === 'gusset') return gussetJoin(fromDrag);
   if (model.option === 'velcro') return joinVelcro(fromDrag);
   if (model.option === 'popper') return joinPopper(fromDrag);
   if (model.option === 'zipper') return joinZipper(fromDrag);
@@ -4563,6 +5073,7 @@ function triggerJoin(fromDrag = false) {
 }
 
 function triggerSeparate() {
+  if (model.option === 'gusset') return gussetSeparate();
   if (model.option === 'velcro') return separateVelcro();
   if (model.option === 'popper') return separatePopper();
   if (model.option === 'zipper') return separateZipper();
@@ -5098,6 +5609,123 @@ async function retractCraftBag() {
   $('#phase').textContent = model.joined ? 'Joined / Interwoven fiber chassis' : 'Separate / Two wool housings';
 }
 
+// Option 11: Stitched Accordion Bellows Gusset Angled Connection Functions
+function setGussetAngle(deg, announce = true) {
+  deg = Math.max(-45, Math.min(45, Math.round(deg)));
+  model.angle = deg;
+  const slider = $('#gussetAngleSlider');
+  if (slider) slider.value = deg;
+  const readout = $('#gussetAngleReadout');
+  if (readout) readout.textContent = (deg >= 0 ? '+' : '') + deg + '°';
+
+  document.querySelectorAll('.gusset-detents .detent-btn').forEach(btn => {
+    btn.classList.toggle('active', +btn.dataset.angle === deg);
+  });
+
+  render();
+
+  if (announce) {
+    const detents = {
+      '-45': 'Full Upward Accordion Cant',
+      '-30': 'Steep Upward Diagonal',
+      '-15': 'Gentle Upward Pitch',
+      '0': 'Straight Axis',
+      '15': 'Gentle Downward Pitch',
+      '20': 'Classic Gusset Angle',
+      '30': 'Steep Downward Pitch',
+      '45': 'Full Downward Fold'
+    };
+    const name = detents[String(deg)] || 'Gusset Detent';
+    say(`Accordion bellows gusset angle set to ${(deg >= 0 ? '+' : '')}${deg}° (${name}). Ribbed wool pleats flexed.`);
+  }
+}
+
+async function gussetJoin(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say(`Guiding capsules together into accordion bellows gusset at ${model.angle >= 0 ? '+' : ''}${model.angle}°...`);
+  $('#phase').textContent = 'Seating accordion bellows gusset';
+
+  const extraW = Math.round((model.morphProgress || 0) * 138);
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + extraW + W) - 30, model.a.x));
+  const targetY = Math.max(120, Math.min(model.pocket ? 280 : 360, model.a.y));
+
+  // 1. Approach and dock
+  if (!await tween(fromDrag ? 240 : 440, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE + extraW - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.cap = t;
+    model.gussetProgress = Math.max(model.gussetProgress || 0, t * 0.7);
+    render();
+  }, token)) return;
+
+  // 2. Seating bellows concertina pleats & locking boxwood toggle pivot
+  $('#phase').textContent = 'Locking boxwood pivot & flexing ribbed concertina';
+  if (!await tween(320, t => {
+    const ease = 1 - Math.pow(1 - t, 3);
+    model.gussetProgress = 0.7 + ease * 0.3;
+    render();
+  }, token)) return;
+
+  model.joined = true;
+  model.gussetProgress = 1;
+  model.blend = 1;
+  model.cap = 1;
+  model.light = 0;
+  model.busy = false;
+  render();
+  say(`Accordion bellows gusset locked at ${model.angle >= 0 ? '+' : ''}${model.angle}°! Boxwood toggle seated & wool pleats flexed.`);
+  $('#phase').textContent = `Joined / Bellows gusset at ${model.angle >= 0 ? '+' : ''}${model.angle}°`;
+}
+
+async function gussetSeparate() {
+  if (!model.joined || model.busy) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Unfastening boxwood toggle button and releasing bellows gusset...');
+  $('#phase').textContent = 'Uncoupling bellows gusset';
+
+  // 1. Unseat gusset lock
+  if (!await tween(220, t => {
+    model.gussetProgress = 1 - t * 0.6;
+    render();
+  }, token)) return;
+
+  // 2. Separate housings
+  const curWA = W + Math.round((model.morphProgress || 0) * 138);
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + curWA + 130);
+
+  $('#phase').textContent = 'Separating wool housings';
+  if (!await tween(480, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - t;
+    model.cap = 1 - t;
+    model.gussetProgress = Math.max(0, 0.4 * (1 - t));
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.gussetProgress = 0;
+  model.blend = 0;
+  model.cap = 0;
+  model.busy = false;
+  render();
+  say('Separated. Independent tactile felt housings restored with ribbed accordion collars.');
+  $('#phase').textContent = 'Separate / Two wool housings';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -5116,6 +5744,7 @@ async function applyState(stateName) {
     if (model.joined) {
       await triggerSeparate();
     } else {
+      model.gussetProgress = 0;
       model.entangle = 0;
       model.duffelLoop = 0;
       model.duffelTension = 0;
@@ -5153,7 +5782,18 @@ async function applyState(stateName) {
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.5;
-    if (model.option === 'morph') {
+    if (model.option === 'gusset') {
+      model.gussetProgress = 0.55;
+      model.velcroProg = 0;
+      model.popperProg = 0;
+      model.zipperProg = 0;
+      model.duffelLoop = 0;
+      model.entangle = 0;
+      model.toolRoll = 0;
+      model.envelopeFlap = 0;
+      model.bellowsFold = 0;
+      model.lozengeSquash = 0;
+    } else if (model.option === 'morph') {
       model.morphProgress = 0.55;
       model.extended = false;
       model.velcroProg = 0;
@@ -5282,7 +5922,9 @@ async function applyState(stateName) {
     model.a.x = 220;
     model.b.x = 220 + W + curExtra + 44; // near each other with safe clearance
     render();
-    if (model.option === 'morph') {
+    if (model.option === 'gusset') {
+      say(`State: Joining — Mid-animation view with accordion bellows gusset flexed at ${model.angle >= 0 ? '+' : ''}${model.angle}° and ribbed concertina pleats extending across the gap.`);
+    } else if (model.option === 'morph') {
       say('State: Joining — Mid-animation view with cotton ribbon stays unrolling sewing kit compartment.');
     } else if (model.option === 'velcro') {
       say('State: Joining — Mid-animation view with micro-hooks partially engaging fuzzy loop pile bed.');
@@ -5324,7 +5966,14 @@ async function applyState(stateName) {
       model.envelopeFlap = 0;
       model.bellowsFold = 0;
       model.lozengeSquash = 0;
-      if (model.option === 'morph') {
+      if (model.option === 'gusset') {
+        model.gussetProgress = 1;
+        model.velcroProg = 0;
+        model.popperProg = 0;
+        model.zipperProg = 0;
+        model.duffelLoop = 0;
+        model.entangle = 0;
+      } else if (model.option === 'morph') {
         model.morphProgress = 1;
         model.extended = true;
         model.entangle = 1;
@@ -5378,7 +6027,9 @@ async function applyState(stateName) {
       }
       model.light = 0;
       render();
-      if (model.option === 'morph') {
+      if (model.option === 'gusset') {
+        say(`State: Joined — Accordion bellows gusset locked at ${model.angle >= 0 ? '+' : ''}${model.angle}° with boxwood toggle pivot and flexible ribbed wool concertina.`);
+      } else if (model.option === 'morph') {
         say('State: Joined — Master unrolled craft bag docked seamlessly with GitDiscuss.');
       } else if (model.option === 'velcro') {
         say('State: Joined — Seamless butt-joint cushion with concealed velcro hook-and-loop micro-peel.');
@@ -5488,6 +6139,22 @@ if ($('#btnPopperAnim')) {
     else triggerJoin();
   };
 }
+if ($('#btnGussetAnim')) {
+  $('#btnGussetAnim').onclick = () => {
+    if (model.joined) triggerSeparate();
+    else triggerJoin();
+  };
+}
+const gussetSlider = $('#gussetAngleSlider');
+if (gussetSlider) gussetSlider.oninput = e => setGussetAngle(+e.target.value);
+document.querySelectorAll('.gusset-detents .detent-btn').forEach(btn => {
+  btn.onclick = () => setGussetAngle(+btn.dataset.angle);
+});
+const gussetRelBtn = $('#gussetRelease');
+if (gussetRelBtn) {
+  gussetRelBtn.onclick = e => { if (e.detail === 0) gussetSeparate(); };
+}
+
 if ($('#btnZipperAnim')) {
   $('#btnZipperAnim').onclick = () => {
     if (model.joined) triggerSeparate();
@@ -5521,9 +6188,9 @@ $('#btnReset').onclick = () => {
     joined: false, busy: false, pocket: false, docked: false, design: false, shade: false,
     blend: 0, cap: 0, entangle: 0, bellowsFold: 0, toolRoll: 0, envelopeFlap: 0, lozengeSquash: 0, duffelLoop: 0, duffelTension: 0,
     zipperProg: 0, zipperTension: 0, popperProg: 0, popperTension: 0, velcroProg: 0, velcroPeel: 0, velcroTension: 0,
-    morphProgress: 0, extended: false, bNudge: 0, option: 'morph', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    morphProgress: 0, extended: false, bNudge: 0, angle: 20, gussetProgress: 0, option: 'gusset', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
-  $('#optionSelect').value = 'morph';
+  $('#optionSelect').value = 'gusset';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
@@ -5534,7 +6201,15 @@ $('#btnReset').onclick = () => {
 // Option selector change
 $('#optionSelect').onchange = async (e) => {
   model.option = e.target.value;
-  if (model.option === 'morph') {
+  if (model.option === 'gusset') {
+    say('Option 11: Stitched Accordion Bellows Gusset angled connection (-45° to +45°) selected. Flexible ribbed wool concertina bellows with turned boxwood toggle pivot and saddle-leather stays.');
+    if (model.shade) {
+      if (model.lozengeSquash > 0.05) await unsquashLozenge();
+      else if (model.envelopeFlap > 0.05) await unfoldEnvelopeFlap();
+      else if (model.toolRoll > 0.05) await unrollToolScroll();
+      else await unfoldBellows();
+    }
+  } else if (model.option === 'morph') {
     say('Option 10: Craft Bag / Sewing Kit Unroll morph selected. Padded felt compartments, measuring twill ribbons, floss bobbins & pin cushion.');
     if (!model.extended) {
       await morphCraftBag();
@@ -5546,7 +6221,14 @@ $('#optionSelect').onchange = async (e) => {
   }
 
   if (model.joined) {
-    if (model.option === 'morph') {
+    if (model.option === 'gusset') {
+      model.gussetProgress = 1;
+      model.velcroProg = 0;
+      model.popperProg = 0;
+      model.zipperProg = 0;
+      model.duffelLoop = 0;
+      model.entangle = 0;
+    } else if (model.option === 'morph') {
       model.morphProgress = 1;
       model.extended = true;
       model.entangle = 1;
@@ -5599,7 +6281,14 @@ $('#optionSelect').onchange = async (e) => {
       model.zipperTension = 0;
     }
   } else if (!model.shade && pointerDistance(alignedTarget(), model.b) < DOCKING.near) {
-    if (model.option === 'velcro') {
+    if (model.option === 'gusset') {
+      model.gussetProgress = 0.55;
+      model.velcroProg = 0;
+      model.popperProg = 0;
+      model.zipperProg = 0;
+      model.duffelLoop = 0;
+      model.entangle = 0;
+    } else if (model.option === 'velcro') {
       model.velcroProg = 0.68;
       model.velcroPeel = 0;
       model.velcroTension = 0.35;
@@ -5651,7 +6340,9 @@ $('#optionSelect').onchange = async (e) => {
     model.duffelTension = 0;
   }
   render();
-  if (model.option === 'morph') {
+  if (model.option === 'gusset') {
+    say('Option 11: Stitched Accordion Bellows Gusset angled connection (-45° to +45°) selected. Flexible ribbed wool concertina bellows with turned boxwood toggle pivot and saddle-leather stays.');
+  } else if (model.option === 'morph') {
     say('Option 10: Craft Bag / Sewing Kit Unroll morph selected. Padded felt compartments, measuring twill ribbons, floss bobbins & pin cushion.');
   } else if (model.option === 'velcro') {
     say('Option 9: Velcro Hook-and-Loop Micro-Peel join selected. Concealed micro-hook flanges compress with microscopic crunch into a seamless unbroken cushion.');
@@ -5794,6 +6485,11 @@ function startDrag(e) {
       kind: 'peel', pointerId: e.pointerId, startPointer,
       peeled: false, dx: 0, dy: 0
     };
+  } else if (kind === 'gussetAngle') {
+    drag = {
+      kind: 'gussetAngle', pointerId: e.pointerId, startPointer,
+      startAngle: model.angle
+    };
   }
 }
 
@@ -5888,6 +6584,18 @@ function onPointerMove(e) {
       drag.peeled = true;
       triggerSeparate();
     }
+  } else if (drag.kind === 'gussetAngle') {
+    const extraW = Math.round((model.morphProgress || 0) * 138);
+    const cx = model.a.x + JOIN_DISTANCE + extraW + 37;
+    const cy = model.a.y + (model.shade ? 22 : 65);
+    const stageRect = stage.getBoundingClientRect();
+    const stageScale = stageRect.width / 1200;
+    const stageX = (e.clientX - stageRect.left) / stageScale;
+    const stageY = (e.clientY - stageRect.top) / stageScale;
+    const rad = Math.atan2(stageY - cy, stageX - cx);
+    let deg = Math.round(rad * (180 / Math.PI));
+    deg = Math.max(-45, Math.min(45, deg));
+    setGussetAngle(deg, false);
   }
 }
 
@@ -5990,7 +6698,35 @@ window.addEventListener('keydown', e => {
     if (model.joined) triggerSeparate();
     else triggerJoin();
   }
-  if (e.key === 'Enter' && document.activeElement === $('#toggleRelease')) triggerSeparate();
+  if (e.key === 'a' || e.key === 'A') {
+    if (model.option === 'gusset') {
+      const detents = [-45, -30, -15, 0, 15, 20, 30, 45];
+      let idx = detents.indexOf(model.angle);
+      idx = (idx + 1) % detents.length;
+      setGussetAngle(detents[idx]);
+    }
+  }
+  if (e.key === '[' || e.key === 'ArrowUp') {
+    if (model.option === 'gusset') {
+      e.preventDefault();
+      setGussetAngle(model.angle - 5);
+    }
+  }
+  if (e.key === ']' || e.key === 'ArrowDown') {
+    if (model.option === 'gusset') {
+      e.preventDefault();
+      setGussetAngle(model.angle + 5);
+    }
+  }
+  if (e.key === 'g' || e.key === 'G') {
+    if (model.joined) triggerSeparate();
+    else triggerJoin();
+  }
+  if (e.key === 'Enter') {
+    if (document.activeElement === $('#toggleRelease') || document.activeElement === $('#gussetRelease')) {
+      triggerSeparate();
+    }
+  }
 });
 
 // Viewport Scaling for Phone & Mobile Widths (390px)
@@ -6011,7 +6747,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat, Duffel Toggle, Tool-Roll, Cross-Stitch Zipper, Envelope Flap, Heavy Brass Popper Snap, Lozenge Squash, Velcro Micro-Peel & Craft Bag Unroll Morph.');
+say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat, Duffel Toggle, Tool-Roll, Cross-Stitch Zipper, Envelope Flap, Heavy Brass Popper Snap, Lozenge Squash, Velcro Micro-Peel, Craft Bag Unroll Morph & Stitched Accordion Bellows Gusset Angled Connection.');
 </script>
 </body>
 </html>
