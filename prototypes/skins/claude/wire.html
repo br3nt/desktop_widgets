@@ -143,7 +143,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -475,8 +475,67 @@ const JOINS={
     s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Twisted trunk: pull the rope, or press Enter, to untwist it and separate the widgets"><title>Grab the rope and pull to untwist it</title><rect x="${f(g.xL-4)}" y="${f(y0)}" width="${f(g.xR-g.xL+8)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(g.xL-6)}" y="${f(y0-2)}" width="${f(g.xR-g.xL+12)}" height="${f(y1-y0+4)}" rx="10" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
    return s;
   }
+ },
+ cage:{label:'Caged bead',kind:'Clasp',gap:52,slow:1.8,
+  about:'A glass bead held in a cage of spiral wire, like a classic wire-wrapped caged bead. Each joinable end carries a head-pin stem and a flat watch-spring spiral: copper on Jarvis, brass on GitDiscuss. <b>Near:</b> the spirals warm and begin to cup. <b>Ready:</b> a dashed ghost of the bead and its cage appears in the gap. Joining: as the pendants close in, each spiral turns edge-on and is drawn out into a domed half-cage, its turns opening like a pulled spring. A glass bead drops between them and bounces, the two half-cages close round it from both sides, and with a quarter-turn twist the cage locks shut, the wire ends meeting at the equator with a spark. The bead lights from inside as the join light: amber while either widget is running, grey labradorite when both are paused. You can see the bead through the gaps, with the back turns of the cage dimmed behind it. <b>Release:</b> tap the bead, or focus it and press Enter; the cage untwists, the bead lifts out, and each half springs flat again.',
+  sayJoin:'Both spirals draw out into half-cages, a glass bead drops between them, and the cage closes and twists shut.',
+  sayJoined:'Clasped by a caged bead. Drag either nameplate to move the pair. Tap the bead to open the cage.',
+  sayRelease:'The cage untwists, the bead lifts out and the spirals spring flat.',
+  sayReady:'Ready: release to cage a bead between them.',sayNear:'Nearby: the spirals warm and start to cup. Move closer.',
+  end(side,lit,h){
+   // Just the stem's root: a short wrap where the head pin leaves the frame. The stem and spiral are drawn over (cageSide).
+   const x=side>0?W-5:5,y=h/2;let s='';
+   if(lit>0)s+=`<circle cx="${x+side*8}" cy="${y}" r="9" fill="#ffb15e" opacity="${f(lit*.5)}" filter="url(#soft)"/>`;
+   return s+wire(`M${x} ${y}H${x+side*7}`,lit>.5?'hot':'copper',2.4)+wire(band(x+side*4,y,false,3,7.5,2.2),'copper',1.1);
+  },
+  under(){return ''},
+  over(c){
+   const jt=c.jt,R=cageR(c.h),ca={x:c.a.x+W+this.gap/2,y:c.a.y+c.h/2},cb={x:c.b.x-this.gap/2,y:c.b.y+c.h/2};
+   const T=cageT(jt),cup=jt===0?.14*model.glow:0,pa=Math.max(cup,T.pull),hot=model.glow>.5&&jt===0||T.twist>0&&T.twist<1;
+   const A=cageSide(ca,1,R,pa,T.spin,c.a.x+W-5+7),B=cageSide(cb,-1,R,pa,T.spin,c.b.x+5-7);
+   const mid={x:(ca.x+cb.x)/2,y:(ca.y+cb.y)/2},on=model.a.run||model.b.run;let s='';
+   if(c.ghost>0&&jt===0){const gx=c.a.x+W+this.gap/2,gy=c.a.y+c.h/2;
+    s+=`<g fill="none" stroke="#f3c96a" stroke-width="1.1" stroke-dasharray="2 2.2" opacity="${f(c.ghost*.85)}"><circle cx="${f(gx)}" cy="${f(gy)}" r="${f(R)}"/><circle cx="${f(gx)}" cy="${f(gy)}" r="${f(R-3.2)}" stroke-opacity=".6"/><path d="M${f(gx)} ${f(gy-R)}V${f(gy+R)}" stroke-opacity=".5"/></g>`}
+   if(model.glow>0&&jt===0)for(const q of [ca,cb])s+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${f(R+3)}" fill="#ffb15e" opacity="${f(model.glow*.35)}" filter="url(#soft)"/>`;
+   // Stems behind everything, then the back turns (dimmed), the bead, and the front turns.
+   s+=wire(A.stem,hot?'hot':'copper',1.9)+wire(B.stem,hot?'hot':'brass',1.9);
+   s+=wire(A.b,'dim',1.4)+wire(B.b,'dimbrass',1.4);
+   if(T.drop>0){
+    const y=mid.y-64*Math.pow(1-clamp(T.drop/.62),2)+(T.drop>.62?-7*Math.sin(Math.PI*seg(T.drop,.62,.86))-2*Math.sin(Math.PI*seg(T.drop,.86,1)):0);
+    const br=R-3.4,lit=T.light;
+    if(lit>0)s+=`<circle cx="${f(mid.x)}" cy="${f(y)}" r="${f(R+8)}" fill="${on?'#ffb15e':'#9fb0c0'}" opacity="${f(.6*lit)}" filter="url(#soft)"/>`;
+    s+=`<g opacity="${f(clamp(T.drop*5))}"><circle cx="${f(mid.x)}" cy="${f(y)}" r="${f(br)}" fill="url(#${on?'st-amber':'st-lab'})" stroke="#24140a" stroke-width=".7"/>`+
+     `<ellipse cx="${f(mid.x)}" cy="${f(y+br*.35)}" rx="${f(br*.7)}" ry="${f(br*.28)}" fill="${on?'#ffd27a':'#c9d4dc'}" opacity="${f(.2+.35*lit)}"/>`+
+     `<ellipse cx="${f(mid.x-br*.35)}" cy="${f(y-br*.42)}" rx="${f(br*.34)}" ry="${f(br*.2)}" fill="#fff" opacity=".8" transform="rotate(-20 ${f(mid.x-br*.35)} ${f(y-br*.42)})"/>`+
+     (lit>0?`<circle cx="${f(mid.x)}" cy="${f(y)}" r="${f(br*.45)}" fill="#fff6dc" opacity="${f(.35*lit)}" filter="url(#soft)"/>`:'')+`</g>`;
+   }
+   s+=wire(A.f,hot?'hot':'copper',1.5)+wire(B.f,hot?'hot':'brass',1.5);
+   // The pole knots where each stem enters its cage.
+   for(const P of [A,B])s+=`<circle cx="${f(P.pole[0])}" cy="${f(P.pole[1])}" r="2" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".5" opacity="${f(P.poleFront?1:.55)}"/>`;
+   const sp=Math.sin(Math.PI*seg(jt,.86,.97));if(sp>.03)s+=sparkle(mid.x,mid.y+R*.97,sp*.75)+sparkle(mid.x,mid.y-R+1,sp*.45);
+   if(jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Caged bead: tap the bead, or press Enter, to open the cage and separate the widgets"><title>Tap the bead to open the cage</title><circle cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(R+6)}" fill="transparent"/><circle class="ringfocus" cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(R+5)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+   return s;
+  }
  }
 };
+/* ---------- Caged bead geometry ---------- */
+// The cage radius shrinks with the casing so it fits the shaded strip.
+const cageR=h=>lerp(10,14,clamp((h-HS)/(H-HS)));
+const cageT=jt=>({pull:ease(seg(jt,.28,.8)),drop:seg(jt,.38,.72),spin:backOut(seg(jt,.8,.92)),twist:seg(jt,.8,.92),light:ease(seg(jt,.88,1))});
+// One half-cage: a spiral of 3.5 turns on a sphere of radius R round centre C, running from the pole (by the stem) to the equator.
+// pull 0 is a flat spiral facing the viewer; pull 1 turns it edge-on and draws it out into a dome. Returns front and back runs, the stem and the pole.
+function cageSide(C,side,R,pull,spin,rootX){
+ const beta=(1-pull)*Math.PI/2,cb=Math.cos(beta),sb=Math.sin(beta),N=160,turns=3.5,fr=[],bk=[];let run=null,front=null,prev=null;
+ // At rest each smaller spiral sits beside its own frame; as it domes it grows and slides in to the shared centre.
+ const cx=C.x-side*R*(1-pull)*.85;R*=lerp(.6,1,pull);
+ // Before the twist the two halves' ends sit a quarter turn apart; the counter-twist brings them together at the equator.
+ const pt=u=>{const ph=u*Math.PI/2,rho=R*Math.sin(ph),a=R*(1-Math.cos(ph))*pull,th=u*turns*2*Math.PI+side*(1-spin)*Math.PI/4+Math.PI,X=a-R*pull,Y=rho*Math.cos(th),Z=rho*Math.sin(th);
+  const x=X*cb+Z*sb,z=-X*sb+Z*cb;return[[cx+side*x,C.y+Y*.97-z*.12],z]};
+ for(let i=0;i<=N;i++){const[p,z]=pt(i/N),s=z>=-.05;if(s!==front){if(run&&run.length>1)(front?fr:bk).push(run);run=prev?[prev]:[];front=s}run.push(p);prev=p}
+ if(run&&run.length>1)(front?fr:bk).push(run);
+ const[pole,pz]=pt(0);
+ return{f:fr.map(poly).join(''),b:bk.map(poly).join(''),pole,poleFront:pz>=-.05,stem:`M${f(rootX)} ${f(C.y)}L${f(pole[0])} ${f(pole[1])}`};
+}
 /* ---------- Twisted trunk geometry ---------- */
 // Six strands round a common axis, 60° apart (offset so no two sit at the same height untwisted). Even strands are Jarvis's copper, odd GitDiscuss's brass.
 const TRUNK_TH=[0,1,2,3,4,5].map(i=>i*Math.PI/3+Math.PI/12);
