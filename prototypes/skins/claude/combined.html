@@ -598,12 +598,13 @@ const APP=['#a52d2a','#2f55a8','#d6a43c','#2f6f47','#2f55a8','#6c3a80','#a52d2a'
 function pinnacle(xc,top,k){const b=top-13*k,ap=top-34*k;
  return{mass:`<rect x="${f(xc-5*k)}" y="${f(b)}" width="${f(10*k)}" height="${f(13*k+2)}" rx="1.5"/><path d="M${f(xc-7*k)} ${f(b+1)}L${f(xc)} ${f(ap)}L${f(xc+7*k)} ${f(b+1)}Z"/>`,
   knots:[...along(xc-7*k,b,xc,ap,1,2,2.2*k),...along(xc+7*k,b,xc,ap,-1,2,2.2*k)].map(p=>fknot(p[0],p[1],2.3*k)).join('')+fknot(xc,ap-2.8*k,3.2*k)}}
-function fcCasing(id,w,h){
- const s=SK[id],small=id==='c',top=small?5:8,G=30,gx=32,L=s.join==='l'?JP:small?16:20,Rw=s.join==='r'?JP:small?16:20,R0=small?9:13;
+function fcCasing(id,w,h,pier=false){
+ const s=SK[id],small=id==='c',top=small?5:8,G=30,gx=32,PB=22,PT=12,jw=pier?PB:JP,L=s.join==='l'?jw:small?16:20,Rw=s.join==='r'?jw:small?16:20,R0=small?9:13;
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
  const pts=[];
- if(s.join==='l')pts.push([0,h,0],[0,top-G,0],[gx,top,4]);else pts.push([0,h,R0],[0,top,R0]);
- if(s.join==='r')pts.push([w-gx,top,4],[w,top-G,0],[w,h,0]);else pts.push([w,top,R0],[w,h,R0]);
+ // The joining end is a half-gable, or (pier) a buttress pier standing proud of the wall, for a flyer to spring from.
+ if(s.join==='l')pts.push(...(pier?[[0,h,0],[0,top-PT,2],[PB,top-PT,2],[PB,top,3]]:[[0,h,0],[0,top-G,0],[gx,top,4]]));else pts.push([0,h,R0],[0,top,R0]);
+ if(s.join==='r')pts.push(...(pier?[[w-PB,top,3],[w-PB,top-PT,2],[w,top-PT,2],[w,h,0]]:[[w-gx,top,4],[w,top-G,0],[w,h,0]]));else pts.push([w,top,R0],[w,h,R0]);
  const body=rpoly(pts);
  // Silhouette: body, scalloped felt cresting and stuffed pinnacles under one felt filter.
  let mass=`<path d="${body}"/>`,knots='';
@@ -611,9 +612,10 @@ function fcCasing(id,w,h){
  const pk=small?.78:1;
  if(s.join!=='l'){const p=pinnacle(L/2,top,pk);mass+=p.mass;knots+=p.knots}
  if(s.join!=='r'){const p=pinnacle(w-Rw/2,top,pk);mass+=p.mass;knots+=p.knots}
+ if(pier&&s.join){const p=pinnacle(s.join==='l'?PB/2:w-PB/2,top-PT,pk);mass+=p.mass;knots+=p.knots}
  // Half-gable at the joining end: crocket knots on the slope and half a pom-pom finial on the seam.
- if(s.join==='r'){knots+=along(w-gx,top,w,top-G,1,3,3).map(p=>fknot(p[0],p[1],2.6)).join('')+`<path d="M${w} ${top-G-.5}A4.4 4.4 0 0 1 ${w} ${top-G-9.3}Z" fill="url(#knot)"/>`}
- if(s.join==='l'){knots+=along(gx,top,0,top-G,-1,3,3).map(p=>fknot(p[0],p[1],2.6)).join('')+`<path d="M0 ${top-G-.5}A4.4 4.4 0 0 0 0 ${top-G-9.3}Z" fill="url(#knot)"/>`}
+ if(!pier&&s.join==='r'){knots+=along(w-gx,top,w,top-G,1,3,3).map(p=>fknot(p[0],p[1],2.6)).join('')+`<path d="M${w} ${top-G-.5}A4.4 4.4 0 0 1 ${w} ${top-G-9.3}Z" fill="url(#knot)"/>`}
+ if(!pier&&s.join==='l'){knots+=along(gx,top,0,top-G,-1,3,3).map(p=>fknot(p[0],p[1],2.6)).join('')+`<path d="M0 ${top-G-.5}A4.4 4.4 0 0 0 0 ${top-G-9.3}Z" fill="url(#knot)"/>`}
  let o=`<defs>${feltFilters(id,s.seed)}<clipPath id="cl-${id}"><path d="${body}"/></clipPath></defs>`;
  o+=`<path d="${body}" fill="#2e211b" filter="url(#g-${id})" transform="translate(1.5 3)"/>`;
  o+=`<g fill="${s.body}" filter="url(#f-${id})">${mass}</g>`;
@@ -625,8 +627,10 @@ function fcCasing(id,w,h){
  const fx=L+3,fw=w-L-Rw-6,fy=top+2,fh=small?14:17;
  let ap=`<path d="${rr4(fx,fy,fw,fh,[6,5,6,5])}" fill="${s.band}"/>`,top2='';
  top2+=stitch(rr4(fx+3,fy+2.6,fw-6,fh-5.2,[4,4,4,4]),'#f3dfb8',.6,.9,'2.4 2.2');
- if(h>=90&&!small)for(const xc of[s.join!=='l'?L/2:null,s.join!=='r'?w-Rw/2:null]){if(xc===null)continue;const a=top+30,b=h-34,d=`M${xc-4} ${b}V${a}Q${xc-4} ${a-5} ${xc} ${a-9}Q${xc+4} ${a-5} ${xc+4} ${a}V${b}Z`;
+ if(h>=90&&!small)for(const xc of[s.join!=='l'||pier?L/2:null,s.join!=='r'||pier?w-Rw/2:null]){if(xc===null)continue;const a=top+30,b=h-34,d=`M${xc-4} ${b}V${a}Q${xc-4} ${a-5} ${xc} ${a-9}Q${xc+4} ${a-5} ${xc+4} ${a}V${b}Z`;
   ap+=`<path d="${d}" fill="${s.band}"/>`;top2+=stitch(d,'#f3dfb8',.55,.8,'1.8 1.8')}
+ // The pier's face: a stitched set-off line where it stands proud of the wall.
+ if(pier&&s.join)top2+=stitch(s.join==='r'?`M${w-PB} ${top+4}V${h-8}`:`M${PB} ${top+4}V${h-8}`,'#3a2a1d',.4,1.1,'3 2.4');
  if(show>.01){const[x,y,sw,sh,b]=SCR[id];let win='';
   win+=`<rect x="${x-b-3}" y="${y-b-2}" width="${sw+2*b+6}" height="${sh+2*b+5}" rx="3" fill="#2a1d16"/>`;
   const n=Math.max(3,Math.round(sw/18)),pw=sw/n,m=Math.max(1,Math.round(sh/15)),ph=sh/m,pc=(i,j)=>APP[(i*4+s.seed+j*3)%APP.length];
@@ -680,6 +684,58 @@ const roseFilter=(id='rf',s0=40)=>{const s=s0+bf*31;return `<filter id="${id}"x=
 // Bits of fluff knocked loose as the two kneelers seat.
 const FLUFF=[[-.2,-1,.3],[.5,-.9,-.6],[-.7,-.6,1.1],[.25,1,.5],[-.45,.85,-1],[.8,.4,.2]];
 const REST={a:13,b:-11};
+
+/* Felt flying buttress: the gothic flyer built by the felt material, so the voussoirs are stuffed wedges that flop into place.
+   The ring is one arch between corbels on the two piers: pointed when there is height for it, a segment when shaded. */
+const FY={gap:110,cuts:[0,.22,.43,.63,.82]},FYW={a:[SK.a.body,'#b9a07a'],b:[SK.b.body,'#9f9884']},FYLOBE=['#d6a43c','#2f55a8','#3f8f57','#2f55a8'];
+function fyGeo(c){
+ const h=c.h,s=clamp((h-HS)/(H-HS)),T=lerp(10,15,s),aR=model.a.x+W,bL=model.b.x,ys=model.a.y+h*.7;
+ const x0=aR+T+2,x1=bL-T-2,a=Math.max(10,(x1-x0)/2),xm=(x0+x1)/2,r=Math.min(a*1.55,h*.7-8);
+ let C,R;if(r>=a){R=(a*a+r*r)/(2*a);C={x:x0+R,y:ys}}else{R=(a*a+r*r)/(2*r);C={x:xm,y:ys-r+R}}
+ const ang=(x,y)=>Math.atan2(C.y-y,x-C.x),ts=ang(x0,ys),ta=ang(xm,ys-r),te=Math.acos(clamp((xm-C.x)/(R+T),-1,1));
+ // side -1 is Jarvis's half, +1 GitDiscuss's (mirrored); u runs springing (0) to apex (1); k runs intrados (0) to extrados (1).
+ const P=(side,u,k)=>{const th=lerp(ts,lerp(ta,te,k),u),rad=R+T*k,x=C.x+rad*Math.cos(th),y=C.y-rad*Math.sin(th);return[side<0?x:2*xm-x,y]};
+ return{s,T,aR,bL,ys,xm,P};
+}
+function fyPieces(G){
+ const out=[],n=5,run=(side,u0,u1,k,o)=>{for(let i=0;i<=n;i++)o.push(G.P(side,lerp(u0,u1,i/n),k));return o};
+ for(const side of[-1,1])for(let k=0;k<4;k++){const u0=FY.cuts[k],u1=FY.cuts[k+1];
+  out.push({side,k,pts:run(side,u1,u0,1,run(side,u0,u1,0,[])),pivot:G.P(side,u0,0),knot:G.P(side,(u0+u1)/2,1.2),col:FYW[side<0?'a':'b'][k%2]})}
+ // The keystone spans the apex: both intrados ends up to the point, then both extrados ends.
+ const K=run(-1,.82,1,0,[]);run(1,1,.82,0,[]).slice(1).forEach(p=>K.push(p));run(1,.82,1,1,[]).forEach(p=>K.push(p));run(-1,1,.82,1,[]).slice(1).forEach(p=>K.push(p));
+ out.push({side:0,k:4,pts:K,col:'#5a2230'});
+ for(const p of out){let x=0,y=0;p.pts.forEach(q=>{x+=q[0];y+=q[1]});p.cx=x/p.pts.length;p.cy=y/p.pts.length;p.d='M'+p.pts.map(q=>f(q[0])+' '+f(q[1])).join('L')+'Z'}
+ return out;
+}
+// Where each piece is on the timeline. Joining: it drops in limp, tilted, flops level with an overshoot and squashes as it lands.
+// Releasing: the keystone lifts out with the pull, then the wedges lose their support and flop down off the ring, innermost first.
+function fyPose(p,jt,dir){
+ if(dir>0){const t0=p.k<4?.44+p.k*.085:.8,q=seg(jt,t0,t0+.06),L=seg(jt,t0+.06,t0+.11);if(q<=0)return null;
+  const r0=p.k<4?p.side*(30-5*p.k):9,rot=q<1?r0*(1-.35*q):r0*.65*Math.cos(L*Math.PI*2)*(1-L),sq=L>0&&L<1?Math.sin(Math.PI*L)*(1-.4*L):0,sk=p.side*8*Math.sin(Math.PI*q);
+  return{tr:`translate(0 ${f(-80*(1-q*q))}) rotate(${f(rot)} ${f(p.cx)} ${f(p.cy)}) translate(${f(p.cx)} ${f(p.cy)}) skewX(${f(sk)}) scale(${f(1+.14*sq)} ${f(1-.2*sq)}) translate(${f(-p.cx)} ${f(-p.cy)})`,op:clamp(q*3)}}
+ if(p.k===4){const kl=seg(1-jt,0,.2);if(kl>=1)return null;return{tr:`translate(0 ${f(-50*ease(kl))}) rotate(${f(6*Math.sin(kl*Math.PI))} ${f(p.cx)} ${f(p.cy)})`,op:1-seg(kl,.7,1)}}
+ const v=seg(.8-(3-p.k)*.09-jt,0,.09);if(v>=1)return null;
+ return{tr:`translate(0 ${f(60*Math.pow(seg(v,.4,1),2))}) rotate(${f(-p.side*70*v*v)} ${f(p.pivot[0])} ${f(p.pivot[1])})`,op:1-seg(v,.65,1)};
+}
+// The springing stone: a stuffed felt corbel on the pier face, with a gold knot that swells as the other widget nears.
+// When the shaded flyer flattens to a segment its springer tilts, so the corbel's top becomes a skewback: level from the pier
+// out to the springer's back edge (ex px out, rise px up), then sloping down to its front edge.
+function fyCorbel(x,y,dir,g,s,ex=0,rise=0){
+ const T=lerp(10,15,s),hh=lerp(13,20,s),m=v=>f(x+dir*v);
+ const d=`M${m(-1)} ${f(y-rise)}H${m(ex)}L${m(T+3)} ${f(y)}Q${m(T+3)} ${f(y+hh*.28)} ${m(T)} ${f(y+hh*.36)}Q${m(5)} ${f(y+hh*.55)} ${m(2)} ${f(y+hh)}H${m(-1)}Z`;
+ return `<path d="${d}" fill="#2e211b" opacity=".5" transform="translate(1.2 2.4)"/><g filter="url(#fyf)"><path d="${d}" fill="${dir>0?SK.a.body:SK.b.body}"/></g>`+
+  stitch(`M${m(1)} ${f(y+2.4)}H${m(T+.5)}`,g>0?'#e9c46e':'#f7e8c9',.45+.5*g,1,'2.6 2')+fknot(x+dir*T*.5,y+hh*.6,lerp(1.6,2.7,g));
+}
+// Running stitch along the ring, just inside both edges, sewn from the springings up to the keystone; it binds the wedges as mortar would.
+function fyStitch(G,prog){if(prog<=0)return '';const N=18,m=Math.floor(prog*N+1e-6);let d='';
+ for(const side of[-1,1])for(const k of[.2,.8])for(let i=0;i<m;i++){const p=G.P(side,i/N,k),q=G.P(side,(i+.55)/N,k);d+=`M${f(p[0])} ${f(p[1])}L${f(q[0])} ${f(q[1])}`}
+ return d?`<g fill="none" stroke-linecap="round"><path d="${d}" stroke="#000" stroke-opacity=".3" stroke-width="1.5" transform="translate(.4 .8)"/><path d="${d}" stroke="#f7e8c9" stroke-opacity=".85" stroke-width="1.1"/></g>`:''}
+// The keystone's boss: an appliqué quatrefoil whose lobes are sewn on one by one, then a gold knot in the middle. Felt cannot glow; this is the join light.
+function fyBoss(p,T,lit){const r=T*.19,cx=p.cx,cy=p.cy+T*.08;let o='',cord='';
+ FYLOBE.forEach((col,i)=>{const a=i*Math.PI/2-Math.PI/2,x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r,pp=seg(lit,i*.2,.2+i*.2),sy=Math.max(.12,Math.abs(Math.cos(pp*Math.PI)));
+  o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="${pp>=.5?col:'#3a1620'}" transform="translate(${f(x)} ${f(y)}) scale(1 ${f(sy*100)/100}) translate(${f(-x)} ${f(-y)})"/>`;cord+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}"/>`});
+ return o+`<g fill="none" stroke="${CORD}" stroke-width=".9" stroke-opacity=".8">${cord}</g>`+(lit>.85?fknot(cx,cy,r*.75*seg(lit,.85,1)+.2):'');
+}
 
 /* ---------- Mix 2: half-couplers (model A). Each skin draws its own half of the join up to a shared mating face. ---------- */
 // The mating face: a round boss 20 px across, 22 px out from the socket end, on the casing's centre line.
@@ -1760,6 +1816,68 @@ const MIXES={
    sepPh:'Separate · two kneelers',nearPh:'Nearby · the halves turn',readyPh:'Ready · tacked',
    mid:(jt,dir)=>dir>0?(jt<.42?'Joining · closing in ':jt<.5?'Joining · seating ':'Joining · sewing the rose '):(jt>.6?'Releasing · unpicking ':jt>.4?'Releasing · unlocking ':'Releasing · parting '),
    turn:d=>'Turning the rose · '+Math.round(Math.abs(d.deg||0))+'° of 60°'}
+ },
+ feltButtress:{label:'Felt flying buttress',kind:'Layer stack',slow:1.5,sepMs:2600,
+  stack:[['Structure','Gothic','the same kneelers, but each joining end is a buttress pier with its own pinnacle and a corbel to spring from; the join is the gothic page\'s flying buttress'],
+   ['Material','Felt','every voussoir is a stuffed felt wedge in its own widget\'s wool, outlined in running stitch, with a French-knot crocket'],
+   ['Ornament','Gothic, with a fallback','the keystone\'s carved boss becomes an appliqué quatrefoil; stone mortar becomes a running stitch through the whole ring'],
+   ['Palette','Stone wools','oatmeal wedges from Jarvis, grey from GitDiscuss, a wine-red keystone with jewel lobes and a gold knot'],
+   ['Motion','Felt','12 fps stop-motion. Stone seats with dust; felt has no weight to seat with, so the wedges arrive limp and flop into place'],
+   ['Display','Felt','cotton patches with cross-stitch numerals']],
+  about:'The second join for the felt cathedral, and the brainstorm\'s own test of the layer-stack model: joins belong to the structure layer and the material only renders them, so a felt cathedral\'s flying buttress is built from felt voussoirs. The structure decides that there is a bay, two piers, corbels, a pointed ring of wedges and a keystone; the felt decides that each wedge is stuffed, sags as it falls and squashes when it lands, and that the ring is held by stitching instead of by its own weight.',
+  join:{label:'Flying buttress, in felt voussoirs',kind:'Bridge',gap:FY.gap,
+   about:'Each joining end is a buttress pier with a felt corbel. <b>Near:</b> the gold knots on the corbels swell and their stitching turns gold. <b>Ready:</b> the whole arch is tacked out across the bay in white basting stitch. Joining: the kneelers close to a 110 px bay and a tailor\'s chalk line marks the curve. Then the stuffed wedges drop in two at a time, one from each side, from the springings up: each falls limp and tilted, flops level with an overshoot and squashes as it lands. The wine-red keystone falls last and squashes, knocking out a puff of fluff, and both kneelers give a little under it. A running stitch is sewn up the ring from both springings to bind it, French-knot crockets pop onto the back of each wedge, and the keystone\'s quatrefoil lobes are sewn on one by one round a gold knot, which is the join light. The chalk brushes away. The arch flattens to a segment when shaded. <b>Release:</b> pull the keystone up (or click the arch, or focus it and press Enter); the stitching comes out, the keystone lifts away, and the wedges lose their support and flop down off the ring, innermost first, before the kneelers part.'},
+  shade:{label:'Plain lower, in felt',kind:'Page baseline',
+   about:'Not a brainstorm item. The stuffing is let out until only the frieze band with the name and a cotton label with one value remain. The piers and their pinnacles stay, and the flyer drops to a shallow felt segment between the corbels, so shaded kneelers stay joined.'},
+  casing:(id,w,h)=>fcCasing(id,w,h,true),
+  readyPose:{},
+  state:()=>({}),
+  // Both kneelers give a little as the keystone lands.
+  squash(c){const p=model.dir>0&&c.jt<1?Math.sin(Math.PI*seg(c.jt,.86,.92)):0;return p>.01?p*.6:0},
+  over(c){
+   const G=fyGeo(c),jt=c.jt,dir=model.dir,P=fyPieces(G);
+   let s=`<defs>${roseFilter('fyf',70)}</defs>`;
+   const g=jt>0?1:c.glow;
+   const sp=G.P(-1,0,1),ex=Math.max(0,sp[0]-G.aR),rise=Math.max(0,G.ys-sp[1]);
+   s+=fyCorbel(G.aR,G.ys,1,g,G.s,ex,rise)+fyCorbel(G.bL,model.b.y+c.h*.7,-1,g,G.s,ex,rise);
+   // Ready: the whole ring tacked out across the bay in basting stitch.
+   if(jt===0&&c.glow>=1){const d=P.map(p=>p.d).join('');
+    s+=`<path d="${d}" fill="#fffaf0" fill-opacity=".05" stroke="#000" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="3 2.2" transform="translate(.5 1)"/><path d="${d}" fill="none" stroke="#fffaf0" stroke-opacity=".85" stroke-width="1.2" stroke-dasharray="3 2.2" stroke-linecap="round"/>`}
+   // Joining: tailor's chalk marks the curve the wedges will sit on, and is brushed away once the ring is sewn.
+   if(dir>0&&jt>0&&jt<1){const cp=seg(jt,.36,.46),op=1-seg(jt,.9,.98);if(cp>0&&op>0){const N=24,m=Math.round(cp*N);let d='';
+    if(m>0)for(const side of[-1,1])for(let i=0;i<=m;i++){const p=G.P(side,i/N,0);d+=(i?'L':'M')+f(p[0])+' '+f(p[1]+1.5)}
+    s+=`<path d="${d}" fill="none" stroke="#d9e7f7" stroke-opacity="${f(.75*op)}" stroke-width="1.6" stroke-dasharray="5 3.4" stroke-linecap="round"/>`}}
+   const lit=dir>0?seg(jt,.92,1):1,knotK=k=>dir>0?seg(jt,.9+.015*k,.93+.015*k):1;
+   if(jt>0)for(const p of P){const q=fyPose(p,jt,dir);if(!q||q.op<=0)continue;
+    s+=`<g transform="${q.tr}" opacity="${f(q.op)}"><path d="${p.d}" fill="#2e211b" opacity=".5" transform="translate(1.2 2.6)"/><g filter="url(#fyf)"><path d="${p.d}" fill="${p.col}" stroke="#2a1d16" stroke-width="1"/></g>`+
+     `<g transform="translate(${f(p.cx)} ${f(p.cy)}) scale(.7) translate(${f(-p.cx)} ${f(-p.cy)})">${stitch(p.d,p.k===4?'#e9c46e':'#f7e8c9',.6,1.2,'3 2.6')}</g>`;
+    if(p.k<4){const kk=knotK(p.k);if(kk>0)s+=fknot(p.knot[0],p.knot[1],2.4*backOut(kk))}
+    else{s+=fyBoss(p,G.T,lit);const t=G.P(-1,1,1);s+=fknot(t[0],t[1]-2.6,2.8)}
+    s+=`</g>`}
+   s+=fyStitch(G,dir>0?seg(jt,.88,.96):seg(jt,.9,1));
+   // A squash of fluff knocked out by the keystone landing.
+   if(dir>0&&jt>.86&&jt<.97){const u=seg(jt,.86,.97),K=P[8];
+    for(const[dx,dy,rot]of FLUFF){const x=K.cx+dx*30*(.4+u),y=K.cy+dy*16*(.8+u*.6)+22*u*u;
+     s+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+u*90)})" fill="none" stroke="#efe0c2" stroke-width="1.3" stroke-linecap="round" opacity="${f(1-u)}"/>`}}
+   if(jt===1){const K=P[8],ring=P.slice(0,8).map(p=>p.d).join('');
+    s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Felt flying buttress: pull the keystone up, or press Enter, to separate the widgets"><title>Pull the keystone up to release</title><path d="${ring}" fill="transparent" stroke="transparent" stroke-width="6"/><path d="${K.d}" fill="transparent" stroke="transparent" stroke-width="16"/><path class="ringfocus" d="${K.d}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+   return s;
+  },
+  // Releasing by hand: drag up and the keystone comes with you; past most of its lift, the ring gives way.
+  grab(p){return{x0:p.x,y0:p.y,deg:0}},
+  pull(d,p){if(Math.hypot(p.x-d.x0,p.y-d.y0)>3)d.moved=true;d.deg=clamp((d.y0-p.y)/50);return 1-.22*d.deg},
+  text:{intro:'The felt kneelers again, with buttress piers at their joining ends. Drag a nameplate toward the other kneeler, or use the state buttons.',
+   join:'The kneelers close to a bay, and stuffed felt wedges flop onto the chalk line two at a time.',
+   joined:'Joined: a felt flying buttress spans the bay. Drag either nameplate to move the pair. Pull the keystone up to release.',
+   sep:'The stitching comes out, the keystone lifts away and the wedges flop down off the ring.',
+   hold:'Held mid-join: half the wedges are on the ring. Use the scrubber to step through the animation.',
+   near:'Nearby: the gold knots on the corbels swell. Move closer.',
+   ready:'Ready: the arch is tacked out across the bay. Release to join.',
+   back:'The keystone drops back in; still joined.',cancel:'Pull cancelled.',
+   shadeOn:'Shaded: the stuffing lets out to the frieze band, and the flyer drops to a shallow segment.',shadeOff:'Unshaded: the stuffing comes back and the flyer rises to a pointed arch.',
+   sepPh:'Separate · two kneelers on piers',nearPh:'Nearby · the corbels perk up',readyPh:'Ready · arch tacked out',
+   mid:(jt,dir)=>dir>0?(jt<.4?'Joining · closing to a bay ':jt<.8?'Joining · wedges flop in ':jt<.88?'Joining · keystone ':'Joining · sewing the ring '):(jt>.8?'Releasing · lifting the keystone ':jt>.4?'Releasing · wedges flop off ':'Releasing · parting '),
+   turn:d=>'Lifting the keystone · '+Math.round(d.deg*100)+'%'}
  },
  coupler:{label:'Stone & felt coupler',kind:'Half-coupler',pair:'stonefelt',
   stack:[['Model','Half-couplers','each skin draws its own half of the join, up to a shared mating face; no pairwise authoring'],
