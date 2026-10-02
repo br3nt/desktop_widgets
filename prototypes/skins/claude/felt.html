@@ -167,7 +167,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -728,6 +728,51 @@ function xTag(x,y,txt,cx=1.9){
 
 const mixHex=(a,b,t)=>'#'+[0,2,4].map(i=>Math.round(lerp(parseInt(a.substr(i+1,2),16),parseInt(b.substr(i+1,2),16),t)).toString(16).padStart(2,'0')).join('');
 
+/* ---------- Appliqué patch geometry ---------- */
+// A hand-cut indigo patch laid over the seam: a squarish oval with a slight wobble, as if cut by eye.
+// It carries the group badge (a cream oval with a felt heart per member) and is stitched round in gold.
+const AP={gap:2-2*EDGE,rx:33,ry:39,col:'#30407a',dk:'#121a38',cream:'#f1e4c6',gold:'#efbf45',goldDk:'#4a3005',sp:7.4,
+ // Pins in the order they go in: red into Jarvis, yellow into GitDiscuss, blue across the foot of the seam. at = place on the stitching round.
+ pins:[{t:Math.PI,ang:12,at:.75,col:'#d23a32',hi:'#ffc0ae'},{t:0,ang:168,at:.25,col:'#e9b336',hi:'#fff4c4'},{t:Math.PI/2,ang:-72,at:.5,col:'#4c8fd8',hi:'#d4eaff'}]};
+const apScale=h=>lerp(.46,1,clamp((h-40)/90));
+const apCentre=(x,y,h)=>({x,y:y+lerp(h/2,h/2+7,clamp((h-40)/90))});
+// Point on the outline (a superellipse with a little wobble) at angle t, radii shrunk by ins, around 0,0.
+function apPt(t,s,ins=0){const c=Math.cos(t),n=Math.sin(t),e=2/3.2,w=1+.025*Math.sin(3*t+1)+.015*Math.sin(5*t);
+ return{x:Math.sign(c)*Math.pow(Math.abs(c),e)*(AP.rx-ins)*s*w,y:Math.sign(n)*Math.pow(Math.abs(n),e)*(AP.ry-ins)*s*w}}
+function apPath(s,ins=0,t0=-Math.PI/2,t1=1.5*Math.PI,close=true){const N=72;let d='';for(let i=0;i<=N;i++)d+=(i?'L':'M')+pt(apPt(lerp(t0,t1,i/N),s,ins));return close?d+'Z':d}
+// Running stitch round the patch from the top, clockwise: [p,q,frac], frac being the stitch's place along the round.
+const apCache={};
+function apStitches(s){
+ const key=Math.round(s*1000);if(apCache[key])return apCache[key];
+ const N=240,P=[];let L=0;
+ for(let i=0;i<=N;i++){const p=apPt(-Math.PI/2+i*2*Math.PI/N,s,6);if(i)L+=Math.hypot(p.x-P[i-1].x,p.y-P[i-1].y);P.push({...p,l:L})}
+ const at=l=>{let i=1;while(i<N&&P[i].l<l)i++;const p=P[i-1],q=P[i],k=(l-p.l)/((q.l-p.l)||1);return{x:lerp(p.x,q.x,k),y:lerp(p.y,q.y,k),tan:unit(V.sub(q,p))}};
+ const n=Math.floor(L/(AP.sp*Math.max(.62,s))),st=[];
+ for(let i=0;i<n;i++){const l0=i*L/n;st.push([at(l0),at(l0+L/n*.58),i/n])}
+ return apCache[key]={st,at:fr=>at(fr*L)};
+}
+const goldThread=(d,w=1.6)=>d?`<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="#0a0e1e" stroke-opacity=".55" stroke-width="${f(w+.9)}" transform="translate(.4 .8)"/><path d="${d}" stroke="${AP.gold}" stroke-width="${w}"/><path d="${d}" stroke="#fff6cf" stroke-opacity=".7" stroke-width="${f(w*.4)}" stroke-dasharray="1.1 1.9"/></g>`:'';
+const heartD=r=>`M0 ${f(.9*r)}C${f(-1.45*r)} ${f(-.1*r)} ${f(-.72*r)} ${f(-1.15*r)} 0 ${f(-.42*r)}C${f(.72*r)} ${f(-1.15*r)} ${f(1.45*r)} ${f(-.1*r)} 0 ${f(.9*r)}Z`;
+// A dressmaker's pin with a glass head at 0,0, the shaft along ang. Pinned (lift 0) the shaft dives in and its point peeps out further on;
+// lifted (lift 1) it hovers above the felt, shaft whole, head shadow far off.
+function dPin(x,y,ang,P,s,lift,op=1){
+ const hy=-16*lift,sh=1.2+5*lift,L=lerp(7,15,lift);
+ let o=`<g opacity="${f(op)}" transform="translate(${f(x)} ${f(y)}) scale(${f(s*100)/100})">`;
+ if(lift<.4){const k=1-lift/.4,r=ang*Math.PI/180,ex=7*Math.cos(r),ey=7*Math.sin(r);
+  o+=`<g opacity="${f(k)}"><ellipse cx="${f(ex)}" cy="${f(ey)}" rx="2.4" ry="1.5" transform="rotate(${ang} ${f(ex)} ${f(ey)})" fill="#050816" opacity=".45"/></g>`}
+ o+=`<g transform="translate(0 ${f(hy)}) rotate(${ang})"><path d="M0 0H${f(L)}" stroke="#000" stroke-opacity=".3" stroke-width="1.1" transform="translate(${f(sh*.4)} ${f(sh)})"/><path d="M0 0H${f(L)}" stroke="url(#metal)" stroke-width=".95" stroke-linecap="round"/>`;
+ if(lift<.4)o+=`<path d="M11.2 0H14.4" stroke="#d9d3c8" stroke-width=".85" stroke-linecap="round" opacity="${f(1-lift/.4)}"/>`;
+ o+=`</g><circle cx="${f(sh*.5)}" cy="${f(hy+sh)}" r="3.3" fill="#000" opacity="${f(.4-.2*lift)}" filter="url(#sh)"/><circle cy="${f(hy)}" r="3.3" fill="${P.col}" stroke="#000" stroke-opacity=".35" stroke-width=".5"/><circle cx="-1" cy="${f(hy-1.1)}" r="1.1" fill="${P.hi}"/></g>`;
+ return o;
+}
+// A seam ripper with its fork at x,y and the turned wooden handle along ang.
+function seamRipper(x,y,ang,op=1){
+ return `<g opacity="${f(op)}" transform="translate(${f(x)} ${f(y)}) rotate(${f(ang)})"><path d="M1.5 -.9L15 -1.3V1.3L1.5 .9Z" fill="url(#metal)" stroke="#2e2a25" stroke-width=".45"/>`+
+  `<path d="M1.8 -.6Q-.8 -1.6 -3.2 -3" fill="none" stroke="#8f887e" stroke-width="1.1" stroke-linecap="round"/><circle cx="-3.5" cy="-3.2" r="1.5" fill="#d8322c" stroke="#5a0e0a" stroke-width=".4"/><path d="M1.8 .6L-2.4 1.5" stroke="#d6d0c4" stroke-width=".9" stroke-linecap="round"/>`+
+  `<rect x="14" y="-2" width="3.2" height="4" rx=".6" fill="#c9952e" stroke="#5e400e" stroke-width=".4"/><rect x="17" y="-2.8" width="19" height="5.6" rx="2.8" fill="#000" opacity=".35" transform="translate(1 1.6)"/>`+
+  `<path d="M17 -2.4Q26 -3.6 36 -2.6Q37.6 0 36 2.6Q26 3.6 17 2.4Z" fill="#9a6235" stroke="#3d220c" stroke-width=".5"/><path d="M19 -1.5Q27 -2.4 34.5 -1.6" fill="none" stroke="#f0c48e" stroke-opacity=".6" stroke-width=".9" stroke-linecap="round"/></g>`;
+}
+
 /* ---------- Options ---------- */
 const JOINS={
  zipper:{label:'Zipper',kind:'Interlock',gap:-2*EDGE,ms:1700,msDrag:1300,relMs:1300,moveEnd:.4,hold:.64,pullDrag:true,
@@ -1166,6 +1211,83 @@ const JOINS={
    o+='</g>';
    // While it turns: the angle in cross-stitch on a pinned cotton tag, above the pair (or below it near the top of the desktop).
    if(model.turning&&jt===1){const up=PA.y-h/2-30>50;o+=xTag(PA.x,up?PA.y-h/2-26:PA.y+h/2+26,signed(th).replace('−','-'))}
+   return o;
+  }
+ },
+ patch:{label:'Appliqué patch',kind:'Clasp',gap:AP.gap,ms:3800,msDrag:3400,relMs:2600,moveEnd:.3,hold:.72,snip:true,
+  ph:[[0,.3,.42,.56,.9,1],[0,.16,.28,.42,.88,1]],
+  about:'A hand-cut indigo felt patch is laid over the seam like a darn on a knee. It carries the group\'s badge: a cream oval appliquéd on top with a felt heart for each member, ochre for Jarvis and teal for GitDiscuss, overlapping and caught with a gold French knot. <b>Near:</b> tailor\'s chalk outlines where each half of the patch will lie. <b>Ready:</b> a ghost of the patch shows over the gap. Joining (12 fps): the cushions butt up, and the patch drops in from above, tilted and close to the camera, and lands flat over the seam with a squash. Three glass-headed dressmaker\'s pins go in one at a time: red into Jarvis, yellow into GitDiscuss, blue across the foot of the seam. Then a needle runs gold running stitch round the patch from the top, clockwise, pulling each pin out just before it gets there; at the end the cushions squeeze together and a gleam runs round the thread. <b>Release:</b> tap the patch (or focus it and press Enter). A seam ripper runs round the edge, the stitches pop and drop as little curls of gold thread, the patch is lifted off, and the cushions part.',
+  sayJoin:'The cushions butt up and a felt patch is laid over the seam, pinned and stitched round.',
+  sayJoined:'Patched. Drag either nameplate to move the pair. Tap the patch to unpick it.',
+  sayRelease:'A seam ripper runs round the patch, the stitches pop, the patch lifts off and the cushions part.',
+  sayUnpick:'The stitching backs out, the pins come out and the patch lifts away.',
+  sayReady:'Ready: a ghost of the patch shows over the gap. Release to patch them together.',
+  sayNear:'Nearby: chalk marks show where the patch will be laid. Move closer.',
+  sayHold:'Held mid-stitch: the needle is going round the patch; the yellow pin is out and the blue one is coming out. Use the scrubber to step through it stitch by stitch.',
+  phReady:'Ready · release to patch',
+  pose:jt=>({th:0,ys:0,sq:model.dir>0?.014*Math.sin(Math.PI*seg(jt,.9,.97)):0}),
+  phase(jt){
+   if(model.dir<0&&model.snip){const u=1-jt;return u<.44?'Releasing · unpicking with the seam ripper':u<.7?'Releasing · lifting the patch off':'Releasing · parting'}
+   if(model.dir<0&&model.busy)return 'Unpicking';
+   const n=apStitches(apScale(ctx().h)).st.length;
+   return jt<.3?'Joining · closing in':jt<.42?'Joining · laying the patch':jt<.56?`Joining · pin ${Math.min(3,Math.floor(seg(jt,.42,.56)*3)+1)} of 3`:jt<.9?`Joining · stitch ${Math.min(n,Math.floor(seg(jt,.56,.9)*n)+1)} of ${n}`:'Joining · pressed flat';
+  },
+  // The badge: cream oval, whip-stitched on, with a felt heart per member and a French knot where they overlap.
+  badge(s){
+   const hr=8.2*s,heart=(x,y,rot,col)=>`<g transform="translate(${f(x)} ${f(y)}) rotate(${rot})"><path d="${heartD(hr)}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.5 1.2)"/><path d="${heartD(hr)}" fill="${col}" filter="url(#tagfelt)"/><path d="${heartD(hr*.7)}" fill="none" stroke="#fff3da" stroke-opacity=".7" stroke-width=".8" stroke-dasharray="1.6 1.6" transform="translate(0 ${f(.08*hr)})"/></g>`;
+   return `<path d="${apPath(s,11.5)}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(.4 1.3)"/><path d="${apPath(s,12)}" fill="${AP.cream}" filter="url(#tagfelt)"/>`+
+    `<path d="${apPath(s,14.2)}" fill="none" stroke="${HTHREAD}" stroke-opacity=".75" stroke-width="1" stroke-dasharray="1.3 2.3" stroke-linecap="round"/>`+
+    heart(5*s,4.5*s,14,'#3f807a')+heart(-4.6*s,-3*s,-12,'#d0912f')+
+    `<circle cx="${f(.6*s)}" cy="${f(2.4*s)}" r="${f(Math.max(1.3,2.2*s))}" fill="${AP.gold}" stroke="${AP.goldDk}" stroke-width=".5"/><circle cx="${f(0)}" cy="${f(1.9*s)}" r="${f(.7*s)}" fill="#fff6cf"/>`;
+  },
+  over(c){
+   const a=c.a,b=c.b,jt=c.jt,h=c.h,s=apScale(h),S=apStitches(s),n=S.st.length,rel=model.dir<0&&model.snip,u=1-jt;
+   const C=apCentre((a.x+W-EDGE+b.x+EDGE)/2,Math.min(a.y,b.y),h);
+   let o='';
+   // Tailor's chalk: half an outline on each cushion where its half of the patch will lie. Near, while closing in, then covered.
+   const chalk=jt>0?(rel?0:Math.min(model.fast?1:seg(jt,0,.08),1-seg(jt,.3,.4))):c.glow;
+   if(chalk>.01){const hg=AP.gap/2,ca=apCentre(a.x+W-EDGE+hg+1,a.y,h),cb=apCentre(b.x+EDGE-hg-1,b.y,h);
+    o+=`<g fill="none" stroke="#fff3da" stroke-opacity="${f(chalk*.75)}" stroke-width="1.8" stroke-dasharray="1.6 2" stroke-linecap="round"><path d="${apPath(s,0,Math.PI/2,1.5*Math.PI,false)}" transform="translate(${f(ca.x)} ${f(ca.y)})"/><path d="${apPath(s,0,-Math.PI/2,Math.PI/2,false)}" transform="translate(${f(cb.x)} ${f(cb.y)})"/></g>`}
+   if(jt===0){
+    if(c.ghost>0){const G=apCentre((a.x+W-EDGE+b.x+EDGE)/2,Math.min(a.y,b.y),h);
+     o+=`<g transform="translate(${f(G.x)} ${f(G.y)})"><ellipse rx="${f(42*s)}" ry="${f(48*s)}" fill="#ffc36a" opacity="${f(c.ghost*.45)}" filter="url(#soft)"/><path d="${apPath(s)}" fill="${AP.col}" fill-opacity=".25" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="4 3"/></g>`}
+    return o;
+   }
+   if(jt<.3||rel&&u>.7)return o;
+   // The patch's pose: dropping in tilted and close to the camera, landing with a squash; on release, lifted off up and away.
+   let dx=0,dy=0,rot=-2,sc=1,sy=1,op=1,shx=.8,shy=2;
+   if(rel){const pe=ease(seg(u,.44,.68));dx=34*pe;dy=-82*pe;rot=-2+24*pe;sc=1+.14*pe;op=1-seg(u,.6,.68);shx+=9*pe;shy+=14*pe}
+   else{const e=ease(seg(jt,.3,.42));dy=-62*(1-e);rot=lerp(-16,-2,e);sc=lerp(1.13,1,e);op=seg(jt,.3,.33);shx+=8*(1-e);shy+=13*(1-e);sy=1-.06*Math.sin(Math.PI*seg(jt,.41,.47))}
+   const sf=rel?1:seg(jt,.56,.9),cut=rel?seg(u,.06,.34):0;
+   const P=apPath(s);
+   o+=`<g opacity="${f(op)}" transform="translate(${f(C.x+dx)} ${f(C.y+dy)}) rotate(${f(rot)}) scale(${f(sc*1000)/1000} ${f(sc*sy*1000)/1000})">`;
+   o+=`<path d="${P}" fill="#000" opacity=".45" filter="url(#sh)" transform="translate(${f(shx)} ${f(shy)})"/><path d="${P}" fill="${AP.col}" filter="url(#tagfelt)"/><path d="${apPath(s,1.4)}" fill="none" stroke="${AP.dk}" stroke-opacity=".45" stroke-width="1"/>`;
+   o+=this.badge(s);
+   // Stitches laid so far (joining), or not yet ripped (releasing). While stitching, the needle dives in and pops up stitch by stitch.
+   const p=sf*n,k=Math.min(n-1,Math.floor(p)),fr=p-Math.floor(p),stitching=!rel&&jt>=.56&&jt<.9;
+   let d='';S.st.forEach(([q0,q1,fq],i)=>{if(rel?fq>=cut:(jt>=.9||jt>=.56&&i<=k))d+=`M${pt(q0)}L${pt(q1)}`});
+   o+=goldThread(d);
+   if(!rel&&jt>=.9){const g=Math.sin(Math.PI*seg(jt,.92,1));if(g>.02)o+=`<path d="${apPath(s,6)}" fill="none" stroke="#fff" stroke-opacity="${f(.6*g)}" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="9 400" stroke-dashoffset="${f(-230*seg(jt,.92,1)*s)}"/>`}
+   // Pins: in one at a time; each is pulled as the needle comes round to it. Ripping never meets them: they are already out.
+   if(!rel)AP.pins.forEach((Pn,i)=>{
+    const ins=ease(seg(jt,.42+i*.045,.42+(i+1)*.045)),out=seg(sf,Pn.at-.08,Pn.at-.02);if(ins<=0||out>=1)return;
+    const H=apPt(Pn.t,s,7);o+=dPin(H.x,H.y,Pn.ang,Pn,Math.max(.7,s),Math.max(1-ins,Math.min(1,out*1.6)),1-seg(out,.5,1))});
+   if(stitching){
+    const st=S.st[k];
+    if(fr<.5){const tip=st[1],ang=angOf(-tip.tan.x,-tip.tan.y)-28,e=eyeOf(tip.x,tip.y,ang);o+=goldThread(`M${pt(e)}q${f(-6-4*fr)} -5 -3 -15`,1.5)+needle(tip.x,tip.y,ang,3)}
+    else{const nx=S.st[(k+1)%n][0],ang=angOf(-nx.tan.x,-nx.tan.y)+34;o+=needle(nx.x,nx.y,ang,0,10)}
+   }
+   o+='</g>';
+   // Releasing: the ripper runs round the stitching; each cut stitch curls and drops. Drawn on the felt, so they stay put when the patch lifts.
+   if(rel&&u<.5){
+    o+=`<g transform="translate(${f(C.x)} ${f(C.y)}) rotate(-2)">`;
+    S.st.forEach(([q0,q1,fq])=>{const age=(u-.06-fq*.28)/.1;if(fq>=cut||age>1)return;const m=V.mix(q0,q1,.5),x=m.x+(m.x>0?5:-5)*age,y=m.y+30*age*age;
+     o+=`<path d="M-2.4 0q1.2-2.6 2.4 0t2.4 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(fq*720+age*160)})" fill="none" stroke="${AP.gold}" stroke-width="1.3" stroke-linecap="round" opacity="${f(1-age)}"/>`});
+    const T=S.at(Math.min(.999,cut)),app=ease(seg(u,0,.06)),away=seg(u,.34,.42),ang=angOf(-T.tan.x,-T.tan.y)-40;
+    if(away<1)o+=seamRipper(T.x+28*(1-app)+20*away,T.y-26*(1-app)-26*away,ang,Math.min(app*1.5,1-away));
+    o+='</g>';
+   }
+   if(jt===1)o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Appliqué patch: tap or press Enter to unpick it and separate the widgets" transform="translate(${f(C.x)} ${f(C.y)}) rotate(-2)"><title>Tap the patch to unpick it</title><path d="${P}" fill="transparent"/><g class="snipHint">${seamRipper(AP.rx*s*.7,AP.ry*s*.8,-40)}</g><path class="ringfocus" d="${P}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
    return o;
   }
  }
