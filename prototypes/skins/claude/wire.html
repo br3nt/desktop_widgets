@@ -311,6 +311,8 @@ const JOINS={
   }
  },
  pivot:{label:'Jump-ring pivot',kind:'Angle · hinge',gap:56,slow:1.6,
+  // Angle setup: GitDiscuss turns about its own eye loop (x0 out from its near edge), which rides half the swing round a ring of radius 14 (offset 28).
+  angle:{def:15,swing:.68,x0:14,ring:28,R:424,origin:c=>({x:c.a.x+W+14,y:c.a.y+c.h/2})},sayTurn:'Swinging GitDiscuss on the ring.',
   about:'The jump ring as a real joint. The ring threads both eye loops and twists shut as before, then GitDiscuss drops onto it and swings under its own weight, overshooting and settling at the set angle. Like links in a chain, it splits the bend: the ring turns half the angle in Jarvis\'s loop and GitDiscuss turns the other half in the ring, so you can watch the ring\'s closed seam roll round as the angle changes. <b>Set the angle:</b> drag GitDiscuss\'s nameplate up or down to swing it (Jarvis\'s nameplate still moves the pair), use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓. While you swing it, a copper dial wire appears past its far end with a readout. <b>Detents</b> (15°, 30° or off) are seed beads on that dial: near one, the pendant catches and the bead lights amber, and on letting go it clicks into the nearest one, with the outermost beads (±30°) as the limits. Off, any angle from −40° to +40° holds. The pair shifts up or down to stay on the desktop. <b>Near, ready and release</b> are the jump ring\'s: the loops warm, a ghost ring appears, and clicking the ring swings GitDiscuss level before the ring twists open.',
   sayJoin:'The ring threads both loops and twists shut, then GitDiscuss swings on it and settles at the set angle.',
   sayJoined:'Joined on a pivot ring. Drag GitDiscuss\'s nameplate to swing it; drag Jarvis to move the pair. Click the ring to open it.',
@@ -516,6 +518,57 @@ const JOINS={
    if(jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Caged bead: tap the bead, or press Enter, to open the cage and separate the widgets"><title>Tap the bead to open the cage</title><circle cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(R+6)}" fill="transparent"/><circle class="ringfocus" cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(R+5)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
    return s;
   }
+ },
+ ball:{label:'Caged ball joint',kind:'Angle · ball joint',gap:60,slow:1.9,
+  // Angle setup: GitDiscuss turns about the bead's centre, x0 in from its near edge; no ring offset.
+  angle:{def:-30,swing:.72,x0:30,ring:0,R:444,origin:c=>({x:c.a.x+W+30,y:c.a.y+c.h/2})},
+  about:'The caged bead as a ball-and-socket. The cage forms exactly as in the Caged bead clasp, but here GitDiscuss\'s head pin runs through the bead, so the bead is the ball and Jarvis\'s copper half-cage is the socket. Once the cage twists shut, GitDiscuss tips on the ball and settles at the set angle with one springy overshoot. The brass half-cage and the bead turn with it while the copper socket stays put, so you see the cups slide over each other at the equator and the bead\'s cream latticino band and gold eyes roll round under a highlight that stays still. <b>Set the angle:</b> grab the bead and turn it like a knob, drag GitDiscuss\'s nameplate up or down, use the Angle slider, or press ↑ ↓ on the focused bead or nameplate. While it turns, the brass cage runs hot, the bead brightens and the copper dial wire appears past GitDiscuss\'s far end with a readout; <b>detents</b> (15°, 30° or off) are seed beads on the dial that catch and click. Off, any angle from −40° to +40° holds. The joint keeps its own angle when you switch joins. The pair shifts up or down to stay on the desktop. <b>Near and ready</b> are the caged bead\'s: the spirals warm and cup, and a ghost cage appears. <b>Release:</b> tap the bead without turning it, or press Enter; GitDiscuss swings level first, then the cage untwists and the spirals spring flat.',
+  sayJoin:'The cage closes round the bead and twists shut, then GitDiscuss tips on the ball and settles at the set angle.',
+  sayJoined:'Joined on a caged ball. Turn the bead or drag GitDiscuss\'s nameplate to set the angle; drag Jarvis to move the pair. Tap the bead to open the cage.',
+  sayTurn:'Turning the ball: GitDiscuss\'s cage rolls over the copper socket.',
+  sayRelease:'GitDiscuss swings level, the cage untwists, the bead lifts out and the spirals spring flat.',
+  sayReady:'Ready: release to cage a ball joint between them.',sayNear:'Nearby: the spirals warm and start to cup. Move closer.',
+  end(side,lit,h){return JOINS.cage.end(side,lit,h)},
+  under(){return ''},
+  over(c){
+   // The cage's own beats run in the first 72% of jt; then GitDiscuss's half and the bead swing about the centre.
+   const jt=c.jt,u=Math.min(1,jt/.72),R=cageR(c.h),hg=this.gap/2,ca={x:c.a.x+W+hg,y:c.a.y+c.h/2},cb={x:c.b.x-hg,y:c.b.y+c.h/2};
+   const T=cageT(u),cup=jt===0?.14*model.glow:0,pa=Math.max(cup,T.pull),turn=model.turning&&pivotOn(),th=swingAt(jt);
+   const hot=model.glow>.5&&jt===0||T.twist>0&&T.twist<1,hotB=hot||turn||(jt>.72&&jt<1);
+   const A=cageSide(ca,1,R,pa,T.spin,c.a.x+W-5+7),B=cageSide(cb,-1,R,pa,T.spin,c.b.x+5-7);
+   const mid={x:(ca.x+cb.x)/2,y:(ca.y+cb.y)/2},on=model.a.run||model.b.run,rot=th?` transform="rotate(${f(th)} ${f(ca.x)} ${f(ca.y)})"`:'';let s='';
+   if(c.ghost>0&&jt===0){
+    s+=`<g fill="none" stroke="#f3c96a" stroke-width="1.1" stroke-dasharray="2 2.2" opacity="${f(c.ghost*.85)}"><circle cx="${f(ca.x)}" cy="${f(ca.y)}" r="${f(R)}"/><circle cx="${f(ca.x)}" cy="${f(ca.y)}" r="${f(R-3.2)}" stroke-opacity=".6"/><path d="M${f(ca.x)} ${f(ca.y-R)}V${f(ca.y+R)}M${f(ca.x+R+4)} ${f(ca.y)}A${f(R+4)} ${f(R+4)} 0 0 0 ${f(ca.x+(R+4)*Math.cos(.6))} ${f(ca.y-(R+4)*Math.sin(.6))}" stroke-opacity=".5"/></g>`}
+   if(model.glow>0&&jt===0)for(const q of [ca,cb])s+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${f(R+3)}" fill="#ffb15e" opacity="${f(model.glow*.35)}" filter="url(#soft)"/>`;
+   // Socket (Jarvis, fixed) and ball cup (GitDiscuss, turning): stems, back turns, bead, front turns.
+   s+=wire(A.stem,hot?'hot':'copper',1.9)+`<g${rot}>${wire(B.stem,hotB?'hot':'brass',1.9)}</g>`;
+   s+=wire(A.b,'dim',1.4)+`<g${rot}>${wire(B.b,'dimbrass',1.4)}</g>`;
+   if(T.drop>0){
+    const y=mid.y-64*Math.pow(1-clamp(T.drop/.62),2)+(T.drop>.62?-7*Math.sin(Math.PI*seg(T.drop,.62,.86))-2*Math.sin(Math.PI*seg(T.drop,.86,1)):0);
+    const br=R-3.4,lit=Math.min(1,T.light+(turn?.35:0)),x=mid.x;
+    // The bead turns with GitDiscuss (plus a little tumble as it drops); its highlight stays with the light.
+    const spinB=th+90*(1-T.drop);
+    if(lit>0)s+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(R+8)}" fill="${on?'#ffb15e':'#9fb0c0'}" opacity="${f(.6*lit)}" filter="url(#soft)"/>`;
+    s+=`<g opacity="${f(clamp(T.drop*5))}"><circle cx="${f(x)}" cy="${f(y)}" r="${f(br)}" fill="url(#${on?'st-amber':'st-lab'})" stroke="#24140a" stroke-width=".7"/>`+
+     `<g transform="rotate(${f(spinB)} ${f(x)} ${f(y)})">`+
+      // Latticino band along the bore, a twisted cream thread through it, and two gold eyes.
+      `<path d="M${f(x-br*.94)} ${f(y-br*.12)}Q${f(x)} ${f(y-br*.42)} ${f(x+br*.94)} ${f(y-br*.12)}V${f(y+br*.12)}Q${f(x)} ${f(y+br*.42)} ${f(x-br*.94)} ${f(y+br*.12)}Z" fill="#fff1d6" opacity="${f(.22+.18*lit)}"/>`+
+      `<path d="M${f(x-br*.9)} ${f(y)}C${f(x-br*.45)} ${f(y-br*.3)} ${f(x-br*.15)} ${f(y+br*.3)} ${f(x+br*.2)} ${f(y)}S${f(x+br*.7)} ${f(y-br*.25)} ${f(x+br*.9)} ${f(y)}" fill="none" stroke="#fff6e4" stroke-width=".8" opacity=".75"/>`+
+      `<circle cx="${f(x+br*.1)}" cy="${f(y-br*.58)}" r="${f(br*.17)}" fill="url(#st-gold)" stroke="#3a2408" stroke-width=".4"/><circle cx="${f(x-br*.1)}" cy="${f(y+br*.58)}" r="${f(br*.17)}" fill="url(#st-gold)" stroke="#3a2408" stroke-width=".4"/>`+
+      `<circle cx="${f(x+br*.1)}" cy="${f(y-br*.58)}" r="${f(br*.06)}" fill="#24140a"/><circle cx="${f(x-br*.1)}" cy="${f(y+br*.58)}" r="${f(br*.06)}" fill="#24140a"/>`+
+     `</g>`+
+     `<ellipse cx="${f(x-br*.35)}" cy="${f(y-br*.42)}" rx="${f(br*.34)}" ry="${f(br*.2)}" fill="#fff" opacity=".8" transform="rotate(-20 ${f(x-br*.35)} ${f(y-br*.42)})"/>`+
+     (lit>0?`<circle cx="${f(x)}" cy="${f(y)}" r="${f(br*.45)}" fill="#fff6dc" opacity="${f(.3*lit)}" filter="url(#soft)"/>`:'')+`</g>`;
+   }
+   s+=wire(A.f,hot?'hot':'copper',1.5)+`<g${rot}>${wire(B.f,hotB?'hot':'brass',1.5)}</g>`;
+   s+=`<circle cx="${f(A.pole[0])}" cy="${f(A.pole[1])}" r="2" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".5" opacity="${f(A.poleFront?1:.55)}"/>`+
+    `<g${rot}><circle cx="${f(B.pole[0])}" cy="${f(B.pole[1])}" r="2" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".5" opacity="${f(B.poleFront?1:.55)}"/></g>`;
+   const sp=Math.sin(Math.PI*seg(u,.86,.97));if(sp>.03)s+=sparkle(mid.x,mid.y+R*.97,sp*.75)+sparkle(mid.x,mid.y-R+1,sp*.45);
+   // Where the cups ride over each other at the equator, a glint while the ball turns.
+   if(jt>.72&&(jt<1||turn)){const a=(th/2-90)*Math.PI/180;s+=sparkle(mid.x+R*Math.cos(a)*.98,mid.y+R*Math.sin(a)*.98,turn?.45:.5*Math.sin(Math.PI*seg(jt,.72,1)))}
+   if(jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Caged ball joint: drag round the bead or press the arrow keys to turn GitDiscuss; tap it or press Enter to open the cage"><title>Turn the bead to set the angle; tap it to open the cage</title><circle cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(R+8)}" fill="transparent" style="cursor:grab;touch-action:none"/><circle class="ringfocus" cx="${f(mid.x)}" cy="${f(mid.y)}" r="${f(R+5)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+   return s;
+  }
  }
 };
 /* ---------- Caged bead geometry ---------- */
@@ -583,19 +636,20 @@ function coilGeo(c){
 const coilT=(jt,i)=>({leap:ease(seg(jt,.12+.05*i,.27+.05*i)),taut:ease(seg(jt,.3+.04*i,.48)),wrap:seg(jt,.5+.05*i,.76+.05*i),tail:backOut(seg(jt,.78+.04*i,.86+.04*i)),heat:seg(jt,.86+.03*i,.97+.01*i)});
 /* ---------- Pivot geometry ---------- */
 // Displayed swing in degrees: level until the ring is shut, then a damped swing that lands exactly on model.angle.
+// Shared by every angled join (JOINS[...].angle): Jump-ring pivot and Caged ball joint.
 function swingAt(jt){
- if(model.join!=='pivot')return 0;
- const u=seg(jt,.68,1);if(u<=0)return 0;const k=Math.pow(1-u,2);
+ const A=J().angle;if(!A)return 0;
+ const u=seg(jt,A.swing,1);if(u<=0)return 0;const k=Math.pow(1-u,2);
  return model.angle*(1-k*Math.cos(3*Math.PI*u))+6*k*Math.sin(2*Math.PI*u);
 }
 // GitDiscuss's vertical extent relative to Jarvis's top edge at angle th.
 function pivotSpan(th,h){
- const r=th*Math.PI/180,ly=h/2+28*Math.sin(r/2);let lo=0,hi=h;
- for(const x of [14,W+14])for(const y of [-h/2,h/2]){const v=ly+x*Math.sin(r)+y*Math.cos(r);lo=Math.min(lo,v);hi=Math.max(hi,v)}
+ const A=J().angle||JOINS.pivot.angle,r=th*Math.PI/180,ly=h/2+A.ring*Math.sin(r/2);let lo=0,hi=h;
+ for(const x of [A.x0,W+A.x0])for(const y of [-h/2,h/2]){const v=ly+x*Math.sin(r)+y*Math.cos(r);lo=Math.min(lo,v);hi=Math.max(hi,v)}
  return [lo,hi];
 }
 const fitY=(y,th,h)=>{const [lo,hi]=pivotSpan(th,h);return clamp(y,46-lo,590-hi)};
-const pivotOn=()=>model.join==='pivot'&&model.jt===1;
+const pivotOn=()=>!!J().angle&&model.jt===1;
 // With detents on, the outermost beads are the limits.
 const lim=()=>model.detent?Math.floor(40/model.detent)*model.detent:40;
 const nearestDetent=v=>{const d=model.detent;return d?clamp(Math.round(v/d)*d,-lim(),lim()):v};
@@ -606,7 +660,7 @@ function snapAngle(raw){
  const n=nearestDetent(raw);return Math.abs(raw-n)<d*.3?n:raw;
 }
 function setAngle(v){
- model.angle=clamp(v,-lim(),lim());
+ model.angle=clamp(v,-lim(),lim());if(J().angle)model.angles[model.join]=model.angle;
  if(pivotOn()){const y=fitY(model.a.y,model.angle,ctx().h);model.a.y=model.b.y=y}
  render();
 }
@@ -616,12 +670,17 @@ function settleAngle(){
  const tok=++settleTok,t0=performance.now(),ms=reduce.matches?0:260;
  (function step(now){if(tok!==settleTok)return;const t=ms?clamp((now-t0)/ms):1;setAngle(lerp(from,to,backOut(t)));if(t<1)requestAnimationFrame(step);else setAngle(to)})(t0);
 }
+function startTurn(d,p){
+ const L=J().angle.origin(ctx());Object.assign(d,{mode:'angle',L,psi0:Math.atan2(p.y-L.y,p.x-L.x),th0:model.angle,raw:model.angle,last:p,group:false});
+ ++settleTok;clearTimeout(turnTimer);if(!d.tap){model.turning=true;say(J().sayTurn)}render();
+}
+function stepAngle(dir){const st=Math.min(model.detent||5,lim());++settleTok;flashTurning();setAngle((Math.round(model.angle/st)+dir)*st);say('GitDiscuss at '+$('#angleOut').textContent+'.')}
 function flashTurning(){model.turning=true;clearTimeout(turnTimer);turnTimer=setTimeout(()=>{model.turning=false;render()},900)}
 // The dial: a copper wire just past GitDiscuss's far end, seed beads at the detents, a hot pointer and a readout tag.
 function dialSvg(c){
  if(!pivotOn())return '';
- const lx=c.a.x+W+14,ly=c.a.y+c.h/2,R=424,cur=model.angle,det=model.detent;
- const P=(a,r=R)=>{const t=a*Math.PI/180;return{x:lx+28*Math.cos(t/2)+r*Math.cos(t),y:ly+28*Math.sin(t/2)+r*Math.sin(t)}};
+ const A=J().angle,O=A.origin(c),R=A.R,cur=model.angle,det=model.detent;
+ const P=(a,r=R)=>{const t=a*Math.PI/180;return{x:O.x+A.ring*Math.cos(t/2)+r*Math.cos(t),y:O.y+A.ring*Math.sin(t/2)+r*Math.sin(t)}};
  let d='';for(let a=-40;a<=40;a+=2){const p=P(a);d+=(a>-40?'L':'M')+f(p.x)+' '+f(p.y)}
  let s=`<path d="${d}" transform="translate(2 5)" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="3"/>`+wire(d,'copper',1.4);
  for(const a of [-40,40]){const p=P(a);s+=wire(circ(p.x,p.y,3.2),'copper',1.3)}
@@ -629,7 +688,7 @@ function dialSvg(c){
   if(on)s+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="10" fill="#ffb15e" opacity=".7" filter="url(#soft)"/>`;
   s+=strandItem({k:'bead',r:on?4.8:3.6,stone:on?'amber':'lab'},p.x,p.y)}}
  else for(let a=-40;a<=40;a+=10){const p=P(a);s+=strandItem({k:'seed',r:2,stone:'gold'},p.x,p.y)}
- const p0=P(cur,406),p1=P(cur,R+8);s+=wire(`M${f(p0.x)} ${f(p0.y)}L${f(p1.x)} ${f(p1.y)}`,'hot',1.3);
+ const p0=P(cur,R-18),p1=P(cur,R+8);s+=wire(`M${f(p0.x)} ${f(p0.y)}L${f(p1.x)} ${f(p1.y)}`,'hot',1.3);
  const t=P(cur,R+34),tx=Math.min(t.x,1168),ty=clamp(t.y,60,585),lab=(cur>0?'+':cur<0?'−':'')+Math.abs(Math.round(cur))+'°';
  s+=`<rect x="${f(tx-24)}" y="${f(ty-11)}" width="48" height="22" rx="6" fill="url(#st-slab)"/>`+wire(rrect(tx-24,ty-11,48,22,6),'copper',1.1)+
   `<text x="${f(tx)}" y="${f(ty+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-size="14" fill="#f2b866">${lab}</text>`;
@@ -1047,7 +1106,7 @@ function treeRender(el,svg){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -1056,8 +1115,8 @@ function separatePose(){
 }
 function joinedPose(fixed='a'){
  const g=J().gap;
- if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24),by=model.join==='pivot'?fitY(fitY(model.b.y,peakSwing(),ctx().h),model.angle,ctx().h):model.b.y;return{a:{x:bx-W-g,y:by},b:{x:bx,y:by}}}
- let ax=clamp(model.a.x,24,1200-2*W-g-24),ay=model.join==='pivot'?fitY(fitY(model.a.y,peakSwing(),ctx().h),model.angle,ctx().h):model.a.y;return{a:{x:ax,y:ay},b:{x:ax+W+g,y:ay}};
+ if(fixed==='b'){let bx=clamp(model.b.x,W+g+24,1200-W-24),by=J().angle?fitY(fitY(model.b.y,peakSwing(),ctx().h),model.angle,ctx().h):model.b.y;return{a:{x:bx-W-g,y:by},b:{x:bx,y:by}}}
+ let ax=clamp(model.a.x,24,1200-2*W-g-24),ay=J().angle?fitY(fitY(model.a.y,peakSwing(),ctx().h),model.angle,ctx().h):model.a.y;return{a:{x:ax,y:ay},b:{x:ax+W+g,y:ay}};
 }
 function setJt(t){
  model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.5));
@@ -1110,9 +1169,9 @@ function render(){
   if(small)clampC();
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=f(h)+'px';
   if(id==='b'){
-   // Pivot: GitDiscuss turns the full swing about its own eye loop, which rides half the swing round the ring.
-   const th=swingAt(model.jt),ph=th*Math.PI/360;
-   el.style.transformOrigin=`-14px ${f(h/2)}px`;el.style.transform=th?`translate(${f(28*Math.cos(ph)-28)}px,${f(28*Math.sin(ph))}px) rotate(${f(th)}deg)`:'';
+   // Angled joins: GitDiscuss turns the full swing about a point x0 out from its near edge; on the pivot that point rides half the swing round the ring.
+   const A=j.angle||{x0:0,ring:0},th=swingAt(model.jt),ph=th*Math.PI/360;
+   el.style.transformOrigin=`-${A.x0}px ${f(h/2)}px`;el.style.transform=th?`translate(${f(A.ring*Math.cos(ph)-A.ring)}px,${f(A.ring*Math.sin(ph))}px) rotate(${f(th)}deg)`:'';
   }
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
   if(small&&model.g>-1){treeRender(el,svg);continue}
@@ -1134,10 +1193,10 @@ function render(){
  const focused=document.activeElement&&document.activeElement.id==='joinHit';
  $('#over').innerHTML=j.over(c);
  $('#dial').innerHTML=dialSvg(c);$('#dial').style.opacity=model.turning&&pivotOn()?1:0;
- $('#angleRow').style.display=model.join==='pivot'?'':'none';
+ $('#angleRow').style.display=j.angle?'':'none';
  const ang=Math.round(model.angle);$('#angle').value=ang;$('#angleOut').textContent=(ang>0?'+':ang<0?'−':'')+Math.abs(ang)+'°';
  $('#detent').textContent=model.detent?'Detents '+model.detent+'°':'Detents off';$('#detent').setAttribute('aria-pressed',String(!!model.detent));
- const hit=$('#joinHit');if(hit){hit.onclick=j.pull?(e=>{if(e.detail===0)doSeparate()}):doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}};if(focused)hit.focus()}
+ const hit=$('#joinHit');if(hit){hit.onclick=j.pull||model.join==='ball'?(e=>{if(e.detail===0)doSeparate()}):doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}else if(model.join==='ball'){const k={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(k){e.preventDefault();stepAngle(k)}}};if(focused)hit.focus()}
  // Controls reflect state
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
@@ -1147,7 +1206,7 @@ function render(){
  $$('#sizeRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.size===model.size)));
  $('#grow').value=Math.round(model.g*100);$('#growOut').textContent=(model.g>=0?'+':'')+model.g.toFixed(2);
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
- const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()+(model.join==='pivot'?' · '+$('#angleOut').textContent:'')};
+ const ph={separate:'Separate · two pendants',joining:'Joining · '+Math.round(model.jt*100)+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angle?' · '+$('#angleOut').textContent:'')};
  $('#phase').textContent=(drag&&drag.unwind?(model.join==='trunk'?'Untwisting · ':'Unwinding · ')+Math.round(drag.deg*100)+'%':drag&&drag.state==='ready'?'Ready · release to join':drag&&drag.state==='near'?'Nearby · move closer':ph[state])+(model.st>.5?' · shaded':'')+(model.g>-1?' · Checks: '+(SIZES.find(x=>x[0]===model.size)||[0,'growing'])[1].toLowerCase():'');
 }
 
@@ -1160,7 +1219,7 @@ function options(row,set,key,aboutEl){
 }
 function pick(key,id){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  if(key==='morph')model.morph=id;
  describe();render();
@@ -1202,6 +1261,11 @@ stage.addEventListener('pointerdown',e=>{
   model.path={s:separatePose(),j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}};
   drag={unwind:true,x0:p.x,y0:p.y,deg:0,moved:false};stage.setPointerCapture(e.pointerId);say(model.join==='trunk'?'Untwisting: pull further to let go.':'Unwinding: pull further to let go.');render();return;
  }
+ // Caged ball joint: grabbing the bead turns it (and GitDiscuss); a tap without turning opens the cage.
+ if(e.button===0&&pivotOn()&&model.join==='ball'&&e.target.closest('#joinHit')){
+  e.preventDefault();const p=local(e);drag={id:'b',start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c},angle:model.angle},state:'idle',tap:true,moved:false,inner:true};
+  startTurn(drag,p);stage.setPointerCapture(e.pointerId);return;
+ }
  const g=e.target.closest('[data-drag]');if(!g||e.button!==0)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
@@ -1209,8 +1273,7 @@ stage.addEventListener('pointerdown',e=>{
  drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c},angle:model.angle},group:model.jt===1&&id!=='c',state:'idle'};
  if(id==='b'&&pivotOn()){
   // Swing GitDiscuss about Jarvis's eye loop rather than moving the pair.
-  const L={x:model.a.x+W+14,y:model.a.y+ctx().h/2};Object.assign(drag,{mode:'angle',L,psi0:Math.atan2(p.y-L.y,p.x-L.x),th0:model.angle,raw:model.angle,last:p,group:false});
-  ++settleTok;clearTimeout(turnTimer);model.turning=true;say('Swinging GitDiscuss on the ring.');render();
+  startTurn(drag,p);
  }
  stage.setPointerCapture(e.pointerId);
 });
@@ -1220,8 +1283,11 @@ stage.addEventListener('pointermove',e=>{
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
  if(drag.mode==='angle'){
   // The pair may have shifted to stay on stage, so measure from where Jarvis's loop is now.
-  const L={x:model.a.x+W+14,y:model.a.y+ctx().h/2};
-  if(L.y!==drag.L.y){drag.th0=drag.raw;drag.psi0=Math.atan2(drag.last.y-L.y,drag.last.x-L.x);drag.L=L}
+  const L=J().angle.origin(ctx());
+  // A bead grab is a tap until it moves; right over the bead's centre the turn is re-anchored rather than jumping.
+  if(drag.tap&&!drag.moved){if(Math.hypot(p.x-drag.start.x,p.y-drag.start.y)<=4){drag.last=p;return}drag.moved=true;model.turning=true;say(J().sayTurn)}
+  if(Math.hypot(p.x-L.x,p.y-L.y)<8){drag.inner=true;drag.last=p;return}
+  if(L.y!==drag.L.y||drag.inner){drag.th0=drag.raw;drag.psi0=Math.atan2((drag.inner?p:drag.last).y-L.y,(drag.inner?p:drag.last).x-L.x);drag.L=L;drag.inner=false}
   let dp=Math.atan2(p.y-L.y,p.x-L.x)-drag.psi0;dp=Math.atan2(Math.sin(dp),Math.cos(dp));
   drag.raw=clamp(drag.th0+dp*180/Math.PI,-lim(),lim());drag.last=p;
   const was=model.angle;setAngle(snapAngle(drag.raw));
@@ -1241,18 +1307,18 @@ stage.addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.unwind){if(!d.moved||d.deg>.5)doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;say(J().sayJoined)}});return}
- if(d.mode==='angle'){model.turning=false;settleAngle();render();say(J().sayJoined);return}
+ if(d.mode==='angle'){model.turning=false;if(d.tap&&!d.moved){++settleTok;doSeparate();return}settleAngle();render();say(J().sayJoined);return}
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
 }
-function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
+function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;if(J().angle)model.angles[model.join]=s.angle;model.turning=false;model.glow=model.ghost=0;render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const k={ArrowLeft:[-10,0],ArrowRight:[10,0],ArrowUp:[0,-10],ArrowDown:[0,10]}[e.key];if(!k)return;e.preventDefault();
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
- if(id==='b'&&pivotOn()&&k[1]){const st=Math.min(model.detent||5,lim());++settleTok;flashTurning();setAngle((Math.round(model.angle/st)+Math.sign(k[1]))*st);say('GitDiscuss at '+$('#angleOut').textContent+'.');return}
+ if(id==='b'&&pivotOn()&&k[1]){stepAngle(Math.sign(k[1]));return}
  const bottom=600-(model.st>.5?HS:H)-14;
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=pivotOn()?fitY(model.a.y+k[1],model.angle,ctx().h):clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else if(id==='c'){model.c.x+=k[0];model.c.y+=k[1];clampC();model.cMoved=true}
