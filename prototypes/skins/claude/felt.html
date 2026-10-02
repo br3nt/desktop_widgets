@@ -805,6 +805,113 @@ function turnBlocks(id,d){
  const F=blockFaces(id)[blkPage(id)];say(`${name}: ${F.l.toLowerCase()} · ${F.num?F.num+' '+F.word:F.text}.`);
 }
 
+/* ---------- Bedtime shade ---------- */
+// The cushion is put to bed in a doll's bed, seen side on. It lets its stuffing out, a walnut headboard and footboard pop up
+// from the table, a ticking pillow is propped against the headboard and the cushion lies down with its head end on it.
+// A patchwork quilt is pulled up over it from behind the footboard, the sheet is turned down over the quilt's top edge, and the
+// name and key value are stitched onto the quilt's cream signature block, the way quilters sign a block. Three felt Zs drift up.
+// Getting up runs the other way: the sheet is thrown back, the quilt is flung off, the bed folds away and the cushion refills.
+const BED={a:{q:['#d0912f','#a1631a','#ead6ab','#7d8f5a'],ink:'#6b2f0c',ink2:'#b88250',bind:'#6e3810',heart:'#b3402c'},
+ b:{q:['#3f807a','#2a5f5a','#dcd2b4','#b4524a'],ink:'#173f3b',ink2:'#6f9e98',bind:'#1d433f',heart:'#e0a63a'},
+ c:{q:['#88506f','#653953','#e8d5c6','#c99a3e'],ink:'#4a1f3c',ink2:'#a77892',bind:'#43203a',heart:'#8fbf4f'}};
+function bedParts(st,small){
+ const H0=small?CH:H,HF=small?48:58,un=model.shDir===0,u=1-st;
+ let dfl,sq=0,fib=0,frame,lie,pil,quilt,sheet,emb,zz=0,off=0,bounce=0;
+ if(!un){dfl=ease(seg(st,.04,.24));sq=Math.sin(Math.PI*seg(st,.22,.3))*.08;const fb=seg(st,.22,.36);fib=fb>0&&fb<1?fb:0;
+  lie=ease(seg(st,.28,.4));frame=backOut(seg(st,.34,.46));pil=backOut(seg(st,.38,.48));quilt=ease(seg(st,.48,.7));sheet=backOut(seg(st,.7,.78));emb=seg(st,.76,.9);zz=seg(st,.78,1)}
+ else{sheet=1-ease(seg(u,0,.1));off=ease(seg(u,.08,.34));quilt=1;emb=1;pil=1-ease(seg(u,.3,.4));frame=1-ease(seg(u,.34,.48));lie=1-ease(seg(u,.44,.56));
+  dfl=1-ease(seg(u,.56,.8));const k=seg(u,.78,.98);bounce=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.5)*.08:0}
+ return{H0,HF,un,dfl,sq,fib,frame,lie,pil,quilt,sheet,emb,zz,off,bounce,h:Math.round(lerp(H0,HF,dfl))};
+}
+// Layout of the bed, from the strip's final height so nothing moves once it has landed.
+function bedGeo(w,small){
+ const HF=small?48:58,hbw=small?14:18,fbw=small?12:15,pw=small?34:44,hb0=5,hb1=hb0+hbw,fb1=w-5,fb0=fb1-fbw;
+ const rail=HF-(small?8:9),cx0=hb1+pw*.45,cy0=small?13:15,qx0=cx0+(small?20:24),qx1=fb0+3,qTop=small?9:10,qBot=rail+3,sw=small?10:12,ft=small?20:24;
+ const bx0=qx0+sw+(small?8:10),bx1=fb0-(small?9:11),bh=small?22:26,by0=Math.round((qTop+qBot-bh)/2);
+ return{HF,hbw,fbw,pw,hb0,hb1,fb0,fb1,rail,cx0,cy0,qx0,qx1,qTop,qBot,sw,ft,bx0,bx1,bh,by0,cs:small?11:13};
+}
+function bedDraw(id,w,h,small,st){
+ const P=bedParts(st,small),s=SKIN[id],B=BED[id],G=bedGeo(w,small);
+ const wrap=t=>{if(P.sq>1e-4)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
+  return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${t}</g>`:t};
+ // Fibres shaken loose when the deflated cushion lands.
+ let fibres='';
+ if(P.fib)for(const cx of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
+  fibres+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
+ if(P.frame<=0&&P.lie<=0)return wrap(casing(id,w,h)+fibres);
+ const knob=(x,y,r)=>`<circle cx="${f(x+.6)}" cy="${f(y+1.2)}" r="${f(r)}" fill="#000" opacity=".35"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="url(#bdk-${id})" stroke="#3a210c" stroke-width=".5"/><circle cx="${f(x-r*.35)}" cy="${f(y-r*.4)}" r="${f(r*.28)}" fill="#fff" opacity=".45"/>`;
+ let t=`<defs><radialGradient id="bdk-${id}" cx=".36" cy=".3" r=".8"><stop stop-color="#f1cf98"/><stop offset=".55" stop-color="#9a6434"/><stop offset="1" stop-color="#4a2a10"/></radialGradient>`+
+  `<linearGradient id="bdp-${id}" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#1d0f06" stop-opacity=".22"/><stop offset=".35" stop-color="#1d0f06" stop-opacity="0"/></linearGradient>`+
+  `<linearGradient id="bdg-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6e6" stop-opacity=".18"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#1a0d05" stop-opacity=".35"/></linearGradient></defs>`;
+ // The headboard: a walnut felt panel with a domed top, a stitched heart and a turned knob, popping up from the table.
+ const hbTop=small?6:7,fr=P.frame,up=(o,y0)=>Math.abs(fr-1)<1e-3?o:`<g transform="translate(0 ${y0}) scale(1 ${f(Math.max(.02,fr)*1000)/1000}) translate(0 ${-y0})">${o}</g>`;
+ if(fr>0){const hb=rr4(G.hb0,hbTop,G.hbw,G.HF-hbTop-2,[G.hbw/2,G.hbw/2,2,2]),hx=G.hb0+G.hbw/2,hy=hbTop+(small?10:13),hs=small?.8:1;
+  t+=up(`<path d="${hb}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(1 1.6)"/><path d="${hb}" fill="#6b4426" filter="url(#g-${id})"/>`+
+   `<path d="${rr4(G.hb0+3,hbTop+3,G.hbw-6,G.HF-hbTop-8,[G.hbw/2-3,G.hbw/2-3,1,1])}" fill="none" stroke="#f1d9b0" stroke-opacity=".6" stroke-width=".9" stroke-dasharray="2.4 2"/>`+
+   `<path d="M${f(hx)} ${f(hy+4*hs)}C${f(hx-6*hs)} ${f(hy-.5*hs)} ${f(hx-3.4*hs)} ${f(hy-4.6*hs)} ${f(hx)} ${f(hy-1.8*hs)}C${f(hx+3.4*hs)} ${f(hy-4.6*hs)} ${f(hx+6*hs)} ${f(hy-.5*hs)} ${f(hx)} ${f(hy+4*hs)}Z" fill="${B.heart}" stroke="#2a1608" stroke-opacity=".4" stroke-width=".6"/>`+
+   knob(hx,hbTop-1,small?2.6:3.2),G.HF)}
+ // The pillow, propped against the headboard: puffed cream ticking with a running stitch round it.
+ if(P.pil>0){const px0=G.hb1-3,px1=G.cx0+(small?12:15),py0=small?4:5,py1=G.rail,pcx=(px0+px1)/2,pcy=(py0+py1)/2,k=P.pil;
+  const pd=`M${f(px0+4)} ${f(py0+3)}Q${f(pcx)} ${f(py0-2)} ${f(px1-4)} ${f(py0+3)}Q${f(px1+2)} ${f(pcy)} ${f(px1-4)} ${f(py1-2)}Q${f(pcx)} ${f(py1+1.5)} ${f(px0+4)} ${f(py1-2)}Q${f(px0-1)} ${f(pcy)} ${f(px0+4)} ${f(py0+3)}Z`;
+  let tk='';for(let x=px0+4;x<px1-2;x+=small?3.6:4.2)tk+=`M${f(x)} ${f(py0)}V${f(py1)}`;
+  t+=`<g transform="translate(${f(pcx)} ${f(py1)}) scale(${f((.7+.3*k)*1000)/1000} ${f(k*1000)/1000}) translate(${f(-pcx)} ${f(-py1)})">`+
+   `<clipPath id="bdpc-${id}"><path d="${pd}"/></clipPath><path d="${pd}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1 1.5)"/><path d="${pd}" fill="#efe5cf" filter="url(#g-${id})"/>`+
+   `<g clip-path="url(#bdpc-${id})"><path d="${tk}" stroke="#5b7aa6" stroke-opacity=".55" stroke-width=".9"/><rect x="${f(px0)}" y="${f(py0-2)}" width="${f(px1-px0)}" height="${f(py1-py0+4)}" fill="url(#bdp-${id})"/></g>`+
+   `<path d="M${f(px0+6)} ${f(py0+5)}Q${f(pcx)} ${f(py0+1)} ${f(px1-6)} ${f(py0+5)}" fill="none" stroke="#a89878" stroke-width=".8" stroke-dasharray="2 1.8"/></g>`}
+ // The cushion lies down: the deflated strip draws in to its place in the bed, head end on the pillow.
+ {const l=P.lie,X0=lerp(0,G.cx0,l),Y0=lerp(0,G.cy0,l),X1=lerp(w,G.qx1,l),Y1=lerp(h,G.rail+1,l);
+  t+=`<g transform="translate(${f(X0)} ${f(Y0)})">${casing(id,X1-X0,Y1-Y0)}</g>`}
+ // The side rail, in front of the cushion's foot.
+ if(fr>0){const rh=small?6:7,rail=rr4(G.hb1-2,G.rail,G.fb0-G.hb1+4,rh,[2,2,2,2]);
+  t+=up(`<path d="${rail}" fill="#5c391f" filter="url(#g-${id})"/><path d="M${f(G.hb1+2)} ${f(G.rail+rh/2)}H${f(G.fb0-2)}" stroke="#f1d9b0" stroke-opacity=".45" stroke-width=".8" stroke-dasharray="3 2.4"/>`,G.HF)}
+ // The quilt, pulled up from behind the footboard. Patches, binding, ties and the signature block all travel with it.
+ // Its foot drapes down behind the footboard; while it is pulled up it also rises from behind the board.
+ if(P.quilt>0&&P.off<1){const{qx0,qx1,qTop,qBot,cs,fb0,ft}=G,dx=(qx1-qx0)*(1-P.quilt),dy=(ft+2-qTop)*(1-P.quilt),r=small?7:9;
+  const qd=`M${f(qx0)} ${f(qTop+r)}Q${f(qx0)} ${f(qTop)} ${f(qx0+r)} ${f(qTop)}H${f(fb0-6)}Q${f(qx1)} ${f(qTop)} ${f(qx1)} ${f(ft+6)}V${f(qBot)}`+(()=>{let d='';const n=Math.ceil((qx1-qx0)/14);for(let i=n;i>0;i--){const x=qx0+(i-.5)*(qx1-qx0)/n;d+=`Q${f(x)} ${f(qBot+2.6)} ${f(qx0+(i-1)*(qx1-qx0)/n)} ${f(qBot)}`}return d})()+'Z';
+  let pt='',sm='',ties='';const ni=Math.ceil((qx1-qx0)/cs),nj=Math.ceil((qBot+3-qTop)/cs);
+  for(let i=0;i<ni;i++)for(let j=0;j<nj;j++){const c=(i%3===1&&j%2===1)?3:(i+j)%2?2:((i>>1)+j)%2?1:0;pt+=`<rect x="${f(qx0+i*cs)}" y="${f(qTop+j*cs)}" width="${cs+.3}" height="${cs+.3}" fill="${B.q[c]}"/>`}
+  for(let i=1;i<ni;i++)sm+=`M${f(qx0+i*cs)} ${f(qTop+1)}V${f(qBot)}`;for(let j=1;j<nj;j++)sm+=`M${f(qx0+1)} ${f(qTop+j*cs)}H${f(qx1)}`;
+  const inBlock=(x,y)=>x>G.bx0-4&&x<G.bx1+4&&y>G.by0-4&&y<G.by0+G.bh+4;
+  for(let i=1;i<ni;i++)for(let j=1;j<nj;j++){const x=qx0+i*cs,y=qTop+j*cs;if((i+j)%2||inBlock(x,y)||y>qBot-2)continue;ties+=`M${f(x-1.4)} ${f(y-1.4)}l2.8 2.8m0-2.8l-2.8 2.8`}
+  let q=`<clipPath id="bdq-${id}"><path d="${qd}"/></clipPath><path d="${qd}" fill="#000" opacity=".45" filter="url(#sh)" transform="translate(-1 2)"/>`+
+   `<g clip-path="url(#bdq-${id})"><g filter="url(#g-${id})">${pt}</g><path d="${sm}" stroke="#fbf0d6" stroke-opacity=".5" stroke-width=".8" stroke-dasharray="2 1.7"/>`+
+   `<path d="${ties}" stroke="#fbf0d6" stroke-width="1" stroke-linecap="round"/><rect x="${f(qx0)}" y="${f(qTop)}" width="${f(qx1-qx0)}" height="${f(qBot+3-qTop)}" fill="url(#bdg-${id})"/></g>`+
+   `<path d="${qd}" fill="none" stroke="${B.bind}" stroke-width="2.4" stroke-opacity=".9"/><path d="M${f(qx0+2.6)} ${f(qTop+r)}Q${f(qx0+2.6)} ${f(qTop+2.6)} ${f(qx0+r)} ${f(qTop+2.6)}H${f(fb0-8)}" fill="none" stroke="#fbf0d6" stroke-opacity=".55" stroke-width=".8" stroke-dasharray="2.2 1.8"/>`;
+  // The signature block: a cream cotton square appliquéd on, with the name in satin stitch and the value in cross-stitch.
+  const bw=G.bx1-G.bx0,bcy=G.by0+G.bh/2;
+  q+=`<rect x="${f(G.bx0)}" y="${f(G.by0+1.4)}" width="${f(bw)}" height="${G.bh}" rx="2.5" fill="#000" opacity=".35" filter="url(#sh)"/>`+
+   `<rect x="${f(G.bx0)}" y="${G.by0}" width="${f(bw)}" height="${G.bh}" rx="2.5" fill="#f6ecd6"/><rect x="${f(G.bx0)}" y="${G.by0}" width="${f(bw)}" height="${G.bh}" rx="2.5" fill="url(#weave)" opacity=".6"/>`+
+   `<rect x="${f(G.bx0+2.2)}" y="${f(G.by0+2.2)}" width="${f(bw-4.4)}" height="${f(G.bh-4.4)}" rx="1.6" fill="none" stroke="${B.ink2}" stroke-width=".9" stroke-dasharray="2.2 1.8"/>`;
+  if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?14:16,c=small?1.7:2.1,wf=small?11:12.5;
+   const x0=G.bx0+(small?8:10),x1=G.bx1-(small?8:10),xp=xpaths(dt.num,c),nw=measure(nm,`italic ${nf}px Georgia,serif`),ww=measure(dt.word,`italic ${wf}px Georgia,serif`);
+   const word=nw+12+xp.w+5+ww<=x1-x0,vw=xp.w+(word?5+ww:0),vx=x1-vw,vy=bcy-3.5*c;
+   q+=`<clipPath id="bde-${id}"><rect x="${f(x0-4)}" y="${f(G.by0)}" width="${f((x1-x0+8)*P.emb)}" height="${G.bh}"/></clipPath><g clip-path="url(#bde-${id})">`+
+    `<text x="${f(x0)}" y="${f(bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="${B.ink}">${nm}</text>`+
+    `<text x="${f(x0)}" y="${f(bcy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="url(#satin)">${nm}</text>`+
+    `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".2" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="${B.ink2}"/><path d="${xp.d2}" stroke="${B.ink}"/></g>`+
+    (word?`<text x="${f(vx+xp.w+5)}" y="${f(bcy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="${B.ink}">${dt.word}</text>`:'')+'</g>'}
+  // The turned-down sheet, folding over the quilt's top edge from the head end, with a scalloped hem and a feather stitch.
+  if(P.sheet>.01){const x=qx0-2,sw=G.sw*P.sheet,y0=qTop-1,y1=qBot+1,rs=Math.min(r,sw);let sc=`M${f(x)} ${f(y0+rs)}Q${f(x)} ${f(y0)} ${f(x+rs)} ${f(y0)}H${f(x+sw)}`;const n=Math.max(3,Math.round((y1-y0)/6));
+   for(let i=0;i<n;i++){const ya=y0+i*(y1-y0)/n,yb=ya+(y1-y0)/n;sc+=`Q${f(x+sw+2.4*P.sheet)} ${f((ya+yb)/2)} ${f(x+sw)} ${f(yb)}`}sc+=`H${f(x)}Z`;
+   let fs='';for(let i=0;i<n;i++){const ya=y0+(i+.5)*(y1-y0)/n,xm=x+sw*.55;fs+=`M${f(xm-2*P.sheet)} ${f(ya-2)}L${f(xm)} ${f(ya+1)}L${f(xm+2*P.sheet)} ${f(ya-2)}`}
+   q+=`<path d="${sc}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1.6 .8)"/><path d="${sc}" fill="#f8f1e2"/><path d="${sc}" fill="url(#weave)" opacity=".5"/>`+
+    `<path d="M${f(x+.8)} ${f(y0)}V${f(y1)}" stroke="#1d0f06" stroke-opacity=".18" stroke-width="1.4"/><path d="${fs}" fill="none" stroke="${B.ink2}" stroke-width=".8" stroke-linecap="round" stroke-linejoin="round"/>`}
+  // Pulled up from behind the footboard; flung off up and away when getting up.
+  const qcx=(qx0+qx1)/2,qcy=(qTop+qBot)/2;
+  t+=P.off>0?`<g opacity="${f(1-P.off)}" transform="translate(${f(P.off*34)} ${f(-P.off*20)}) rotate(${f(P.off*9)} ${f(qcx)} ${f(qcy)})">${q}</g>`:
+   `<clipPath id="bdx-${id}"><rect x="-40" y="-60" width="${f(fb0+G.fbw/2+40)}" height="${G.HF+60}"/></clipPath><g clip-path="url(#bdx-${id})"><g transform="translate(${f(dx)} ${f(dy)})">${q}</g></g>`}
+ // The footboard, in front of the quilt's foot, lower than the headboard.
+ if(fr>0){const ft=G.ft,fb=rr4(G.fb0,ft,G.fbw,G.HF-ft-2,[G.fbw/2,G.fbw/2,2,2]),fx=G.fb0+G.fbw/2;
+  t+=up(`<path d="${fb}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(1 1.6)"/><path d="${fb}" fill="#6b4426" filter="url(#g-${id})"/>`+
+   `<path d="${rr4(G.fb0+3,ft+3,G.fbw-6,G.HF-ft-8,[G.fbw/2-3,G.fbw/2-3,1,1])}" fill="none" stroke="#f1d9b0" stroke-opacity=".6" stroke-width=".9" stroke-dasharray="2.4 2"/>`+knob(fx,ft-1,small?2.4:2.9),G.HF)}
+ // Three felt Zs drift up off the pillow once the sheet is turned down, and fade.
+ if(P.zz>0&&P.zz<1)for(let i=0;i<3;i++){const p=seg(P.zz,i*.2,i*.2+.6);if(p<=0||p>=1)continue;
+  const zs=(small?4:5)+i*1.4,x=G.cx0+(small?4:6)+p*(16+i*7)+Math.sin(p*7+i)*2,y=G.cy0-2-p*(20+i*6),o=Math.sin(Math.PI*p);
+  const zd=`M${f(x-zs/2)} ${f(y-zs/2)}H${f(x+zs/2)}L${f(x-zs/2)} ${f(y+zs/2)}H${f(x+zs/2)}`;
+  t+=`<g opacity="${f(o)}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${zd}" stroke="#2a1608" stroke-opacity=".45" stroke-width="${f(zs*.42+1)}" transform="translate(.5 .9)"/><path d="${zd}" stroke="#f3e6c8" stroke-width="${f(zs*.42)}"/><path d="${zd}" stroke="${B.ink2}" stroke-width=".6" stroke-dasharray="1.2 1.2"/></g>`}
+ return wrap(t+fibres);
+}
+
 /* ---------- Zipper geometry ---------- */
 const zTop=h=>EDGE+Math.min(14,(h-2*EDGE)*.3);
 // Where the slider sits (widget-local y) and how far the two halves lean apart, from join progress.
@@ -2110,7 +2217,7 @@ JOINS.bunting={label:'Bunting',kind:'Bridge',gap:BU.gap,ms:3800,msDrag:3400,relM
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -2140,7 +2247,12 @@ const SHADES={
   about:'The rotating-blocks toy (cubes on a rod that you turn to match the pictures) in stuffed felt. The cotton display is put away and the stuffing lets out to a strip, landing with a squash that shakes fibres loose. The name band gathers into a tab at the left end and the name is satin-stitched on it. Two felt loops are sewn on, a wooden dowel with turned knobs is pushed in through them from the right, and two soft square blocks puff up on it one after the other. <b>Each face is one of the widget\'s screens</b>, in its own felt: mustard for the first (Status, Queue, Passed), duck-egg for the second (Task, Thread, Waiting), rose for the third (Log, Run). The left block names the screen in satin stitch; the right one carries its key value on a cotton patch, cross-stitched where it is a number. The blocks then give one quarter turn onto the current screen, the label block first and the value block a beat behind. <b>Tap the blocks</b> (or focus them and press Enter or ↓; ↑ turns back) to turn them a face: each overshoots a little and squashes as it lands. A tap always turns forward through the three screens, as the toy does, and they never turn by themselves. On Jarvis and GitDiscuss the screen under the display turns with them, so unshading shows the screen you turned to. Drag the strip by its name tab. Unshading plays it backwards. Joined pairs stay joined.',
   sayOn:'Shaded: each cushion becomes a strip with two felt blocks on a dowel. Tap the blocks to turn them to the next screen.',sayOff:'Unshaded: the blocks and dowel come off and the cushions refill.',
   height:(st,small)=>blocksParts(st,small).h,key:id=>{const T=TURN[id];return`|${f(T.r1*1000)}|${f(T.r2*1000)}|${f(T.q1*1000)}|${f(T.q2*1000)}`},
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:blocksDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:blocksDraw},
+ bedtime:{label:'Bedtime',kind:'Tuck',ms:3200,ownStrip:true,
+  about:'Felt stop-motion\'s favourite scene, the little one put to bed. The cotton display is put away and the stuffing lets out to a strip, landing with a squash that shakes fibres loose. Then a doll\'s bed is built around it, seen side on: a walnut felt headboard with a domed top, a stitched heart and a turned knob, a lower footboard and a side rail pop up from the table, and a cream ticking pillow puffs up, propped against the headboard. The cushion draws in and lies down with its head end on the pillow. A patchwork quilt in the cushion\'s own felts is pulled up over it from behind the footboard, with a dark binding, running-stitch seams and wool ties at the corners, and the cream sheet is turned down over its top edge with a scalloped hem and a feather stitch. <b>The name and key value are stitched onto the quilt\'s signature block</b>, the cream square quilters sign: the name in satin stitch, the value in cross-stitch beside it. Three felt Zs drift up off the pillow and fade, so the resting strip is still. Unshading gets it up: the sheet is thrown back, the quilt is flung off, the pillow and the bed fold away and the cushion refills with a bounce. Joined pairs stay joined, bed to bed.',
+  sayOn:'Shaded: each cushion is put to bed under a patchwork quilt, its name and value stitched on the quilt.',sayOff:'Unshaded: the quilts are thrown off, the beds fold away and the cushions refill.',
+  height:(st,small)=>bedParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:bedDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
