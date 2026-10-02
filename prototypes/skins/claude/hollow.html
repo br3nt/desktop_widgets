@@ -127,7 +127,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .wait span{font:italic 10.5px/1.3 Georgia,serif;color:#5c4a36}
 .rose{position:absolute;right:15px;bottom:9px}
 .mmorph{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
-.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.platehit{cursor:w-resize}.hit.inkhit{cursor:s-resize}.hit.inkhit .wet{opacity:0}.hit.inkhit:hover .wet,.hit.inkhit:focus-visible .wet{opacity:.5}.hit .pinhit{cursor:pointer}
+.hit{pointer-events:all;cursor:crosshair}.hit.bellhit{cursor:pointer}.hit.brackethit{cursor:grab}.hit.shellhit{cursor:ns-resize}.hit.platehit{cursor:w-resize}.hit.inkhit{cursor:s-resize}.hit.inkhit .wet{opacity:0}.hit.inkhit:hover .wet,.hit.inkhit:focus-visible .wet{opacity:.5}.hit .pinhit{cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0;pointer-events:none}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;color:#aeb8c6;font-size:13px}
@@ -226,7 +226,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the ink bleed, pull the fused seam down to wet the ink and part it. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -425,7 +425,9 @@ const JOINS={
    return s;
   }
  },
- bracket:{label:'Hanging bracket',kind:'Angle',gap:44,holdAt:.68,msOut:2600,slow:1.35,angled:true,
+ bracket:{label:'Hanging bracket',kind:'Angle',gap:44,holdAt:.68,msOut:2600,slow:1.35,angled:true,range:30,step:10,angleLabel:'Bracket angle in degrees',
+  stepSay:(k,to)=>'The bracket swings a notch '+(k>0?'down':'up')+'; GitDiscuss at '+signed(to)+'.',
+  place(h){const bd=this.bend(model.jt);return{o:`${-this.gap/2}px ${f(h/2)}px`,t:bd?`rotate(${f(bd*100)/100}deg)`:''}},
   about:'The two shells meet on an iron hinge and GitDiscuss can hang at an angle to Jarvis, from −30° to +30°. Joining: the shells close to a lantern\'s width apart, two hinge leaves reach out from the middle eyelets and meet on an iron knuckle, and its brass pin drops home with a spark. A notched iron quadrant sweeps up out of Jarvis\'s strap and arcs over the gap. From GitDiscuss\'s strap a lamp bracket rises through the quadrant, its arm reaching back over the gap on a curled brace. A brass pawl on the bracket drops into the middle notch, and a lantern is hung on the arm\'s hook, swings and kindles as the join light. Then GitDiscuss swings on the knuckle to its angle, the pawl clicking over each notch, and the lantern lags behind, swings back and settles plumb. Whatever the angle, the lantern hangs straight down. <b>Angle:</b> swing the bracket or the lantern (or drag GitDiscuss\'s nameplate), use the slider, or focus the bracket and press the arrow keys. The notches are 10° detents: the pawl rides up between them and drops in at each, and on letting go it settles into the nearest. The pair moves up or down to stay on the stage. <b>Near:</b> the middle eyelets catch the light. <b>Ready:</b> a dotted ghost of the knuckle, quadrant, bracket and lantern. <b>Release:</b> tap the brass knuckle pin (or press Enter on the bracket). GitDiscuss swings level, the pin is drawn, the lantern is lifted off, the bracket and quadrant fold back into their straps and the shells part.',
   text:{join:'The shells close; a hinge, a notched quadrant and a lamp bracket are forged across the gap, and GitDiscuss swings to its angle.',
    joined:'Joined on a hanging bracket. Swing the bracket or the lantern, or drag GitDiscuss\'s nameplate, to set the angle; tap the brass knuckle pin to release.',
@@ -462,6 +464,7 @@ const JOINS={
    if(d.moved){const to=Math.round(model.angle/10)*10;animateAngle(to,420);say('GitDiscuss set at '+signed(to)+'; the pawl drops into its notch.')}
    else{const el=$('#b');if(d.fromGrip&&el.classList.contains('signed')){signTap('b');return}
     if(d.fromGrip&&d.touch&&el.classList.contains('cocooned'))el.classList.toggle('loose');
+    const sv=Math.round(model.angle/10)*10;if(sv!==model.angle)animateAngle(sv,300);
     render();say('Swing the bracket or the lantern to set the angle; tap the brass knuckle pin to release.')}},
   seamCancel(d){if(d.angle){model.angle=d.th0;refitPair()}},
   over(c){
@@ -726,6 +729,102 @@ const JOINS={
    }
    return s+(bo<1?`<g opacity="${f(bo)}">${body}</g>`:body);
   }
+ },
+ shell:{label:'Shell articulation',kind:'Angle',gap:60,holdAt:.5,msOut:2300,slow:1.3,angled:true,range:45,step:15,N:3,S:24,angleLabel:'Joint angle in degrees',
+  about:'GitDiscuss hangs off Jarvis on a short neck of three shell plates, like the segments of a pill bug\'s back, and the joint flexes from −45° to +45°. Each plate is hinged to the next along its middle, so as the joint bends the plates slide further under each other on the inside of the angle and fan apart on the outside, where the pale membrane between them stretches open and creases. The bend is shared out over four hinges: Jarvis\'s collar, the two plate joints and GitDiscuss\'s strap. <b>Near:</b> the middle eyelets catch the light. <b>Ready:</b> a dotted ghost of the three plates and the spiracle. Joining: the shells close to a short neck apart, a thorned collar lifts on Jarvis\'s strap, and the plates telescope out from under it, each sliding out from under the last. The end plate is held up as it runs out, then drops over GitDiscuss\'s strap with a <b>click</b>. The membrane fills in, the brass-ringed spiracle on the middle plate kindles as the join light, and the joint flexes to its angle in a ripple that runs from Jarvis to GitDiscuss, overshooting and settling. <b>Angle:</b> drag the plates up or down, swing GitDiscuss by its nameplate, use the slider, or focus the plates and press the arrow keys. The detents are every 15°: the angle lingers near each, and sparks flick from the inside lips as the plates seat; on letting go it settles into the nearest. The pair moves up or down to stay on the stage. <b>Release:</b> tap the spiracle (or press Enter on the plates). It dims, the joint straightens from GitDiscuss back, the end plate lifts off with a spark, the plates slide home under the collar and the shells part.',
+  text:{join:'The shells close; three shell plates telescope out from under Jarvis\'s collar, click onto GitDiscuss, and the joint flexes to its angle.',
+   joined:'Joined by three articulated shell plates. Drag the plates up or down, or swing GitDiscuss\'s nameplate, to flex the joint; tap the lit spiracle to release.',
+   release:'The spiracle dims: the joint straightens, the end plate lifts off and the plates slide home under Jarvis\'s collar.',back:'The plates slide back under Jarvis\'s collar.',
+   hold:'Held mid-join: the plates telescoping out. Use the scrubber to step through the animation.',
+   ready:'Ready: the plates are ghosted across the gap. Release to join.',near:'Nearby: the middle eyelets catch the light. Move closer.',
+   phReady:'Ready · the plates are ghosted',phNear:'Nearby · the eyelets catch the light',get phDrag(){return drag&&drag.pin?'Tap the spiracle to release':'Flexing the joint · '+signed(model.angle)}},
+  stepSay:(k,to)=>'The joint flexes a ridge '+(k>0?'down':'up')+'; GitDiscuss at '+signed(to)+'.',
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.28?'Joining · closing in ':jt<.34?'Joining · the collar lifts ':jt<.6?'Joining · the plates telescope ':jt<.7?'Joining · click ':jt<.78?'Joining · the spiracle kindles ':'Joining · flexing to '+signed(model.angle)+' · '):(r<.18?'Releasing · straightening ':r<.26?'Releasing · unclicked ':r<.46?'Releasing · the plates slide home ':'Releasing · parting ')},
+  // How far each hinge (Jarvis's collar, the two plate joints, GitDiscuss's strap) is flexed. They share the angle;
+  // joining, the flex ripples from Jarvis to GitDiscuss with an overshoot, and releasing, it straightens from GitDiscuss back.
+  flex(jt){const A=model.angle,n=this.N+1,sh=Array.from({length:n},(_,i)=>i*.1);
+   if(jt>=1)return sh.map(()=>A/n);
+   if(model.dir>0){const u=seg(jt,.78,1);return sh.map(o=>{const v=seg(u,o,o+.7);return A/n*(1-Math.pow(1-v,3)*Math.cos(1.7*Math.PI*v))})}
+   const r=seg(1-jt,0,.18);return sh.map((_,i)=>{const o=(n-1-i)*.1;return A/n*(1-ease(seg(r,o,o+.7)))})},
+  parts(jt){if(jt>=1)return{op:1,rise:0,p1:1,p2:1,lift:0,mem:1,lit:1};
+   if(model.dir>0){const a=seg(jt,.28,.34);return{op:clamp(a*2),rise:-5*(1-backOut(a)),p1:dart(seg(jt,.34,.48)),p2:dart(seg(jt,.42,.6)),lift:jt<.6?-4*seg(jt,.36,.44):-4*(1-backOut(seg(jt,.6,.68))),mem:seg(jt,.6,.7),lit:seg(jt,.68,.8)}}
+   const r=1-jt;return{op:1-seg(r,.38,.46),rise:0,p1:1-dart(seg(r,.3,.42)),p2:1-dart(seg(r,.24,.36)),lift:-4*seg(r,.18,.24),mem:1-seg(r,.2,.28),lit:1-seg(r,.12,.22)}},
+  // Each plate's hinge point and turn; plates still telescoping out sit closer in. E is where GitDiscuss's strap hinges on.
+  frames(jt,hh){const d=this.flex(jt),k=this.parts(jt),S=this.S,ext=[1,k.p1,k.p2],o=[],an=[];let p={x:model.a.x+W-6,y:model.a.y+hh},a=0;
+   for(let i=0;i<this.N;i++){if(i){const r=an[i-1]*Math.PI/180;p={x:p.x+S*ext[i]*Math.cos(r),y:p.y+S*ext[i]*Math.sin(r)}}a+=d[i];o.push(p);an.push(a)}
+   const r=a*Math.PI/180;return{d,k,o,an,E:{x:p.x+S*Math.cos(r),y:p.y+S*Math.sin(r)},A:a+d[this.N]}},
+  place(h){const F=this.frames(model.jt,h/2);if(!F.d.some(x=>Math.abs(x)>.001))return{o:'',t:''};
+   return{o:`6px ${f(h/2)}px`,t:`translate(${f(F.E.x-model.b.x-6)}px,${f(F.E.y-model.b.y-h/2)}px) rotate(${f(F.A*100)/100}deg)`}},
+  // The range of Jarvis's y that keeps both shells and the plates on the stage at this angle.
+  fitRange(ang,hh){const n=this.N+1,S=this.S,q=hh+8,ys=[-hh-36,hh+6];let p=[0,0],a=0;
+   for(let i=0;i<this.N;i++){a+=ang*1.1/n;for(const y of [-q,q])for(const x of [0,S])ys.push(p[1]+rot([x,y],a)[1]);const r=rot([S,0],a);p=[p[0]+r[0],p[1]+r[1]]}
+   a+=ang*1.1/n;for(const y of [-hh-36,hh+6])for(const x of [-6,W-6])ys.push(p[1]+rot([x,y],a)[1]);
+   const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,40-mn-hh),hi=594-mx-hh;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]},
+  fit(y){return clamp(y,...this.fitRange(model.angle,ctx().h/2))},
+  releaseStart(){stopAngle()},
+  key(){$('#a .grip').focus();doSeparate()},
+  arrow(k){stepAngle(k)},
+  // The plates flex with an up or down drag; GitDiscuss's nameplate swings round Jarvis's collar.
+  seamDown(p,t){++angAnim;model.angTo=undefined;if(t&&t.closest('[data-part=pin]'))return{seam:true,pin:true,p0:p,moved:0};
+   const hh=ctx().h/2;return{seam:true,angle:true,grip:!t,py:p.y,prev:Math.atan2(p.y-model.a.y-hh,p.x-model.a.x-W+6),raw:model.angle,th0:model.angle,moved:false}},
+  seamMove(d,p){if(d.pin){d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));return}
+   let dd;if(d.grip){const a=Math.atan2(p.y-model.a.y-ctx().h/2,p.x-model.a.x-W+6);dd=(a-d.prev)*180/Math.PI;dd=((dd+540)%360)-180;d.prev=a}else{dd=(p.y-d.py)*.55;d.py=p.y}
+   d.raw=clamp(d.raw+dd,-this.range,this.range);if(Math.abs(d.raw-d.th0)>1.5)d.moved=true;model.angle=magnet(d.raw,this.step);refitPair();render()},
+  seamUp(d){if(d.pin){if(d.moved<10){$('#a .grip').focus();doSeparate()}else render();return}
+   if(d.moved){const to=Math.round(model.angle/this.step)*this.step;animateAngle(to,420);say('GitDiscuss set at '+signed(to)+'; the plates seat on their ridge.')}
+   else{const el=$('#b');if(d.fromGrip&&el.classList.contains('signed')){signTap('b');return}
+    if(d.fromGrip&&d.touch&&el.classList.contains('cocooned'))el.classList.toggle('loose');
+    // A tap that stopped a swing mid-way settles it onto the nearest ridge.
+    const sv=Math.round(model.angle/this.step)*this.step;if(sv!==model.angle)animateAngle(sv,300);
+    render();say('Drag the plates up or down to flex the joint; tap the lit spiracle to release.')}},
+  seamCancel(d){if(d.angle){model.angle=d.th0;refitPair()}},
+  // The spiracle on the middle plate: a brass-ringed breathing pore whose glass lights as the join light.
+  spiracle(lit){return `<ellipse cx="15" rx="4.8" ry="6.2" fill="url(#brass)" stroke="${INK}" stroke-width="1.1"/><ellipse cx="15" rx="2.5" ry="3.8" fill="#3c3022" stroke="${INK}" stroke-width=".7"/>`+
+   (lit>0?`<ellipse cx="15" rx="2.5" ry="3.8" fill="#ffd581" opacity="${f(lit)}"/><ellipse cx="14.3" cy="-1" rx=".8" ry="1.7" fill="#fff6d8" opacity="${f(lit)}"/>`:'')},
+  over(c){
+   const hh=c.h/2,jt=c.jt,now=performance.now(),N=this.N,S=this.S,ph=hh+4,pk=[0,2.5,1],seamY=-.52*hh,CP=JOINS.carapace;
+   const J0={x:model.a.x+W-6,y:model.a.y+hh},at=(o,a,x,y)=>{const r=rot([x,y],a);return{x:o.x+r[0],y:o.y+r[1]}};
+   if(jt===0){this.nk=null;this.live=false;const g=c.glow;if(g<=0)return '';
+    let s=glints([{x:model.a.x+W-9.5,y:model.a.y+hh},{x:model.b.x+9.5,y:model.b.y+hh}],g);
+    if(g>=1){const gh=d=>`<path d="${d}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="2.5 4" stroke-linecap="round" opacity=".55"/>`;
+     for(let i=0;i<N;i++){const x=J0.x+S*i;s+=gh(CP.plateD(x-1,x+S+3,J0.y-ph+pk[i],J0.y+ph-pk[i]))}
+     s+=`<circle cx="${f(J0.x+S+15)}" cy="${f(J0.y)}" r="7" fill="none" stroke="#ffe7a8" stroke-width="1.2" stroke-dasharray="2 2"/>`}
+    return s}
+   const F=this.frames(jt,hh),{k,o,an,d}=F,A=F.A;if(k.op<=0)return '';
+   let s='';
+   // The membrane under the plates: hidden on the inside of the bend, stretched open and creased on the outside.
+   if(k.mem>0){const m=ph-5,top=[],bot=[],edge=(p,a,x)=>{top.push(at(p,a,x,-m));bot.push(at(p,a,x,m))};
+    edge(J0,0,0);for(let i=1;i<N;i++)edge(o[i],(an[i-1]+an[i])/2,0);edge(F.E,A,-2);
+    const md='M'+top.concat(bot.reverse()).map(P).join('L')+'Z';let cr='';
+    for(let i=0;i<=N;i++){const dj=d[i];if(Math.abs(dj)<1)continue;const p=i===0?J0:i===N?F.E:o[i],a=i===0?dj/2:i===N?an[N-1]+dj/2:(an[i-1]+an[i])/2,sg=dj>0?-1:1;
+     for(const t of [-.28,.28]){const u=at(p,a+t*dj,0,sg*m*.6),v=at(p,a+t*dj,0,sg*m);cr+=`M${P(u)}L${P(v)}`}}
+    s+=`<g opacity="${f(k.mem)}"><path d="${md}" fill="#c9bfa6"/><path d="${md}" fill="#ffc768" opacity="${f(.4*k.lit)}"/>${cr?`<path d="${cr}" stroke="#6b604d" stroke-width=".9" stroke-linecap="round" fill="none"/>`:''}</g>`}
+   // Shingled: the end plate lowest, Jarvis's collar on top, each plate's bowed lip lying over the next.
+   let st='';
+   for(let i=N-1;i>=0;i--){const lf=i===N-1?k.lift:0;
+    let b=CP.plate(-1,S+3,-ph+pk[i]+lf,ph-pk[i]+lf,seamY+lf,{lift:-lf});if(i===1)b+=this.spiracle(k.lit);
+    st+=`<g transform="translate(${P(o[i])}) rotate(${f(an[i]*100)/100})">${b}</g>`}
+   st+=`<g transform="translate(${P(J0)})">${CP.plate(-13,4,-ph-1,ph+1,seamY,{thorn:true})}${[-hh/2,0,hh/2].map(y=>`<circle cx="-5" cy="${f(y)}" r="3.4" fill="url(#brass)" stroke="${INK}" stroke-width="1"/><circle cx="-5" cy="${f(y)}" r="1.1" fill="${INK}"/>`).join('')}</g>`;
+   s+=`<g transform="translate(0 ${f(k.rise)})" opacity="${f(k.op)}">${st}</g>`;
+   const sp=at(o[1],an[1],15,0);if(k.lit>0)s+=`<circle cx="${f(sp.x)}" cy="${f(sp.y)}" r="40" fill="url(#lamp)" opacity="${f(k.lit)}"/>`;
+   // The click as the end plate drops over GitDiscuss's strap; the spark as it lifts off again.
+   const lip=y=>at(o[N-1],an[N-1],S+3,y),ly=[-ph+pk[N-1]+4,ph-pk[N-1]-4];
+   if(model.dir>0&&jt>.6&&jt<.72){const u=seg(jt,.6,.72),rr=10+12*ease(u);let t='';
+    for(const[y,sy]of [[ly[0],-1],[ly[1],1]]){const p=lip(y);s+=spark(p,1-u,4+7*u);for(const a of [-50,0,50]){const ra=a*Math.PI/180,ux=Math.sin(ra),uy=sy*Math.cos(ra);t+=`M${f(p.x+ux*rr*.55)} ${f(p.y+uy*rr*.55)}L${f(p.x+ux*rr)} ${f(p.y+uy*rr)}`}}
+    s+=`<path d="${t}" stroke="#e9edf1" stroke-width="${f(1+1.4*(1-u))}" stroke-linecap="round" fill="none" opacity="${f(1-u)}"/>`}
+   if(model.dir<0&&jt<1){const u=seg(1-jt,.18,.26);if(u>0&&u<1)s+=spark(lip(0),1-u,5+6*u)}
+   // Detents: as the plates seat on a 15° ridge, sparks flick from the inside lips.
+   if(jt===1){const sv=this.step,nk=Math.round(model.angle/sv);if(Math.abs(model.angle-nk*sv)<1.2){if(this.nk!=null&&nk!==this.nk)this.flash={t:now,sg:Math.sign(model.angle)||1};this.nk=nk}}else this.nk=null;
+   const fl=this.flash&&now-this.flash.t<260;
+   if(fl){const u=(now-this.flash.t)/260;for(let i=1;i<N;i++)s+=spark(at(o[i],(an[i-1]+an[i])/2,0,this.flash.sg*(ph-3)),1-u,3+6*u)}
+   this.live=fl;
+   if(jt===1){const q=ph+6,tp=[at(J0,0,-14,-q)],bt=[at(J0,0,-14,q)];for(let i=0;i<N;i++){tp.push(at(o[i],an[i],S+4,-q));bt.push(at(o[i],an[i],S+4,q))}
+    const hd='M'+tp.concat(bt.reverse()).map(P).join('L')+'Z';
+    s+=`<g class="hit shellhit" id="seamHit" tabindex="0" role="group" aria-label="Shell articulation: GitDiscuss at ${signed(model.angle)}. Up and down arrows flex the joint a ridge (15°) up or down; Enter separates the widgets"><title>Drag the plates up or down to flex the joint; tap the lit spiracle to release</title>`+
+     `<path d="${hd}" fill="transparent"/><path class="ringfocus" d="${hd}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3" stroke-linejoin="round"/>`+
+     `<circle class="pinhit" data-part="pin" cx="${f(sp.x)}" cy="${f(sp.y)}" r="11" fill="transparent"><title>Tap the spiracle to release</title></circle></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -958,8 +1057,8 @@ function cutThreads(LACE,r){
 /* ---------- Hanging bracket: ironwork, the plumb lantern, angle setting ---------- */
 const rot=(p,deg)=>{const r=deg*Math.PI/180,c=Math.cos(r),s=Math.sin(r);return[p[0]*c-p[1]*s,p[0]*s+p[1]*c]};
 const signed=v=>{v=Math.round(v);return(v>0?'+':v<0?'−':'')+Math.abs(v)+'°'};
-// Sticky 10° detents: the angle lingers near each notch, then lets go.
-const magnet=raw=>{const k=Math.round(raw/10)*10,d=raw-k;return k+d*Math.pow(Math.abs(d)/5,1.5)};
+// Sticky detents every `st` degrees: the angle lingers near each, then lets go.
+const magnet=(raw,st=10)=>{const k=Math.round(raw/st)*st,d=raw-k;return k+d*Math.pow(Math.abs(d)/(st/2),1.5)};
 // A tightening curl that continues a stroke from `p`, heading `tan` degrees; sg 1 curls clockwise.
 function spiral(p,tan,r0,sg,turn=1.4){const tr=tan*Math.PI/180,cx=p.x-Math.sin(tr)*sg*r0,cy=p.y+Math.cos(tr)*sg*r0,a0=Math.atan2(p.y-cy,p.x-cx);let d='';
  for(let i=1;i<=16;i++){const t=i/16,a=a0+sg*t*turn*2*Math.PI,r=r0*(1-.72*t);d+=`L${f(cx+r*Math.cos(a))} ${f(cy+r*Math.sin(a))}`}return d}
@@ -994,18 +1093,19 @@ function drawLantern(Hp,phi,lit,op){
 let tickRAF=0,lastRender=0;
 function keepTicking(){if(!tickRAF)tickRAF=requestAnimationFrame(()=>{tickRAF=0;if(performance.now()-lastRender>12)render();else keepTicking()})}
 let angAnim=0;
-const bracketOn=()=>model.join==='bracket'&&model.jt===1;
-function refitPair(){if(!bracketOn())return;const[lo,hi]=JOINS.bracket.fitRange(model.angle,ctx().h/2);model.a.y=model.b.y=clamp(model.a.y,lo,hi)}
-function pairY(){return bracketOn()?JOINS.bracket.fitRange(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
+// The angled joins (hanging bracket, shell articulation) share this; each has its own range, detent step and remembered angle.
+const angOn=()=>!!J().angled&&model.jt===1;
+function refitPair(){if(!angOn())return;const[lo,hi]=J().fitRange(model.angle,ctx().h/2);model.a.y=model.b.y=clamp(model.a.y,lo,hi)}
+function pairY(){return angOn()?J().fitRange(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
 function animateAngle(to,ms=750){
- to=clamp(to,-30,30);model.angTo=to;const from=model.angle,y0=model.a.y,y1=clamp(y0,...JOINS.bracket.fitRange(to,ctx().h/2)),tok=++angAnim,t0=performance.now();
- (function step(now){if(tok!==angAnim)return;if(!bracketOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
-  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*Math.PI*t)),-32,32);model.a.y=model.b.y=lerp(y0,y1,ease(t));render();
+ const j=J();to=clamp(to,-j.range,j.range);model.angTo=to;const from=model.angle,y0=model.a.y,y1=clamp(y0,...j.fitRange(to,ctx().h/2)),tok=++angAnim,t0=performance.now();
+ (function step(now){if(tok!==angAnim)return;if(!angOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
+  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*Math.PI*t)),-j.range-2,j.range+2);model.a.y=model.b.y=lerp(y0,y1,ease(t));render();
   if(t<1)requestAnimationFrame(step);else model.angTo=undefined})(t0);
 }
 function stopAngle(){++angAnim;if(model.angTo!==undefined){model.angle=model.angTo;model.angTo=undefined;refitPair()}}
-function stepAngle(k){const base=model.angTo??model.angle,to=clamp(Math.round(base/10)*10+10*k,-30,30);animateAngle(to);say('The bracket swings a notch '+(k>0?'down':'up')+'; GitDiscuss at '+signed(to)+'.')}
-function setBracketAngle(v){v=Math.round(clamp(v,-30,30)/10)*10;if(bracketOn())animateAngle(v);else{stopAngle();model.angle=v;render()}}
+function stepAngle(k){const j=J(),base=model.angTo??model.angle,to=clamp(Math.round(base/j.step)*j.step+j.step*k,-j.range,j.range);animateAngle(to);say(j.stepSay(k,to))}
+function setAngle(v){const j=J();v=Math.round(clamp(v,-j.range,j.range)/j.step)*j.step;if(angOn())animateAngle(v);else{stopAngle();model.angle=v;render()}}
 
 /* ---------- Morph: map unfurl (Checks) ---------- */
 // g runs 0 sheet, 1 folio, 2 atlas. Every frame is drawn from g alone, so shrinking plays the growth backwards.
@@ -1097,7 +1197,7 @@ function morphTo(id){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:700,y:420}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angTo:undefined,morph:'unfurl',size:'sheet',g:0,restore:null,cMoved:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,restore:null,cMoved:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -1171,8 +1271,8 @@ function render(){
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',G=small&&model.g>0?geo(model.g):null,w=small?(G?G.w:CW):W,h=small?(G?G.h:ch):c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
-  // GitDiscuss turns about the bracket's knuckle, in the middle of the gap.
-  if(id==='b'){const bd=model.join==='bracket'?JOINS.bracket.bend(model.jt):0;el.style.transformOrigin=`${-JOINS.bracket.gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
+  // On an angled join GitDiscuss turns: about the bracket's knuckle, or on the end of the shell plates.
+  if(id==='b'){const t=j.place?j.place(h):null;el.style.transformOrigin=t?t.o:'';el.style.transform=t?t.t:''}
   // A join's click can jolt the two shells toward each other for a moment.
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
@@ -1193,8 +1293,8 @@ function render(){
  if(j.live)keepTicking();
  const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{const ar={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];
   if(e.key==='Enter'||e.key===' '){e.preventDefault();J().key()}else if(ar&&J().arrow){e.preventDefault();J().arrow(ar)}};if(focused)hit.focus()}
- const ang=model.join==='bracket';$('#angleRow').style.display=ang?'':'none';
- if(ang){$('#angle').value=Math.round(model.angTo??model.angle);$('#angleOut').textContent=signed(model.angTo??model.angle)}
+ const ang=!!j.angled;$('#angleRow').style.display=ang?'':'none';
+ if(ang){const r=$('#angle');if(+r.max!==j.range){r.min=-j.range;r.max=j.range;r.step=j.step;r.setAttribute('aria-label',j.angleLabel)}r.value=Math.round(model.angTo??model.angle);$('#angleOut').textContent=signed(model.angTo??model.angle)}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
@@ -1216,7 +1316,7 @@ function act(k){if(drag)cancelDrag();if(k==='separate')doSeparate();else if(k===
 function options(row,set,key){Object.entries(set).forEach(([id,o])=>{const b=document.createElement('button');b.dataset.opt=id;b.textContent=o.label;b.title=o.kind;b.onclick=()=>pick(key,id);$(row).append(b)})}
 function pick(key,id){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){stopAngle();lamp.on=false;const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;model.peal=model.armed=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
+ if(key==='join'&&id!==model.join){stopAngle();if(J().angled)model.angs[model.join]=model.angle;if(JOINS[id].angled)model.angle=model.angs[id];lamp.on=false;const was=model.jt;++anim;model.busy=false;model.join=id;model.path=null;model.jt=0;model.dir=1;model.cut=null;model.peal=model.armed=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
  if(key==='shade')model.shade=id;
  if(key==='morph')model.morph=id;
  describe();render();
@@ -1235,7 +1335,7 @@ $('#grow').oninput=e=>{if(drag&&drag.id==='c')cancelDrag();
  ++morphAnim;model.restore=null;model.g=e.target.value/100;const S=SIZES.find(x=>x[2]===model.g);model.size=S?S[0]:null;
  const[w,h]=cDims();model.c.x=clamp(model.c.x,30,1170-w);model.c.y=clamp(model.c.y,TOP-10,590-h);render()};
 $('#grow').onchange=()=>render();
-$('#angle').oninput=e=>{if(drag)cancelDrag();setBracketAngle(+e.target.value)};
+$('#angle').oninput=e=>{if(drag)cancelDrag();setAngle(+e.target.value)};
 $('#scrub').oninput=e=>{stopAngle();++anim;model.busy=false;model.poised=false;model.glow=0;
  if(model.dir<0){model.dir=1;model.cut=null}
  if(model.jt===0||model.jt===1||!model.path)model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};
@@ -1263,8 +1363,8 @@ stage.addEventListener('pointerdown',e=>{
  if(e.target.closest('#seamHit')&&model.jt===1){e.preventDefault();drag=J().seamDown(local(e),e.target);stage.setPointerCapture(e.pointerId);render();return}
  const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();
  const id=g.dataset.drag,p=local(e);
- // On the hanging bracket, GitDiscuss's nameplate swings it about the knuckle instead of moving the pair.
- if(id==='b'&&bracketOn()){drag=Object.assign(JOINS.bracket.seamDown(p,null),{fromGrip:true,touch:e.pointerType!=='mouse'});stage.setPointerCapture(e.pointerId);render();return}
+ // On an angled join, GitDiscuss's nameplate swings it instead of moving the pair.
+ if(id==='b'&&angOn()){drag=Object.assign(J().seamDown(p,null),{fromGrip:true,touch:e.pointerType!=='mouse'});stage.setPointerCapture(e.pointerId);render();return}
  // A widget grabbed mid-join snaps to the nearer end state; Checks never interrupts the pair.
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1;model.cut=null}
  drag={id,start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle',touch:e.pointerType!=='mouse'};
@@ -1309,7 +1409,7 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
  const bottom=600-(model.st>.5?HS:H)-14;
- if(id==='b'&&bracketOn()&&k[1]){stepAngle(k[1]>0?1:-1);return}
+ if(id==='b'&&angOn()&&k[1]){stepAngle(k[1]>0?1:-1);return}
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],30,1200-2*W-g-30),ay=clamp(model.a.y+k[1],...pairY());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else{const m=model[id],[cw,chh]=cDims(),w=id==='c'?cw:W;m.x=clamp(m.x+k[0],30,1200-w-30);m.y=clamp(m.y+k[1],id==='c'?TOP-10:TOP,id==='c'?600-chh-10:bottom);if(id==='c')model.cMoved=true}render();
 }));
