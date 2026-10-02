@@ -64,7 +64,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Bone Needle Guide Retraction shade — Display frame retracts along polished bone needles with insectoid click (Built in prototypes/skins/agy/hollow.html with dual polished bone guide needles, cold-forged iron runner sleeves, Pharloom brass collars, golden silk stay threads, spring-loaded bone locking pawls with impact spark burst, unclipped readable 44px status strip with bone needle badge, Option 8 switcher, and 'N' keyboard shortcut)
 
 ### Cycle 9: Quinary Joins
-- [ ] Gothic: Mortise & Forged Tie-Rod Pin join — Castellated stone teeth mesh and iron tie rod shoots through bore
+- [x] Gothic: Mortise & Forged Tie-Rod Pin join — Castellated stone teeth mesh and iron tie rod shoots through bore (Built in prototypes/skins/agy/gothic.html with alternating ashlar crenellations, horizontal cylindrical bore channels, forged wrought-iron tension rod with fleur-de-lis anchor plates, tapered cotter wedge with split ring, metallic clatter impact sparks, interactive cotter release pin, Option 9 switcher, and 'M' keyboard shortcut)
 - [ ] Felt: Velcro Hook-and-Loop Micro-Peel join — Concealed micro-hook flanges compress with microscopic crunch
 - [ ] Elven: Starlight Pearl Cage & Filigree Claw join — Articulated talon prongs embrace sea pearl in filigree socket
 - [ ] Wire: Wild Nest Cabochon Clamp join — Springy oxidized wire fingers close around domed polished cabochon
