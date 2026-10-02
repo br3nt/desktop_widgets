@@ -768,6 +768,89 @@ header {
 #stage.design #pocketBay { outline: 1px dashed var(--stitch-gold); outline-offset: 4px; }
 #stage.design .felt-screen { outline: 1px dashed #7ee2b0; outline-offset: 3px; }
 
+/* Option 10: Craft Bag / Sewing Kit Unroll Morph Styles */
+.felt-extension-screen {
+  position: absolute;
+  left: 336px;
+  top: 32px;
+  width: 0;
+  height: 64px;
+  border: 2px solid #161e19;
+  border-radius: 6px;
+  background: var(--display-ink);
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.95), 0 0 0 1px #526b5a, 0 3px 6px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  color: var(--stitch-mint);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  box-sizing: border-box;
+}
+.felt-extension-screen.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.module.shade .felt-extension-screen {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.felt-extension-screen .extension-panel {
+  padding: 4px 7px;
+  white-space: nowrap;
+}
+.felt-extension-screen .extension-panel strong {
+  display: block;
+  font-size: 11px;
+  color: var(--stitch-gold);
+  letter-spacing: 0.2px;
+  margin: 1px 0;
+}
+.felt-extension-screen .extension-panel strong em {
+  font-style: normal;
+  color: var(--wool-cream);
+}
+.felt-extension-screen .extension-panel small {
+  display: block;
+  font-size: 9px;
+  color: #8da495;
+  margin-top: 1px;
+}
+.felt-tension-track {
+  height: 4px;
+  background: #141c18;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 5px;
+  border: 0.5px solid #2f4035;
+}
+.felt-tension-fill {
+  height: 100%;
+  width: 78%;
+  background: linear-gradient(90deg, var(--stitch-mint), var(--stitch-gold));
+  border-radius: 2px;
+}
+.unroll-pull-tab {
+  cursor: pointer;
+  pointer-events: auto;
+  transition: filter 140ms ease;
+  touch-action: none;
+}
+.unroll-pull-tab:hover {
+  filter: brightness(1.25);
+}
+.ext-badge {
+  font-size: 9px;
+  color: var(--stitch-gold);
+  background: rgba(226, 177, 60, 0.15);
+  border: 1px solid var(--stitch-gold);
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin-left: 6px;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+}
+
 /* Footer and Aesthetic Notes */
 footer {
   padding: 20px 28px 30px;
@@ -797,8 +880,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat, duffel toggle, tool-roll, cross-stitch zipper, envelope flap, brass popper, lozenge squash &amp; velcro micro-peel</span></h1>
-    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Artist's felt tool-roll · Running cross-stitch zipper · Envelope clutch flap · Heavy brass popper snap · High-damp wool lozenge squash · Concealed velcro hook-and-loop micro-peel</p>
+    <h1>Tactile Felt <span>/ fiber entanglement, bellows pleat, duffel toggle, tool-roll, cross-stitch zipper, envelope flap, brass popper, lozenge squash, velcro micro-peel &amp; craft bag unroll morph</span></h1>
+    <p>Dense carded wool roving · Scored accordion pleats · Turned olive-wood duffel toggles · Artist's felt tool-roll · Running cross-stitch zipper · Envelope clutch flap · Heavy brass popper snap · High-damp wool lozenge squash · Concealed velcro hook-and-loop micro-peel · Craft bag / sewing kit unroll morph</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -812,7 +895,8 @@ footer .note-highlight {
         <option value="envelope">6. Envelope Flap Tuck shade</option>
         <option value="popper">7. Heavy Brass Press-Stud (Popper) Snap join</option>
         <option value="lozenge">8. High-Damp Wool Squeeze (Lozenge Squash) shade</option>
-        <option value="velcro" selected>9. Velcro Hook-and-Loop Micro-Peel join</option>
+        <option value="velcro">9. Velcro Hook-and-Loop Micro-Peel join</option>
+        <option value="morph" selected>10. Craft Bag / Sewing Kit Unroll morph</option>
       </select>
     </div>
     <div class="control-group">
@@ -824,7 +908,8 @@ footer .note-highlight {
     </div>
     <button id="btnJoinAnim">Join capsules</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
-    <button id="btnVelcroAnim" class="primary-btn">Peel &amp; crunch Velcro</button>
+    <button id="btnUnrollAnim" class="primary-btn">Unroll craft bag</button>
+    <button id="btnVelcroAnim">Peel &amp; crunch Velcro</button>
     <button id="btnLozengeAnim">Squash wool lozenge</button>
     <button id="btnPopperAnim">Snap brass poppers</button>
     <button id="btnEnvelopeAnim">Fold envelope flap</button>
@@ -1123,6 +1208,63 @@ footer .note-highlight {
           <stop offset="70%" stop-color="#d4c39c"/>
           <stop offset="100%" stop-color="#a8956e"/>
         </linearGradient>
+
+        <!-- Option 10: Craft Bag / Sewing Kit Unroll Morph Gradients -->
+        <linearGradient id="oatmealMelangeGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ded4c3"/>
+          <stop offset="25%" stop-color="#c9bc9e"/>
+          <stop offset="60%" stop-color="#9a8c71"/>
+          <stop offset="100%" stop-color="#4a3e2e"/>
+        </linearGradient>
+
+        <linearGradient id="twillRibbonGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#faf7ef"/>
+          <stop offset="30%" stop-color="#f2ead7"/>
+          <stop offset="70%" stop-color="#ddd2ba"/>
+          <stop offset="100%" stop-color="#b8a88a"/>
+        </linearGradient>
+
+        <linearGradient id="flossScarletGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#ff7b88"/>
+          <stop offset="25%" stop-color="#e63946"/>
+          <stop offset="70%" stop-color="#b51a2b"/>
+          <stop offset="100%" stop-color="#590d15"/>
+        </linearGradient>
+
+        <linearGradient id="flossGoldGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#ffdf85"/>
+          <stop offset="30%" stop-color="#e2b13c"/>
+          <stop offset="70%" stop-color="#af821a"/>
+          <stop offset="100%" stop-color="#523906"/>
+        </linearGradient>
+
+        <linearGradient id="flossMintGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#7ff0e3"/>
+          <stop offset="30%" stop-color="#2ec4b6"/>
+          <stop offset="70%" stop-color="#1b7a70"/>
+          <stop offset="100%" stop-color="#0a3833"/>
+        </linearGradient>
+
+        <linearGradient id="pinSteelGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="35%" stop-color="#d9e2ec"/>
+          <stop offset="70%" stop-color="#9fb3c8"/>
+          <stop offset="100%" stop-color="#486581"/>
+        </linearGradient>
+
+        <radialGradient id="pinCushionGrad" cx="40%" cy="35%" r="65%">
+          <stop offset="0%" stop-color="#6b5042"/>
+          <stop offset="45%" stop-color="#4e382d"/>
+          <stop offset="80%" stop-color="#302119"/>
+          <stop offset="100%" stop-color="#1c120c"/>
+        </radialGradient>
+
+        <linearGradient id="bobbinCardGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#f5e6cc"/>
+          <stop offset="30%" stop-color="#deb887"/>
+          <stop offset="75%" stop-color="#b8860b"/>
+          <stop offset="100%" stop-color="#5c4018"/>
+        </linearGradient>
       </defs>
 
       <!-- Shared Wool Casing and Entangled Fiber Seam -->
@@ -1189,11 +1331,24 @@ footer .note-highlight {
         </div>
       </div>
 
+      <!-- Option 10: Craft Kit Notions Telemetry Panel -->
+      <div class="felt-extension-screen" id="extensionScreen-a" aria-label="Jarvis craft kit notions telemetry">
+        <div class="extension-panel">
+          <div class="felt-label">✂ Sewing Kit / Notions</div>
+          <strong>06 <em>notions unrolled</em></strong>
+          <small>Twill ribbon stays taut · 100% carded</small>
+          <div class="felt-tension-track">
+            <div class="felt-tension-fill"></div>
+          </div>
+        </div>
+      </div>
+
       <!-- Shade Strip Display -->
       <div class="shade-strip" data-drag="a" aria-label="Jarvis shade strip (drag to move)">
-        <span class="shade-tag"><span>●</span> JARVIS · 03 AGENTS</span>
+        <span class="shade-tag"><span>●</span> JARVIS · 03 AGENTS <span class="ext-badge" id="extBadge-a" hidden>[UNROLLED]</span></span>
         <div class="shade-pips">
           <i class="gold"></i><i class="mint"></i><i class="gold"></i>
+          <i class="coral ext-notion" style="display:none"></i><i class="mint ext-notion" style="display:none"></i>
         </div>
       </div>
 
@@ -1313,6 +1468,9 @@ footer .note-highlight {
   <p>
     <span class="note-highlight">Option 9 — Velcro Hook-and-Loop Micro-Peel [Join]:</span> Concealed backing flanges lined with micro-molded hook fabric on Jarvis (Module A) and curly microfiber loop pile on GitDiscuss (Module B) are embedded beneath the felt docking collars with saddle stitching and gold reinforcement bar-tacks. As the capsules approach and dock, the micro-hooks compress into the dense loop bed with a cushioned, visceral "tactile crunch" and microscopic fiber vibration, fusing the two casings into an unbroken, continuous plush felt cushion with an imperceptible hairline butt-joint. At the top edge of the seam, an artisan woven herringbone "PEEL" ribbon tab with chevron embroidery and a brass eyelet rivet serves as the interactive release grip. Grasping and pulling the PEEL tab (or pressing 'V') initiates an authentic angular peeling motion: the upper edge lifts at a progressive 12°–15° angle as dozens of micro-filaments stretch taut under tensile strain before snapping free in a cascading shear wave from top to bottom, releasing the widgets back into independent felt housings.
   </p>
+  <p>
+    <span class="note-highlight">Option 10 — Craft Bag / Sewing Kit Unroll Morph [Morph]:</span> Inspired by roll-up artisan craft pouches and multi-compartment needlework sewing kits, Jarvis expands laterally by 138px, transforming from a standard compact felt capsule into an unrolled master craft bag. An embroidered twill pull-tab on the right flank releases a saddle-leather strap and unrolls the compartment along two horizontal natural cotton twill ribbon stays with woven tailor's measurement hashmarks. The unrolled bay reveals an authentic artisan sewing kit interior lined in soft oatmeal melange felt with needle-punch dimples, featuring a 3-tier embroidery floss bobbin rack (scarlet, gold, and mint stranded floss), a padded heather-wool pin cushion with stainless-steel tailor pins, and an auxiliary sewing notions telemetry panel. In full alignment with neighbor clearance rules, lateral unrolling smoothly nudges adjacent modules aside without overlap, restoring their relative offset upon retraction. Clicking the pull-tab or pressing 'U'/'M' unrolls or re-rolls the craft kit.
+  </p>
 </footer>
 
 <script>
@@ -1347,7 +1505,10 @@ const model = {
   velcroProg: 0, // 0 = separate / resting flanges, 0.72 = hooks engaging loops, 1 = fully crunched & seated
   velcroPeel: 0, // 0 = flush butt-joint, 1 = fully peeled open from top to bottom
   velcroTension: 0, // tensile strain on filaments during manual peel drag or peel wave
-  option: 'velcro', // 'entanglement', 'bellows', 'duffel', 'toolroll', 'zipper', 'envelope', 'popper', 'lozenge', or 'velcro'
+  morphProgress: 0, // 0 = standard compact 390px capsule, 1 = unrolled craft bag & sewing kit (528px)
+  extended: false,
+  bNudge: 0,
+  option: 'morph', // 'entanglement', 'bellows', 'duffel', 'toolroll', 'zipper', 'envelope', 'popper', 'lozenge', 'velcro', or 'morph'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -3285,6 +3446,222 @@ function drawVelcroJoin(a, b, isJoined, velcroProg, velcroPeel, velcroTension, b
   return s;
 }
 
+// Option 10: Craft Bag / Sewing Kit Unroll Morph (Padded Felt Compartments, Twill Measuring Stays, Bobbins & Pin Cushion)
+function drawCraftBagExtension(extraW, morphProgress, isShade = false) {
+  if (extraW <= 2 || morphProgress <= 0.01) return '';
+  const p = Math.min(1, Math.max(0, morphProgress));
+  let s = `<g class="craft-bag-extension-bay" opacity="${p}">`;
+
+  const startX = 334;
+  const bayW = extraW;
+  const endX = startX + bayW;
+  const midBayX = startX + bayW / 2;
+
+  // 1. Natural Cotton Twill Ribbon Stays with Stamped Tailor's Inch Markings (Top & Bottom)
+  // Top Stay Ribbon
+  s += `<rect x="${startX - 6}" y="16" width="${bayW + 10}" height="8" rx="1.5"
+              fill="url(#twillRibbonGrad)" stroke="#261b0c" stroke-width="0.9"/>`;
+  for (let tx = startX + 4; tx <= endX - 4; tx += 6) {
+    const isMajor = (tx - (startX + 4)) % 24 === 0;
+    const tickH = isMajor ? 5 : 3;
+    s += `<line x1="${tx}" y1="16" x2="${tx}" y2="${16 + tickH}" stroke="#3a2813" stroke-width="${isMajor ? 0.9 : 0.6}"/>`;
+    if (isMajor && tx + 12 <= endX) {
+      const inchNum = Math.floor((tx - (startX + 4)) / 24) + 1;
+      s += `<text x="${tx + 2.5}" y="22" font-size="4.5" font-family="'Courier New', monospace" font-weight="bold" fill="#3a2813">${inchNum}</text>`;
+    }
+  }
+  // Bottom Stay Ribbon
+  s += `<rect x="${startX - 6}" y="106" width="${bayW + 10}" height="8" rx="1.5"
+              fill="url(#twillRibbonGrad)" stroke="#261b0c" stroke-width="0.9"/>`;
+  for (let tx = startX + 4; tx <= endX - 4; tx += 6) {
+    const isMajor = (tx - (startX + 4)) % 24 === 0;
+    const tickH = isMajor ? 5 : 3;
+    s += `<line x1="${tx}" y1="${114 - tickH}" x2="${tx}" y2="114" stroke="#3a2813" stroke-width="${isMajor ? 0.9 : 0.6}"/>`;
+  }
+
+  // Brass anchor eyelets
+  s += `<circle cx="${startX - 2}" cy="20" r="2.2" fill="url(#eyeletBrassGrad)" stroke="#2d1c07" stroke-width="0.7"/>`;
+  s += `<circle cx="${startX - 2}" cy="110" r="2.2" fill="url(#eyeletBrassGrad)" stroke="#2d1c07" stroke-width="0.7"/>`;
+  s += `<circle cx="${endX + 1}" cy="20" r="2.2" fill="url(#eyeletBrassGrad)" stroke="#2d1c07" stroke-width="0.7"/>`;
+  s += `<circle cx="${endX + 1}" cy="110" r="2.2" fill="url(#eyeletBrassGrad)" stroke="#2d1c07" stroke-width="0.7"/>`;
+
+  // 2. In Full Height (not shade): Soft Oatmeal Melange Padded Felt Backing Panel
+  if (!isShade && bayW >= 24) {
+    s += `<g class="melange-panel">
+      <!-- Deep shadow behind melange insert -->
+      <rect x="${startX + 2}" y="28" width="${bayW - 4}" height="74" rx="6"
+            fill="#060907" opacity="0.45" filter="url(#woolPillowShadow)"/>
+      <!-- Soft Heather Oatmeal Wool Lining -->
+      <rect x="${startX + 2}" y="28" width="${bayW - 4}" height="74" rx="6"
+            fill="url(#oatmealMelangeGrad)" stroke="#1a130a" stroke-width="1.6"/>
+      <rect x="${startX + 2}" y="28" width="${bayW - 4}" height="74" rx="6"
+            fill="url(#needlePunchPat)"/>
+      <!-- Ivory Running Stitches around Melange Border -->
+      <rect x="${startX + 4.5}" y="30.5" width="${bayW - 9}" height="69" rx="4.5"
+            fill="none" stroke="#faf6eb" stroke-width="1" stroke-dasharray="3 2" opacity="0.85"/>
+    </g>`;
+  }
+
+  // 3. Sewing Kit Notions & Tools (when bayW >= 42 and not shade)
+  if (!isShade && bayW >= 42) {
+    s += `<g class="craft-notions">`;
+
+    // A. 3-Tier Embroidery Floss Bobbin Rack (Scarlet, Gold, Mint)
+    const bobbinX = startX + 16;
+    if (bobbinX + 18 <= endX - 10) {
+      s += `<!-- 3-Tier Embroidery Floss Bobbin Rack -->
+      <g transform="translate(${bobbinX}, 34)">
+        <!-- Stitched Kraft Card Bobbin Body -->
+        <rect x="0" y="0" width="18" height="28" rx="2.5" fill="url(#bobbinCardGrad)" stroke="#281708" stroke-width="0.9"/>
+        <!-- Floss Wound Tiers (Scarlet, Gold, Mint) -->
+        <!-- Tier 1: Scarlet Floss -->
+        <rect x="1.5" y="4" width="15" height="6" rx="1" fill="url(#flossScarletGrad)" stroke="#380a0f" stroke-width="0.6"/>
+        <line x1="3" y1="7" x2="15" y2="7" stroke="#ff7b88" stroke-width="0.8" stroke-dasharray="1.5 1"/>
+        <!-- Tier 2: Marigold Gold Floss -->
+        <rect x="1.5" y="11" width="15" height="6" rx="1" fill="url(#flossGoldGrad)" stroke="#382506" stroke-width="0.6"/>
+        <line x1="3" y1="14" x2="15" y2="14" stroke="#ffdf85" stroke-width="0.8" stroke-dasharray="1.5 1"/>
+        <!-- Tier 3: Mint Turquoise Floss -->
+        <rect x="1.5" y="18" width="15" height="6" rx="1" fill="url(#flossMintGrad)" stroke="#092823" stroke-width="0.6"/>
+        <line x1="3" y1="21" x2="15" y2="21" stroke="#7ff0e3" stroke-width="0.8" stroke-dasharray="1.5 1"/>
+        <!-- Notched Waist Slots -->
+        <circle cx="0" cy="14" r="1.5" fill="#1a130a"/>
+        <circle cx="18" cy="14" r="1.5" fill="#1a130a"/>
+        <!-- Loose tail thread tuck -->
+        <path d="M 15 22 Q 20 24 16 28" fill="none" stroke="#2ec4b6" stroke-width="0.9" stroke-linecap="round"/>
+      </g>`;
+    }
+
+    // B. Padded Heather Wool Pin Cushion with Polished Stainless Steel Tailor Pins
+    const cushionX = startX + 48;
+    if (cushionX + 14 <= endX - 10) {
+      s += `<!-- Padded Wool Pin Cushion with Pearl Tailor Pins -->
+      <g transform="translate(${cushionX}, 48)">
+        <!-- Cushion Base Shadow -->
+        <ellipse cx="0" cy="12" rx="12" ry="11" fill="#060907" opacity="0.4" filter="url(#woolPillowShadow)"/>
+        <!-- Domed Heather Wool Pin Cushion -->
+        <ellipse cx="0" cy="11" rx="11" ry="10" fill="url(#pinCushionGrad)" stroke="#1a1208" stroke-width="1.2"/>
+        <ellipse cx="0" cy="11" rx="11" ry="10" fill="url(#needlePunchPat)"/>
+        <!-- Quilted Segment Stitches -->
+        <line x1="-9" y1="11" x2="9" y2="11" stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.8"/>
+        <line x1="0" y1="2" x2="0" y2="20" stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.8"/>
+        <circle cx="0" cy="11" r="1.6" fill="#e2b13c" stroke="#261706" stroke-width="0.5"/>
+        <!-- Pin 1: Coral Head (angled left) -->
+        <line x1="-8" y1="-5" x2="-2" y2="9" stroke="url(#pinSteelGrad)" stroke-width="1" stroke-linecap="round"/>
+        <circle cx="-8" cy="-5" r="2.4" fill="#ff6b6b" stroke="#330b0b" stroke-width="0.6"/>
+        <circle cx="-9" cy="-6" r="0.7" fill="#ffffff" opacity="0.8"/>
+        <!-- Pin 2: Gold Head (angled center) -->
+        <line x1="2" y1="-8" x2="1" y2="8" stroke="url(#pinSteelGrad)" stroke-width="1.1" stroke-linecap="round"/>
+        <circle cx="2" cy="-8" r="2.6" fill="#ffd166" stroke="#3d2805" stroke-width="0.6"/>
+        <circle cx="1.2" cy="-9" r="0.8" fill="#ffffff" opacity="0.8"/>
+        <!-- Pin 3: Mint Head (angled right) -->
+        <line x1="9" y1="-4" x2="3" y2="10" stroke="url(#pinSteelGrad)" stroke-width="1" stroke-linecap="round"/>
+        <circle cx="9" cy="-4" r="2.4" fill="#48cae4" stroke="#06222b" stroke-width="0.6"/>
+        <circle cx="8" cy="-5" r="0.7" fill="#ffffff" opacity="0.8"/>
+      </g>`;
+    }
+
+    // C. Bridle Leather Shears Pocket with Brass Eyelet & Scissor Loop
+    const shearsX = startX + 80;
+    if (shearsX + 18 <= endX - 8) {
+      s += `<!-- Bridle Leather Shears Pocket -->
+      <g transform="translate(${shearsX}, 38)">
+        <!-- Leather Pocket Sleeve -->
+        <path d="M 0 8 L 0 34 Q 8 38 16 34 L 16 8 Q 8 4 0 8 Z"
+              fill="url(#tabLeatherGrad)" stroke="#1a1109" stroke-width="1.2"/>
+        <!-- Perimeter Saddle Stitches -->
+        <path d="M 2 9 L 2 32 Q 8 35 14 32 L 14 9"
+              fill="none" stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.85"/>
+        <!-- Twin Brass Rivets -->
+        <circle cx="3" cy="11" r="1.5" fill="url(#eyeletBrassGrad)" stroke="#261706" stroke-width="0.5"/>
+        <circle cx="13" cy="11" r="1.5" fill="url(#eyeletBrassGrad)" stroke="#261706" stroke-width="0.5"/>
+        <!-- Peeking Polished Steel Scissors Loop Handle -->
+        <circle cx="8" cy="1" r="6" fill="none" stroke="url(#pinSteelGrad)" stroke-width="2.2"/>
+        <circle cx="8" cy="1" r="3.5" fill="none" stroke="#161e19" stroke-width="0.8"/>
+        <!-- Antique Brass Safety Pin on Pocket Face -->
+        <path d="M 4 20 L 12 20 Q 14 20 14 24 Q 14 28 12 28 L 5 28 Q 3 28 3 24 Q 3 20 5 20 Z"
+              fill="none" stroke="url(#eyeletBrassGrad)" stroke-width="1" opacity="0.9"/>
+      </g>`;
+    }
+
+    s += `</g>`;
+  }
+
+  // 4. Interactive Embroidered Leather Pull-Tab at Outer Right Flank (data-unroll-toggle="true")
+  s += `<g class="unroll-pull-tab" data-unroll-toggle="true" transform="translate(${endX - 2}, 65)" title="Click to roll / unroll craft bag">
+    <!-- Drop Shadow -->
+    <path d="M -1 -17 H 15 Q 23 -17 23 -9 V 9 Q 23 17 15 17 H -1 Z"
+          fill="#060907" opacity="0.45" filter="url(#woolPillowShadow)"/>
+    <!-- Stiffened Cognac Leather Pull Tab -->
+    <path d="M 0 -16 H 14 Q 21 -16 21 -8 V 8 Q 21 16 14 16 H 0 Z"
+          fill="url(#tabLeatherGrad)" stroke="#1a1109" stroke-width="1.3"/>
+    <!-- Ivory Running Stitches -->
+    <path d="M 2 -14 H 13 Q 18 -14 18 -7 V 7 Q 18 14 13 14 H 2"
+          fill="none" stroke="#faf6eb" stroke-width="0.8" stroke-dasharray="2 1.5" opacity="0.85"/>
+    <!-- Cream Chevron Embroidery -->
+    <path d="M 4 -10 L 9 -5 L 4 0 M 4 0 L 9 5 L 4 10"
+          fill="none" stroke="#faf6eb" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+    <!-- Brass Eyelet Rivet -->
+    <circle cx="14" cy="0" r="2.8" fill="url(#eyeletBrassGrad)" stroke="#261706" stroke-width="0.8"/>
+    <circle cx="14" cy="0" r="1.1" fill="#140a02"/>
+    <!-- Turned Boxwood Charm Bead -->
+    <ellipse cx="23" cy="0" rx="3.2" ry="5" fill="url(#toggleWoodGrad)" stroke="#261706" stroke-width="0.9"/>
+    <line x1="17" y1="0" x2="20" y2="0" stroke="#faf6eb" stroke-width="1.2"/>
+  </g>`;
+
+  // 5. In Shade Mode: Extended Cornice & Notions Pips
+  if (isShade && bayW >= 24) {
+    s += `<g class="craft-shade-extension">
+      <line x1="${startX}" y1="8" x2="${endX}" y2="8" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.75"/>
+      <line x1="${startX}" y1="36" x2="${endX}" y2="36" stroke="#faf6eb" stroke-width="1.2" stroke-dasharray="3 3" opacity="0.75"/>
+      <circle cx="${startX + 16}" cy="22" r="3" fill="#e63946" stroke="#140809" stroke-width="0.8"/>
+      <circle cx="${startX + 30}" cy="22" r="3" fill="#e2b13c" stroke="#140809" stroke-width="0.8"/>
+      <circle cx="${startX + 44}" cy="22" r="3" fill="#2ec4b6" stroke="#140809" stroke-width="0.8"/>
+    </g>`;
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+function updateExtensionLayout() {
+  const morph = model.morphProgress || 0;
+  const extraW = Math.round(morph * 138);
+  const curWA = W + extraW;
+
+  const aEl = $('#a');
+  if (aEl) {
+    aEl.style.width = curWA + 'px';
+    const shellA = $('#shell-a');
+    if (shellA) {
+      shellA.style.width = curWA + 'px';
+      shellA.setAttribute('viewBox', `0 0 ${curWA} 130`);
+    }
+    const extScreen = $('#extensionScreen-a');
+    if (extScreen) {
+      if (morph > 0.04) {
+        extScreen.classList.add('visible');
+        extScreen.style.width = Math.max(0, extraW - 14) + 'px';
+      } else {
+        extScreen.classList.remove('visible');
+        extScreen.style.width = '0px';
+      }
+    }
+    const shadeStripA = aEl.querySelector('.shade-strip');
+    const badgeA = $('#extBadge-a');
+    if (shadeStripA) {
+      if (model.shade && morph > 0.1) {
+        shadeStripA.style.width = Math.min(curWA - 40, 284 + Math.round(extraW * 0.7)) + 'px';
+        if (badgeA) badgeA.hidden = (morph < 0.6);
+        aEl.querySelectorAll('.ext-notion').forEach(v => v.style.display = (morph > 0.6 ? 'inline-block' : 'none'));
+      } else {
+        shadeStripA.style.width = '';
+        if (badgeA) badgeA.hidden = true;
+        aEl.querySelectorAll('.ext-notion').forEach(v => v.style.display = 'none');
+      }
+    }
+  }
+}
+
 // Render the entire hardware layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -3294,9 +3671,12 @@ function renderHardware() {
   const sq = model.lozengeSquash;
   const isShade = model.shade || f > 0.5 || r > 0.5 || env > 0.5 || sq > 0.5;
   const glow = model.busy ? model.light : connectionGlow.socket.value;
+  const morph = model.morphProgress || 0;
+  const extraW = Math.round(morph * 138);
+  const curWA = W + extraW;
   let shared = '';
 
-  const midX = (a.x + W - 22 + b.x + 22) / 2;
+  const midX = (a.x + curWA - 22 + b.x + 22) / 2;
 
   if (p > 0) {
     // Continuous Monolithic Plush Felt Chassis
@@ -3321,58 +3701,64 @@ function renderHardware() {
       const dLoop = model.joined ? 1 : (model.duffelLoop || (glow > 0.25 ? (glow - 0.25) / 0.75 : 0));
       shared += drawDuffelJoin(a, b, model.joined, dLoop, model.duffelTension, p, Math.max(f, r, env, sq));
     } else {
-      // Option 1: Entangled Fiber Seam (or default)
+      // Option 1 & 10: Entangled Fiber Seam (or default)
       if (model.joined || model.entangle > 0.02 || (glow > 0.3 && !model.joined)) {
         const entRatio = model.joined ? 1 : model.entangle || Math.max(0, (glow - 0.25) / 0.75);
-        const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 16 + b.x + 16) / 2;
+        const kMidX = model.joined ? a.x + JOIN_DISTANCE + extraW : (a.x + curWA - 16 + b.x + 16) / 2;
         shared += drawEntangledFeltSeam(kMidX, a.y, entRatio, Math.max(p, glow > 0.3 ? 0.9 : entRatio));
       }
     }
   }
 
   if (model.joined && model.design) {
-    shared += `<line x1="${a.x + JOIN_DISTANCE}" y1="${a.y + 10}" x2="${a.x + JOIN_DISTANCE}" y2="${a.y + 120}"
+    shared += `<line x1="${a.x + JOIN_DISTANCE + extraW}" y1="${a.y + 10}" x2="${a.x + JOIN_DISTANCE + extraW}" y2="${a.y + 120}"
                      stroke="#e2b13c" stroke-dasharray="4 3" stroke-width="1.5"/>`;
   }
 
   $('#sharedFeltStage').innerHTML = shared;
 
-  // Individual capsules: A = Sage Green Wool, B = Terracotta Wool
+  // Individual capsules: A = Sage Green Wool (curWA width when morphed), B = Terracotta Wool
   for (const id of ['a', 'b']) {
     const isA = id === 'a';
+    const capWidth = isA ? curWA : W;
+    const rightOffset = isA ? extraW : 0;
     const grad = isA ? 'url(#sageWoolGrad)' : 'url(#terracottaWoolGrad)';
-    let individual = drawFeltCasing(0, 0, W, grad, 1, f, r, model.option === 'toolroll', env, model.option === 'envelope', sq, model.option === 'lozenge');
+    let individual = drawFeltCasing(0, 0, capWidth, grad, 1, f, r, model.option === 'toolroll', env, model.option === 'envelope', sq, model.option === 'lozenge');
+
+    if (isA) {
+      individual += drawCraftBagExtension(extraW, morph, isShade);
+    }
 
     // Only draw roving fringe caps if NOT in duffel, zipper, popper, or velcro option
     if (model.option !== 'duffel' && model.option !== 'zipper' && model.option !== 'popper' && model.option !== 'velcro') {
       individual += drawRovingCap(0, 0, false, !isA, isA ? 0 : model.cap, Math.max(f, r, env, sq)) +
-                    drawRovingCap(0, 0, true, !isA, isA ? model.cap : 0, Math.max(f, r, env, sq));
+                    drawRovingCap(rightOffset, 0, true, !isA, isA ? model.cap : 0, Math.max(f, r, env, sq));
     }
 
     if (model.option === 'velcro') {
       // Option 9: Concealed hook flange on Module A, microfiber loop socket on Module B
       if (isA) {
-        individual += drawVelcroEndCap(0, 0, true, false, model.joined ? 1 : (model.velcroProg * 0.7), Math.max(f, r, env, sq));
+        individual += drawVelcroEndCap(rightOffset, 0, true, false, model.joined ? 1 : (model.velcroProg * 0.7), Math.max(f, r, env, sq));
       } else {
         individual += drawVelcroEndCap(0, 0, false, true, model.joined ? 1 : (model.velcroProg * 0.7), Math.max(f, r, env, sq));
       }
     } else if (model.option === 'popper') {
       // Option 7: Stiffened tabs with male studs on Module A; slotted pocket eyes with female sockets on Module B
       if (isA) {
-        individual += drawPopperEndCap(0, 0, true, false, model.joined ? 1 : (model.popperProg * 0.7), Math.max(f, r, env, sq));
+        individual += drawPopperEndCap(rightOffset, 0, true, false, model.joined ? 1 : (model.popperProg * 0.7), Math.max(f, r, env, sq));
       } else {
         individual += drawPopperEndCap(0, 0, false, true, model.joined ? 1 : (model.popperProg * 0.7), Math.max(f, r, env, sq));
       }
     }
 
-    $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawFeltSocketLight(isA ? W - 22 : 22, 0, glow)}</g>`;
+    $('#shell-' + id).innerHTML = `<g opacity="${1 - p}">${individual}${drawFeltSocketLight(isA ? curWA - 22 : 22, 0, glow)}</g>`;
   }
 
   // Socket proximity aura
   if (!isShade && glow > 0.05 && p < 0.98) {
     $('#feltProximityAura').innerHTML = `
       <g opacity="${glow}">
-        ${drawFeltSocketLight(a.x + W - 22, a.y, glow)}
+        ${drawFeltSocketLight(a.x + curWA - 22, a.y, glow)}
         ${drawFeltSocketLight(b.x + 22, b.y, glow)}
       </g>
     `;
@@ -3385,6 +3771,7 @@ function updateStateButtons() {
   const isShade = model.shade || model.bellowsFold > 0.5 || model.toolRoll > 0.5 || model.envelopeFlap > 0.5 || model.lozengeSquash > 0.5;
   const isJoined = model.joined;
   const isJoining = ((model.entangle > 0.1 && model.entangle < 0.95) ||
+                     (model.option === 'morph' && model.morphProgress > 0.1 && model.morphProgress < 0.95) ||
                      (model.option === 'velcro' && model.velcroProg > 0.1 && model.velcroProg < 0.95) ||
                      (model.option === 'popper' && model.popperProg > 0.1 && model.popperProg < 0.95) ||
                      (model.option === 'duffel' && model.duffelLoop > 0.1 && model.duffelLoop < 0.95) ||
@@ -3413,6 +3800,7 @@ function render() {
   renderHardware();
   paintGlowValues();
   updateStateButtons();
+  updateExtensionLayout();
 
   ['a', 'b'].forEach(id => {
     const m = model[id], el = $('#' + id);
@@ -3428,6 +3816,10 @@ function render() {
     btn.textContent = m.running ? 'Ⅱ' : '▶';
     btn.setAttribute('aria-label', (m.running ? 'Pause ' : 'Resume ') + (id === 'a' ? 'Jarvis' : 'GitDiscuss'));
   });
+
+  const morph = model.morphProgress || 0;
+  const extraW = Math.round(morph * 138);
+  const curWA = W + extraW;
 
   $('#runText').innerHTML = model.a.running ? '03 <em>agents running</em>' : '03 <em>agents paused</em>';
   $('#activityState').textContent = model.a.running ? 'Pocket running' : 'Pocket paused';
@@ -3470,13 +3862,21 @@ function render() {
   stage.classList.toggle('design', model.design);
   $('#btnDesign').setAttribute('aria-pressed', String(model.design));
 
-  $('#portA').style.left = (model.a.x + W - 30) + 'px';
+  $('#portA').style.left = (model.a.x + curWA - 30) + 'px';
   $('#portA').style.top = (model.a.y + 54) + 'px';
   $('#portB').style.left = (model.b.x + 12) + 'px';
   $('#portB').style.top = (model.b.y + 54) + 'px';
 
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
+
+  const unrollBtn = $('#btnUnrollAnim');
+  if (unrollBtn) {
+    unrollBtn.textContent = model.extended ? 'Roll craft bag' : 'Unroll craft bag';
+    unrollBtn.disabled = model.busy;
+    const isMorphOption = model.option === 'morph';
+    unrollBtn.classList.toggle('primary-btn', isMorphOption);
+  }
 
   const lozengeBtn = $('#btnLozengeAnim');
   if (lozengeBtn) {
@@ -4616,6 +5016,88 @@ async function unsquashLozenge() {
   $('#phase').textContent = model.joined ? 'Joined / Interwoven fiber chassis' : 'Separate / Two wool housings';
 }
 
+// Option 10: Craft Bag / Sewing Kit Unroll Morph Animations (Lateral Compartment Unroll & Notions)
+async function morphCraftBag() {
+  if (model.busy || model.extended) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Unrolling craft bag! Embroidered pull-tab releases saddle-leather strap and unrolls sewing kit on twill ribbon stays.');
+  $('#phase').textContent = 'Unrolling craft bag & notions compartment';
+
+  const startMorph = model.morphProgress || 0;
+  const startBX = model.b.x;
+  const startAX = model.a.x;
+
+  await tween(480, t => {
+    // Viscoelastic wool unroll easing: smooth uncurl with cushioned settlement
+    const ease = t < 0.7 ? Math.pow(t / 0.7, 1.5) * 0.8 : 0.8 + Math.sin((t - 0.7) / 0.3 * Math.PI * 0.5) * 0.2;
+    const currentMorph = startMorph + (1 - startMorph) * ease;
+    model.morphProgress = currentMorph;
+    const currentExtra = Math.round(currentMorph * 138);
+    const curWA = W + currentExtra;
+
+    if (model.joined) {
+      model.b.x = model.a.x + JOIN_DISTANCE + currentExtra;
+    } else {
+      // Neighbor clearance rule: nudge GitDiscuss aside without covering
+      const minBX = model.a.x + curWA + 28;
+      if (model.b.x < minBX) {
+        const nudgeDist = minBX - model.b.x;
+        model.b.x = minBX;
+        model.bNudge = (model.bNudge || 0) + nudgeDist;
+      }
+    }
+    render();
+  }, token);
+
+  model.morphProgress = 1;
+  model.extended = true;
+  model.busy = false;
+  render();
+  say('Craft bag unrolled. Twill ribbon stays taut with tailor\'s marks, 3-tier floss bobbins & pin cushion ready.');
+  $('#phase').textContent = 'Craft bag unrolled / Sewing kit & notions open';
+}
+
+async function retractCraftBag() {
+  if (model.busy || !model.extended) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  say('Rolling up craft bag. Pockets and notions tuck into compact felt casing.');
+  $('#phase').textContent = 'Rolling craft bag';
+
+  const startMorph = model.morphProgress;
+  const startBX = model.b.x;
+  const nudgeToRestore = model.bNudge || 0;
+
+  await tween(440, t => {
+    const ease = 1 - Math.sin(t * Math.PI / 2);
+    const currentMorph = startMorph * ease;
+    model.morphProgress = currentMorph;
+    const currentExtra = Math.round(currentMorph * 138);
+    const curWA = W + currentExtra;
+
+    if (model.joined) {
+      model.b.x = model.a.x + JOIN_DISTANCE + currentExtra;
+    } else if (nudgeToRestore > 0) {
+      const targetBX = Math.max(startBX - nudgeToRestore, model.a.x + curWA + 28);
+      model.b.x = startBX - (startBX - targetBX) * t;
+    }
+    render();
+  }, token);
+
+  model.morphProgress = 0;
+  model.extended = false;
+  model.bNudge = 0;
+  model.busy = false;
+  render();
+  say('Craft bag rolled. Compact felt casing restored.');
+  $('#phase').textContent = model.joined ? 'Joined / Interwoven fiber chassis' : 'Separate / Two wool housings';
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -4650,10 +5132,13 @@ async function applyState(stateName) {
       model.lozengeSquash = 0;
       model.cap = 0;
       model.blend = 0;
+      model.morphProgress = (model.option === 'morph' ? 1 : 0);
+      model.extended = (model.option === 'morph');
+      model.bNudge = 0;
       model.a.x = 140;
       model.b.x = 680;
       render();
-      say('State: Separate — Two independent tactile felt capsules.');
+      say('State: Separate — Two independent tactile felt capsules' + (model.extended ? ' (Craft bag unrolled).' : '.'));
     }
   } else if (stateName === 'joining') {
     if (model.shade || model.lozengeSquash > 0.05) {
@@ -4668,7 +5153,19 @@ async function applyState(stateName) {
     model.joined = false;
     model.blend = 0.25;
     model.cap = 0.5;
-    if (model.option === 'velcro') {
+    if (model.option === 'morph') {
+      model.morphProgress = 0.55;
+      model.extended = false;
+      model.velcroProg = 0;
+      model.popperProg = 0;
+      model.zipperProg = 0;
+      model.duffelLoop = 0;
+      model.entangle = 0.45;
+      model.toolRoll = 0;
+      model.envelopeFlap = 0;
+      model.bellowsFold = 0;
+      model.lozengeSquash = 0;
+    } else if (model.option === 'velcro') {
       model.velcroProg = 0.68; // mid-flight hook flange entering loop pile bed
       model.velcroPeel = 0;
       model.velcroTension = 0.35;
@@ -4781,10 +5278,13 @@ async function applyState(stateName) {
       model.lozengeSquash = 0;
     }
     model.light = 0.75;
-    model.a.x = 240;
-    model.b.x = 240 + W + 50; // near each other
+    const curExtra = Math.round((model.morphProgress || 0) * 138);
+    model.a.x = 220;
+    model.b.x = 220 + W + curExtra + 44; // near each other with safe clearance
     render();
-    if (model.option === 'velcro') {
+    if (model.option === 'morph') {
+      say('State: Joining — Mid-animation view with cotton ribbon stays unrolling sewing kit compartment.');
+    } else if (model.option === 'velcro') {
       say('State: Joining — Mid-animation view with micro-hooks partially engaging fuzzy loop pile bed.');
     } else if (model.option === 'lozenge') {
       say('State: Joining — Mid-animation view with wool casing half compressed into a rounded lozenge pill.');
@@ -4814,8 +5314,9 @@ async function applyState(stateName) {
       await unfoldBellows();
     }
     if (!model.joined) {
-      model.a.x = 220;
-      model.b.x = 220 + JOIN_DISTANCE;
+      const curExtra = Math.round((model.morphProgress || 0) * 138);
+      model.a.x = 200;
+      model.b.x = 200 + JOIN_DISTANCE + curExtra;
       model.joined = true;
       model.blend = 1;
       model.cap = 1;
@@ -4823,7 +5324,15 @@ async function applyState(stateName) {
       model.envelopeFlap = 0;
       model.bellowsFold = 0;
       model.lozengeSquash = 0;
-      if (model.option === 'velcro') {
+      if (model.option === 'morph') {
+        model.morphProgress = 1;
+        model.extended = true;
+        model.entangle = 1;
+        model.velcroProg = 0;
+        model.popperProg = 0;
+        model.zipperProg = 0;
+        model.duffelLoop = 0;
+      } else if (model.option === 'velcro') {
         model.velcroProg = 1;
         model.velcroPeel = 0;
         model.velcroTension = 0;
@@ -4869,7 +5378,9 @@ async function applyState(stateName) {
       }
       model.light = 0;
       render();
-      if (model.option === 'velcro') {
+      if (model.option === 'morph') {
+        say('State: Joined — Master unrolled craft bag docked seamlessly with GitDiscuss.');
+      } else if (model.option === 'velcro') {
         say('State: Joined — Seamless butt-joint cushion with concealed velcro hook-and-loop micro-peel.');
       } else if (model.option === 'popper') {
         say('State: Joined — Heavy brass press-studs snapped shut into dimpled wool sockets.');
@@ -4953,6 +5464,12 @@ $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState('shade');
 $('#btnJoinAnim').onclick = () => triggerJoin();
 $('#btnSeparateAnim').onclick = () => triggerSeparate();
+if ($('#btnUnrollAnim')) {
+  $('#btnUnrollAnim').onclick = () => {
+    if (model.extended) retractCraftBag();
+    else morphCraftBag();
+  };
+}
 if ($('#btnVelcroAnim')) {
   $('#btnVelcroAnim').onclick = () => {
     if (model.joined) triggerSeparate();
@@ -5003,9 +5520,10 @@ $('#btnReset').onclick = () => {
   Object.assign(model, {
     joined: false, busy: false, pocket: false, docked: false, design: false, shade: false,
     blend: 0, cap: 0, entangle: 0, bellowsFold: 0, toolRoll: 0, envelopeFlap: 0, lozengeSquash: 0, duffelLoop: 0, duffelTension: 0,
-    zipperProg: 0, zipperTension: 0, popperProg: 0, popperTension: 0, velcroProg: 0, velcroPeel: 0, velcroTension: 0, option: 'velcro', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    zipperProg: 0, zipperTension: 0, popperProg: 0, popperTension: 0, velcroProg: 0, velcroPeel: 0, velcroTension: 0,
+    morphProgress: 0, extended: false, bNudge: 0, option: 'morph', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
-  $('#optionSelect').value = 'velcro';
+  $('#optionSelect').value = 'morph';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
@@ -5014,10 +5532,29 @@ $('#btnReset').onclick = () => {
 };
 
 // Option selector change
-$('#optionSelect').onchange = (e) => {
+$('#optionSelect').onchange = async (e) => {
   model.option = e.target.value;
+  if (model.option === 'morph') {
+    say('Option 10: Craft Bag / Sewing Kit Unroll morph selected. Padded felt compartments, measuring twill ribbons, floss bobbins & pin cushion.');
+    if (!model.extended) {
+      await morphCraftBag();
+    }
+  } else {
+    if (model.extended) {
+      await retractCraftBag();
+    }
+  }
+
   if (model.joined) {
-    if (model.option === 'velcro') {
+    if (model.option === 'morph') {
+      model.morphProgress = 1;
+      model.extended = true;
+      model.entangle = 1;
+      model.velcroProg = 0;
+      model.popperProg = 0;
+      model.zipperProg = 0;
+      model.duffelLoop = 0;
+    } else if (model.option === 'velcro') {
       model.velcroProg = 1;
       model.velcroPeel = 0;
       model.velcroTension = 0;
@@ -5114,7 +5651,9 @@ $('#optionSelect').onchange = (e) => {
     model.duffelTension = 0;
   }
   render();
-  if (model.option === 'velcro') {
+  if (model.option === 'morph') {
+    say('Option 10: Craft Bag / Sewing Kit Unroll morph selected. Padded felt compartments, measuring twill ribbons, floss bobbins & pin cushion.');
+  } else if (model.option === 'velcro') {
     say('Option 9: Velcro Hook-and-Loop Micro-Peel join selected. Concealed micro-hook flanges compress with microscopic crunch into a seamless unbroken cushion.');
   } else if (model.option === 'lozenge') {
     say('Option 8: High-Damp Wool Squeeze (Lozenge Squash) shade selected. Wool body compresses vertically with lateral pill bulge into a dense rounded lozenge.');
@@ -5164,7 +5703,8 @@ $('#concurrencyToggle').onclick = () => {
 
 // Dragging & Interaction Physics
 function alignedTarget() {
-  return { x: model.a.x + JOIN_DISTANCE, y: model.a.y };
+  const extraW = Math.round((model.morphProgress || 0) * 138);
+  return { x: model.a.x + JOIN_DISTANCE + extraW, y: model.a.y };
 }
 function pocketTarget() {
   return { x: model.a.x + 58, y: model.a.y + (model.shade ? 40 : 121) + 40 };
@@ -5263,16 +5803,18 @@ function onPointerMove(e) {
   const dx = (e.clientX - drag.startPointer.x) / scale, dy = (e.clientY - drag.startPointer.y) / scale;
 
   if (drag.kind === 'module') {
+    const extraW = Math.round((model.morphProgress || 0) * 138);
+    const curWA = W + extraW;
     if (model.joined) {
-      model.a.x = Math.max(20, Math.min(1200 - (JOIN_DISTANCE + W) - 20, drag.startA.x + dx));
+      model.a.x = Math.max(20, Math.min(1200 - (JOIN_DISTANCE + extraW + W) - 20, drag.startA.x + dx));
       model.a.y = Math.max(100, Math.min(model.pocket ? 305 : 385, drag.startA.y + dy));
-      model.b.x = model.a.x + JOIN_DISTANCE;
+      model.b.x = model.a.x + JOIN_DISTANCE + extraW;
       model.b.y = model.a.y;
     } else {
       const m = model[drag.id];
       const start = drag.id === 'a' ? drag.startA : drag.startB;
       let rawX = start.x + dx, rawY = start.y + dy;
-      rawX = Math.max(20, Math.min(1200 - W - 20, rawX));
+      rawX = Math.max(20, Math.min(1200 - (drag.id === 'a' ? curWA : W) - 20, rawX));
       rawY = Math.max(100, Math.min(model.pocket && drag.id === 'a' ? 305 : 385, rawY));
 
       if (drag.id === 'b') {
@@ -5390,6 +5932,12 @@ function cancelDrag() {
 
 // Global listeners
 stage.addEventListener('click', e => {
+  const unrollTab = e.target.closest('[data-unroll-toggle]');
+  if (unrollTab) {
+    if (model.extended) retractCraftBag();
+    else morphCraftBag();
+    return;
+  }
   const peelTab = e.target.closest('[data-peel-toggle]');
   if (peelTab) {
     if (model.joined) triggerSeparate();
@@ -5420,6 +5968,10 @@ window.addEventListener('keydown', e => {
   if (e.key === '2') applyState('joining');
   if (e.key === '3') applyState('joined');
   if (e.key === '4') applyState('shade');
+  if (e.key === 'u' || e.key === 'U' || e.key === 'm' || e.key === 'M') {
+    if (model.extended) retractCraftBag();
+    else morphCraftBag();
+  }
   if (e.key === 'v' || e.key === 'V') {
     if (model.joined) triggerSeparate();
     else triggerJoin();
@@ -5459,7 +6011,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat, Duffel Toggle, Tool-Roll, Cross-Stitch Zipper, Envelope Flap, Heavy Brass Popper Snap, Lozenge Squash & Velcro Hook-and-Loop Micro-Peel.');
+say('Tactile Felt skin loaded: Dense carded wool with Fiber Entanglement, Bellows Pleat, Duffel Toggle, Tool-Roll, Cross-Stitch Zipper, Envelope Flap, Heavy Brass Popper Snap, Lozenge Squash, Velcro Micro-Peel & Craft Bag Unroll Morph.');
 </script>
 </body>
 </html>

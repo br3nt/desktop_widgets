@@ -72,7 +72,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 
 ### Cycle 10: Morphs
 - [x] Gothic: Cathedral Extension morph — Lateral expansion with miniature corbels, secondary lancets and crypt drawer (Built in prototypes/skins/agy/gothic.html with 140px lateral nave bay expansion, sliding cantilever corbels with masonry contact sparks on bronze runners, auxiliary chantry telemetry panel, twin celestial sapphire and liturgical ruby stained glass lancets, stepped Romanesque crypt stairs in undercroft, neighbor clearance push-and-restore logic, Option 10 switcher, and 'X'/'E' keyboard shortcut)
-- [ ] Felt: Craft Bag / Sewing Kit Unroll morph — Embroidered pull-tab unfolds padded felt pockets on cotton ribbons
+- [x] Felt: Craft Bag / Sewing Kit Unroll morph — Embroidered pull-tab unfolds padded felt pockets on cotton ribbons (Built in prototypes/skins/agy/felt.html with 138px lateral felt expansion, tailor's measuring twill ribbon stays, 3-tier embroidery floss bobbins, padded heather wool pin cushion with pearl pins, leather shears sleeve, interactive embroidered pull-tab toggle, neighbor clearance push-and-restore logic, Option 10 switcher, and 'U'/'M' keyboard shortcut)
 - [ ] Elven: Blooming Frond / Parchment Unroll morph — Silver filigree boughs sweep open with translucent parchment bay
 - [ ] Wire: Unfolding Wire Sculpture morph — Auxiliary display bays swing down on beaded strands along copper rails
 - [ ] Hollow: Insect Carapace Unfurling morph — Chitin plates split on organic centerline revealing amber spore chamber
