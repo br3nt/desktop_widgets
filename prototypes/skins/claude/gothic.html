@@ -106,7 +106,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -130,7 +130,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -173,6 +173,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="pshade" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#2a1d10" stop-opacity=".42"/><stop offset=".28" stop-color="#fff8e8" stop-opacity=".3"/><stop offset=".55" stop-color="#fff8e8" stop-opacity="0"/><stop offset="1" stop-color="#2a1d10" stop-opacity=".5"/></linearGradient>
  <linearGradient id="rgRoll" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6eed8"/><stop offset=".28" stop-color="#e2d5b6"/><stop offset=".7" stop-color="#ad9d7e"/><stop offset="1" stop-color="#5f5140"/></linearGradient>
  <linearGradient id="rgPurb" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#23231f"/><stop offset=".2" stop-color="#5f5f53"/><stop offset=".33" stop-color="#a3a18c"/><stop offset=".48" stop-color="#4a4a40"/><stop offset=".85" stop-color="#2b2b25"/><stop offset="1" stop-color="#151512"/></linearGradient>
+ <linearGradient id="rtVel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7eed6"/><stop offset="1" stop-color="#e6d4ab"/></linearGradient>
+ <linearGradient id="rtRoll" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5e4a2e"/><stop offset=".16" stop-color="#cdb98e"/><stop offset=".36" stop-color="#f4e8ca"/><stop offset=".7" stop-color="#d2bb8e"/><stop offset=".9" stop-color="#8a714a"/><stop offset="1" stop-color="#4a3820"/></linearGradient>
  <linearGradient id="rgSide" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#000" stop-opacity=".5"/><stop offset=".32" stop-color="#000" stop-opacity="0"/><stop offset=".62" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></linearGradient>
  <linearGradient id="pniche"x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0f0a07"/><stop offset=".6" stop-color="#241910"/><stop offset="1" stop-color="#3b2b1c"/></linearGradient>
 </defs></svg>
@@ -260,7 +262,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
-$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg>'));
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -1557,7 +1559,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -1575,7 +1577,10 @@ const SHADES={
   about:'The strip is a carved stone drum, like a lettered roller turning in a wall. The wall lowers to its frieze, which keeps the name. Under it a channel opens in the stone, and a pale limestone cylinder on two gilt spindles spins in it, slowing over two turns until it settles with a small rebound on the line the widget was showing. <b>Each face of the drum is one line, cut in capitals,</b> with its number or label picked out in red the way scribes rubricated a heading: Jarvis carries its agent count, its task and its last log entry; GitDiscuss its queue, its thread and its log; Checks its pass count, what is waiting and the run. The lines are the widget\'s own screens, so turning the drum also turns the page that shows when you unshade. Click or tap the drum, or focus it and press Enter or the arrow keys, to turn it one line, with weight; the faces above and below roll over the top and under the bottom of the channel, and three small lozenges at its end mark which line is up. It never turns by itself. Joins still work on the shaded pair.'},
  rings:{label:'Shaft rings',kind:'Cinch',ms:3200,h:small=>small?46:60,lowAt:[0,.5],
   on:'Shaded: roll mouldings swell out of the wall and pack together as the wall lowers, then dark marble shaft rings drop on and cinch the sheaf; the middle collar lights with the value.',off:'Unshaded: the collar goes dark, the rings loosen and lift away, and the rolls spread back into a wall.',
-  about:'In Early English churches (Salisbury, Lincoln, the Temple Church) slender shafts were bound to the piers by <i>shaft rings</i>, annulets of dark, polished Purbeck marble that look as if they were tightened round the stone. Here they bind the whole facade. As the wall lowers, its face breaks into round roll mouldings, thin at first and swelling, and because they stay evenly spaced over whatever wall is left, lowering the wall is what packs them: they close up and meet with a jolt and a puff of grit along the beds, a tight sheaf of rolls running between the end piers. Then the rings come down one at a time, left, right, then the collar in the middle: each drops on loose with a small bounce, then tightens, and the sheaf is drawn in under it and bulges between, the way a bundle gathers under a cord. Grit squeezes out at each ring\'s edge and a glint runs round its gilt fillet. The middle collar is wider and holds a pointed pane of quarry glass, which kindles with a flare (warm while the widget runs, cold if it is paused) and shows the key value in dark ink. <b>The strip is the bound sheaf:</b> the name in the frieze, the cinched rolls, two shaft rings and the lit collar. Unshading plays it back, and joins still work on the shaded pair.'}
+  about:'In Early English churches (Salisbury, Lincoln, the Temple Church) slender shafts were bound to the piers by <i>shaft rings</i>, annulets of dark, polished Purbeck marble that look as if they were tightened round the stone. Here they bind the whole facade. As the wall lowers, its face breaks into round roll mouldings, thin at first and swelling, and because they stay evenly spaced over whatever wall is left, lowering the wall is what packs them: they close up and meet with a jolt and a puff of grit along the beds, a tight sheaf of rolls running between the end piers. Then the rings come down one at a time, left, right, then the collar in the middle: each drops on loose with a small bounce, then tightens, and the sheaf is drawn in under it and bulges between, the way a bundle gathers under a cord. Grit squeezes out at each ring\'s edge and a glint runs round its gilt fillet. The middle collar is wider and holds a pointed pane of quarry glass, which kindles with a flare (warm while the widget runs, cold if it is paused) and shows the key value in dark ink. <b>The strip is the bound sheaf:</b> the name in the frieze, the cinched rolls, two shaft rings and the lit collar. Unshading plays it back, and joins still work on the shaded pair.'},
+ rotulus:{label:'Rotulus',kind:'Roll',ms:3400,h:small=>small?50:58,lowAt:[.16,.74],
+  on:'Shaded: the window turns to an illuminated vellum leaf, and as the wall lowers the leaf winds up onto a gilt rod; the value is written on the roll and it is sealed with wax.',off:'Unshaded: the seal comes away, the roll unwinds down the wall as it rises, and the leaf turns back into glass.',
+  about:'Medieval records and liturgy were often kept on a <i>rotulus</i>, a long vellum roll wound on a rod, and a roll that was put away had a note of what it held written on its back (the <i>dorse</i>) and was closed with a pendant wax seal. Here the window becomes the roll. The display fades and the glass turns to an illuminated leaf hanging from the frieze: a red and blue penwork border, a gilded initial in a blue square with a red flourish, the name in red, then lines of brown script. A gilt rod with turned knobs comes in along its foot. Then the wall lowers, and the roll rides down with the foot of the wall, so <b>lowering the wall is what winds the leaf up</b>: the roll climbs, fattening lap by lap, its laps turning over the top, shading the leaf just above it and casting a shadow on the stone below, while the script disappears into it line by line. When it lands under the frieze, a silk tag drops from under it, and a drop of wax falls onto the roll, squashes and is stamped with a quatrefoil, with a glint. The wax is the status: honey amber while running, blue when paused, red for a decision needed, green for passed. Last, the key value is written along the roll beside a small gilded initial. <b>The strip is the sealed roll:</b> the name in the frieze, the value on the dorse, the seal. Unshading plays it back, the leaf unwinding as the wall rises. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -1861,6 +1866,82 @@ function rings(id,w,h,k){
   // Tightening: grit squeezes out at the ring's edges, then a glint runs round its fillet.
   const gt=seg(r.t,.42,.8);if(gt>0&&gt<1)s+=dust(x0-1,yc-hh,gt,2,6,r.x)+dust(x1+1,yc+hh,gt,2,6,r.x+3);
   const gl=Math.sin(Math.PI*seg(r.t,.8,1));if(gl>.05)s+=`<g opacity="${f(gl)}">${sparkle(gx[0],yt+3+(yb-yt-6)*(1-seg(r.t,.8,1)),gl*5)}</g>`}
+ return s;
+}
+
+/* Rotulus: the window becomes an illuminated vellum leaf hanging from the frieze. The roll rides just above the wall's foot,
+   so lowering the wall is what winds the leaf up onto its gilt rod; then the value is written on the dorse and a wax seal closes it.
+   yt/yb: the leaf's top and foot; R0: the bare rod; Rf: the full roll; foot: the stone left under the roll. */
+function rtGeo(id){const sm=id==='c',[x,y,sw,sh,b]=SCR[id];return{sm,x0:x-b-1,x1:x+sw+b+1,yt:y-b,yb:y+sh+b,R0:sm?2.2:2.6,Rf:sm?9:11,foot:sm?5:6}}
+// Wax colours (light, body, shadow): honey while running, blue when paused, red for a decision, green for passed.
+const rtWax=id=>id==='a'?(model.a.run?['#ffe7a0','#d99a1e','#6e4508']:['#d6e2ff','#4f74c8','#1c2c66']):id==='b'?['#ffb3a3','#b8262c','#4e0b10']:['#cdf0b8','#3f9a4c','#14461f'];
+const rtCache={};
+// The leaf's face: penwork border, a gilded initial with a red flourish, the name rubricated, then lines of script.
+function rtLeaf(id){
+ if(rtCache[id])return rtCache[id];
+ const G=rtGeo(id),{sm,x0,x1,yt,yb}=G,S=sm?13:18,bx=x0+(sm?7:9),by=yt+(sm?6:8),fs=sm?8.5:10,lh=sm?5.5:6.6,name=tpText(id)[0];
+ let s=`<rect x="${f(x0)}" y="${yt}" width="${f(x1-x0)}" height="${yb-yt}" fill="url(#rtVel)" stroke="#8a7350" stroke-width=".6"/>`+
+  `<rect x="${f(x0+2.5)}" y="${yt+2.5}" width="${f(x1-x0-5)}" height="${yb-yt-5}" fill="none" stroke="#a3222f" stroke-width=".7"/>`+
+  `<rect x="${f(x0+4.2)}" y="${yt+4.2}" width="${f(x1-x0-8.4)}" height="${yb-yt-8.4}" fill="none" stroke="#2b56b3" stroke-width=".45" stroke-dasharray="3 1.4"/>`;
+ // The flourish runs down the margin from the initial, with curls.
+ s+=`<path d="M${f(bx+S*.5)} ${f(by+S)}C${f(bx-1)} ${f(by+S+6)} ${f(bx+3)} ${f(yb-12)} ${f(bx+S*.3)} ${f(yb-7)}" fill="none" stroke="#a3222f" stroke-width=".7"/>`+
+  [.35,.65].map(t=>{const y=lerp(by+S,yb-7,t);return `<circle cx="${f(bx+1.6)}" cy="${f(y)}" r="1.6" fill="none" stroke="#a3222f" stroke-width=".55"/>`}).join('');
+ s+=`<rect x="${f(bx)}" y="${f(by)}" width="${S}" height="${S}" fill="#2b56b3" stroke="url(#gild)" stroke-width="1.1"/>`+
+  `<text x="${f(bx+S/2)}" y="${f(by+S*.78)}" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="${f(S*.8)}" fill="#f3cf6e">${RT0[id]}</text>`;
+ const tx=bx+S+5;
+ s+=`<text x="${f(tx)}" y="${f(by+fs*.95)}" font-family="Georgia,serif" font-size="${fs}" letter-spacing="1.6" fill="#8e1f2b">${name.toUpperCase()}</text>`;
+ // Script: brown word strokes on ruled lines, indented beside the initial.
+ let d='',i=0;for(let y=by+fs+lh+1;y<yb-6;y+=lh,i++){const xs=y<by+S+2?tx:bx+(sm?6:7);let x=xs;
+  while(true){const wl=5+hash(i*7+x,3)*16;if(x+wl>x1-9)break;d+=`M${f(x)} ${f(y)}h${f(wl)}`;x+=wl+3}}
+ s+=`<path d="${d}" stroke="#4a3523" stroke-opacity=".55" stroke-width="${sm?1.2:1.5}" stroke-linecap="round" fill="none"/>`;
+ return rtCache[id]=s;
+}
+const RT0={a:'J',b:'G',c:'C'};
+function rotulus(id,w,h,k){
+ const G=rtGeo(id),{sm,x0,x1,yt,yb,R0,Rf,foot}=G,xm=(x0+x1)/2,Wd=x1-x0,hf=SHADES.rotulus.h(sm),U=yb-(hf-foot-Rf),a=(Rf-R0)/U;
+ // The roll's centre sits just above the foot, its radius growing with what it has wound: yc = h-foot-R(yc), solved directly.
+ const yc=Math.min(yb,(h-foot-R0-a*yb)/(1-a)),u=yb-yc,R=lerp(R0,Rf,clamp(u/U)),phi=2*u/(R0+R),lf=seg(k,.03,.13);
+ if(lf<=0)return '';
+ let s=`<defs><clipPath id="rtc-${id}"><rect x="${f(x0-2)}" y="${yt-2}" width="${f(Wd+4)}" height="${f(Math.max(0,yc-yt+2))}"/></clipPath></defs>`;
+ s+=`<g opacity="${f(lf)}"><g clip-path="url(#rtc-${id})">${rtLeaf(id)}`;
+ // The roll shades the leaf just above it, more as it fattens.
+ if(u>1)s+=`<rect x="${f(x0)}" y="${f(yc-R-6)}" width="${f(Wd)}" height="6" fill="url(#tpShB)" opacity="${f(.4*clamp(u/12))}"/>`;
+ s+='</g>';
+ // Its shadow on the stone below
+ s+=`<rect x="${f(x0+2)}" y="${f(yc+R-1)}" width="${f(Wd-4)}" height="${sm?4:5}" fill="url(#tpShT)" opacity=".38"/>`;
+ // The roll: laps turning over the top as it climbs, and the laps' spiral at its ends.
+ s+=`<rect x="${f(x0)}" y="${f(yc-R)}" width="${f(Wd)}" height="${f(2*R)}" rx="${f(Math.min(R,1.8))}" fill="url(#rtRoll)" stroke="#5a4630" stroke-width=".6"/>`;
+ let laps='';for(let i=0;i<6;i++){const an=phi+i*Math.PI/3,c=Math.cos(an);if(c>.08)laps+=`<path d="M${f(x0+1)} ${f(yc-R*Math.sin(an))}H${f(x1-1)}" stroke-opacity="${f(.32*c)}"/>`}
+ // The laps fade once the roll has landed, so the dorse is clean for the writing.
+ const lo=1-seg(k,.78,.86);if(R>3&&lo>0)s+=`<g stroke="#7a6242" stroke-width=".55" opacity="${f(lo)}">${laps}</g>`;
+ for(const ex of[x0,x1]){s+=`<ellipse cx="${f(ex)}" cy="${f(yc)}" rx="1.6" ry="${f(R)}" fill="#8a714a" stroke="#4a3820" stroke-width=".5"/>`;
+  for(let r=R-2.2;r>R0;r-=2.2)s+=`<ellipse cx="${f(ex)}" cy="${f(yc)}" rx=".9" ry="${f(r)}" fill="none" stroke="#4a3820" stroke-width=".35" opacity=".7"/>`}
+ // Gilt rod knobs, coming in with the rod
+ const kn=backOut(seg(k,.06,.16)),kr=(sm?2.4:3)+.12*R;
+ if(kn>0)for(const[ex,dir]of[[x0,-1],[x1,1]]){const cx=ex+dir*(kr+1.2);
+  s+=`<g transform="translate(${f(cx)} ${f(yc)}) scale(${f(kn)})"><rect x="${f(-dir*(kr+1.6)-1.2)}" y="-1.2" width="2.4" height="2.4" fill="url(#gild)"/><circle r="${f(kr)}" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/><circle cx="${f(dir*(kr+.9))}" r="1.1" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/></g>`}
+ s+='</g>';
+ // Layout along the dorse: gilded initial, the value, then the seal.
+ const[,num,val]=tpText(id),fs=sm?10:11,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`),S=sm?11:13,Rs=sm?5:6,
+  tot=S+5+tw+10+2*Rs,gx=xm-tot/2,xs=gx+S+5+tw+10+Rs,[wl,wb,wd]=rtWax(id);
+ // The silk tag drops from under the roll.
+ const rb=ease(seg(k,.72,.8));
+ if(rb>0){const y0=yc+R*.55,y1=lerp(y0,h-1.5,rb);s+=`<path d="M${f(xs-1.6)} ${f(y0)}L${f(xs-1.2)} ${f(y1)}L${f(xs+.2)} ${f(y1-1.6)}L${f(xs+1.6)} ${f(y1)}L${f(xs+1.8)} ${f(y0)}Z" fill="#6b2a5a" stroke="#2e0f26" stroke-width=".4"/><path d="M${f(xs-.4)} ${f(y0)}V${f(y1-1.8)}" stroke="#c98ab6" stroke-width=".5" opacity=".7"/>`}
+ // The wax drop falls, squashes and is stamped with a quatrefoil.
+ const wt=seg(k,.76,.9);
+ if(wt>0){const fa=seg(wt,0,.35),y=lerp(Math.max(yc-18,yt),yc+1,fa*fa),sq=Math.sin(Math.PI*seg(wt,.35,.6)),r=Rs*lerp(.6,1,seg(wt,.35,.5)),imp=seg(wt,.55,.7);
+  s+=`<defs><radialGradient id="rtW-${id}" cx=".36" cy=".3" r=".8"><stop stop-color="${wl}"/><stop offset=".5" stop-color="${wb}"/><stop offset="1" stop-color="${wd}"/></radialGradient></defs>`+
+   `<g transform="translate(${f(xs)} ${f(y)}) scale(${f(1+.3*sq)} ${f(1-.24*sq)})" opacity="${f(seg(wt,0,.1))}"><ellipse cx=".4" cy=".8" rx="${f(r+1)}" ry="${f(r+.6)}" fill="#000" opacity=".25"/><circle r="${f(r+.7*seg(wt,.4,.6))}" fill="${wb}" opacity=".85"/><circle r="${f(r)}" fill="url(#rtW-${id})" stroke="${wd}" stroke-width=".5"/>`;
+  if(imp>0){const q=r*.24;s+=`<g opacity="${f(imp)}"><circle r="${f(r*.68)}" fill="none" stroke="${wd}" stroke-width=".7"/><circle r="${f(r*.68)}" fill="none" stroke="${wl}" stroke-width=".4" opacity=".6" transform="translate(-.4 -.4)"/><g fill="${wd}" opacity=".6">${[[q,0],[-q,0],[0,q],[0,-q]].map(([cx,cy])=>`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*.2)}"/>`).join('')}</g></g>`}
+  s+='</g>';
+  const gl=Math.sin(Math.PI*seg(wt,.7,1));if(gl>.05)s+=`<g opacity="${f(gl)}">${sparkle(xs-Rs*.35,yc+1-Rs*.4,gl*5)}</g>`}
+ // The value is written along the dorse, left to right, after a small gilded initial.
+ const lt=seg(k,.84,.97);
+ if(lt>0){s+=`<defs><clipPath id="rtt-${id}"><rect x="${f(gx-2)}" y="${f(yc-R-2)}" width="${f((S+9+tw)*lt)}" height="${f(2*R+4)}"/></clipPath></defs><g clip-path="url(#rtt-${id})">`+
+   `<rect x="${f(gx)}" y="${f(yc-S/2)}" width="${S}" height="${S}" fill="#2b56b3" stroke="url(#gild)" stroke-width="1"/><text x="${f(gx+S/2)}" y="${f(yc+S*.3)}" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="${f(S*.8)}" fill="#f3cf6e">${RT0[id]}</text>`+
+   `<text x="${f(gx+S+5)}" y="${f(yc+fs*.36)}" font-family="Georgia,serif" font-size="${fs}"><tspan font-weight="700" font-size="${fs+1}" fill="#8e1f2b">${num}</tspan><tspan font-style="italic" fill="#3b2c1f"> ${val}</tspan></text></g>`}
+ // A glint runs over the knobs as it finishes.
+ const g2=Math.sin(Math.PI*seg(k,.94,1));if(g2>.05)for(const ex of[x0-kr-1.2,x1+kr+1.2])s+=`<g opacity="${f(g2)}">${sparkle(ex-kr*.3,yc-kr*.4,g2*5)}</g>`;
  return s;
 }
 
@@ -2601,7 +2682,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -2625,15 +2706,18 @@ function render(){
   const hk=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(hk*2.2),strip=seg(k,.55,1);
   // Triptych: the display hides once the wings are shut over it. Cornice: it slides up behind the soffit instead of fading.
   // Crypt: the display goes dark before the tracery rises, long before the wall sinks.
-  const vis=cn?1:cr?1-seg(k,0,.12):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  // Rotulus: the display fades first, as the glass turns to vellum.
+  const vis=cn?1:cr?1-seg(k,0,.12):rt?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(cn){const cut=Math.max(0,Se-(n.offsetTop-d));n.style.transform=`translateY(${-d}px)`;n.style.clipPath=`inset(${f(cut)}px -24px -24px -24px)`;
     o=cut>=n.offsetHeight?0:n.matches('.tabline,.knob')?1-seg(k,.25,.5):1}
    else if(n.style.transform){n.style.transform='';n.style.clipPath=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);
+  const ls=el.querySelector('.rtsvg'),lkey=rt?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
+  if(ls.dataset.key!==lkey){ls.dataset.key=lkey;ls.setAttribute('width',w);ls.setAttribute('height',h);ls.setAttribute('viewBox',`0 0 ${w} ${h}`);ls.innerHTML=lkey?rotulus(id,w,h,k):''}
   const gs=el.querySelector('.rgsvg'),gkey=rg?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.b.run}`:'';
   if(gs.dataset.key!==gkey){gs.dataset.key=gkey;gs.setAttribute('width',w);gs.setAttribute('height',h);gs.setAttribute('viewBox',`0 0 ${w} ${h}`);gs.innerHTML=gkey?rings(id,w,h,k):''}
   const ns=el.querySelector('.cnsvg'),nkey=cn?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
