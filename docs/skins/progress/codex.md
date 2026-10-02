@@ -22,7 +22,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Hollow · Join · Reed gate bolt — sliding attachment — Added a selectable carved reed bar, open keeper and pale locking pin with staged slide/drop and reverse release; retained both earlier joins; 102 simulated DOM, animation and touch checks passed; visual review blocked by sandbox browser launch and denied Chrome access.
 - [x] Gothic · Join · Iron strap and pin — mechanical attachment — Added selectable riveted iron cheeks, four alternating knuckles and a descending ring-headed pin with reverse withdrawal; retained all three earlier joins; 114 simulated DOM, animation and touch checks passed; full-page visual review blocked by unavailable browser access and failed sandbox browser launch.
 - [x] Felt · Join · Hidden magnetic hems — face attachment — Added selectable squared wool hems, animated local dimpling, a dark crease and paired embroidered release dots; retained all three earlier joins; 88 simulated DOM, animation and touch checks passed; visual review blocked by unavailable browser access, failed headless launch and unsupported SVG conversion.
-- [ ] Elven · Join · Calligraphic ribbon — binding attachment
+- [x] Elven · Join · Calligraphic ribbon — binding attachment — Added selectable flat silver figure-eight strapwork, enamel collars, an over-under crossing and reverse unwind; retained all three earlier joins; simulated DOM interaction checks passed; browser visual review blocked by denied Chrome access and failed sandbox browser launch.
 - [ ] Wire · Join · Branch graft — structural fusion
 - [ ] Hollow · Join · Shadow dovetail — silhouette fusion
 - [ ] Gothic · Join · Radial apse joint — rotating attachment
