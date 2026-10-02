@@ -268,12 +268,14 @@ function star(x,y,r,op,fill='#fff'){return `<path d="M${f(x)} ${f(y-r)}Q${f(x)} 
 })();
 
 /* ---------- Casing: a long leaf with a pointed outer tip; the joining end is squared off with a silver stem ---------- */
-function body(w,h,join,d){
+// open: leave the joining end's rim out (it is drawn on its own as .endrim, so the weave can unravel it).
+const endRim=(w,h)=>`M${f(w-15)} 5Q${w-7} 5 ${w-7} 13L${w-7} ${h-13}Q${w-7} ${h-5} ${f(w-15)} ${h-5}`;
+function body(w,h,join,d,open){
  const t=5+d,b=h-5-d,m=h/2,cx=w/2,k=Math.min(1,h/H),sh=Math.min(64,h*.5+20),tip=d*2.4,R=join?w-7-d:w-tip;
  let s=`M${f(tip)} ${m}C${f(14+d*.6)} ${f(m-h*.3)} ${f(sh-26)} ${t} ${f(sh)} ${t}L${f(cx-30)} ${t}Q${cx} ${f(t-6*k+d*.4)} ${f(cx+30)} ${t}`;
- if(join)s+=`L${f(R-8)} ${t}Q${f(R)} ${t} ${f(R)} ${f(t+8)}L${f(R)} ${f(b-8)}Q${f(R)} ${b} ${f(R-8)} ${b}`;
+ if(join)s+=open?`L${f(R-8)} ${t}M${f(R-8)} ${b}`:`L${f(R-8)} ${t}Q${f(R)} ${t} ${f(R)} ${f(t+8)}L${f(R)} ${f(b-8)}Q${f(R)} ${b} ${f(R-8)} ${b}`;
  else s+=`L${f(w-sh)} ${t}C${f(w-sh+26)} ${t} ${f(w-14-d*.6)} ${f(m-h*.3)} ${f(R)} ${m}C${f(w-14-d*.6)} ${f(m+h*.3)} ${f(w-sh+26)} ${b} ${f(w-sh)} ${b}`;
- return s+`L${f(cx+24)} ${b}Q${cx} ${f(b+5*k-d*.4)} ${f(cx-24)} ${b}L${f(sh)} ${b}C${f(sh-26)} ${b} ${f(14+d*.6)} ${f(m+h*.3)} ${f(tip)} ${m}Z`;
+ return s+`L${f(cx+24)} ${b}Q${cx} ${f(b+5*k-d*.4)} ${f(cx-24)} ${b}L${f(sh)} ${b}C${f(sh-26)} ${b} ${f(14+d*.6)} ${f(m+h*.3)} ${f(tip)} ${m}`+(open?'':'Z');
 }
 // Filigree on the leaf tip: a vein, two tendrils curling back into spirals, two small leaves.
 function tipFiligree(h,k){const m=h/2;let o='';
@@ -288,7 +290,7 @@ function casing(id,w,h,lit){
  o+=`<path d="${outer}" fill="url(#night)"/><path d="${outer}" fill="url(#pearl)" opacity=".14"/><path d="${outer}" fill="url(#moonlit)"/>`;
  // A sprinkle of fixed star points in the night glass, kept clear of the pane.
  for(const [x,y] of small?[[.22,.82],[.8,.18]]:[[.16,.84],[.62,.9],[.9,.88],[.4,.08]])o+=`<circle cx="${f(x*w)}" cy="${f(y*h)}" r=".7" fill="#e6ecff" opacity=".55"/>`;
- o+=`<path d="${inner}" fill="none" stroke="#c9d4ee" stroke-width=".7" opacity=".45"/><path d="${outer}" fill="none" stroke="url(#silver)" stroke-width="1.5"/>`;
+ o+=`<path d="${inner}" fill="none" stroke="#c9d4ee" stroke-width=".7" opacity=".45"/>`+(join?`<path d="${body(w,h,true,0,true)}" fill="none" stroke="url(#silver)" stroke-width="1.5" stroke-linecap="round"/><path class="endrim" d="${endRim(w,h)}" fill="none" stroke="url(#silver)" stroke-width="1.5"/>`:`<path d="${outer}" fill="none" stroke="url(#silver)" stroke-width="1.5"/>`);
  o+=tipFiligree(h,k);if(small)o+=`<g transform="translate(${w} 0) scale(-1 1)">${tipFiligree(h,k)}</g>`;
  // Crest: a thin crescent on a stem above the casing's peak, its star lit while the widget is running.
  const cy=t-12*k,r=5.5*k;
@@ -444,8 +446,110 @@ const JOINS={
   phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.44?'Joining · the staves meet ':jt<.81?'Joining · the runes turn to match ':jt<.9?'Joining · the seal draws round ':'Joining · the runes fade '):(jt>.9?'Releasing · the runes flare ':jt>.8?'Releasing · the seal unwrites ':jt>.56?'Releasing · the runes scramble ':jt>.5?'Releasing · the staves draw in ':'Releasing · the casings part '),
   about:'A lock made of writing. Each joining end carries a rune stave: a slim half-lens of night glass on the silver stem, with four invented runes cut into it, split down the middle. Jarvis holds the left halves, GitDiscuss the right, and GitDiscuss\'s halves start out scrambled. <b>Near:</b> the runes kindle down both staves, top first, brighter the closer you come. <b>Ready:</b> every rune burns, threads of light link each pair across the gap, and a dashed ghost of the seal hangs between them. Joining: the casings close to a narrow gap and the staves slide out until their faces meet with a flash, so the seam is a shared stave line through every rune. Then GitDiscuss\'s half-runes turn over on the seam like little hinged pages, top to bottom, each passing two wrong glyphs before it lands on the half that completes its partner, and each match flares. When all four match, light runs round the two staves, which together make one pointed seal, a star glints at its tips, and the moonstone set at its heart kindles as the join light. Then the runes fade to a faint engraving. <b>Hover</b> the seam (or focus it with the keyboard) and they light up again to be read. <b>Release:</b> slide the seal up or down: GitDiscuss\'s half-runes slip along their stave out of match, and past half a rune the seal breaks (let go sooner and they slide back). Clicking the seal, or focusing it and pressing Enter, also breaks it. The runes flare, the rim unwrites, the halves turn back to a scramble, the staves draw in and the casings part. Shaded, the seal keeps its two inner runes and the moonstone. Drag a nameplate to move the pair.',
   over:c=>drawRunes(c)
+ },
+ weave:{label:'Weave',kind:'Bind',gap:52,lift:true,slow:1.15,msOut:2700,
+  txt:{join:'The casings close, the silver rim at each joining end unravels into a thread, and the two threads weave over and under into one knot.',
+   joined:'Bound by a woven knot, its heart-stone lit. Drag a nameplate to move the pair; draw the knot upward (or click it) to unweave it.',
+   release:'The heart-stone dims, the knot loosens, each thread draws back out of the weave, and the rims knit shut again.',
+   stop:'The threads draw back and the rims knit shut.',
+   hold:'Held mid-join: the threads are weaving across the gap. Use the scrubber to step through the knot.',
+   ready:'Ready: the loose threads touch and a ghost of the knot hangs in the gap. Release to weave it.',near:'Nearby: the rims fray and a loose thread lifts from each end. Move closer.',
+   readyPh:'Ready · the loose threads touch',nearPh:'Nearby · the rims fray',
+   liftPh:'Drawing up · the knot loosens',lifting:'The knot loosens as you draw it up. Keep going to unweave it.',settle:'The knot draws tight again.'},
+  phase:(jt,dir)=>dir>0?(jt<.12?'Joining · closing in ':jt<.3?'Joining · the rims unravel ':jt<.8?'Joining · threads weave over and under ':jt<.88?'Joining · the knot draws tight ':'Joining · the heart-stone kindles '):(jt>.88?'Releasing · the heart-stone dims ':jt>.8?'Releasing · the knot loosens ':jt>.58?'Releasing · the threads unweave ':jt>.5?'Releasing · the rims knit back ':'Releasing · the casings part '),
+  about:'A bind made of the casings themselves. The silver rim along each joining end is one thread of the border. <b>Near:</b> the rims fray: a loose silver thread peels off the top corner of Jarvis\'s end and a white-gold one off the bottom corner of GitDiscuss\'s, and they lift and uncurl toward each other. <b>Ready:</b> their tips touch with a glint and a dashed ghost of the knot hangs in the gap. Joining: the casings close to a narrow gap and the end rims unravel. Each thread runs down its own rim, leaves it, and weaves across the gap: it loops once round on itself and passes alternately over and under the other thread (and itself) at every one of the eight crossings, like a carrick bend, the sailor\'s knot for joining two ropes. Each thread is a flat ribbon edged in two hairlines, silver from Jarvis and white gold from GitDiscuss, and it tucks into the far rim, running along it to the corner the other thread left, so each end is rebound by its partner. Then the knot draws tight with a small overshoot, a moonstone heart-stone sets in the open middle and kindles as the join light, and a glint runs along both threads. <b>Release:</b> draw the knot upward: it loosens and rises off its anchors as you pull, and past a short distance it lets go (let go sooner and it draws tight again). Clicking the knot, or focusing it and pressing Enter, does the same. The heart-stone dims, the knot loosens, each thread draws back out of the weave along its own path, the rims knit shut and the casings part. Shaded, the knot keeps its eight crossings in a flatter weave. Drag a nameplate to move the pair.',
+  over:c=>drawWeave(c)
  }
 };
+/* ---------- Weave drawing ---------- */
+// Each joining end's rim becomes a flat ribbon thread that runs down its rim, loops once and crosses to the partner's rim.
+// The knot (two interlocked loops, rotationally symmetric) is laid out round the seam's centre; crossings alternate over and under.
+const WCORE=(()=>{const c=[[-14,-30]];for(let i=0;i<=14;i++){const a=(-90+i*22.5)*PI/180;c.push([6+19*Math.cos(a),9+19*Math.sin(a)])}c.push([12,-30]);return c})();
+function crPts(P){const out=[];
+ for(let i=0;i<P.length-1;i++){const p0=P[Math.max(0,i-1)],p1=P[i],p2=P[i+1],p3=P[Math.min(P.length-1,i+2)],n=Math.max(2,Math.ceil(Math.hypot(p2.x-p1.x,p2.y-p1.y)/3));
+  for(let j=0;j<n;j++){const t=j/n,t2=t*t,t3=t2*t,c=(a,b,c,d)=>.5*(2*b+(c-a)*t+(2*a-5*b+4*c-d)*t2+(3*b-a-3*c+d)*t3);out.push({x:c(p0.x,p1.x,p2.x,p3.x),y:c(p0.y,p1.y,p2.y,p3.y)})}}
+ out.push({...P[P.length-1]});let acc=0;out.forEach((p,i)=>{if(i)acc+=Math.hypot(p.x-out[i-1].x,p.y-out[i-1].y);p.s=acc});return out}
+let WG=null;
+function weaveGeo(h,tz,ly=0){
+ const k=clamp((h-HS)/(H-HS)),v=lerp(.55,1,k),sy=v*tz,sx=lerp(.82,1,k)*tz,ao=Math.min(34*v,h/2-13);
+ const a=model.a,b=model.b,rA=a.x+W-7,rB=b.x+7,cx=(rA+rB)/2,cy=(a.y+b.y)/2+h/2+ly,mA=a.y+h/2,mB=b.y+h/2;
+ const key=[h,tz,ly,rA,rB,a.y,b.y].map(f).join();if(WG&&WG.key===key)return WG;
+ const L=([x,y],r)=>r?{x:cx-x*sx,y:cy-y*sy}:{x:cx+x*sx,y:cy+y*sy},room=h/2-13-ao>4;
+ // A: Jarvis's top corner, down its rim, the knot, then GitDiscuss's rim up to its top corner. B is A turned half round.
+ const A=[{x:rA-8,y:a.y+5},{x:rA-2.3,y:a.y+7.3},{x:rA,y:a.y+13},...(room?[{x:rA,y:mA-ao}]:[]),...WCORE.map(p=>L(p,0)),...(room?[{x:rB,y:mB-ao}]:[]),{x:rB,y:b.y+13},{x:rB+2.3,y:b.y+7.3},{x:rB+8,y:b.y+5}];
+ const B=[{x:rB+8,y:b.y+h-5},{x:rB+2.3,y:b.y+h-7.3},{x:rB,y:b.y+h-13},...(room?[{x:rB,y:mB+ao}]:[]),...WCORE.map(p=>L(p,1)),...(room?[{x:rA,y:mA+ao}]:[]),{x:rA,y:a.y+h-13},{x:rA-2.3,y:a.y+h-7.3},{x:rA-8,y:a.y+h-5}];
+ const S=[crPts(A),crPts(B)],X=[];
+ // Every crossing, including each thread's crossing with itself.
+ for(let p=0;p<2;p++)for(let q=p;q<2;q++){const P=S[p],Q=S[q];
+  for(let i=0;i<P.length-1;i++)for(let j=p===q?i+3:0;j<Q.length-1;j++){
+   const a1=P[i],a2=P[i+1],b1=Q[j],b2=Q[j+1],dx=a2.x-a1.x,dy=a2.y-a1.y,ex=b2.x-b1.x,ey=b2.y-b1.y,den=dx*ey-dy*ex;if(Math.abs(den)<1e-9)continue;
+   const u=((b1.x-a1.x)*ey-(b1.y-a1.y)*ex)/den,w=((b1.x-a1.x)*dy-(b1.y-a1.y)*dx)/den;
+   if(u>=0&&u<1&&w>=0&&w<1)X.push({p,q,sp:a1.s+u*(a2.s-a1.s),sq:b1.s+w*(b2.s-b1.s),x:a1.x+u*dx,y:a1.y+u*dy})}}
+ // Alternate over and under along each thread: a parity constraint between neighbouring crossings, solved breadth first.
+ const passes=[[],[]];X.forEach((c,i)=>{passes[c.p].push({i,w:0,s:c.sp});passes[c.q].push({i,w:1,s:c.sq})});
+ const adj=X.map(()=>[]);for(const ps of passes){ps.sort((m,n)=>m.s-n.s);for(let i=1;i<ps.length;i++){const m=ps[i-1],n=ps[i];if(m.i===n.i)continue;const par=1^m.w^n.w;adj[m.i].push([n.i,par]);adj[n.i].push([m.i,par])}}
+ const val=X.map(()=>-1);
+ for(let r=0;r<X.length;r++){if(val[r]>=0)continue;val[r]=0;const qu=[r];while(qu.length){const c=qu.shift();for(const[n,par]of adj[c])if(val[n]<0){val[n]=val[c]^par;qu.push(n)}}}
+ X.forEach((c,i)=>c.pOver=val[i]===1);
+ // Each pass's redraw window stops halfway to the next crossing along its thread, so it never covers a neighbour.
+ for(const ps of passes)ps.forEach((m,n)=>{X[m.i][m.w?'qWin':'pWin']=[n?(ps[n-1].s+m.s)/2:-1e9,n<ps.length-1?(m.s+ps[n+1].s)/2:1e9]});
+ return WG={key,S,X,cx,cy,mA,mB,rA,rB,ao,k};
+}
+// The grown part of a thread; it swells out of its rim, tapers into the far rim, and has a sharp growing tip.
+function wpart(S,len,RW){const tot=S[S.length-1].s,out=[];len=Math.min(len,tot);if(len<=0)return out;
+ for(let i=0;i<S.length;i++){if(S[i].s<=len){out.push({...S[i]});continue}const p=S[i-1],q=S[i],u=(len-p.s)/((q.s-p.s)||1);out.push({x:lerp(p.x,q.x,u),y:lerp(p.y,q.y,u),s:len});break}
+ for(const p of out)p.w=RW*clamp(.32+.68*p.s/14)*clamp(.32+.68*(tot-p.s)/14)*(len<tot-.5?clamp(.18+.82*(len-p.s)/14,.18,1):1);
+ return out}
+const wedge=(pts,r)=>{const n=pts.length;return pts.map((p,i)=>{const a=pts[Math.max(0,i-1)],b=pts[Math.min(n-1,i+1)],dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1;return f(p.x-dy/l*p.w*r)+','+f(p.y+dx/l*p.w*r)}).join(' ')};
+function wrope(core,ext,col){if(core.length<2)return '';ext=ext||core;
+ return `<path d="${ribbon(core,2.2)}" fill="${NIGHT}"/><path d="${ribbon(ext)}" fill="#252b58"/><polyline points="${wedge(ext,.36)}" fill="none" stroke="${col}" stroke-width=".95"/><polyline points="${wedge(ext,-.36)}" fill="none" stroke="${col}" stroke-width=".95" opacity=".8"/>`}
+const WCOL=['#eef2fc','#f3e0a8'];
+// The loose ends of the frayed rims, while dragging near.
+function weaveStubs(h,u,op,RW){if(op<=0)return {s:''};
+ const k=clamp((h-HS)/(H-HS)),ao=Math.min(34*lerp(.55,1,k),h/2-13),a=model.a,b=model.b,rA=a.x+W-7,rB=b.x+7;
+ const pA={x:rA,y:a.y+h/2-ao},pB={x:rB,y:b.y+h/2+ao},D=Math.hypot(pB.x-pA.x,pB.y-pA.y),th=Math.atan2(pB.y-pA.y,pB.x-pA.x);
+ const e=ease(u),Lc=lerp(9,Math.min(D/2+2,74),e),T=lerp(1.8*PI,.22*PI,e);
+ const one=(lead,p,hd,col)=>{const pts=crPts(lead).concat(curlPts(p,hd,Lc,T,-1,22).slice(1));let acc=0;pts.forEach((q,i)=>{if(i)acc+=Math.hypot(q.x-pts[i-1].x,q.y-pts[i-1].y);q.s=acc});
+  const tot=acc;pts.forEach(q=>q.w=RW*clamp(.32+.68*q.s/14)*clamp(.15+.85*(tot-q.s)/18));return{s:wrope(pts,null,col),tip:pts[pts.length-1]}};
+ const A=one([{x:rA-8,y:a.y+5},{x:rA-2.3,y:a.y+7.3},{x:rA,y:a.y+13},pA],pA,th,WCOL[0]),B=one([{x:rB+8,y:b.y+h-5},{x:rB+2.3,y:b.y+h-7.3},{x:rB,y:b.y+h-13},pB],pB,th+PI,WCOL[1]);
+ return {s:`<g opacity="${f(op*100)/100}">${A.s}${B.s}</g>`,ta:A.tip,tb:B.tip}}
+function drawWeave(c){
+ const h=c.h,jt=c.jt,k=clamp((h-HS)/(H-HS)),kk=lerp(.72,1,k),RW=4.8*kk;let s='';
+ if(jt===0){const g=c.glow;if(g<=0)return s;
+  const G=weaveGeo(h,1),hal=[{x:G.rA,y:G.mA-G.ao},{x:G.rB,y:G.mB+G.ao}];
+  s+=hal.map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(8+10*g)}" fill="url(#halo)" opacity="${f(g)}"/>`).join('');
+  if(g>=1)s+=G.S.map(S=>`<polyline points="${S.map(P).join(' ')}" fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" opacity=".5"/>`).join('');
+  const st=weaveStubs(h,g,clamp(g*3),RW);s+=st.s;
+  if(g>=1){const mx=(st.ta.x+st.tb.x)/2,my=(st.ta.y+st.tb.y)/2;s+=`<circle cx="${f(mx)}" cy="${f(my)}" r="12" fill="url(#halo)"/>`+star(mx,my,7,.95)}
+  return s}
+ const dir=model.dir,lift=jt===1?model.lift:dir<0?model.lift*seg(jt,.78,1):0;
+ let g,tz,gl,sc,spark=0,glint=-1;
+ if(dir>0){g=ease(seg(jt,.12,.8));tz=jt<.8?1.12:1+.12*(1-back(seg(jt,.8,.9),1.8));sc=back(seg(jt,.8,.88),1.6);gl=ease(seg(jt,.86,1));spark=Math.sin(PI*seg(jt,.74,.84));if(jt>.88&&jt<1)glint=seg(jt,.88,1)}
+ else{g=ease(seg(jt,.58,.86));tz=1+.14*(1-seg(jt,.8,.92));sc=ease(seg(jt,.8,.9));gl=ease(seg(jt,.88,1))}
+ tz+=lift*.2;gl*=1-lift*.7;
+ // The loose ends of a join that has just begun fade back into the threads growing along the rims.
+ if(dir>0&&jt<.16)s+=weaveStubs(h,1-seg(jt,0,.12),1-seg(jt,.08,.16),RW).s;
+ if(g<=0)return s;
+ const G=weaveGeo(h,f(tz*100)/100,-lift*9),len=G.S.map(S=>g*S[S.length-1].s);
+ G.S.forEach((S,i)=>{s+=wrope(wpart(S,len[i],RW),null,WCOL[i])});
+ // Redraw the upper thread over each crossing once both threads have woven past it.
+ for(const x of G.X){const [i,s0]=x.pOver?[x.p,x.sp]:[x.q,x.sq],[j,s1]=x.pOver?[x.q,x.sq]:[x.p,x.sp];
+  if(len[i]<s0-7||len[j]<s1-4)continue;const S=wpart(G.S[i],len[i],RW),[lo,hi]=x.pOver?x.pWin:x.qWin,inW=d=>p=>Math.abs(p.s-s0)<=d&&p.s>=lo&&p.s<=hi;
+  s+=wrope(S.filter(inW(7)),S.filter(inW(8.5)),WCOL[i])}
+ if(dir>0&&g>0&&g<1)G.S.forEach((S,i)=>{const t=wpart(S,len[i],RW).pop();if(t)s+=star(t.x,t.y,3.4*kk,.85,i?'#fff3cf':'#fff')});
+ if(spark>.01)for(const p of [{x:G.rB,y:G.mB-G.ao},{x:G.rA,y:G.mA+G.ao}])s+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(12*spark)}" fill="url(#halo)"/>`+star(p.x,p.y,6*spark*kk,spark);
+ // The heart-stone in the open middle of the knot.
+ if(sc>0){const r=3.8*lerp(.62,1,k)*sc;
+  if(gl>0)s+=`<circle cx="${f(G.cx)}" cy="${f(G.cy)}" r="${f(20*kk*gl)}" fill="url(#halo)" opacity="${f(gl)}"/>`;
+  s+=`<circle cx="${f(G.cx)}" cy="${f(G.cy)}" r="${f(r)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><circle cx="${f(G.cx)}" cy="${f(G.cy)}" r="${f(r*.6)}" fill="url(#moonstone)" opacity="${f(.55+.45*gl)}"/>`;
+  if(gl>.5)s+=star(G.cx+r*.6,G.cy-r*.65,r*.65*gl,gl)}
+ if(glint>=0){const o=Math.sin(PI*glint);G.S.forEach(S=>{const p=wpart(S,glint*S[S.length-1].s,RW).pop();if(p)s+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="7" fill="url(#halo)" opacity="${f(o)}"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="1.5" fill="#fff" opacity="${f(o)}"/>`})}
+ if(jt===1){const hh=Math.max(40,lerp(.55,1,G.k)*76+8);
+  s+=`<g class="hit lift" id="seamHit" tabindex="0" role="button" aria-label="Woven knot: drag it up, click it, or press Enter, to unweave it and separate the widgets"><title>Draw the knot up to unweave it</title><rect x="${f(G.rA+2)}" y="${f(G.cy-hh/2)}" width="${f(G.rB-G.rA-4)}" height="${f(hh)}" rx="10" fill="transparent"/><circle class="ringfocus" cx="${f(G.cx)}" cy="${f(G.cy)}" r="${f(31*kk)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return s;
+}
+// How much of each joining end's own rim is still there: the weave unravels it into the threads.
+function rimOp(){if(model.join!=='weave'||model.jt===0)return 1;const jt=model.jt;return model.dir>0?1-seg(jt,.06,.3):1-seg(jt,.5,.6)}
 /* ---------- Moonlight bridge drawing ---------- */
 // The rail runs between the upper knops and arches a little; the arch springs from the lower knops and rises to just under the rail's crown.
 function bridgeGeo(h){const k=clamp(h/H,.5,1);
@@ -1263,6 +1367,7 @@ function render(){
   if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-forkS(model.angle,h/2))+'px '+f(h/2)+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
+  {const er=svg.querySelector('.endrim');if(er)er.style.opacity=f(rimOp())}
   const k=ease(s),show=cn?1-seg(s,0,.16):1-clamp(k*2.2),strip=cn?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.pf,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(cn?1-seg(s,0,.16):1-clamp(k*1.6));
