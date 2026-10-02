@@ -74,6 +74,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
+#cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
 .clsvg,.tpsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
@@ -102,6 +103,9 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="tpGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6dc8c"/><stop offset=".5" stop-color="#d1a03e"/><stop offset="1" stop-color="#8a5e1a"/></linearGradient>
  <pattern id="tpDots" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".6" fill="#7b5413" opacity=".55"/></pattern>
  <linearGradient id="tpShT" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".8"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
+ <radialGradient id="cglass" cx=".5" cy=".35" r=".85"><stop stop-color="#fffbf1"/><stop offset=".55" stop-color="#f6ead0"/><stop offset="1" stop-color="#e2cb9c"/></radialGradient>
+ <radialGradient id="cspill"><stop stop-color="#fff0c4" stop-opacity=".42"/><stop offset=".45" stop-color="#f2c46a" stop-opacity=".16"/><stop offset="1" stop-color="#f2c46a" stop-opacity="0"/></radialGradient>
+ <radialGradient id="cpool"><stop stop-color="#fff0c4" stop-opacity=".34"/><stop offset=".5" stop-color="#c8414f" stop-opacity=".16"/><stop offset="1" stop-color="#3f62c8" stop-opacity="0"/></radialGradient>
  <linearGradient id="tpShB" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#000" stop-opacity=".8"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>
 </defs></svg>
 <header><div><h1>Gothic cathedral <span>/ Claude skin study</span></h1><p>Weathered limestone facades with pinnacles and cresting, lit windows of clear quarry glass in coloured borders, carved bosses. <a href="index.html">All pages</a></p></div>
@@ -148,7 +152,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the lead came, grab the soldered seam and pull down to draw the knife. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -512,8 +516,126 @@ const JOINS={
   move(d,p){const a=Math.atan2(p.y-d.cy,p.x-d.cx);let da=(a-d.prev)*180/Math.PI;da=((da+540)%360)-180;d.prev=a;
    d.deg=clamp(d.deg+da,2*(-this.max-d.th0),2*(this.max-d.th0));if(Math.abs(d.deg)>3)d.moved=true;model.angle=magnet(d.th0+d.deg/2)},
   key(e,hit){if(hit.id!=='dialHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
+ },
+ came:{label:'Lead came solder',kind:'Bind',gap:0,ms:1.6,sepMs:2400,S0:.47,S1:.82,COOL:.17,LW:42,
+  say:{join:'The facades close into one window, a soldering iron runs molten solder down the came between the two centre lights, and it cools to grey.',
+   joined:'Joined: one window, its centre light soldered down the came. Drag either nameplate to move the pair. Draw the knife down the came to release.',
+   sep:'The knife runs down the came and cracks each joint, the light goes out, and the facades part.',hold:'Held mid-join: solder is running down the came, hot behind the iron. Use the scrubber to step through the animation.',
+   ready:'Ready: the iron is hot over the seam and the joints are marked. Release to solder.',near:'Nearby: the open lead cames catch the light. Move closer.',readyPh:'Ready · the iron is hot',nearPh:'Nearby · the cames gleam',
+   back:'The knife lifts out before the came gives; the joints are pressed shut again.'},
+  phase:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.47?'Joining · the iron comes down ':jt<.82?'Joining · running the solder ':jt<.88?'Joining · cooling ':'Joining · the light comes through '):(jt>.7?'Releasing · cracking the came ':jt>.58?'Releasing · the light goes out ':jt>.4?'Releasing · the came splits ':'Releasing · parting '),
+  dragPh:d=>'Drawing the knife · '+Math.round(100*(d.amt||0))+'%',
+  about:'The two windows become one. Each joining end is glazed instead of solid: past a stone mullion beside its display it carries half of a pointed centre light, clear quarry glass in a ruby or blue border under half a hood moulding, and its edge is a bare lead came with its channel open. Apart, the half-lights are dark. <b>Near:</b> the open cames catch the light, a gleam sliding down them as you close in, and the glass warms. <b>Ready:</b> a soldering iron hangs hot over the seam and the joints to be soldered are marked. Joining: the facades close so the halves meet as one pointed light under one hood, the iron comes down to the apex, and a bead of molten solder runs down the came, pausing to puddle at each joint where the leading meets it with a spit of sparks and a wisp of flux smoke. The trail behind it glows white, yellow and orange and cools through dull red to lead grey from the top down. The iron lifts away, a glint of tin runs down the cooled seam, and light comes through the centre light and spills onto the stone: that light is the join light. Each display keeps its own content. <b>Release:</b> draw the glazier\'s knife down the came (grab the seam and pull down; hovering shows the knife). Each joint cracks as the blade passes, with flecks of solder; past halfway the came splits, the light goes out and the facades part. Click it, or focus it and press Enter, to do the same. Shaded, the centre light shrinks to a short leaded slit, still soldered.',
+  // A half-light at a facade's joining edge x (o points back into the facade), sized to the wall's height.
+  geo(x,y,o,h){const k=clamp((H-h)/(H-HS));return{x,o,xo:x+o*this.LW,yA:y+lerp(18,30,k),ys:y+lerp(44,33,k),yB:y+lerp(101,40,k)}},
+  N(g){return Math.max(1,Math.round((g.yB-g.yA)/18))},
+  // Half a pointed arch from the apex on the seam to the springing on the outer side; i insets it (negative grows it, for the hood).
+  arch(g,i){const{x,o}=g,xo=g.xo-o*i,yA=g.yA+i*1.2,ys=g.ys+i*.6,r=ys-yA;return{xo,yA,ys,c:`M${f(x)} ${f(yA)}C${f(x+o*this.LW*.4)} ${f(yA+r*.16)} ${f(xo)} ${f(yA+r*.5)} ${f(xo)} ${f(ys)}`}},
+  shape(g,i){const a=this.arch(g,i);return a.c+`L${f(a.xo)} ${f(g.yB-i)}L${f(g.x)} ${f(g.yB-i)}Z`},
+  half(id,g,lit,glow){
+   const{x,o,xo,yA,ys,yB}=g,outer=this.shape(g,0),inner=this.shape(g,Math.min(5,(g.yB-g.ys)*.3)),N=this.N(g),d=(yB-yA)/N,m=1.2,x0=Math.min(x,xo)-2;
+   let s=`<defs><clipPath id="co-${id}"><path d="${outer}"/></clipPath><clipPath id="ci-${id}"><path d="${inner}"/></clipPath></defs><path d="${this.shape(g,-2.5)}" fill="#2a1f15" opacity=".45"/>`;
+   // Coloured border, pieced along the jamb and the sill
+   let pc='';for(let yy=ys;yy<yB-5;yy+=22)pc+=`<rect x="${f(Math.min(xo,xo-o*5))}" y="${f(yy)}" width="5" height="11"/>`;
+   for(let xx=4;xx<this.LW-8;xx+=22)pc+=`<rect x="${f(o>0?x+xx:x-xx-11)}" y="${f(yB-5)}" width="11" height="5"/>`;
+   s+=`<g clip-path="url(#co-${id})"><path d="${outer}" fill="${id==='a'?'#8e1f2b':'#1f3f8a'}"/><g fill="${id==='a'?'#1f3f8a':'#8e1f2b'}" stroke="#1d1612" stroke-width=".8">${pc}</g></g>`;
+   // Quarry glass: dark until lit; diamond leading that meets the seam at the solder joints
+   let lat='';for(let k=-5;k<=N+5;k++){const yy=yA+k*d;lat+=`M${f(x)} ${f(yy)}l${f(o*80)} ${f(-80*m)}M${f(x)} ${f(yy)}l${f(o*80)} ${f(80*m)}`}
+   s+=`<g clip-path="url(#ci-${id})"><rect x="${f(x0)}" y="${f(yA-2)}" width="${this.LW+4}" height="${f(yB-yA+4)}" fill="#1b1824"/>`+
+    (lit>0?`<rect x="${f(x0)}" y="${f(yA-2)}" width="${this.LW+4}" height="${f(yB-yA+4)}" fill="url(#cglass)" opacity="${f(lit*100)/100}"/>`:'')+
+    `<path d="${lat}" fill="none" stroke="${mixc([92,84,104],[42,32,22],lit)}" stroke-width=".9"/></g>`;
+   s+=`<path d="${inner}" fill="none" stroke="#1d1612" stroke-width="1"/><path d="${outer}" fill="none" stroke="#1d1612" stroke-width="1.3"/>`+
+    `<circle cx="${f(xo-o*2.5)}" cy="${f(ys+1)}" r="1.6" fill="url(#gild)"/>`;
+   // The bare came at the edge: a lead flange with its channel open
+   s+=`<path d="M${f(x+o*1.1)} ${f(yA)}V${f(yB)}" stroke="#3d3934" stroke-width="2.2"/><path d="M${f(x+o*1.8)} ${f(yA+1)}V${f(yB-1)}" stroke="#a8a196" stroke-width=".5" opacity=".75"/><path d="M${f(x)} ${f(yA)}V${f(yB)}" stroke="#0d0a08" stroke-width=".7"/>`;
+   // Near: a gleam slides down the open came as the other facade closes in
+   if(glow>0&&model.jt===0){const gy=lerp(yA+5,yB-5,glow);s+=`<ellipse cx="${f(x+o*1.2)}" cy="${f(gy)}" rx="3" ry="9" fill="#ffd98a" opacity="${f(.5*glow)}" filter="url(#lglow)" style="mix-blend-mode:screen"/><path d="M${f(x+o*1.4)} ${f(gy-6)}V${f(gy+6)}" stroke="#fff4d6" stroke-width="1.3" stroke-linecap="round" opacity="${f(.85*glow)}"/>`}
+   return s;
+  },
+  hood(g){const a=this.arch(g,-4.5),d=a.c+`L${f(a.xo)} ${f(a.ys+6)}`;
+   return `<path d="${d}" fill="none" stroke="#3a2c1c" stroke-opacity=".55" stroke-width="4.4"/><path d="${d}" fill="none" stroke="#d6c9ab" stroke-width="2.8"/><path d="${a.c}" fill="none" stroke="#fff6e2" stroke-opacity=".6" stroke-width=".7" transform="translate(0 -.8)"/>`+
+    `<circle cx="${f(a.xo)}" cy="${f(a.ys+7.5)}" r="2.4" fill="#cbbd9f" stroke="#3a2c1c" stroke-opacity=".6" stroke-width=".7"/>`},
+  // The solder bead down the seam. Forward, it runs with the iron and cools from the top; on release, the knife cracks it joint by joint.
+  solder(g,jt,fwd){
+   const{x,yA,yB}=g,N=this.N(g),S0=this.S0,S1=this.S1,q=1-jt;
+   const t=fwd?seg(jt,S0,S1):1,u=fwd?clamp(t-Math.sin(2*Math.PI*N*t)/(2*Math.PI*N)*.85):1;
+   if(u<=0)return{s:'',glow:'',tip:null};
+   const temp=v=>fwd?1-seg(jt-(S0+v*(S1-S0)),0,this.COOL):0,Y=v=>lerp(yA,yB,v);
+   const ku=fwd?0:seg(q,0,.3),sep=fwd?0:ease(seg(q,.42,.6)),fade=fwd?1:1-seg(q,.5,.62);
+   let s='',gl='';
+   const M=Math.max(3,Math.ceil(u*28));
+   for(let i=0;i<M;i++){const v0=u*i/M,v1=u*(i+1)/M,T=temp((v0+v1)/2),c=heat(T),y0=Y(v0),y1=Y(v1);
+    if((v0+v1)/2<ku){const o=.95+1.6*sep;s+=`<path d="M${f(x-o)} ${f(y0)}V${f(y1)}M${f(x+o)} ${f(y0)}V${f(y1)}" stroke="${c}" stroke-width="1.7"/>`}
+    else s+=`<path d="M${f(x)} ${f(y0)}V${f(y1)}" stroke="${c}" stroke-width="3.4" stroke-linecap="round"/>`;
+    if(T>.3)gl+=`<path d="M${f(x)} ${f(y0)}V${f(y1)}" stroke="${c}" stroke-width="8" opacity="${f((T-.3)/.7)}"/>`}
+   if(ku>0)s+=`<path d="M${f(x)} ${f(yA)}V${f(Y(ku))}" stroke="#120e0b" stroke-width="${f(.6+1.6*sep)}"/>`;
+   s+=`<path d="M${f(x-.8)} ${f(yA+1)}V${f(Y(u)-1)}" stroke="#f3f1ea" stroke-width=".55" opacity=".6"/>`;
+   // A puddle at every joint where the leading meets the came
+   const dx=2.7,dy=3.2;
+   for(let k=0;k<=N;k++){const v=k/N;if(v>u+1e-6)continue;const T=temp(v),c=heat(T),y=Y(v),ts=S0+v*(S1-S0),gr=fwd?backOut(seg(jt,ts-.004,ts+.03)):1;if(gr<=0)continue;
+    const up=k>0,dn=k<N,arms=(up?`M${f(x-dx*gr)} ${f(y-dy*gr)}L${f(x)} ${f(y)}L${f(x+dx*gr)} ${f(y-dy*gr)}`:'')+(dn?`M${f(x-dx*gr)} ${f(y+dy*gr)}L${f(x)} ${f(y)}L${f(x+dx*gr)} ${f(y+dy*gr)}`:'');
+    const blob=`<path d="${arms}" fill="none" stroke="${c}" stroke-width="${f(2.3*gr)}" stroke-linecap="round" stroke-linejoin="round"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(2.9*gr)}" fill="${c}"/><circle cx="${f(x-.9)}" cy="${f(y-.9)}" r="${f(.9*gr)}" fill="#fbfaf4" opacity=".55"/>`;
+    if(!fwd&&ku>0&&v<=ku+1e-6){const o=1.6*sep;s+=`<g transform="translate(${f(-o)} 0)">${blob}</g><g transform="translate(${f(o)} 0)">${blob}</g><path d="M${f(x)} ${f(y-4)}V${f(y+4)}" stroke="#120e0b" stroke-width="${f(.8+1.6*sep)}"/>`;
+     // Flecks of solder as the blade cracks the joint
+     const p=seg(q,v*.3,v*.3+.05);if(p>0&&p<1)for(const[a,b]of[[-1,.2],[1,.5],[-1,.9]])s+=`<circle cx="${f(x+a*(2+6*p)*(.6+b))}" cy="${f(y+12*p*p*b)}" r=".8" fill="#c4c1b8" opacity="${f(1-p)}"/>`}
+    else s+=blob;
+    if(T>.3)gl+=`<circle cx="${f(x)}" cy="${f(y)}" r="7" fill="${c}" opacity="${f((T-.3)/.7)}"/>`;
+    // A spit of sparks as the puddle forms
+    const sp=fwd?seg(jt,ts,ts+.03):0;if(sp>0&&sp<1){let r='';for(let i=0;i<6;i++){const a=(i*60+20+k*17)*Math.PI/180,r0=3+4*sp,r1=5+9*sp;r+=`M${f(x+Math.cos(a)*r0)} ${f(y+Math.sin(a)*r0)}L${f(x+Math.cos(a)*r1)} ${f(y+Math.sin(a)*r1)}`}
+     s+=`<path d="${r}" stroke="#ffe08a" stroke-width=".9" stroke-linecap="round" opacity="${f(1-sp)}"/>`}
+   }
+   return{s:`<g opacity="${f(fade)}">${s}</g>`,glow:gl,tip:fwd&&t<1?Y(u):null};
+  },
+  // Soldering iron, its copper bit at x,y and the handle up to the right
+  iron(x,y,op){
+   return `<g opacity="${f(op)}" transform="translate(${f(x)} ${f(y)}) rotate(32)"><circle r="8" fill="#ff9a3a" opacity=".55" filter="url(#lglow)" style="mix-blend-mode:screen"/>`+
+    `<path d="M0 0L-2.6 -5L-3.4 -15H3.4L2.6 -5Z" fill="#b8673a" stroke="#4a2410" stroke-width=".6"/><path d="M0 0L-1.5 -4.6H1.5Z" fill="#ffd27a"/><path d="M-1.6 -6L-2 -14" stroke="#e9a578" stroke-width=".6"/>`+
+    `<rect x="-1.2" y="-36" width="2.4" height="21" fill="#5b5f66" stroke="#26282c" stroke-width=".5"/><path d="M-.5 -35V-16" stroke="#c9ced6" stroke-width=".5"/>`+
+    `<rect x="-2.6" y="-39.5" width="5.2" height="4" rx=".8" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/>`+
+    `<path d="M-3.2 -39.5C-3.9 -50 -3.9 -60 -2.4 -67H2.4C3.9 -60 3.9 -50 3.2 -39.5Z" fill="#6b4626" stroke="#2a1a0c" stroke-width=".7"/><path d="M-1.6 -42C-2.1 -50 -2.1 -58 -1.2 -64" stroke="#a87b4d" stroke-width=".7" fill="none" opacity=".7"/></g>`},
+  // Glazier's lead knife, the hooked blade's point at x,y and the handle up to the left
+  knife(x,y,op){
+   return `<g opacity="${f(op)}" transform="translate(${f(x)} ${f(y)}) rotate(-24)"><path d="M0 0C4 -3 6.5 -9 5.6 -17L1.4 -17C2.2 -10 1.4 -4 0 0Z" fill="#dfe4ea" stroke="#3e444b" stroke-width=".6"/><path d="M.7 -1.6C3.6 -5 4.8 -10 4.4 -16" stroke="#fff" stroke-width=".6" fill="none" opacity=".8"/>`+
+    `<rect x="1" y="-21" width="5" height="4.2" rx=".6" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/><path d="M1.2 -21C.6 -30 .8 -38 2 -44H5.4C6.4 -38 6.6 -30 5.8 -21Z" fill="#4a2f17" stroke="#1d1209" stroke-width=".7"/><path d="M2.4 -24C2 -31 2.2 -37 3 -41" stroke="#8a6440" stroke-width=".6" fill="none"/></g>`},
+  over(c){
+   const h=c.h,jt=c.jt,fwd=model.dir>0||jt===0,q=1-jt,ga=this.geo(model.a.x+W,model.a.y,-1,h),gb=this.geo(model.b.x,model.b.y,1,h);
+   const lit=jt===0?.22*c.glow:fwd?(jt>=1?1:Math.max(.22*c.glow,seg(jt,.86,.98))):1-seg(q,.3,.45),sp=jt===0?0:fwd?seg(jt,.88,1):lit;
+   const X=(ga.x+gb.x)/2,yA=(ga.yA+gb.yA)/2;
+   let s='';
+   // The centre light's glow on the stone and the floor
+   if(sp>0){const my=(ga.yA+ga.yB)/2;s+=`<g style="mix-blend-mode:screen" opacity="${f(sp*100)/100}"><ellipse cx="${f(X)}" cy="${f(my)}" rx="55" ry="${f(Math.max(30,(ga.yB-ga.yA)*.9))}" fill="url(#cspill)"/><ellipse cx="${f(X-14)}" cy="${f(model.a.y+h+38)}" rx="120" ry="16" fill="url(#cpool)"/></g>`}
+   s+=this.half('a',ga,lit,c.glow)+this.half('b',gb,lit,c.glow)+this.hood(ga)+this.hood(gb);
+   if(jt===0){
+    if(c.glow>=1){const N=this.N(ga);let gh='';for(let k=0;k<=N;k++)gh+=`<circle cx="${f(X)}" cy="${f(lerp(ga.yA,ga.yB,k/N))}" r="3.2"/>`;
+     s+=`<g fill="#f3d48a" fill-opacity=".12" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="2 1.6"><path d="M${f(X)} ${f(ga.yA)}V${f(ga.yB)}" fill="none"/>${gh}</g>`+this.iron(X,yA-16,1)}
+    return s;
+   }
+   const sol=this.solder(ga,jt,fwd);
+   s+=`<g filter="url(#lglow)" style="mix-blend-mode:screen">${sol.glow}</g>${sol.s}`;
+   if(fwd){
+    const inn=c.glow>=1?1:seg(jt,.28,.4),down=ease(seg(jt,.4,this.S0)),lift=ease(seg(jt,this.S1,.9));
+    if(inn>0&&lift<1){const y0=sol.tip??(jt>=this.S1?ga.yB:lerp(yA-16,yA-1,down));
+     s+=this.iron(X+34*lift,y0-1.5-44*lift,inn*(1-lift));
+     // Flux smoke off the bit while it works
+     if(sol.tip!==null)for(let i=0;i<3;i++){const p=(jt*46+i/3)%1;s+=`<circle cx="${f(X+3+Math.sin(p*6+i*2)*3+6*p)}" cy="${f(sol.tip-4-20*p)}" r="${f(1.4+3.4*p)}" fill="#d8d2c6" opacity="${f(.32*(1-p))}"/>`}}
+    // A glint of tin runs down the cooled seam
+    const gt=seg(jt,.92,1);if(gt>0&&gt<1)s+=`<g opacity="${f(Math.sin(Math.PI*gt))}">${sparkle(X-.6,lerp(ga.yA,ga.yB,gt),5)}</g>`;
+   }else if(q<.38){const ku=seg(q,0,.3),out=seg(q,.3,.38);s+=this.knife(X+.5-8*out,lerp(ga.yA-3,ga.yB,ku)-10*out,1-out)}
+   if(jt===1){const y0=ga.yA-8,y1=ga.yB+8;
+    s+=`<g class="hit" id="cameHit" tabindex="0" role="button" aria-label="Lead came: draw the knife down it, or press Enter, to separate the widgets"><title>Draw the knife down the came to release</title><rect x="${f(X-12)}" y="${f(y0)}" width="24" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(X-14)}" y="${f(y0-2)}" width="28" height="${f(y1-y0+4)}" rx="3" fill="none" stroke="#f0cf7a" stroke-width="1.5"/>`+
+     (model.dir>0?`<g class="kh">${this.knife(X+.5,ga.yA-3,1)}</g>`:'')+`</g>`}
+   return s;
+  },
+  grab(p){const g=this.geo(model.a.x+W,model.a.y,-1,ctx().h);return{knife:true,x0:p.x,y0:p.y,yA:g.yA,len:g.yB-g.yA,amt:0,moved:false}},
+  // The knife only cuts downward: it follows the pointer down the came and never uncracks a joint.
+  move(d,p){if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;if(d.moved)d.amt=Math.max(d.amt,clamp((p.y-d.y0)/Math.max(40,d.len)));setJt(1-.3*d.amt)},
+  letGo:d=>!d.moved||d.amt>.6
  }
 };
+/* Lead came: solder colour from cold lead grey (0) to white heat (1). */
+const SOLDER=[[0,[143,141,136]],[.1,[107,74,58]],[.25,[168,52,26]],[.45,[236,106,30]],[.65,[255,167,51]],[.85,[255,224,122]],[1,[255,251,230]]];
+const mixc=(A,B,t)=>'rgb('+A.map((v,j)=>Math.round(lerp(v,B[j],clamp(t)))).join(',')+')';
+const heat=t=>{t=clamp(t);let i=1;while(i<SOLDER.length-1&&SOLDER[i][0]<t)i++;const[a,A]=SOLDER[i-1],[b,B]=SOLDER[i];return mixc(A,B,(t-a)/(b-a))};
 /* Rose dial helpers: signed degrees, petal detents, keeping the angled pair on the stage, and the angle's own clock. */
 const signed=v=>(v>0?'+':v<0?'−':'')+Math.abs(Math.round(v))+'°';
 const magnet=v=>{v=clamp(v,-45,45);const n=Math.round(v/15)*15;return Math.abs(v-n)<3.5?n:v};
@@ -854,7 +976,7 @@ function endDrag(){
  // Rose dial: let go and the nearest petal drops under the pawl.
  if(d.dial||d.mode==='angle'){if(d.moved)animateAngle(Math.round(model.angle/15)*15,420);else render();
   say(d.dial&&!d.moved?'Turn the rose to set the angle; tap the gilded pawl at its top to release.':'GitDiscuss set at '+signed(Math.round(model.angle/15)*15)+'.');return}
- if(d.hit){if(J().letGo(d))doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;model.dir=1;say(model.join==='rose'?'The rose settles back; still joined.':'The keystone drops back into place; still joined.')}});return}
+ if(d.hit){if(J().letGo(d))doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;model.dir=1;say(J().say.back||(model.join==='rose'?'The rose settles back; still joined.':'The keystone drops back into place; still joined.'))}});return}
  const ready=d.state==='ready';
  if(ready){startJoinFrom({a:0,b:0},.55);model.ready=true;model.path=null;doJoin(d.id==='b'?'a':'b',1500)}else{model.glow=0;render()}
 }
