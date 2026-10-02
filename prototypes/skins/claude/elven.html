@@ -689,7 +689,8 @@ function bridgeGeo(h){const k=clamp(h/H,.5,1);
  return{k,A1,B1,A2,B2,deck:t=>({x:lerp(A1.x,B1.x,t),y:lerp(A1.y,B1.y,t)-rd*Math.sin(PI*t)}),arch:t=>({x:lerp(A2.x,B2.x,t),y:lerp(A2.y,B2.y,t)-ra*Math.pow(Math.sin(PI*t),.8)})}}
 // A curve grown from both ends toward its middle: u = 1 meets at the crown.
 function halves(fn,u,n=28){if(u<=0)return[];const a=[],b=[];for(let i=0;i<=n;i++){const t=.5*u*i/n;a.push({...fn(t),t});b.push({...fn(1-t),t})}return[a,b]}
-const poly=pts=>'M'+pts.map(P).join('L');
+// Fewer than two points draws nothing (an upTo() cut at zero length).
+const poly=pts=>pts.length<2?'':'M'+pts.map(P).join('L');
 function bridgeLight(fn,u,op,w=6){if(u<=0||op<=0)return '';let s='';
  for(const h of halves(fn,u)){const d=poly(h),e=h[h.length-1];
   s+=`<path d="${d}" fill="none" stroke="#a8c0ff" stroke-width="${w}" stroke-linecap="round" opacity="${f(op*.7*100)/100}" filter="url(#soft)"/><path d="${d}" fill="none" stroke="#f4f7ff" stroke-width="1.2" stroke-linecap="round" opacity="${f(op*100)/100}"/>`;
@@ -1566,7 +1567,6 @@ function lensD(G,da=0,db=0,n=140){let d='';for(let i=0;i<n;i++)d+=(i?'L':'M')+P(
 // One half of an inset rim, from the crest down round a tip (side −1 left, 1 right) to the keel.
 function lensHalf(G,da,db,side,n=140){const out=[];for(let i=0;i<=n;i++){const t=-PI/2+side*PI*i/n;out.push({...lensPt(G,t,da,db),t})}return arcS(out)}
 function upTo(pts,len){const out=[];for(let i=0;i<pts.length;i++){const p=pts[i];if(p.s<=len){out.push(p);continue}if(i){const q=pts[i-1],u=(len-q.s)/((p.s-q.s)||1);out.push({x:lerp(q.x,p.x,u),y:lerp(q.y,p.y,u),s:len})}break}return out}
-const poly=pts=>pts.length<2?'':'M'+pts.map(P).join('L');
 // The interlace: two strands weaving over and under in the band between the rims, drawn from the crest down both sides.
 // Runs break at the points of widest separation, so each crossing lies inside one run; the period is fitted so the keel is one of those points.
 function interlace(G,rev){
