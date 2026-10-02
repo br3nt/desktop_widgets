@@ -893,6 +893,41 @@ header {
   text-shadow: 0 0 6px #7bf2c6;
   pointer-events: none;
 }
+.sylvan-release-clasp.quicksilver-pin {
+  width: 32px;
+  height: 48px;
+  cursor: pointer;
+}
+.sylvan-release-clasp.quicksilver-pin::before {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 32px;
+  left: 11px;
+  top: 8px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #ffffff 0%, #d4eaf7 25%, #7ea8c4 55%, #1d3647 85%, #45e6b5 100%);
+  border: 1.5px solid #c8dbe6;
+  box-shadow: 0 0 10px rgba(123, 242, 198, 0.5), inset 0 1px 2px #ffffff;
+  transform: translateX(calc(var(--tension, 0) * 12px)) scaleY(calc(1 - var(--tension, 0) * 0.15));
+  transition: transform 80ms ease;
+}
+.sylvan-release-clasp.quicksilver-pin:hover::before {
+  border-color: #7bf2c6;
+  box-shadow: 0 0 14px rgba(123, 242, 198, 0.8), inset 0 0 6px #ffffff;
+}
+.sylvan-release-clasp.quicksilver-pin::after {
+  content: "✦";
+  position: absolute;
+  top: 13px;
+  left: 11px;
+  width: 10px;
+  text-align: center;
+  font-size: 10px;
+  color: #7bf2c6;
+  text-shadow: 0 0 6px #ffffff;
+  pointer-events: none;
+}
 
 /* Design Overlay */
 #portOverlay { position: absolute; inset: 0; pointer-events: none; }
@@ -958,8 +993,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Elven &amp; Intricate <span>/ tendril braid, lotus nocturne, crystal cleavage &amp; scabbard slide</span></h1>
-    <p>Spun star-silver (Ithildin) · Nephrite jade gems · 30° moonstone prisms · Sylvan scabbard slide</p>
+    <h1>Elven &amp; Intricate <span>/ tendril braid, lotus, crystal, scabbard &amp; liquid ithildin</span></h1>
+    <p>Spun star-silver (Ithildin) · Nephrite jade gems · Quicksilver meniscus bridge · Sylvan scabbard slide</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -968,7 +1003,8 @@ footer .note-highlight {
         <option value="tendril_braid">1. Living Tendril Braid (Sylvan Weave)</option>
         <option value="lotus_petals">2. Lotus Petal Nocturne shade</option>
         <option value="crystal_cleavage">3. Crystalline Cleavage &amp; Harmonic Chime join</option>
-        <option value="scabbard_slide" selected>4. Sylvan Scabbard Slide shade</option>
+        <option value="scabbard_slide">4. Sylvan Scabbard Slide shade</option>
+        <option value="liquid_ithildin" selected>5. Liquid Ithildin Meniscus (Quicksilver Bridge) join</option>
       </select>
     </div>
     <div class="control-group">
@@ -978,11 +1014,11 @@ footer .note-highlight {
       <button id="btnStateJoined" aria-pressed="false">Joined</button>
       <button id="btnStateShade" aria-pressed="false">Shade</button>
     </div>
-    <button id="btnScabbardAnim" class="primary-btn">Slide into scabbard</button>
-    <button id="btnJoinAnim">Seat crystal prisms</button>
+    <button id="btnJoinAnim" class="primary-btn">Snap quicksilver meniscus</button>
+    <button id="btnScabbardAnim">Slide into scabbard</button>
     <button id="btnSeparateAnim" disabled>Separate</button>
     <button id="btnLotusAnim">Close lotus petals</button>
-    <button id="btnChimeAnim" title="Trigger pure-harmonic chime wavefront">Chime resonance</button>
+    <button id="btnChimeAnim" title="Agitate quicksilver meniscus to trigger fluid surface tension ripple">Agitate meniscus</button>
     <button id="btnDesign" aria-pressed="false">Design mode</button>
     <button id="btnReset">Reset</button>
   </nav>
@@ -1140,6 +1176,46 @@ footer .note-highlight {
           <stop offset="75%" stop-color="#a5d8ff" stop-opacity="0.8"/>
           <stop offset="100%" stop-color="#a5d8ff" stop-opacity="0"/>
         </linearGradient>
+
+        <!-- Option 5: Liquid Ithildin Meniscus (Quicksilver Bridge) Gradients & Filter -->
+        <linearGradient id="quicksilverGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="15%" stop-color="#e2eff7"/>
+          <stop offset="40%" stop-color="#9ec4dc"/>
+          <stop offset="70%" stop-color="#4d738e"/>
+          <stop offset="90%" stop-color="#1a3344"/>
+          <stop offset="100%" stop-color="#7bf2c6"/>
+        </linearGradient>
+
+        <radialGradient id="quicksilverBeadGrad" cx="35%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="25%" stop-color="#d9edf8"/>
+          <stop offset="60%" stop-color="#7ba5c2"/>
+          <stop offset="85%" stop-color="#233f52"/>
+          <stop offset="100%" stop-color="#0f1f2a"/>
+        </radialGradient>
+
+        <radialGradient id="jadeCupGrad" cx="30%" cy="30%" r="70%">
+          <stop offset="0%" stop-color="#c2f7e7"/>
+          <stop offset="35%" stop-color="#45e6b5"/>
+          <stop offset="75%" stop-color="#13785b"/>
+          <stop offset="100%" stop-color="#08382b"/>
+        </radialGradient>
+
+        <linearGradient id="electrumSettingGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#fff7d6"/>
+          <stop offset="35%" stop-color="#e0c570"/>
+          <stop offset="75%" stop-color="#94782b"/>
+          <stop offset="100%" stop-color="#45350d"/>
+        </linearGradient>
+
+        <filter id="quicksilverSurfaceGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.2" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
       <!-- Shared Hull & Intertwined Tendril Weave -->
@@ -1323,7 +1399,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade, Crystalline Cleavage Join &amp; Sylvan Scabbard Slide Shade</h3>
+  <h3>Elven &amp; Intricate Architecture, Tendril Braid Join, Lotus Petal Nocturne Shade, Crystalline Cleavage Join, Sylvan Scabbard Slide Shade &amp; Liquid Ithildin Meniscus Join</h3>
   <p>
     Forged from spun star-silver (Ithildin), white birchwood inlays, and mother-of-pearl bezels. Contours follow swept aerodynamic swan-wing curves and delicate botanical filigree crowns, preserving high contrast and uncompromised display readability.
   </p>
@@ -1338,6 +1414,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 4 — Sylvan Scabbard Slide shade:</span> The lower display bay glides upward into an overhead repoussé star-silver canopy, inspired by a ceremonial blade sliding home into its velvet-lined scabbard. Mother-of-pearl vertical guide rails guide the motion with weightless, frictionless Art Nouveau grace. As the blade seats home, twin spring-tempered silver catches lock into scabbard detents, leaving only a 22px mother-of-pearl chape rim exposed with an unclipped, high-contrast starlight status strip (widget name and key live metric) and glowing jade and moonstone jewels.
+  </p>
+  <p>
+    <span class="note-highlight">Option 5 — Liquid Ithildin Meniscus (Quicksilver Bridge) join:</span> Semicircular polished nephrite jade cups carved into the star-silver mating rims hold droplets of living liquid Ithildin (quicksilver). As the capsules approach within capture distance, electrostatic attraction draws the liquid metal across the threshold, forming an elastic hourglass neck (catenoid liquid bridge). Upon docking, surface tension snaps the liquid into a seamless, gleaming quicksilver bead resting inside a unified jade chalice, with concentric caustic ripples and damped fluid wobble settling into stillness. The meniscus flexes organically as joined modules move. Pulling the quicksilver capillary needle right breaks surface tension and releases the assembly.
   </p>
 </footer>
 
@@ -1365,7 +1444,9 @@ const model = {
   chimeWave: 0,       // 0 to 1 = expanding harmonic chime wavefront ripples
   scabbardSlide: 0,   // 0 = fully extended blade, 1 = seated inside scabbard
   scabbardFlash: 0,   // 0 to 1 = insertion starlight quicksilver shimmer
-  option: 'scabbard_slide',
+  meniscusProgress: 0, // 0 = resting droplets in jade cups, 0.5 = hourglass neck, 1 = snapped quicksilver meniscus
+  meniscusSnap: 0,     // 0 to 1 = surface tension snap & damped fluid oscillation wavefront
+  option: 'liquid_ithildin',
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1590,6 +1671,150 @@ function drawElvenCrystalCap(x, y, isRight, isSocket, retract = 0, isShade = fal
         <!-- Internal Starlight Sparkles -->
         <circle cx="48" cy="46" r="1.6" fill="#ffffff" opacity="0.9"/>
         <circle cx="28" cy="88" r="1.4" fill="#7bf2c6" opacity="0.85"/>
+      </g>
+    `;
+  }
+}
+
+// Option 5: Liquid Ithildin Meniscus (Quicksilver Bridge) End-Cap on Docking Rim
+function drawElvenMeniscusCap(x, y, isRight, isSocket, retract = 0, isShade = false, proximity = 0) {
+  if (isShade) return '';
+  if (retract >= 0.98) return ''; // Replaced by monolithic jade chalice & quicksilver bead in joined state
+  const scale = 1 - retract * 0.9;
+  if (scale < 0.05) return '';
+
+  const reach = Math.min(1, Math.max(0, (proximity - 0.15) / 0.85));
+
+  if (isRight) {
+    // Module A: Right Mating Rim with Carved Jade Cup & Liquid Star-Silver Droplet
+    // Center of main cup at (342, 65)
+    const stretchX = reach * 28;
+    return `
+      <g class="elven-meniscus-cap-a" transform="translate(${x}, ${y}) scale(${scale})" transform-origin="342px 65px">
+        <!-- Star-Silver Bracket Mounting Jade Cup -->
+        <path d="M 326 32 C 336 34 340 48 340 65 C 340 82 336 96 326 98"
+              fill="none" stroke="url(#vineSilverGrad)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M 330 46 L 344 54 M 330 84 L 344 76"
+              fill="none" stroke="url(#electrumSettingGrad)" stroke-width="1.6"/>
+
+        <!-- Semicircular Nephrite Jade Cup (Cradle facing right) -->
+        <path d="M 338 38 C 362 42, 362 88, 338 92 Z"
+              fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="1.8"/>
+        <!-- Polished Translucent Jade Bevel & Reflection Rim -->
+        <path d="M 338 40 C 358 44, 358 86, 338 90"
+              fill="none" stroke="url(#nephriteJadeGrad)" stroke-width="1.2" opacity="0.85"/>
+        <path d="M 340 50 C 354 54, 354 76, 340 80"
+              fill="none" stroke="#dffff5" stroke-width="0.8" opacity="0.6"/>
+
+        <!-- Electrum Setting Claws holding Jade Cup -->
+        <circle cx="340" cy="40" r="2.6" fill="url(#electrumSettingGrad)" stroke="#1a2b34" stroke-width="0.6"/>
+        <circle cx="358" cy="65" r="2.8" fill="url(#electrumSettingGrad)" stroke="#1a2b34" stroke-width="0.6"/>
+        <circle cx="340" cy="90" r="2.6" fill="url(#electrumSettingGrad)" stroke="#1a2b34" stroke-width="0.6"/>
+
+        <!-- Liquid Star-Silver (Ithildin) Droplet Resting / Bulging in Cup -->
+        <path d="M 342 46
+                 C ${356 + reach * 10} ${48 - reach * 4},
+                   ${358 + stretchX} ${58 - reach * 6},
+                   ${360 + stretchX} 65
+                 C ${358 + stretchX} ${72 + reach * 6},
+                   ${356 + reach * 10} ${82 + reach * 4},
+                   342 84 Z"
+              fill="url(#quicksilverBeadGrad)" stroke="#ffffff" stroke-width="1"
+              stroke-opacity="${0.7 + reach * 0.3}" filter="url(#quicksilverSurfaceGlow)"/>
+
+        <!-- Quicksilver Chrome Specular Highlight -->
+        <path d="M 344 50 Q ${352 + reach * 12} 55 ${352 + stretchX * 0.7} 65"
+              fill="none" stroke="#ffffff" stroke-width="${1.2 + reach * 0.8}" stroke-linecap="round"/>
+        <circle cx="${346 + reach * 6}" cy="54" r="1.6" fill="#ffffff"/>
+
+        <!-- Electrostatic Starlight Sparkles (When approaching) -->
+        ${reach > 0.1 ? `
+          <circle cx="${364 + stretchX}" cy="65" r="${1.2 + reach * 1.2}" fill="#ffffff" filter="url(#moonlitCausticGlow)"/>
+          <line x1="${362 + stretchX}" y1="65" x2="${374 + stretchX * 1.3}" y2="62"
+                stroke="#7bf2c6" stroke-width="1" stroke-dasharray="2 2" opacity="${reach}"/>
+          <circle cx="${376 + stretchX * 1.3}" cy="62" r="1" fill="#7bf2c6"/>
+        ` : ''}
+
+        <!-- Secondary Upper & Lower Capillary Droplet Cups -->
+        <g transform="translate(328, 22)">
+          <ellipse cx="0" cy="0" rx="4.5" ry="3.5" fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="0.8"/>
+          <circle cx="0.5" cy="0" r="2.2" fill="url(#quicksilverBeadGrad)"/>
+          <circle cx="0" cy="-0.5" r="0.7" fill="#ffffff"/>
+        </g>
+        <path d="M 328 26 Q 334 32 338 38" fill="none" stroke="url(#quicksilverGrad)" stroke-width="0.9" opacity="0.8"/>
+
+        <g transform="translate(328, 108)">
+          <ellipse cx="0" cy="0" rx="4.5" ry="3.5" fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="0.8"/>
+          <circle cx="0.5" cy="0" r="2.2" fill="url(#quicksilverBeadGrad)"/>
+          <circle cx="0" cy="-0.5" r="0.7" fill="#ffffff"/>
+        </g>
+        <path d="M 328 104 Q 334 98 338 92" fill="none" stroke="url(#quicksilverGrad)" stroke-width="0.9" opacity="0.8"/>
+      </g>
+    `;
+  } else {
+    // Module B: Left Mating Rim with Complementary Jade Cup & Liquid Star-Silver Droplet
+    // Center of main cup at (26, 65)
+    const stretchX = reach * 28;
+    return `
+      <g class="elven-meniscus-cap-b" transform="translate(${x}, ${y}) scale(${scale})" transform-origin="26px 65px">
+        <!-- Star-Silver Bracket Mounting Jade Cup -->
+        <path d="M 42 32 C 32 34 28 48 28 65 C 28 82 32 96 42 98"
+              fill="none" stroke="url(#vineSilverGrad)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M 38 46 L 24 54 M 38 84 L 24 76"
+              fill="none" stroke="url(#electrumSettingGrad)" stroke-width="1.6"/>
+
+        <!-- Semicircular Nephrite Jade Cup (Cradle facing left) -->
+        <path d="M 30 38 C 6 42, 6 88, 30 92 Z"
+              fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="1.8"/>
+        <!-- Polished Translucent Jade Bevel & Reflection Rim -->
+        <path d="M 30 40 C 10 44, 10 86, 30 90"
+              fill="none" stroke="url(#nephriteJadeGrad)" stroke-width="1.2" opacity="0.85"/>
+        <path d="M 28 50 C 14 54, 14 76, 28 80"
+              fill="none" stroke="#dffff5" stroke-width="0.8" opacity="0.6"/>
+
+        <!-- Electrum Setting Claws holding Jade Cup -->
+        <circle cx="28" cy="40" r="2.6" fill="url(#electrumSettingGrad)" stroke="#1a2b34" stroke-width="0.6"/>
+        <circle cx="10" cy="65" r="2.8" fill="url(#electrumSettingGrad)" stroke="#1a2b34" stroke-width="0.6"/>
+        <circle cx="28" cy="90" r="2.6" fill="url(#electrumSettingGrad)" stroke="#1a2b34" stroke-width="0.6"/>
+
+        <!-- Liquid Star-Silver Droplet Resting / Bulging to Left -->
+        <path d="M 26 46
+                 C ${12 - reach * 10} ${48 - reach * 4},
+                   ${10 - stretchX} ${58 - reach * 6},
+                   ${8 - stretchX} 65
+                 C ${10 - stretchX} ${72 + reach * 6},
+                   ${12 - reach * 10} ${82 + reach * 4},
+                   26 84 Z"
+              fill="url(#quicksilverBeadGrad)" stroke="#ffffff" stroke-width="1"
+              stroke-opacity="${0.7 + reach * 0.3}" filter="url(#quicksilverSurfaceGlow)"/>
+
+        <!-- Quicksilver Specular Highlight -->
+        <path d="M 24 50 Q ${16 - reach * 12} 55 ${16 - stretchX * 0.7} 65"
+              fill="none" stroke="#ffffff" stroke-width="${1.2 + reach * 0.8}" stroke-linecap="round"/>
+        <circle cx="${22 - reach * 6}" cy="54" r="1.6" fill="#ffffff"/>
+
+        <!-- Electrostatic Starlight Sparkles -->
+        ${reach > 0.1 ? `
+          <circle cx="${4 - stretchX}" cy="65" r="${1.2 + reach * 1.2}" fill="#ffffff" filter="url(#moonlitCausticGlow)"/>
+          <line x1="${6 - stretchX}" y1="65" x2="${-6 - stretchX * 1.3}" y2="62"
+                stroke="#7bf2c6" stroke-width="1" stroke-dasharray="2 2" opacity="${reach}"/>
+          <circle cx="${-8 - stretchX * 1.3}" cy="62" r="1" fill="#7bf2c6"/>
+        ` : ''}
+
+        <!-- Secondary Upper & Lower Capillary Droplet Cups -->
+        <g transform="translate(40, 22)">
+          <ellipse cx="0" cy="0" rx="4.5" ry="3.5" fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="0.8"/>
+          <circle cx="-0.5" cy="0" r="2.2" fill="url(#quicksilverBeadGrad)"/>
+          <circle cx="0" cy="-0.5" r="0.7" fill="#ffffff"/>
+        </g>
+        <path d="M 40 26 Q 34 32 30 38" fill="none" stroke="url(#quicksilverGrad)" stroke-width="0.9" opacity="0.8"/>
+
+        <g transform="translate(40, 108)">
+          <ellipse cx="0" cy="0" rx="4.5" ry="3.5" fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="0.8"/>
+          <circle cx="-0.5" cy="0" r="2.2" fill="url(#quicksilverBeadGrad)"/>
+          <circle cx="0" cy="-0.5" r="0.7" fill="#ffffff"/>
+        </g>
+        <path d="M 40 104 Q 34 98 30 92" fill="none" stroke="url(#quicksilverGrad)" stroke-width="0.9" opacity="0.8"/>
       </g>
     `;
   }
@@ -2103,6 +2328,227 @@ function drawScabbardOverlay(f, width = W) {
   return s;
 }
 
+// Option 5: Shared Liquid Ithildin Meniscus (Quicksilver Bridge) Join
+function drawLiquidIthildinJoin(a, b, progress, isJoined, light, snapWave, isShade = false, tension = 0) {
+  if (isShade) return '';
+  let s = '';
+
+  const strength = Math.max(progress, light, connectionGlow.socket.value);
+  const midX = (a.x + 342 + b.x + 26) / 2;
+  const midY = (a.y + 65 + b.y + 65) / 2;
+  const gap = (b.x + 26) - (a.x + 342);
+
+  // 1. Electrostatic Stream & Hourglass Liquid Neck (when separate / approaching / joining)
+  if (!isJoined && strength > 0.05 && gap > 0) {
+    const ax = a.x + 342, ay = a.y + 65;
+    const bx = b.x + 26,  by = b.y + 65;
+
+    s += `<g class="quicksilver-liquid-bridge">`;
+
+    // A. Electrostatic Attraction Aura & Caustic Glow
+    s += `<ellipse cx="${midX}" cy="${midY}" rx="${Math.max(12, gap * 0.65)}" ry="${32 * strength}"
+                   fill="#38d9a9" opacity="${0.18 * strength}" filter="url(#moonlitCausticGlow)"/>`;
+
+    // B. Stretching Hourglass Liquid Neck (Catenoid profile)
+    const waistYRad = Math.max(3.5, 20 * progress + (1 - Math.min(1, gap / 200)) * 8);
+    const topCurveY = midY - waistYRad;
+    const botCurveY = midY + waistYRad;
+
+    s += `
+      <!-- Fluid Hourglass Body -->
+      <path d="M ${ax} ${ay - 20}
+               C ${midX - 8} ${topCurveY}, ${midX + 8} ${topCurveY}, ${bx} ${by - 20}
+               L ${bx} ${by + 20}
+               C ${midX + 8} ${botCurveY}, ${midX - 8} ${botCurveY}, ${ax} ${ay + 20}
+               Z"
+            fill="url(#quicksilverBeadGrad)" stroke="url(#quicksilverGrad)" stroke-width="1.4"
+            filter="url(#quicksilverSurfaceGlow)"/>
+
+      <!-- Quicksilver Chrome Liquid Highlight along upper curvature -->
+      <path d="M ${ax + 2} ${ay - 14}
+               C ${midX - 6} ${topCurveY + 4}, ${midX + 6} ${topCurveY + 4}, ${bx - 2} ${by - 14}"
+            fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" opacity="0.95"/>
+      <path d="M ${ax + 6} ${ay - 8}
+               C ${midX - 4} ${topCurveY + 8}, ${midX + 4} ${topCurveY + 8}, ${bx - 6} ${by - 8}"
+            fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.75"/>
+
+      <!-- Liquid Core Center Ribbon -->
+      <line x1="${ax}" y1="${ay}" x2="${bx}" y2="${by}"
+            stroke="url(#crystalBeamGrad)" stroke-width="2.2" opacity="${0.6 + 0.4 * strength}"
+            filter="url(#crystalOpticalGlow)"/>
+    `;
+
+    // C. Dancing Electrostatic Arc Filaments
+    const numArcs = Math.min(4, Math.floor(strength * 4) + 1);
+    for (let i = 0; i < numArcs; i++) {
+      const arcOffset = (i % 2 === 0 ? 1 : -1) * (10 + i * 7);
+      const sag = (i * 9) * (1 - progress);
+      s += `<path d="M ${ax + 4} ${ay + (i - 1.5) * 8}
+                     Q ${midX} ${midY + arcOffset + sag} ${bx - 4} ${by + (i - 1.5) * 8}"
+                  fill="none" stroke="${i % 2 === 0 ? '#7bf2c6' : '#a5d8ff'}"
+                  stroke-width="0.9" stroke-dasharray="3 3" opacity="${0.5 * strength}"/>`;
+    }
+
+    // D. Small floating mercury droplet satellites
+    for (let k = 0; k < 3; k++) {
+      const dropFrac = 0.25 + k * 0.25;
+      const dx = ax + (bx - ax) * dropFrac;
+      const dy = ay + Math.sin(k * 2.3 + strength * 4) * (waistYRad * 0.7);
+      s += `<circle cx="${dx}" cy="${dy}" r="${1.2 + k * 0.4}" fill="#ffffff" filter="url(#quicksilverSurfaceGlow)"/>`;
+    }
+
+    s += `</g>`;
+  }
+
+  // 2. Monolithic Unified Nephrite Jade Cradle & Gleaming Quicksilver Bead (when joined)
+  if (isJoined || progress >= 0.98) {
+    const kMidX = a.x + JOIN_DISTANCE + 26; // = a.x + 342
+    const kMidY = a.y + 65;
+
+    // Fluid Meniscus Wobble from Snap or Agitation
+    let wobbleX = 0, wobbleY = 0;
+    if (snapWave > 0.001) {
+      const decay = Math.exp(-snapWave * 5);
+      const osc = Math.sin(snapWave * 20);
+      wobbleX = osc * decay * 10;
+      wobbleY = -osc * decay * 10;
+    }
+
+    // Dynamic elongation / flexing under drag tension
+    const flexX = tension * 14;
+    const flexY = -tension * 6;
+
+    const beadRx = Math.max(10, 16 + wobbleX + flexX);
+    const beadRy = Math.max(14, 25 + wobbleY + flexY);
+
+    s += `<g class="monolithic-quicksilver-meniscus">`;
+
+    // A. Outer Unified Sculpted Nephrite Jade Chalice / Oval Font
+    s += `
+      <!-- Jade Font Shadow & Outer Contour -->
+      <ellipse cx="${kMidX}" cy="${kMidY}" rx="28" ry="38"
+               fill="#06221a" stroke="#09382b" stroke-width="2.5"/>
+      <ellipse cx="${kMidX}" cy="${kMidY}" rx="27" ry="37"
+               fill="url(#jadeCupGrad)"/>
+      <!-- Polished Jade Translucent Inner Bevel -->
+      <ellipse cx="${kMidX}" cy="${kMidY}" rx="23" ry="33"
+               fill="none" stroke="url(#nephriteJadeGrad)" stroke-width="1.6" opacity="0.9"/>
+      <ellipse cx="${kMidX}" cy="${kMidY}" rx="20" ry="30"
+               fill="#08171d" stroke="#122c24" stroke-width="1"/>
+    `;
+
+    // B. Four Art Nouveau Electrum Setting Claws Holding Jade Chalice
+    const clawSettings = [
+      [kMidX, kMidY - 37, 0],
+      [kMidX + 27, kMidY, 90],
+      [kMidX, kMidY + 37, 180],
+      [kMidX - 27, kMidY, -90]
+    ];
+    clawSettings.forEach(([cx, cy, rot]) => {
+      s += `<g transform="translate(${cx}, ${cy}) rotate(${rot})">
+        <path d="M -5 0 Q 0 -8 5 0 Q 0 -3 -5 0 Z" fill="url(#electrumSettingGrad)" stroke="#16222b" stroke-width="0.8"/>
+        <circle cx="0" cy="0" r="2.8" fill="url(#electrumSettingGrad)" stroke="#16222b" stroke-width="0.6"/>
+        <circle cx="0" cy="0" r="1.3" fill="#ffffff"/>
+      </g>`;
+    });
+
+    // C. Star-Silver Botanical Sylvan Keel Brackets Bridging Hulls into Jade Chalice
+    s += `
+      <path d="M ${kMidX - 32} ${kMidY - 32} Q ${kMidX} ${kMidY - 42} ${kMidX + 32} ${kMidY - 32}"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="${kMidX}" cy="${kMidY - 39}" r="3" fill="url(#nephriteJadeGrad)" stroke="#16222b" stroke-width="0.6"/>
+
+      <path d="M ${kMidX - 32} ${kMidY + 32} Q ${kMidX} ${kMidY + 42} ${kMidX + 32} ${kMidY + 32}"
+            fill="none" stroke="url(#vineSilverGrad)" stroke-width="2.2" stroke-linecap="round"/>
+      <circle cx="${kMidX}" cy="${kMidY + 39}" r="3" fill="url(#nephriteJadeGrad)" stroke="#16222b" stroke-width="0.6"/>
+    `;
+
+    // D. The Gleaming Fluid Bead of Quicksilver (Liquid Ithildin Meniscus)
+    s += `
+      <!-- Meniscus Liquid Droplet Body -->
+      <ellipse cx="${kMidX}" cy="${kMidY}" rx="${beadRx}" ry="${beadRy}"
+               fill="url(#quicksilverBeadGrad)" stroke="#ffffff" stroke-width="1.2"
+               stroke-opacity="0.85" filter="url(#quicksilverSurfaceGlow)"/>
+
+      <!-- Liquid Mercury Specular Crescent Highlight -->
+      <path d="M ${kMidX - beadRx * 0.65} ${kMidY - beadRy * 0.4}
+               C ${kMidX - beadRx * 0.2} ${kMidY - beadRy * 0.75},
+                 ${kMidX + beadRx * 0.3} ${kMidY - beadRy * 0.6},
+                 ${kMidX + beadRx * 0.6} ${kMidY - beadRy * 0.2}"
+            fill="none" stroke="#ffffff" stroke-width="${2 + wobbleX * 0.1}" stroke-linecap="round" opacity="0.95"/>
+      <path d="M ${kMidX - beadRx * 0.45} ${kMidY - beadRy * 0.15}
+               C ${kMidX - beadRx * 0.1} ${kMidY - beadRy * 0.45},
+                 ${kMidX + beadRx * 0.25} ${kMidY - beadRy * 0.35},
+                 ${kMidX + beadRx * 0.45} ${kMidY - beadRy * 0.05}"
+            fill="none" stroke="#dffff5" stroke-width="1" stroke-linecap="round" opacity="0.8"/>
+
+      <!-- Central Living Ithildin Starlight Star-Core -->
+      <circle cx="${kMidX}" cy="${kMidY}" r="4.2" fill="#ffffff" filter="url(#moonlitCausticGlow)"/>
+      <circle cx="${kMidX}" cy="${kMidY}" r="2.4" fill="#7bf2c6"/>
+      <path d="M ${kMidX - 6} ${kMidY} H ${kMidX + 6} M ${kMidX} ${kMidY - 6} V ${kMidY + 6}"
+            stroke="#ffffff" stroke-width="0.8" opacity="0.9"/>
+    `;
+
+    // E. Upper and Lower Capillary Veins Running into Hulls
+    s += `
+      <!-- Top Capillary Silver Stream -->
+      <path d="M ${kMidX} ${kMidY - beadRy} Q ${kMidX} ${a.y + 24} ${kMidX - 14} ${a.y + 22}"
+            fill="none" stroke="url(#quicksilverGrad)" stroke-width="1.4" opacity="0.85"/>
+      <path d="M ${kMidX} ${kMidY - beadRy} Q ${kMidX} ${a.y + 24} ${kMidX + 14} ${a.y + 22}"
+            fill="none" stroke="url(#quicksilverGrad)" stroke-width="1.4" opacity="0.85"/>
+      <circle cx="${kMidX - 14}" cy="${a.y + 22}" r="3" fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="0.6"/>
+      <circle cx="${kMidX + 14}" cy="${a.y + 22}" r="3" fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="0.6"/>
+      <circle cx="${kMidX - 14}" cy="${a.y + 22}" r="1.4" fill="url(#quicksilverBeadGrad)"/>
+      <circle cx="${kMidX + 14}" cy="${a.y + 22}" r="1.4" fill="url(#quicksilverBeadGrad)"/>
+
+      <!-- Bottom Capillary Silver Stream -->
+      <path d="M ${kMidX} ${kMidY + beadRy} Q ${kMidX} ${a.y + 106} ${kMidX - 14} ${a.y + 108}"
+            fill="none" stroke="url(#quicksilverGrad)" stroke-width="1.4" opacity="0.85"/>
+      <path d="M ${kMidX} ${kMidY + beadRy} Q ${kMidX} ${a.y + 106} ${kMidX + 14} ${a.y + 108}"
+            fill="none" stroke="url(#quicksilverGrad)" stroke-width="1.4" opacity="0.85"/>
+      <circle cx="${kMidX - 14}" cy="${a.y + 108}" r="3" fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="0.6"/>
+      <circle cx="${kMidX + 14}" cy="${a.y + 108}" r="3" fill="url(#jadeCupGrad)" stroke="#09382b" stroke-width="0.6"/>
+      <circle cx="${kMidX - 14}" cy="${a.y + 108}" r="1.4" fill="url(#quicksilverBeadGrad)"/>
+      <circle cx="${kMidX + 14}" cy="${a.y + 108}" r="1.4" fill="url(#quicksilverBeadGrad)"/>
+    `;
+
+    s += `</g>`;
+  }
+
+  // 3. Surface Tension Snap Caustic Wavefront & Starlight Splashes
+  if (snapWave > 0.001) {
+    const sw = snapWave;
+    const cx = a.x + JOIN_DISTANCE + 26, cy = a.y + 65;
+
+    s += `<g class="meniscus-snap-wavefront">`;
+    // Expanding Concentric Fluid Caustic Ripples
+    s += `<ellipse cx="${cx}" cy="${cy}" rx="${24 + sw * 140}" ry="${32 + sw * 120}"
+                   fill="none" stroke="#7bf2c6"
+                   stroke-width="${Math.max(0.6, (1 - sw) * 4)}" opacity="${(1 - sw) * 0.9}"
+                   filter="url(#moonlitCausticGlow)"/>`;
+    s += `<ellipse cx="${cx}" cy="${cy}" rx="${12 + sw * 80}" ry="${18 + sw * 70}"
+                   fill="none" stroke="#ffffff"
+                   stroke-width="${Math.max(0.5, (1 - sw) * 3)}" opacity="${(1 - sw) * 0.95}"/>`;
+    s += `<ellipse cx="${cx}" cy="${cy}" rx="${4 + sw * 40}" ry="${6 + sw * 35}"
+                   fill="none" stroke="#a5d8ff"
+                   stroke-width="${Math.max(0.5, (1 - sw) * 2)}" opacity="${(1 - sw) * 0.85}"/>`;
+
+    // 8 Radiating Starlight Droplet Splashes
+    const angles = [0, 45, 90, 135, 180, 225, 270, 315];
+    angles.forEach((deg, idx) => {
+      const rad = deg * Math.PI / 180;
+      const dist = sw * 95;
+      const px = cx + dist * Math.cos(rad);
+      const py = cy + dist * Math.sin(rad) * 0.8;
+      const r = Math.max(0.8, (1 - sw) * (idx % 2 === 0 ? 3.2 : 2.2));
+      s += `<circle cx="${px}" cy="${py}" r="${r}" fill="#ffffff" filter="url(#quicksilverSurfaceGlow)" opacity="${(1 - sw) * 0.9}"/>`;
+    });
+    s += `</g>`;
+  }
+
+  return s;
+}
+
 // Render Complete Hardware Layer
 function renderHardware() {
   const a = model.a, b = model.b, p = model.blend;
@@ -2115,7 +2561,7 @@ function renderHardware() {
   if (p > 0) {
     // Seamless Monolithic Star-Silver Hull
     shared += drawElvenCasing(a.x, a.y, (b.x + W) - a.x, p, isShade);
-    if (!isShade && model.option !== 'crystal_cleavage') {
+    if (!isShade && model.option !== 'crystal_cleavage' && model.option !== 'liquid_ithildin') {
       // Connecting Botanical Crest along seam
       shared += `
         <g opacity="${p}">
@@ -2131,6 +2577,9 @@ function renderHardware() {
   if (model.option === 'crystal_cleavage') {
     // Option 3: Crystalline Cleavage & Harmonic Chime Join
     shared += drawCrystalCleavageJoin(a, b, model.crystalGlide, model.joined, glow, model.chimeWave, isShade);
+  } else if (model.option === 'liquid_ithildin') {
+    // Option 5: Liquid Ithildin Meniscus (Quicksilver Bridge) Join
+    shared += drawLiquidIthildinJoin(a, b, model.meniscusProgress, model.joined, glow, model.meniscusSnap, isShade, model.tension);
   } else {
     // Option 1: Living Tendril Braid (Sylvan Weave) Join
     if (!isShade && (model.joined || model.tendrilProgress > 0.02 || (glow > 0.25 && !model.joined))) {
@@ -2153,6 +2602,8 @@ function renderHardware() {
     let endCaps = '';
     if (model.option === 'crystal_cleavage') {
       endCaps = drawElvenCrystalCap(0, 0, isA, !isA, model.joined ? 1 : 0, isShade);
+    } else if (model.option === 'liquid_ithildin') {
+      endCaps = drawElvenMeniscusCap(0, 0, isA, !isA, model.joined ? 1 : 0, isShade, glow);
     } else {
       endCaps = drawElvenTendrilCap(0, 0, false, isA ? 0 : model.cap, isShade) +
         drawElvenTendrilCap(0, 0, true, isA ? model.cap : 0, isShade);
@@ -2163,7 +2614,7 @@ function renderHardware() {
     $('#shell-' + id).innerHTML = `
       <g opacity="${1 - p}">
         ${individual}
-        ${model.option === 'crystal_cleavage' ? '' : drawElvenProximityAura(isA ? W - 22 : 22, 0, glow)}
+        ${(model.option === 'crystal_cleavage' || model.option === 'liquid_ithildin') ? '' : drawElvenProximityAura(isA ? W - 22 : 22, 0, glow)}
       </g>
     `;
   }
@@ -2185,7 +2636,7 @@ function renderHardware() {
   }
 
   // Active Proximity Aura (for Tendril Braid)
-  if (model.option !== 'crystal_cleavage' && !isShade && glow > 0.05 && p < 0.98) {
+  if (model.option !== 'crystal_cleavage' && model.option !== 'liquid_ithildin' && !isShade && glow > 0.05 && p < 0.98) {
     $('#elvenLightAura').innerHTML = `
       <g opacity="${glow}">
         ${drawElvenProximityAura(a.x + W - 22, a.y, glow)}
@@ -2200,7 +2651,11 @@ function renderHardware() {
 function updateStateButtons() {
   const isShade = model.shade || model.petalFold > 0.5 || model.scabbardSlide > 0.5;
   const isJoined = model.joined;
-  const isJoining = ((model.option === 'crystal_cleavage' ? (model.crystalGlide > 0.1 && model.crystalGlide < 0.95) : (model.tendrilProgress > 0.1 && model.tendrilProgress < 0.95))) && !isJoined && !isShade;
+  const isJoining = ((model.option === 'crystal_cleavage'
+    ? (model.crystalGlide > 0.1 && model.crystalGlide < 0.95)
+    : (model.option === 'liquid_ithildin'
+      ? (model.meniscusProgress > 0.1 && model.meniscusProgress < 0.95)
+      : (model.tendrilProgress > 0.1 && model.tendrilProgress < 0.95)))) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -2359,15 +2814,21 @@ function render() {
 
   const release = $('#sylvanRelease');
   release.hidden = !model.joined || model.busy || model.shade;
-  release.style.left = (model.a.x + (model.option === 'crystal_cleavage' ? 334 : 338)) + 'px';
-  release.style.top = (model.a.y + (model.option === 'crystal_cleavage' ? 12 : 44)) + 'px';
+  release.style.left = (model.a.x + (model.option === 'crystal_cleavage' ? 334 : (model.option === 'liquid_ithildin' ? 336 : 338))) + 'px';
+  release.style.top = (model.a.y + (model.option === 'crystal_cleavage' ? 12 : (model.option === 'liquid_ithildin' ? 14 : 44))) + 'px';
   release.style.setProperty('--tension', model.tension);
   if (model.option === 'crystal_cleavage') {
     release.classList.add('crystal-pin');
+    release.classList.remove('quicksilver-pin');
     release.setAttribute('aria-label', 'Release GitDiscuss: pull crystal pin or press Enter');
     release.setAttribute('title', 'Pull crystal pin to dissolve optical bond · Enter to separate');
-  } else {
+  } else if (model.option === 'liquid_ithildin') {
     release.classList.remove('crystal-pin');
+    release.classList.add('quicksilver-pin');
+    release.setAttribute('aria-label', 'Release GitDiscuss: pull quicksilver needle or press Enter');
+    release.setAttribute('title', 'Pull quicksilver needle to break surface tension · Enter to separate');
+  } else {
+    release.classList.remove('crystal-pin', 'quicksilver-pin');
     release.setAttribute('aria-label', 'Release GitDiscuss: pull right or press Enter');
     release.setAttribute('title', 'Pull right to unweave silver tendrils · Enter to separate');
   }
@@ -2387,11 +2848,15 @@ function render() {
     } else if (model.joined) {
       $('#phase').textContent = model.option === 'crystal_cleavage'
         ? 'Joined / Monolithic moonstone prism'
-        : 'Joined / One unified sylvan instrument';
-    } else if (model.crystalGlide > 0.1 || model.tendrilProgress > 0.1) {
+        : (model.option === 'liquid_ithildin'
+          ? 'Joined / Quicksilver meniscus in jade chalice'
+          : 'Joined / One unified sylvan instrument');
+    } else if (model.crystalGlide > 0.1 || model.tendrilProgress > 0.1 || model.meniscusProgress > 0.1) {
       $('#phase').textContent = model.option === 'crystal_cleavage'
         ? 'Joining / Crystal planes gliding on 30° bias'
-        : 'Joining / Silver tendrils intertwining';
+        : (model.option === 'liquid_ithildin'
+          ? 'Joining / Liquid Ithildin hourglass neck'
+          : 'Joining / Silver tendrils intertwining');
     } else {
       $('#phase').textContent = 'Separate / Two sylvan star-silver hulls';
     }
@@ -2631,6 +3096,107 @@ async function triggerHarmonicChime() {
   renderHardware();
 }
 
+// Option 5: Liquid Ithildin Meniscus (Quicksilver Bridge) Join Animations
+async function joinMeniscus(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Liquid star-silver droplets reach across the gap. Electrostatic attraction forms an hourglass neck.');
+  $('#phase').textContent = 'Electrostatic attraction / Hourglass neck';
+
+  // 1. Approach & neck stretch
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.canopy ? 305 : 385, model.a.y));
+
+  if (!await tween(fromDrag ? 240 : 460, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.4) / 0.6);
+    model.meniscusProgress = t;
+    model.light = t * 0.8;
+    render();
+  }, token)) return;
+
+  // 2. Surface tension snap & damped fluid wobble
+  $('#phase').textContent = 'Surface tension snap & fluid settling';
+  model.joined = true;
+  model.blend = 1;
+  model.meniscusProgress = 1;
+  model.light = 0;
+  render();
+
+  await tween(fromDrag ? 360 : 560, t => {
+    model.meniscusSnap = t;
+    renderHardware();
+  }, token);
+
+  model.meniscusSnap = 0;
+  model.busy = false;
+  render();
+  say('Surface tension snapped. Quicksilver meniscus seated in carved jade cradle. Pull needle clasp to release.');
+  $('#phase').textContent = 'Joined / Quicksilver meniscus bridge';
+}
+
+async function separateMeniscus() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Breaking surface tension. Quicksilver neck thins and parts into two calm droplets.');
+  $('#phase').textContent = 'Breaking surface tension';
+
+  // 1. Parting snap ripple
+  if (!await tween(180, t => {
+    model.meniscusSnap = t;
+    renderHardware();
+  }, token)) return;
+
+  model.meniscusSnap = 0;
+  model.joined = false;
+
+  // 2. Gliding apart
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Quicksilver retracting into jade cups';
+  if (!await tween(520, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.5);
+    model.meniscusProgress = 1 - t;
+    render();
+  }, token)) return;
+
+  model.busy = false;
+  model.blend = 0;
+  model.meniscusProgress = 0;
+  render();
+  say('Separated. Independent star-silver hulls with liquid Ithildin resting in jade cups.');
+  $('#phase').textContent = 'Separate / Two star-silver hulls';
+}
+
+async function triggerMeniscusRipple() {
+  if (model.busy) return;
+  const token = ++animationToken;
+  say('Agitating the quicksilver meniscus: Surface tension caustics ripple across the carved jade cradle.');
+  await tween(580, t => {
+    model.meniscusSnap = t;
+    renderHardware();
+  }, token);
+  model.meniscusSnap = 0;
+  renderHardware();
+}
+
 // Option 2: Lotus Petal Nocturne Shade Mode Animations
 async function closeLotusPetals() {
   if (model.busy || (model.shade && model.petalFold >= 0.98)) return;
@@ -2754,10 +3320,12 @@ async function applyState(stateName) {
     }
     if (model.joined) {
       if (model.option === 'crystal_cleavage') await separateCrystal();
+      else if (model.option === 'liquid_ithildin') await separateMeniscus();
       else await separate();
     } else {
       model.tendrilProgress = 0;
       model.crystalGlide = 0;
+      model.meniscusProgress = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -2778,14 +3346,25 @@ async function applyState(stateName) {
     if (model.option === 'crystal_cleavage') {
       model.crystalGlide = 0.55;
       model.tendrilProgress = 0;
+      model.meniscusProgress = 0;
       model.a.x = 240;
       model.b.x = 240 + W + 46;
       model.b.y = model.a.y - 12; // 30° diagonal approach offset
       render();
       say('State: Joining — Mid-animation view with 30° crystal planes approaching along the bias with spectral refraction rays.');
+    } else if (model.option === 'liquid_ithildin') {
+      model.meniscusProgress = 0.58;
+      model.tendrilProgress = 0;
+      model.crystalGlide = 0;
+      model.a.x = 240;
+      model.b.x = 240 + W + 46;
+      model.b.y = model.a.y;
+      render();
+      say('State: Joining — Mid-animation view with liquid star-silver reaching across the gap to form an hourglass neck.');
     } else {
       model.tendrilProgress = 0.58; // mid-flight reaching tendrils
       model.crystalGlide = 0;
+      model.meniscusProgress = 0;
       model.a.x = 240;
       model.b.x = 240 + W + 50;
       model.b.y = model.a.y;
@@ -2808,12 +3387,21 @@ async function applyState(stateName) {
       if (model.option === 'crystal_cleavage') {
         model.crystalGlide = 1;
         model.tendrilProgress = 0;
+        model.meniscusProgress = 0;
         render();
         say('State: Joined — Monolithic moonstone prism with invisible optical seam.');
         triggerHarmonicChime();
+      } else if (model.option === 'liquid_ithildin') {
+        model.meniscusProgress = 1;
+        model.tendrilProgress = 0;
+        model.crystalGlide = 0;
+        render();
+        say('State: Joined — Smooth quicksilver meniscus resting in carved jade chalice.');
+        triggerMeniscusRipple();
       } else {
         model.tendrilProgress = 1;
         model.crystalGlide = 0;
+        model.meniscusProgress = 0;
         render();
         say('State: Joined — Monolithic star-silver hull with Art Nouveau sylvan lattice.');
       }
@@ -2886,10 +3474,12 @@ $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState('shade');
 $('#btnJoinAnim').onclick = () => {
   if (model.option === 'crystal_cleavage') joinCrystal();
+  else if (model.option === 'liquid_ithildin') joinMeniscus();
   else join();
 };
 $('#btnSeparateAnim').onclick = () => {
   if (model.option === 'crystal_cleavage') separateCrystal();
+  else if (model.option === 'liquid_ithildin') separateMeniscus();
   else separate();
 };
 $('#btnLotusAnim').onclick = () => {
@@ -2900,7 +3490,10 @@ $('#btnScabbardAnim').onclick = () => {
   if (model.shade || model.scabbardSlide > 0.5) drawScabbardBlade();
   else slideScabbardBlade();
 };
-$('#btnChimeAnim').onclick = () => triggerHarmonicChime();
+$('#btnChimeAnim').onclick = () => {
+  if (model.option === 'liquid_ithildin') triggerMeniscusRipple();
+  else triggerHarmonicChime();
+};
 $('#btnDesign').onclick = () => {
   model.design = !model.design;
   render();
@@ -2913,28 +3506,49 @@ $('#btnReset').onclick = () => {
   Object.assign(model, {
     joined: false, busy: false, canopy: false, docked: false, design: false, shade: false,
     blend: 0, cap: 0, tendrilProgress: 0, petalFold: 0, crystalGlide: 0, chimeWave: 0,
-    scabbardSlide: 0, scabbardFlash: 0,
-    option: 'scabbard_slide', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    scabbardSlide: 0, scabbardFlash: 0, meniscusProgress: 0, meniscusSnap: 0,
+    option: 'liquid_ithildin', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
   Object.assign(model.b, { x: 680, y: 220, page: 0, running: true });
   Object.assign(model.meter, { x: 805, y: 510 });
-  $('#btnJoinAnim').textContent = 'Seat crystal prisms';
-  $('#btnJoinAnim').classList.remove('primary-btn');
+  $('#btnJoinAnim').textContent = 'Snap quicksilver meniscus';
+  $('#btnJoinAnim').classList.add('primary-btn');
   $('#btnLotusAnim').classList.remove('primary-btn');
-  $('#btnScabbardAnim').classList.add('primary-btn');
-  $('#optionSelect').value = 'scabbard_slide';
+  $('#btnScabbardAnim').classList.remove('primary-btn');
+  if ($('#btnChimeAnim')) {
+    $('#btnChimeAnim').textContent = 'Agitate meniscus';
+    $('#btnChimeAnim').setAttribute('title', 'Agitate quicksilver meniscus to trigger fluid surface tension ripple');
+  }
+  $('#optionSelect').value = 'liquid_ithildin';
   render();
-  say('Reset to initial Elven study configuration with Sylvan Scabbard Slide shade.');
+  say('Reset to initial Elven study configuration with Liquid Ithildin Meniscus join.');
 };
 
 $('#optionSelect').onchange = async (e) => {
   model.option = e.target.value;
-  if (model.option === 'scabbard_slide') {
+  if (model.option === 'liquid_ithildin') {
+    say('Option 5: Liquid Ithildin Meniscus (Quicksilver Bridge) join selected. Liquid star-silver droplets snap by surface tension.');
+    $('#btnJoinAnim').textContent = 'Snap quicksilver meniscus';
+    $('#btnJoinAnim').classList.add('primary-btn');
+    $('#btnLotusAnim').classList.remove('primary-btn');
+    $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Agitate meniscus';
+      $('#btnChimeAnim').setAttribute('title', 'Agitate quicksilver meniscus to trigger fluid surface tension ripple');
+    }
+    if (model.shade && model.scabbardSlide > 0.05) {
+      await drawScabbardBlade();
+    }
+  } else if (model.option === 'scabbard_slide') {
     say('Option 4: Sylvan Scabbard Slide shade selected. Display bay glides upward into overhead repoussé star-silver canopy.');
     $('#btnScabbardAnim').classList.add('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Chime resonance';
+      $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
+    }
     if (model.shade && model.petalFold > 0.05) {
       await bloomLotusPetals();
       await slideScabbardBlade();
@@ -2945,6 +3559,10 @@ $('#optionSelect').onchange = async (e) => {
     $('#btnJoinAnim').classList.add('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Chime resonance';
+      $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
+    }
     if (model.shade && model.scabbardSlide > 0.05) {
       await drawScabbardBlade();
     }
@@ -2953,6 +3571,10 @@ $('#optionSelect').onchange = async (e) => {
     $('#btnLotusAnim').classList.add('primary-btn');
     $('#btnJoinAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Chime resonance';
+      $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
+    }
     if (model.shade && model.scabbardSlide > 0.05) {
       await drawScabbardBlade();
       await closeLotusPetals();
@@ -2965,6 +3587,10 @@ $('#optionSelect').onchange = async (e) => {
     $('#btnJoinAnim').classList.add('primary-btn');
     $('#btnLotusAnim').classList.remove('primary-btn');
     $('#btnScabbardAnim').classList.remove('primary-btn');
+    if ($('#btnChimeAnim')) {
+      $('#btnChimeAnim').textContent = 'Chime resonance';
+      $('#btnChimeAnim').setAttribute('title', 'Trigger pure-harmonic chime wavefront');
+    }
     if (model.shade) {
       if (model.scabbardSlide > 0.05) await drawScabbardBlade();
       else await bloomLotusPetals();
@@ -3164,6 +3790,7 @@ function onPointerMove(e) {
     if (pullX >= 65 && !drag.released) {
       drag.released = true;
       if (model.option === 'crystal_cleavage') separateCrystal();
+      else if (model.option === 'liquid_ithildin') separateMeniscus();
       else separate();
     }
   }
@@ -3174,6 +3801,7 @@ function onPointerUp(e) {
   if (drag.kind === 'module' && drag.id === 'b' && !model.joined) {
     if (pointerDistance(alignedTarget(), model.b) <= DOCKING.capture) {
       if (model.option === 'crystal_cleavage') joinCrystal(true);
+      else if (model.option === 'liquid_ithildin') joinMeniscus(true);
       else join(true);
       return;
     }
@@ -3210,6 +3838,7 @@ window.addEventListener('keydown', e => {
   if (e.key === 'Escape') cancelDrag();
   if (e.key === 'Enter' && document.activeElement === $('#sylvanRelease')) {
     if (model.option === 'crystal_cleavage') separateCrystal();
+    else if (model.option === 'liquid_ithildin') separateMeniscus();
     else separate();
   }
 });
@@ -3231,7 +3860,7 @@ window.addEventListener('orientationchange', fit);
 requestAnimationFrame(animateGlow);
 render();
 fit();
-say('Elven & Intricate skin loaded: Spun star-silver with Sylvan Scabbard Slide shade.');
+say('Elven & Intricate skin loaded: Spun star-silver with Liquid Ithildin Meniscus join.');
 </script>
 </body>
 </html>
