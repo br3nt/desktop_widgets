@@ -101,6 +101,10 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .w[data-wf] .grip{justify-content:center;gap:8px}.w[data-wf] .grip>span:first-child{font-size:0}.w[data-wf] .grip b{margin:0}
 /* Scale and detail: the ring's and six-foil's small round panes */
 #lv1 .disc .num{font-size:18px;line-height:20px}#lv2 .disc .num{font-size:17px;line-height:19px}#lv2 .disc small{font-size:10px}#lv2 .disc .tiny{font-size:9px}
+/* Altarpiece: the open panels' gesso cartouches */
+.av .mw{background:radial-gradient(ellipse 90% 120% at 50% 0%,#fffaf0,#f4e6c6 62%,#e6d1a4);outline-color:#4a2c06;box-shadow:inset 0 0 10px #b8862a40}
+.av .mw.lst{padding:4px 3px 0 5px}.av .mw ul{font:10px/1.5 Georgia,serif;margin-top:1px}.av .mw li:before{margin-right:4px}
+#av2 .rb{position:static;display:block;margin:3px 0 0}
 .wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
@@ -245,6 +249,15 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  </div>
  <div class="wv" id="lv1" aria-hidden="true"><div class="mw disc" style="left:27px;top:19px;width:62px;height:62px"><span class="num">12/14</span><div class="tiny">passed</div></div></div>
  <div class="wv" id="lv2" aria-hidden="true"><div class="mw disc" style="left:51px;top:43px;width:62px;height:62px"><div class="tiny">Passed</div><span class="num">12/14</span><small class="wait">2 waiting</small></div></div>
+ <div class="wv av" id="av1" aria-hidden="true">
+  <div class="mw col" style="left:113px;top:108px;width:88px;height:66px"><div class="tiny">Passed</div><span class="num ok">12</span><small>checks</small></div>
+  <div class="mw col" style="left:224px;top:106px;width:168px;height:86px"><div class="tiny">Run 418 · main</div><span class="num">12 / 14</span><small>checks passed · 86%</small><small class="wait">2 waiting for you</small></div>
+  <div class="mw lst" style="left:415px;top:108px;width:88px;height:66px"><div class="tiny">Waiting · 2</div><ul><li>deploy-preview</li><li>e2e-safari</li></ul></div>
+ </div>
+ <div class="wv av" id="av2" aria-hidden="true">
+  <div class="mw col" style="left:13px;top:108px;width:88px;height:66px"><div class="tiny">Pass rate</div><span class="num ok">86%</span><small>run 418</small></div>
+  <div class="mw col" style="left:515px;top:108px;width:88px;height:66px"><div class="tiny">Last 10 runs</div><span class="rb"></span><small>main</small></div>
+ </div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
 </section>
@@ -2730,6 +2743,152 @@ MORPHS.detail={label:'Scale and detail',kind:'Scale',sizes:[['facade','Facade',0
  box:lBox,dims:lDims,render:lRender,phase:lPhase,
  say:(d,S)=>d>0?'Checks grows to '+S[3]+': with more room, the tracery gains a level.':'Checks shrinks to '+S[3]+': with less room, the tracery drops a level so it never blurs to grey.',
  about:'One round window at three sizes, with as much tracery as each size can hold. Gothic tracery is fine stonework, and drawn too small it turns to grey fuzz, so the window adds or drops a level of tracery as it crosses each size, and its pane says only what fits. <b>Ring</b> (96 px across): a plain oculus with a gilded keystone and no tracery at all. Its status is one ring of glass in two arcs, twelve-fourteenths green for passed and the rest red for waiting, round a pane that shows just the count. <b>Six-foil</b> (144 px): the stone widens into a plate pierced with six foils of ruby and blue glass and gold roundels. This is plate tracery, the earliest kind. The pane adds the label and the two waiting. <b>Rose</b> (224 px): the plate is cut away for bar tracery, the later and finer kind, with fourteen petals, one per check (hover or tap one to read it), ball-flowers round the outer order, and the full readout in the pane. <b>Growing:</b> the stone widens first, and once there is room the new tracery is cut. The six foils are pierced one by one with grit, or the rose\'s bars are drawn in along the opening, then the glass goes in and kindles, and the status passes from the ring into the petals. <b>Shrinking</b> drops the finer level before the window gets too small for it. The phase line shows the size as a share of the full rose. Pick a size, press M, or scrub the slider. Checks grows from its foot and moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way. Shading takes it back to the facade first, and unshading grows it again.'};
+
+/* ---------- Morph: altarpiece (Checks) ---------- */
+// g runs 0 facade, 1 triptych, 2 feast day. A winged altarpiece showed more the holier the day: shut, in grisaille, on weekdays; its wings open on Sundays;
+// and on feast days a second pair of leaves, folded away behind the first, swung out as well. The facade becomes the shut altarpiece, then it opens.
+// Everything is a function of g, so shrinking closes it in reverse. Panels are AW wide (the centre twice that); the body runs ABT to ABB, the predella below.
+const AW=100,ABT=72,ABB=222,AH=248,AD=[[CW,CH],[416,AH],[616,AH]];
+// The box widens smoothly, and only just before the wings need the room, so a Checks near the stage edge never snaps sideways.
+const apBox=g=>g<1e-6?AD[0]:g<=1?[lerp(CW,416,ease(seg(g,.4,.5))),AH]:[lerp(416,616,ease(seg(g-1,0,.15))),AH],apDims=k=>AD[k];
+// A heavy wing's swing in degrees: it gathers speed, hits its stop at full flat and rebounds once. With q, the first 90° (hidden behind the open wing) goes by quickly.
+const apSwing=(t,q=0)=>{if(t<=0)return 0;if(t<q)return 90*t/q;const v=(t-q)/(1-q),a=q?90:0,b=180-a,x=Math.min(1,v/.8);return v<.8?a+b*(q?x:x*x):180-8*Math.sin(Math.PI*(v-.8)/.2)};
+// The shut altarpiece's outline, from bottom centre clockwise, so the facade can flow into it point for point.
+const apClosed=cx=>`M${cx} ${AH}H${cx-120}V${ABB}H${cx-106}V${ABT-6}L${cx} 16L${cx+106} ${ABT-6}V${ABB}H${cx+120}V${AH}Z`;
+const apCache={};
+// One wing face, flat, in its own frame: x 0 at the hinge to AW at the free edge, y 0 at the body's top.
+// 'out' is the weekday face in grisaille, a hooded stone figure in a painted niche; 'in' and 'leaf' are gilt, with saints over a gesso cartouche and a tiled floor.
+function apFace(kind){
+ if(apCache[kind])return apCache[kind];
+ const w=AW,h=ABB-ABT;let s;
+ if(kind==='out'){
+  s=`<rect width="${w}" height="${h}" fill="url(#gris)"/><rect x="2.5" y="2.5" width="${w-5}" height="${h-5}" fill="none" stroke="#fbfaf5" stroke-opacity=".6" stroke-width=".8"/><rect x="3.3" y="3.3" width="${w-5.8}" height="${h-5.8}" fill="none" stroke="#3e3c38" stroke-opacity=".42" stroke-width=".8"/>`+
+   `<path d="${lancet(50,136,24,29)}" fill="#6e6b64"/><path d="M76 136V52" stroke="#3a3833" stroke-width="6" opacity=".25"/><path d="M21.6 136V54" stroke="#fbfaf5" stroke-opacity=".45"/>`+
+   `<path d="M14 42L50 8L86 42" fill="none" stroke="#4a4843" stroke-width="1.3"/><path d="M15 43.4L50 10L85 43.4" fill="none" stroke="#fbfaf5" stroke-opacity=".5" stroke-width=".7"/>`+
+   `<g fill="#a9a69e" stroke="#4a4843" stroke-width=".5">${crockets(14,42,50,8,1,3,2.1)+crockets(86,42,50,8,-1,3,2.1)}<circle cx="50" cy="5.5" r="2.6"/></g>`+
+   // The figure on its corbel: hooded and faceless, a book at the breast, lit from the upper left
+   `<path d="M36 132H64L58 140H42Z" fill="#b5b2aa" stroke="#4a4843" stroke-width=".6"/>`+
+   `<path d="M41 52Q36 92 33 131H67Q64 92 59 52Q50 47 41 52Z" fill="#dcd9d0"/><path d="M51 50Q58 51 59 52Q64 92 67 131H53Q56 92 51 50Z" fill="#9b988f" opacity=".75"/>`+
+   `<path d="M43 70Q41 100 39.5 128M47 66Q46 100 46 129M56 70Q58 100 59.5 128" fill="none" stroke="#8c8982" stroke-width=".8"/>`+
+   `<path d="M42 45Q41 33 50 31.5Q59 33 58 45Q57 52 59.5 54H40.5Q43 52 42 45Z" fill="#d2cfc6"/><path d="M50 31.5Q59 33 58 45Q57 52 59.5 54H52Q55 46 50 31.5Z" fill="#9b988f" opacity=".6"/><ellipse cx="49.5" cy="44" rx="4.4" ry="5.6" fill="#8c8982"/>`+
+   `<g transform="rotate(-12 50 68)"><rect x="44.5" y="63" width="11" height="8.5" fill="#ecebe4" stroke="#6e6b64" stroke-width=".6"/><path d="M50 63V71.5" stroke="#6e6b64" stroke-width=".5"/></g>`;
+ }else{
+  const lf=kind==='leaf',C=lf?['#a3222f','#25603f','#2b56b3']:['#2b56b3','#a3222f','#25603f'];
+  s=`<rect width="${w}" height="${h}" fill="url(#tpGold)"/><rect width="${w}" height="${h}" fill="url(#tpDots)"/><rect x="3" y="3" width="${w-6}" height="${h-6}" fill="none" stroke="#8e1f2b" stroke-width="2.2"/>`;
+  // Three haloed saints in a row, under a painted red arcade
+  for(let i=0;i<3;i++){const x=(i+.5)*w/3;
+   s+=`<path d="M${f(x-15)} 33V14Q${f(x-15)} 6 ${f(x)} 5Q${f(x+15)} 6 ${f(x+15)} 14V33" fill="none" stroke="#8e1f2b" stroke-width=".9" opacity=".7"/>`+
+    `<path d="M${f(x-1.7)} 18.8L${f(x-6.6)} 33H${f(x+6.6)}L${f(x+1.7)} 18.8Z" fill="${C[i]}" stroke="#4a2c06" stroke-width=".5"/><circle cx="${f(x)}" cy="15" r="5" fill="#f7dc8a" stroke="#7b5413" stroke-width=".7"/><circle cx="${f(x)}" cy="15" r="2.4" fill="#ecd2ae"/>`}
+  // The gesso cartouche the display is painted on, with gilt corner bosses; it keeps clear of the gilt frame the wing hangs from.
+  s+=`<rect x="7" y="36" width="88" height="66" fill="#f3e6c6" stroke="#1d1612" stroke-width="1.5"/>`+[[7,36],[95,36],[7,102],[95,102]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.2" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/>`).join('');
+  // A tiled floor under the saints' feet
+  s+=`<path d="M5 107H95" stroke="#4a2c06" stroke-opacity=".6"/>`;
+  for(let r=0;r<4;r++)for(let c=0;c<9;c++){const x=10+c*11+(r%2?5.5:0),y=112+r*8.4;if(x+5.5>95)continue;
+   s+=`<path d="M${f(x)} ${f(y-4.2)}L${f(x+5.5)} ${f(y)}L${f(x)} ${f(y+4.2)}L${f(x-5.5)} ${f(y)}Z" fill="${(r+c)%2?'#e9dcb8':lf?'#1f3f8a':'#25603f'}" stroke="#4a2c06" stroke-width=".4"/>`}
+ }
+ s+=`<rect x=".7" y=".7" width="${w-1.4}" height="${h-1.4}" fill="none" stroke="#3a2608" stroke-width="1.4"/><rect x="1.6" y="1.6" width="${w-3.2}" height="${h-3.2}" fill="none" stroke="url(#tpGold)" stroke-width="1"/>`;
+ return apCache[kind]=s;
+}
+// A wing hung at hx; side -1 opens to the left, +1 to the right. Closed (0°) it lies over the centre showing `out`; open (180°) it lies beside it showing `face`.
+// A feast-day leaf (out null) starts folded behind the open wing, so it shows only once it has swung past edge-on.
+function apWing(hx,side,phi,face,out){
+ const c=Math.cos(phi*D2R),sn=Math.sin(phi*D2R),sx=-side*c,xf=hx+sx*AW,H=ABB-ABT;let o='';
+ if(!out&&c>-.015)return '';
+ // A shadow on the centre beside the free edge while a wing stands out over it
+ if(c>0&&sn>.02)o+=`<rect x="${f(side<0?xf:xf-16*sn)}" y="${ABT}" width="${f(16*sn)}" height="${H}" fill="url(#apSh${side<0?'L':'R'})" opacity="${f(.6*sn)}"/>`;
+ if(Math.abs(c)>.015)o+=`<g transform="translate(${f(hx)} ${ABT}) scale(${f(sx*1000)/1000} 1)">${apFace(c<0?face:out)}<rect width="${AW}" height="${H}" fill="#000" opacity="${f(.55*(1-Math.abs(c)))}"/></g>`;
+ // The wing's thickness, seen while it stands out
+ if(sn>.06)o+=`<rect x="${f(xf-1.7*sn)}" y="${ABT}" width="${f(3.4*sn)}" height="${H}" fill="#6b4626" stroke="#d8aa48" stroke-width=".5"/>`;
+ return o;
+}
+// The centre panel: gold ground, a blue arcade, the cartouche and a row of fourteen gems, one per check, that kindle with the panels.
+function apCentre(cx,lit){
+ const x0=cx-AW,H=ABB-ABT;
+ let s=`<rect x="${x0}" y="${ABT}" width="${2*AW}" height="${H}" fill="url(#tpGold)"/><rect x="${x0}" y="${ABT}" width="${2*AW}" height="${H}" fill="url(#tpDots)"/><rect x="${x0+3}" y="${ABT+3}" width="${2*AW-6}" height="${H-6}" fill="none" stroke="#8e1f2b" stroke-width="2.2"/>`;
+ for(const dx of[-62,0,62])s+=`<path d="${lancet(cx+dx,ABT+31,ABT+7,27)}" fill="#1f3f8a" stroke="#4a2c06" stroke-width=".8"/><path d="${lancet(cx+dx,ABT+31,ABT+11,23)}" fill="none" stroke="#f6dc8a" stroke-opacity=".55" stroke-width=".6"/>`+
+  [[-11,22],[9,19],[-3,14],[13,27],[-16,28]].map(([a,b])=>`<circle cx="${cx+dx+a}" cy="${ABT+b}" r=".9" fill="#f6dc8a"/>`).join('')+`<circle cx="${cx+dx}" cy="${ABT+5}" r="2" fill="url(#gild)"/>`;
+ s+=`<rect x="${cx-84}" y="${ABT+34}" width="168" height="86" fill="#f3e6c6" stroke="#1d1612" stroke-width="1.5"/>`;
+ let gw='';
+ for(let j=0;j<14;j++){const x=f(cx+(j-6.5)*12.4),y=ABT+135,st=j<12?'pass':'need';
+  s+=`<circle cx="${x}" cy="${y}" r="5.2" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/><circle cx="${x}" cy="${y}" r="3.6" fill="url(#lg-${st})" stroke="#1d1612" stroke-width=".7"/><circle cx="${x}" cy="${y}" r="3.6" fill="#16131f" opacity="${f(.62*(1-lit))}"/>`;
+  if(lit>0)gw+=`<circle cx="${x}" cy="${y}" r="4.6" fill="${LCOL[st]}" opacity="${f(.7*lit)}"/>`}
+ return s+(gw?glowG(gw):'');
+}
+// Frame, crest and predella: a gilt moulding round the centre, a crocketed gable with a small rose (lit on feast days), pinnacles on the posts, and a painted predella that carries the nameplate.
+function apCrest(cx,rose){
+ const x0=cx-106,x1=cx+106,ty=ABT-6,R=13,ry=46;
+ let s=`<rect x="${cx-120}" y="${ABB}" width="240" height="${AH-ABB}" fill="#4a2318" stroke="#1d1612"/><rect x="${cx-112}" y="${ABB+3}" width="224" height="20" fill="url(#tpGold)"/><rect x="${cx-112}" y="${ABB+3}" width="224" height="20" fill="url(#tpDots)"/>`+
+  `<rect x="${cx-112}" y="${ABB+3}" width="224" height="20" fill="none" stroke="#8e1f2b" stroke-width="1.2"/><path d="M${cx-120} ${AH-1}H${cx+120}" stroke="url(#tpGold)" stroke-width="1.6"/>`;
+ s+=`<path d="M${x0} ${ty+.5}L${cx} 16L${x1} ${ty+.5}Z" fill="url(#tpGold)" stroke="#4a2c06" stroke-width="1"/><path d="M${x0+14} ${ty}L${cx} 25L${x1-14} ${ty}" fill="none" stroke="#8a5e1a" stroke-width="1.2"/>`+
+  `<g fill="url(#gild)" stroke="#4a2c06" stroke-width=".5">${crockets(x0,ty,cx,16,1,5,2.6)+crockets(x1,ty,cx,16,-1,5,2.6)+pinnacle(x0+3,ty,.92)+pinnacle(x1-3,ty,.92)}`+
+  `<circle cx="${cx}" cy="13" r="3.2"/><rect x="${cx-1.4}" y="1" width="2.8" height="12"/><circle cx="${cx}" cy="1.5" r="2.2"/><circle cx="${cx-4.4}" cy="6" r="2"/><circle cx="${cx+4.4}" cy="6" r="2"/><rect x="${cx-4.4}" y="5" width="8.8" height="2"/></g>`;
+ if(rose>0)s+=`<circle cx="${cx}" cy="${ry}" r="${R*2.8}" fill="url(#cspill)" opacity="${f(rose)}" style="mix-blend-mode:screen"/>`;
+ s+=`<circle cx="${cx}" cy="${ry}" r="${R+4}" fill="#2a1f15" opacity=".5"/><g transform="translate(${cx} ${ry}) scale(${f(R/RB*100)/100})">${rosePattern(1)}</g>`+
+  `<circle cx="${cx}" cy="${ry}" r="${R+1.6}" fill="none" stroke="${LEAD}" stroke-width="4"/><circle cx="${cx}" cy="${ry}" r="${R+1.6}" fill="none" stroke="url(#gild)" stroke-width="2.4"/><circle cx="${cx}" cy="${ry}" r="${R}" fill="#120e16" opacity="${f(.62*(1-rose))}"/>`;
+ // The gilt moulding round the centre, which the wings hang from
+ const fr=`<rect x="${cx-103}" y="${ABT-3}" width="206" height="${ABB-ABT+3}"`;
+ return s+`<g fill="none">${fr} stroke="#1d1612" stroke-width="7.4"/>${fr} stroke="url(#tpGold)" stroke-width="5.4"/>${fr} stroke="#fff4c4" stroke-opacity=".5" stroke-width=".7" transform="translate(-1.6 -1.6)"/></g>`;
+}
+function apRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),[w,h]=apBox(g),cx=w/2,oF=[(w-CW)/2,h-CH],my=(ABT+ABB)/2;
+ el.dataset.m='1';el.style.width=w+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ const key='a'+i;
+ if(ms.dataset.key!==key){ms.dataset.key=key;ms._d=ms._s='';ms._bx=null;fx._s=null;
+  ms.innerHTML=`<defs>${stoneFilter('w',29)}<linearGradient id="apShL"><stop stop-color="#1a0f05" stop-opacity=".8"/><stop offset="1" stop-color="#1a0f05" stop-opacity="0"/></linearGradient>`+
+   `<linearGradient id="apShR"><stop stop-color="#1a0f05" stop-opacity="0"/><stop offset="1" stop-color="#1a0f05" stop-opacity=".8"/></linearGradient></defs><g class="ast"></g><g class="afac">${cas(0)}</g><g class="adyn"></g>`;
+ }
+ const bx=f(w)+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${f(w)} ${h}`)}}
+ // The facade fades as its stone flows into the shut altarpiece's outline; then the painted altarpiece comes up over the stone.
+ const fac=ms.querySelector('.afac');
+ if(i===0){fac.style.display='';fac.setAttribute('transform',`translate(${f(oF[0])} ${f(oF[1])})`);fac.setAttribute('opacity',f(1-seg(u,.06,.22)))}else fac.style.display='none';
+ const a=i?1:seg(u,.3,.44);let d='',st='',P=null;
+ // The flowing stone lies under the facade, so it shows only as the facade fades.
+ if(i===0&&u>.06&&u<.46){const s=ease(seg(u,.1,.38)),A=wSamp(WF[0].o),B=wSamp(apClosed(0));P=A.map((p,j)=>[lerp(p[0]+oF[0],B[j][0]+cx,s),lerp(p[1]+oF[1],B[j][1],s)]);
+  st=`<path d="${ptsD(P)}" fill="url(#lime)" filter="url(#st-w)" opacity="${f(1-seg(u,.36,.46))}"/>`}
+ if(ms._s!==st){ms._s=st;ms.querySelector('.ast').innerHTML=st}
+ // Wing angles: the inner pair opens on the first step (left a beat ahead), the feast-day leaves on the second.
+ const tL=i?1:seg(u,.5,.84),tR=i?1:seg(u,.56,.9),lL=i?seg(u,.04,.6):0,lR=i?seg(u,.12,.68):0,lit=i?1:seg(u,.9,1),rose=i?seg(u,.72,.86):0;
+ if(a>0){
+  let s=apWing(cx-2*AW,-1,apSwing(lL,.2),'leaf',null)+apWing(cx+2*AW,1,apSwing(lR,.2),'leaf',null)+apCentre(cx,lit)+apWing(cx-AW,-1,apSwing(tL),'in','out')+apWing(cx+AW,1,apSwing(tR),'in','out')+apCrest(cx,rose);
+  // The gilt turn-button across the seam of the shut wings
+  if(i===0&&u<.53)s+=`<g opacity="${f(1-seg(u,.5,.53))}" transform="translate(${f(cx-5)} ${my}) rotate(${f(-90*ease(seg(u,.44,.5)))})"><rect x="-3" y="-1.8" width="18" height="3.6" rx="1.4" fill="url(#gild)" stroke="#3a2608" stroke-width=".6"/><circle r="2" fill="#fff0c0" stroke="#3a2608" stroke-width=".5"/></g>`;
+  d+=a<1?`<g opacity="${f(a)}">${s}</g>`:s;
+ }
+ if(ms._d!==d){ms._d=d;ms.querySelector('.adyn').innerHTML=d}
+ // Grit off the flowing stone, dust where each wing lands against its stop, and glints: the latch, the rose kindling, the panels lighting.
+ const dust=JOINS.buttress.dust,spk=(x,y,t,r)=>{const v=Math.sin(Math.PI*t);return v>.05?`<g opacity="${f(v)}">${sparkle(x,y,r*v)}</g>`:''};
+ let fxs='';
+ if(P&&u>.1){const A=wSamp(WF[0].o),B=wSamp(apClosed(0));for(let j=0;j<8;j++){const q=Math.round((j+.5)*WN/8)%WN,dd=Math.hypot(A[q][0]+oF[0]-B[q][0]-cx,A[q][1]+oF[1]-B[q][1]);
+  if(dd>8)fxs+=dust(P[q][0],P[q][1],seg(u,.12+.025*j,.36+.025*j),5,10+dd*.05,j+151)}}
+ const land=(t,x,sd,q=0)=>{const v=q?q+.8*(1-q):.8,p=seg(t,v-.02,1);return p>0&&p<1?dust(x,ABB,p,5,10,sd)+dust(x,ABT+8,p,3,7,sd+5):''};
+ if(i===0){fxs+=land(tL,cx-2*AW,161)+land(tR,cx+2*AW,171)+spk(cx-5,my-15,seg(u,.47,.56),6);const t=seg(u,.9,1);fxs+=spk(cx-2*AW+5,ABT+5,t,6)+spk(cx+2*AW-5,ABT+5,t,6)}
+ else{fxs+=land(lL,cx-3*AW,181,.2)+land(lR,cx+3*AW,191,.2)+spk(cx,46,seg(u,.72,.9),9);const t=seg(u,.86,1);fxs+=spk(cx-3*AW+5,ABT+5,t,6)+spk(cx+3*AW-5,ABT+5,t,6)}
+ if(fx._s!==fxs){fx._s=fxs;fx.innerHTML=fxs}
+ // Displays: the triptych's three panes once its wings are open, the feast-day pair once theirs are; each fades in only when its panel lies flat.
+ const rb=$('#av2 .rb');if(!rb.firstChild)rb.innerHTML=$('#bv2 .rb').innerHTML;
+ const dv0=i===0?1-seg(u,0,.08):0;
+ [[$('#av1'),i===0?seg(u,.9,1):1],[$('#av2'),i===1?seg(u,.86,1):0]].forEach(([n,v])=>{if(v<.01){n.style.display='none';return}Object.assign(n.style,{display:'block',left:f(cx-3*AW-8)+'px',top:f(h-AH)+'px',opacity:f(v)})});
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+oF[0])+'px';n.style.top=f(y+oF[1])+'px';n.style.opacity=f(dv0);n.style.visibility=dv0<.02?'hidden':'visible'}
+ // The nameplate moves from the facade's frieze to the predella halfway through the first step, faded out while it moves.
+ const fc=i===0&&u<.5,gp=fc?[22+oF[0],6+oF[1],CW-44,15]:[cx-110,ABB+4,220,17];
+ Object.assign(gr.style,{left:f(gp[0])+'px',top:f(gp[1])+'px',width:f(gp[2])+'px',height:gp[3]+'px',right:'auto',opacity:f(i?1:u<.5?1-seg(u,.3,.42):seg(u,.58,.7))});
+ if(fc)delete el.dataset.wf;else el.dataset.wf='a';
+ el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'opening')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function apPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0;
+ const t=i===0?(up?(u<.1?'the facade dims':u<.44?'the stone becomes a shut altarpiece':u<.5?'turning the latch':u<.9?'opening the wings':'the panels light'):(u>.9?'the panels go dark':u>.5?'closing the wings':u>.44?'turning the latch':u>.1?'the altarpiece turns back to stone':'the facade lights again')):
+  (up?(u<.7?'swinging out the feast-day leaves':u<.86?'kindling the rose':'the feast-day panels light'):(u>.86?'the feast-day panels dim':u>.7?'the rose goes dark':u>.04?'folding the feast-day leaves away':'the triptych stands open'));
+ return 'Checks · '+t;
+}
+MORPHS.altar={label:'Altarpiece',kind:'Unfold',sizes:[['facade','Facade',0,'a facade'],['trip','Triptych',1,'an open triptych'],['feast','Feast day',2,'open for a feast day']],ms:[3600,3200],
+ box:apBox,dims:apDims,render:apRender,phase:apPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes an altarpiece and opens its wings.':'Feast day: the leaves folded behind the wings swing out, and the rose is lit.'):(S[2]===0?'The wings close and the altarpiece turns back to stone.':'The feast-day leaves fold away behind the wings.'),
+ about:'A winged altarpiece showed more the holier the day. On weekdays it stood shut, its wings painted in grisaille, grey monochrome that imitates carved stone. On Sundays the wings were opened onto gold, and on feast days a second pair of leaves, folded away behind the first, swung out as well. Here Checks grows the same way, by unfolding rather than by building. <b>Triptych</b> (416 px): the facade\'s stone flows into the shut altarpiece, a gilt frame under a crocketed gable with a small rose, on a painted predella that carries the nameplate. Its wings show two hooded stone figures in painted niches. A gilt turn-button swings off the seam with a glint, and the heavy wings swing open one after the other, edge-on for a moment, with a shadow cast on the gold behind and a rebound and dust as each meets its stop. Inside, under rows of haloed saints, three gesso cartouches carry the count and run 418 in the centre, the twelve passed on the left and the two waiting by name on the right, and a row of fourteen gems under the centre, one per check, kindles green and red. <b>Feast day</b> (616 px): the outer leaves swing out from behind the open wings and land with dust, the rose in the gable is lit, and the new leaves carry the pass rate and the last ten runs. <b>Shrinking</b> closes it in reverse. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading shuts it and turns it back into the facade first, and unshading opens it again.'};
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
