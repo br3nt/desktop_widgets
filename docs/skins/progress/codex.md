@@ -18,7 +18,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Gothic · Join · Lead-came solder — surface fusion — Added selectable sliding glass leaves, a descending solder highlight, leaded mullion and crown release catch; retained both earlier options; 38 simulated DOM, animation, state and touch-pointer checks passed; full-page visual review blocked by sandbox browser launch and denied Chrome access.
 - [x] Felt · Join · Zip closure — line attachment — Added selectable stitched moss tapes, closing teeth and a travelling coral zipper pull with reverse unzip; retained both earlier options; 41 simulated DOM, animation and touch-pointer checks passed; full-page visual review blocked by unavailable browser access and denied native Chrome access.
 - [x] Elven · Join · Iris clasp — enclosing attachment — Added three animated silver petals, a polished collar and turning release rim; preserved both earlier joins; 48 simulated DOM, animation and touch checks passed; browser visual review blocked by denied Chrome access and sandbox browser launch.
-- [ ] Wire · Join · Coil ferrule — binding attachment
+- [x] Wire · Join · Coil ferrule — binding attachment — Finished the selectable eight-turn copper sleeve with visible bundled wires, staged advance and reverse release; retained both earlier joins; 81 simulated DOM, animation and touch checks passed; visual review blocked by denied Chrome access and unavailable sandbox preview rendering.
 - [ ] Hollow · Join · Reed gate bolt — sliding attachment
 - [ ] Gothic · Join · Iron strap and pin — mechanical attachment
 - [ ] Felt · Join · Hidden magnetic hems — face attachment
