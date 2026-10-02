@@ -853,6 +853,48 @@ header {
   transition: transform 60ms linear;
 }
 
+/* Bronze Gargoyle Clench Lever / Tail Release (Option 7) */
+.gargoyle-release {
+  position: absolute;
+  width: 36px;
+  height: 42px;
+  z-index: 12;
+  border: 0;
+  background: none;
+  cursor: ew-resize;
+  touch-action: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 160ms ease;
+}
+.gargoyle-release[hidden] { display: none; }
+.gargoyle-release::before {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 28px;
+  border-radius: 4px 10px 10px 4px;
+  background: linear-gradient(135deg, #fae3a2 0%, #b88b3a 35%, #349a78 70%, #1a1408 100%);
+  border: 1.5px solid #141815;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.85), inset 0 1px rgba(255, 255, 255, 0.4);
+  transform: translateX(calc(var(--tension, 0) * 10px)) rotate(calc(var(--tension, 0) * -12deg));
+  transition: transform 60ms linear;
+}
+.gargoyle-release:hover::before {
+  border-color: var(--gold-glow);
+  box-shadow: 0 0 10px rgba(230, 180, 71, 0.7);
+}
+.gargoyle-release::after {
+  content: "🐉";
+  position: absolute;
+  font-size: 14px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.9));
+  transform: translateX(calc(var(--tension, 0) * 10px));
+  transition: transform 60ms linear;
+}
+
 /* Port Overlay for Design Mode */
 #portOverlay { position: absolute; inset: 0; pointer-events: none; }
 .socket-port {
@@ -917,8 +959,8 @@ footer .note-highlight {
 
 <header>
   <div class="header-titles">
-    <h1>Gothic Basilica <span>/ nave vaulting, keystone, triptych, buttress &amp; telescoping pillars</span></h1>
-    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld · Triptych altar fold · Flying buttress arm swing · Pillar telescoping shade</p>
+    <h1>Gothic Basilica <span>/ nave vaulting, keystone, triptych, buttress, telescoping pillars &amp; bronze gargoyle</span></h1>
+    <p>Monumental ashlar limestone · Pointed lancet arch · Keystone drop join · Lancet portcullis shade · Lead-came solder weld · Triptych altar fold · Flying buttress arm swing · Pillar telescoping shade · Bronze gargoyle clench join</p>
   </div>
   <nav class="controls-bar" aria-label="Experiment state and option controls">
     <div class="control-group">
@@ -930,6 +972,7 @@ footer .note-highlight {
         <option value="triptych">4. Triptych Altar Fold shade</option>
         <option value="buttress">5. Flying Buttress Arm Swing join</option>
         <option value="pillar">6. Pillar Telescoping (Capital to Plinth) shade</option>
+        <option value="gargoyle">7. Bronze Gargoyle Clench join</option>
       </select>
     </div>
     <div class="control-group">
@@ -1155,6 +1198,40 @@ footer .note-highlight {
           <stop offset="68%" stop-color="#7a5c1b"/>
           <stop offset="100%" stop-color="#382607"/>
         </linearGradient>
+
+        <!-- Option 7: Antique Cast Bronze with Verdigris Patina Gradient -->
+        <linearGradient id="gargoyleBronzeGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#fae3a2"/>
+          <stop offset="20%" stop-color="#b88b3a"/>
+          <stop offset="50%" stop-color="#694e18"/>
+          <stop offset="80%" stop-color="#3b2b0a"/>
+          <stop offset="100%" stop-color="#1c1404"/>
+        </linearGradient>
+
+        <linearGradient id="gargoyleVerdigrisGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6ee7b7"/>
+          <stop offset="35%" stop-color="#349a78"/>
+          <stop offset="70%" stop-color="#1f5d47"/>
+          <stop offset="100%" stop-color="#103628"/>
+        </linearGradient>
+
+        <!-- Option 7: Heavy Forged Iron Tether Ring Gradient -->
+        <linearGradient id="ironRingGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#606e67"/>
+          <stop offset="25%" stop-color="#3d4742"/>
+          <stop offset="50%" stop-color="#8ba194"/>
+          <stop offset="75%" stop-color="#232926"/>
+          <stop offset="100%" stop-color="#131715"/>
+        </linearGradient>
+
+        <!-- Option 7: Gargoyle Sanctuary Eye Glint Filter -->
+        <filter id="gargoyleGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
       <!-- Shared arch, keystone and decorative joints -->
@@ -1335,6 +1412,12 @@ footer .note-highlight {
             title="Pull right to unseat buttress arm · Enter to separate" hidden>
     </button>
 
+    <!-- Bronze Gargoyle Clench Lever / Tail Release (Option 7) -->
+    <button id="gargoyleRelease" class="gargoyle-release" data-drag="release"
+            aria-label="Release Gargoyle Clench: pull right or press Enter"
+            title="Pull right to unclasp gargoyle claws · Enter to separate" hidden>
+    </button>
+
     <!-- Socket Overlay for Design Mode -->
     <div id="portOverlay" aria-hidden="true">
       <div class="socket-port" id="portA" data-label="Pointed Arch Springer · A"></div>
@@ -1344,7 +1427,7 @@ footer .note-highlight {
 </div>
 
 <footer>
-  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade, Lead-Came Solder, Triptych Altar, Flying Buttress &amp; Telescoping Pillars</h3>
+  <h3>Gothic Basilica Architecture · Keystone Join, Portcullis Shade, Lead-Came Solder, Triptych Altar, Flying Buttress, Telescoping Pillars &amp; Bronze Gargoyle Clench</h3>
   <p>
     In this aesthetic, modules are carved from dressed ashlar limestone. Pointed lancet arches frame the clerestory displays, supported by fluted colonnettes. When separate, each module's mating end forms one half of a monumental pointed arch (a voussoir springer).
   </p>
@@ -1365,6 +1448,9 @@ footer .note-highlight {
   </p>
   <p>
     <span class="note-highlight">Option 6 — Pillar Telescoping (Capital to Plinth) [Shade]:</span> The monumental fluted stone columns flanking each display consist of three concentric, telescoping drums capped with carved Corinthian acanthus capitals and seated in molded stone plinths. When collapsing to shade mode, the plinths and lower casing smoothly slide upward while the fluted drums telescope inside one another and sink down into the plinth wells. Stone friction dust puffs burst at the collar bushings as the capitals seat with millimeter precision directly onto the plinths, compressing the module into a compact 44px slit framing the illuminated gold status plaque. Extending the pillars raises the column drums back to their full cathedral vault height.
+  </p>
+  <p>
+    <span class="note-highlight">Option 7 — Bronze Gargoyle Clench [Join]:</span> A miniature cast-bronze grotesque / winged gargoyle with patinated verdigris finish is perched on the upper capital corbel of Jarvis. GitDiscuss features a heavy forged-iron tether ring set into an ashlar relief quatrefoil rosette boss. As the modules enter proximity, the gargoyle springs forward on its forged-iron hinge pin, its bat/dragon wings spreading wide across the clerestory roofline. Its muscular forepaws clamp tightly shut over the iron ring with a resounding metallic snap. A coiled bronze tail curling along the corbel serves as the release lever: pulling the tail right unclasps the claws to separate.
   </p>
 </footer>
 
@@ -1392,7 +1478,8 @@ const model = {
   triptychFold: 0, // 0 = open wings (full clerestory), 1 = closed stone reliquary shutters
   buttressSwing: 0, // 0 = stowed along pier pinnacle, 1 = swung 42° and seated in corbel
   pillarTelescope: 0, // 0 = fully extended columns, 1 = compressed into molded plinths
-  option: 'keystone', // 'keystone', 'portcullis', 'leadcame', 'triptych', 'buttress', or 'pillar'
+  gargoyleSpring: 0, // 0 = perched in crouch on corbel, 1 = clenched over iron ring
+  option: 'keystone', // 'keystone', 'portcullis', 'leadcame', 'triptych', 'buttress', 'pillar', or 'gargoyle'
   light: 0,
   limit: 3,
   feel: 'free',
@@ -1768,6 +1855,124 @@ function drawButtressEndCap(x, y, isRight, isModuleA, retract = 0, isShade = fal
   return drawGothicCap(x, y, isRight, retract, isShade);
 }
 
+// Option 7: Bronze Gargoyle Clench End-Cap (Perched Grotesque on Module A; Ashlar Rosette & Iron Ring on Module B)
+function drawGargoyleEndCap(x, y, isRight, isModuleA, retract = 0, isShade = false) {
+  if (isShade) return '';
+  const scaleX = 1 - retract;
+  if (Math.abs(scaleX) < 0.05) return '';
+
+  if (isModuleA && isRight) {
+    // Module A (Jarvis) right mating end: stone corbel & perched bronze gargoyle
+    const showPerched = model.option === 'gargoyle' && !model.joined && model.gargoyleSpring < 0.05;
+    return `
+      <g class="gargoyle-perch-assembly" opacity="${scaleX}">
+        <!-- Molded Ashlar Stone Corbel Bracket -->
+        <path d="M ${x + 316} ${y + 16} H ${x + 348} V ${y + 28} Q ${x + 346} ${y + 44} ${x + 332} ${y + 54} H ${x + 316} Z"
+              fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.5"/>
+        <line x1="${x + 316}" y1="${y + 17}" x2="${x + 348}" y2="${y + 17}" stroke="#8ca193" stroke-width="1"/>
+        <line x1="${x + 316}" y1="${y + 28}" x2="${x + 348}" y2="${y + 28}" stroke="#526257" stroke-width="1"/>
+        
+        <!-- Acanthus leaf corbel relief -->
+        <path d="M ${x + 322} ${y + 28} Q ${x + 340} ${y + 32} ${x + 336} ${y + 46}" fill="none" stroke="#7e9185" stroke-width="1.1"/>
+        <path d="M ${x + 324} ${y + 22} Q ${x + 342} ${y + 26} ${x + 338} ${y + 36}" fill="none" stroke="#48564e" stroke-width="0.9"/>
+
+        <!-- Forged-Iron Hinge Pivot Bracket with Square Dome Rivets -->
+        <rect x="${x + 324}" y="${y + 13}" width="22" height="6" rx="1.5" fill="#1b211e" stroke="#0d110f" stroke-width="1"/>
+        <circle cx="${x + 328}" cy="${y + 16}" r="1" fill="#7e9185"/>
+        <circle cx="${x + 342}" cy="${y + 16}" r="1" fill="#7e9185"/>
+
+        <!-- Wall colonnette shaft below corbel -->
+        <line x1="${x + 324}" y1="${y + 54}" x2="${x + 324}" y2="${y + 118}" stroke="#3d4c42" stroke-width="3"/>
+        <line x1="${x + 324}" y1="${y + 54}" x2="${x + 324}" y2="${y + 118}" stroke="#7e9185" stroke-width="1"/>
+
+        ${showPerched ? `
+        <!-- Resting Bronze Grotesque Perched on Corbel -->
+        <g class="perched-gargoyle-static" transform="translate(${x + 332}, ${y + 14})">
+          <!-- Curled Tail hanging down corbel -->
+          <path d="M -4 2 Q -12 6 -10 18 Q -9 24 -14 26" fill="none" stroke="url(#gargoyleBronzeGrad)" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M -14 26 L -17 24 L -16 28 Z" fill="#b88b3a"/>
+
+          <!-- Crouched Hindquarters & Haunches -->
+          <ellipse cx="-2" cy="0" rx="5" ry="4" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.8"/>
+          <!-- Muscular Torso -->
+          <path d="M -4 0 Q 0 -6 6 -2 Q 8 4 2 5 Q -2 4 -4 0 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.8"/>
+          <!-- Verdigris shoulder patina -->
+          <path d="M -1 -2 Q 2 -5 5 -2 Q 3 1 0 0 Z" fill="url(#gargoyleVerdigrisGrad)" opacity="0.85"/>
+
+          <!-- Folded Dragon Wings -->
+          <path d="M -3 -3 Q -6 -14 0 -15 Q -1 -7 4 -3 Z" fill="url(#gargoyleVerdigrisGrad)" stroke="url(#gargoyleBronzeGrad)" stroke-width="1"/>
+          <!-- Wing spiky carpal thumb claw -->
+          <path d="M -1 -15 L -2 -18 L 1 -15 Z" fill="#fae3a2"/>
+
+          <!-- Snarling Horned Gargoyle Head -->
+          <path d="M 4 -3 Q 9 -8 13 -4 Q 14 0 10 2 Q 6 1 4 -3 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.8"/>
+          <!-- Curved Demon Horn -->
+          <path d="M 8 -7 Q 6 -13 10 -15 Q 11 -11 9 -6" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.6"/>
+          <!-- Glowing Amber Eye -->
+          <circle cx="10" cy="-3" r="1.1" fill="#ffd885" filter="url(#gargoyleGlow)"/>
+          <circle cx="10" cy="-3" r="0.5" fill="#ffffff"/>
+          <!-- Fanged Jaw & Teeth -->
+          <path d="M 10 1 L 12 -1 L 11 3 Z" fill="#fae3a2"/>
+
+          <!-- Front Claws resting on stone edge -->
+          <path d="M 6 3 L 9 5 L 8 8 L 5 4 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.6"/>
+          <line x1="8" y1="8" x2="9" y2="9" stroke="#fae3a2" stroke-width="0.8"/>
+        </g>
+        ` : ''}
+
+        <!-- Outer voussoir cap to edge of casing -->
+        <path d="M ${x + 330} ${y + 16} L ${x + W - 16} ${y + 16} Q ${x + W - 4} ${y + 64} ${x + W - 16} ${y + 120} L ${x + 330} ${y + 120} Z"
+              fill="none" stroke="#252e28" stroke-width="1.2" opacity="0.5"/>
+      </g>
+    `;
+  } else if (!isModuleA && !isRight) {
+    // Module B (GitDiscuss) left mating end: ashlar rosette boss & forged iron tether ring
+    const showStaticRing = model.option === 'gargoyle' && !model.joined && model.gargoyleSpring < 0.05;
+    return `
+      <g class="gargoyle-rosette-assembly" opacity="${scaleX}">
+        <!-- Carved Ashlar Rosette Boss Plate -->
+        <rect x="${x + 50}" y="${y + 12}" width="34" height="38" rx="3" fill="url(#buttressStoneGrad)" stroke="#111614" stroke-width="1.5"/>
+        <line x1="${x + 51}" y1="${y + 13}" x2="${x + 83}" y2="${y + 13}" stroke="#8ca193" stroke-width="1"/>
+        
+        <!-- Relief Quatrefoil Stone Rosette -->
+        <g transform="translate(${x + 67}, ${y + 31})">
+          <circle cx="0" cy="0" r="14" fill="#1b211e" stroke="#111614" stroke-width="1"/>
+          <!-- Four carved trefoil lobes -->
+          <circle cx="-6" cy="0" r="5" fill="#2d3731" stroke="#48564e" stroke-width="0.8"/>
+          <circle cx="6" cy="0" r="5" fill="#2d3731" stroke="#48564e" stroke-width="0.8"/>
+          <circle cx="0" cy="-6" r="5" fill="#2d3731" stroke="#48564e" stroke-width="0.8"/>
+          <circle cx="0" cy="6" r="5" fill="#2d3731" stroke="#48564e" stroke-width="0.8"/>
+          <circle cx="0" cy="0" r="7" fill="#141916" stroke="#526257" stroke-width="0.9"/>
+          
+          <!-- Cast Bronze Clevis Bracket -->
+          <rect x="-4" y="-7" width="8" height="14" rx="2" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.8"/>
+          <circle cx="0" cy="0" r="2.2" fill="#111614"/>
+          <circle cx="0" cy="0" r="1" fill="#7e9185"/>
+
+          ${showStaticRing ? `
+          <!-- Resting Forged Iron Tether Ring (Hanging at ~35° tilt) -->
+          <g transform="rotate(35)">
+            <ellipse cx="6" cy="0" rx="9.5" ry="7.5" fill="none" stroke="url(#ironRingGrad)" stroke-width="3.4"/>
+            <ellipse cx="6" cy="0" rx="9.5" ry="7.5" fill="none" stroke="#8ca194" stroke-width="0.8" opacity="0.6"/>
+            <!-- Ring weld scarf joint -->
+            <line x1="14" y1="-2" x2="16" y2="2" stroke="#e6b447" stroke-width="1" opacity="0.75"/>
+          </g>
+          ` : ''}
+        </g>
+
+        <!-- Wall colonnette shaft beneath rosette -->
+        <line x1="${x + 67}" y1="${y + 50}" x2="${x + 67}" y2="${y + 118}" stroke="#3d4c42" stroke-width="3"/>
+        <line x1="${x + 67}" y1="${y + 50}" x2="${x + 67}" y2="${y + 118}" stroke="#7e9185" stroke-width="1"/>
+
+        <!-- Outer left voussoir cap to edge of casing -->
+        <path d="M ${x + 16} ${y + 16} L ${x + 50} ${y + 16} V ${y + 120} L ${x + 16} ${y + 120} Z"
+              fill="none" stroke="#252e28" stroke-width="1.2" opacity="0.5"/>
+      </g>
+    `;
+  }
+  return drawGothicCap(x, y, isRight, retract, isShade);
+}
+
 // Option 5: Architectural Shadow Gap Niche between the two clerestory walls
 function drawButtressShadowGap(midX, y, opacity = 1) {
   return `
@@ -1907,6 +2112,197 @@ function drawFlyingButtress(ax, ay, bx, by, swingRatio = 0, isJoined = false, op
         <circle cx="${cx + 6}" cy="${cy + 4}" r="${pFlash * 8}" fill="#7e9185" opacity="${(1 - pFlash) * 0.5}" filter="url(#votiveGlow)"/>
       `;
     }
+  }
+
+  s += `</g>`;
+  return s;
+}
+
+// Option 7: The Bronze Gargoyle Clench Mechanism (Springing Grotesque & Clamping Claws over Iron Ring)
+function drawGargoyleClench(ax, ay, bx, by, springRatio = 0, isJoined = false, opacity = 1, glow = 0) {
+  const currentRatio = isJoined ? 1 : springRatio;
+  const px = ax + 332;
+  const py = ay + 14;
+  const rx = bx + 67;
+  const ry = by + 31;
+
+  let s = `<g class="bronze-gargoyle-clench-system" opacity="${opacity}">`;
+
+  // 1. Dynamic Drop Shadow on Cathedral Wall
+  const shadowOpacity = 0.5 * (0.3 + 0.7 * currentRatio);
+  const shadowX = px + currentRatio * 28;
+  const shadowY = py + 24;
+  s += `
+    <g transform="translate(${shadowX}, ${shadowY}) scale(${1 + currentRatio * 0.15})">
+      <ellipse cx="0" cy="0" rx="${16 + currentRatio * 18}" ry="8" fill="#000000" opacity="${shadowOpacity}" filter="url(#stoneShadowBlur)"/>
+    </g>
+  `;
+
+  // 2. Swiveling Forged-Iron Tether Ring on Module B
+  // When separate / low springRatio, ring hangs angled (35°). As gargoyle approaches / clenches, ring aligns horizontally (0°).
+  const ringAngle = (1 - currentRatio) * 35;
+  s += `
+    <g transform="translate(${rx}, ${ry})">
+      <g transform="rotate(${ringAngle})">
+        <!-- Heavy Forged Iron Tether Ring -->
+        <ellipse cx="6" cy="0" rx="9.5" ry="7.5" fill="none" stroke="url(#ironRingGrad)" stroke-width="3.4"/>
+        <ellipse cx="6" cy="0" rx="9.5" ry="7.5" fill="none" stroke="#8ca194" stroke-width="0.8" opacity="0.6"/>
+        <!-- Forged iron scarf joint notch -->
+        <line x1="14" y1="-2" x2="16" y2="2" stroke="#e6b447" stroke-width="1.1" opacity="0.75"/>
+      </g>
+    </g>
+  `;
+
+  // 3. The Springing Cast-Bronze Winged Gargoyle
+  // Pivot anchor is on Module A corbel at (px, py).
+  // As currentRatio goes 0 -> 1:
+  // - Body lurches forward: offset dx = currentRatio * 34, dy = -Math.sin(currentRatio * Math.PI) * 7
+  // - Body pitches forward: rotate angle = currentRatio * 20 degrees
+  const lungeX = px + currentRatio * 34;
+  const lungeY = py - Math.sin(currentRatio * Math.PI) * 7;
+  const pitchAngle = currentRatio * 20;
+
+  s += `<g transform="translate(${lungeX}, ${lungeY}) rotate(${pitchAngle})">`;
+
+  // --- Gargoyle Coiled Bronze Tail (Acts as release lever) ---
+  const tensionBend = (model.tension || 0) * 12;
+  s += `
+    <g class="gargoyle-tail" transform="rotate(${-tensionBend})">
+      <path d="M -4 2 Q -16 8 -12 22 Q -10 30 -18 34" fill="none" stroke="url(#gargoyleBronzeGrad)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M -18 34 L -22 31 L -20 37 Z" fill="#ffd885"/>
+      <line x1="-16" y1="8" x2="-14" y2="22" stroke="#6ee7b7" stroke-width="0.8" opacity="0.6"/>
+    </g>
+  `;
+
+  // --- Rear Bat/Dragon Wing (Back plane) ---
+  const rearWingAngle = -25 - currentRatio * 28;
+  s += `
+    <g transform="translate(-2, -4) rotate(${rearWingAngle})">
+      <!-- Wing bone spar -->
+      <path d="M 0 0 Q -8 -22 6 -32 Q 10 -22 6 -12 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.8"/>
+      <!-- Spiked thumb claw -->
+      <path d="M 5 -32 L 8 -36 L 9 -31 Z" fill="#fae3a2"/>
+      <!-- Verdigris webbing membrane -->
+      <path d="M 0 0 Q 8 -16 6 -32 Q -2 -24 -8 -16 Q -4 -8 0 0 Z" fill="url(#gargoyleVerdigrisGrad)" opacity="0.8" stroke="#12382a" stroke-width="0.6"/>
+      <line x1="2" y1="-8" x2="-6" y2="-16" stroke="#8ce9c2" stroke-width="0.6" opacity="0.5"/>
+    </g>
+  `;
+
+  // --- Muscular Grotesque Body & Haunches ---
+  s += `
+    <!-- Crouched hindquarters -->
+    <ellipse cx="-2" cy="1" rx="6" ry="5" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.9"/>
+    <!-- Iron hinge clevis plate at hindquarters -->
+    <circle cx="-5" cy="2" r="3.5" fill="#1b211e" stroke="#0d110f" stroke-width="1"/>
+    <circle cx="-5" cy="2" r="1.5" fill="#e6b447"/>
+
+    <!-- Muscular arched torso and spine ridges -->
+    <path d="M -5 1 Q 0 -8 8 -3 Q 12 5 3 6 Q -3 5 -5 1 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.9"/>
+    <path d="M -2 -4 Q 3 -7 7 -3 Q 4 1 0 0 Z" fill="url(#gargoyleVerdigrisGrad)" opacity="0.85"/>
+    <!-- Spine dorsal scales -->
+    <path d="M -3 -5 L -2 -8 L -1 -5 Z" fill="#fae3a2"/>
+    <path d="M 1 -7 L 2 -10 L 3 -7 Z" fill="#fae3a2"/>
+    <path d="M 5 -6 L 6 -9 L 7 -6 Z" fill="#fae3a2"/>
+  `;
+
+  // --- Fore Bat/Dragon Wing (Front plane, arching wide over the gap) ---
+  const frontWingAngle = 10 + currentRatio * 32;
+  s += `
+    <g transform="translate(4, -5) rotate(${frontWingAngle})">
+      <!-- Main curved wing spar -->
+      <path d="M 0 0 Q -4 -26 12 -36 Q 16 -24 10 -12 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.9"/>
+      <!-- Spiked carpal thumb claw -->
+      <path d="M 12 -36 L 16 -40 L 16 -34 Z" fill="#fae3a2"/>
+      <!-- Verdigris wing membrane struts -->
+      <path d="M 0 0 Q 12 -18 12 -36 Q 2 -26 -4 -16 Q -1 -8 0 0 Z" fill="url(#gargoyleVerdigrisGrad)" opacity="0.85" stroke="#12382a" stroke-width="0.7"/>
+      <!-- Translucent membrane ribs -->
+      <line x1="2" y1="-6" x2="6" y2="-24" stroke="#8ce9c2" stroke-width="0.7" opacity="0.6"/>
+      <line x1="3" y1="-5" x2="-2" y2="-18" stroke="#8ce9c2" stroke-width="0.7" opacity="0.5"/>
+    </g>
+  `;
+
+  // --- Grotesque Snarling Head & Jaws ---
+  s += `
+    <g transform="translate(7, -4)">
+      <!-- Head silhouette -->
+      <path d="M 0 0 Q 6 -7 11 -3 Q 13 2 8 4 Q 3 3 0 0 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.9"/>
+      <path d="M 2 -2 Q 6 -5 9 -2 Q 6 1 3 0 Z" fill="url(#gargoyleVerdigrisGrad)" opacity="0.8"/>
+
+      <!-- Backward sweeping curved horns -->
+      <path d="M 4 -5 Q 2 -13 7 -16 Q 8 -11 6 -5" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.7"/>
+      <path d="M 2 -4 Q 0 -11 4 -14 Q 5 -10 3 -4" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.6" opacity="0.8"/>
+
+      <!-- Glowing sanctuary eyes -->
+      <circle cx="8" cy="-2" r="1.3" fill="#ffd885" filter="url(#gargoyleGlow)"/>
+      <circle cx="8" cy="-2" r="0.6" fill="#ffffff"/>
+
+      <!-- Snarling open maw with fangs -->
+      <path d="M 8 2 L 11 -1 L 12 3 L 8 4 Z" fill="#1b1206"/>
+      <!-- Upper & lower fangs -->
+      <polygon points="9,0 10,-2 10.5,0" fill="#fae3a2"/>
+      <polygon points="10,3 11,4 11.5,3" fill="#fae3a2"/>
+    </g>
+  `;
+
+  // --- Articulated Claws (Snap shut over iron ring!) ---
+  // In flight: claws open (clawSpread ~ 12px).
+  // Joined: claws tightly clamped shut over the ring (clawSpread = 0).
+  const clawSpread = (1 - currentRatio) * 12;
+  s += `
+    <g class="gargoyle-forearms" transform="translate(8, 2)">
+      <!-- Upper claw arm -->
+      <g transform="rotate(${-clawSpread})">
+        <path d="M 0 0 Q 8 -4 14 -2 L 18 1 L 14 3 Q 7 0 0 1 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.8"/>
+        <!-- Sharp curved bronze talons -->
+        <path d="M 14 -2 Q 20 -4 21 3 Q 18 2 15 1 Z" fill="#fae3a2" stroke="#1a1408" stroke-width="0.5"/>
+        <path d="M 16 -1 Q 22 -2 22 5 Q 19 4 17 2 Z" fill="#fae3a2" stroke="#1a1408" stroke-width="0.5"/>
+      </g>
+
+      <!-- Lower claw arm -->
+      <g transform="rotate(${clawSpread})">
+        <path d="M 0 2 Q 8 6 14 4 L 18 1 L 14 -1 Q 7 3 0 2 Z" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="0.8"/>
+        <!-- Sharp curved lower talons -->
+        <path d="M 14 4 Q 20 6 21 -1 Q 18 0 15 2 Z" fill="#fae3a2" stroke="#1a1408" stroke-width="0.5"/>
+        <path d="M 16 3 Q 22 4 22 -3 Q 19 -1 17 1 Z" fill="#fae3a2" stroke="#1a1408" stroke-width="0.5"/>
+      </g>
+    </g>
+  `;
+
+  s += `</g>`; // End of gargoyle body
+
+  // 4. Clench Bite Friction Sparks & Impact Shockwave
+  if (currentRatio > 0.85) {
+    const biteProg = (currentRatio - 0.85) / 0.15; // 0 to 1
+    const contactX = rx + 6;
+    const contactY = ry;
+    s += `
+      <!-- Contact point metal bite sparks -->
+      <circle cx="${contactX}" cy="${contactY}" r="${4 + biteProg * 14}" fill="#ffd885" opacity="${(1 - biteProg) * 0.8}" filter="url(#votiveGlow)"/>
+      <circle cx="${contactX - 4}" cy="${contactY - 5}" r="${biteProg * 6}" fill="#6ee7b7" opacity="${(1 - biteProg) * 0.7}" filter="url(#votiveGlow)"/>
+      <circle cx="${contactX + 5}" cy="${contactY + 4}" r="${biteProg * 6}" fill="#6ee7b7" opacity="${(1 - biteProg) * 0.7}" filter="url(#votiveGlow)"/>
+      <!-- Metallic bite spark rays -->
+      <line x1="${contactX - 5}" y1="${contactY - 5}" x2="${contactX - 10}" y2="${contactY - 10}" stroke="#ffffff" stroke-width="1.2" opacity="${1 - biteProg}"/>
+      <line x1="${contactX + 5}" y1="${contactY - 5}" x2="${contactX + 11}" y2="${contactY - 11}" stroke="#ffd885" stroke-width="1.2" opacity="${1 - biteProg}"/>
+      <line x1="${contactX}" y1="${contactY + 6}" x2="${contactX + 2}" y2="${contactY + 12}" stroke="#6ee7b7" stroke-width="1.2" opacity="${1 - biteProg}"/>
+    `;
+  }
+
+  // 5. Reinforcing Bronze Base Tie-Strap across bottom plinth joint when joined
+  if (currentRatio > 0.6) {
+    const strapAlpha = (currentRatio - 0.6) / 0.4;
+    const seamMidX = (ax + JOIN_DISTANCE + bx) / 2;
+    s += `
+      <g class="gargoyle-base-tie-strap" opacity="${strapAlpha}">
+        <!-- Heavy Cast Bronze Base Tie Strap -->
+        <rect x="${seamMidX - 14}" y="${ay + 104}" width="28" height="8" rx="2" fill="url(#gargoyleBronzeGrad)" stroke="#1a1408" stroke-width="1"/>
+        <line x1="${seamMidX - 13}" y1="${ay + 105}" x2="${seamMidX + 13}" y2="${ay + 105}" stroke="#ffd885" stroke-width="0.8"/>
+        <!-- Rosette Dome Rivets on left and right plates -->
+        <circle cx="${seamMidX - 8}" cy="${ay + 108}" r="2" fill="#1b211e" stroke="#0d110f" stroke-width="0.8"/>
+        <circle cx="${seamMidX - 8}" cy="${ay + 108}" r="0.8" fill="#ffd885"/>
+        <circle cx="${seamMidX + 8}" cy="${ay + 108}" r="2" fill="#1b211e" stroke="#0d110f" stroke-width="0.8"/>
+        <circle cx="${seamMidX + 8}" cy="${ay + 108}" r="0.8" fill="#ffd885"/>
+      </g>
+    `;
   }
 
   s += `</g>`;
@@ -2526,6 +2922,9 @@ function renderHardware() {
       } else if (model.option === 'buttress') {
         // Option 5: Architectural shadow gap recess between clerestory walls
         shared += drawButtressShadowGap(midX, a.y, p);
+      } else if (model.option === 'gargoyle') {
+        // Option 7: Architectural shadow gap niche behind clenching gargoyle
+        shared += drawButtressShadowGap(midX, a.y, p);
       } else {
         // Option 1 & 2: United nave pointed arch ribbing at the seam
         shared += `<g opacity="${p}">
@@ -2539,7 +2938,7 @@ function renderHardware() {
   }
 
   // Draw Keystone for Option 1
-  if (!isShade && model.option !== 'leadcame' && model.option !== 'buttress' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
+  if (!isShade && model.option !== 'leadcame' && model.option !== 'buttress' && model.option !== 'gargoyle' && (model.joined || model.keystoneDrop > 0.02 || (glow > 0.3 && !model.joined))) {
     const drop = model.joined ? 1 : model.keystoneDrop || Math.max(0, (glow - 0.3) / 0.7 * 0.7);
     const kMidX = model.joined ? a.x + JOIN_DISTANCE : (a.x + W - 18 + b.x + 18) / 2;
     shared += drawKeystone(kMidX, a.y, drop, Math.max(p, glow > 0.3 ? 0.9 : drop));
@@ -2555,6 +2954,12 @@ function renderHardware() {
   if (!isShade && model.option === 'buttress') {
     const swing = model.joined ? 1 : model.buttressSwing || Math.max(0, (glow - 0.25) / 0.75 * 0.5);
     shared += drawFlyingButtress(a.x, a.y, b.x, b.y, swing, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow);
+  }
+
+  // Draw Bronze Gargoyle Clench for Option 7
+  if (!isShade && model.option === 'gargoyle') {
+    const spring = model.joined ? 1 : model.gargoyleSpring || Math.max(0, (glow - 0.25) / 0.75 * 0.5);
+    shared += drawGargoyleClench(a.x, a.y, b.x, b.y, spring, model.joined, Math.max(p, glow > 0.15 ? 1 : 0.95), glow);
   }
 
   if (model.joined && model.design) {
@@ -2574,6 +2979,9 @@ function renderHardware() {
     } else if (model.option === 'buttress') {
       capL = drawButtressEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
       capR = drawButtressEndCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
+    } else if (model.option === 'gargoyle') {
+      capL = drawGargoyleEndCap(0, 0, false, isA, isA ? 0 : model.cap, isShade);
+      capR = drawGargoyleEndCap(0, 0, true, isA, isA ? model.cap : 0, isShade);
     } else {
       capL = drawGothicCap(0, 0, false, isA ? 0 : model.cap, isShade);
       capR = drawGothicCap(0, 0, true, isA ? model.cap : 0, isShade);
@@ -2622,8 +3030,7 @@ function renderHardware() {
 
 function updateStateButtons() {
   const isShade = model.shade;
-  const isJoined = model.joined;
-  const isJoining = ((model.option === 'leadcame' ? model.solderProgress > 0.05 && model.solderProgress < 0.95 : model.option === 'buttress' ? model.buttressSwing > 0.05 && model.buttressSwing < 0.95 : model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95)) && !isJoined && !isShade;
+  const isJoining = ((model.option === 'leadcame' ? model.solderProgress > 0.05 && model.solderProgress < 0.95 : model.option === 'buttress' ? model.buttressSwing > 0.05 && model.buttressSwing < 0.95 : model.option === 'gargoyle' ? model.gargoyleSpring > 0.05 && model.gargoyleSpring < 0.95 : model.keystoneDrop > 0.1 && model.keystoneDrop < 0.95)) && !isJoined && !isShade;
   const isSep = !isJoined && !isJoining && !isShade;
 
   $('#btnStateSeparate').classList.toggle('active', isSep);
@@ -2710,7 +3117,10 @@ function render() {
   $('#btnJoinAnim').disabled = model.joined || model.busy;
   $('#btnSeparateAnim').disabled = !model.joined || model.busy;
 
-  if (model.option === 'buttress') {
+  if (model.option === 'gargoyle') {
+    $('#btnJoinAnim').textContent = model.joined ? 'Gargoyle clenched' : 'Spring gargoyle join';
+    $('#btnSeparateAnim').textContent = 'Unclench gargoyle';
+  } else if (model.option === 'buttress') {
     $('#btnJoinAnim').textContent = model.joined ? 'Buttress seated' : 'Swing buttress join';
     $('#btnSeparateAnim').textContent = 'Unhitch buttress';
   } else if (model.option === 'leadcame') {
@@ -2748,9 +3158,19 @@ function render() {
   const release = $('#keystoneRelease');
   const solderRel = $('#solderRelease');
   const buttressRel = $('#buttressRelease');
-  if (model.option === 'leadcame') {
+  const gargoyleRel = $('#gargoyleRelease');
+  if (model.option === 'gargoyle') {
+    release.hidden = true;
+    solderRel.hidden = true;
+    buttressRel.hidden = true;
+    gargoyleRel.hidden = !model.joined || model.busy || model.shade;
+    gargoyleRel.style.left = (model.a.x + 322) + 'px';
+    gargoyleRel.style.top = (model.a.y + 10) + 'px';
+    gargoyleRel.style.setProperty('--tension', model.tension);
+  } else if (model.option === 'leadcame') {
     release.hidden = true;
     buttressRel.hidden = true;
+    gargoyleRel.hidden = true;
     solderRel.hidden = !model.joined || model.busy || model.shade;
     solderRel.style.left = (model.a.x + JOIN_DISTANCE - 14) + 'px';
     solderRel.style.top = (model.a.y + 55) + 'px';
@@ -2758,6 +3178,7 @@ function render() {
   } else if (model.option === 'buttress') {
     release.hidden = true;
     solderRel.hidden = true;
+    gargoyleRel.hidden = true;
     buttressRel.hidden = !model.joined || model.busy || model.shade;
     buttressRel.style.left = (model.b.x + 54) + 'px';
     buttressRel.style.top = (model.b.y + 4) + 'px';
@@ -2765,6 +3186,7 @@ function render() {
   } else {
     solderRel.hidden = true;
     buttressRel.hidden = true;
+    gargoyleRel.hidden = true;
     release.hidden = !model.joined || model.busy || model.shade;
     release.style.left = (model.a.x + 338) + 'px';
     release.style.top = (model.a.y + 44) + 'px';
@@ -2783,6 +3205,8 @@ function render() {
         $('#phase').textContent = 'Joined / Lead-came soldered frieze';
       } else if (model.option === 'buttress') {
         $('#phase').textContent = 'Joined / Flying buttress bridge seated';
+      } else if (model.option === 'gargoyle') {
+        $('#phase').textContent = 'Joined / Bronze gargoyle claws clenched over iron ring';
       } else {
         $('#phase').textContent = 'Joined / One monolithic basilica';
       }
@@ -2790,6 +3214,8 @@ function render() {
       $('#phase').textContent = 'Joining / Molten silver solder flowing';
     } else if (model.option === 'buttress' && model.buttressSwing > 0.05) {
       $('#phase').textContent = 'Joining / Flying buttress arm swinging across gap';
+    } else if (model.option === 'gargoyle' && model.gargoyleSpring > 0.05) {
+      $('#phase').textContent = 'Joining / Gargoyle springing forward & lunging claws across gap';
     } else if (model.keystoneDrop > 0.1) {
       $('#phase').textContent = 'Joining / Keystone poised in descent';
     } else {
@@ -3284,6 +3710,108 @@ async function buttressSeparate() {
   say('Separated. Independent cathedral pier and corbel housings restored.');
 }
 
+// Option 7 Join Animation: Gargoyle stirs, wings spread, springs forward on iron hinge, and snaps claws over iron ring
+async function gargoyleJoin(fromDrag = false) {
+  if (model.busy || model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  const token = ++animationToken;
+  render();
+  say('Gargoyle awakens on its corbel. Bronze wings spread and sanctuary eyes blaze as the iron ring approaches.');
+  $('#phase').textContent = 'Sanctuary eyes kindling';
+
+  const initialLight = model.light;
+  if (!await tween(fromDrag ? 90 : 220, t => {
+    model.light = initialLight + (1 - initialLight) * t;
+    model.gargoyleSpring = t * 0.25;
+    renderHardware();
+  }, token)) return;
+
+  // 2. Align casings flush as inner caps retract
+  $('#phase').textContent = 'Aligning corbel and rosette tether';
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetX = Math.max(30, Math.min(1200 - (JOIN_DISTANCE + W) - 30, model.a.x));
+  const targetY = Math.max(110, Math.min(model.undercroft ? 305 : 385, model.a.y));
+
+  if (!await tween(fromDrag ? 240 : 440, t => {
+    model.a.x = startA.x + (targetX - startA.x) * t;
+    model.a.y = startA.y + (targetY - startA.y) * t;
+    model.b.x = startB.x + (targetX + JOIN_DISTANCE - startB.x) * t;
+    model.b.y = startB.y + (targetY - startB.y) * t;
+    model.blend = Math.max(0, (t - 0.5) / 0.5);
+    model.cap = t;
+    model.gargoyleSpring = 0.25 + t * 0.45; // lunging forward
+    render();
+  }, token)) return;
+
+  // 3. Gargoyle snaps claws shut over iron ring with decisive bite!
+  $('#phase').textContent = 'Snapping bronze claws shut';
+  say('The bronze grotesque lunges across the gap, clamping its clawed talons tightly shut around the forged iron tether ring!');
+  const initialSpring = model.gargoyleSpring;
+  if (!await tween(fromDrag ? 200 : 380, t => {
+    const snapT = Math.sin(t * Math.PI / 2);
+    model.gargoyleSpring = initialSpring + (1 - initialSpring) * snapT;
+    renderHardware();
+  }, token)) return;
+
+  // 4. Clench impact vibration and flash
+  $('#phase').textContent = 'Gargoyle clench locked';
+  if (!await tween(160, t => {
+    model.light = 1 - t;
+    renderHardware();
+  }, token)) return;
+
+  model.joined = true;
+  model.busy = false;
+  model.blend = 1;
+  model.cap = 1;
+  model.gargoyleSpring = 1;
+  model.light = 0;
+  render();
+  say('Bronze gargoyle clench locked tight over iron ring. Pull coiled bronze tail or press G to unclasp & separate.');
+}
+
+async function gargoyleSeparate() {
+  if (model.busy || !model.joined) return;
+  model.busy = true;
+  stopDrag();
+  model.feel = 'free';
+  model.tension = 0;
+  const token = ++animationToken;
+  render();
+  say('Unlatching gargoyle tail lever. Bronze claws release the iron ring.');
+
+  // 1. Release claws and gargoyle recoils back to corbel perch
+  $('#phase').textContent = 'Unclasping talons & folding wings';
+  if (!await tween(260, t => {
+    model.gargoyleSpring = 1 - t;
+    renderHardware();
+  }, token)) return;
+
+  const startA = { ...model.a }, startB = { ...model.b };
+  const targetA = Math.max(30, Math.min(260, model.a.x));
+  const targetB = Math.min(780, targetA + W + 130);
+
+  $('#phase').textContent = 'Separating cathedral housings';
+  if (!await tween(520, t => {
+    model.a.x = startA.x + (targetA - startA.x) * t;
+    model.b.x = startB.x + (targetB - startB.x) * t;
+    model.blend = 1 - Math.min(1, t * 2.6);
+    model.cap = 1 - Math.max(0, (t - 0.4) / 0.6);
+    render();
+  }, token)) return;
+
+  model.joined = false;
+  model.busy = false;
+  model.blend = 0;
+  model.cap = 0;
+  model.gargoyleSpring = 0;
+  model.light = 0;
+  render();
+  say('Separated. Independent cathedral housings restored.');
+}
+
 // Preset State Switchers
 async function applyState(stateName) {
   if (model.busy) return;
@@ -3295,7 +3823,8 @@ async function applyState(stateName) {
       else await liftPortcullis();
     }
     if (model.joined) {
-      if (model.option === 'buttress') await buttressSeparate();
+      if (model.option === 'gargoyle') await gargoyleSeparate();
+      else if (model.option === 'buttress') await buttressSeparate();
       else if (model.option === 'leadcame') await meltSeparate();
       else await separate();
     } else {
@@ -3304,6 +3833,7 @@ async function applyState(stateName) {
       model.buttressSwing = 0;
       model.triptychFold = 0;
       model.pillarTelescope = 0;
+      model.gargoyleSpring = 0;
       model.cap = 0;
       model.blend = 0;
       model.a.x = 140;
@@ -3323,22 +3853,32 @@ async function applyState(stateName) {
     model.light = 0.8;
     model.a.x = 240;
     model.b.x = 240 + W + 44; // near each other
-    if (model.option === 'buttress') {
+    if (model.option === 'gargoyle') {
+      model.gargoyleSpring = 0.52; // mid-flight spring across divide, claws open, wings spread
+      model.solderProgress = 0;
+      model.buttressSwing = 0;
+      model.keystoneDrop = 0;
+      render();
+      say('State: Joining — Mid-animation view with bronze gargoyle springing forward with wings spread and claws lunging toward the iron ring.');
+    } else if (model.option === 'buttress') {
       model.buttressSwing = 0.52; // mid-flight 42-degree swing across gap
       model.solderProgress = 0;
       model.keystoneDrop = 0;
+      model.gargoyleSpring = 0;
       render();
       say('State: Joining — Mid-animation view with arched stone buttress arm swinging across the divide toward the corbel.');
     } else if (model.option === 'leadcame') {
       model.solderProgress = 0.52; // mid-flight solder flow down came channel
       model.keystoneDrop = 0;
       model.buttressSwing = 0;
+      model.gargoyleSpring = 0;
       render();
       say('State: Joining — Mid-animation view with molten silver solder flowing down the lead came channel.');
     } else {
       model.keystoneDrop = 0.52; // mid-flight aloft
       model.solderProgress = 0;
       model.buttressSwing = 0;
+      model.gargoyleSpring = 0;
       render();
       say('State: Joining — Mid-animation view with keystone descending into the arch apex.');
     }
@@ -3355,22 +3895,32 @@ async function applyState(stateName) {
       model.blend = 1;
       model.cap = 1;
       model.light = 0;
-      if (model.option === 'buttress') {
+      if (model.option === 'gargoyle') {
+        model.gargoyleSpring = 1;
+        model.solderProgress = 0;
+        model.buttressSwing = 0;
+        model.keystoneDrop = 0;
+        render();
+        say('State: Joined — Bronze gargoyle claws clamped tight around forged iron tether ring.');
+      } else if (model.option === 'buttress') {
         model.buttressSwing = 1;
         model.solderProgress = 0;
         model.keystoneDrop = 0;
+        model.gargoyleSpring = 0;
         render();
         say('State: Joined — Flying buttress arm firmly seated into corbel, bridging open-air shadow gap.');
       } else if (model.option === 'leadcame') {
         model.solderProgress = 1;
         model.keystoneDrop = 0;
         model.buttressSwing = 0;
+        model.gargoyleSpring = 0;
         render();
         say('State: Joined — Seamless lead-came solder seam with stained glass frieze.');
       } else {
         model.keystoneDrop = 1;
         model.solderProgress = 0;
         model.buttressSwing = 0;
+        model.gargoyleSpring = 0;
         render();
         say('State: Joined — Monolithic basilican arch locked by granite keystone.');
       }
@@ -3444,12 +3994,14 @@ $('#btnStateJoining').onclick = () => applyState('joining');
 $('#btnStateJoined').onclick = () => applyState('joined');
 $('#btnStateShade').onclick = () => applyState(model.shade ? 'joined' : 'shade');
 $('#btnJoinAnim').onclick = () => {
-  if (model.option === 'buttress') buttressJoin();
+  if (model.option === 'gargoyle') gargoyleJoin();
+  else if (model.option === 'buttress') buttressJoin();
   else if (model.option === 'leadcame') solderWeld();
   else join();
 };
 $('#btnSeparateAnim').onclick = () => {
-  if (model.option === 'buttress') buttressSeparate();
+  if (model.option === 'gargoyle') gargoyleSeparate();
+  else if (model.option === 'buttress') buttressSeparate();
   else if (model.option === 'leadcame') meltSeparate();
   else separate();
 };
@@ -3467,7 +4019,14 @@ $('#btnPortcullisAnim').onclick = () => {
 };
 $('#optionSelect').onchange = async e => {
   model.option = e.target.value;
-  if (model.option === 'pillar') {
+  if (model.option === 'gargoyle') {
+    say('Option 7: Bronze Gargoyle Clench join selected. Cast-bronze winged grotesque perching on corbel & snapping claws over iron rosette ring.');
+    if (model.shade) {
+      if (model.pillarTelescope > 0.05) await extendPillars();
+      else if (model.triptychFold > 0.05) await unfoldTriptych();
+      else await liftPortcullis();
+    }
+  } else if (model.option === 'pillar') {
     say('Option 6: Pillar Telescoping (Capital to Plinth) shade selected. Fluted stone columns compress into molded plinths.');
     if (!model.shade) {
       await compressPillars();
@@ -3517,7 +4076,7 @@ $('#btnReset').onclick = () => {
   resetGlow();
   Object.assign(model, {
     joined: false, busy: false, undercroft: false, docked: false, design: false, shade: false,
-    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, buttressSwing: 0, pillarTelescope: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
+    blend: 0, cap: 0, keystoneDrop: 0, portcullisDrop: 0, solderProgress: 0, triptychFold: 0, buttressSwing: 0, pillarTelescope: 0, gargoyleSpring: 0, option: 'keystone', light: 0, limit: 3, feel: 'free', tension: 0, front: 'b'
   });
   $('#optionSelect').value = 'keystone';
   Object.assign(model.a, { x: 140, y: 220, page: 0, running: true });
@@ -3561,12 +4120,12 @@ function snapshot() {
   return {
     a: { ...model.a }, b: { ...model.b }, meter: { ...model.meter },
     joined: model.joined, docked: model.docked, cap: model.cap, blend: model.blend,
-    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, buttressSwing: model.buttressSwing, option: model.option, front: model.front
+    keystoneDrop: model.keystoneDrop, portcullisDrop: model.portcullisDrop, solderProgress: model.solderProgress, triptychFold: model.triptychFold, buttressSwing: model.buttressSwing, pillarTelescope: model.pillarTelescope, gargoyleSpring: model.gargoyleSpring, option: model.option, front: model.front
   };
 }
 function restore(s) {
   for (const id of ['a', 'b', 'meter']) Object.assign(model[id], s[id]);
-  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'buttressSwing', 'option', 'front']) model[k] = s[k];
+  for (const k of ['joined', 'docked', 'cap', 'blend', 'keystoneDrop', 'portcullisDrop', 'solderProgress', 'triptychFold', 'buttressSwing', 'pillarTelescope', 'gargoyleSpring', 'option', 'front']) model[k] = s[k];
 }
 function cancelDrag() {
   if (!drag) return;
@@ -3646,6 +4205,8 @@ function magneticGoal(raw, target, id) {
       model.solderProgress = p.brightness * 0.45;
     } else if (model.option === 'buttress') {
       model.buttressSwing = p.brightness * 0.7; // buttress arm swings downward as you approach!
+    } else if (model.option === 'gargoyle') {
+      model.gargoyleSpring = p.brightness * 0.7; // gargoyle springs forward as you approach!
     } else {
       model.keystoneDrop = p.brightness * 0.7; // keystone hovers downward as you approach!
     }
@@ -3653,6 +4214,7 @@ function magneticGoal(raw, target, id) {
     model.keystoneDrop = 0;
     model.solderProgress = 0;
     model.buttressSwing = 0;
+    model.gargoyleSpring = 0;
   }
 
   return target ? { x: raw.x + (target.x - raw.x) * strength, y: raw.y + (target.y - raw.y) * strength } : raw;
@@ -3707,7 +4269,14 @@ stage.addEventListener('pointermove', e => {
   if (Math.abs(dx) + Math.abs(dy) > 3) d.moved = true;
 
   if (d.kind === 'shellLatch') {
-    if (model.option === 'leadcame') {
+    if (model.option === 'gargoyle') {
+      model.tension = clamp(dx / 64, 0, 1);
+      model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
+      model.gargoyleSpring = 1 - model.tension * 0.6; // gargoyle claws unseat and recoil!
+      if (dx < 64) { render(); return; }
+      gargoyleSeparate();
+      return;
+    } else if (model.option === 'leadcame') {
       model.tension = clamp(dx / 60, 0, 1);
       model.b.x = d.saved.b.x + clamp(dx * 0.14, 0, 10);
       model.solderProgress = 1 - model.tension * 0.5;
@@ -3778,6 +4347,7 @@ stage.addEventListener('pointerup', () => {
   $('#cryptBay').classList.remove('hot');
   if (ready) {
     if (d.id === 'meter') insertChecks();
+    else if (model.option === 'gargoyle') gargoyleJoin(true);
     else if (model.option === 'buttress') buttressJoin(true);
     else if (model.option === 'leadcame') solderWeld(true);
     else join(true);
@@ -3791,6 +4361,7 @@ stage.addEventListener('pointerup', () => {
     model.keystoneDrop = 0;
     model.solderProgress = 0;
     model.buttressSwing = 0;
+    model.gargoyleSpring = 0;
   }
   render();
 });
@@ -3799,6 +4370,7 @@ stage.addEventListener('pointercancel', cancelDrag);
 $('#keystoneRelease').onclick = e => { if (e.detail === 0) separate(); };
 $('#solderRelease').onclick = e => { if (e.detail === 0) meltSeparate(); };
 $('#buttressRelease').onclick = e => { if (e.detail === 0) buttressSeparate(); };
+$('#gargoyleRelease').onclick = e => { if (e.detail === 0) gargoyleSeparate(); };
 
 window.addEventListener('keydown', e => {
   if (e.target.matches('input, select, textarea')) return;
@@ -3814,16 +4386,21 @@ window.addEventListener('keydown', e => {
     applyState('shade');
   } else if (e.key === 'j' || e.key === 'J') {
     if (!model.joined) {
-      if (model.option === 'buttress') buttressJoin();
+      if (model.option === 'gargoyle') gargoyleJoin();
+      else if (model.option === 'buttress') buttressJoin();
       else if (model.option === 'leadcame') solderWeld();
       else join();
     }
   } else if (e.key === 's' || e.key === 'S') {
     if (model.joined) {
-      if (model.option === 'buttress') buttressSeparate();
+      if (model.option === 'gargoyle') gargoyleSeparate();
+      else if (model.option === 'buttress') buttressSeparate();
       else if (model.option === 'leadcame') meltSeparate();
       else separate();
     }
+  } else if (e.key === 'g' || e.key === 'G') {
+    if (!model.joined) gargoyleJoin();
+    else gargoyleSeparate();
   } else if (e.key === 'b' || e.key === 'B') {
     if (!model.joined) buttressJoin();
     else buttressSeparate();
@@ -3840,6 +4417,7 @@ window.addEventListener('keydown', e => {
     if (document.activeElement === $('#keystoneRelease') && model.joined) separate();
     else if (document.activeElement === $('#solderRelease') && model.joined) meltSeparate();
     else if (document.activeElement === $('#buttressRelease') && model.joined) buttressSeparate();
+    else if (document.activeElement === $('#gargoyleRelease') && model.joined) gargoyleSeparate();
   }
 });
 

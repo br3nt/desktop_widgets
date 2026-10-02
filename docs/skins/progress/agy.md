@@ -50,7 +50,7 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 - [x] Hollow: Layered Shale Slabs (Roof Shingle Retraction) shade — Stepped slate slabs slide behind primary mask plate (Built in prototypes/skins/agy/hollow.html with 3-tier Fungal Wastes slate/shale shingles, staggered upward retraction physics, stone friction dust puffs & detent jitter, cold-forged iron latch bar with twin Pharloom brass guide pins, unclipped glanceable 44px status strip with shale badge, Option 6 switcher, and 'R' keyboard shortcut)
 
 ### Cycle 7: Quaternary Joins
-- [ ] Gothic: Bronze Gargoyle Clench join — Hinged cast-bronze grotesque snaps claws shut over iron ring
+- [x] Gothic: Bronze Gargoyle Clench join — Hinged cast-bronze grotesque snaps claws shut over iron ring (Built in prototypes/skins/agy/gothic.html with patinated verdigris bronze grotesque, carved limestone corbel perch on Jarvis, relief quatrefoil rosette & forged-iron tether ring on GitDiscuss, articulated dragon wings & lunging claws, metallic friction sparks, coiled tail release lever, Option 7 switcher, and 'G' keyboard shortcut)
 - [ ] Felt: Heavy Brass Press-Stud (Popper) Snap join — Stiffened felt tabs seat brass popper studs into recessed sockets
 - [ ] Elven: Willow-Blade Bayonet Sheath join — Spring-tempered silver willow leaves glide silently into scabbards
 - [ ] Wire: Shepherd's Crook & Spiral Eyelet join — Hand-bent copper crook snaps into double-spiral wire cradle
