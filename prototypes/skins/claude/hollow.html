@@ -270,7 +270,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -1090,6 +1090,144 @@ const JOINS={
     s+=`<g class="hit mychit" id="seamHit" tabindex="0" role="button" aria-label="Mycelium web: pull it down, tap, or press Enter, to separate the widgets"><title>Pull the web down, or tap, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
    return s;
   }
+ },
+ stay:{label:'Chain stay',kind:'Angle',gap:36,holdAt:.56,msOut:2300,slow:1.3,angled:true,min:0,range:40,step:10,P:7,angleLabel:'Chain stay angle in degrees',
+  about:'The chain half of the hanging joints: GitDiscuss hangs from Jarvis like a drawbridge, on an iron hinge at the foot of the gap and a chain from eyelet to eyelet across the top, so it can only lean out and down, from level to +40°, and the chain\'s length is the angle. Joining: the shells close to a bell\'s width apart, hinge leaves slide out from the foot of each strap and meet on a knuckle, and its brass pin drops in with a spark. A chain lowers out of Jarvis\'s top eyelet, and its hook is thrown across in one arc and catches GitDiscuss\'s top eyelet. A brass bell drops through the gap onto a hook under the hinge pin and swings. Then GitDiscuss is let go: it falls outward on the hinge, gathering speed, until the slack chain snaps taut with a jolt and a couple of small rebounds, and the jolt rings the bell, which kindles as the join light. Whatever the angle, the bell hangs plumb. <b>Angle:</b> drag the chain (or GitDiscuss\'s nameplate) to lean it out or draw it in, use the slider, or focus the chain and press the arrow keys. The links feed through Jarvis\'s eyelet as you do, so the spare chain hanging down its strap grows and shrinks. A catch in the eyelet drops into a link every 10°: the drag lingers there, the eyelet sparks and the bell ticks, and on letting go it settles onto the nearest. The pair moves up or down to stay on the stage. <b>Near:</b> the top and bottom eyelets catch the light. <b>Ready:</b> a dotted ghost of the chain, the hinge and the bell. <b>Release:</b> tap the bell twice (the first tap rings it), or press Enter twice on the focused chain. GitDiscuss is lifted level, the bell is taken off, the hook comes out of the eyelet and the chain runs home through Jarvis\'s eyelet, the pin is drawn, the hinge comes apart and the shells part.',
+  text:{join:'The shells close on a hinge at their feet; a chain is thrown across the top, a bell is hung on the hinge pin, and GitDiscuss falls out until the chain snaps taut.',
+   joined:'Joined on a chain stay. Drag the chain, or GitDiscuss\'s nameplate, to lean it out or draw it in; tap the bell twice to release.',
+   release:'GitDiscuss is lifted level, the bell comes off, the chain unhooks and runs home, and the hinge pin is drawn.',back:'The chain runs back into Jarvis\'s eyelet and the hinge comes apart.',
+   hold:'Held mid-join: the chain thrown across the gap. Use the scrubber to step through the animation.',
+   ready:'Ready: the hinge, chain and bell are ghosted in the gap. Release to join.',near:'Nearby: the top and bottom eyelets catch the light. Move closer.',
+   phReady:'Ready · the chain is ghosted',phNear:'Nearby · the eyelets catch the light',get phDrag(){return drag&&drag.pin?'Tap the bell twice to release':'Leaning GitDiscuss · '+signed(model.angle)}},
+  stepSay:(k,to)=>(k>0?'The chain pays out a link':'The chain is drawn in a link')+'; GitDiscuss at '+signed(to)+'.',
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.3?'Joining · closing in ':jt<.46?'Joining · pinning the hinge ':jt<.63?'Joining · the chain is thrown ':jt<.78?'Joining · hanging the bell ':jt<.88?'Joining · falling out to '+signed(model.angle)+' · ':'Joining · the chain snaps taut '):(r<.14?'Releasing · lifted level ':r<.22?'Releasing · the bell comes off ':r<.36?'Releasing · the chain runs home ':r<.47?'Releasing · drawing the pin ':'Releasing · parting ')},
+  // GitDiscuss's lean about the hinge pin. Joining it falls (accelerating) until the chain is taut, then jolts in shrinking rebounds,
+  // never past the chain's length. Releasing, it is lifted level first.
+  bend(jt){const A=model.angle;if(jt>=1)return A;
+   if(model.dir>0){const u=seg(jt,.78,1);if(u<.45)return A*Math.pow(u/.45,2);const v=(u-.45)/.55;return A*(1-.09*Math.abs(Math.sin(3*Math.PI*v))*Math.pow(1-v,2))}
+   return A*(1-ease(seg(1-jt,0,.14)))},
+  place(h){const bd=this.bend(model.jt);return{o:`${-this.gap/2}px ${h-6}px`,t:bd?`rotate(${f(bd*100)/100}deg)`:''}},
+  // K is the hinge pin at the foot of the gap; A is Jarvis's top eyelet, and B is GitDiscuss's, turned with it about K.
+  pts(h,bd){const g=this.gap,K={x:model.a.x+W+g/2,y:model.a.y+h-6},ey=h*.25-(h-6),r=rot([g/2+9.5,ey],bd);
+   return{K,A:{x:K.x-g/2-9.5,y:K.y+ey},B:{x:K.x+r[0],y:K.y+r[1]}}},
+  // Eyelet to eyelet at a lean of a degrees: the taut length of the chain.
+  dist(h,a){const g=this.gap,ey=h*.25-(h-6),r=rot([g/2+9.5,ey],a);return Math.hypot(r[0]+g/2+9.5,r[1]-ey)},
+  // The range of Jarvis's y that keeps both shells and the bell on the stage at this lean.
+  fitRange(ang,hh){const h=2*hh,ky=h-6,g=this.gap,a=ang+1,ys=[-ky-36,6,36];
+   for(const p of [[g/2,-ky-36],[g/2+W,-ky-36],[g/2,6],[g/2+W,6]])ys.push(rot(p,a)[1]);
+   const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,40-mn-ky),hi=594-mx-ky;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]},
+  fit(y){return clamp(y,...this.fitRange(model.angle,ctx().h/2))},
+  parts(jt){if(jt>=1)return{leaf:1,knuckle:1,pin:1,feed:1,fly:1,drop:1,home:0,bell:1,lit:1};
+   if(model.dir>0)return{leaf:seg(jt,.3,.4),knuckle:seg(jt,.37,.43),pin:seg(jt,.41,.46),feed:seg(jt,.45,.5),fly:dart(seg(jt,.49,.62)),drop:seg(jt,.62,.7),home:0,bell:seg(jt,.66,.76),lit:seg(jt,.88,.96)};
+   const r=1-jt;return{leaf:1-seg(r,.4,.47),knuckle:1-seg(r,.4,.45),pin:1-seg(r,.36,.41),feed:1-seg(r,.33,.4),fly:1,drop:1,home:dart(seg(r,.2,.34)),bell:1-seg(r,.12,.22),lit:1-seg(r,.06,.14)}},
+  releaseStart(){stopAngle();model.armed=0},
+  // First tap rings the bell; a second within a moment unhooks the chain.
+  tap(){const now=performance.now();if(model.armed&&now<model.armed){model.armed=0;$('#a .grip').focus();doSeparate();return}
+   model.armed=now+1400;this.ring={t:now,amp:16,pulse:true};render();say('The bell rings. Tap it again to unhook the chain.')},
+  key(){this.tap()},
+  arrow(k){stepAngle(k)},
+  // A tap on the bell lets any running swing finish; only a drag on the chain or nameplate takes the angle over.
+  seamDown(p,t){if(t&&t.closest('[data-part=pin]'))return{seam:true,pin:true,p0:p,moved:0};
+   ++angAnim;model.angTo=undefined;const K=this.pts(ctx().h,0).K;return{seam:true,angle:true,prev:Math.atan2(p.y-K.y,p.x-K.x),raw:model.angle,th0:model.angle,moved:false}},
+  seamMove(d,p){if(d.pin){d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));return}
+   const K=this.pts(ctx().h,0).K,a=Math.atan2(p.y-K.y,p.x-K.x);let dd=(a-d.prev)*180/Math.PI;dd=((dd+540)%360)-180;d.prev=a;
+   d.raw=clamp(d.raw+dd,0,this.range);if(Math.abs(d.raw-d.th0)>1.5)d.moved=true;model.angle=magnet(d.raw,this.step);refitPair();render()},
+  seamUp(d){if(d.pin){if(d.moved<10)this.tap();else render();return}
+   if(d.moved){const to=Math.round(model.angle/this.step)*this.step;animateAngle(to,420);say('GitDiscuss set at '+signed(to)+'; the catch drops into a link.')}
+   else{const el=$('#b');if(d.fromGrip&&el.classList.contains('signed')){signTap('b');return}
+    if(d.fromGrip&&d.touch&&el.classList.contains('cocooned'))el.classList.toggle('loose');
+    const sv=Math.round(model.angle/this.step)*this.step;if(sv!==model.angle)animateAngle(sv,300);
+    render();say('Drag the chain, or GitDiscuss\'s nameplate, to lean it; tap the bell twice to release.')}},
+  seamCancel(d){if(d.angle){model.angle=d.th0;refitPair()}},
+  // The chain from its end E (ringed through GitDiscuss's eyelet, or a hook in flight) back to Jarvis's eyelet A, sagging through Q,
+  // then the spare hanging down Jarvis's strap: Lt of chain in all, of which at most `cap` hangs (the rest is in the strap).
+  // Links are counted from E, so as the span lengthens they feed up out of the hanging spare and through the eyelet.
+  chain(A,Q,E,Lt,cap,hooked,sway){const p=this.P,n=24,pts=[],L=[0];
+   for(let i=0;i<=n;i++){const t=1-i/n;pts.push({x:(1-t)*(1-t)*A.x+2*t*(1-t)*Q.x+t*t*E.x,y:(1-t)*(1-t)*A.y+2*t*(1-t)*Q.y+t*t*E.y});if(i)L.push(L[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y))}
+   const span=L[n],tail=clamp(Lt-span,0,cap),T={x:A.x+sway,y:A.y+tail};
+   const at=s=>{if(s>=span){const u=tail?(s-span)/tail:0;return{x:lerp(A.x,T.x,u),y:lerp(A.y,T.y,u),a:Math.atan2(T.y-A.y,T.x-A.x)}}
+    let i=1;while(i<n&&L[i]<s)i++;const u=(s-L[i-1])/((L[i]-L[i-1])||1),q0=pts[i-1],q1=pts[i];return{x:lerp(q0.x,q1.x,u),y:lerp(q0.y,q1.y,u),a:Math.atan2(q1.y-q0.y,q1.x-q0.x)}};
+   let s='';
+   for(let k=0;(k+.5)*p<span+tail;k++){const q=at((k+.5)*p);
+    s+=`<g transform="translate(${P(q)}) rotate(${f(q.a*180/Math.PI)})">`+(k%2?`<path d="M-3.4 0H3.4" stroke="${INK}" stroke-width="2.8"/><path d="M-3 0H3" stroke="#8593a6" stroke-width="1"/>`:`<ellipse rx="4.3" ry="2.4" stroke="${INK}" stroke-width="2.4"/><ellipse rx="4.3" ry="2.4" stroke="#6f7c90" stroke-width=".9"/>`)+'</g>'}
+   if(span+tail<1)return '';
+   const ring=q=>`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="3.6" stroke="${INK}" stroke-width="2.4"/><circle cx="${f(q.x)}" cy="${f(q.y)}" r="3.6" stroke="#9aa6b6" stroke-width=".9"/>`;
+   const ea=Math.atan2(pts[0].y-pts[1].y,pts[0].x-pts[1].x)*180/Math.PI;
+   s+=hooked?ring(E):span>2?`<g transform="translate(${P(E)}) rotate(${f(ea)})"><path d="M-2 0H1.5Q5.2 0 5.2 3.5T1.4 7" stroke="${INK}" stroke-width="2.6"/><path d="M-2 0H1.5Q5.2 0 5.2 3.5T1.4 7" stroke="#9aa6b6" stroke-width="1"/></g>`:'';
+   if(tail>4)s+=ring(T);
+   // The eyelet's lower lip over the chain, so the links read as passing through it.
+   s+=`<path d="M${f(A.x-4.4)} ${f(A.y)}A4.4 4.4 0 0 0 ${f(A.x+4.4)} ${f(A.y)}" stroke="${INK}" stroke-width="2.4"/><path d="M${f(A.x-4)} ${f(A.y+.4)}A4 4 0 0 0 ${f(A.x+4)} ${f(A.y+.4)}" stroke="#d9b468" stroke-width="1"/>`;
+   return `<g fill="none" stroke-linecap="round">${s}</g>`},
+  over(c){
+   const h=c.h,jt=c.jt,now=performance.now(),g=this.gap;
+   if(jt===0){this.live=false;this.nk=null;const gl=c.glow;if(gl<=0)return '';
+    const{K,A}=this.pts(h,0),Jb={x:model.a.x+W-9.5,y:model.a.y+h-6},Bt={x:model.b.x+9.5,y:model.b.y+h*.25},Bb={x:model.b.x+9.5,y:model.b.y+h-6};
+    let s=glints([A,Jb,Bt,Bb],gl);
+    if(gl>=1){const gh=d=>`<path d="${d}" fill="none" stroke="#e9edf1" stroke-width="1.5" stroke-dasharray="2.5 4" stroke-linecap="round" opacity=".55"/>`,b=(x,y)=>f(K.x+x)+' '+f(K.y+y);
+     s+=gh(`M${P(A)}Q${f((A.x+Bt.x)/2)} ${f((A.y+Bt.y)/2+8)} ${P(Bt)}`)+gh(`M${P(Jb)}L${P(Bb)}`)+`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="7.6" fill="none" stroke="#ffe7a8" stroke-width="1.2" stroke-dasharray="2 2"/>`+
+      `<path d="M${b(-3.2,15)}Q${b(-6.6,15.4)} ${b(-6.6,21)}Q${b(-6.9,26.4)} ${b(-9.4,28.6)}H${b(9.4,28.6)}Q${b(6.9,26.4)} ${b(6.6,21)}Q${b(6.6,15.4)} ${b(3.2,15)}Z" fill="none" stroke="#ffe7a8" stroke-width="1" stroke-dasharray="2 2" stroke-linejoin="round" opacity=".75"/>`}
+    return s}
+   const k=this.parts(jt),bd=this.bend(jt),{K,A,B}=this.pts(h,bd),rg=`rotate(${f(bd)} ${f(K.x)} ${f(K.y)})`,w=(x,y)=>f(K.x+x)+' '+f(K.y+y);
+   const rivet=(x,y)=>`<circle cx="${f(K.x+x)}" cy="${f(K.y+y)}" r="3.6" fill="url(#brass)" stroke="${INK}" stroke-width="1"/><circle cx="${f(K.x+x)}" cy="${f(K.y+y)}" r="1" fill="${INK}"/>`;
+   let s='',after='';
+   // The bell: dropped onto its hook, swung by the snap, ticked at each link, rung by a tap. It always hangs plumb from the pin.
+   let ang=0,clap=0,rings=[],dy=0,bop=1;
+   if(model.dir>0&&jt<1){dy=-64*(1-backOut(k.bell));bop=clamp(k.bell*3);
+    if(jt>=.76&&jt<.88){const v=seg(jt,.76,.88);ang=9*Math.sin(3*Math.PI*v)*(1-v)}
+    else if(jt>=.88){const v=seg(jt,.88,1);ang=20*Math.sin(5*Math.PI*v)*Math.pow(1-v,1.2);clap=-4.5*Math.sin(5*Math.PI*v-.7)*(1-v);rings=[.04,.2,.38].map(e=>seg(v,e,e+.42))}
+    if(jt>.74&&jt<.79){const u=seg(jt,.74,.79);after+=spark({x:K.x,y:K.y+9},1-u,4+5*u)}}
+   // A ring (a tap, or a link ticking past) swings the bell and dies away; it carries on into a release.
+   const R=this.ring,re=R?(now-R.t)/1000:9,rd=re<1.6?Math.exp(-re*2.6):0,rp=re*2*Math.PI*1.9;
+   if(model.dir<0&&jt<1){const u=seg(1-jt,.12,.22);dy=-50*ease(u);bop=k.bell;ang=6*Math.sin(Math.PI*u)+(R?R.amp*Math.sin(rp)*rd:0)}
+   else if(jt===1&&R&&rd>0){ang=R.amp*Math.sin(rp)*rd;clap=-.25*R.amp*Math.sin(rp-.7)*rd;if(R.pulse)rings=[0,.16].map(o=>seg(re,o,o+.6))}
+   // The spare chain sways a little with the bell.
+   const sway=-ang*.12;
+   // Hinge leaves at the foot of each strap (GitDiscuss's turning with it), the knuckle and its pin.
+   if(k.leaf>0){s+=`<g fill="none" stroke-linecap="round">${iron(`M${w(-g/2-9.5,0)}L${w(-5,0)}`,4.4,k.leaf)}</g>`+rivet(-g/2-9.5,0)+
+    `<g transform="${rg}"><g fill="none" stroke-linecap="round">${iron(`M${w(g/2+9.5,0)}L${w(5,0)}`,4.4,k.leaf)}</g>${rivet(g/2+9.5,0)}</g>`}
+   if(k.knuckle>0){const ks=backOut(k.knuckle);
+    s+=`<g transform="translate(${f(K.x)} ${f(K.y)}) scale(${f(ks*100)/100})"><circle r="7.8" fill="url(#iron)" stroke="${INK}" stroke-width="1.7"/><path d="M-5.4 -2.6A6 6 0 0 1 2.4 -5.8" fill="none" stroke="#9aa8bc" stroke-width=".9" opacity=".6"/></g>`}
+   const at={x:K.x,y:K.y+11+dy};
+   if(k.bell>0&&dy>-1)s+=`<path d="M${w(0,2.6)}V${f(at.y+.4)}" stroke="${INK}" stroke-width="2.4"/><path d="M${w(0,2.6)}V${f(at.y+.4)}" stroke="#9aa6b6" stroke-width=".9"/>`;
+   if(k.pin>0&&k.knuckle>0){const off=-18*(1-k.pin),op=clamp(k.pin*3);
+    if(off<-1)s+=`<path d="M${w(0,0)}L${w(0,off)}" stroke="${INK}" stroke-width="2.6" opacity="${f(op)}"/><path d="M${w(0,0)}L${w(0,off)}" stroke="#9aa6b6" stroke-width="1" opacity="${f(op)}"/>`;
+    s+=`<g opacity="${f(op)}" transform="translate(${w(0,off)}) rotate(${f(bd)})"><circle r="3.4" fill="url(#brass)" stroke="${INK}" stroke-width=".9"/><path d="M-2.2 0H2.2" stroke="${INK}" stroke-width="1"/></g>`}
+   // The chain. Joined it is all but taut (the span is the eyelet-to-eyelet length plus half a pixel); joining, it hangs slack
+   // until GitDiscuss's fall takes up the sag. Lt is enough for the full lean; at most `cap` hangs below the eyelet.
+   if(k.feed>0){const Lt=this.dist(h,this.range)+12,cap=Math.max(0,h*.75-14)*k.feed,Ls=this.dist(h,model.angle)+.5;
+    const mid=(E,dy)=>({x:(A.x+E.x)/2,y:(A.y+E.y)/2+dy}),sagQ=E=>{const D=Math.hypot(E.x-A.x,E.y-A.y);return mid(E,2*(Ls>D?Math.sqrt(3*D*(Ls-D)/8):0))};
+    let E=A,Q=A,hooked=false;
+    if(model.dir>0&&jt<1){
+     if(k.drop>0){hooked=true;E=B;Q=k.drop<1?{x:(A.x+B.x)/2,y:lerp(mid(B,8).y,sagQ(B).y,backOut(k.drop))}:sagQ(B)}
+     else if(k.fly>0){const d=k.fly;E={x:lerp(A.x,B.x,d),y:lerp(A.y,B.y,d)-38*Math.sin(Math.PI*d)};Q=mid(E,8)}}
+    else if(model.dir<0&&jt<1&&k.home>0){const d=k.home,Q0=sagQ(B);E={x:lerp(B.x,A.x,d),y:lerp(B.y,A.y,d)-6*seg(d,0,.15)-30*Math.sin(Math.PI*d)};Q={x:(A.x+E.x)/2,y:lerp(Q0.y,(A.y+E.y)/2+8,d)}}
+    else{hooked=true;E=B;Q=sagQ(B)}
+    s+=this.chain(A,Q,E,Lt,cap,hooked,sway)}
+   // The bell and its light (the join light).
+   if(k.bell>0){const ra=ang*Math.PI/180,mouth={x:at.x-Math.sin(ra)*15,y:at.y+Math.cos(ra)*15};
+    if(k.lit>0)s+=`<circle cx="${f(mouth.x)}" cy="${f(mouth.y)}" r="40" fill="url(#lamp)" opacity="${f(k.lit*bop)}"/>`;
+    s+=`<g opacity="${f(bop)}">${drawBell(at,ang,clap,false)}</g>`;
+    for(const q of rings)if(q>0&&q<1){const R=10+46*ease(q);
+     s+=`<circle cx="${f(mouth.x)}" cy="${f(mouth.y)}" r="${f(R)}" fill="none" stroke="#f3e2b0" stroke-width="${f(.4+2.2*(1-q))}" opacity="${f(.8*(1-q))}"/><circle cx="${f(mouth.x)}" cy="${f(mouth.y)}" r="${f(R*.8)}" fill="none" stroke="#fff" stroke-width=".7" opacity="${f(.35*(1-q))}"/>`}}
+   // Sparks: the pin seating, the hook catching, the hook lifting out, the pin drawn.
+   if(model.dir>0&&jt>.46&&jt<.51){const u=seg(jt,.46,.51);after+=spark(K,1-u,5+6*u)}
+   if(model.dir>0&&jt>.62&&jt<.67){const u=seg(jt,.62,.67);after+=spark(B,1-u,5+7*u)}
+   if(model.dir<0&&jt<1){const r=1-jt;for(const[a0,a1,p]of[[.2,.25,B],[.36,.41,K]]){const u=seg(r,a0,a1);if(u>0&&u<1)after+=spark(p,1-u,4+6*u)}}
+   // Detents: the eyelet's catch drops into a link every 10°, with a spark and a tick of the bell.
+   if(jt===1){const nk=Math.round(model.angle/this.step);if(Math.abs(model.angle-nk*this.step)<1.2){if(this.nk!=null&&nk!==this.nk){this.flash=now;if(!(this.ring&&this.ring.pulse&&now-this.ring.t<900))this.ring={t:now,amp:7}}this.nk=nk}}else this.nk=null;
+   const fl=this.flash&&now-this.flash<240;if(fl){const u=(now-this.flash)/240;after+=spark(A,1-u,3+6*u)}
+   this.live=!!(fl||jt===1&&this.ring&&now-this.ring.t<1600);
+   s+=after;
+   // The grab area: the chain span (its GitDiscuss end measured in GitDiscuss's turned frame, so it stays on the strap), down to the knuckle,
+   // plus the spare chain hanging down Jarvis's strap.
+   if(jt===1){const pd=12,ey=h*.25-(h-6),bv=y=>{const r=rot([g/2+14.5,ey+y],bd);return{x:K.x+r[0],y:K.y+r[1]}},b0=bv(-pd),b1=bv(pd);
+    const tl=clamp(this.dist(h,this.range)+12-this.dist(h,model.angle)-.5,0,Math.max(0,h*.75-14));
+    const hd=`M${f(A.x-pd)} ${f(A.y-pd)}L${P(b0)}L${P(b1)}L${f(K.x+8)} ${f(K.y+8)}L${f(K.x-8)} ${f(K.y+8)}L${f(A.x+8)} ${f(A.y+pd)}L${f(A.x+8)} ${f(A.y+tl+6)}L${f(A.x-8)} ${f(A.y+tl+6)}Z`;
+    s+=`<g class="hit brackethit" id="seamHit" tabindex="0" role="group" aria-label="Chain stay: GitDiscuss leaning ${signed(model.angle)}. Up and down arrows draw the chain in or pay it out a link (10°); Enter rings the bell, and a second Enter unhooks the chain to separate the widgets"><title>Drag the chain to lean GitDiscuss; tap the bell twice to release</title>`+
+     `<path d="${hd}" fill="transparent"/><path class="ringfocus" d="${hd}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3" stroke-linejoin="round"/>`+
+     `<circle class="pinhit" data-part="pin" cx="${f(K.x)}" cy="${f(K.y+24)}" r="16" fill="transparent"><title>Tap the bell twice to release</title></circle></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -1497,22 +1635,24 @@ function drawLantern(Hp,phi,lit,op){
 let tickRAF=0,lastRender=0;
 function keepTicking(){if(!tickRAF)tickRAF=requestAnimationFrame(()=>{tickRAF=0;if(performance.now()-lastRender>12)render();else keepTicking()})}
 let angAnim=0;
-// The angled joins (hanging bracket, shell articulation) share this; each has its own range, detent step and remembered angle.
+// The angled joins (hanging bracket, shell articulation, chain stay) share this; each has its own range, detent step and remembered angle.
+// A join that can only lean one way runs from `min` (by default −range) to range.
+const amin=j=>j.min??-j.range;
 const angOn=()=>!!J().angled&&model.jt===1;
 // A raised pair pushed down by the fit keeps its resting height: the push comes off its lift.
 function refitPair(){if(!angOn())return;const[lo,hi]=J().fitRange(model.angle,ctx().h/2),ny=clamp(model.a.y,lo,hi),d=ny-model.a.y;if(d>0)model.lift=Math.max(0,model.lift-d);model.a.y=model.b.y=ny}
 function pairY(){return angOn()?J().fitRange(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
 function animateAngle(to,ms=750){
  // A running lift stops here (it is settled again once the swing ends), and any push down comes off it.
- stopLift();const j=J();to=clamp(to,-j.range,j.range);model.angTo=to;const from=model.angle,y0=model.a.y,y1=clamp(y0,...j.fitRange(to,ctx().h/2)),tok=++angAnim,t0=performance.now();
+ stopLift();const j=J();to=clamp(to,amin(j),j.range);model.angTo=to;const from=model.angle,y0=model.a.y,y1=clamp(y0,...j.fitRange(to,ctx().h/2)),tok=++angAnim,t0=performance.now();
  if(y1>y0)model.lift=Math.max(0,model.lift-(y1-y0));
  (function step(now){if(tok!==angAnim)return;if(!angOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
-  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*Math.PI*t)),-j.range-2,j.range+2);model.a.y=model.b.y=lerp(y0,y1,ease(t));render();
+  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*Math.PI*t)),j.min??amin(j)-2,j.range+2);model.a.y=model.b.y=lerp(y0,y1,ease(t));render();
   if(t<1)requestAnimationFrame(step);else model.angTo=undefined})(t0);
 }
 function stopAngle(){++angAnim;if(model.angTo!==undefined){model.angle=model.angTo;model.angTo=undefined;refitPair()}}
-function stepAngle(k){const j=J(),base=model.angTo??model.angle,to=clamp(Math.round(base/j.step)*j.step+j.step*k,-j.range,j.range);animateAngle(to);say(j.stepSay(k,to))}
-function setAngle(v){const j=J();v=Math.round(clamp(v,-j.range,j.range)/j.step)*j.step;if(angOn())animateAngle(v);else{stopAngle();model.angle=v;render()}}
+function stepAngle(k){const j=J(),base=model.angTo??model.angle,to=clamp(Math.round(base/j.step)*j.step+j.step*k,amin(j),j.range);animateAngle(to);say(j.stepSay(k,to))}
+function setAngle(v){const j=J();v=Math.round(clamp(v,amin(j),j.range)/j.step)*j.step;if(angOn())animateAngle(v);else{stopAngle();model.angle=v;render()}}
 
 /* ---------- Morph: map unfurl (Checks) ---------- */
 // g runs 0 sheet, 1 folio, 2 atlas. Every frame is drawn from g alone, so shrinking plays the growth backwards.
@@ -1764,7 +1904,7 @@ function morphTo(id){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:700,y:420}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30,stay:20},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
@@ -1876,7 +2016,7 @@ function render(){
  const hit=$('#seamHit');if(hit){hit.onkeydown=e=>{const ar={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];
   if(e.key==='Enter'||e.key===' '){e.preventDefault();J().key()}else if(ar&&J().arrow){e.preventDefault();J().arrow(ar)}};if(focused)hit.focus()}
  const ang=!!j.angled;$('#angleRow').style.display=ang?'':'none';
- if(ang){const r=$('#angle');if(+r.max!==j.range){r.min=-j.range;r.max=j.range;r.step=j.step;r.setAttribute('aria-label',j.angleLabel)}r.value=Math.round(model.angTo??model.angle);$('#angleOut').textContent=signed(model.angTo??model.angle)}
+ if(ang){const r=$('#angle');if(+r.max!==j.range||+r.min!==amin(j)){r.min=amin(j);r.max=j.range;r.step=j.step;r.setAttribute('aria-label',j.angleLabel)}r.value=Math.round(model.angTo??model.angle);$('#angleOut').textContent=signed(model.angTo??model.angle)}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
