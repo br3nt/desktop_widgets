@@ -1,3 +1,5 @@
+- [ ] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/combined.html: SyntaxError: Identifier 'RB' has already been declared
+prototypes/skins/claude/combined.html: ["Uncaught SyntaxError: Identifier 'RB' has already been declared @line 2513"]
 # Claude skin study: progress
 
 One item per run, in this order. Aesthetics are interleaved so none waits long. Pages: `prototypes/skins/claude/<skin>.html` and `combined.html`, with the index at `prototypes/skins/claude/index.html`.
