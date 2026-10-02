@@ -192,7 +192,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M builds Checks up a size (from the nave it comes back down to a lancet) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M builds Checks up a size (from the nave it comes back down to a lancet) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -884,6 +884,149 @@ const JOINS={
   move(d,p){const a=Math.atan2(p.y-d.cy,p.x-d.cx);let da=(a-d.prev)*180/Math.PI;da=((da+540)%360)-180;d.prev=a;
    d.deg=clamp(d.deg+da,(-this.max-d.th0)/2,(this.max-d.th0)/2);if(Math.abs(d.deg)>1.5)d.moved=true;model.angle=magnet(d.th0+2*d.deg)},
   key(e,hit){if(hit.id!=='wallHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
+ },
+ doors:{label:'Nave doors',kind:'Clasp',gap:0,ms:1.7,sepMs:2300,S:28,O:1.32,
+  say:{join:'The facades meet under one gable, the oak leaves swing shut, and the drop bar falls across them into its staple.',
+   joined:'Joined: the nave doors are shut and barred, with candlelight showing under them. Drag either nameplate to move the pair. Lift the bar to release.',
+   sep:'The bar is lifted, the light goes out, the leaves swing open and the facades part.',hold:'Held mid-join: the leaves are swinging shut. Use the scrubber to step through the animation.',
+   ready:'Ready: the shut doors and their bar are chalked across the doorway. Release to shut them.',near:'Nearby: the open leaves stir on their hinges. Move closer.',readyPh:'Ready · the doors are marked out',nearPh:'Nearby · the leaves stir',
+   back:'The bar drops back into its staple; still joined.'},
+  phase:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.7?'Joining · the leaves swing shut ':jt<.84?'Joining · the bar drops ':'Joining · candles lit within '):(jt>.86?'Releasing · lifting the bar ':jt>.4?'Releasing · the leaves swing open ':'Releasing · parting '),
+  dragPh:d=>'Lifting the bar · '+Math.round(100*(d.amt||0))+'%',
+  about:'The seam is a doorway, and joining shuts it. Each joining end carries half of a pointed doorway under its half-gable: moulded orders round the arch with a hood and label stop, a capital at the springing, a dark nave beyond with a far lancet, and one oak leaf on iron strap hinges standing open into the church. Jarvis\'s leaf carries the drop bar, upright on its pivot. <b>Near:</b> the leaves stir on their hinges and the rebates warm. <b>Ready:</b> the shut doors and the bar are chalked across the doorway. Joining: the facades meet and the two half-gables become one gable over one door. Jarvis\'s leaf swings shut, then GitDiscuss\'s slams against it with a rebound and a puff of dust at the head and the sill. The bar falls across both leaves into GitDiscuss\'s staple, bounces once and lands with a thud and a glint on the iron. Candles are lit inside: their light shows under the doors, along the meeting crack and round the head of the arch, and pools on the floor in front. That is the join light, amber while both widgets run and cold blue when either is paused. Shaded, the doorway lowers with the wall to a squat door and keeps its bar. <b>Release:</b> lift the bar (drag it up; past halfway it clears the staple), or click it, or focus it and press Enter. The light goes out, the leaves swing open into the nave and the facades part.',
+  geo(h){const u=clamp((h-HS)/(H-HS)),s=this.S,ap=lerp(12,21,u),r=Math.min(s*1.6,(h-ap)*.45),sp=ap+r;
+   return{h,u,s,ap,sp,fl:h,k:lerp(.6,1,u),by:sp+(h-sp)*lerp(.5,.42,u),px:-lerp(9,15.4,u),cx:lerp(8,17,u),tb:lerp(1.7,2.7,u)}},
+  // The pointed head, stretched to the rise: x runs from the seam (the apex) out to the springing, d outside the opening.
+  arch(g,d,n=12){const S=g.s+d,R=g.sp-g.ap+d,P=[];for(let i=0;i<=n;i++){const t=i/n;P.push([S*t,g.sp-R*Math.sqrt(Math.max(0,4-(1+t)**2))/Math.sqrt(3)])}return P},
+  topY(g,x){const t=clamp(Math.abs(x)/g.s);return g.sp-(g.sp-g.ap)*Math.sqrt(4-(1+t)**2)/Math.sqrt(3)},
+  open(g,o){return `M0 ${f(g.fl)}`+this.arch(g,0).map(([x,y])=>`L${f(o*x)} ${f(y)}`).join('')+`L${f(o*g.s)} ${f(g.fl)}Z`},
+  // Each joining end's half of the doorway is drawn about its own edge (x = 0 there); o = −1 opens to Jarvis's side, +1 to GitDiscuss's.
+  ends:()=>[['a',-1,model.a.x+W,model.a.y],['b',1,model.b.x,model.b.y]],
+  // The dark nave beyond: floor joints running back and a far lancet on the axis. Lit, it warms from the middle.
+  inside(g,o,lit){const{s,sp,fl}=g,wy=sp+(fl-sp)*.1,wh=Math.min(15,(fl-sp)*.36),d=fl-sp;
+   let t=`<path d="${this.open(g,o)}" fill="url(#pniche)"/><path d="M${f(o*s*.45)} ${f(fl)}L${f(o*3)} ${f(fl-d*.3)}M${f(o*s)} ${f(fl-d*.07)}L${f(o*5)} ${f(fl-d*.34)}M0 ${f(fl-d*.34)}H${f(o*s)}" stroke="#5a4630" stroke-width=".6" opacity=".55" fill="none"/>`;
+   if(wh>6)t+=`<path d="M0 ${f(wy+wh)}H${f(o*2.8)}V${f(wy+3.2)}Q${f(o*2.8)} ${f(wy+.9)} 0 ${f(wy)}Z" fill="#6f86bd" opacity="${f(.45+.4*lit)}"/>`;
+   if(lit>0)t+=`<path d="${this.open(g,o)}" fill="url(#dlit)" opacity="${f(lit)}" style="mix-blend-mode:screen"/>`;
+   return t},
+  // A point on a leaf: u runs from the hinge (0) to the meeting edge (1), y is its height when shut. Swung in by a, it narrows toward the hinge and its far edge recedes.
+  lp(g,o,a,u,y){const cy=(g.sp+g.fl)/2;return[o*g.s*(1-u*Math.cos(a)),cy+(y-cy)*(1-.3*u*Math.sin(a))]},
+  leaf(g,o,a){
+   const k=g.k,fb=g.fl-1.6,top=u=>this.topY(g,g.s*(1-u)),M=(u,y)=>{const p=this.lp(g,o,a,u,y);return f(p[0])+' '+f(p[1])},pl=P=>'M'+P.map(([u,y])=>M(u,y)).join('L');
+   const OAK=['#6e4526','#5f3b1f','#764c29','#66401f'],edge=[];for(let j=0;j<=12;j++)edge.push([j/12,top(j/12)]);
+   const out=pl([[0,fb],...edge,[1,fb]])+'Z';let s='',grain='';
+   for(let i=0;i<4;i++){const u0=i/4,u1=(i+1)/4,P=[[u0,fb]];for(let j=0;j<=3;j++){const u=lerp(u0,u1,j/3);P.push([u,top(u)])}P.push([u1,fb]);s+=`<path d="${pl(P)}Z" fill="${OAK[(i+(o>0?2:0))%4]}"/>`;
+    for(const w of[.3,.62])grain+=`M${M(u0+w/4,top(u0+w/4)+2)}L${M(u0+w/4+.01,fb-2)}`;
+    if(i)s+=`<path d="M${M(u0,top(u0))}L${M(u0,fb)}" stroke="#24150a" stroke-width=".8" opacity=".8"/><path d="M${M(u0+.02,top(u0)+1)}L${M(u0+.02,fb)}" stroke="#a5784a" stroke-width=".4" opacity=".45"/>`}
+   s+=`<path d="${grain}" stroke="#2c1a0c" stroke-width=".35" opacity=".45"/>`;
+   // Strap hinges ending in a lozenge and two curls, nailed with iron studs
+   const w=1.5*k,ys=g.u>.5?[g.sp+(g.fl-g.sp)*.14,g.fl-(g.fl-g.sp)*.2]:[g.sp+(g.fl-g.sp)*.16];
+   for(const y of ys){s+=`<path d="${pl([[0,y-w],[.7,y-w],[.72,y-w*1.9],[.85,y],[.72,y+w*1.9],[.7,y+w],[0,y+w]])}Z" fill="#2a2420" stroke="#0f0b08" stroke-width=".5"/>`+
+    `<path d="${pl([[.6,y-w],[.67,y-w*3],[.61,y-w*4.3],[.55,y-w*3.5]])}M${M(.6,y+w)}L${M(.67,y+w*3)}L${M(.61,y+w*4.3)}L${M(.55,y+w*3.5)}" fill="none" stroke="#2a2420" stroke-width="${f(1.1*k)}" stroke-linecap="round" stroke-linejoin="round"/>`+
+    `<path d="M${M(.02,y-w+.4)}L${M(.68,y-w+.4)}" stroke="#857b70" stroke-width=".45" opacity=".7"/>`;
+    for(const u of[.12,.3,.48]){const p=this.lp(g,o,a,u,y);s+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="${f(.75*k)}" fill="#a39886"/>`}
+    const h0=this.lp(g,o,a,0,y);s+=`<rect x="${f(h0[0]-1.6*k)}" y="${f(h0[1]-2.4*k)}" width="${f(3.2*k)}" height="${f(4.8*k)}" rx="${f(.8*k)}" fill="#1c1814"/>`}
+   // Ring pull below the bar
+   if(g.u>.5){const p=this.lp(g,o,a,.86,g.by+12),rx=2.8*Math.max(.22,Math.cos(a));s+=`<circle cx="${f(p[0])}" cy="${f(p[1]-2.6)}" r="1" fill="#1c1814"/><ellipse cx="${f(p[0])}" cy="${f(p[1])}" rx="${f(rx)}" ry="2.8" fill="none" stroke="#211c18" stroke-width="1.2"/><path d="M${f(p[0]-rx*.7)} ${f(p[1]-1.6)}Q${f(p[0])} ${f(p[1]-3.2)} ${f(p[0]+rx*.7)} ${f(p[1]-1.6)}" fill="none" stroke="#8d8378" stroke-width=".4"/>`}
+   // The meeting stile, and the leaf darkening as it swings away into the nave
+   s+=`<path d="M${M(1,top(1))}L${M(1,fb)}" stroke="#1a1009" stroke-width="1.1"/><path d="${out}" fill="none" stroke="#1d140c" stroke-width=".9"/>`;
+   if(Math.abs(a)>.01)s+=`<path d="${out}" fill="#0b0806" opacity="${f(.6*Math.abs(Math.sin(a)))}"/>`;
+   return s},
+  // Bar and staple: the bar pivots on Jarvis's leaf; its catch is on GitDiscuss's. ph is the bar's angle (−90 upright, 0 across).
+  bar(g,a,ph){const L=g.cx-g.px+5,t=g.tb,r=ph*Math.PI/180,c=Math.cos(r),sn=Math.sin(r);
+   const P=(x,y)=>{const X=g.px+x*c-y*sn,Y=g.by+x*sn+y*c,p=this.lp(g,-1,a,1+X/g.s,Y);return f(p[0])+' '+f(p[1])},pv=P(0,0).split(' ');
+   return `<path d="M${P(-4,-t)}L${P(L,-t)}L${P(L,t)}L${P(-4,t)}Z" fill="#5a381c" stroke="#1d140c" stroke-width=".8"/><path d="M${P(-3,-t+.6)}L${P(L-1,-t+.6)}" stroke="#a87a4c" stroke-width=".5" opacity=".7"/>`+
+    `<path d="M${P(L-3.2,-t)}L${P(L-3.2,t)}M${P(-1.8,-t)}L${P(-1.8,t)}" stroke="#211c18" stroke-width="1.3"/><circle cx="${pv[0]}" cy="${pv[1]}" r="${f(1.8*g.k)}" fill="#2a2420" stroke="#0f0b08" stroke-width=".5"/><circle cx="${pv[0]}" cy="${pv[1]}" r="${f(.8*g.k)}" fill="url(#gild)"/>`},
+  staple(g,a,front){const t=g.tb,M=(x,y)=>{const p=this.lp(g,1,a,1-x/g.s,y);return f(p[0])+' '+f(p[1])},x0=g.cx-1.7,x1=g.cx+1.7;
+   return front?`<path d="M${M(x0,g.by-t-1.4)}L${M(x1,g.by-t-1.4)}L${M(x1,g.by+t+1.4)}L${M(x0,g.by+t+1.4)}Z" fill="#2a2420" stroke="#0f0b08" stroke-width=".5"/><path d="M${M(x0+.5,g.by-t-1)}L${M(x0+.5,g.by+t+1)}" stroke="#857b70" stroke-width=".4"/>`
+    :`<path d="M${M(x0-1.6,g.by-t-3)}L${M(x1+1.6,g.by-t-3)}L${M(x1+1.6,g.by+t+3)}L${M(x0-1.6,g.by+t+3)}Z" fill="#1c1814" opacity=".85"/>`},
+  // Moulded orders round the head and down the jambs, a hood with a label stop, capitals at the springing, bases and the sill.
+  frame(g,o,warm){const k=g.k,D=[4.2*k,7.2*k],hd=10*k,run=d=>`M${f(o*(g.s+d))} ${f(g.fl-.5)}V${f(g.sp)}`+this.arch(g,d).reverse().map(([x,y])=>`L${f(o*x)} ${f(y)}`).join(''),
+    hood='M'+this.arch(g,hd).reverse().map(([x,y])=>`${f(o*x)} ${f(y)}`).join('L');
+   let s=`<path d="M0 ${f(g.fl-1.7)}H${f(o*g.s)}V${f(g.fl)}H0Z" fill="#a99a7c"/><path d="M0 ${f(g.fl-1.7)}H${f(o*g.s)}" stroke="#3a2c1c" stroke-opacity=".6" stroke-width=".6"/>`;
+   for(const d of D)s+=`<path d="${run(d)}" fill="none" stroke="#3a2c1c" stroke-opacity=".62" stroke-width="${f(3.3*k)}"/><path d="${run(d)}" fill="none" stroke="#d6c9ab" stroke-width="${f(2*k)}"/><path d="${run(d-.5*k)}" fill="none" stroke="#fff6e2" stroke-opacity=".5" stroke-width=".5"/>`;
+   s+=`<path d="${run(1)}" fill="none" stroke="#1d140c" stroke-width="${f(2*k)}"/>`;
+   if(warm>0)s+=`<g opacity="${f(warm)}" fill="none"><path d="${run(1.6)}" stroke="#ffc861" stroke-width="3" opacity=".5" filter="url(#lglow)" style="mix-blend-mode:screen"/><path d="${run(1.8)}" stroke="#ffe3a0" stroke-width=".9"/></g>`;
+   s+=`<path d="${hood}" fill="none" stroke="#3a2c1c" stroke-opacity=".6" stroke-width="${f(3*k)}"/><path d="${hood}" fill="none" stroke="#e1d6bd" stroke-width="${f(1.8*k)}"/>`;
+   const lx=o*(g.s+hd),cx0=o*g.s,cx1=o*(g.s+hd-1);
+   s+=`<circle cx="${f(lx)}" cy="${f(g.sp+1.8*k)}" r="${f(2*k)}" fill="#cfc2a4" stroke="#3a2c1c" stroke-opacity=".6" stroke-width=".6"/><circle cx="${f(lx-o*.5)}" cy="${f(g.sp+1.4*k)}" r="${f(.7*k)}" fill="#3a2a18" opacity=".45"/>`+
+    `<path d="M${f(cx0)} ${f(g.sp-2*k)}H${f(cx1)}V${f(g.sp+1.2*k)}Q${f(lerp(cx0,cx1,.5))} ${f(g.sp+3.4*k)} ${f(cx0)} ${f(g.sp+1.2*k)}Z" fill="url(#lime)" stroke="#3a2c1c" stroke-opacity=".6" stroke-width=".6"/>`+
+    `<path d="M${f(cx0)} ${f(g.fl-1.7)}V${f(g.fl-7*k)}H${f(cx1)}V${f(g.fl-1.7)}Z" fill="url(#lime)" stroke="#3a2c1c" stroke-opacity=".55" stroke-width=".6"/><path d="M${f(cx0)} ${f(g.fl-5*k)}H${f(cx1)}" stroke="#fff6e2" stroke-opacity=".5" stroke-width=".5"/>`;
+   return s},
+  st(c){const jt=c.jt,O=this.O,q=1-jt;
+   if(jt===0){const a=O*(1-.3*c.glow);return{aA:a,aB:a,bar:0,lit:0,slam:0,thud:0}}
+   if(model.dir>0){const a0=O*(1-.3*c.glow),sw=t=>t<.84?a0*(1-(t/.84)**2):-a0*.05*Math.sin(Math.PI*(t-.84)/.16),tA=seg(jt,.4,.6),tB=seg(jt,.46,.68),tb=seg(jt,.7,.84);
+    return{aA:sw(tA),aB:sw(tB),bar:tb<.74?(tb/.74)**2:1-.14*Math.sin(Math.PI*(tb-.74)/.26),lit:seg(jt,.84,1),slam:tB>.84?seg(tB,.84,1):0,thud:tb>.74?seg(tb,.74,1):0}}
+   return{aA:O*ease(seg(q,.14,.46)),aB:O*ease(seg(q,.2,.56)),bar:1-ease(seg(q,0,.14)),lit:1-seg(q,0,.1),slam:0,thud:0}},
+  // The bar stands upright; in the lowest strip there is less headroom, so it leans.
+  barAngle(g,b){return-lerp(72,90,g.u)*(1-b)},
+  lights(g,o,lit,col){const k=g.k;
+   return `<g style="mix-blend-mode:screen" opacity="${f(lit)}"><path d="M0 ${f(g.fl-1.9)}H${f(o*(g.s-1))}" stroke="${col}" stroke-width="1.3"/><path d="M0 ${f(g.ap+2)}V${f(g.fl-2)}" stroke="${col}" stroke-width=".9"/>`+
+    `<path d="M0 ${f(g.ap+1)}V${f(g.fl-2)}M0 ${f(g.fl-1.5)}H${f(o*g.s)}" stroke="${col}" stroke-width="4" opacity=".5" filter="url(#lglow)"/><path d="${'M'+this.arch(g,.4).map(([x,y])=>`${f(o*x)} ${f(y)}`).join('L')}" fill="none" stroke="${col}" stroke-width=".7" opacity=".55"/>`+
+    `<ellipse cx="${f(o*g.s*.55)}" cy="${f(g.fl+3)}" rx="${f(g.s*1.1)}" ry="${f(4*k+1)}" fill="${col}" opacity=".35" filter="url(#lglow)"/></g>`},
+  defs(g,col){return `<defs><radialGradient id="dlit" gradientUnits="userSpaceOnUse" cx="0" cy="${f(g.sp+(g.fl-g.sp)*.45)}" r="${f(g.s*1.7)}"><stop stop-color="${col}" stop-opacity=".7"/><stop offset=".6" stop-color="${col}" stop-opacity=".22"/><stop offset="1" stop-color="${col}" stop-opacity="0"/></radialGradient></defs>`},
+  over(c){
+   const g=this.geo(c.h),r=this.st(c),jt=c.jt,col=model.a.run&&model.b.run?'#ffc861':'#9fb8ff',E=this.ends(),T=(x,y)=>`translate(${f(x)} ${f(y)})`,dust=JOINS.buttress.dust;
+   const[,,ax,ay]=E[0],[,,bx,bY]=E[1],warm=c.glow*(1-seg(jt,.3,.5));
+   let s=this.defs(g,col),fx='';
+   for(const[id,o,x,y]of E)s+=`<g transform="${T(x,y)}">${this.inside(g,o,r.lit)}${this.leaf(g,o,o<0?r.aA:r.aB)}${o>0?this.staple(g,r.aB,false):''}</g>`;
+   // Ready: the shut leaves and the bar chalked across the doorway.
+   const gh=jt===0?seg(c.glow,.8,1)*.85:model.dir>0?.7*(1-seg(jt,.4,.62)):0;
+   if(gh>0)for(const[id,o,x,y]of E)s+=`<g transform="${T(x,y)}" fill="none" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="3 2.4" opacity="${f(gh)}"><path d="${this.open(g,o)}" fill="#f3d48a" fill-opacity=".06"/>${o<0?`<rect x="${f(g.px-4)}" y="${f(g.by-g.tb)}" width="${f(g.cx-g.px+9)}" height="${f(2*g.tb)}"/>`:`<path d="M${f(g.cx+3)} ${f(g.by-g.tb-2)}V${f(g.by+g.tb+2)}"/>`}</g>`;
+   s+=`<g transform="${T(ax,ay)}">${this.bar(g,r.aA,this.barAngle(g,r.bar))}</g><g transform="${T(bx,bY)}">${this.staple(g,r.aB,true)}</g>`;
+   if(r.slam>0)fx+=dust(0,g.fl-3,r.slam,6,15,7)+dust(0,g.ap+6,r.slam,4,10,9);
+   if(r.thud>0){fx+=dust(g.cx,g.by,r.thud,5,11,13);const gl=Math.sin(Math.PI*r.thud);if(gl>.05)fx+=`<g opacity="${f(gl)}">${sparkle(g.cx,g.by-g.tb-1,6*gl)}</g>`}
+   if(r.lit>0)for(const[id,o,x,y]of E)s+=`<g transform="${T(x,y)}">${this.lights(g,o,r.lit,col)}</g>`;
+   for(const[id,o,x,y]of E)s+=`<g transform="${T(x,y)}">${this.frame(g,o,warm)}</g>`;
+   s+=`<g transform="${T(ax,ay)}">${fx}</g>`;
+   if(jt===1){const x0=g.px-8,x1=g.cx+8,y0=g.by-13,y1=g.by+13;
+    s+=`<g transform="${T(ax,ay)}"><g class="hit" id="barHit" tabindex="0" role="button" aria-label="Drop bar: lift it, or press Enter, to separate the widgets"><title>Lift the bar to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(x0-2)}" y="${f(y0-2)}" width="${f(x1-x0+4)}" height="${f(y1-y0+4)}" rx="3" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g></g>`}
+   return s},
+  grab(p){return{lift:true,x0:p.x,y0:p.y,amt:0,moved:false}},
+  move(d,p){d.amt=clamp((d.y0-p.y)/40);if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;setJt(1-.14*d.amt)},
+  letGo:d=>!d.moved||d.amt>.5
+ },
+ portcullis:{label:'Portcullis',kind:'Clasp · iron',gap:0,ms:1.6,sepMs:2500,
+  say:{join:'The facades meet under one gable, and the portcullis drops out of the arch, rattling in its grooves, and bites the threshold.',
+   joined:'Joined: the portcullis is down, with torchlight showing through the grille. Drag either nameplate to move the pair. Winch the grille up to release.',
+   sep:'The grille is winched up into the arch notch by notch, the torches go out and the facades part.',hold:'Held mid-join: the grille is falling. Use the scrubber to step through the animation.',
+   ready:'Ready: the grille is chalked across the doorway. Release to drop it.',near:'Nearby: the spikes of the grille show in the head of the arch. Move closer.',readyPh:'Ready · the grille is marked out',nearPh:'Nearby · the spikes show',
+   back:'The grille drops back onto the threshold; still joined.'},
+  phase:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.6?'Joining · the portcullis drops ':jt<.76?'Joining · it bites the threshold ':'Joining · torches lit within '):(jt>.5?'Releasing · winching it up ':jt>.4?'Releasing · the torches go out ':'Releasing · parting '),
+  dragPh:d=>'Winching the grille · '+Math.round(100*(d.amt||0))+'%',
+  about:'The nave doors\' doorway, with a portcullis instead of doors. Apart, each half doorway stands open onto the dark nave, an unlit torch on its inner wall. <b>Near:</b> the spikes of the grille show in the head of the arch. <b>Ready:</b> the grille is chalked across the doorway. Joining: the facades meet under one gable, and the portcullis drops out of its slot in the arch, gathering speed and rattling in its grooves. Its spikes bite the threshold, it bounces twice and settles in a spray of grit. The torches inside are lit, and their light comes through the grille and pools on the floor in front: that is the join light, amber while both widgets run and cold blue when either is paused. The grille is riveted wrought iron, open enough that the nave shows through it. <b>Release:</b> winch the grille up (drag it up; past halfway the pawl holds it), or click it, or focus it and press Enter. It rises into the arch notch by notch, the torches go out and the facades part.',
+  st(c){const jt=c.jt,q=1-jt;
+   if(jt===0)return{p:0,peek:12*c.glow,lit:0,bump:0,dx:0,hit:0};
+   if(model.dir>0){const tf=seg(jt,.42,.6),b=seg(jt,.6,.74);return{p:tf*tf,peek:12*c.glow,lit:seg(jt,.76,1),bump:4*Math.abs(Math.sin(2*Math.PI*b))*(1-b),dx:tf>0&&tf<1?.7*Math.sin(jt*640):0,hit:b}}
+   // Winched up a notch at a time: each pull lifts it, then the pawl holds.
+   const v=seg(q,0,.5)*7,i=Math.floor(v);return{p:1-Math.min(1,(i+ease(seg(v-i,0,.65)))/7),peek:0,lit:1-seg(q,.42,.56),bump:0,dx:0,hit:0}},
+  grille(g,o,Y,dx){const k=g.k,top=Y-5-(g.fl-g.ap)-14;let bars='',spk='',rv='',hl='',hz='';
+   const xs=[];for(let x=3.5;x<g.s+3;x+=7)xs.push(o*x+dx);
+   for(const X of xs){bars+=`<rect x="${f(X-1.2)}" y="${f(top)}" width="2.4" height="${f(Y-5-top)}"/>`;spk+=`M${f(X-1.3)} ${f(Y-5)}L${f(X)} ${f(Y)}L${f(X+1.3)} ${f(Y-5)}Z`;hl+=`M${f(X-.7)} ${f(top)}V${f(Y-4)}`}
+   for(let yy=Y-7;yy>top;yy-=9*lerp(.8,1,g.u)){hz+=`<rect x="${f(Math.min(0,o*(g.s+3))+dx)}" y="${f(yy-1.1)}" width="${f(g.s+3)}" height="2.2"/>`;for(const X of xs)rv+=`<rect x="${f(X-.8)}" y="${f(yy-.8)}" width="1.6" height="1.6"/>`}
+   const iron=`${hz}${bars}<path d="${spk}"/>`;
+   return `<g fill="#000" opacity=".45" transform="translate(1.2 1.6)">${iron}</g><g fill="#2b2723" stroke="#0e0b09" stroke-width=".4">${iron}</g><path d="${hl}" stroke="#7a726a" stroke-width=".45" opacity=".75"/><g fill="#6a625a">${rv}</g>`},
+  torch(g,o,lit,col){if(g.u<.5)return '';const x=o*g.s*.62,y=g.sp+(g.fl-g.sp)*.16;
+   let t=`<path d="M${f(x-1.4)} ${f(y+1)}H${f(x+1.4)}L${f(x+.6)} ${f(y+7)}H${f(x-.6)}Z" fill="#2a2016"/>`;
+   if(lit>0)t+=`<g opacity="${f(lit)}"><circle cx="${f(x)}" cy="${f(y-1)}" r="7" fill="${col}" opacity=".6" filter="url(#lglow)" style="mix-blend-mode:screen"/><path d="M${f(x-1.5)} ${f(y+.8)}Q${f(x-1.6)} ${f(y-2)} ${f(x)} ${f(y-4.6)}Q${f(x+1.6)} ${f(y-2)} ${f(x+1.5)} ${f(y+.8)}Z" fill="#fff1c4"/></g>`;
+   return t},
+  over(c){
+   const D=JOINS.doors,g=D.geo(c.h),r=this.st(c),jt=c.jt,col=model.a.run&&model.b.run?'#ffc861':'#9fb8ff',E=D.ends(),T=(x,y)=>`translate(${f(x)} ${f(y)})`;
+   const[,,ax,ay]=E[0],warm=c.glow*(1-seg(jt,.3,.5)),Y=lerp(g.ap-2+r.peek*g.k,g.fl,r.p)-r.bump*g.k;
+   let s=D.defs(g,col);
+   for(const[id,o,x,y]of E){
+    s+=`<defs><clipPath id="pq-${id}"><path d="${D.open(g,o)}"/></clipPath></defs><g transform="${T(x,y)}">${D.inside(g,o,r.lit)}${this.torch(g,o,r.lit,col)}<g clip-path="url(#pq-${id})">${Y>g.ap-1.5?this.grille(g,o,Y,r.dx):''}</g>`;
+    if(r.lit>0)s+=`<ellipse cx="${f(o*g.s*.5)}" cy="${f(g.fl+3)}" rx="${f(g.s*1.25)}" ry="${f(5*g.k+1)}" fill="${col}" opacity="${f(.4*r.lit)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`;
+    s+=`${D.frame(g,o,warm)}</g>`}
+   // Ready: the grille chalked across the doorway.
+   const gh=jt===0?seg(c.glow,.8,1)*.85:model.dir>0?.7*(1-seg(jt,.42,.6)):0;
+   if(gh>0)for(const[id,o,x,y]of E){let d='';for(let xx=3.5;xx<g.s;xx+=7)d+=`M${f(o*xx)} ${f(g.ap)}V${f(g.fl)}`;for(let yy=g.fl-7;yy>g.ap;yy-=9*lerp(.8,1,g.u))d+=`M0 ${f(yy)}H${f(o*g.s)}`;
+    s+=`<g transform="${T(x,y)}" fill="none" stroke="#f3d48a" stroke-width=".8" stroke-dasharray="3 2.4" opacity="${f(gh)}"><g clip-path="url(#pq-${id})"><path d="${d}"/></g><path d="${D.open(g,o)}"/></g>`}
+   if(r.hit>0&&r.hit<1){const dust=JOINS.buttress.dust;let d='';for(let i=0;i<4;i++)d+=dust((i-1.5)*14,g.fl-1,r.hit,4,10,i+30);s+=`<g transform="${T(ax,ay)}">${d}</g>`}
+   if(jt===1)s+=`<g transform="${T(ax,ay)}"><g class="hit" id="gateHit" tabindex="0" role="button" aria-label="Portcullis: winch it up, or press Enter, to separate the widgets"><title>Winch the grille up to release</title><rect x="${f(-g.s)}" y="${f(g.ap)}" width="${f(2*g.s)}" height="${f(g.fl-g.ap)}" fill="transparent"/><rect class="ringfocus" x="${f(-g.s-2)}" y="${f(g.ap-2)}" width="${f(2*g.s+4)}" height="${f(g.fl-g.ap+4)}" rx="3" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g></g>`;
+   return s},
+  grab(p){return{lift:true,x0:p.x,y0:p.y,amt:0,moved:false}},
+  move(d,p){d.amt=clamp((d.y0-p.y)/50);if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;setJt(1-.25*d.amt)},
+  letGo:d=>!d.moved||d.amt>.5
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
