@@ -227,7 +227,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the buckled strap, drag GitDiscuss's nameplate to slide the strap to another eyelet (each eyelet is 15°), and tap the strap or the buckle to unbuckle it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. On the fishing game, tap the line or the fish to let it go. On the pound-a-peg, tap the flaps to knock the pegs out. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. On the frogged shade, the ball band's dye swatch is the status colour. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the buckled strap, drag GitDiscuss's nameplate to slide the strap to another eyelet (each eyelet is 15°), and tap the strap or the buckle to unbuckle it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. On the fishing game, tap the line or the fish to let it go. On the pound-a-peg, tap the flaps to knock the pegs out. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. On the frogged shade, the ball band's dye swatch is the status colour. On the sewing box shade, the middle spool's thread is the status colour, and the box keeps each widget's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -1297,6 +1297,132 @@ function frogDraw(id,w,h,small,st){
   t+=`<clipPath id="fbd-${id}"><rect x="${f(bx-2)}" y="${f(by-2)}" width="${f(bw+4)}" height="${f((bh+4)*P.band)}"/></clipPath><g clip-path="url(#fbd-${id})">${k}</g>`}
  return t;
 }
+
+/* ---------- Sewing box shade ---------- */
+// The Nest kind in felt, from the cantilever sewing box. Its trays ride on pairs of arms: they swing up and in over the
+// box to open, and out and down into it to close. The cushion becomes the box standing open at full height, then the
+// trays swing down into it one after the other, the lower one first, gathering speed and bobbing as they land. The shade
+// is foot-anchored (see shiftFeet), so the box stays on the table and the trays visibly come down into it. Shut, only the
+// trays' rims and what pokes out of them show over the box front, which carries the name and value on a cotton label.
+// The middle spool's thread is the status colour.
+function sewParts(st,small){
+ const H0=small?CH:H,HF=small?48:58,L=H0-HF,un=model.shDir===0,u=1-st;
+ let base,cush,tR,tL,goods,aR,aL,bR=0,bL=0,fR=0,fL=0,sq=0,lab,emb,bounce=0;
+ if(!un){base=backOut(seg(st,.05,.16));tR=backOut(seg(st,.12,.22));tL=backOut(seg(st,.16,.26));goods=seg(st,.22,.32);cush=1-seg(st,.16,.28);
+  // Each tray is let go and swings down gathering speed, lands in the box and bobs once; fibres puff off its rim.
+  const r=seg(st,.34,.5),l=seg(st,.52,.7);aR=r*r;aL=l*l;
+  const br=seg(st,.5,.58),bl=seg(st,.7,.8);bR=br>0&&br<1?Math.sin(Math.PI*br)*(1-br):0;bL=bl>0&&bl<1?Math.sin(Math.PI*bl)*(1-bl):0;
+  fR=br>0&&br<1?br:0;fL=bl>0&&bl<1?bl:0;sq=Math.sin(Math.PI*seg(st,.7,.78))*.06;
+  lab=backOut(seg(st,.78,.85));emb=seg(st,.84,.97)}
+ else{emb=1-seg(u,0,.12);lab=1-ease(seg(u,.1,.18));
+  // Opening, each tray is lifted up and in, slowing as it rises, and settles with a small overshoot.
+  const l=seg(u,.16,.36),r=seg(u,.34,.52),up=backOut;aL=1-up(l);aR=1-up(r);
+  goods=1-seg(u,.52,.6);tR=1-ease(seg(u,.56,.66));tL=1-ease(seg(u,.58,.68));base=1-ease(seg(u,.64,.76));cush=seg(u,.6,.76);
+  const k=seg(u,.82,1);bounce=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.5)*.06:0}
+ // The top tray sets the height: open, it stands L over its place in the box.
+ return{H0,HF,L,un,base,cush,tR,tL,goods,aR,aL,bR,bL,fR,fL,sq,lab,emb,bounce,h:Math.round(HF+L*Math.cos(clamp(aL,-.2,1)*Math.PI/2))};
+}
+// Shut, the box front is BF tall; the trays' rims stand 6px over it and their contents m-2 over the rims, to the strip's top.
+// Open, the left tray rises L (to the widget's top) and the right one L-TH, so it sits just under the left one.
+function sewGeo(w,small){
+ const sm=small,HF=sm?48:58,m=sm?8:9,TH=sm?18:28,L=(sm?CH:H)-HF,g=sm?3:4,e=sm?12:14;
+ return{sm,HF,m,BF:HF-m-6,TH,L,L2:L-TH,bx0:3,tl:[e,w/2-g],tr:[w/2+g,w-e],ai:sm?8:10,aw:sm?2.6:3.4};
+}
+// A tray's offset from its place in the box: a is how far it has closed (0 up and in, 1 down in the box), b a bob as it lands.
+// Its arms pivot L inward of where they meet the tray when it is shut, so a quarter turn carries it up and in by L.
+function sewTray(G,left,a,b){
+ const th=a*Math.PI/2,L=left?G.L:G.L2,[x0,x1]=left?G.tl:G.tr,dx=(left?1:-1)*L*(1-Math.sin(th));
+ return{x0:x0+dx,x1:x1+dx,dx,dy:-L*Math.cos(th)+b*(G.sm?2:3),L,n0:x0,n1:x1,left};
+}
+function sewSpool(cx,top,bot,sm,thread){
+ const fw=sm?4.6:6,tw=sm?3.6:4.8,fh=sm?2:2.6;let wind='';
+ for(let y=top+fh+1.4;y<bot;y+=1.7)wind+=`M${f(cx-tw)} ${f(y)}h${f(2*tw)}`;
+ return `<rect x="${f(cx-tw+.6)}" y="${f(top+1.2)}" width="${f(2*tw)}" height="${f(bot-top)}" fill="#000" opacity=".3" filter="url(#sh)"/>`+
+  `<rect x="${f(cx-tw)}" y="${f(top+fh)}" width="${f(2*tw)}" height="${f(bot-top-fh)}" fill="${thread}"/><path d="${wind}" stroke="#1a0d05" stroke-opacity=".22" stroke-width=".6"/>`+
+  `<rect x="${f(cx-tw+.8)}" y="${f(top+fh)}" width="1.2" height="${f(bot-top-fh)}" fill="#fff" opacity=".28"/>`+
+  `<rect x="${f(cx-fw)}" y="${f(top)}" width="${f(2*fw)}" height="${fh}" rx=".8" fill="#c99560" stroke="#6b4220" stroke-opacity=".55" stroke-width=".5"/>`+
+  `<path d="M${f(cx+tw)} ${f(top+fh+2)}q${sm?2.5:3.2} 1 ${sm?1.6:2} ${sm?3.4:4.4}" fill="none" stroke="${thread}" stroke-width=".8" stroke-linecap="round"/>`;
+}
+// What pokes up out of a tray: three wooden spools in the left one (the middle one's thread is the status colour),
+// a silver thimble and a tomato pincushion with two glass-headed pins in the right one, kept clear of its inner end.
+function sewGoods(id,T,y0,G,k,C){
+ const{sm,TH}=G,top=y0-(G.m-2),bot=y0+TH*.6,tw=T.x1-T.x0;let o='';
+ const pop=(i,cx,by,s)=>{const p=backOut(seg(k,i*.2,i*.2+.5));return p<=0?'':`<g transform="translate(${f(cx)} ${f(by)}) scale(${f(Math.max(.01,p)*1000)/1000}) translate(${f(-cx)} ${f(-by)})" opacity="${f(clamp(p*3))}">${s}</g>`};
+ if(T.left){const th=['#efe1c2',C,'#3d4f7a'],dy=[2,0,1.5];
+  [.24,.5,.76].forEach((q,i)=>{const cx=T.x0+tw*q;o+=pop(i,cx,bot,sewSpool(cx,top+dy[i],bot,sm,th[i]))})}
+ else{const tx=T.x0+tw*.68,tt=top+(sm?2:2.5),a=sm?2.6:3.4,b=sm?3.8:5,hh=bot-tt;
+  let dots='';for(let r=0;r<3;r++)for(let c=-1;c<=1;c++)dots+=`<circle cx="${f(tx+c*(a*.55)+(r%2)*.8)}" cy="${f(tt+2+r*1.8)}" r=".42"/>`;
+  o+=pop(0,tx,bot,`<path d="M${f(tx-a)} ${f(tt+1)}Q${f(tx)} ${f(tt-1.6)} ${f(tx+a)} ${f(tt+1)}L${f(tx+b)} ${f(tt+hh)}H${f(tx-b)}Z" fill="#000" opacity=".3" filter="url(#sh)" transform="translate(.6 1)"/>`+
+   `<path d="M${f(tx-a)} ${f(tt+1)}Q${f(tx)} ${f(tt-1.6)} ${f(tx+a)} ${f(tt+1)}L${f(tx+b)} ${f(tt+hh)}H${f(tx-b)}Z" fill="url(#metal)" stroke="#5d574f" stroke-opacity=".6" stroke-width=".5"/><g fill="#5d574f" opacity=".55">${dots}</g>`);
+  const px=T.x0+tw*.86,rx=sm?7:9.5,ry=sm?5.5:7.2,cy=top+(sm?2.4:3)+ry,ct=cy-ry;
+  let seams='';for(const q of[-.55,0,.55])seams+=`M${f(px+q*rx*.5)} ${f(ct+1)}Q${f(px+q*rx*1.1)} ${f(cy)} ${f(px+q*rx*.6)} ${f(cy+ry)}`;
+  let cap='';for(let i=0;i<5;i++){const an=(-90+i*72)*Math.PI/180;cap+=`M${f(px)} ${f(ct+1.2)}L${f(px+Math.cos(an)*(sm?3:4))} ${f(ct+1.2+Math.sin(an)*(sm?1.6:2))}`}
+  const pin=(x0,y0,x1,y1,c)=>`<path d="M${f(x0)} ${f(y0)}L${f(x1)} ${f(y1)}" stroke="url(#metal)" stroke-width=".8"/><circle cx="${f(x1)}" cy="${f(y1)}" r="${sm?1.4:1.8}" fill="${c}" stroke="#1a0d05" stroke-opacity=".3" stroke-width=".4"/><circle cx="${f(x1-.5)}" cy="${f(y1-.5)}" r=".5" fill="#fff" opacity=".7"/>`;
+  o+=pop(1,px,bot,`<ellipse cx="${f(px+.6)}" cy="${f(cy+1.2)}" rx="${rx}" ry="${ry}" fill="#000" opacity=".35" filter="url(#sh)"/><ellipse cx="${f(px)}" cy="${f(cy)}" rx="${rx}" ry="${ry}" fill="#c8463c" filter="url(#g-${id})"/>`+
+   `<path d="${seams}" fill="none" stroke="#7a2018" stroke-opacity=".55" stroke-width=".8"/><path d="${cap}" stroke="#4f7a32" stroke-width="${sm?1.6:2}" stroke-linecap="round"/>`+
+   pin(px-2,ct+3,px-(sm?5.5:7),top+.6,'#f6e8c8')+pin(px+2,ct+2.5,px+(sm?4.5:5.8),top+1.4,'#e7c06a'))}
+ return o;
+}
+function sewDraw(id,w,h,small,st){
+ const P=sewParts(st,small),s=SKIN[id],G=sewGeo(w,small),{TH,BF}=G,yb=h-BF,yn=yb-6;
+ const wrap=t=>{if(P.sq>1e-4)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
+  return P.bounce?`<g transform="translate(0 ${h}) scale(1 ${f((1+P.bounce)*1000)/1000}) translate(0 ${-h})">${t}</g>`:t};
+ if(P.base<=0&&P.cush>=1)return wrap(casing(id,w,h));
+ const C=PLEAT_C[labelStatus(id)],trayL=s.band,trayR=mixHex(s.body,'#f4ead8',.38);
+ let t=`<defs>${feltFilters(id,s.seed)}</defs>`;
+ if(P.cush>0)t+=`<g opacity="${f(P.cush)}">${casing(id,w,h).replace(/<defs>[\s\S]*?<\/defs>/,'')}</g>`;
+ // The box rises off the table from its foot; its back wall's top edge shows over the front, dark inside.
+ const rise=`transform="translate(0 ${h}) scale(1 ${f(Math.max(.01,P.base)*1000)/1000}) translate(0 ${-h})" opacity="${f(clamp(P.base*4))}"`;
+ t+=`<g ${rise}><path d="${rr4(G.bx0+3,yb-5,w-2*G.bx0-6,8,[3,3,1,1])}" fill="${mixHex(s.body,'#1a0d05',.55)}" filter="url(#g-${id})"/></g>`;
+ const TR=sewTray(G,false,P.aR,P.bR),TL=sewTray(G,true,P.aL,P.bL),py=yn+TH*.55,ax=T=>[T.n0+G.ai,T.n1-G.ai];
+ // The arms: wooden slats pivoted inside the box below its top edge, so they pass behind both trays and the box front.
+ for(const[T,k]of[[TR,P.tR],[TL,P.tL]]){if(k<=0)continue;let d='';
+  for(const x of ax(T))d+=`M${f(x+(T.left?T.L:-T.L))} ${f(py)}L${f(x+T.dx)} ${f(py+T.dy)}`;
+  t+=`<g opacity="${f(clamp((k-.5)*3))}" fill="none" stroke-linecap="round"><path d="${d}" stroke="#000" stroke-opacity=".35" stroke-width="${f(G.aw+1.6)}" filter="url(#sh)" transform="translate(.6 1.2)"/>`+
+   `<path d="${d}" stroke="#5a3a22" stroke-width="${f(G.aw+1)}"/><path d="${d}" stroke="#c99560" stroke-width="${G.aw}"/><path d="${d}" stroke="#f0cf9c" stroke-opacity=".5" stroke-width="${f(G.aw*.3)}"/></g>`}
+ // The trays, right (lower) first: the dark inside over the rim, what pokes out of it, the felt front with a blanket-stitched
+ // rim, and brass rivets where the arms meet it. Each pops on from its middle as the box is opened out.
+ for(const[T,k,col]of[[TR,P.tR,trayR],[TL,P.tL,trayL]]){if(k<=0)continue;
+  const x0=T.x0,x1=T.x1,tw=x1-x0,y0=yn+T.dy,cy=y0+TH/2,cx=(x0+x1)/2,fr=rr4(x0,y0,tw,TH,[3,3,7,7]);
+  let o=`<path d="${rr4(x0+1.5,y0-3.5,tw-3,7,[3,3,1,1])}" fill="${mixHex(col,'#1a0d05',.6)}" filter="url(#g-${id})"/>`+sewGoods(id,T,y0,G,P.goods,C);
+  let bl='';for(let x=x0+4;x<=x1-4;x+=5)bl+=`M${f(x)} ${f(y0+.8)}v${G.sm?2.8:3.6}`;bl+=`M${f(x0+4)} ${f(y0+(G.sm?3.6:4.4))}H${f(x1-4)}`;
+  o+=`<path d="${fr}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.4)"/><path d="${fr}" fill="${col}" filter="url(#g-${id})"/>`+
+   `<path d="${bl}" fill="none" stroke="#f7e8c9" stroke-opacity=".8" stroke-width=".9" stroke-linecap="round"/>`;
+  for(const x of ax(T))o+=`<circle cx="${f(x+T.dx)}" cy="${f(py+T.dy)}" r="${G.sm?1.6:2.1}" fill="#c9a24e" stroke="#5a3a12" stroke-opacity=".6" stroke-width=".5"/><circle cx="${f(x+T.dx-.5)}" cy="${f(py+T.dy-.6)}" r=".6" fill="#fff" opacity=".6"/>`;
+  t+=`<g transform="translate(${f(cx)} ${f(cy)}) scale(${f(Math.max(.01,k)*1000)/1000}) translate(${f(-cx)} ${f(-cy)})" opacity="${f(clamp(k*3))}">${o}</g>`}
+ // The box front, over the trays' lower parts and the arms' pivots, blanket-stitched along its top edge.
+ const bf=rr4(G.bx0,yb,w-2*G.bx0,BF,G.sm?[3,3,9,9]:[4,4,12,12]);
+ let bl='';for(let x=G.bx0+6;x<=w-G.bx0-6;x+=5)bl+=`M${x} ${f(yb+.6)}v${G.sm?3.2:4}`;bl+=`M${G.bx0+6} ${f(yb+(G.sm?3.8:4.6))}H${w-G.bx0-6}`;
+ t+=`<g ${rise}><path d="${bf}" fill="#000" opacity=".45" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${bf}" fill="${s.body}" filter="url(#f-${id})"/>`+
+  `<path d="${bl}" fill="none" stroke="#f7e8c9" stroke-opacity=".85" stroke-width="1" stroke-linecap="round"/></g>`;
+ // A cotton label sewn on the front: the name in satin stitch and the value cross-stitched beside it, left to right.
+ if(P.lab>0){const lx0=G.sm?14:20,lx1=w-lx0,ly=yb+(G.sm?6:8),lh=BF-(G.sm?11:15),lc=ly+lh/2,lb=rr4(lx0,ly,lx1-lx0,lh,[3,4,3,4]);
+  let o=`<path d="${lb}" fill="#000" opacity=".3" filter="url(#sh)" transform="translate(0 1.1)"/><path d="${lb}" fill="#f3e9d2" filter="url(#g-${id})"/>`+
+   `<path d="${rr4(lx0+2.5,ly+2.5,lx1-lx0-5,lh-5,[2,2,2,2])}" fill="none" stroke="${s.band}" stroke-opacity=".75" stroke-width=".9" stroke-dasharray="2.2 1.8"/>`;
+  if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?13:15,c=small?1.6:2,wf=small?11:12.5;
+   const x0=lx0+(small?8:10),x1=lx1-(small?8:10),xp=xpaths(dt.num,c),nw=measure(nm,`italic 700 ${nf}px Georgia,serif`),ww=measure(dt.word,`italic ${wf}px Georgia,serif`);
+   const word=nw+12+xp.w+5+ww<=x1-x0,vw=xp.w+(word?5+ww:0),vx=x1-vw,vy=lc-3.5*c;
+   o+=`<clipPath id="swe-${id}"><rect x="${f(x0-4)}" y="${f(ly)}" width="${f((x1-x0+8)*P.emb)}" height="${f(lh)}"/></clipPath><g clip-path="url(#swe-${id})">`+
+    `<text x="${x0}" y="${f(lc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="${mixHex(s.band,'#1a0d05',.3)}">${nm}</text>`+
+    `<text x="${x0}" y="${f(lc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="url(#satin)" opacity=".6">${nm}</text>`+
+    `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".2" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="#5c6f99"/><path d="${xp.d2}" stroke="#1f2d4d"/></g>`+
+    (word?`<text x="${f(vx+xp.w+5)}" y="${f(lc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="#1f2d4d">${dt.word}</text>`:'')+'</g>'}
+  t+=`<g transform="translate(${w/2} ${f(lc)}) scale(${f(Math.max(.01,P.lab)*1000)/1000}) translate(${-w/2} ${f(-lc)})" opacity="${f(clamp(P.lab*3))}">${o}</g>`}
+ // Fibres knocked off each tray's rim as it lands.
+ for(const[T,fv,col]of[[TR,P.fR,trayR],[TL,P.fL,trayL]])if(fv)for(const cx of[T.x0+5,T.x1-5])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*14*(.4+fv),fy=yn-2+dy*6*(.6+fv)-6*fv;
+  t+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+fv*90)})" fill="none" stroke="${col}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-fv)}"/>`}
+ return wrap(t);
+}
+// A foot-anchored shade (the sewing box) keeps each widget's foot where it stood: as the strip's height changes, the
+// widgets (and a running join path or drag origin with them) move down by d (Checks by dc), kept on the stage.
+function shiftFeet(d,dc){
+ if(!d&&!dc)return;const h=shH(false),ch=shH(true);
+ if(d){shiftPair(-d);for(const id of['a','b'])model[id].y=clamp(model[id].y,46,600-h-14)}
+ if(dc&&model.g<=0)model.c.y=clamp(model.c.y+dc,46,590-ch);
+ if(drag&&drag.saved){for(const id of['a','b'])drag.saved[id].y+=d;drag.saved.c.y+=dc}
+}
+// The offset a foot-anchored shade has added at the current shade progress, so switching options while shaded can re-anchor.
+const footOff=()=>SHADES[model.shade].foot?[H-shH(false),CH-shH(true)]:[0,0];
 
 /* ---------- Zipper geometry ---------- */
 const zTop=h=>EDGE+Math.min(14,(h-2*EDGE)*.3);
@@ -3711,7 +3837,7 @@ JOINS.peg={label:'Pound-a-peg',kind:'Rivet',gap:PG.gap,ms:5600,msDrag:5200,relMs
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -3766,10 +3892,15 @@ const SHADES={
   about:'The Unravel kind (elven\'s spindle, wire\'s spool, gothic\'s unleading) done in felt. Felt is knitting that has been fulled, and here it goes back: the cotton display is put away and the felt relaxes into chunky stocking stitch, its name band turning into a contrasting stripe along the top rows. A turned wooden nostepinne, the stick knitters wind yarn balls on, slides in along the strip\'s centre line, and the loose end at the bottom corner is pulled up and tied on. Then the knitting is frogged (knitters\' slang: "rip it, rip it") from the bottom up, a row every frame or two. The live stitch runs back and forth along each row, leaving a fringe of open loops, and the kinked yarn runs from it to the stick, where it winds into a cross-wound cake that fattens and turns. The cushion shortens as the rows come off. The stripe rows come off last, so the cake ends in the band\'s felt, and the tail is tucked under. <b>A paper ball band is wrapped round the cake</b> with the name printed in red and the key value cross-stitched in navy, and <b>its dye swatch is the status</b>: amber running, blue paused, red needs you, green passed. Nothing moves at rest. Unshading knits it back up row by row. Joined pairs stay joined, cake to cake.',
   sayOn:'Shaded: each cushion is frogged back into yarn and wound into a cake on a winding stick, its name and value on the ball band.',sayOff:'Unshaded: the yarn is knitted back up and felts into a cushion again.',
   height:(st,small)=>frogParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:frogDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:frogDraw},
+ sewbox:{label:'Sewing box',kind:'Nest',ms:3600,ownStrip:true,foot:true,
+  about:'The Nest kind (gothic\'s font cover, wire\'s beehive coil, hollow\'s telescoping abdomen, elven\'s far-glass) done in felt, from the cantilever sewing box, whose trays ride on pairs of arms: they swing up and in over the box to open, and out and down into it to close. The cotton display is put away, and the cushion becomes the box standing open: a felt box rises off the table from its foot, and two felt trays pop up on their wooden arms over it, the left one high and the right one just under it. Wooden spools pop up out of the left tray, and a silver thimble and a tomato pincushion with two glass-headed pins out of the right one. Then the box is shut, a frame at a time. The right tray is let go first and swings out and down on its arms, gathering speed, drops into the box and bobs, knocking fibres off its rim; then the left tray does the same, and the box squashes a little as it lands. <b>The box keeps its foot on the table</b>, so the strip ends up where the cushion\'s foot was, and the trays visibly come down into it. Shut, only the trays\' blanket-stitched rims and what pokes out of them show over the box front. A cotton label pops onto the front, and the name is satin-stitched on it with the key value cross-stitched beside it. <b>The middle spool\'s thread is the status</b>: amber running, blue paused, red needs you, green passed. Nothing moves at rest. Unshading unpicks the label and lifts the trays up and in, the left one first, each settling with a small overshoot; then the spools and trays are put away, the box sinks into the table and the cushion refills with a bounce. Joined pairs stay joined.',
+  sayOn:'Shaded: each cushion becomes a felt sewing box and its trays fold down into it; the name and value are on the label, and the middle spool shows the status.',sayOff:'Unshaded: the trays are lifted out of the sewing boxes and the cushions refill.',
+  height:(st,small)=>sewParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:sewDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
-const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
+const lowH=small=>{const s=SHADES[model.shade];if(s.foot)return shH(small);return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
 
 /* ---------- Morph: stuffing (Checks) ---------- */
 // g runs 0 pad, 1 cushion, 2 pillow. The chrome is drawn from gq, g sampled on the 12 fps frames; display text fades on the smooth g.
@@ -4527,8 +4658,9 @@ function placeAt(x,y){if(MM().pad){const[w,h]=cDims(),o=cPad();model.c.x=clamp(x
 // The pair's box with a margin, measured where it stood before any lift it was given to make room for Checks.
 // It is measured unshaded (a grown Checks unshades the pair first) and takes in GitDiscuss's bend on an angled join.
 function pairBox(){
- const L=model.lift,ya=model.a.y+L,yb=model.b.y+L;let x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(ya,yb),y1=Math.max(ya,yb)+H;
- if(J().angled&&model.jt>0){const F=angFrame(model.angle,H);for(const lx of[0,W])for(const ly of[0,H]){const p=hingePt(F,model.b.x,yb,lx,ly);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)}}
+ // A foot-anchored shade has moved the pair down by the height it has lost, so it is measured at the height it has now.
+ const L=model.lift,ya=model.a.y+L,yb=model.b.y+L,HH=SHADES[model.shade].foot?shH(false):H;let x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(ya,yb),y1=Math.max(ya,yb)+HH;
+ if(J().angled&&model.jt>0){const F=angFrame(model.angle,HH);for(const lx of[0,W])for(const ly of[0,HH]){const p=hingePt(F,model.b.x,yb,lx,ly);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)}}
  return{x0:Math.min(model.a.x,model.b.x)-10,x1:x1+10,y0:y0-10,y1:y1+10};
 }
 // How far the pair has to rise (from where it stood) to clear a w×h Checks centred at cx,cy that reaches below it; never past the top of the stage.
@@ -4683,7 +4815,7 @@ function toggleShade(force){
  // Shade runs on its own clock so it can overlap a join.
  // The direction picks the bolster's timeline; a toggle mid-run keeps it, so the pose runs back rather than jumping.
  const sh=SHADES[model.shade];if(start===0||start===1)model.shDir=to;
- stepped((sh.ms||560)*Math.abs(to-start),t=>{model.st=lerp(start,to,t);render()},token,k=>k===shadeAnim).then(ok=>{if(ok&&to===0&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}});
+ stepped((sh.ms||560)*Math.abs(to-start),t=>{const h0=shH(false),c0=shH(true);model.st=lerp(start,to,t);if(SHADES[model.shade].foot)shiftFeet(h0-shH(false),c0-shH(true));render()},token,k=>k===shadeAnim).then(ok=>{if(ok&&to===0&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}});
  say(to?(sh.sayOn||'Shaded: the cushion deflates to its name band and one value.'):(sh.sayOff||'Unshaded: the stuffing comes back.'));
 }
 
@@ -4747,7 +4879,7 @@ function pick(key,id){
  if(drag)cancelDrag();
  if(togDrag&&key==='shade'){togDrag=null;++shadeAnim;model.st=1}
  if(key==='join'&&id!==model.join){const was=model.jt;++anim;++angAnim;model.busy=false;if(J().angled)ANG[model.join]=J().det?Math.round(model.angle/J().det)*J().det:model.angle;model.join=id;if(J().angled)model.angle=ANG[id];model.path=null;model.jt=0;model.dir=1;model.snip=false;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
- if(key==='shade')model.shade=id;
+ if(key==='shade'){const[o0,c0]=footOff();model.shade=id;const[o1,c1]=footOff();shiftFeet(o1-o0,c1-c0)}
  // Any morph pick drops a pending switch, so picking the current one again cancels it.
  if(key==='morph'){const tok=++morphSwitch;if(id!==model.morph){
   // A grown Checks goes back to a pad under the old morph first, then the new one takes over.
