@@ -638,8 +638,106 @@ const JOINS={
   phase:(jt,dir)=>dir>0?(jt<.3?'Joining · settling a span apart ':jt<.58?'Joining · damselflies drift in ':jt<.8?'Joining · pairing in tandem ':'Joining · they kindle '):(jt>.9?'Releasing · the light goes out ':jt>.72?'Releasing · the pairs let go ':jt>.55?'Releasing · they fly off ':'Releasing · the casings part '),
   about:'The Swarm join kind in elven: nothing is fixed to either casing. Damselflies are the slenderest things with wings, glass wings that fold together over the back when they rest, and they fly in tandem: the male holds the female just behind her head with the tip of his tail, and the pair lays eggs into a plant stem together, her tail curved down into it. Here the joining stems are those plant stems. <b>Near:</b> the stems glow and two damselflies flutter over the gap while you hold the casings close, one moon-blue and one gold-green. <b>Ready:</b> three tandem pairs are traced across the gap in dashed moonlight. Joining: the casings settle a span apart (64 px, with the night showing through). Three moon-blue males drift down out of the sky one after another in the wavering way damselflies fly, the middle one first; each hovers a moment above its place, darts in, grips Jarvis\'s stem with its legs and folds its wings over its back. Three gold-green females rise from below the same way and hover just ahead of each male, and he lowers the tip of his tail onto her neck with a glint. She then folds her wings and curves her tail down to GitDiscuss\'s stem, touching it with a glint, so each pair runs stem to stem. Last they kindle pair by pair, segment by segment from the thorax back, as the join light: the males moon-blue while Jarvis runs, the females gold while GitDiscuss runs, each going grey when its own widget is paused. The pterostigma, the small dark cell near each wing tip, kindles with them, and a glint runs along each pair. Everything stays in the gap, clear of the panes, nameplates and buttons. Nothing moves at rest. In a shade only the middle pair fits; the outer pairs let go and fly off as the strip narrows (blue up, gold down) and come back as it opens. <b>Release:</b> tap the damselflies, or focus them and press Enter. The light goes out, each pair lets go (she lifts her tail from the stem, he lets go of her neck), the females drop away below, the males lift off into the night, and the casings part.',
   over:c=>drawDamsel(c)
+ },
+ swan:{label:'Swan lock',kind:'Lock',gap:50,lift:true,slow:1.2,msOut:2700,
+  txt:{join:'The casings close, the silver swan on Jarvis\'s stem bows its neck through the catch on GitDiscuss\'s lock plate, and a white feather drifts down out of the night into the lock and turns.',
+   joined:'Locked: the swan\'s neck is through the catch and the feather key stands turned in the lock, its moonstone lit. Drag a nameplate to move the pair; draw the feather up out of the lock (or tap it) to release.',
+   release:'The moonstone dims, the feather turns back and the catch opens, the feather floats away, the swan lifts its head out of the catch and the casings part.',
+   stop:'The swan lifts its head and the feather is blown away.',
+   hold:'Held mid-join: the swan\'s neck is through the catch and the feather key is drifting down. Use the scrubber to step through the lock.',
+   ready:'Ready: the swan\'s bow and the feather in the lock are traced in moonlight. Release to lock.',near:'Nearby: the swan raises its head toward the lock plate. Move closer.',
+   readyPh:'Ready · the lock is traced',nearPh:'Nearby · the swan looks up',
+   liftPh:'Drawing up · the feather turns back',lifting:'The feather turns back edge-on and rises out of the slot as you draw it up. Keep going to unlock.',settle:'The feather sinks back into the lock and turns.'},
+  phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.56?'Joining · the swan bows through the catch ':jt<.74?'Joining · a feather drifts down ':jt<.8?'Joining · the feather slides into the lock ':jt<.88?'Joining · the feather key turns ':'Joining · the moonstone kindles '):(jt>.92?'Releasing · the moonstone dims ':jt>.84?'Releasing · the key turns back ':jt>.72?'Releasing · the feather floats away ':jt>.58?'Releasing · the swan lifts its head ':'Releasing · the casings part '),
+  about:'The Lock join kind in elven, after felt\'s padlock, hollow\'s lever bolt and gothic\'s tracery lock. Where those use iron and keys of metal, this one is a hasp shaped like a swan and a key that is a feather. On Jarvis\'s stem a small silver swan sits on a scrolled console, wing folded, its neck held in an S. On GitDiscuss\'s stem hangs a slender lancet lock plate of night glass rimmed in silver, with a slot at its top tip, a moonstone in its middle and an open silver catch ring on the side facing Jarvis. <b>Near:</b> the swan raises its head and looks toward the lock, half lifting its wing, and the moonstone and its eye glow. <b>Ready:</b> the swan\'s bowed neck and the feather standing in the lock are traced in dashed moonlight. Joining: the casings close, the swan lifts its wing and bows its long neck over the gap, and its head dips down through the catch ring (the ring\'s near rim passes in front of the neck). A white feather drifts down out of the night, swaying and tumbling as feathers fall, lines up edge-on over the slot and slides in quill first. Then it turns a quarter, so its vane opens face-on, and the turn swings the catch ring shut round the neck with a glint. Last, the moonstone in the plate and the swan\'s eye kindle as the join light (moonlight while both widgets run, a cold grey if either is paused), and a glint runs down the neck. Pulling the casings apart does nothing: the lock holds. <b>Release:</b> draw the feather up: it turns back edge-on as you pull, opening the catch, then rises out of the slot, and past a short distance it lets go (let go sooner and it sinks back and turns again). Tapping it, or focusing it and pressing Enter, does the same. The moonstone dims, the feather turns back and floats away into the night, the swan lifts its head out of the catch, folds its wing and the casings part. The swan and the plate stay on their stems while separate. Shaded, the lock shrinks with the casings and the swan\'s neck reaches further. Nothing moves at rest. Drag a nameplate to move the pair.',
+  over:c=>drawSwan(c)
  }
 };
+/* ---------- Swan lock drawing ---------- */
+// Jarvis's stem carries a silver swan whose neck is the hasp; GitDiscuss's stem carries a lancet lock plate with an open catch ring
+// facing Jarvis and a slot at its top tip, where a feather is the key. Shapes are drawn facing right at unit scale, then scaled by k.
+const SWB='M2 4Q6 7 11 6.5C17 6 21 5.5 23 2.5C27 5 28.5 10 24 12.5L9 12.5Q3 11.5 2 4Z',SWW='M21.5 5.5C16 1.5 9 1.5 3.5 4.5C9 7.5 16 8.5 21.5 5.5Z';
+const SWH='M-2.6 -2.3C0 -3.6 3 -2.8 4.2 -1.1L9.4 .5Q10 1.4 9 1.7L3.6 1.9C1 3.1 -2 2.7 -3 .6Z';
+const SWF='M0 -5C-4.6 -9 -5.6 -21 -1.2 -32L0 -33C2.6 -26 4.2 -14 0 -5Z',SWBB=[-9,-13,-17,-21,-25].map(y=>`M0 ${y}L-3.4 ${y-3.4}M0 ${y+1}L2.4 ${y-2}`).join('');
+const swBz=(P,t)=>{const u=1-t,a=u*u*u,b=3*u*u*t,c=3*u*t*t,d=t*t*t;return{x:a*P[0].x+b*P[1].x+c*P[2].x+d*P[3].x,y:a*P[0].y+b*P[1].y+c*P[2].y+d*P[3].y}};
+const swMix=(A,B,t)=>A.map((p,i)=>({x:lerp(p.x,B[i].x,t),y:lerp(p.y,B[i].y,t)}));
+function swGeo(h){
+ const k=lerp(.42,1,clamp((h-HS)/(H-HS))),xa=model.a.x+W-11.5,xb=model.b.x+11.5,ma=model.a.y+h/2,mb=model.b.y+h/2;
+ const O={x:xa+2,y:ma+10*k},px=xb-9-6*k,top=mb-14*k;
+ return{k,xa,xb,ma,mb,O,base:{x:O.x+23*k,y:O.y+2.5*k},px,top,bot:mb+30*k,R:{x:px-11*k,y:mb+2*k},rx:5*k,ry:2*k,slot:{x:px,y:top+2*k},stone:{x:px,y:mb+13*k}}}
+// The neck as a cubic: at rest an S (alert: raised and looking toward the lock); n runs 0 to .6 to arch over the catch, .6 to 1 to dip through it.
+function swPose(G,n,g){
+ const k=G.k,B=G.base,R=G.R,L=(x,y)=>({x:B.x+x*k,y:B.y+y*k});
+ const rest=swMix([L(0,0),L(6,-14),L(-9,-22),L(-1,-36)],[L(0,0),L(7,-17),L(-1,-27),L(6,-39)],ease(g));
+ const hover=[L(0,0),L(4,-28),{x:R.x,y:R.y-26*k},{x:R.x,y:R.y-12*k}],thru=[L(0,0),L(4,-28),{x:R.x,y:R.y-20*k},{x:R.x,y:R.y+7*k}];
+ if(n<=0)return{P:rest,a:-10*ease(g)};
+ if(n<.6){const e=ease(n/.6);return{P:swMix(rest,hover,e),a:lerp(-10*ease(g),90,e)}}
+ return{P:swMix(hover,thru,ease((n-.6)/.4)),a:90}}
+const swNeck=(P,k)=>Array.from({length:23},(_,i)=>{const t=i/22,p=swBz(P,t);p.w=lerp(4.2,2.3,t)*k;return p});
+function swRing(G,front,gate){const{R,rx,ry}=G,k=G.k;
+ if(!front)return `<path d="M${f(R.x-rx)} ${f(R.y)}A${f(rx)} ${f(ry)} 0 0 1 ${f(R.x+rx)} ${f(R.y)}" fill="none" stroke="#aeb9d6" stroke-width="${f(1.5*k)}"/>`;
+ const th=lerp(.55,1,clamp(gate))*PI;
+ return `<path d="M${f(R.x+rx)} ${f(R.y)}A${f(rx)} ${f(ry)} 0 0 1 ${f(R.x+rx*Math.cos(th))} ${f(R.y+ry*Math.sin(th))}" fill="none" stroke="#f4f7ff" stroke-width="${f(1.7*k)}" stroke-linecap="round"/>`}
+function swFeather(x,y,deg,sx,k,o){
+ if(o.ghost)return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(deg)}) scale(${op(k)})" opacity=".6"><path d="${SWF}" fill="none" stroke="#dfe8ff" stroke-width=".8" stroke-dasharray="2.4 2"/><path d="M0 1L0 -33" stroke="#dfe8ff" stroke-width=".6" stroke-dasharray="2.4 2"/></g>`;
+ const sv=op(Math.max(.07,sx));let s=`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(deg)}) scale(${op(k)})" opacity="${op(o.op??1)}">`;
+ if(o.gl>0)s+=`<path d="${SWF}" transform="scale(${sv} 1)" fill="none" stroke="${o.lc}" stroke-width="4" opacity="${op(.5*o.gl)}" filter="url(#soft)"/>`;
+ s+=`<g transform="scale(${sv} 1)"><path d="${SWF}" fill="#eef2ff" fill-opacity=".9" stroke="#c9d4ee" stroke-width=".5"/><path d="${SWBB}" fill="none" stroke="#9fb0d8" stroke-width=".4" opacity=".7"/></g>`;
+ return s+`<path d="M0 -4L0 -33" stroke="#f4f7ff" stroke-width=".8"/><path d="M0 1.5L0 -5" stroke="#aeb9d6" stroke-width="1.2" stroke-linecap="round"/></g>`}
+// The alert pose held at ready carries on into the join until the swan bows, so it doesn't drop its head when the drag lets go.
+let swFrom=0;
+function drawSwan(c){
+ const h=c.h,jt=c.jt,dir=model.dir,G=swGeo(h),k=G.k,run=model.a.run&&model.b.run,LC=run?'#e6edff':'#9aa3b8';
+ // A lifted feather stays lifted through the release (model.lift holds until the casings have parted).
+ const lift=jt===1||dir<0?model.lift:0,lt=seg(lift,0,.6),lr=seg(lift,.4,1);
+ // Phase values: the neck (n), the wing raised (wr), the feather's fall and insertion, its turn (1 = face-on, locked), the catch gate, the light.
+ let g=0,n=0,wr=0,fall=0,ins=0,turn=0,gate=0,gl=0,spark=0,glint=-1,out=0;
+ if(jt===0&&!model.busy)swFrom=c.glow;
+ if(jt===0){g=model.busy&&dir>0?swFrom:c.glow;wr=.45*g}
+ else if(dir>0){g=swFrom*(1-seg(jt,.3,.56));n=seg(jt,.3,.56);wr=.45*swFrom*(1-seg(jt,.3,.62))+Math.sin(PI*seg(jt,.3,.62));fall=seg(jt,.5,.74);ins=ease(seg(jt,.74,.8));turn=back(seg(jt,.8,.88),1.6);gate=ease(seg(jt,.8,.88));spark=Math.sin(PI*seg(jt,.84,.9));gl=ease(seg(jt,.88,1));if(jt<1)glint=seg(jt,.9,1)}
+ else{n=seg(jt,.58,.72);wr=Math.sin(PI*seg(jt,.56,.74));fall=1;ins=1;turn=ease(seg(jt,.84,.92));gate=turn;gl=ease(seg(jt,.92,1));out=1-seg(jt,.72,.84)}
+ turn*=1-lt;gate*=1-lt;gl*=1-.6*lift;
+ const{O,R,slot,stone,px,top,bot}=G;let s='';
+ // Near: halos on the swan's eye and the plate's moonstone.
+ const pose=swPose(G,n,g),hd=pose.P[3];
+ if(g>0)s+=[hd,stone].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((8+8*g)*k+4)}" fill="url(#halo)" opacity="${op(g*.7)}"/>`).join('');
+ // The swan: a scrolled console off Jarvis's stem, the body, and a wing that lifts as it bows.
+ const con=widths(curlPts({x:G.xa+1,y:O.y+13*k},.1,24*k,1.7*PI,1,20),2.4*k,.4);
+ s+=`<path d="${ribbon(con)}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".5"/>`;
+ s+=`<g transform="translate(${f(O.x)} ${f(O.y)}) scale(${op(k)})"><path d="${SWB}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".7"/><path d="M5 9.5Q14 11 22 10" fill="none" stroke="#7f8fb8" stroke-width=".5"/>`;
+ s+=`<g transform="rotate(${f(34*wr)} 21 5)"><path d="${SWW}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".6"/><path d="M20 5.2Q14 3.4 6 4.4M19.5 6.2Q13 6 8 6.6" fill="none" stroke="#7f8fb8" stroke-width=".5"/></g></g>`;
+ // The lock plate: two silver arms to GitDiscuss's stem, a night-glass lancet, the slot, the moonstone and the catch's arm.
+ const w=6*k,D=`M${f(px)} ${f(top)}C${f(px+w)} ${f(top+10*k)} ${f(px+w)} ${f(bot-12*k)} ${f(px)} ${f(bot)}C${f(px-w)} ${f(bot-12*k)} ${f(px-w)} ${f(top+10*k)} ${f(px)} ${f(top)}Z`;
+ for(const y of [G.mb-4*k,G.mb+22*k])s+=`<path d="M${f(px+w*.6)} ${f(y)}L${f(G.xb-2)} ${f(y)}" stroke="#c9d4ee" stroke-width="${f(1.8*k)}" stroke-linecap="round"/><circle cx="${f(px+w*.6+1.5*k)}" cy="${f(y)}" r="${f(1.2*k)}" fill="#fff"/>`;
+ s+=`<path d="M${f(px-w*.6)} ${f(R.y)}L${f(R.x+G.rx)} ${f(R.y)}" stroke="#c9d4ee" stroke-width="${f(1.6*k)}" stroke-linecap="round"/>`;
+ s+=`<path d="${D}" fill="url(#night)" stroke="url(#silver)" stroke-width="${f(1.3*k)}"/><path d="M${f(px)} ${f(top+8*k)}L${f(px)} ${f(stone.y-4.5*k)}" stroke="#aeb9d6" stroke-width="${f(.6*k)}" opacity=".7"/>`;
+ s+=leaf(px,stone.y+3.5*k,90,.42*k,.85)+`<rect x="${f(px-.8*k)}" y="${f(top+1.2*k)}" width="${f(1.6*k)}" height="${f(5.5*k)}" rx="${f(.8*k)}" fill="#05060f"/>`;
+ if(gl>0&&run)s+=`<circle cx="${f(stone.x)}" cy="${f(stone.y)}" r="${f(13*k)}" fill="url(#halo)" opacity="${op(gl)}"/>`;
+ s+=`<circle cx="${f(stone.x)}" cy="${f(stone.y)}" r="${f(3.7*k)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".6"/><circle cx="${f(stone.x)}" cy="${f(stone.y)}" r="${f(2.6*k)}" fill="url(#moonstone)"/>`;
+ if(gl>0)s+=`<circle cx="${f(stone.x)}" cy="${f(stone.y)}" r="${f(2.6*k)}" fill="${LC}" opacity="${op(.85*gl)}"/>`;
+ // The neck threads the catch: its far rim behind, the near rim (with the gate that closes it) in front.
+ s+=swRing(G,false);
+ const nk=swNeck(pose.P,k);
+ s+=`<path d="${ribbon(nk)}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".6"/>`;
+ s+=`<g transform="translate(${f(hd.x)} ${f(hd.y)}) rotate(${f(pose.a)}) scale(${op(k)})"><path d="${SWH}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".6"/><path d="M4.2 -1.1L9.4 .5Q10 1.4 9 1.7L3.6 1.9Z" fill="#e8d9a8"/>`;
+ if(gl>0&&run)s+=`<circle cx=".8" cy="-.8" r="5" fill="url(#halo)" opacity="${op(gl)}"/>`;
+ s+=`<circle cx=".8" cy="-.8" r="1" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".3"/>${gl>0?`<circle cx=".8" cy="-.8" r="1" fill="${LC}" opacity="${op(gl)}"/>`:''}</g>`;
+ s+=swRing(G,true,jt===0?0:gate);
+ if(spark>0)s+=star(R.x-G.rx,R.y,5*k*spark+1,spark);
+ if(glint>0&&glint<1){const q=nk[Math.round((1-glint)*22)];s+=star(q.x,q.y,4*k+1,Math.sin(PI*glint))}
+ // Ready: the bowed neck and the feather in the lock, traced in moonlight.
+ if(jt===0&&g>=1){const gp=swNeck(swPose(G,1,0).P,k);s+=`<path d="${poly(gp)}" fill="none" stroke="#dfe8ff" stroke-width="${f(1.2*k)}" stroke-dasharray="3 2.4" opacity=".7"/>`+swFeather(slot.x,slot.y,10,1,k,{ghost:1})}
+ // The feather key: drifting down, sliding in edge-on and turning face-on; on release, turning back and floating away.
+ if(jt>0&&(dir>0?fall>0:out<1)){let x,y,deg,sx,al=1;
+  if(dir>0){const u=1-ease(fall),wav=fall*PI*2.6;
+   x=slot.x+(Math.sin(wav)*22-14)*u;y=slot.y-9*k*Math.max(1-ins,lr)-Math.min(130,slot.y-10)*u;deg=10+Math.sin(wav+.9)*34*u;
+   sx=Math.max(lerp(.14,.3+.7*Math.abs(Math.cos(wav*1.2)),u),lerp(.14,1,turn));al=clamp(fall*3)}
+  else{const fl=seg(out,.3,1);x=slot.x-18*fl*fl+Math.sin(fl*PI*2)*10*fl;y=slot.y-9*k*Math.max(lr,ease(seg(out,0,.3)))-120*Math.pow(fl,1.3);deg=10+Math.sin(fl*PI*2.4)*28*fl;
+   sx=out>.3?lerp(.14,.3+.7*Math.abs(Math.cos(fl*7)),seg(out,.3,.6)):lerp(.14,1,turn);al=1-seg(out,.7,1)}
+  s+=swFeather(x,y,deg,sx,k,{op:al,gl,lc:LC})}
+ if(jt===1){const x0=G.xa+3,y0=slot.y-40*k,wd=G.xb-3-x0,hh=bot+2-y0;
+  s+=`<g class="hit lift" id="seamHit" tabindex="0" role="button" aria-label="Swan lock: draw the feather key up, tap it, or press Enter, to unlock it and separate the widgets"><title>Draw the feather up out of the lock to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(hh)}" rx="10" fill="transparent"/><rect class="ringfocus" x="${f(slot.x-8*k-3)}" y="${f(y0)}" width="${f(16*k+6)}" height="${f(slot.y+3-y0)}" rx="${f(8*k+3)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return s}
 /* ---------- Damselflies drawing ---------- */
 // Three tandem pairs hang across the gap. A moon-blue male grips Jarvis's stem and holds a gold-green female by the neck with the tip of his tail;
 // she curves her own tail down to GitDiscuss's stem. Both face Jarvis, as a pair in tandem faces one way. Each is drawn facing left from its neck N,
