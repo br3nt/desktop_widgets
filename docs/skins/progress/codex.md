@@ -46,7 +46,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Wire · Shade · Stone strand — Added selectable staged wire withdrawal into wound collars, unequal jade/amber/pearl stones, crisp summary plaques and reverse expansion with independent Checks shade; retained all seven joins and plain summary; 229 simulated interaction, animation, geometry and touch checks passed; full-page visual review blocked by denied Chrome access.
 - [x] Hollow · Shade · Silk blind — Finished selectable travelling woven silk, a turning chalk spindle, rigid rising hem and red expand pull with reverse unwind and focus restoration; retained all six joins and earlier shades; 314 simulated DOM, animation, geometry and touch checks passed; full-page visual review blocked by denied Chrome access and failed sandbox browser launch.
 - [x] Gothic · Shade · Stone course stack — Added selectable staggered limestone courses, a carved 36 px reading lintel, reverse extension and independent Checks shade; retained all six joins and earlier shades; 684 simulated DOM, animation, geometry, touch and regression checks passed; visual review blocked by denied Chrome access and failed sandbox headless launch.
-- [ ] Felt · Shade · Drawstring pouch
+- [x] Felt · Shade · Drawstring pouch — Added selectable tightening side cords, vertical wool gathers, tucked cord ends and a rigid 36 px reading strip with reverse opening and independent Checks shade; preserved all six joins and earlier shades; 414 simulated DOM, animation, geometry, touch and regression checks passed; visual review blocked by denied Chrome access and sandbox renderer failure.
 - [ ] Elven · Shade · Fan of ribs
 - [ ] Wire · Shade · Flattened hoop
 - [ ] Hollow · Shade · Ink closure
