@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -283,7 +283,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
-$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg>'));
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -2175,7 +2175,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -2205,7 +2205,10 @@ const SHADES={
   about:'Through Lent, medieval churches hid their altarpieces and images behind a great linen veil, the <i>Fastentuch</i> or <i>Hungertuch</i> ("hunger cloth"), painted with a border and a cross, hung from an iron rod and raised and lowered on cords. Here the window is put away for the season. The display fades as an iron rod slides in under the frieze, resting in two brackets, with a gilt finial on each end and silk tassels hanging from them. The veil is let down from the rod, unrolling as it falls and gathering speed, lands with a small rebound and swings once; its tempera border, its red cross formée in a quatrefoil and blue ring, and the blue stripe and fringe of its hem cover the whole window. Then, as the wall lowers, cords behind the veil draw its hem up at four gilt rings, so <b>lowering the wall is what gathers the cloth</b>: the hem rises into three festoons, their folds shaded crest and hollow, the painted cross disappears into the gathers, and the dark bay behind shows under the swags. The swags settle with a small bounce, then a painted roundel and the key value are brushed onto the flat band left to right, and the roundel\'s gilt rim catches the light. The roundel and the tassels are the status: honey amber while running, blue when paused, red for a decision, green for passed. <b>The strip is the gathered veil:</b> the name in the frieze, the rod and its tassels, and the value on the cloth above the festoons. Unshading plays it back, the veil letting down as the wall rises and rolling back up to its rod. Joins still work on the shaded pair.'},
  corona:{label:'Corona',kind:'Hang',ms:3600,h:small=>small?60:76,lowAt:[.06,.4],
   on:'Shaded: the wall lowers and a gilt corona is let down out of the frieze on chains; its glass lamps are kindled one by one and the value is engraved round its rim.',off:'Unshaded: the inscription is wiped away, the lamps go out, and the corona is drawn up into the vault as the wall rises.',
-  about:'Romanesque and Gothic churches hung great wheel chandeliers, <i>coronae</i>, from their vaults: Bishop Hezilo\'s at Hildesheim and Barbarossa\'s at Aachen are gilt rings set with little towers and gates for the walls of the Heavenly Jerusalem, with an inscription engraved round the rim between beaded borders and lamps standing on top. They hung on long chains and were let down to be lit. Here the widget is put away as one. The display fades and the wall lowers to its frieze, leaving a dark bay. Then the corona is let down out of the frieze on iron chains, slowly, as off a windlass, stretches its chains as it lands with a small bounce and sways once. Its glass lamps are kindled one by one from the left, each flaring as it catches, and light pools on the stone behind. <b>Lit lamps are the status:</b> Jarvis has three, one per agent (amber while running, blue when paused), GitDiscuss two red ones for its decisions, and Checks seven green and one red. The rest stay dark glass. Last, the key value is engraved round the rim from a leading cross, and the cross at the end glints. <b>The strip is the hanging corona:</b> the name in the frieze, the lamps and the value on the gilt band. Nothing moves at rest. Unshading plays it back, the corona drawn up into the vault as the wall rises. Joins still work on the shaded pair.'}
+  about:'Romanesque and Gothic churches hung great wheel chandeliers, <i>coronae</i>, from their vaults: Bishop Hezilo\'s at Hildesheim and Barbarossa\'s at Aachen are gilt rings set with little towers and gates for the walls of the Heavenly Jerusalem, with an inscription engraved round the rim between beaded borders and lamps standing on top. They hung on long chains and were let down to be lit. Here the widget is put away as one. The display fades and the wall lowers to its frieze, leaving a dark bay. Then the corona is let down out of the frieze on iron chains, slowly, as off a windlass, stretches its chains as it lands with a small bounce and sways once. Its glass lamps are kindled one by one from the left, each flaring as it catches, and light pools on the stone behind. <b>Lit lamps are the status:</b> Jarvis has three, one per agent (amber while running, blue when paused), GitDiscuss two red ones for its decisions, and Checks seven green and one red. The rest stay dark glass. Last, the key value is engraved round the rim from a leading cross, and the cross at the end glints. <b>The strip is the hanging corona:</b> the name in the frieze, the lamps and the value on the gilt band. Nothing moves at rest. Unshading plays it back, the corona drawn up into the vault as the wall rises. Joins still work on the shaded pair.'},
+ aumbry:{label:'Aumbry',kind:'Stow',ms:3400,h:small=>small?50:60,lowAt:[.1,.5],
+  on:'Shaded: the window is drawn back into a stone recess in the wall as the wall lowers, two oak doors swing shut over it, a parchment label with the value is nailed across them, and the lamp beside the aumbry is lit.',off:'Unshaded: the lamp goes out, the label comes away, the doors swing open and the window comes forward out of the wall as it rises.',
+  about:'Medieval churches kept their vessels, books and relics in an <i>aumbry</i>, a cupboard let into the thickness of the wall, with a stone surround and oak doors hung on iron straps. Where it held the reserved sacrament, a lamp was kept burning beside it. Here the window is put away into the wall rather than covered or folded. A chamfered stone surround forms round the bay, and the window (display and all) is drawn back into the wall: it shrinks in perspective toward the middle of the recess and darkens, and the recess walls it leaves behind, coursed stone that darkens with depth, are lit from above, so the sill is the palest and the soffit the darkest. The wall lowers at the same time, so the window is deep in a long, low recess by the time it settles. Then two oak doors on strap hinges swing in from the jambs, the free edges looming larger as they come toward you, and meet in the middle with a small rebound and a puff of dust. A parchment label unrolls across the meeting stiles from the middle out, with the value in red and brown ink, and is nailed at both ends. Last, the hanging lamp beside the label kindles with a flare, and its light pools on the oak. <b>The lamp is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the shut aumbry:</b> the name in the frieze, the doors, the label and the lamp. Nothing moves at rest. Unshading plays it back, the window coming forward out of the wall as it rises. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -2786,6 +2789,99 @@ function corona(id,w,h,k){
    [gx+r,gx+tot-r].map(x=>`<path d="${vlCross(r)}" transform="translate(${f(x)} ${f(cy(x)+bh/2)})" fill="#24160a"/>`).join('')+'</g>';
   const g2=Math.sin(Math.PI*seg(k,.93,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(gx+tot-r,cy(gx+tot-r)+bh/2-2,g2*5)}</g>`}
  return s+'</g></g></g>';
+}
+
+/* Aumbry: a cupboard let into the thickness of a church wall, with a stone surround and oak doors on iron straps, and a lamp kept
+   burning beside it. The window is drawn back into a recess as the wall lowers (auPose moves the display; aumbry() draws the recess
+   round it; the display's box is SCR, as in the CSS), then the doors swing shut, a label with the value is nailed across them
+   and the lamp is lit.
+   O: the recess mouth inside the surround; I: the window's frame at its current depth; Sc: the display inside that frame. */
+function auGeo(id,w,h,k){
+ const G=rgGeo(id,w,h),{sm,xa,xb}=G,fb=G.y0-3,yF=h-(sm?3:4),fw=sm?2.5:3,[sx,sy,sw,sh,b]=SCR[id];
+ const r=ease(seg(k,.06,.5)),O={x0:xa+fw,y0:fb+fw,x1:xb-fw,y1:yF-fw};
+ // Drawn back toward the middle of the recess, never taller than the recess the lowering wall leaves.
+ const s=Math.min(lerp(1,sm?.42:.36,r),(O.y1-O.y0-(sm?7:8))/(sh+2*b)),X=lerp(sx+sw/2,(O.x0+O.x1)/2,r),Y=Math.min(lerp(sy+sh/2,(O.y0+O.y1)/2,r),O.y1-s*(sh/2+b));
+ const box=(hw,hh)=>({x0:X-hw,y0:Y-hh,x1:X+hw,y1:Y+hh});
+ return{sm,xa,xb,fb,yF,r,s,X,Y,O,I:box(s*(sw/2+b),s*(sh/2+b)),Sc:box(s*sw/2,s*sh/2)};
+}
+function auPose(n,G){const{s,X,Y,r}=G,w2=n.offsetWidth,h2=n.offsetHeight;
+ n.style.clipPath='';n.style.transformOrigin='0 0';n.style.transform=`translate(${f(X-s*w2/2-n.offsetLeft)}px,${f(Y-s*h2/2-n.offsetTop)}px) scale(${Math.round(s*1000)/1000})`;
+ n.style.filter=`brightness(${Math.round(lerp(1,.5,r)*100)/100})`}
+function aumbry(id,w,h,k){
+ const G=auGeo(id,w,h,k),{sm,xa,xb,fb,yF,O,I,Sc}=G,op=seg(k,0,.04);if(op<=0)return '';
+ const[gl,gb,gd]=msGlass(id),[,num,val]=tpText(id),fs=sm?10:11.5,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`);
+ const P=(a,b,t)=>({x0:lerp(a.x0,b.x0,t),y0:lerp(a.y0,b.y0,t),x1:lerp(a.x1,b.x1,t),y1:lerp(a.y1,b.y1,t)}),
+  R=q=>`M${f(q.x0)} ${f(q.y0)}H${f(q.x1)}V${f(q.y1)}H${f(q.x0)}Z`,Q=(...p)=>'M'+p.map(([x,y])=>f(x)+' '+f(y)).join('L')+'Z';
+ const xm=(O.x0+O.x1)/2,mid=(O.y0+O.y1)/2,lh=sm?13:16,lw=tw+(sm?16:22);
+ let s=`<defs><linearGradient id="auO-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#7d4f28"/><stop offset=".55" stop-color="#633c1b"/><stop offset="1" stop-color="#4a2a12"/></linearGradient>`+
+  `<linearGradient id="auP-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fffaf0"/><stop offset=".6" stop-color="#f3e4c2"/><stop offset="1" stop-color="#dcc79a"/></linearGradient>`+
+  `<radialGradient id="auB-${id}" cx=".36" cy=".3" r=".8"><stop stop-color="${gl}"/><stop offset=".5" stop-color="${gb}"/><stop offset="1" stop-color="${gd}"/></radialGradient></defs><g opacity="${f(op)}">`;
+ // The recess: coursed stone lit from above (pale sill, dark soffit), darker the deeper it goes, with the window's frame at the back.
+ const wo=seg(k,.03,.12);
+ // (At the start the window's bezel reaches 3px above the mouth, under the surround; the walls are kept inside the mouth.)
+ if(wo>0){const o=O,i={x0:Math.max(I.x0,O.x0),y0:Math.max(I.y0,O.y0),x1:Math.min(I.x1,O.x1),y1:Math.min(I.y1,O.y1)};let jn='';
+  s+=`<g opacity="${f(wo)}"><path d="${Q([o.x0,o.y0],[o.x1,o.y0],[i.x1,i.y0],[i.x0,i.y0])}" fill="#3b2f22"/><path d="${Q([o.x0,o.y1],[o.x1,o.y1],[i.x1,i.y1],[i.x0,i.y1])}" fill="#a8946f"/>`+
+   `<path d="${Q([o.x0,o.y0],[i.x0,i.y0],[i.x0,i.y1],[o.x0,o.y1])}" fill="#7a684f"/><path d="${Q([o.x1,o.y0],[i.x1,i.y0],[i.x1,i.y1],[o.x1,o.y1])}" fill="#665640"/>`;
+  for(let q=1;q<4;q++)s+=`<path d="${R(P(o,i,q/4))}${R(i)}" fill="#000" fill-rule="evenodd" opacity=".13"/>`;
+  for(const q of[.35,.7])jn+=R(P(o,i,q));
+  for(const t of[.25,.5,.75])jn+=`M${f(lerp(o.x0,o.x1,t))} ${f(o.y0)}L${f(lerp(i.x0,i.x1,t))} ${f(i.y0)}M${f(lerp(o.x0,o.x1,t))} ${f(o.y1)}L${f(lerp(i.x0,i.x1,t))} ${f(i.y1)}`;
+  jn+=`M${f(o.x0)} ${f(mid)}L${f(i.x0)} ${f((i.y0+i.y1)/2)}M${f(o.x1)} ${f(mid)}L${f(i.x1)} ${f((i.y0+i.y1)/2)}`;
+  s+=`<path d="${jn}" fill="none" stroke="#1b140d" stroke-opacity=".4" stroke-width=".6"/>`+
+   `<path d="M${f(o.x0)} ${f(o.y0)}L${f(i.x0)} ${f(i.y0)}M${f(o.x1)} ${f(o.y0)}L${f(i.x1)} ${f(i.y0)}M${f(o.x0)} ${f(o.y1)}L${f(i.x0)} ${f(i.y1)}M${f(o.x1)} ${f(o.y1)}L${f(i.x1)} ${f(i.y1)}" stroke="#1b140d" stroke-opacity=".55" stroke-width=".7"/>`+
+   // The window's own frame, dark oak with a gilt fillet round the display, going back with it.
+   `<path d="${R(I)}${R(Sc)}" fill="#2e2015" fill-rule="evenodd" stroke="#120b05" stroke-width=".6"/><path d="${R(P(I,Sc,.55))}" fill="none" stroke="#d9a63c" stroke-opacity=".75" stroke-width="${f(Math.max(.5,G.s))}"/></g>`;
+  // The chamfered stone surround, lit along its top and left, its chamfer in shadow.
+  s+=`<g opacity="${f(wo)}"><path d="M${f(xa)} ${f(fb)}H${f(xb)}V${f(yF)}H${f(xa)}Z${R(O)}" fill="#d3c4a2" fill-rule="evenodd"/>`+
+   `<path d="M${f(xa+.4)} ${f(yF)}V${f(fb+.4)}H${f(xb)}" fill="none" stroke="#fff6e2" stroke-opacity=".7" stroke-width=".7"/><path d="${R(O)}" fill="none" stroke="#4a3a28" stroke-width="1"/>`+
+   `<path d="M${f(O.x0+1)} ${f(O.y1)}H${f(O.x1-1)}" stroke="#efe3c6" stroke-opacity=".6" stroke-width=".6"/></g>`}
+ // The doors swing in from the jambs, their free edges looming as they come toward you, meet with a small rebound, and settle.
+ const dc=seg(k,.5,.63);
+ if(dc>0){const cl=backOut(dc),a=Math.PI/2*(1-cl),ca=Math.cos(a),sa=Math.sin(a),D=(O.x1-O.x0)/2,e=(O.y1-O.y0)*.16*sa,n=sm?4:6;
+  for(const dir of[1,-1]){const hx=dir>0?O.x0:O.x1,pr=(q,v)=>[hx+dir*D*ca*q,lerp(O.y0-e*q,O.y1+e*q,v)];
+   if(D*ca<.4)continue;
+   let bd='',st='';for(let j=1;j<n;j++){const[x0,y0]=pr(j/n,0),[,y1]=pr(j/n,1);bd+=`M${f(x0)} ${f(y0)}V${f(y1)}`}
+   const face=Q(pr(0,0),pr(1,0),pr(1,1),pr(0,1));
+   s+=`<path d="${face}" fill="url(#auO-${id})" stroke="#1e1007" stroke-width=".6"/><path d="${bd}" stroke="#2e1a0a" stroke-opacity=".5" stroke-width=".6"/>`+
+    `<path d="${Q(pr(.05,.14),pr(.95,.14),pr(.95,.86),pr(.05,.86))}" fill="none" stroke="#a0703f" stroke-opacity=".45" stroke-width=".6"/>`;
+   // Iron strap hinges from the jamb, nailed, ending in a split curl short of the label; pintles in the stone.
+   const qs=Math.min(.6,(D-lw/2-4)/D-.06);
+   for(const v of[.2,.8]){const[x0,y0]=pr(0,v),[x1,y1]=pr(qs,v),[xc,yc]=pr(qs+.06,v);
+    st+=`<path d="M${f(x0)} ${f(y0)}L${f(x1)} ${f(y1)}" stroke="#1b1612" stroke-width="${sm?1.8:2.2}" stroke-linecap="round"/>`+
+     `<path d="M${f(x1)} ${f(y1)}Q${f(xc)} ${f(yc-2.4)} ${f(xc)} ${f(yc-.6)}M${f(x1)} ${f(y1)}Q${f(xc)} ${f(yc+2.4)} ${f(xc)} ${f(yc+.6)}" fill="none" stroke="#1b1612" stroke-width="1" stroke-linecap="round"/>`+
+     [.2,.42].map(q=>{const[nx,ny]=pr(q,v);return `<circle cx="${f(nx)}" cy="${f(ny)}" r=".55" fill="#8a8072"/>`}).join('')+
+     `<rect x="${f(hx-(dir>0?3:0))}" y="${f(y0-1.6)}" width="3" height="3.2" rx=".8" fill="#1b1612"/>`}
+   s+=st;
+   // The free edge's thickness while it stands open, and the face darkening as it turns from the light.
+   if(Math.abs(sa)>.05){const[x0,y0]=pr(1,0),[,y1]=pr(1,1),t=2.6*Math.abs(sa);s+=`<path d="${Q([x0,y0],[x0+dir*t,y0+.6],[x0+dir*t,y1-.6],[x0,y1])}" fill="#8a5a2e" stroke="#1e1007" stroke-width=".4"/>`}
+   s+=`<path d="${face}" fill="#000" opacity="${f(.5*Math.abs(sa))}"/>`}
+  // They meet with a puff of dust from the sill.
+  const dd=seg(k,.59,.72);if(dd>0&&dd<1)s+=JOINS.buttress.dust(xm,O.y1-1,dd,5,sm?8:11,31);
+  if(dc>=1)s+=`<path d="M${f(xm)} ${f(O.y0+.5)}V${f(O.y1-.5)}" stroke="#120902" stroke-width="1"/><path d="M${f(xm+1)} ${f(O.y0+.5)}V${f(O.y1-.5)}" stroke="#a0703f" stroke-opacity=".4" stroke-width=".5"/>`}
+ // A parchment label unrolls across the meeting stiles from the middle out, then is nailed at both ends.
+ const lt=seg(k,.68,.8);
+ if(lt>0){const ly0=mid-lh/2,x0=xm-lw/2,cw=lw*ease(lt),nk=sm?1.6:2;
+  s+=`<clipPath id="auc-${id}"><rect x="${f(xm-cw/2)}" y="${f(ly0-2)}" width="${f(cw+2)}" height="${lh+6}"/></clipPath><g clip-path="url(#auc-${id})">`+
+   `<rect x="${f(x0+1)}" y="${f(ly0+1.4)}" width="${f(lw)}" height="${lh}" fill="#000" opacity=".35"/>`+
+   `<path d="M${f(x0)} ${f(ly0)}H${f(x0+lw)}L${f(x0+lw-nk)} ${f(mid)}L${f(x0+lw)} ${f(ly0+lh)}H${f(x0)}L${f(x0+nk)} ${f(mid)}Z" fill="url(#auP-${id})" stroke="#5a4028" stroke-width=".6"/>`+
+   `<text x="${f(xm-tw/2)}" y="${f(mid+fs*.36)}" font-family="Georgia,serif" font-size="${fs}"><tspan font-weight="700" font-size="${fs+1}" fill="#8e1f2b">${num}</tspan><tspan font-style="italic" fill="#2c2117"> ${val}</tspan></text></g>`;
+  if(lt<1)for(const x of[xm-cw/2,xm+cw/2])s+=`<rect x="${f(x-1.6)}" y="${f(ly0-.6)}" width="3.2" height="${lh+1.2}" rx="1.6" fill="#e8d6ae" stroke="#5a4028" stroke-width=".5"/>`;
+  const nt=seg(k,.78,.85);
+  if(nt>0)for(const x of[x0+(sm?5:6),x0+lw-(sm?5:6)])s+=`<circle cx="${f(x)}" cy="${f(mid)}" r="${f(1.3*(1+.7*(1-nt)))}" fill="#2a241e" opacity="${f(nt)}"/><circle cx="${f(x-.4)}" cy="${f(mid-.4)}" r=".45" fill="#b8ad9c" opacity="${f(nt)}"/>`}
+ // The lamp beside the aumbry: hung on a short chain from the frieze, kindled last with a flare. Its glass is the status.
+ const lo=seg(k,.8,.85);
+ if(lo>0){const s1=sm?.8:1,lx=Math.min(xm+lw/2+(sm?11:15),O.x1-8),ly=mid+4*s1,q=ease(seg(k,.85,.94)),flr=Math.sin(Math.PI*seg(k,.85,.98));
+  let ch='';for(let y=fb+1;y<ly-10.4*s1-1;y+=2.3)ch+=`<ellipse cx="${f(lx)}" cy="${f(y+1)}" rx=".8" ry="1.15"/>`;
+  s+=`<g opacity="${f(lo)}">`;
+  if(q>0)s+=`<circle cx="${f(lx)}" cy="${f(ly-3)}" r="${sm?10:13}" fill="${gb}" opacity="${f(.35*q)}" filter="url(#soft)"/>`;
+  s+=`<path d="M${f(lx-2.4)} ${f(fb)}h4.8" stroke="#1b1612" stroke-width="1.2"/><g fill="none" stroke="#1b1612" stroke-width=".7">${ch}</g>`+
+   `<g transform="translate(${f(lx)} ${f(ly)}) scale(${s1})"><path d="M0 -10.4L-2.8 -7.6M0 -10.4L2.8 -7.6" stroke="#1b1612" stroke-width=".5"/>`;
+  if(q>0)s+=`<circle cy="-5" r="${f(4+3*flr)}" fill="${gl}" opacity="${f(.55*q)}" filter="url(#lglow)"/>`;
+  s+=`<path d="M-2.6 -7.6H2.6L1.6 -3Q0 -1.8 -1.6 -3Z" fill="#2b2333" stroke="#1b1612" stroke-width=".4"/>`;
+  if(q>0)s+=`<path d="M-2.6 -7.6H2.6L1.6 -3Q0 -1.8 -1.6 -3Z" fill="url(#auB-${id})" opacity="${f(q)}"/>`+
+   `<g transform="translate(0 -7.6) scale(${f(q*(1+.3*flr))})"><path d="M0 -4.4C1.2 -2.4 1.3 -1 0 0C-1.3 -1 -1.2 -2.4 0 -4.4Z" fill="#ffe7a0"/><path d="M0 -2.9C.6 -1.7 .6 -.8 0 -.3C-.6 -.8 -.6 -1.7 0 -2.9Z" fill="#fffdf4"/></g>`;
+  s+=`<path d="M-2.9 -7.6H2.9" stroke="#e0ad40" stroke-width=".7"/><circle cy="-1.4" r=".9" fill="url(#gild)"/></g></g>`;
+  const g2=Math.sin(Math.PI*seg(k,.93,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(lx+2,ly-10*s1,g2*4)}</g>`}
+ return s+'</g>';
 }
 
 /* Crypt: the floor stays where the wall stood and the facade sinks into it. Tracery rises in the window first,
@@ -3809,7 +3905,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -3837,15 +3933,21 @@ function render(){
   // Rotulus: the display fades first, as the glass turns to vellum.
   // Misericord: the display fades as the seat swings down over it. Lenten veil: it fades as the rod comes in, before the veil drops.
   // Corona: it fades as the wall starts to lower, long before the corona comes down.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  // Aumbry: the tabs and buttons fade; the display itself is drawn back into the recess and hidden once the doors are shut.
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  const auG=au?auGeo(id,w,h,k):null;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
+   if(!au&&n.style.filter)n.style.filter='';
    if(cn){const cut=Math.max(0,Se-(n.offsetTop-d));n.style.transform=`translateY(${-d}px)`;n.style.clipPath=`inset(${f(cut)}px -24px -24px -24px)`;
     o=cut>=n.offsetHeight?0:n.matches('.tabline,.knob')?1-seg(k,.25,.5):1}
-   else if(n.style.transform){n.style.transform='';n.style.clipPath=''}
+   else if(au&&n.matches('.screen,.mini')){auPose(n,auG);o=1-seg(k,.64,.68)}
+   else if(n.style.transform){n.style.transform='';n.style.clipPath='';n.style.transformOrigin=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co||au?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);
+  const as=el.querySelector('.ausvg'),akey=au?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
+  if(as.dataset.key!==akey){as.dataset.key=akey;as.setAttribute('width',w);as.setAttribute('height',h);as.setAttribute('viewBox',`0 0 ${w} ${h}`);as.innerHTML=akey?aumbry(id,w,h,k):''}
   const os=el.querySelector('.cosvg'),okey=co?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(os.dataset.key!==okey){os.dataset.key=okey;os.setAttribute('width',w);os.setAttribute('height',h);os.setAttribute('viewBox',`0 0 ${w} ${h}`);os.innerHTML=okey?corona(id,w,h,k):''}
   const vs=el.querySelector('.vlsvg'),vkey=vl?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
