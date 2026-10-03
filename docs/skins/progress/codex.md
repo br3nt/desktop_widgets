@@ -37,7 +37,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Hollow · Join · Silk suspension bridge — remote attachment — Added selectable upper chalk pins, staged silk span, rising lower arc and central latch with reverse release across an 86 px gap; retained all five earlier joins; 90 simulated DOM, animation, touch and regression checks passed; visual review blocked by unavailable browser access and failed sandbox browser launch.
 - [x] Gothic · Shade · Clerestory strip — Added a separate shade selector, rising limestone walls, retained glass lights and readable dark summary slots with drawer restoration; preserved all six joins and plain summary; 131 simulated DOM, state, animation and touch checks passed; full-page visual review blocked by denied Chrome access.
 - [x] Felt · Shade · Roll into a bolster — Finished selectable upward wool curl, sewn summary tapes, reverse unroll, independent Checks shade and drawer restoration; retained all six joins and plain summary; 211 simulated DOM, animation, touch and regression checks passed; full-page visual review blocked by unavailable browser surface and denied Chrome access.
-- [ ] Elven · Shade · Pressed leaf
+- [x] Elven · Shade · Pressed leaf — Added selectable closing silver bows, a slim almond frame, crisp summary fields, reverse opening and independent Checks shade with drawer restoration; preserved all six joins and plain summary; 209 simulated interaction, animation, geometry and touch checks passed; full-page visual review blocked by denied Chrome access and sandbox browser launch.
 - [ ] Wire · Join · Beaded insect clasp — articulated attachment
 - [ ] Hollow · Shade · Nested husks
 - [ ] Gothic · Shade · Folding triptych
