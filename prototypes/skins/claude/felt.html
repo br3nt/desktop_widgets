@@ -208,7 +208,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -993,6 +993,81 @@ function lineDraw(id,w,h,small,st){
    t+=`<g opacity="${op}" transform="translate(0 ${f(dy)}) rotate(${f(r)} ${f(x)} ${f(y+ph/2)})"><path d="${body}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(.8 1.4)"/><path d="${body}" fill="url(#wlw-${id})" stroke="#4a2c12" stroke-opacity=".6" stroke-width=".5"/>`+
     `<path d="M${f(x)} ${f(y+1)}V${f(y+ph-2)}" stroke="#4a2c12" stroke-opacity=".35" stroke-width=".6"/><path d="M${f(x0-.4)} ${f(y+ph*.42)}h${f(pw+.8)}m0 1.6h${f(-pw-.8)}" stroke="#d8dde2" stroke-width="1"/><circle cx="${f(x0+pw+.4)}" cy="${f(y+ph*.42+.8)}" r="1.3" fill="none" stroke="#d8dde2" stroke-width=".8"/>`+
     `<path d="M${f(x0+.8)} ${f(y+ph*.42+.4)}h${f(pw-1.6)}" stroke="#fff" stroke-opacity=".7" stroke-width=".4"/></g>`})}
+ return wrap(t+fibres);
+}
+
+/* ---------- Toy piano shade ---------- */
+// The cushion is the lid of a felt toy piano. It lets its stuffing out to a strip, then tips back on its top edge like a
+// fallboard opening, foreshortening as it goes and catching the light, and uncovers a walnut name board over a row of felt
+// keys. A glissando runs up the keys, felt notes float off them, coloured note stickers (the kind beginners put on keys) are
+// pressed on as the status, and the name and value are stitched onto the name board. Closing drops the lid with a clunk.
+function pianoParts(st,small){
+ const H0=small?CH:H,HF=small?48:58,un=model.shDir===0,u=1-st;
+ let dfl,sq=0,fib=0,lid,gl=0,notes=0,stick,emb,bounce=0;
+ if(!un){dfl=ease(seg(st,.04,.24));sq=Math.sin(Math.PI*seg(st,.22,.3))*.08;const fb=seg(st,.22,.36);fib=fb>0&&fb<1?fb:0;
+  // The lid gathers speed as it swings back, knocks the stop and drops forward a little before it rests.
+  const o=seg(st,.32,.5),r=seg(st,.5,.58);lid=o*o-(r>0&&r<1?Math.sin(Math.PI*r)*.14:0);
+  gl=seg(st,.56,.76);notes=seg(st,.6,.86);stick=seg(st,.68,.84);emb=seg(st,.8,.94)}
+ else{lid=1-Math.pow(seg(u,0,.16),2);sq=Math.sin(Math.PI*seg(u,.16,.24))*.07;stick=1;emb=1;
+  dfl=1-ease(seg(u,.28,.62));const k=seg(u,.62,.86);bounce=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.5)*.08:0}
+ return{H0,HF,un,dfl,sq,fib,lid,gl,notes,stick,emb,bounce,h:Math.round(lerp(H0,HF,dfl))};
+}
+// Layout from the strip's final height. Black keys follow the piano's pattern of twos and threes.
+function pianoGeo(w,small){
+ const HF=small?48:58,bx0=small?12:14,bx1=w-bx0,n=small?15:19;
+ return{HF,bx0,bx1,by0:small?4:5,by1:small?22:28,ky0:small?24:30,ky1:HF-(small?7:8),n,kw:(bx1-bx0)/n,black:i=>i<n-1&&[0,1,3,4,5].includes(i%7)};
+}
+function pianoDraw(id,w,h,small,st){
+ const P=pianoParts(st,small),s=SKIN[id],G=pianoGeo(w,small),{bx0,bx1,by0,by1,ky0,ky1,n,kw}=G;
+ const wrap=t=>{if(P.sq>1e-4)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
+  return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${t}</g>`:t};
+ let fibres='';
+ if(P.fib)for(const cx of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
+  fibres+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
+ if(P.lid<=0)return wrap(casing(id,w,h)+fibres);
+ const bw=bx1-bx0,bh=by1-by0,kh=ky1-ky0,dip=small?1.2:1.5;
+ // Each key dips as the glissando passes it, three keys moving at once.
+ const press=i=>{const v=(P.gl*(n+3)-i)/3;return v>0&&v<1?Math.sin(Math.PI*v):0};
+ let t=casing(id,w,h)+`<defs><linearGradient id="tpk-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".12"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#3a2614" stop-opacity=".28"/></linearGradient>`+
+  `<linearGradient id="tpl-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1a0d05" stop-opacity=".45"/><stop offset="1" stop-color="#1a0d05" stop-opacity="0"/></linearGradient></defs>`;
+ // The name board: walnut felt with a gilt running stitch, under the lid's rolled-back edge.
+ const board=rr4(bx0,by0,bw,bh,[5,6,3,4]);
+ t+=`<path d="${board}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.4)"/><path d="${board}" fill="#4f301b" filter="url(#g-${id})"/>`+
+  `<path d="${rr4(bx0+3,by0+3,bw-6,bh-6,[3,4,2,2])}" fill="none" stroke="#e3b866" stroke-opacity=".55" stroke-width=".9" stroke-dasharray="2.4 2"/>`;
+ // The keyboard well and the white keys, felt over card, each a separate piece with the dark well between them.
+ t+=`<path d="${rr4(bx0,ky0-1,bw,kh+2,[2,2,3,3])}" fill="#24160c"/>`;
+ let keys='';for(let i=0;i<n;i++){const p=press(i),x=bx0+i*kw;keys+=`<path d="${rr4(x+.6,ky0+p*dip,kw-1.2,kh-p*dip-.3,[1,1,2.6,2.6])}" fill="${p>.05?mixHex('#f3ead6','#d6c6a4',p):'#f3ead6'}"/>`}
+ t+=`<g filter="url(#g-${id})">${keys}</g><rect x="${bx0}" y="${ky0}" width="${f(bw)}" height="${kh}" fill="url(#tpk-${id})"/>`;
+ // Note stickers on the white keys, one per status: amber running, blue idle or waiting, red needs you, green passed.
+ const cols=pleatColours(id),k=cols.length,sr=small?2.4:2.9;
+ if(P.stick>0)cols.forEach((c,j)=>{const v=backOut(seg(P.stick,j/k*.6,j/k*.6+.4));if(v<=0)return;const i=Math.floor((j+.5)*n/k),x=bx0+(i+.5)*kw,y=ky1-(small?4:5)+press(i)*dip,r=sr*v;
+  t+=`<circle cx="${f(x+.4)}" cy="${f(y+.7)}" r="${f(r)}" fill="#000" opacity=".3"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="${PLEAT_C[c]}"/><path d="M${f(x-r*.55)} ${f(y-r*.25)}q${f(r*.55)} ${f(-r*.6)} ${f(r*1.1)} 0" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".7"/>`});
+ // Black keys: thick dark felt standing proud, a lit top edge, dipping a little less than the white key to their left.
+ for(let i=0;i<n;i++){if(!G.black(i))continue;const p=Math.max(press(i),press(i+1))*.8,bkw=kw*.56,x=bx0+(i+1)*kw-bkw/2,y=ky0-.5+p*dip,bkh=kh*.58;
+  t+=`<path d="${rr4(x+.6,y+1.2,bkw,bkh,[1,1,2,2])}" fill="#000" opacity=".4" filter="url(#sh)"/><path d="${rr4(x,y,bkw,bkh,[1,1,2,2])}" fill="#2b211b"/>`+
+   `<path d="M${f(x+1.4)} ${f(y+bkh-2)}V${f(y+2)}" stroke="#fff" stroke-opacity=".16" stroke-width="1"/><path d="M${f(x+.8)} ${f(y+bkh-1.4)}H${f(x+bkw-.8)}" stroke="#7a6555" stroke-opacity=".7" stroke-width=".8"/>`}
+ // The name in gilt satin stitch and the value in cream cross-stitch, stitched on left to right.
+ if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?13:15.5,c=small?1.6:2.1,wf=small?11:12.5,cy=(by0+by1)/2;
+  const x0=bx0+(small?10:13),x1=bx1-(small?10:13),xp=xpaths(dt.num,c),nw=measure(nm,`italic 700 ${nf}px Georgia,serif`),ww=measure(dt.word,`italic ${wf}px Georgia,serif`);
+  const word=nw+12+xp.w+5+ww<=x1-x0,vw=xp.w+(word?5+ww:0),vx=x1-vw,vy=cy-3.5*c;
+  t+=`<clipPath id="tpe-${id}"><rect x="${f(x0-4)}" y="${by0}" width="${f((x1-x0+8)*P.emb)}" height="${bh}"/></clipPath><g clip-path="url(#tpe-${id})">`+
+   `<text x="${x0}" y="${f(cy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="#e7c06a">${nm}</text>`+
+   `<text x="${x0}" y="${f(cy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="url(#satin)">${nm}</text>`+
+   `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".3" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="#c9ae7e"/><path d="${xp.d2}" stroke="#f6e8c8"/></g>`+
+   (word?`<text x="${f(vx+xp.w+5)}" y="${f(cy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="#f1e2c0">${dt.word}</text>`:'')+'</g>'}
+ // The lid: the whole flat cushion, hinged along its top edge. Tipping back it foreshortens toward the hinge, turns its face
+ // up to the lamp so it lightens, and casts a shadow down onto what it uncovers. Once open, only its rolled edge shows.
+ if(P.lid<1){const a=clamp(P.lid)*Math.PI/2,sy=Math.max(.02,Math.cos(a)),yb=h*sy;
+  t+=`<rect x="${bx0-4}" y="${f(yb-1)}" width="${f(bw+8)}" height="${f(7*Math.sin(a)+2)}" fill="url(#tpl-${id})" opacity="${f(Math.min(1,Math.sin(a)*2))}"/>`+
+   `<g transform="scale(1 ${f(sy*1000)/1000})">${casing(id,w,h).replace(/<defs>[\s\S]*?<\/defs>/,'')}<path d="${rr4(EDGE,EDGE,w-2*EDGE,h-2*EDGE,s.r)}" fill="#fff6e6" opacity="${f(.28*Math.sin(a))}"/></g>`}
+ const re=P.un?seg(P.lid,.82,1):seg(st,.46,.5);
+ if(re>0){const lip=rr4(bx0-3,1,bw+6,by0+1.5,[2,2,2,2]);t+=`<g opacity="${f(re)}"><path d="${lip}" fill="${s.band}" filter="url(#g-${id})"/><path d="M${bx0+2} ${f(by0+1.8)}H${bx1-2}" stroke="#1a0d05" stroke-opacity=".35" stroke-width="1.2"/></g>`}
+ // Three felt quavers float up off the keys the glissando plays, sway and fade, so the resting strip is still.
+ if(P.notes>0&&P.notes<1)for(let j=0;j<3;j++){const p=seg(P.notes,j*.2,j*.2+.6);if(p<=0||p>=1)continue;
+  const ns=small?.8:1,x=bx0+kw*(n*(.22+.28*j))+Math.sin(p*6+j*2)*4,y=ky0-2-p*(small?30:38),o=Math.sin(Math.PI*p),rot=Math.sin(p*5+j)*12;
+  const nd=`M2.6 0V-12.5Q3.4 -9.4 7.2 -7.6Q5.6 -9.8 2.6 -12.5`;
+  t+=`<g opacity="${f(o)}" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${ns})"><g transform="translate(.5 .9)" opacity=".4"><ellipse rx="3.4" ry="2.5" transform="rotate(-22)" fill="#2a1608"/><path d="${nd}" fill="none" stroke="#2a1608" stroke-width="2"/></g>`+
+   `<ellipse rx="3.4" ry="2.5" transform="rotate(-22)" fill="${s.body}"/><path d="${nd}" fill="${s.body}" stroke="${s.body}" stroke-width="1.6" stroke-linejoin="round"/><ellipse rx="2.3" ry="1.4" transform="rotate(-22)" fill="none" stroke="#f7e8c9" stroke-opacity=".75" stroke-width=".6" stroke-dasharray="1.1 1"/></g>`}
  return wrap(t+fibres);
 }
 
@@ -2663,7 +2738,7 @@ let beBuzz=0;
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -2703,7 +2778,12 @@ const SHADES={
   about:'A new shade kind, Hang: the cushion is pegged out to air. The cotton display is put away and the stuffing lets out to a flat strip, landing with a squash that shakes fibres loose. The felt draws in from its ends, two turned wooden props with ball tops pop up from the table there, and a twisted cotton line is strung from one to the other and tied off. The felt then gathers up onto the line and drops down the front, folded over it with a bounce: the fold catches the light along the line, and the back half, in the cushion\'s darker band felt, peeks out below the hem. Two spring pegs clip it on, the left one first, each with its silver spring. <b>The name and key value are on a laundry name tape</b>, the cream cotton tape sewn into school jumpers: the name woven in red, the value cross-stitched in navy beside it. One gust sways the felt from the line and it settles, so the resting strip is still. Unshading takes it in: the pegs spring off, the felt is lifted off the line and unfolds, the line is untied, the props fold away and the cushion refills with a bounce. Joined pairs stay joined, line to line.',
   sayOn:'Shaded: each cushion is pegged out on a washing line, its name and value on a laundry name tape.',sayOff:'Unshaded: the pegs come off, the felt is taken in and the cushions refill.',
   height:(st,small)=>lineParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:lineDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:lineDraw},
+ piano:{label:'Toy piano',kind:'Tip',ms:3000,ownStrip:true,
+  about:'The Tip shade kind (gothic\'s misericord) done in felt, from the felt toy pianos of stop-motion nurseries: the cushion is the piano\'s lid. The cotton display is put away and the stuffing lets out to a strip, landing with a squash that shakes fibres loose. Then the whole cushion tips back on its top edge like a fallboard opening: it foreshortens toward the hinge, lightens as its face turns up to the lamp and throws a shadow down onto what it uncovers, gathers speed, knocks the stop and drops forward a little before it rests with only its rolled edge showing. Under it is a walnut felt name board with a gilt running stitch and a row of felt keys, white over a dark well with thick black keys in twos and threes. A glissando runs up the keys, each dipping as it passes, and three felt quavers in the cushion\'s colour float up off them, sway and fade, so the resting strip is still. <b>Note stickers are the status</b>, the coloured dots beginners put on keys, pressed on one by one: amber running, blue idle or waiting, red needs you, green passed (Jarvis three amber and one blue, all blue when paused; GitDiscuss two red, one blue and one green; Checks six green and one red). <b>The name is satin-stitched in gilt on the name board and the key value cross-stitched in cream beside it.</b> Unshading drops the lid shut with a clunk and the cushion refills with a bounce. Joined pairs stay joined, piano to piano.',
+  sayOn:'Shaded: each cushion tips back like a piano lid, uncovering felt keys with status stickers and a name board.',sayOff:'Unshaded: the lids drop shut and the cushions refill.',
+  height:(st,small)=>pianoParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:pianoDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
