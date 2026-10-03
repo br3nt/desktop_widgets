@@ -279,7 +279,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the voussoirs, drag the stones or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one stone, and the keystone's gilded boss releases. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. On the windlass, drag up on the wheel to lift its pawl and let GitDiscuss roll back, or tap the wheel. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the voussoirs, drag the stones or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one stone, and the keystone's gilded boss releases. On the casement stay, drag the stay or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one hole in the stay, and the gilt pin releases. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. On the windlass, drag up on the wheel to lift its pawl and let GitDiscuss roll back, or tap the wheel. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -333,7 +333,7 @@ function casing(id,w,h){
  const bt=model.join==='buttress'&&!small,PT=12,pw=JP-6;
  // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
  // Frieze procession: square too, so the two friezes along the top meet as one band.
- const dl=(model.join==='dial'||model.join==='apse'||model.join==='fan'||model.join==='chevet'||model.join==='strap'||model.join==='frieze'||model.join==='vous')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
+ const dl=(model.join==='dial'||model.join==='apse'||model.join==='fan'||model.join==='chevet'||model.join==='strap'||model.join==='frieze'||model.join==='vous'||model.join==='stay')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
  // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
  const tooth=x=>{const t=[[x,top]];for(const r of JOINS.pier.rows(h))t.push([x,r.y],[x+r.e*JOINS.pier.TO,r.y],[x+r.e*JOINS.pier.TO,r.yb],[x,r.yb]);t.push([x,h]);return t};
@@ -2136,6 +2136,152 @@ const JOINS={
   grab(p){return JOINS.fan.grab.call(this,p)},
   move(d,p){return JOINS.fan.move.call(this,d,p)},
   key(e,hit){if(hit.id!=='vousHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
+ },
+ /* Casement stay: GitDiscuss swings open about the shared corner like a casement, and a wrought-iron stay holds it (Stay). */
+ // A flat iron bar pivots on a bracket on GitDiscuss's end and drops over a gilt pin on Jarvis's; each hole in the bar is one 15° setting.
+ stay:{label:'Casement stay',kind:'Angle · stay',gap:0,step:15,max:45,slider:'Casement stay',xPad:22,
+  // Pin and pivot stand E above the cornice (below the foot when bending up), A in from the joint.
+  A:14,E:12,lt:0,want:0,ltFrom:0,ltAt:0,landed:true,landAt:-1e4,raf:0,
+  n(a=model.angle){return clamp(Math.round(Math.abs(a)/15),0,3)},
+  get ms(){return this.n()?2.3:1.55},get sepMs(){return this.n()?3000:1500},
+  // Where the release starts taking the stay down: after GitDiscuss has swung shut, or at once when it is level.
+  relB(n){return n?.33:.2},
+  // The stay's direction off the pin: held raised over the roof when it stands above the cornice, hanging when it is under the foot.
+  rest:up=>up?210:90,
+  say:{join:'The facades butt square and two iron brackets are set at the joint; a wrought-iron stay is set on GitDiscuss\'s pivot and lowered (or swung up) onto the gilt pin on Jarvis\'s, then lifted while GitDiscuss swings open, and dropped onto the hole for its angle.',
+   joined:'Joined by a casement stay, one hole per 15°. Drag the stay, or GitDiscuss\'s nameplate: the stay lifts off the pin, GitDiscuss swings, and the stay drops onto the nearest hole. Tap the gilt pin to release.',
+   sep:'The boss goes dark, the stay is lifted and GitDiscuss swings shut; the stay is swung down, taken off its pivot, the brackets are drawn and the facades part.',
+   hold:'Held mid-join: the casement stay is being set. Use the scrubber to step through the animation.',
+   ready:'Ready: the stay and its brackets are chalked out across the corner. Release to join.',near:'Nearby: the stone warms where the brackets will stand. Move closer.',readyPh:'Ready · the stay is set out',nearPh:'Nearby · the bracket seats warm',
+   tap:'Drag the stay to swing GitDiscuss; tap the gilt pin to release.'},
+  stepSay(from,to){return to===from?'The stay is on its last hole: GitDiscuss at '+signed(to)+'.':'The stay is lifted, GitDiscuss swings '+(Math.abs(to)>Math.abs(from)?'open':'in')+', and the stay drops onto hole '+(this.n(to)+1)+' of 4; GitDiscuss at '+signed(to)+'.'},
+  phase(jt,dir){const n=this.n();
+   if(dir>0)return jt<.36?'Joining · closing in ':jt<.46?'Joining · setting the brackets ':jt<.54?'Joining · setting the stay on its pivot ':jt<.64?'Joining · bringing the stay onto the pin ':
+    !n?'Joining · the boss kindles ':jt<.7?'Joining · lifting the stay ':jt<.92?'Joining · GitDiscuss swings open ':jt<.95?'Joining · the stay drops onto hole '+(n+1)+' ':'Joining · the boss kindles ';
+   const r=1-jt,b=this.relB(n);
+   return r<.08?'Releasing · the boss goes dark ':r<b?(!n?'Releasing · the boss goes dark ':r<.12?'Releasing · lifting the stay ':r<.28?'Releasing · GitDiscuss swings shut ':'Releasing · the stay drops onto hole 1 '):
+    r<b+.04?'Releasing · lifting the stay off the pin ':r<b+.19?'Releasing · the stay is swung off ':r<b+.23?'Releasing · lifting the stay off its pivot ':r<b+.28?'Releasing · drawing the brackets ':'Releasing · parting '},
+  dragPh(){return'Swinging GitDiscuss on the stay · '+signed(model.angle)},
+  about:'A casement window is held open by its stay: a flat bar of wrought iron pivoted on the casement, with a row of holes that drop over a pin on the frame, so the window stays at whichever hole you leave it on and the wind cannot slam it. Here GitDiscuss is the casement. It turns about the corner it shares with Jarvis, and the stay runs across the mouth of the opening, <b>one hole per 15°</b>: the angle is held by the bar and read off it, the pin showing through the hole in use. Bending down (positive angles) the brackets stand on the cornice and the stay rides over the roofline; bending up (negative angles) they hang under the foot and the stay runs beneath. The bar is black iron with a twisted neck by the pivot, a swell round each hole with the smith\'s dots beside it counting the holes, and a fishtail end; its pivot is capped by a gilt quatrefoil with a glass boss. <b>Near:</b> the stone warms where the two brackets will stand. <b>Ready:</b> the brackets, the bar and its holes, and the casement\'s swing are chalked out across the corner. Joining: the facades butt square and the brackets are set with grit, a gilt-headed pin on Jarvis\'s and a pivot on GitDiscuss\'s. The stay is dropped onto its pivot, held raised over the roof (or hanging and swaying under the foot), then brought over onto the pin, where it drops onto the first hole with a clank. Then it is lifted, GitDiscuss swings open a little past its angle, settles back, and the stay drops onto the hole for that angle. Last, the glass in the quatrefoil kindles as the join light: amber while both widgets run, cold blue if either is paused. <b>Angle:</b> −45° to +45° in 15° steps (holes 1 to 4). Drag the stay or GitDiscuss\'s nameplate, use the slider, or focus the stay and press the arrow keys. While it moves the stay rides lifted over the pin, holes sliding past it; when it stops, the nearest hole drops onto the pin with a clank and a glint. A parchment label by the joint reads the angle and the hole. One drag stops at level rather than flipping to the other corner; from level, grab above the joint\'s middle to bend down or below it to bend up. The pair moves to stay on the stage, and nothing moves at rest. <b>Release:</b> tap the gilt pin (or focus the stay and press Enter). The boss goes dark, the stay is lifted, GitDiscuss swings shut and the stay drops onto the first hole; then it is lifted off the pin, swung clear and taken off its pivot, the brackets are drawn and the facades part.',
+  // GitDiscuss stays level until the stay is on the pin, then swings 5° past its angle while the stay is lifted, and settles back onto the hole.
+  // Releasing, it swings shut while the stay is lifted, before the stay is taken down. It never crosses 0°.
+  bend(jt){const A=model.angle,n=this.n(),ab=Math.abs(A),sg=A<0?-1:1;if(jt>=1)return A;if(!n)return 0;let v;
+   if(model.dir>0)v=jt<.7?0:jt<.86?(ab+5)*ease(seg(jt,.7,.86)):lerp(ab+5,ab,ease(seg(jt,.86,.92)));
+   else{const r=1-jt;v=r<.12?ab:ab*(1-ease(seg(r,.12,.28)))}
+   return sg*v},
+  up:b=>b>0||(b===0&&model.angle>=0),
+  geo(c,bend=model.angle){const h=c.h,up=this.up(bend);return{h,up,P:{x:c.a.x+W,y:c.a.y+(up?h:8)},big:h>=90}},
+  // The distance from pivot to pin at angle t is 2r·sin(φ+t/2), r and φ being their place about the corner; a hole goes at each 15°.
+  dims(h){const d=h-8+this.E,r=Math.hypot(this.A,d),ph=Math.atan2(this.A,d),L=t=>2*r*Math.sin(ph+Math.abs(t)*Math.PI/360);return{d,r,holes:[0,15,30,45].map(L)}},
+  pts(c,bend){const G=this.geo(c,bend),{P,up,h}=G,sy=up?-1:1,{d,r,holes}=this.dims(h),D=Math.PI/180,cs=Math.cos(bend*D),sn=Math.sin(bend*D),ly=sy*d;
+   const rot=(x,y)=>({x:P.x+x*cs-y*sn,y:P.y+x*sn+y*cs});
+   return{...G,sy,d,r,holes,rot,pin:{x:P.x-this.A,y:P.y+sy*d},piv:rot(this.A,ly),yb:P.y+sy*(h-8)}},
+  // As the fan vault, with room for the stay while it is put on or taken off: raised over the roof bending down, hanging below the foot bending up.
+  range(ang,h){const[a,b]=JOINS.fan.range(ang,h),L=this.dims(h).holes[3]+16;
+   if(ang<0)return[a,Math.max(a,Math.min(b,600-14-(h+this.E+L+4)))];const a2=Math.max(a,10-(8-this.E-L*.5-4));return[a2,Math.max(a2,b)]},
+  // An iron bracket standing E off the stone at x (base yb, sy the way out), with a C-scroll brace on its outer side (ox).
+  bracket(x,yb,sy,ox,k,g){if(g<=0)return '';const E=this.E*g,yt=yb+sy*E,w=1.6*k,bw=5*k,y0=Math.min(yb,yt);
+   const brace=`M${f(x)} ${f(yb+sy*1.2*k)}C${f(x+ox*6.5*k)} ${f(yb+sy*1.2*k)} ${f(x+ox*7.5*k)} ${f(yb+sy*E*.62)} ${f(x+ox*3.4*k)} ${f(yb+sy*E*.66)}`,cu={x:x+ox*3.4*k,y:yb+sy*E*.66};
+   return `<g opacity="${f(seg(g,0,.25))}"><g transform="translate(.9 1.4)" opacity=".3"><path d="${brace}" fill="none" stroke="#000" stroke-width="${f(1.9*k)}"/><rect x="${f(x-w)}" y="${f(y0)}" width="${f(2*w)}" height="${f(E)}"/></g>`+
+    `<path d="${brace}" fill="none" stroke="#221c18" stroke-width="${f(1.9*k)}" stroke-linecap="round"/><circle cx="${f(cu.x)}" cy="${f(cu.y)}" r="${f(1.3*k)}" fill="#221c18"/>`+
+    `<rect x="${f(x-w)}" y="${f(y0)}" width="${f(2*w)}" height="${f(E)}" fill="url(#syIronV)" stroke="#0e0b09" stroke-width=".4"/>`+
+    `<rect x="${f(x-bw)}" y="${f(sy<0?yb-1.7*k:yb)}" width="${f(2*bw)}" height="${f(1.7*k)}" fill="#3a3430" stroke="#0e0b09" stroke-width=".4"/><circle cx="${f(x-bw*.6)}" cy="${f(yb+sy*.85*k)}" r="${f(.55*k)}" fill="#8a8078"/><circle cx="${f(x+bw*.6)}" cy="${f(yb+sy*.85*k)}" r="${f(.55*k)}" fill="#8a8078"/></g>`},
+  pinHead(p,k,op){return op<=0?'':`<g opacity="${f(op)}"><circle cx="${f(p.x+.6)}" cy="${f(p.y+.9)}" r="${f(2.5*k)}" fill="#000" opacity=".35"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(2.4*k)}" fill="url(#gild)" stroke="#5a3a0c" stroke-width=".5"/><circle cx="${f(p.x-.7*k)}" cy="${f(p.y-.7*k)}" r="${f(.75*k)}" fill="#fffbe8" opacity=".75"/></g>`},
+  // The stay itself, from its pivot B along direction psi (degrees): a flat bar with a twisted neck, a swell round each hole with the smith's dots,
+  // and a fishtail end. Lifted, it stands a little off the stone and its shadow falls further. The hole on the pin is left for the pin's head.
+  bar(B,psi,holes,k,lift,seat,big){const len=holes[3]+16*k,xe=len-6*k,w=2.1*k,fl=Math.cos(psi*Math.PI/180)<0?-1:1;
+   const T=`translate(${f(B.x)} ${f(B.y-lift*2.5*k)}) rotate(${f(psi)}) scale(1 ${fl})`;
+   let sh=`<rect x="0" y="${f(-w)}" width="${f(xe)}" height="${f(2*w)}"/><circle r="${f(4.6*k)}"/>`;
+   for(const x of holes)sh+=`<circle cx="${f(x)}" r="${f(3.5*k)}"/>`;
+   sh+=`<path d="M${f(xe-1)} ${f(-w)}L${f(len)} ${f(-4.4*k)}Q${f(len-3.2*k)} 0 ${f(len)} ${f(4.4*k)}L${f(xe-1)} ${f(w)}Z"/>`;
+   let s=`<g transform="translate(${f(1.2+3*lift)} ${f(2+4*lift)})"><g transform="${T}" fill="#000" opacity="${f(.34-.12*lift)}">${sh}</g></g><g transform="${T}">`+
+    `<g fill="#0c0907" stroke="#0c0907" stroke-width="1.1" stroke-linejoin="round">${sh}</g><g fill="url(#syIron)">${sh}</g>`;
+   // The twisted neck between the pivot and the first hole.
+   let tw='';for(let x=5.4*k;x<holes[0]-4.6*k;x+=2.6*k)tw+=`M${f(x)} ${f(-w+.3)}L${f(x+1.5*k)} ${f(w-.3)}`;
+   s+=`<path d="${tw}" stroke="#a49888" stroke-opacity=".55" stroke-width="${f(.6*k)}"/><path d="M${f(holes[0]+3.6*k)} ${f(-w+.5)}H${f(xe)}" stroke="#a89c8e" stroke-opacity=".45" stroke-width=".6"/>`;
+   holes.forEach((x,i)=>{if(i!==seat)s+=`<circle cx="${f(x)}" r="${f(1.6*k)}" fill="#090605"/><path d="M${f(x-1.4*k)} ${f(.8*k)}A${f(1.6*k)} ${f(1.6*k)} 0 0 0 ${f(x+1.4*k)} ${f(.8*k)}" fill="none" stroke="#8a8076" stroke-opacity=".55" stroke-width=".5"/>`;
+    if(big)for(let j=0;j<=i;j++)s+=`<circle cx="${f(x+(j-i/2)*1.7*k)}" cy="${f(2.9*k)}" r=".5" fill="#c9bcaa" opacity=".7"/>`});
+   return s+'</g>'},
+  // The pivot's gilt quatrefoil, with a glass boss that is the join light.
+  rosette(B,k,lit,run,glowC,op){if(op<=0)return '';let lb='';for(let i=0;i<4;i++){const a=(45+i*90)*Math.PI/180;lb+=`<circle cx="${f(B.x+Math.cos(a)*2.4*k)}" cy="${f(B.y+Math.sin(a)*2.4*k)}" r="${f(2.4*k)}"/>`}
+   return `<g opacity="${f(op)}">`+(lit>0?`<circle cx="${f(B.x)}" cy="${f(B.y)}" r="${f(13*k)}" fill="${glowC}" opacity="${f(.4*lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`:'')+
+    `<g transform="translate(.7 1)" fill="#000" opacity=".32">${lb}</g><g fill="url(#gild)" stroke="#5a3a0c" stroke-width=".5">${lb}</g>`+
+    `<circle cx="${f(B.x)}" cy="${f(B.y)}" r="${f(2.2*k)}" fill="${lit>0?mixc([58,47,28],run?[255,200,97]:[159,184,255],lit):'#3a2f1c'}" stroke="#5a3a0c" stroke-width=".6"/>`+
+    (lit>0?`<circle cx="${f(B.x-.6*k)}" cy="${f(B.y-.7*k)}" r="${f(.6*k)}" fill="#fffbe8" opacity="${f(lit)}"/>`:'')+'</g>'},
+  over(c){
+   const jt=c.jt,fwd=model.dir>0,bend=this.bend(jt),G=this.pts(c,bend),{P,up,h,big,sy,holes,pin,piv,rot,yb}=G,k=big?1:.62,D=Math.PI/180,now=performance.now(),n=this.n();
+   const run=model.a.run&&model.b.run,glowC=run?'#ffd98a':'#9fb8ff',E=this.E,q=p=>f(p.x)+' '+f(p.y),dust=(p,t,m,sp,sd)=>JOINS.buttress.dust(p.x,p.y,t,m,sp,sd);
+   let s=`<defs><linearGradient id="syIron" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8a7f74"/><stop offset=".3" stop-color="#433b34"/><stop offset="1" stop-color="#15110e"/></linearGradient>`+
+    `<linearGradient id="syIronV" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#7c7268"/><stop offset=".4" stop-color="#3a332d"/><stop offset="1" stop-color="#15110e"/></linearGradient></defs>`,fx='';
+   if(jt===0){this.want=0;this.lt=0;this.landed=true;this.wasDown=false;const gho=seg(c.glow,.8,1)*.85;
+    // Ready: the brackets, the bar and its holes, and the casement's swing, chalked out across the corner at the angle it will take.
+    if(gho>0){const A=model.angle,gu=A>=0,Pg={x:c.a.x+W,y:c.a.y+(gu?h:8)},gy=gu?-1:1,{d,r,holes:hl}=this.dims(h),cs=Math.cos(A*D),sn=Math.sin(A*D),gr=(x,y)=>({x:Pg.x+x*cs-y*sn,y:Pg.y+x*sn+y*cs});
+     const Bg=gr(this.A,gy*d),Ag={x:Pg.x-this.A,y:Pg.y+gy*d},ul=Math.hypot(Ag.x-Bg.x,Ag.y-Bg.y)||1,at=t=>({x:Bg.x+(Ag.x-Bg.x)/ul*t,y:Bg.y+(Ag.y-Bg.y)/ul*t}),len=hl[3]+16*k;
+     const a0=Math.atan2(Ag.y-Pg.y,Ag.x-Pg.x),a1=Math.atan2(Bg.y-Pg.y,Bg.x-Pg.x),ygb=Pg.y+gy*(h-8);
+     let gh=`<path d="M${f(Ag.x)} ${f(ygb)}V${f(Ag.y)}M${q(gr(this.A,gy*(h-8)))}L${q(Bg)}M${q(Bg)}L${q(at(len))}"/>`;
+     for(const x of hl)gh+=`<circle cx="${f(at(x).x)}" cy="${f(at(x).y)}" r="${f(2.6*k)}"/>`;
+     gh+=`<path d="M${f(Pg.x+r*Math.cos(a0))} ${f(Pg.y+r*Math.sin(a0))}A${f(r)} ${f(r)} 0 0 ${A>=0?1:0} ${f(Pg.x+r*Math.cos(a1))} ${f(Pg.y+r*Math.sin(a1))}" opacity=".6"/><circle cx="${f(Bg.x)}" cy="${f(Bg.y)}" r="${f(4.6*k)}"/>`;
+     s+=`<g fill="none" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="3 2.4" opacity="${f(gho)}">${gh}</g><circle cx="${f(Ag.x)}" cy="${f(Ag.y)}" r="${f(2.4*k)}" fill="#f3d48a" opacity="${f(gho*.8)}"/>`}
+    // Near: the stone warms where each bracket will stand.
+    else if(c.glow>0){const g=c.glow,tg=model.angle>=0?-1:1;let w='';
+     for(const[x,y]of[[c.a.x+W-this.A,c.a.y+(tg<0?8:h)],[c.b.x+this.A,c.b.y+(tg<0?8:h)]])w+=`<path d="M${f(x-5*k)} ${f(y)}H${f(x+5*k)}M${f(x)} ${f(y)}V${f(y+tg*E*g)}"/>`;
+     s+=`<g fill="none" stroke="#f3cf78" stroke-linecap="round" opacity="${f(.85*g)}"><g stroke-width="5" opacity=".3" filter="url(#soft)">${w}</g><g stroke-width="1.6">${w}</g></g>`}
+    return s}
+   // Where the stay points when it lies on the pin.
+   const AIM=(Math.atan2(pin.y-piv.y,pin.x-piv.x)/D+360)%360;
+   let br=1,show=1,psi=null,lift=0,dy=0,lit=1,pulse=0;
+   if(jt===1){this.wasDown=true;
+    // Joined: the stay rides lifted while the angle moves (drag, slider, keys) and drops onto the nearest hole when it stops.
+    const dragging=!!(drag&&(drag.dial||drag.mode==='angle')),moving=model.angTo!==undefined&&model.angle!==model.angTo,off=Math.abs(model.angle/15-Math.round(model.angle/15))>.01,want=dragging||moving||off?1:0;
+    if(want!==this.want){this.ltFrom=this.lt;this.ltAt=now;this.want=want;if(want)this.landed=false}
+    const e=(now-this.ltAt)/(want?120:150);
+    this.lt=want?lerp(this.ltFrom,1,ease(clamp(e))):e>=1?0:this.ltFrom*(1-e*e);
+    if(!want&&e>=1&&!this.landed){this.landed=true;this.landAt=now;if(!reduce.matches)pawlClick()}
+    lift=reduce.matches?want:this.lt;
+    if((e<1||now-this.landAt<300)&&!this.raf&&!reduce.matches)this.raf=requestAnimationFrame(()=>{this.raf=0;render()})}
+   else{this.want=0;this.lt=0;this.landed=true;const R0=this.rest(up),sw=up?3:7;
+    if(fwd){br=ease(seg(jt,.36,.46));show=seg(jt,.46,.49);dy=-18*k*(1-ease(seg(jt,.46,.52)));
+     // Set on its pivot it rocks (held raised over the roof, or hanging under the foot); brought over, it rides the pin's head and drops onto the first hole.
+     if(jt<.54){const u=seg(jt,.49,.54);psi=R0+sw*Math.sin(u*Math.PI*3)*(1-u)}
+     else if(jt<.64){const u=seg(jt,.54,.64);psi=lerp(R0,AIM,ease(Math.min(1,u/.8)));lift=u<.8?1:1-seg(u,.8,1)}
+     else if(n)lift=jt<.7?seg(jt,.64,.68):jt<.92?1:1-seg(jt,.92,.95);
+     lit=n?seg(jt,.95,1):seg(jt,.66,.8);pulse=Math.max(Math.sin(Math.PI*seg(jt,.62,.68)),n?Math.sin(Math.PI*seg(jt,.94,.99)):0);
+     if(jt>.42&&jt<.54){const t=seg(jt,.42,.54);fx+=dust({x:pin.x,y:yb},t,5,10*k,711)+dust(rot(this.A,sy*(h-8)),t,5,10*k,723)}}
+    else{const r=1-jt,b=this.relB(n);lit=1-seg(r,0,.08);
+     if(n&&r<b)lift=r<.12?seg(r,.08,.12):r<.28?1:1-seg(r,.28,.33);
+     else if(r>=b){if(r<b+.04)lift=seg(r,b,b+.04);else if(r<b+.14){lift=1;psi=lerp(AIM,R0,Math.pow(seg(r,b+.04,b+.14),2))}else{const u=seg(r,b+.14,b+.19);psi=R0+(up?1:-1)*sw*Math.sin(u*Math.PI*2)*(1-u);lift=1}
+      dy=-18*k*ease(seg(r,b+.18,b+.23));show=1-seg(r,b+.19,b+.23);br=1-ease(seg(r,b+.22,b+.28))}
+     pulse=n?Math.sin(Math.PI*seg(r,.31,.36)):0}
+    // A clank each time the stay drops onto the pin mid-join or mid-release (once per drop).
+    const down=show>0&&psi===null&&lift<.5;if(down&&!this.wasDown&&!reduce.matches)pawlClick();this.wasDown=down}
+   // The brackets: Jarvis's carries the pin, GitDiscuss's (turning with it) the pivot.
+   s+=this.bracket(pin.x,yb,sy,-1,k,br)+(br>0?`<g transform="rotate(${f(bend)} ${f(P.x)} ${f(P.y)})">${this.bracket(P.x+this.A,yb,sy,1,k,br)}</g>`:'');
+   const seated=show>0&&psi===null&&lift<.5,B={x:piv.x,y:piv.y+dy};
+   // While the brackets rise or sink, the pin's head and the pivot ride their tops.
+   if(!seated)s+=this.pinHead(br<1?{x:pin.x,y:yb+sy*E*br}:pin,k,seg(br,0,.25));
+   if(show>0){const seat=seated?Math.round(Math.abs(bend)/15):-1,g=this.bar(B,psi??AIM,holes,k,lift,seat,big);s+=show<1?`<g opacity="${f(show)}">${g}</g>`:g}
+   else if(br>0){const pv=rot(this.A,sy*(h-8+E*br));s+=`<circle cx="${f(pv.x)}" cy="${f(pv.y)}" r="${f(2*k)}" fill="#2a2420" stroke="#0c0907" stroke-width=".5" opacity="${f(seg(br,0,.25))}"/>`}
+   if(seated)s+=this.pinHead(pin,k,1);
+   s+=this.rosette(B,k,lit,run,glowC,show)+fx;
+   if(pulse>.05)s+=`<g opacity="${f(pulse)}">${sparkle(pin.x,pin.y,pulse*(big?11:7))}</g>`;
+   const hop=jt===1?Math.sin(Math.PI*clamp((now-model.clickAt)/220)):0;
+   if(hop>.05)s+=`<g opacity="${f(hop)}">${sparkle(pin.x,pin.y-3*k,8*hop*k)}</g>`;
+   if(jt!==1)return s;
+   const hole=Math.round(Math.abs(bend)/15)+1;
+   // While it turns: a parchment label under Jarvis's foot (below the stay when it runs under the foot).
+   if(now<model.turnUntil||drag&&(drag.dial||drag.mode==='angle')){
+    const deg=signed(bend),tl=lift>.5?' · stay lifted':` · on hole ${hole} of 4`,lw=Math.round(('GitDiscuss '+deg+tl).length*6.3+22),lx=P.x-12-lw,ly=c.a.y+h+(up?12:30);
+    s+=`<g><rect x="${f(lx-4)}" y="${f(ly-4)}" width="${lw+8}" height="27" fill="#4a3d2c"/><rect x="${f(lx-3)}" y="${f(ly-3)}" width="${lw+6}" height="25" fill="#cbbd9f"/><rect x="${f(lx)}" y="${f(ly)}" width="${lw}" height="19" fill="#f6ead0" stroke="#1d1612" stroke-width="1.5"/>`+
+     `<text x="${f(lx+lw/2)}" y="${f(ly+13.5)}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#2c2117">GitDiscuss <tspan font-weight="700" fill="#8e1f2b">${deg}</tspan>${tl}</text></g>`}
+   const len=holes[3]+16*k,E2={x:piv.x+Math.cos(AIM*D)*len,y:piv.y+Math.sin(AIM*D)*len},ln=`M${q(piv)}L${q(E2)}`;
+   s+=`<g class="hit" id="stayHit" tabindex="0" role="slider" aria-label="Casement stay: GitDiscuss angle. Arrow keys move the stay one hole (15°); Enter separates the widgets" aria-valuemin="${-this.max}" aria-valuemax="${this.max}" aria-valuenow="${Math.round(model.angle)}" aria-valuetext="${signed(model.angle)}, hole ${this.n()+1} of 4" style="cursor:grab"><title>Drag the stay to swing GitDiscuss</title><path d="${ln}" fill="none" stroke="transparent" stroke-width="22" stroke-linecap="round"/><path class="ringfocus" d="${ln}" fill="none" stroke="#f0cf7a" stroke-opacity=".4" stroke-width="16" stroke-linecap="round"/></g>`+
+    `<g class="hit" id="bossHit" role="button" aria-label="Tap the gilt pin to separate the widgets" style="cursor:pointer"><title>Tap the gilt pin to release</title><circle cx="${f(pin.x)}" cy="${f(pin.y)}" r="${big?9:7}" fill="transparent"/></g>`;
+   return s;
+  },
+  // Drag the stay (or GitDiscuss's nameplate) about the corner; a gesture never crosses zero, as on the fan vault.
+  grab(p){return JOINS.fan.grab.call(this,p)},
+  move(d,p){return JOINS.fan.move.call(this,d,p)},
+  key(e,hit){if(hit.id!=='stayHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
@@ -4093,7 +4239,7 @@ MORPHS.hearse={label:'Tenebrae hearse',kind:'Kindle',sizes:[['facade','Facade',0
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -4182,8 +4328,8 @@ function render(){
   // Apse wall: GitDiscuss turns about its own edge, carried to the far mitre of the canted wall.
   if(id==='b'){const bd=AJ()?AJ().bend(model.jt):0;
    if(model.join==='apse'){const E=JOINS.apse.geo(c,bd).E2;el.style.transformOrigin=`0px ${f(h/2)}px`;el.style.transform=bd?`translate(${f(E.x-m.x)}px,${f(E.y-m.y-h/2)}px) rotate(${f(bd*100)/100}deg)`:''}
-   // Fan vault and voussoirs: GitDiscuss turns about the corner it shares with Jarvis, the bottom one bending down and the top one bending up.
-   else if(model.join==='fan'||model.join==='vous'){el.style.transformOrigin=`0px ${J().up(bd)?h:8}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
+   // Fan vault, voussoirs and casement stay: GitDiscuss turns about the corner it shares with Jarvis, the bottom one bending down and the top one bending up.
+   else if(model.join==='fan'||model.join==='vous'||model.join==='stay'){el.style.transformOrigin=`0px ${J().up(bd)?h:8}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
    // Chevet: GitDiscuss always turns down about the foot it shares with Jarvis, so the chapels rise in the wedge above.
    else if(model.join==='chevet'){el.style.transformOrigin=`0px ${h}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
    // Rose dial and strap hinge: GitDiscuss pivots about the middle of the gap (the rose, or the hinge's knuckle).
@@ -4355,7 +4501,7 @@ stage.addEventListener('pointerdown',e=>{
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1}
  drag={id,start:p,cb:cBase(),saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
  // On the rose dial, GitDiscuss's nameplate swings it about the rose (Jarvis still moves the pair).
- if(id==='b'&&model.jt===1&&AJ()){stopAngle();const C=model.join==='apse'?JOINS.apse.geo(ctx(),model.angle).M:model.join==='fan'||model.join==='vous'||model.join==='chevet'||model.join==='strap'?J().geo(ctx()).P:JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
+ if(id==='b'&&model.jt===1&&AJ()){stopAngle();const C=model.join==='apse'?JOINS.apse.geo(ctx(),model.angle).M:model.join==='fan'||model.join==='vous'||model.join==='stay'||model.join==='chevet'||model.join==='strap'?J().geo(ctx()).P:JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
  // The pair is in the hand: any lift making room for Checks pauses (turning the dial doesn't move it, so that leaves the lift running).
  if(id!=='c'&&drag.mode!=='angle')stopLift();
  stage.setPointerCapture(e.pointerId);
