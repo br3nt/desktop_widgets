@@ -303,7 +303,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · on the map dividers, drag a leg, the wing or the tag (or GitDiscuss's nameplate) to open or close them, ↑ opens and ↓ closes them a notch, and tap the brass head to release · on the silk web, drag the web (or GitDiscuss's nameplate) to swing GitDiscuss, ↑ ↓ on the focused web move it 15°, and tap the drop at the hub to release · on the revolving lantern, tap a lantern (or press Enter on its nameplate) to turn its drum to the next screen · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · on the map dividers, drag a leg, the wing or the tag (or GitDiscuss's nameplate) to open or close them, ↑ opens and ↓ closes them a notch, and tap the brass head to release · on the silk web, drag the web (or GitDiscuss's nameplate) to swing GitDiscuss, ↑ ↓ on the focused web move it 15°, and tap the drop at the hub to release · on the moths, tap them, wave across them or press Enter on them to scatter them · on the revolving lantern, tap a lantern (or press Enter on its nameplate) to turn its drum to the next screen · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -1494,6 +1494,104 @@ const JOINS={
      `<path d="M${B.map(P).join('L')}Z" fill="transparent" stroke="transparent" stroke-width="12" stroke-linejoin="round"/>`+
      `<circle class="ringfocus" cx="${f(H.x)}" cy="${f(H.y)}" r="${f(Math.min(F.R,32)+8)}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/>`+
      `<circle class="pinhit" data-part="pin" cx="${f(H.x)}" cy="${f(H.y)}" r="12" fill="transparent"><title>Tap the drop at the hub to release</title></circle></g>`}
+   return s;
+  }
+ },
+ moths:{label:'Moths',kind:'Swarm',gap:34,holdAt:.6,msOut:1900,slow:1.25,N:5,ORD:[2,0,4,1,3],
+  about:'Nothing is fixed to either shell. The brass eyelets are the lure. <b>Near:</b> the eyelets on both straps warm like small lamps, and two pale moths come out of the fog and flutter round the gap as you drag. <b>Ready:</b> a chalk ghost of five moths settled across the gap. Joining: the shells close to two fingers apart and every eyelet glows. Then five moths come in out of the fog one after another, from above and below and from both sides. Each one loops past the seam, hooks back and drops onto it, wings beating fast, its shadow falling away and sharpening on the shells as it comes down. It lands with a puff of wing dust, wings spread flat, straddling the gap with one pair of wings on each strap. They settle wing over wing like shingles, heads up, then all sweep their wings back into the resting pose and give one shiver. The eyelets\' light goes into them: the eyespot on each forewing kindles top to bottom, amber while both widgets run, cold blue-white if either is paused. The seam is a column of pale moths over the dark gap. Nothing moves at rest. In a shade, the moths that no longer fit lift off into the fog as the strip narrows, and come back when it opens. <b>Release:</b> tap the moths, wave across them (a short drag), or focus them and press Enter. Their eyes go dark, they lift off one after another with a puff of dust and scatter up into the fog, and the shells part.',
+  text:{join:'The shells close; the eyelets glow, and moths come in out of the fog and settle across the gap.',
+   joined:'Joined: five pale moths sit wing over wing across the gap, their eyespots lit. Drag either nameplate to move the pair. Tap the moths, or wave across them, to release.',
+   release:'Shooed: the eyespots go dark and the moths scatter into the fog.',back:'The moths turn back into the fog.',
+   hold:'Held mid-join: moths in flight, some already settled. Use the scrubber to step through the animation.',
+   ready:'Ready: a ghost of the settled moths shows across the gap. Release to call them in.',near:'Nearby: the eyelets warm and moths stir in the fog. Move closer.',
+   phReady:'Ready · the moths are ghosted',phNear:'Nearby · moths stir in the fog',phDrag:'Wave across the moths to scatter them'},
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.26?'Joining · the eyelets warm ':jt<.82?'Joining · moths come in out of the fog ':jt<.88?'Joining · settling ':'Joining · their eyes kindle '):(r<.08?'Releasing · the eyes go dark ':r<.45?'Releasing · the moths scatter ':'Releasing · parting ')},
+  releaseStart(){},
+  key(){$('#a .grip').focus();doSeparate()},
+  // A tap or a short wave across the column scatters them.
+  seamDown(p){return{seam:true,p0:p,moved:0}},
+  seamMove(d,p){d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));if(d.moved>14){drag=null;$('#a .grip').focus();doSeparate()}},
+  seamUp(){$('#a .grip').focus();doSeparate()},
+  rnd(i,k){const v=Math.sin(i*12.9898+k*78.233)*43758.5453;return v-Math.floor(v)},
+  bz(P,u){const v=1-u;return{x:v*v*v*P[0].x+3*v*v*u*P[1].x+3*v*u*u*P[2].x+u*u*u*P[3].x,y:v*v*v*P[0].y+3*v*v*u*P[1].y+3*v*u*u*P[2].y+u*u*u*P[3].y}},
+  bzA(P,u){const v=1-u,d=k=>3*v*v*(P[1][k]-P[0][k])+6*v*u*(P[2][k]-P[1][k])+3*u*u*(P[3][k]-P[2][k]);return Math.atan2(d('y'),d('x'))*180/Math.PI+90},
+  angTo(a,b,t){return a+(((b-a)%360+540)%360-180)*t},
+  tone(){return model.a.run&&model.b.run?{glass:'#ffcf73',core:'#fff3cf'}:{glass:'#c4d8f2',core:'#f4f8ff'}},
+  // Where each slot's moth sits on the seam. Slots that no longer fit the strip have `off` > 0 and lift away.
+  // Slot s needs a strip of 20 + 22s px; both shade heights (130 and 44) fit whole moths, so nothing rests half lifted.
+  slots(c){const h=c.h,mx=model.a.x+W+this.gap/2,sc=lerp(.8,1,clamp((h-HS)/(H-HS))),off=Array.from({length:this.N},(_,s)=>clamp((20+22*s-h)/14)),n=Math.max(1,off.reduce((t,o)=>t+1-o,0));
+   return off.map((o,s)=>{const y=model.a.y+8+(h-16)*(Math.min(s,n-.5)+.5)/n;
+    return{s,x:mx+(s%2?2:-2)*sc,y:Math.min(y,model.a.y+h-8),rot:(s%2?6:-6)+(this.rnd(s,9)-.5)*6,sc,off:o}})},
+  // A moth seen from above, head up at its thorax. k foreshortens the wings as they beat (1 is spread flat); sw sweeps them back.
+  wings(k,sw,fw,hw,st,extra=''){const FW='M1.4 -1.6C8 -6.4 19 -5.2 25 2.6C22.4 7.6 18 11.6 12.6 13.2C8 12 4.2 8.4 1.8 4.6Z',HW='M1.6 2.6C8 3.6 14.6 7.6 15 13.6C12.4 18.6 6.4 18.8 1.8 11Z';
+   const one=sx=>`<g transform="scale(${f(sx*k*100)/100} 1)"><g transform="rotate(${f(sw*.6)} 1.6 2)"><path d="${HW}" fill="${hw}" ${st}/></g><g transform="rotate(${f(sw)} 1.4 0)"><path d="${FW}" fill="${fw}" ${st}/>${extra}</g></g>`;
+   return one(1)+one(-1)},
+  moth(x,y,rot,o){const k=clamp(o.k??1,.12,1),sw=o.sw||0,sc=o.sc||1,op=o.op??1,tf=(dx,dy)=>`translate(${f(x+dx)} ${f(y+dy)}) rotate(${f(rot)}) scale(${f(sc*100)/100})`;
+   const BODY='M0 1.6C2.8 3 3 11 0 15C-3 11 -2.8 3 0 1.6Z';
+   if(o.ghost)return `<g transform="${tf(0,0)}" opacity="${f(op)}" stroke="#e9edf1" stroke-width="1.1" stroke-dasharray="2 2.4" stroke-linecap="round">${this.wings(1,sw,'none','none','')}<path d="${BODY}M0 -2.6V1.6" fill="none"/></g>`;
+   let s='';
+   // The shadow falls away from the moth the higher it flies.
+   const a=o.air||0;s+=`<g transform="${tf(2+16*a,3+24*a)}" opacity="${f(op*.36*(1-.7*a))}">${this.wings(k,sw,INK,INK,'')}<path d="${BODY}" fill="${INK}"/></g>`;
+   const lit=o.lit||0,tn=this.tone();
+   const spot=`<circle cx="14" cy="4.4" r="2.5" fill="${lit>0?tn.glass:'#5b6676'}" stroke="${INK}" stroke-width=".9"/>`+(lit>0?`<circle cx="14" cy="4.4" r="2.5" fill="${tn.glass}" opacity="${f(lit)}"/><circle cx="13.6" cy="4" r="1" fill="${tn.core}" opacity="${f(lit)}"/>`:'');
+   const marks=`<path d="M3 -.6Q13 -3 22.6 2.4" fill="none" stroke="${INK}" stroke-width=".7" opacity=".7"/><path d="M4 7.6C9 10.6 15 10.4 21.6 5.4" fill="none" stroke="#7d8899" stroke-width="2.2" opacity=".55" stroke-linecap="round"/>`+spot;
+   s+=`<g transform="${tf(0,0)}" opacity="${f(op)}">`;
+   if(lit>0)s+=[-1,1].map(d=>`<circle cx="${f(d*14*k)}" cy="4.4" r="7" fill="${tn.glass}" opacity="${f(.55*lit)}" filter="url(#blur3)"/>`).join('');
+   s+=this.wings(k,sw,'#cdd5df','#a7b2c1',`stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"`,marks);
+   s+=`<path d="M-1 -6Q-3.4 -10.6 -6.6 -12.6M1 -6Q3.4 -10.6 6.6 -12.6" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/><path d="M-1 -6Q-3.4 -10.6 -6.6 -12.6M1 -6Q3.4 -10.6 6.6 -12.6M-2.3 -8.6l-1.7 .3M-3.6 -10.1l-1.5 .8M-5 -11.4l-1 1.1M2.3 -8.6l1.7 .3M3.6 -10.1l1.5 .8M5 -11.4l1 1.1" fill="none" stroke="#d6dde6" stroke-width=".9" stroke-linecap="round"/>`;
+   s+=`<path d="${BODY}" fill="#9aa5b3" stroke="${INK}" stroke-width=".9"/><path d="M-2 6.4Q0 7.4 2 6.4M-1.8 9.6Q0 10.6 1.8 9.6" fill="none" stroke="${INK}" stroke-width=".6"/><ellipse cy="-.4" rx="3.3" ry="3.6" fill="#c3ccd7" stroke="${INK}" stroke-width=".9"/><circle cy="-4.6" r="2.1" fill="#2b3340" stroke="${INK}" stroke-width=".8"/></g>`;
+   return s},
+  // A puff of pale wing dust at p; u runs 0 to 1.
+  dust(p,u,seed){if(u<=0||u>=1)return '';let s='';for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2+seed,v=6+10*this.rnd(seed,i);
+   s+=`<circle cx="${f(p.x+Math.cos(a)*v*u)}" cy="${f(p.y+Math.sin(a)*v*u+10*u*u)}" r="${f(1.1-.5*u)}" fill="#dfe6ee" opacity="${f(.8*(1-u))}"/>`}return s},
+  over(c){
+   const jt=c.jt,h=c.h,ys=rows(h),A=ys.map(y=>({x:model.a.x+W-9.5,y:model.a.y+y})),B=ys.map(y=>({x:model.b.x+9.5,y:model.b.y+y}));
+   const SL=this.slots(c),now=performance.now(),mx=(model.a.x+W+model.b.x)/2;let s='';this.live=false;
+   if(jt===0){const g=c.glow;if(g<=0)return '';
+    // The fog moths keep fluttering while you hold still near the gap.
+    this.live=!reduce.matches;
+    s+=glints(A.concat(B),g*.8);
+    if(g>=1)s+=SL.filter(q=>q.off<1).map(q=>this.moth(q.x,q.y,q.rot,{ghost:1,sw:16,sc:q.sc,op:.5})).join('');
+    // Two moths stir in the fog round the gap, closer as you near; their orbit is mostly vertical so they stay off the displays.
+    for(let j=0;j<2;j++){const R=lerp(84,44,g),th=now/900+j*2.6,cy=(model.a.y+model.b.y)/2+h/2,p=t=>({x:mx+Math.min(R*.5,this.gap/2+26)*Math.cos(t),y:cy+R*.9*Math.sin(t*1.7)}),q=p(th),q2=p(th+.02);
+     s+=this.moth(clamp(q.x,20,1180),clamp(q.y,20,585),Math.atan2(q2.y-q.y,q2.x-q.x)*180/Math.PI+90,{k:.3+.7*Math.abs(Math.cos(now/45+j*1.3)),sc:.8,op:.75*g,air:1})}
+    return s}
+   // The eyelets glow as lures until their light passes into the moths.
+   const eg=model.dir>0?(model.poised?.8+.2*seg(jt,0,.24):seg(jt,.06,.24))*(1-seg(jt,.86,1)):jt<1?.5*seg(1-jt,0,.08)*(1-seg(1-jt,.12,.3)):0;
+   if(eg>0)s+=glints(A.concat(B),eg);
+   const drawn=[];
+   for(let i=0;i<this.N;i++){const q=SL[this.ORD[i]],L={x:q.x,y:q.y},sd=this.rnd(q.s,1)<.5?-1:1,up=q.s<2?-1:q.s>2?1:(this.rnd(q.s,2)<.5?-1:1);
+    let x=L.x,y=L.y,rot=q.rot,k=1,sw=16,op=1,air=0,lit=0,fly=false,after='';
+    if(model.dir>0&&jt<1){const w0=.26+i*.07,u=seg(jt,w0,w0+.28);
+     if(u<=0)continue;
+     if(u<1){fly=true;const S={x:clamp(L.x+sd*(150+120*this.rnd(q.s,3)),20,1180),y:clamp(L.y+up*(110+90*this.rnd(q.s,4)),20,585)};
+      const BZ=[S,{x:L.x+sd*90*(.6+.6*this.rnd(q.s,5)),y:lerp(S.y,L.y,.2)-40},{x:L.x-sd*34,y:L.y-30},L],e=ease(u),p=this.bz(BZ,e),wb=(1-u)*(1-u);
+      x=p.x+7*Math.sin(u*31+q.s)*wb;y=p.y+5*Math.sin(u*23+2*q.s)*wb;
+      rot=this.angTo(this.bzA(BZ,clamp(e,.001,.999)),q.rot,ease(seg(u,.7,1)));
+      k=lerp(.3+.7*Math.abs(Math.cos(u*Math.PI*14+q.s)),1,ease(seg(u,.82,1)));sw=0;air=1-ease(seg(u,.75,1));op=seg(u,0,.12)}
+     else sw=16*backOut(seg(jt,.82,.9));
+     after+=this.dust(L,seg(jt,w0+.26,w0+.34),q.s);
+     if(jt>.84&&jt<.9)k=1-.22*Math.sin(Math.PI*seg(jt,.84,.9))*Math.abs(Math.sin(jt*260));
+     lit=seg(jt,.86+q.s*.018,.91+q.s*.018)}
+    else if(model.dir<0&&jt<1){const r=1-jt,u=seg(r,.04+i*.04,.32+i*.04);lit=1-seg(r,0,.08);
+     if(u>0){fly=true;const E={x:clamp(L.x-sd*(200+140*this.rnd(q.s,6)),20,1180),y:clamp(L.y-150-90*this.rnd(q.s,7),10,585)};
+      const BZ=[L,{x:L.x-sd*20,y:L.y-50},{x:lerp(L.x,E.x,.5),y:E.y+40},E],e=u*u*(1.6-.6*u),p=this.bz(BZ,e);
+      x=p.x+5*Math.sin(u*27+q.s)*u;y=p.y;rot=this.angTo(q.rot,this.bzA(BZ,clamp(e,.001,.999)),ease(seg(u,0,.25)));
+      k=lerp(1,.3+.7*Math.abs(Math.cos(u*Math.PI*16+q.s)),ease(seg(u,0,.08)));sw=16*(1-seg(u,0,.12));air=ease(seg(u,0,.3));op=1-seg(u,.55,1);
+      after+=this.dust(L,seg(u,0,.25),q.s+3)}}
+    else lit=1;
+    // A moth whose slot no longer fits the shaded strip lifts off into the fog.
+    // Slots that don't fit never fly in or out of a shaded strip.
+    if(q.off>=1)continue;
+    if(q.off>0){const o=q.off;y-=30*o;x+=(q.s%2?1:-1)*14*o;op*=1-o;lit*=1-o;
+     if(!fly){k=1-.7*Math.abs(Math.sin(o*Math.PI*3));sw=16*(1-o);air=o}}
+    if(op<=0)continue;
+    drawn.push({fly,s:q.s,svg:this.moth(x,y,rot,{k,sw,sc:q.sc,op,air,lit})+after});
+   }
+   drawn.sort((p,q)=>(p.fly-q.fly)||(p.s-q.s));
+   s+=drawn.map(d=>d.svg).join('');
+   if(jt===1){const n=SL.filter(q=>q.off<1),y0=Math.min(...n.map(q=>q.y))-16,y1=Math.max(...n.map(q=>q.y))+20,x0=mx-30;
+    s+=`<g class="hit bellhit" id="seamHit" tabindex="0" role="button" aria-label="Moths: tap them, wave across them, or press Enter, to scatter them and separate the widgets"><title>Tap the moths, or wave across them, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="60" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="60" height="${f(y1-y0)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
    return s;
   }
  }
