@@ -3939,7 +3939,13 @@ const MORPHS={
   // The pad is the anchor: pad() is its resting top-left in the box now, padAt(i) at rest at size i. box() keeps room below for the swing.
   pad:()=>{const q=mbGeo(mbAt(model.gq));return[q.ox,q.oy]},padAt:i=>{if(!i)return[0,0];const q=mbGeo(mbAt(i));return[q.ox,q.oy]},
   fill:g=>g-Math.min(1,Math.floor(g)),box:i=>{if(!i)return[CW,CH];const q=mbGeo(mbAt(i));return[q.w,q.h]},dims:()=>{const q=mbGeo(mbAt(model.gq));return[q.w,q.h]},
-  sayUp:n=>'A dowel is hung over Checks and balanced: Checks becomes '+n+'.',sayDown:n=>'The knot slides back and the mobile is taken down: Checks shrinks to '+n+'.'}
+  sayUp:n=>'A dowel is hung over Checks and balanced: Checks becomes '+n+'.',sayDown:n=>'The knot slides back and the mobile is taken down: Checks shrinks to '+n+'.'},
+ swatch:{label:'Swatch fan',kind:'Fan',
+  about:'The Fan kind (elven\'s brisé fan, gothic\'s flabellum, wire\'s woven fan, hollow\'s earwig wing) done in felt, from the felt swatch deck a shop keeps by the till: strips of every colour of felt, rounded at the tip and held at one end by a brass split pin, fanned out to choose from. The pad never changes and never moves; the deck is pinned behind it. <b>Growing:</b> the closed deck slides down from behind the pad and a split pin is pushed through and squashed home. The bundle swings out to the left, then a thumb sweeps the strips out to the right, leaving each one behind at its place with a wobble, a frame at a time. There are fourteen strips, one per check: twelve greens graded pale to deep like a paint deck, then the two waiting checks in amber. Each tip is blanket-stitched in cream. A cotton tape is unrolled across the strips from left to right, its ends cut with pinking shears and its edges running-stitched in raspberry, and the count and run come up on it in two upright arcs (12 / 14 checks passed, run 418 · main · 86% · 2 waiting). Then a tick is cross-stitched on each passed tip in turn, and a red glass-headed pin is pushed into each waiting one. <b>Full deck:</b> a second deck of ten longer strips, one per recent run, slides down behind the first and is spread both ways, the middle strips first, until its tips stand out round the swatch fan like petals (green passed, raspberry failed, amber waiting). A cream tab is popped onto each tip with its run number, 409 to 418 from left to right, and the tape\'s words change to name the two waiting checks. <b>Shrinking</b> plays the same timeline backwards. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks folds the deck away first, and unshading fans it again. Switching morphs takes Checks back to a pad first.',
+  sizes:['Pad','Swatch fan','Full deck'],noun:['a pad','a swatch fan','a full deck'],up:4200,down:3000,
+  pad:()=>{const q=sfGeo(sfAt(model.gq));return[q.ox,q.oy]},padAt:i=>{if(!i)return[0,0];const q=sfGeo(sfAt(i));return[q.ox,q.oy]},
+  fill:g=>g-Math.min(1,Math.floor(g)),box:i=>{if(!i)return[CW,CH];const q=sfGeo(sfAt(i));return[q.w,q.h]},dims:()=>{const q=sfGeo(sfAt(model.gq));return[q.w,q.h]},
+  sayUp:n=>'A felt swatch deck is pinned under Checks and fanned out: Checks becomes '+n+'.',sayDown:n=>'The strips are swept back together and slid away: Checks shrinks to '+n+'.'}
 };
 const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
@@ -4036,6 +4042,7 @@ function morphRender(el){
  if(model.morph==='detail')return sdRender(el,svg,gr,kn,pa);
  if(model.morph==='cake')return cakeRender(el,svg,gr,kn,pa);
  if(model.morph==='mobile')return mbRender(el,svg,gr,kn,pa);
+ if(model.morph==='swatch')return sfRender(el,svg,gr,kn,pa);
  el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
@@ -4641,6 +4648,126 @@ function mbRender(el,svg,gr,kn,pa){
  put(el.querySelector('.mb2'),q.Bl?v.v2:0,q.Bl?ox+q.Bl.x-46:0,q.Bl?oy+q.Bl.y+28:0,92,38);
  const si=SIZES.findIndex(x=>x[2]===model.g);
  el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418, 86% passed':'')+(model.g>=2?'; deploy-preview and e2e-safari waiting for Brent':''));
+ return true;
+}
+/* ---------- Morph: swatch fan (Checks) ---------- */
+// g runs 0 pad, 1 swatch fan, 2 full deck. As with the mobile, everything is placed in the pad's frame and the pad stays put.
+// A felt swatch deck is pinned behind the pad by a brass split pin at (px,py): fourteen strips, one per check, fanned ±A1.
+// The full deck adds a run deck of ten longer strips behind it, fanned ±A2, one per recent run. Angles are degrees from straight
+// down, positive to the right. The cotton tape (band) is laid across the front strips between r0 and r1, ±B.
+const SF={px:138,py:70,L1:128,w0:9,w1:23,A1:74,L2:168,v0:10,v1:30,A2:99,B:64,r0:80,r1:112};
+const sfMix=(a,b,t)=>'#'+[1,3,5].map(k=>Math.round(lerp(parseInt(a.substr(k,2),16),parseInt(b.substr(k,2),16),t)).toString(16).padStart(2,'0')).join('');
+// Twelve greens graded pale to deep like a paint deck, then the two waiting checks in amber.
+const SFCOL=[...Array.from({length:12},(_,i)=>sfMix('#d6e8a2','#2e5a27',i/11)),'#e8b24c','#c9822a'];
+const SFRUN=[[409,'ok'],[410,'ok'],[411,'fail'],[412,'ok'],[413,'ok'],[414,'ok'],[415,'fail'],[416,'ok'],[417,'ok'],[418,'wait']],SFRC={ok:'#6f9a3c',fail:'#b8476e',wait:'#d99a32'};
+const sfDamp=(s,a,n)=>s>0&&s<1?a*Math.sin(2*Math.PI*n*s)*(1-s)*(1-s):0;
+// SFTK[k]: the sweep's linear time when the thumb leaves strip k (where ease reaches k/13).
+const SFTK=Array.from({length:13},(_,k)=>{let a=0,b=1;for(let n=0;n<24;n++){const m=(a+b)/2;if(ease(m)<k/13)a=m;else b=m}return a});
+const sfR=(a,r,dy=0)=>{const t=a*Math.PI/180;return{x:SF.px+r*Math.sin(t),y:SF.py+dy+r*Math.cos(t)}};
+// Step 0: the closed deck slides down from behind the pad, the split pin is pushed through, the bundle swings left, and a thumb
+// sweeps the strips out to the right, leaving each behind (with a wobble) at its place. Then the tape is unrolled across them,
+// the words come up, the passed strips get a stitched tick and the two waiting ones a glass-headed pin.
+// Step 1: the run deck slides down behind it and is spread both ways, the middle strips first; a tab is popped onto each tip.
+function sfAt(g){
+ const i=Math.min(1,Math.floor(g)),p=g-i;
+ if(i===0){
+  const sw=seg(p,.22,.32),raw=(p-.32)/.38,sr=clamp(raw),s=ease(sr),G=-SF.A1+2*SF.A1*s;
+  // Each strip wobbles in its own window of the sweep's linear time, starting when the thumb leaves it, so every wobble ends before the sweep does.
+  const a1=Array.from({length:14},(_,k)=>{if(sr<=0)return-SF.A1*backOut(sw);const T=-SF.A1+k*2*SF.A1/13;
+   let v=Math.min(T,G);if(k<13)v+=sfDamp(seg(raw,SFTK[k],SFTK[k]+.12),3.5,1.5);else v+=sfDamp(seg(p,.7,.82),3,1.5);return v});
+  return{i,p,slide1:ease(seg(p,0,.14)),pin:seg(p,.14,.22),a1,band:seg(p,.7,.8),txt:seg(p,.8,.9),ticks:12*seg(p,.78,.9),pins:[seg(p,.84,.9),seg(p,.9,.96)],gl:seg(p,.93,1),slide2:0,a2:null,tab:()=>0,swOut:0,swIn:0};
+ }
+ const a1=Array.from({length:14},(_,k)=>-SF.A1+k*2*SF.A1/13);
+ const a2=Array.from({length:10},(_,j)=>{const r=Math.floor(Math.abs(j-4.5));return(-SF.A2+j*2*SF.A2/9)*backOut(seg(p,.18+.035*r,.46+.035*r))});
+ return{i,p,slide1:1,pin:1,a1,band:1,txt:1,ticks:12,pins:[1,1],gl:seg(p,.93,1),slide2:ease(seg(p,0,.16)),a2,tab:j=>seg(p,.6+.026*j,.68+.026*j),swOut:seg(p,.86,.91),swIn:seg(p,.91,.96)};
+}
+// Where it all lies in the pad's frame, and the box round it (ox, oy put the pad's top-left in the box). dy1, dy2 slide the decks.
+function sfGeo(o,raw){
+ let x0=0,y0=0,x1=CW,y1=CH;const add=(p,r)=>{x0=Math.min(x0,p.x-r);y0=Math.min(y0,p.y-r);x1=Math.max(x1,p.x+r);y1=Math.max(y1,p.y+r)};
+ const q={o,dy1:-160*(1-o.slide1),dy2:-200*(1-o.slide2)};
+ for(const a of o.a1)add(sfR(a,SF.L1-SF.w1/2,q.dy1),SF.w1/2+2);
+ if(o.slide2>0)for(const a of o.a2){add(sfR(a,SF.L2-SF.v1/2,q.dy2),SF.v1/2+2);add(sfR(a,155,q.dy2),16)}
+ // The pins come in along their strips from outside the tips.
+ [12,13].forEach((k,n)=>{if(o.pins[n]>0){add(sfR(o.a1[k],154),5);add(sfR(o.a1[k],138),5)}});
+ q.bb=[x0,y0,x1,y1];if(raw)return q;
+ // As with the mobile, the box covers the whole step, so it never changes size mid-step; the bare pad matches the plain pad exactly.
+ if(!o.i&&!o.p){q.ox=q.oy=0;q.w=CW;q.h=CH;return q}
+ const[a,b,c,d]=sfEnv(o.i&&!o.p?0:o.i),m=6;q.ox=Math.round(m-a);q.oy=Math.round(m-b);q.w=Math.ceil(c+q.ox+m);q.h=Math.ceil(d+q.oy+m);
+ return q;
+}
+const SFENV=[];
+function sfEnv(i){
+ if(SFENV[i])return SFENV[i];let e=[0,0,CW,CH];
+ for(let k=1;k<=200;k++){const b=sfGeo(sfAt(i+k/200),1).bb;e=[Math.min(e[0],b[0]),Math.min(e[1],b[1]),Math.max(e[2],b[2]),Math.max(e[3],b[3])]}
+ return SFENV[i]=e;
+}
+// One felt strip: narrow at the pivot, round at the tip, its tip blanket-stitched in cream.
+// sh is the shadow's strength: full for the bottom strip, and for the others growing with the gap to the strip under them,
+// so a closed bundle doesn't stack fourteen shadows into a black edge.
+function sfStrip(a,L,w0,w1,dy,fill,sh=1){
+ const t=a*Math.PI/180,c=Math.cos(t),s=Math.sin(t),P=(u,v)=>pt({x:SF.px+u*c+v*s,y:SF.py+dy-u*s+v*c}),r=w1/2,ri=r-3.2;
+ const d=`M${P(-w0/2,0)}L${P(-r,L-r)}A${f(r)} ${f(r)} 0 0 0 ${P(r,L-r)}L${P(w0/2,0)}A${f(w0/2)} ${f(w0/2)} 0 0 0 ${P(-w0/2,0)}Z`;
+ const st=`M${P(-ri,L-34)}L${P(-ri,L-r)}A${f(ri)} ${f(ri)} 0 0 0 ${P(ri,L-r)}L${P(ri,L-34)}`;
+ return (sh>.02?`<path d="${d}" fill="#000" opacity="${f(.3*sh)}" transform="translate(1.4 2.4)"/>`:'')+`<path d="${d}" fill="${fill}" filter="url(#g-c)"/>`+
+  `<path d="${st}" fill="none" stroke="#f7e8c9" stroke-opacity=".85" stroke-width="1" stroke-dasharray="2.6 2.2" stroke-linecap="round"/>`;
+}
+// The cotton tape from -B to E, pinked at both ends once laid (the leading end is a roll while it is unrolled).
+function sfBand(E,done){
+ const{B,r0,r1}=SF,zz=(a,ra,rb,dir)=>{let s='';for(let k=1;k<=6;k++)s+=`L${pt(sfR(a+(k%2&&(done||dir<0)?dir*1.8:0),lerp(ra,rb,k/6)))}`;return s};
+ const d=`M${pt(sfR(-B,r1))}A${r1} ${r1} 0 0 0 ${pt(sfR(E,r1))}${zz(E,r1,r0,1)}A${r0} ${r0} 0 0 1 ${pt(sfR(-B,r0))}${zz(-B,r0,r1,-1)}Z`;
+ let x=`<path d="${d}" fill="#000" opacity=".32" filter="url(#sh)" transform="translate(1.5 3)"/><path d="${d}" fill="#f2e8d4" filter="url(#g-c)"/>`;
+ if(E+B>8)for(const r of[r0+3.6,r1-2.6])x+=`<path d="M${pt(sfR(-B+3,r))}A${f(r)} ${f(r)} 0 0 0 ${pt(sfR(E-3,r))}" fill="none" stroke="#b8476e" stroke-opacity=".8" stroke-width="1.1" stroke-dasharray="3 2.4" stroke-linecap="round"/>`;
+ if(!done){const a=sfR(E,r0-4),b=sfR(E,r1+4);
+  x+=`<path d="M${pt(a)}L${pt(b)}" stroke="#000" stroke-opacity=".3" stroke-width="11" stroke-linecap="round" transform="translate(1.5 2.5)"/><path d="M${pt(a)}L${pt(b)}" stroke="#e6d9c0" stroke-width="11" stroke-linecap="round" filter="url(#g-c)"/>`+
+   `<path d="M${pt(a)}L${pt(b)}" stroke="#fff6e4" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" transform="translate(-2 -1)"/>`}
+ return x;
+}
+function sfSvg(q,fr){
+ const o=q.o,keep=BO;BO=fr<0?0:(fr%3)*31;
+ // The pad's own casing stays as it is; its defs carry the felt filters the rest uses.
+ const cs=casing('c',CW,CH),cut=cs.indexOf('</defs>')+7;let x=cs.slice(0,cut);const pad=cs.slice(cut);BO=keep;
+ const arc=(id,r,a)=>`<path id="${id}" d="M${pt(sfR(-a,r))}A${r} ${r} 0 0 0 ${pt(sfR(a,r))}"/>`;
+ x+=`<defs><radialGradient id="sfbr" cx=".38" cy=".32" r=".75"><stop stop-color="#fff0b8"/><stop offset=".45" stop-color="#d4a23c"/><stop offset="1" stop-color="#6b4a12"/></radialGradient>`+
+  `<radialGradient id="sfpin" cx=".35" cy=".3" r=".75"><stop stop-color="#ffd6de"/><stop offset=".4" stop-color="#d23a4e"/><stop offset="1" stop-color="#5e0f1c"/></radialGradient>`+
+  `<clipPath id="sfclip"><rect x="-400" y="40" width="1200" height="800"/></clipPath>${arc('sfA',93,62)}${arc('sfB',106,62)}</defs>`;
+ x+=`<g transform="translate(${q.ox} ${q.oy})">`;
+ // Back to front: the run deck, the swatch deck (strip 0 on top), the run tabs, the pad, the tape and its words, the pins.
+ if(o.slide2>0){x+=`<g${o.slide2<1?' clip-path="url(#sfclip)"':''}>`;for(let j=0;j<10;j++)x+=sfStrip(o.a2[j],SF.L2,SF.v0,SF.v1,q.dy2,SFRC[SFRUN[j][1]],j?clamp(Math.abs(o.a2[j]-o.a2[j-1])/8):1);x+='</g>'}
+ x+=`<g${o.slide1<1?' clip-path="url(#sfclip)"':''}>`;for(let k=13;k>=0;k--)x+=sfStrip(o.a1[k],SF.L1,SF.w0,SF.w1,q.dy1,SFCOL[k],k<13?clamp(Math.abs(o.a1[k]-o.a1[k+1])/6):1);x+='</g>';
+ if(o.slide2>0)for(let j=0;j<10;j++){const e=o.tab(j);if(e<=0)continue;const c=sfR(o.a2[j],155,q.dy2),[n,res]=SFRUN[j],sc=backOut(e);
+  x+=`<g transform="translate(${pt(c)}) scale(${f(sc*100)/100})" opacity="${f(seg(e,0,.3))}"><path d="${rr4(-13,-7,26,14,[5,4,6,4])}" fill="#000" opacity=".3" transform="translate(1 1.6)"/>`+
+   `<path d="${rr4(-13,-7,26,14,[5,4,6,4])}" fill="#f4ead6" filter="url(#g-c)"/><circle cx="-8.2" cy="0" r="2.2" fill="${SFRC[res]}"/>`+
+   `<text x="3.4" y="3.3" text-anchor="middle" font-family="'Avenir Next',Avenir,'Segoe UI',Helvetica,sans-serif" font-weight="700" font-size="9" ${n===418?'style="fill:var(--accent)"':'fill="#3a2a1e"'}>${n}</text></g>`}
+ x+=pad;
+ if(o.band>0){const b=ease(o.band);x+=sfBand(-SF.B+2*SF.B*b,o.band>=1)}
+ if(o.txt>0){const T=(a,b,op)=>op>.01?`<g opacity="${f(op)}"><text font-family="Georgia,serif" font-style="italic" font-size="11.5" fill="#3a2a1e" letter-spacing=".2"><textPath href="#sfA" startOffset="50%" text-anchor="middle">${a}</textPath></text>`+
+   `<text font-family="Georgia,serif" font-size="10" fill="#5a4636" letter-spacing=".3"><textPath href="#sfB" startOffset="50%" text-anchor="middle">${b}</textPath></text></g>`:'',em=s=>`<tspan style="fill:var(--accent)" font-weight="700">${s}</tspan>`;
+  x+=T(`${em('12 / 14')} checks passed`,'run 418 · main · 86% · 2 waiting',o.txt*(1-o.swOut))+T(`${em('12 / 14')} · run 418 · ${em('86%')}`,'waiting: deploy-preview · e2e-safari',o.txt*o.swIn)}
+ // A cross-stitched tick on each passed strip's tip, one after another.
+ for(let k=0;k<Math.floor(o.ticks+1e-6)&&k<12;k++){const c=sfR(o.a1[k],SF.L1-SF.w1/2+.5),d=`M${f(c.x-3.2)} ${f(c.y-.2)}l2.3 2.6l4.3 -5.2`;
+  x+=`<path d="${d}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" transform="translate(.5 .8)"/><path d="${d}" fill="none" stroke="${k<4?'#3f5f22':'#fff7e6'}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`}
+ // Glass-headed pins are pushed into the two waiting strips' tips, for Brent's attention.
+ [12,13].forEach((k,n)=>{const e=o.pins[n];if(e<=0)return;const a=o.a1[k],u=ease(e),h=sfR(a,138+16*(1-u)),tip=sfR(a,121+16*(1-u));
+  x+=`<g opacity="${f(seg(e,0,.3))}"><path d="M${pt(h)}L${pt(tip)}" stroke="#000" stroke-opacity=".3" stroke-width="1.6" transform="translate(1.5 2)"/><path d="M${pt(h)}L${pt(tip)}" stroke="#c9ccd2" stroke-width="1.2" stroke-linecap="round"/>`+
+   `<circle cx="${f(h.x+1)}" cy="${f(h.y+1.6)}" r="4.2" fill="#000" opacity=".3"/><circle cx="${f(h.x)}" cy="${f(h.y)}" r="4.2" fill="url(#sfpin)"/><circle cx="${f(h.x-1.4)}" cy="${f(h.y-1.5)}" r="1.1" fill="#fff" opacity=".85"/></g>`});
+ // The split pin's brass dome, squashed home as it goes through, and a glint once the deck is open.
+ if(o.pin>0){const s=1.8-.8*backOut(o.pin),r=6.4*s,{px,py}=SF;
+  x+=`<g opacity="${f(seg(o.pin,0,.25))}"><circle cx="${px+1}" cy="${py+1.8}" r="${f(r)}" fill="#000" opacity=".35"/><circle cx="${px}" cy="${py}" r="${f(r)}" fill="url(#sfbr)" stroke="#5a3d0e" stroke-width=".6"/>`+
+   `<path d="M${f(px-r*.55)} ${f(py-r*.25)}a${f(r*.6)} ${f(r*.6)} 0 0 1 ${f(r*.5)} ${f(-r*.4)}" fill="none" stroke="#fff6d8" stroke-opacity=".85" stroke-width=".9" stroke-linecap="round"/></g>${mbSpark(px+4,py-4,Math.sin(Math.PI*o.gl))}`}
+ return x+'</g>';
+}
+function sfRender(el,svg,gr,kn,pa){
+ el.dataset.m='1';pa.style.display='none';el.querySelectorAll('.pp,.cp,.sd,.ck,.cktool,.mb').forEach(n=>n.style.display='none');el.classList.remove('sdb');
+ const q=sfGeo(sfAt(model.gq)),{w,h,ox,oy}=q;
+ el.style.width=w+'px';el.style.height=h+'px';el.style.transform='';
+ const key=`sf|${model.gq}|${model.mFr<0?-1:model.mFr%3}`;
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=sfSvg(q,model.mFr)}
+ // The pad keeps its own nameplate, display and knot where they always are.
+ const mini=el.querySelector('.mini');mini.style.left=f(ox+17)+'px';mini.style.top=f(oy+25)+'px';mini.style.opacity=1;mini.style.visibility='visible';
+ kn.style.left=f(ox+243)+'px';kn.style.top=f(oy+34)+'px';kn.style.opacity=1;kn.style.visibility='visible';
+ gr.style.opacity=1;gr.style.left=f(ox+24)+'px';gr.style.right=f(w-ox-CW+24)+'px';gr.style.top=f(oy+4)+'px';el.querySelector('.strip').style.opacity=0;
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 2 failed; deploy-preview and e2e-safari waiting':''));
  return true;
 }
 const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
