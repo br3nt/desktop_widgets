@@ -608,8 +608,116 @@ const JOINS={
   phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.42?'Joining · the arms reach ':jt<.5?'Joining · the limb is raised ':jt<.56?'Joining · the plate is engraved ':jt<.68?'Joining · the rete is laid on ':jt<.76?'Joining · the rule is pinned ':jt<.86?'Joining · the stars kindle ':'Joining · turning to '+AS.ph(model.angle)+' '):(jt>.88?'Releasing · turning level ':jt>.78?'Releasing · the stars go out ':jt>.7?'Releasing · the pin is drawn ':jt>.64?'Releasing · the rete is lifted off ':jt>.56?'Releasing · the limb is lowered ':'Releasing · the casings part '),
   about:'An angle you read off the sky. An astrolabe is two discs and a pointer: a fixed plate engraved with the lines of the sky overhead, and an openwork rete above it whose pointers mark the bright stars; turning the rete shows which star stands overhead. Here GitDiscuss is the astrolabe\'s rule. <b>Near:</b> Jarvis\'s knops glow and slim silver arms peek out toward each other. <b>Ready:</b> a dashed ghost of the limb, the rule and the zenith star hangs between the stems. Joining: the casings close to a span apart (wide enough for the full turn). Jarvis\'s knops reach out on bowed silver arms with leaves, and the limb is raised between them: a silver ring that draws itself round from Jarvis\'s side, with a moonstone crest at its top and a zenith mark under it. The night-glass plate inside is engraved: a ring of degree ticks, the meridian, and the nested circles of altitude round the zenith. The rete is laid on, spinning down into place: an outer ring, the offset ring of the ecliptic, a cross-bar and two scrolls, and seven flame-shaped pointers, whose moonstone tips kindle later. GitDiscuss\'s rule grows from its stem across the plate and is pinned through the middle with a flash. The stars kindle one by one, a glint runs round the limb, and GitDiscuss turns to its angle with one soft overshoot. <b>The stops are stars:</b> the rete turns twice as far as GitDiscuss, so each 15° brings the next star under the zenith mark, where it kindles as the join light: Capella, Aldebaran and Arcturus raised, Vega level, Altair, Deneb and Spica lowered. Between stars nothing stands under the mark, which is still a valid resting place, to ±50°. The rule\'s tip reads the angle on the limb\'s ticks. Arriving on a star flares it. To turn: drag GitDiscuss\'s nameplate round the pin, use the Angle slider, or focus GitDiscuss\'s nameplate or the astrolabe and press ↑ ↓ to step between stars (Shift+↑ ↓ for 1°). Tap GitDiscuss\'s nameplate without dragging to sight the star overhead. While it turns, a moonstone tag reads the angle and the star. The pair refits vertically to stay on the stage; drag Jarvis\'s nameplate to move it. Shaded, the astrolabe shrinks with the casings and keeps its stars. Nothing moves at rest. <b>Release:</b> click the astrolabe, or focus it and press Enter. GitDiscuss turns level, the stars go out, the pin is drawn and the rule draws back into GitDiscuss\'s stem, the rete is lifted off spinning, the plate dims, the limb is lowered, the arms draw back into the stems and the casings part.',
   over:c=>drawAstro(c)
+ },
+ damsel:{label:'Damselflies',kind:'Swarm',gap:64,slow:1.4,msOut:3000,
+  txt:{join:'The casings settle a span apart. Moon-blue damselflies drift down out of the night and alight on Jarvis\'s stem; gold-green ones rise from below, and each blue one takes a gold one by the neck with the tip of its tail, so they hang across the gap in tandem.',
+   joined:'Joined: three pairs of damselflies hang in tandem across the gap, lit from within. Drag a nameplate to move the pair; tap the damselflies (or press Enter) to send them off.',
+   release:'The light goes out of them, each pair lets go, the gold ones drop away below, the blue ones lift off into the night, and the casings part.',
+   stop:'The damselflies turn back into the night.',
+   hold:'Held mid-join: damselflies on the wing, the first already alighting. Use the scrubber to step through the swarm.',
+   ready:'Ready: three tandem pairs are traced in moonlight across the gap. Release to call them in.',near:'Nearby: two damselflies flutter over the gap. Move closer.',
+   readyPh:'Ready · the pairs are traced',nearPh:'Nearby · damselflies flutter over the gap'},
+  phase:(jt,dir)=>dir>0?(jt<.3?'Joining · settling a span apart ':jt<.58?'Joining · damselflies drift in ':jt<.8?'Joining · pairing in tandem ':'Joining · they kindle '):(jt>.9?'Releasing · the light goes out ':jt>.72?'Releasing · the pairs let go ':jt>.55?'Releasing · they fly off ':'Releasing · the casings part '),
+  about:'The Swarm join kind in elven: nothing is fixed to either casing. Damselflies are the slenderest things with wings, glass wings that fold together over the back when they rest, and they fly in tandem: the male holds the female just behind her head with the tip of his tail, and the pair lays eggs into a plant stem together, her tail curved down into it. Here the joining stems are those plant stems. <b>Near:</b> the stems glow and two damselflies flutter over the gap while you hold the casings close, one moon-blue and one gold-green. <b>Ready:</b> three tandem pairs are traced across the gap in dashed moonlight. Joining: the casings settle a span apart (64 px, with the night showing through). Three moon-blue males drift down out of the sky one after another in the wavering way damselflies fly, the middle one first; each hovers a moment above its place, darts in, grips Jarvis\'s stem with its legs and folds its wings over its back. Three gold-green females rise from below the same way and hover just ahead of each male, and he lowers the tip of his tail onto her neck with a glint. She then folds her wings and curves her tail down to GitDiscuss\'s stem, touching it with a glint, so each pair runs stem to stem. Last they kindle pair by pair, segment by segment from the thorax back, as the join light: the males moon-blue while Jarvis runs, the females gold while GitDiscuss runs, each going grey when its own widget is paused. The pterostigma, the small dark cell near each wing tip, kindles with them, and a glint runs along each pair. Everything stays in the gap, clear of the panes, nameplates and buttons. Nothing moves at rest. In a shade only the middle pair fits; the outer pairs let go and fly off as the strip narrows (blue up, gold down) and come back as it opens. <b>Release:</b> tap the damselflies, or focus them and press Enter. The light goes out, each pair lets go (she lifts her tail from the stem, he lets go of her neck), the females drop away below, the males lift off into the night, and the casings part.',
+  over:c=>drawDamsel(c)
  }
 };
+/* ---------- Damselflies drawing ---------- */
+// Three tandem pairs hang across the gap. A moon-blue male grips Jarvis's stem and holds a gold-green female by the neck with the tip of his tail;
+// she curves her own tail down to GitDiscuss's stem. Both face Jarvis, as a pair in tandem faces one way. Each is drawn facing left from its neck N,
+// pitched by rot (degrees; negative is nose down), with its tail as a centre line in stage coordinates.
+const DFO=[1,0,2],DFC={m:{body:[152,184,238],dark:'#16204a',eye:[128,166,250],lit:[206,226,255],halo:'halo'},f:{body:[184,216,186],dark:'#1b3a33',eye:[218,234,166],lit:[255,222,150],halo:'haloWarm'}};
+const DFW='M0 0C2.4 -.5 4.6 -1.7 8 -2.3C11.6 -2.8 15.2 -2.4 16.8 -1.2C17.5 -.4 17 .5 15.6 .7C11.4 1.1 5.2 .7 0 0Z',DFV='M.6 -.1C5 -1 10 -1.7 16.4 -1.3',DFP='M14 -2.45L15.6 -2.2L15.5 -1.4L13.9 -1.6Z';
+const DFT='M0 -2.3C3 -3.6 7.5 -3 9.2 -1.1C9.6 0 9.4 1.2 8.6 1.7C6 2.6 2.4 2.8 0 2.2C-.7 1.2 -.7 -1.3 0 -2.3Z';
+const dfRGB=(a,b,t)=>`rgb(${a.map((v,i)=>Math.round(lerp(v,b[i],clamp(t)))).join(',')})`;
+const dfR=(p,deg,dx,dy)=>{const a=deg*PI/180,c=Math.cos(a),s=Math.sin(a);return{x:p.x+dx*c-dy*s,y:p.y+dx*s+dy*c}};
+const dfW=pts=>(pts.forEach((p,i)=>p.w=i===pts.length-1?2.1:lerp(2.5,1.35,i/(pts.length-1))),pts);
+const dfLine=(A,deg,L)=>dfW(Array.from({length:21},(_,i)=>dfR(A,deg,L*i/20,0)));
+const dfQuad=(A,C,E)=>dfW(Array.from({length:21},(_,i)=>{const t=i/20,u=1-t;return{x:u*u*A.x+2*u*t*C.x+t*t*E.x,y:u*u*A.y+2*u*t*C.y+t*t*E.y}}));
+// Rows of the three pairs (top, middle, bottom) from the casing top; the outer two need a tall casing.
+const dfRows=h=>{const m=h/2-7;return[m-27,m,m+27]};
+// A pair's resting places: his neck Nm by Jarvis's stem, his tail tip Tm, her neck Nf just under it, and the point SP where her tail meets GitDiscuss's stem.
+function dfGeo(xa,ya,xb,yb,h,i){const r=dfRows(h)[i],Nm={x:xa+9.1,y:ya+r},Tm={x:Nm.x+39,y:Nm.y};return{Nm,Tm,Nf:{x:Tm.x,y:Tm.y+2.2},SP:{x:xb-3.5,y:yb+r+16}}}
+// A flight: a wavering drift from S to a hover point Hv, a moment's hover, then a dart onto P. rot follows the climb or fall (sg: which way it is flown).
+function dfPath(S,Hv,P,u){
+ if(u<.62){const e=ease(u/.62);return{x:lerp(S.x,Hv.x,e)+9*Math.sin(e*PI*3)*(1-e),y:lerp(S.y,Hv.y,e)}}
+ if(u<.8){const v=(u-.62)/.18;return{x:Hv.x+1.5*Math.sin(v*PI*2),y:Hv.y+2.2*Math.sin(v*PI*3)}}
+ const v=(u-.8)/.2,e=1-Math.pow(1-v,3);return{x:lerp(Hv.x,P.x,e),y:lerp(Hv.y,P.y,e)}}
+function dfFly(S,Hv,P,u,sg){const a=dfPath(S,Hv,P,clamp(u-.01)),b=dfPath(S,Hv,P,clamp(u+.01));return{p:dfPath(S,Hv,P,u),rot:clamp(-(b.y-a.y)*sg*3.2,-26,26)*(1-seg(u,.9,1))}}
+// The body: tail (ten segments kindling from the thorax back), thorax with its shoulder stripe, a big eye, and legs (gripping a stem face at local x gx, by weight gw).
+function dfly(N,rot,abd,o){
+ const C=DFC[o.sex],lit=o.lit||0,LC=o.cold?[176,182,198]:C.lit,al=o.op??1;if(al<=.01)return '';
+ const tf=`translate(${f(N.x)} ${f(N.y)}) rotate(${f(rot)})`;
+ if(o.ghost)return `<g opacity="${op(al*.7)}" fill="none" stroke="#dfe8ff" stroke-width=".7" stroke-dasharray="2 1.6"><path d="${ribbon(abd)}"/><g transform="${tf}"><path d="${DFT}"/><circle cx="-2.7" cy="0" r="2.7"/></g></g>`;
+ let s=`<g opacity="${op(al)}">`;
+ if(lit>0)s+=`<path d="${poly(abd)}" fill="none" stroke="${dfRGB(LC,LC,0)}" stroke-width="7" stroke-linecap="round" opacity="${op(.4*lit)}" filter="url(#soft)"/>`;
+ s+=`<path d="${ribbon(abd)}" fill="${C.dark}" stroke="${NIGHT}" stroke-width=".4"/>`;
+ for(let j=0;j<10;j++){const a=abd[2*j],b=abd[2*j+1],c=abd[2*j+2],m={x:lerp(b.x,c.x,.55),y:lerp(b.y,c.y,.55),w:lerp(b.w,c.w,.55)};
+  s+=`<path d="${ribbon([a,b,m],-.25)}" fill="${dfRGB(C.body,LC,.85*seg(lit,j*.05,j*.05+.5))}"/>`}
+ s+=`<g transform="${tf}">`;
+ const gw=o.gw||0,hip=[[2,2.2],[4.4,2.5],[6.8,2.2]],tuck=[[.4,5],[3.4,5.8],[7.6,5.2]],grip=[[o.gx??0,2.6],[o.gx??0,5.2],[o.gx??0,7.8]];
+ s+=hip.map((hp,n)=>{const ft=[lerp(tuck[n][0],grip[n][0],gw),lerp(tuck[n][1],grip[n][1],gw)],kn=[(hp[0]+ft[0])/2+.6,(hp[1]+ft[1])/2+1.6];
+  return `<path d="M${hp[0]} ${hp[1]}L${f(kn[0])} ${f(kn[1])}L${f(ft[0])} ${f(ft[1])}" fill="none" stroke="#c9d4ee" stroke-width=".55" stroke-linejoin="round" opacity=".8"/>`}).join('');
+ if(lit>0)s+=`<circle cx="-2.7" cy="0" r="7" fill="url(#${C.halo})" opacity="${op(.55*lit)}"/>`;
+ s+=`<path d="${DFT}" fill="${dfRGB(C.body,LC,.55*lit)}" stroke="${NIGHT}" stroke-width=".5"/><path d="M1 -2.1Q5 -2.9 8.6 -1.3" fill="none" stroke="${C.dark}" stroke-width=".9"/>`;
+ s+=`<circle cx="-2.7" cy="0" r="2.7" fill="${dfRGB(C.eye,LC,.7*lit)}" stroke="${NIGHT}" stroke-width=".5"/><circle cx="-3.5" cy="-.9" r=".8" fill="#fff" opacity=".85"/>`;
+ return s+'</g></g>'}
+// Four glass wings from the top of the thorax: folded together over the back (sp 0), or beating (sp 1) at phase ph with a faint blur fan.
+function dfWings(N,rot,o){
+ const sp=o.sp||0,al=o.op??1,LC=o.cold?[176,182,198]:DFC[o.sex].lit;if(al<=.01)return '';
+ let s=`<g transform="translate(${f(N.x)} ${f(N.y)}) rotate(${f(rot)}) translate(5 -2.5)" opacity="${op(al)}">`;
+ if(sp>.01&&!o.ghost){const a0=-140*PI/180,a1=-4*PI/180,r=17;s+=`<path d="M0 0L${f(r*Math.cos(a0))} ${f(r*Math.sin(a0))}A${r} ${r} 0 0 1 ${f(r*Math.cos(a1))} ${f(r*Math.sin(a1))}Z" fill="#dfe8ff" opacity="${op(.07*sp)}"/>`}
+ for(let w=0;w<4;w++){const a=lerp(-5-3*w,-72+66*Math.sin((o.ph||0)-(w>1?1.2:0))+(w%2?5:0),sp);
+  s+=o.ghost?`<path d="${DFW}" transform="rotate(${f(a)})" fill="none" stroke="#dfe8ff" stroke-width=".6" stroke-dasharray="2 1.6" opacity=".6"/>`:
+   `<g transform="rotate(${f(a)})" opacity="${op(1-.4*sp)}"><path d="${DFW}" fill="#e6eeff" fill-opacity=".14" stroke="#e4ecff" stroke-opacity=".62" stroke-width=".45"/><path d="${DFV}" fill="none" stroke="#e4ecff" stroke-opacity=".35" stroke-width=".35"/><path d="${DFP}" fill="${dfRGB([52,60,98],LC,o.lit||0)}"/></g>`}
+ return s+'</g>'}
+// A damselfly on the wing with a straight tail.
+function dfOne(N,rot,sex,o){const abd=dfLine(dfR(N,rot,9,0),rot,sex==='m'?30:27);return dfly(N,rot,abd,{...o,sex})+dfWings(N,rot,{...o,sex})}
+// While a drag is near, the two fliers keep fluttering even when the pointer is still; the loop stops with the drag.
+let dfLoop=false;
+function dfKick(){if(dfLoop||reduce.matches)return;dfLoop=true;requestAnimationFrame(function st(){if(!(drag&&drag.id&&model.glow>0&&model.jt===0&&J()===JOINS.damsel)){dfLoop=false;return}render();requestAnimationFrame(st)})}
+function drawDamsel(c){
+ const h=c.h,jt=c.jt,xa=model.a.x+W-11.5,xb=model.b.x+11.5,ya=model.a.y,yb=model.b.y,cold={m:!model.a.run,f:!model.b.run};let s='';
+ if(jt===0){const g=c.glow;if(g<=0)return s;
+  if(drag&&drag.id)dfKick();
+  const t=reduce.matches?0:performance.now()/1000,mx=(model.a.x+W+model.b.x)/2,my=(ya+yb)/2+h/2,rd=drag&&drag.state==='ready';
+  s+=[[xa,ya],[xb,yb]].map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y+h/2)}" r="${f(8+10*g)}" fill="url(#halo)" opacity="${op(g*.7)}"/>`).join('');
+  if(g>=1)for(let i=0;i<3;i++){if(i!==1&&h<112)continue;const G=dfGeo(xa,ya,xa+J().gap+23,ya,h,i),fr=18,fa=dfR(G.Nf,fr,9,0);
+   s+=dfly(G.Nm,0,dfLine({x:G.Nm.x+9,y:G.Nm.y},0,30),{sex:'m',ghost:1})+dfly(G.Nf,fr,dfQuad(fa,{x:G.SP.x-8,y:fa.y+4},G.SP),{sex:'f',ghost:1})+dfWings(G.Nm,0,{sex:'m',ghost:1})+dfWings(G.Nf,fr,{sex:'f',ghost:1})}
+  [['m',-1],['f',1]].forEach(([sex,sd],i)=>{const N={x:mx-16+sd*14+8*Math.sin(t*1.3+i*2.1),y:my-30+sd*12+9*Math.sin(t*2.2+i)},vy=19.8*Math.cos(t*2.2+i);
+   s+=dfOne(N,clamp(-vy*1.1,-20,20),sex,{op:g*(rd?.55:1),sp:1,ph:t*42+i*1.7,cold:cold[sex]})});
+  return s}
+ const po=seg(h,100,124),sg=model.dir>0?1:-1,gl=model.dir>0?seg(jt,.9,1):0;let wings='';
+ for(let k=0;k<3;k++){const i=DFO[k],G=dfGeo(xa,ya,xb,yb,h,i),p=i===1?1:po;
+  let mU,fU,cl,bd,lt;
+  if(model.dir>0){mU=seg(jt,.18+.1*k,.48+.1*k);fU=seg(jt,.28+.1*k,.58+.1*k);cl=seg(jt,.58+.1*k,.63+.1*k);bd=seg(jt,.62+.1*k,.7+.1*k);lt=seg(jt,.78+.05*k,.9+.05*k)}
+  else{lt=seg(jt,.9,1);bd=seg(jt,.84-.03*k,.9-.03*k);cl=seg(jt,.78-.03*k,.84-.03*k);fU=seg(jt,.64-.02*k,.78-.03*k);mU=seg(jt,.55,.7-.03*k)}
+  // An outer pair in a narrowing shade lets go and flies off: her tail lifts, he lets go, she drops away, he lifts off.
+  if(p<1){bd*=seg(p,.9,1);cl=Math.min(cl,seg(p,.8,.9));fU=Math.min(fU,seg(p,.1,.8));mU=Math.min(mU,seg(p,0,.6));lt*=seg(p,.9,1)}
+  if(mU<=0&&fU<=0)continue;
+  // An outer pair leaving or returning with the shade flies its path the way the shade is going.
+  const ph=jt*260+k*2.3,lit=ease(lt),sgk=p<1&&model.st>0&&model.st<1?(model.shDir>0?-1:1):sg;
+  // Him: down out of the sky to a hover above his place, then onto Jarvis's stem. His tail is raised until he takes her neck.
+  const Sm={x:xa+43.5+[12,-6,20][i],y:Math.max(20,ya-120-16*k)},M=dfFly(Sm,{x:G.Nm.x+24,y:G.Nm.y-18},G.Nm,mU,sgk);
+  const tl=M.rot-9*seg(mU,.85,1)*(1-ease(cl)),mAbd=dfLine(dfR(M.p,M.rot,9,0),tl,30);
+  // Her: up from below to hover just ahead of him; once held she pitches down and curves her tail onto GitDiscuss's stem.
+  const Sf={x:xa+43.5+[-8,10,-14][i],y:Math.min(596,yb+h+120+16*k)},F=dfFly(Sf,{x:G.Nf.x+8,y:G.Nf.y+20},G.Nf,fU,sgk);
+  const hd=seg(fU,.88,1),eb=ease(bd),fr=F.rot*(1-hd)+hd*lerp(4,18,eb),fa=dfR(F.p,fr,9,0),fe=dfR(fa,fr,27,0);
+  const fAbd=dfQuad(fa,{x:lerp((fa.x+fe.x)/2,G.SP.x-8,eb),y:lerp((fa.y+fe.y)/2,fa.y+4,eb)},{x:lerp(fe.x,G.SP.x,eb),y:lerp(fe.y,G.SP.y,eb)});
+  const fo={sex:'f',op:seg(fU,0,.08),lit,cold:cold.f,sp:fU<.999?1:1-ease(seg(bd,0,.7)),ph:ph+1.4},mo={sex:'m',op:seg(mU,0,.08),lit,cold:cold.m,sp:1-seg(mU,.86,1),ph,gx:-5.6,gw:seg(mU,.88,1)};
+  if(fU>0)s+=dfly(F.p,fr,fAbd,fo);
+  if(mU>0)s+=dfly(M.p,M.rot,mAbd,mo);
+  if(fU>0)wings+=dfWings(F.p,fr,fo);
+  if(mU>0)wings+=dfWings(M.p,M.rot,mo);
+  // Glints: his feet on the stem, the clasp on her neck, her tail touching GitDiscuss's stem; then one runs along the pair.
+  if(model.dir>0){const a=Math.sin(PI*seg(mU,.9,1)),b=Math.sin(PI*cl),d=Math.sin(PI*seg(bd,.75,1));
+   if(a>.01)wings+=star(xa+3.5,G.Nm.y+5,4*a,a);if(b>.01)wings+=star(mAbd[20].x,mAbd[20].y,4.5*b,b);if(d>.01)wings+=star(G.SP.x,G.SP.y,4*d,d)}
+  if(gl>0&&gl<1&&p>=1){const ch=mAbd.concat(fAbd),q=ch[Math.round(gl*(ch.length-1))],e=Math.sin(PI*gl);wings+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${f(7*e)}" fill="url(#halo)" opacity="${op(e)}"/>`+star(q.x,q.y,3.6*e,e)}
+ }
+ s+=wings;
+ if(jt===1){const x0=xa-6,y0=Math.min(ya,yb)+4,wd=xb-xa+12,hd=h-8;
+  s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Damselflies: click, or press Enter, to send them off and separate the widgets"><title>Tap the damselflies to send them off</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(hd)}" fill="transparent"/><rect class="ringfocus" x="${f(x0+2)}" y="${f(y0+2)}" width="${f(wd-4)}" height="${f(hd-4)}" rx="10" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return s}
 /* ---------- Weave drawing ---------- */
 // Each joining end's rim becomes a flat ribbon thread that runs down its rim, loops once and crosses to the partner's rim.
 // The knot (two interlocked loops, rotationally symmetric) is laid out round the seam's centre; crossings alternate over and under.
@@ -2601,6 +2709,7 @@ function toggleShade(force){
  // A grown Checks lets its leaves fall first, and grows them again once unshaded.
  if(to===1&&model.g>0){const keep=model.size&&model.size!=='bud'?model.size:SIZES[Math.max(1,Math.round(model.g))][0];++shadeAnim;
   morphTo('bud').then(ok=>{if(ok){model.restore=keep;toggleShade(1)}});return}
+ model.shDir=to>start?1:-1;
  const token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||620)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;
  (function step(now){if(token!==shadeAnim)return;const t=reduce.matches||ms<=0?1:clamp((now-t0)/ms);model.st=lerp(start,to,e(t));refitPair();render();if(t<1)requestAnimationFrame(step);else if(to===0&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}})(t0);
  say(to?(sh.sayIn||'Shaded: the casing narrows to a slim leaf with its nameplate and one value.'):(sh.sayOut||'Unshaded: the casing opens again.'));
