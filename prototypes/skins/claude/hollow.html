@@ -361,7 +361,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · on the map dividers, drag a leg, the wing or the tag (or GitDiscuss's nameplate) to open or close them, ↑ opens and ↓ closes them a notch, and tap the brass head to release · on the silk web, drag the web (or GitDiscuss's nameplate) to swing GitDiscuss, ↑ ↓ on the focused web move it 15°, and tap the drop at the hub to release · on the moths, tap them, wave across them or press Enter on them to scatter them · on the lever bolt, strike across the lever, tap it or press Enter on it to draw the bolt · on the shell shims, drag the shims (or GitDiscuss's nameplate) to open or close the wedge a shim (15°) at a time, ↑ ↓ on the focused shims step it, and tap the shims to knock them out · on the grapnel, tap the winch, the line or the grapnel, flick across the line, or press Enter on it to shake the grapnel off · on the revolving lantern, tap a lantern (or press Enter on its nameplate) to turn its drum to the next screen · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · on the map dividers, drag a leg, the wing or the tag (or GitDiscuss's nameplate) to open or close them, ↑ opens and ↓ closes them a notch, and tap the brass head to release · on the silk web, drag the web (or GitDiscuss's nameplate) to swing GitDiscuss, ↑ ↓ on the focused web move it 15°, and tap the drop at the hub to release · on the moths, tap them, wave across them or press Enter on them to scatter them · on the lever bolt, strike across the lever, tap it or press Enter on it to draw the bolt · on the shell shims, drag the shims (or GitDiscuss's nameplate) to open or close the wedge a shim (15°) at a time, ↑ ↓ on the focused shims step it, and tap the shims to knock them out · on the grapnel, tap the winch, the line or the grapnel, flick across the line, or press Enter on it to shake the grapnel off · on the bone stay, drag the bone (or GitDiscuss's nameplate) to swing GitDiscuss, ↑ ↓ on the focused bone move it a notch (15°), and tap the iron peg to lift the bone off ·on the revolving lantern, tap a lantern (or press Enter on its nameplate) to turn its drum to the next screen · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -2033,6 +2033,193 @@ const JOINS={
     s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Grapnel: tap the winch, the line or the grapnel, or press Enter, to shake the grapnel off and separate the widgets"><title>Tap the winch, the line or the grapnel, or flick across the line, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
    return s;
   }
+ },
+ /* Bone stay: a notched rib bone pivoted on GitDiscuss drops over an iron peg on Jarvis and holds the angle (Stay). */
+ // The Stay angle kind in Hollow, after gothic's casement stay. The shells meet strap to strap and GitDiscuss turns on a pin at the inside
+ // corner, as on the shims; the angle is held by a brace across the opening, with a notch per 15° cut on the side facing the shells.
+ // Over the roofs when GitDiscuss is lowered, under the bellies when it is raised; crossing level, the bone is lifted off one side and set on the other.
+ bone:{label:'Bone stay',kind:'Angle · stay',gap:-6,angled:true,range:45,step:15,holdAt:.53,angleLabel:'Bone stay angle in degrees',
+  side:1,sw:null,lf:null,clk:null,ev:4.8,at:0,HW:4,E0:4.8,E1:8.4,SWMS:640,
+  n(a=model.angle){return clamp(Math.round(Math.abs(a)/15),0,3)},
+  // At 0° there is no swing, so the join and release take less time (and the release takes the bone off sooner: z).
+  get slow(){return this.n()?1.6:1},get msOut(){return this.n()?3000:2200},z(){return this.n()?0:.1},
+  about:'From the notched props that hold cellar hatches and shutters open in a town built underground, carved here from a long rib bone. GitDiscuss turns on a pin at the inside corner of the joint, as on the shims, and the angle is held by a <b>brace across the opening</b>: the bone is pivoted on an iron bracket on GitDiscuss, and a notch for each 15°, cut on the side facing the shells, drops over an iron peg on a bracket on Jarvis. Lowered (positive angles), the brackets stand on the roofs and the bone lies over the roofline; raised, they hang under the bellies and the bone runs beneath. The bone is pale and waisted, with a knuckle at the pivot riveted in brass, a double knob at the free end, red silk lashing at both ends, an engraved wave by the knuckle and carver\'s dots counting the notches. <b>Near:</b> the shells glint where the brackets will stand. <b>Ready:</b> a chalk ghost of the brackets, the bone with its notches, and GitDiscuss\'s swing. Joining: the shells close strap to strap and pins are struck home at head and foot. The brackets are raised with a scatter of grit. The bone is set on its pivot from above (or below), held raised, then brought down onto the peg, landing in the first notch with a clank. It is lifted, GitDiscuss swings open a little past its angle and settles, and the bone drops into the notch for that angle. Last, the glass in the peg kindles as the join light: amber while both run, cold blue-white if either is paused. <b>Angle:</b> −45° to +45° in 15° steps (notches 1 to 4). Drag the bone or GitDiscuss\'s nameplate, use the slider, or focus the bone and press ↑ ↓. While GitDiscuss moves, the bone rides lifted with its notches sliding past the peg; when it stops, the nearest notch drops onto the peg with a clank. Crossing level, the bone is lifted off one side and set on the other. The pair moves up or down to stay on the stage, and nothing moves at rest. <b>Release:</b> tap the iron peg (or press Enter on the bone). The glass goes dark, the bone is lifted, GitDiscuss swings level and the bone drops onto the first notch; then it is raised off the peg and taken away, the brackets are drawn, the pins pulled and the shells part.',
+  text:{join:'The shells close and are pinned; iron brackets are raised, a notched bone is set across the opening, and GitDiscuss swings to its angle.',
+   joined:'Joined by a bone stay, one notch per 15°. Drag the bone (or GitDiscuss\'s nameplate) to swing GitDiscuss; tap the iron peg to lift the bone off.',
+   release:'The peg goes dark; the bone is lifted, GitDiscuss swings level, and the bone is taken off before the shells part.',back:'The bone is taken back off and the pins drawn.',
+   hold:'Held mid-join: the bone is set on its pivot and held raised, about to be brought down onto the peg. Use the scrubber to step through the animation.',
+   ready:'Ready: a ghost of the brackets and the notched bone shows across the joint. Release to set the stay.',near:'Nearby: the shells glint where the brackets will stand. Move closer.',
+   phReady:'Ready · the stay is ghosted',phNear:'Nearby · the bracket spots glint',get phDrag(){return drag&&drag.moved?'Swinging GitDiscuss · the bone rides lifted · '+signed(model.angle):'Tap the iron peg to lift the bone off'}},
+  stepSay(k,to){const n=this.n(to);return'GitDiscuss '+(k<0?'rises':'drops')+' 15° to '+signed(to)+': the bone drops onto notch '+(n+1)+' of 4'+(to>0?', over the roofs.':to<0?', under the bellies.':'.')},
+  phase(dir,jt){const n=this.n(),A=model.angle;
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<.38)return'Joining · the pins are struck home ';if(jt<.45)return'Joining · the brackets are raised ';
+    if(jt<.57)return'Joining · the bone is set on its pivot ';if(jt<.6)return'Joining · clank: notch 1 ';if(!n)return'Joining · the peg kindles ';
+    if(jt<.64)return'Joining · the bone is lifted ';if(jt<.88)return'Joining · swinging to '+signed(A)+' · ';if(jt<.94)return'Joining · the bone drops onto notch '+(n+1)+' ';return'Joining · the peg kindles '}
+   const r=1-jt;if(r<.06)return'Releasing · the peg goes dark ';
+   if(n&&r<.1)return'Releasing · the bone is lifted ';if(n&&r<.26)return'Releasing · swinging level ';if(n&&r<.3)return'Releasing · dropped onto notch 1 ';if(!n&&r<.2)return'Releasing · the bone is lifted ';
+   return r<.42-this.z()?'Releasing · the bone is taken off ':r<.42?'Releasing · the brackets are drawn ':r<.48?'Releasing · the pins are drawn ':'Releasing · parting '},
+  // GitDiscuss's swing: joining, it swings 5° past its angle while the bone rides lifted, and settles; releasing, it swings level.
+  bend(jt){const A=model.angle;if(jt>=1)return A;if(!A)return 0;
+   if(model.dir>0){if(jt<.64)return 0;if(jt>=.88)return A;const u=seg(jt,.64,.88),top=A+(A<0?-5:5);return u<.6?top*dart(u/.6):lerp(top,A,backOut(seg(u,.6,1)))}
+   const r=1-jt;return r<.1?A:r>=.26?0:A*(1-ease(seg(r,.1,.26)))},
+  // The pins sit on the joint line at the head and foot; GitDiscuss turns on the foot pin when lowered and the head pin when raised.
+  py(h,bd){return bd<0?14:h-5},
+  place(h){const bd=this.bend(model.jt);return{o:`3px ${this.py(h,bd)}px`,t:bd?`rotate(${f(bd*100)/100}deg)`:''}},
+  tone(){return model.a.run&&model.b.run?{glass:'#ffd581',core:'#fff6d8',g:'leakA'}:{glass:'#bcd3f0',core:'#f4f8ff',g:'leakC'}},
+  // On side s (1 over the roofs, −1 under the bellies), before GitDiscuss turns: the peg on Jarvis (J), the pivot on GitDiscuss (G),
+  // and the feet of their brackets on the shell (Jf, Gf).
+  // The brackets stand tall enough that the bone clears GitDiscuss's strap at ±45°.
+  pts(s,h,a,b){const dy=s>0?-22:h+20,rf=s>0?9:h-2;return{J:{x:a.x+W-33,y:a.y+dy},G:{x:b.x+47,y:b.y+dy},Jf:{x:a.x+W-33,y:a.y+rf},Gf:{x:b.x+47,y:b.y+rf}}},
+  // A point on GitDiscuss carried round with it, bd degrees about its pin.
+  turn(p,h,bd,b=model.b){if(!bd)return p;const O={x:b.x+3,y:b.y+this.py(h,bd)},[x,y]=rot([p.x-O.x,p.y-O.y],bd);return{x:O.x+x,y:O.y+y}},
+  // Where the notches are cut: the pivot-to-peg distance at each 15° step, set back so the peg sits in its notch E0 off the bone's middle.
+  cuts(s,h){const a={x:0,y:0},b={x:W-6,y:0},q=this.pts(s,h,a,b);
+   return[0,1,2,3].map(k=>{const g=this.turn(q.G,h,s*15*k,b);return Math.sqrt(Math.max(1,(g.x-q.J.x)**2+(g.y-q.J.y)**2-this.E0**2))})},
+  // The bone's heading (degrees) from its pivot G so the peg Jp sits e off its middle, on the side facing the shells.
+  aim(G,Jp,e,s){const D=Math.hypot(Jp.x-G.x,Jp.y-G.y);return(Math.atan2(Jp.y-G.y,Jp.x-G.x)-Math.atan2(-s*e,Math.sqrt(Math.max(1,D*D-e*e))))*180/Math.PI},
+  // Dropping onto the peg from `from`: it falls, hits at u = .55, and rebounds once a little.
+  drop(u,from=this.E1){return u<.55?lerp(from,this.E0,Math.pow(u/.55,2)):this.E0+(from-this.E0)*.16*Math.sin(Math.PI*seg(u,.55,1))},
+  // The bone in its own frame: the pivot knuckle at 0, the shaft along +x, waisted, with the notches cut on the side facing the shells (fs).
+  boneD(L,ns,fs){const hw=this.HW,r=3.2,hc=Math.sqrt(r*r-(this.E0-hw)**2),sw=fs>0?0:1,y=fs*hw,yo=-fs*hw;
+   let d=`M5 ${f(yo)}Q${f(L*.5)} ${f(yo+fs*1.3)} ${f(L-5)} ${f(yo)}L${f(L-5)} ${f(y)}`;
+   for(let i=ns.length-1;i>=0;i--)d+=`L${f(ns[i]+hc)} ${f(y)}A${r} ${r} 0 0 ${sw} ${f(ns[i]-hc)} ${f(y)}`;
+   return d+`L5 ${f(y)}Z`},
+  bone(G,phi,L,ns,s,op,sh){
+   const fs=-s,hw=this.HW,tf=`translate(${P(G)}) rotate(${f(phi)})`,r=3.2,hc=Math.sqrt(r*r-(this.E0-hw)**2),sw=fs>0?0:1,yo=-fs*(hw-1.3),
+    shape=`<path d="${this.boneD(L,ns,fs)}"/><circle r="6.2"/><circle cx="${f(L-3.5)}" cy="2.4" r="4.6"/><circle cx="${f(L-3.5)}" cy="-2.4" r="4.6"/>`;
+   // Scrimshaw: a wave engraved from the knuckle toward the first notch, and the carver's dots counting the notches.
+   let wv='M22 0';for(let x=22;x<ns[0]-12;x+=6)wv+=`q1.5 ${f(-1.1*fs)} 3 0t3 0`;
+   let det=`<path d="${wv}" fill="none" stroke="${INK}" stroke-width=".55" opacity=".5"/>`;
+   ns.forEach((x,k)=>{for(let i=0;i<=k;i++)det+=`<circle cx="${f(x+(i-k/2)*2.4)}" cy="${f(-fs*1.3)}" r=".7" fill="${INK}" opacity=".7"/>`});
+   // A pale lip along the outer edge and shade inside each notch.
+   det+=`<path d="M10 ${f(yo)}Q${f(L*.5)} ${f(yo+fs*1.3)} ${f(L-10)} ${f(yo)}" fill="none" stroke="#fbf6ea" stroke-width="1.2" stroke-linecap="round" opacity=".9"/>`;
+   det+=`<path d="${ns.map(x=>`M${f(x+hc)} ${f(fs*hw)}A${r} ${r} 0 0 ${sw} ${f(x-hc)} ${f(fs*hw)}`).join('')}" fill="none" stroke="#9d917a" stroke-width="1.1"/>`;
+   // Red silk lashing by the knuckle and at the free end.
+   let ls='';for(const x of[11,13.6,16.2,L-11.4,L-9.2])ls+=`M${f(x)} ${f(-hw-.5)}L${f(x+2.2)} ${f(hw+.5)}`;
+   det+=`<path d="${ls}" stroke="#3a070b" stroke-width="2.1" stroke-linecap="round"/><path d="${ls}" stroke="${RED}" stroke-width="1.2" stroke-linecap="round"/>`;
+   // The pivot: a brass rivet through the knuckle.
+   det+=`<circle r="2.5" fill="url(#brass)" stroke="${INK}" stroke-width=".8"/>`;
+   return `<g opacity="${f(op)}"><g transform="translate(${f(1.5+sh*.5)} ${f(2.5+sh)})"><g transform="${tf}" fill="${INK}" opacity=".42">${shape}</g></g>`+
+    `<g transform="${tf}"><g fill="none" stroke="${INK}" stroke-width="2.6" stroke-linejoin="round" filter="url(#wobW)">${shape}</g><g fill="#e2d9c4">${shape}</g>${det}</g></g>`},
+  // An iron bracket from the shell (foot F) to the peg or pivot (T), with a riveted foot plate and a scrolled knee brace; u raises it.
+  bracket(F,T,u,s,out,head){if(u<=0)return '';
+   const Tp={x:lerp(F.x,T.x,u),y:lerp(F.y,T.y,u)},m={x:lerp(F.x,T.x,.45),y:lerp(F.y,T.y,.45)},Fb={x:F.x+out*10,y:F.y-s*1.2},hd=Math.atan2(Fb.y-m.y,out)*180/Math.PI;
+   let o=`<g opacity="${f(clamp(u*3))}"><rect x="${f(F.x-6)}" y="${f(F.y-2.2)}" width="12" height="4.4" rx="1.8" fill="url(#iron)" stroke="${INK}" stroke-width="1"/><circle cx="${f(F.x-3)}" cy="${f(F.y)}" r=".9" fill="#9aa6b6"/><circle cx="${f(F.x+3)}" cy="${f(F.y)}" r=".9" fill="#9aa6b6"/></g>`;
+   o+=`<g fill="none" stroke-linecap="round" stroke-linejoin="round" filter="url(#wobW)">${iron(`M${P(F)}L${P(Tp)}`,2.4)}`;
+   if(u>.6)o+=iron(`M${P(m)}Q${f(F.x+out*9)} ${f(m.y)} ${P(Fb)}${spiral(Fb,hd,2.6,out*s>0?1:-1,1.1)}`,1.5,seg(u,.6,1));
+   o+='</g>';
+   if(head&&u>=.75)o+=`<g opacity="${f(seg(u,.75,1))}"><circle cx="${f(T.x)}" cy="${f(T.y)}" r="3.6" fill="url(#iron)" stroke="${INK}" stroke-width="1"/><circle cx="${f(T.x)}" cy="${f(T.y)}" r="1.2" fill="#9aa6b6"/></g>`;
+   return o},
+  // The iron peg on Jarvis's bracket, its glass the join light.
+  peg(p,lit,tn,op){const x=f(p.x),y=f(p.y);
+   return `<g opacity="${f(op)}"><circle cx="${f(p.x+.8)}" cy="${f(p.y+1.3)}" r="3" fill="${INK}" opacity=".5"/><circle cx="${x}" cy="${y}" r="3" fill="url(#iron)" stroke="${INK}" stroke-width="1.1"/><circle cx="${x}" cy="${y}" r="1.7" fill="#3c3022" stroke="${INK}" stroke-width=".5"/>`+
+    (lit>0?`<circle cx="${x}" cy="${y}" r="1.7" fill="${tn.glass}" opacity="${f(lit)}"/><circle cx="${f(p.x-.5)}" cy="${f(p.y-.5)}" r=".7" fill="${tn.core}" opacity="${f(lit)}"/>`:'')+'</g>'},
+  // One side's brackets, bone and peg: br raises the brackets, bop shows the bone, rho raises it away from the shells about its pivot,
+  // lift carries it off its pivot, e is how far the peg sits off its middle (seated or lifted), cl a clank fading.
+  rig(R,h,bd,lit,tn,k){const a=model.a,b=model.b,sd=R.sd,q=this.pts(sd,h,a,b),O={x:b.x+3,y:b.y+this.py(h,bd)},G=this.turn(q.G,h,bd),ns=this.cuts(sd,h),L=ns[3]+16;
+   let o='';
+   // The join light: a glow round the peg, under the bone.
+   if(lit>0&&R.br>=1)o+=`<circle cx="${f(q.J.x)}" cy="${f(q.J.y)}" r="${f(20+18*h/H)}" fill="url(#${tn.g})" opacity="${f(.75*lit)}"/>`;
+   o+=this.bracket(q.Jf,q.J,R.br,sd,-1,false)+(bd?`<g transform="rotate(${f(bd*100)/100} ${P(O)})">`:'<g>')+this.bracket(q.Gf,q.G,R.br,sd,1,true)+'</g>';
+   // Under the bellies there is less room below the pair, so the bone is raised and carried less far.
+   const rk=sd>0?.8:.4;
+   if(R.bop>0)o+=this.bone({x:G.x,y:G.y-sd*R.lift*rk},this.aim(G,q.J,R.e,sd)+sd*R.rho*rk,L,ns,sd,R.bop,R.e-this.E0+R.lift*.25);
+   const pk=seg(R.br,.75,1);if(pk>0)o+=this.peg(q.J,R.br>=1?lit:0,tn,pk);
+   if(R.cl>=0&&R.cl<1)o+=spark(q.J,1-R.cl,(4+7*R.cl)*k)+JOINS.shims.ticks(q.J,R.cl,k);
+   return o},
+  // The range of Jarvis's y that keeps both shells and the bone on the stage, allowing for the 5° swing past.
+  fitRange(ang,hh){const h=2*hh,a=ang?Math.sign(ang)*(Math.abs(ang)+6):0,py=this.py(h,ang),ys=[-42,h+(ang<0||!ang&&this.side<0?36:4)];
+   for(const p of [[-3,-30-py],[W-3,-30-py],[-3,h+4-py],[W-3,h+4-py]])ys.push(py+rot(p,a)[1]);
+   const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,40-mn),hi=594-mx;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]},
+  fit(y){return clamp(y,...this.fitRange(model.angle,ctx().h/2))},
+  releaseStart(){stopAngle();this.sw=null;this.lf=null},
+  key(){$('#a .grip').focus();doSeparate()},
+  arrow(k){stepAngle(k)},
+  // Drags turn GitDiscuss about the pin it is turning on. A tap on the peg lifts the bone off; a tap elsewhere just settles it.
+  piv(){return{x:model.a.x+W-3,y:model.a.y+(this.side>0?ctx().h-5:14)}},
+  seamDown(p,t){++angAnim;model.angTo=undefined;const C=this.piv();
+   return{seam:true,angle:true,sd:this.side,peg:!!(t&&t.closest&&t.closest('.pegTap')),p0:p,mv:0,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle,moved:false}},
+  seamMove(d,p){d.mv=Math.max(d.mv,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));
+   // The pin moves with the pair as it is refitted, so it is found afresh each move (on the side the drag began on).
+   const C={x:model.a.x+W-3,y:model.a.y+(d.sd>0?ctx().h-5:14)},a=Math.atan2(p.y-C.y,p.x-C.x);let dd=(a-d.prev)*180/Math.PI;dd=((dd+540)%360)-180;d.prev=a;
+   dd*=clamp(Math.hypot(p.x-C.x,p.y-C.y)/70,.1,1);d.raw=clamp(d.raw+dd,-this.range,this.range);
+   if(d.mv>6)d.moved=true;if(!d.moved)return;model.angle=magnet(d.raw,this.step);refitPair();render()},
+  seamUp(d){
+   if(d.moved){const to=Math.round(model.angle/this.step)*this.step;animateAngle(to,420);say('GitDiscuss set at '+signed(to)+'; the bone drops onto notch '+(this.n(to)+1)+' with a clank.');return}
+   // A tap may have stopped a swing between notches: it settles on the nearest, so the bone always sits on the peg.
+   const sv=Math.round(model.angle/this.step)*this.step;
+   if(d.fromGrip){if(sv!==model.angle)animateAngle(sv,300);const el=$('#b');if(el.classList.contains('signed')){signTap('b');return}if(el.classList.contains('lantern')){lanternTap('b');return}
+    if(d.touch&&el.classList.contains('cocooned'))el.classList.toggle('loose');
+    render();say('Drag GitDiscuss\'s nameplate to swing it; tap the iron peg to lift the bone off.');return}
+   if(!d.peg){if(sv!==model.angle)animateAngle(sv,300);render();say('Drag the bone to swing GitDiscuss; tap the iron peg to lift the bone off.');return}
+   model.angle=sv;refitPair();$('#a .grip').focus();doSeparate()},
+  seamCancel(d){if(d.moved){model.angle=d.th0;refitPair()}},
+  over(c){
+   const jt=c.jt,h=c.h,now=performance.now(),s=h/H,k=Math.max(.55,s),A=model.angle,bd=this.bend(jt),n=this.n(),tn=this.tone(),a=model.a,b=model.b,rd=Math.PI/180;
+   const jx=a.x+W-3,top={x:jx,y:a.y+14},foot={x:jx,y:a.y+h-5},pr=3+1.6*s,r=1-jt,fresh=now-this.at>250;this.at=now;this.live=false;
+   if(jt<1){this.sw=null;this.lf=null;this.side=A<0?-1:1}
+   if(jt===0){this.clk=null;this.ev=this.E0;const g=c.glow;if(g<=0)return '';
+    const sd=this.side,q=this.pts(sd,h,a,b);let o=glints([q.Jf,q.Gf],g*.8);
+    if(g>=1){
+     // Ready: a chalk ghost of the brackets, the bone and its notches, and GitDiscuss's swing, at the angle it will take.
+     const vb={x:a.x+W-6,y:a.y},qv=this.pts(sd,h,a,vb),Gv=this.turn(qv.G,h,A,vb),Gf=this.turn(qv.Gf,h,A,vb),ns=this.cuts(sd,h),ph=this.aim(Gv,qv.J,this.E0,sd)*rd,
+      u={x:Math.cos(ph),y:Math.sin(ph)},nv={x:u.y*sd,y:-u.x*sd},L=ns[3]+16;
+     let d=`M${P(Gv)}L${f(Gv.x+u.x*L)} ${f(Gv.y+u.y*L)}M${P(qv.Jf)}L${P(qv.J)}M${P(Gf)}L${P(Gv)}`;
+     for(const x of ns){const m={x:Gv.x+u.x*x,y:Gv.y+u.y*x};d+=`M${P(m)}l${f(nv.x*4)} ${f(nv.y*4)}`}
+     if(A){const pin=sd>0?foot:top,R0=sd>0?h-7:h-16,a0=(sd>0?-90:90)*rd,a1=a0+A*rd;
+      d+=`M${f(pin.x+R0*Math.cos(a0))} ${f(pin.y+R0*Math.sin(a0))}A${f(R0)} ${f(R0)} 0 0 ${A>0?1:0} ${f(pin.x+R0*Math.cos(a1))} ${f(pin.y+R0*Math.sin(a1))}`}
+     o+=`<path d="${d}" fill="none" stroke="#e9edf1" stroke-width="1.1" stroke-dasharray="2.5 3" stroke-linecap="round" opacity=".6"/>`+
+      [qv.J,Gv].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(pr)}" fill="none" stroke="#ffe7a8" stroke-width="1" stroke-dasharray="2 2"/>`).join('')}
+    return o}
+   let o='',fx='',pin=1,lit=1;const rigs=[];
+   if(jt<1){const sd=this.side,E0=this.E0,E1=this.E1;let br,bop,rho,lift,e=E0,cl=-1;
+    if(model.dir>0){pin=ease(seg(jt,.3,.38));br=ease(seg(jt,.36,.46));lit=n?seg(jt,.93,.99):seg(jt,.62,.8);
+     if(jt>.36&&jt<.44){const u=seg(jt,.36,.44);for(const p of[top,foot])fx+=spark(p,1-u,(4+6*u)*k)}
+     // The brackets are set with a scatter of grit.
+     if(jt>.42&&jt<.64){const q=this.pts(sd,h,a,b),u=seg(jt,.42,.64);fx+=JOINS.shims.grit(q.Jf,u,h,0)+JOINS.shims.grit(q.Gf,u,h,1)}
+     // The bone is set on its pivot from above (or below), held raised, then brought down onto the peg's first notch.
+     bop=seg(jt,.45,.5);lift=26*(1-ease(seg(jt,.45,.51)));rho=18*(1-Math.pow(seg(jt,.51,.57),2));
+     if(n&&jt>=.6)e=jt<.64?lerp(E0,E1,ease(seg(jt,.6,.64))):jt<.88?E1:this.drop(seg(jt,.88,.94));
+     cl=jt>=.57&&jt<.63?seg(jt,.57,.63):n&&jt>=.913&&jt<.973?seg(jt,.913,.973):-1}
+    else{const z=this.z();lit=1-seg(r,0,.06);pin=1-ease(seg(r,.42,.48));br=1-ease(seg(r,.36-z,.44-z));
+     if(n&&r>=.06)e=r<.1?lerp(E0,E1,ease(seg(r,.06,.1))):r<.26?E1:this.drop(seg(r,.26,.3));
+     // Lifted off the peg, raised about its pivot, then carried off it (sooner at 0°, where there is no swing first).
+     if(r>=.3-z)e=lerp(E0,E1,ease(seg(r,.3-z,.34-z)));
+     rho=18*ease(seg(r,.31-z,.37-z));lift=26*ease(seg(r,.36-z,.42-z));bop=1-seg(r,.37-z,.42-z);
+     cl=n&&r>=.282&&r<.342?seg(r,.282,.342):-1}
+    rigs.push({sd,br,bop,rho,lift,e,cl});this.ev=e}
+   else{
+    // Joined. Crossing level carries the bone to the other side: lifted off this one and set on that. (Not when the stay was just picked.)
+    // A swing heading somewhere takes its side from where it is going, so the overshoot arriving at 0° does not cross; otherwise 2° of play either side of level.
+    const T=model.angTo,want=T!==undefined?(T>0?1:T<0?-1:this.side):bd>2?1:bd<-2?-1:this.side;
+    if(want!==this.side){if(!fresh&&!reduce.matches){this.sw={from:this.side,t0:now};this.lf=null;this.ev=this.E1}this.side=want}
+    let w=-1;if(this.sw){w=(now-this.sw.t0)/this.SWMS;if(w>=1){this.sw=null;w=-1}else this.live=true}
+    // Away from a notch (dragged, swinging or between steps) the bone rides lifted; once it stops on one it drops with a clank.
+    const near=Math.abs(bd-Math.round(bd/15)*15)<.35,moving=!!(drag&&drag.angle&&drag.moved)||model.angTo!==undefined||!near||w>=0,to=moving?this.E1:this.E0;
+    // The swing's last frame still has a target set; tick once more so the bone drops when it clears.
+    if(model.angTo!==undefined)this.live=true;
+    if((this.lf?this.lf.to:this.ev)!==to)this.lf={from:this.ev,to,t0:now,hit:false};
+    const Lf=this.lf;if(Lf){const u=reduce.matches?1:(now-Lf.t0)/(Lf.to===this.E0?280:130);
+     this.ev=Lf.to===this.E0?this.drop(clamp(u),Lf.from):lerp(Lf.from,Lf.to,ease(clamp(u)));
+     if(Lf.to===this.E0&&!Lf.hit&&u>=.55){Lf.hit=true;if(!reduce.matches)this.clk=now}
+     if(u>=1){this.ev=Lf.to;this.lf=null}else this.live=true}
+    let cl=-1;if(this.clk!=null){const v=(now-this.clk)/420;if(v<1){cl=v;this.live=true}else this.clk=null}
+    if(w>=0){
+     rigs.push({sd:this.sw.from,br:1-ease(seg(w,.2,.55)),bop:1-seg(w,.25,.45),rho:22*ease(seg(w,0,.4)),lift:20*ease(seg(w,.05,.45)),e:this.E1,cl:-1});
+     rigs.push({sd:this.side,br:ease(seg(w,.35,.7)),bop:seg(w,.55,.72),rho:18*(1-ease(seg(w,.6,1))),lift:20*(1-ease(seg(w,.55,.9))),e:this.E1,cl:-1})}
+    else rigs.push({sd:this.side,br:1,bop:1,rho:0,lift:0,e:this.ev,cl})}
+   for(const R of rigs)o+=this.rig(R,h,bd,lit,tn,k);
+   // The pins: iron bosses on the joint line, struck home as the straps meet and drawn as they part.
+   if(pin>0)for(const p of[top,foot]){const rr=pr*(.4+.6*pin);
+    o+=`<g opacity="${f(clamp(pin*2))}"><circle cx="${f(p.x+.8)}" cy="${f(p.y+1.4)}" r="${f(rr)}" fill="${INK}" opacity=".5"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(rr)}" fill="url(#iron)" stroke="${INK}" stroke-width="1.1"/>`+
+     `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(rr*.45)}" fill="#9aa6b6"/></g>`}
+   o+=fx;
+   if(jt===1){const sd=this.side,q=this.pts(sd,h,a,b),G=this.turn(q.G,h,bd),ph=this.aim(G,q.J,this.ev,sd)*rd,L=this.cuts(sd,h)[3]+16,ln=`M${P(G)}L${f(G.x+Math.cos(ph)*L)} ${f(G.y+Math.sin(ph)*L)}`;
+    o+=`<g class="hit brackethit" id="seamHit" tabindex="0" role="group" aria-label="Bone stay: GitDiscuss at ${signed(A)}, the bone on notch ${this.n(A)+1} of 4. Up arrow raises GitDiscuss a notch (15°) and down arrow lowers it; Enter lifts the bone off to separate the widgets"><title>Drag the bone to swing GitDiscuss; tap the iron peg to lift the bone off</title>`+
+     `<path d="${ln}" fill="none" stroke="transparent" stroke-width="18" stroke-linecap="round"/><circle class="pegTap" cx="${f(q.J.x)}" cy="${f(q.J.y)}" r="10" fill="transparent"/>`+
+     `<path class="ringfocus" d="${ln}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round"/></g>`}
+   return o;
+  }
  }
 };
 const SHADES={
@@ -3671,7 +3858,7 @@ function morphTo(id){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:700,y:420}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30,stay:20,dividers:-20,web:30,shims:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30,stay:20,dividers:-20,web:30,shims:30,bone:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
