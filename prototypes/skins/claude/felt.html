@@ -208,7 +208,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -2302,6 +2302,130 @@ JOINS.fan={label:'Godet fan',kind:'Angle · fan',gap:FN.gap,ms:3200,msDrag:2800,
  }
 };
 
+/* ---------- Sock heel: a knitted tube whose bend is knitted in, a short-row wedge per 15° ---------- */
+// A sock turns its heel with short rows: rows worked only part way across, so one side of the tube gains fabric and it bends.
+// The tube is knitted from Jarvis's ribbed cuff and grafted onto GitDiscuss's; each 15° is a wedge of six raspberry short rows
+// bounded by cream purl ridges, so the angle can be counted. The pivot is the inside corner, mid-gap, as on the godet fan.
+// Rows are laid out in (u along the tube, v across it from the inside edge) and mapped onto the stage: straight legs, a fan heel.
+const SK={gap:30,max:45,det:15,L:25,cuff:8,rw:3.4,per:6,leg:['cream','cream','teal','cream','cream'],tr:{prev:null,dir:0},
+ col:{cream:['#b3a078','#f2e6c8'],teal:['#1d4c48','#5aa197'],heel:['#6a1c2a','#c64a5d']}};
+function skFrame(th,h){const sg=fanSg(th),r=th*Math.PI/180;return{th,sg,ox:-SK.gap/2,oy:sg>0?h-EDGE-2:EDGE+2,shr:0,cos:Math.cos(r),sin:Math.sin(r)}}
+const skR=h=>h-2*EDGE-4,skNh=th=>Math.abs(th)<.5?0:Math.max(1,Math.round(Math.abs(th)/(SK.det/SK.per)));
+// Rows from Jarvis's cuff to GitDiscuss's around nh heel rows. k is a leg row's place in the knitting order.
+function skRows(nh){
+ const {L,cuff,rw}=SK,S=nh*rw,R=[{u0:-L,u1:-L+cuff,col:'teal',rib:1}];
+ SK.leg.forEach((c,k)=>R.push({u0:-L+cuff+k*rw,u1:-L+cuff+(k+1)*rw,col:c,k}));
+ for(let i=0;i<nh;i++)R.push({u0:i*rw,u1:(i+1)*rw,col:'heel'});
+ SK.leg.forEach((c,k)=>R.push({u0:S+k*rw,u1:S+(k+1)*rw,col:SK.leg[4-k],k:5+k}));
+ R.push({u0:S+L-cuff,u1:S+L,col:'teal',rib:1});
+ return R;
+}
+// (u,v) to the stage. Jarvis's leg runs from P; the heel fans about P, its outside swelling a little; GitDiscuss's leg turns about Pb.
+function skMap(P,Pb,sg,th,S){
+ const A0=sg>0?-Math.PI/2:Math.PI/2,sp=th*Math.PI/180,k=Math.abs(th)/SK.max;
+ return(u,v)=>{
+  if(u<=0)return{x:P.x+u,y:P.y+v*Math.sin(A0)};
+  if(u<S){const t=u/S,a=A0+sp*t,rr=v*(1+.06*k*Math.sin(Math.PI*t));return{x:P.x+rr*Math.cos(a),y:P.y+rr*Math.sin(a)}}
+  const a=A0+sp,w=u-S;return{x:Pb.x+w*Math.cos(sp)+v*Math.cos(a),y:Pb.y+w*Math.sin(sp)+v*Math.sin(a)};
+ };
+}
+const skOutline=(Mp,rows,R)=>{const us=[rows[0].u0,...rows.map(r=>r.u1)];return'M'+us.map(u=>pt(Mp(u,R))).join('L')+'L'+us.reverse().map(u=>pt(Mp(u,0))).join('L')+'Z'};
+// A wooden knitting needle, point at p, raspberry bead knob at q.
+function skNeedle(p,q,s){
+ return `<path d="M${pt(p)}L${pt(q)}" stroke="#000" stroke-opacity=".35" stroke-width="${f(3.4*s)}" stroke-linecap="round" filter="url(#sh)" transform="translate(1 2)"/>`+
+  `<path d="M${pt(p)}L${pt(q)}" stroke="#4e3014" stroke-width="${f(3.2*s)}" stroke-linecap="round"/><path d="M${pt(V.mix(p,q,.05))}L${pt(q)}" stroke="#d6a868" stroke-width="${f(1.9*s)}" stroke-linecap="round"/>`+
+  `<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${f(3.1*s)}" fill="#a63a50" stroke="#5e1a2a" stroke-width=".7"/><circle cx="${f(q.x-.9*s)}" cy="${f(q.y-.9*s)}" r="${f(.9*s)}" fill="#fff" fill-opacity=".45"/>`;
+}
+// A wound ball of yarn in col ([shade, light]).
+function skBall(B,r,sc,col){
+ if(sc<=.02)return'';
+ return `<g transform="translate(${f(B.x)} ${f(B.y)}) scale(${f(sc*100)/100})"><circle r="${f(r)}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1.2 2.4)"/><circle r="${f(r)}" fill="${col[1]}" stroke="${col[0]}" stroke-width=".8"/>`+
+  [18,72,124,160].map(a=>`<ellipse rx="${f(r*.92)}" ry="${f(r*.34)}" transform="rotate(${a})" fill="none" stroke="${col[0]}" stroke-opacity=".75" stroke-width=".9"/>`).join('')+
+  `<ellipse rx="${f(r*.6)}" ry="${f(r*.2)}" transform="rotate(-38) translate(${f(-r*.15)} ${f(-r*.35)})" fill="none" stroke="#fffaf0" stroke-opacity=".55" stroke-width="1"/></g>`;
+}
+// The working yarn from p to the ball at q; kinked when it has just been unravelled.
+function skYarn(p,q,kink,col){
+ const d=unit(V.sub(q,p)),nm={x:-d.y,y:d.x},len=Math.hypot(q.x-p.x,q.y-p.y),C=V.add(V.mix(p,q,.5),V.mul(nm,len*.16)),n=Math.max(8,Math.round(len/1.5));
+ let s='';for(let i=0;i<=n;i++){const t=i/n,b=quadAt(p,C,q,t),w=kink?Math.sin(t*len/3.4*2*Math.PI)*1.8*Math.sin(Math.PI*t):0;s+=(i?'L':'M')+pt(V.add(b,V.mul(nm,w)))}
+ return `<path d="${s}" fill="none" stroke="#2a1608" stroke-opacity=".45" stroke-width="2.4" stroke-linejoin="round"/><path d="${s}" fill="none" stroke="${col}" stroke-width="1.5" stroke-linejoin="round"/>`;
+}
+JOINS.sock={label:'Sock heel',kind:'Angle · short rows',gap:SK.gap,ms:4800,msDrag:4200,relMs:3400,moveEnd:.3,hold:.48,angled:true,frame:skFrame,cap:true,amax:SK.max,astep:SK.det,det:SK.det,swingAt:.7,
+ ph:[[0,.3,.6,.7,1],[0,.14,.56,.68,1]],
+ about:'A sock turns a corner at its heel with short rows: rows knitted only part of the way across, so the outside of the tube gains fabric and the inside does not, and the tube bends. Here the joint is a knitted tube and <b>its angle is knitted into it</b>. At rest Jarvis\'s end carries a teal ribbed cuff with a needle still through its live stitches, and GitDiscuss\'s end a matching cuff. <b>Near:</b> the needle lifts, a second one comes in and they click, and a ball of cream yarn peeks out on the heel's side. <b>Ready:</b> a dashed ghost of the tube shows at the set angle. Joining (12 fps): the cushions close in, then the leg is knitted across the gap a row a frame in oatmeal with a teal stripe, the needles working at the live edge and the yarn running back to the ball. A tapestry needle grafts the last row onto GitDiscuss\'s cuff in Kitchener stitch, then GitDiscuss swings to the angle while the heel is knitted in from a raspberry ball, the tube\'s outside swelling round the turn and the inside bunching. <b>Angle:</b> −45° to +45°, with a detent every 15°. Each 15° is one wedge of six raspberry short rows, bounded by cream purl ridges, so the wedges count the angle (two wedges is 30°); for + angles the heel opens upward, for − angles downward. Drag GitDiscuss\'s nameplate, use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓: opening it knits rows in, closing it unravels them and the yarn goes back to the ball kinked. Jarvis\'s nameplate still moves the pair. <b>Release:</b> tap the sock (or focus it and press Enter). It is frogged: the heel unravels as GitDiscuss swings level, the graft is pulled out, the leg unravels row by row back to Jarvis\'s cuff, and the cushions part.',
+ sayJoin:'The leg is knitted across the gap and grafted on, then the heel is turned to the angle.',
+ sayJoined:'Joined by a knitted sock heel. Each raspberry wedge is 15°. Drag GitDiscuss\'s nameplate to knit or unravel the heel; drag Jarvis to move the pair. Tap the sock to frog it.',
+ sayRelease:'The sock is frogged: the heel and leg unravel and the cushions part.',
+ sayReady:'Ready: release to knit the sock between them.',sayNear:'Nearby: the needles click and the yarn ball peeks out. Move closer.',
+ sayHold:'Held mid-knit: the leg is being knitted across the gap. Use the scrubber to step through it.',phReady:'Ready · release to knit the sock',
+ sayBend:'Turning the heel.',turnWord:'Turning the heel',
+ pose:()=>({th:0,ys:0,sq:0}),
+ phase(jt){
+  const row=Math.min(10,Math.floor(10*seg(jt,.3,.6)+1e-6));
+  if(model.dir<0&&model.busy)return jt>.7?'Releasing · unravelling the heel':jt>.6?'Releasing · pulling out the graft':jt>.3?'Releasing · unravelling the leg ('+row+' rows left)':'Releasing · parting';
+  return jt<.3?'Joining · closing in':jt<.6?'Joining · knitting the leg (row '+(row+1)+' of 10)':jt<.7?'Joining · grafting onto GitDiscuss\'s cuff':'Joining · turning the heel';
+ },
+ over(c){
+  const a=c.a,b=c.b,h=c.h,jt=c.jt,s=pinScale(h),th=bendAt(jt),F=skFrame(th,h),sg=F.sg,R=skR(h),fr=Math.floor(performance.now()/FRAME)%2;
+  const P={x:a.x+W+SK.gap/2,y:a.y+F.oy},Pb={x:b.x-SK.gap/2,y:b.y+F.oy},nh=skNh(th),S=nh*SK.rw,rows=skRows(nh),Mp=skMap(P,Pb,sg,th,S);
+  const nS=Math.max(3,Math.round(R/4.4)),SH=R/nS,kn=jt>=.6?10:Math.floor(10*seg(jt,.3,.6)+1e-6);
+  // Is the work growing or being unravelled? While turning, from the change in the heel; otherwise from the direction of play.
+  const T=SK.tr;
+  if(jt===1){if(model.turning&&T.prev!==null&&Math.abs(Math.abs(th)-Math.abs(T.prev))>.05)T.dir=Math.sign(Math.abs(th)-Math.abs(T.prev));if(!model.turning)T.dir=0;T.prev=th}else{T.prev=null;T.dir=0}
+  const frog=model.turning&&jt===1?T.dir<0:model.dir<0&&jt>0&&jt<1;
+  let o='';
+  // Ready: a ghost of the finished sock at the set angle, from Jarvis's end.
+  if(c.ghost>0&&jt===0){const gs=fanSg(model.angle),gn=skNh(model.angle),gP={x:P.x,y:a.y+(gs>0?h-EDGE-2:EDGE+2)},gM=skMap(gP,gP,gs,model.angle,gn*SK.rw),d=skOutline(gM,skRows(gn),R);
+   o+=`<path d="${d}" fill="#ffc36a" opacity="${f(c.ghost*.4)}" filter="url(#soft)"/><path d="${d}" fill="${SK.col.cream[1]}" fill-opacity=".16" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="4 3"/>`}
+  // The rows: a yarn-shade ground, a light V per stitch, ribbing for the cuffs; then the tube's round shading.
+  const shown=rows.filter(r=>r.k===undefined||r.k<kn),fill={},lit={};let sh='',hl='',quad=(u0,u1,v0,v1)=>`M${pt(Mp(u0,v0))}L${pt(Mp(u0,v1))}L${pt(Mp(u1,v1))}L${pt(Mp(u1,v0))}Z`;
+  const hv=sg>0?.72:.28;
+  for(const r of shown){
+   fill[r.col]=(fill[r.col]||'')+quad(r.u0,r.u1,0,R);
+   sh+=quad(r.u0,r.u1,0,R*.13)+quad(r.u0,r.u1,R*.87,R);hl+=quad(r.u0,r.u1,R*(hv-.09),R*(hv+.09));
+   let d='';const w=r.u1-r.u0;
+   for(let j=0;j<nS;j++){const v=(j+.5)*SH;
+    if(r.rib){if(j%2===0)d+=`M${pt(Mp(r.u0+.7,v))}L${pt(Mp(r.u1-.7,v))}`;continue}
+    const p0=Mp(r.u0,v),p1=Mp(r.u1,v);if(Math.hypot(p1.x-p0.x,p1.y-p0.y)<.8)continue;
+    d+=`M${pt(Mp(r.u1-.12*w,v-SH*.42))}L${pt(Mp(r.u0+.2*w,v))}L${pt(Mp(r.u1-.12*w,v+SH*.42))}`}
+   lit[r.col]=(lit[r.col]||'')+d}
+  o+=`<path d="${Object.values(fill).join('')}" fill="#000" opacity=".36" filter="url(#sh)" transform="translate(1.2 2.4)"/>`;
+  for(const k in fill)o+=`<path d="${fill[k]}" fill="${SK.col[k][0]}"/>`;
+  for(const k in lit)o+=`<path d="${lit[k]}" fill="none" stroke="${SK.col[k][1]}" stroke-width="${f(SH*.34)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  o+=`<path d="${sh}" fill="#1a0c04" opacity=".26"/><path d="${hl}" fill="#fff8e6" opacity=".12"/>`;
+  // Cream purl ridges bound each 15° wedge of the heel; the inside corner bunches up.
+  if(nh){let rd='';for(let i=0;i<=nh;i++){if(i%SK.per)continue;const u=i*SK.rw;for(let j=0;j<nS;j++){const v=(j+.5)*SH;rd+=`M${pt(Mp(u-.8,v))}L${pt(Mp(u+.8,v))}`}}
+   o+=`<path d="${rd}" stroke="#3a1a10" stroke-opacity=".45" stroke-width="${f(SH*.62)}" stroke-linecap="round" transform="translate(.4 .8)"/><path d="${rd}" stroke="#f0e4c6" stroke-width="${f(SH*.5)}" stroke-linecap="round"/>`;
+   const sp=th*Math.PI/180,A0=sg>0?-Math.PI/2:Math.PI/2;let pk='';
+   for(const rr of [3.5,6.5,9.5]){const q0={x:P.x+rr*Math.cos(A0),y:P.y+rr*Math.sin(A0)},q1={x:P.x+rr*Math.cos(A0+sp),y:P.y+rr*Math.sin(A0+sp)};pk+=`M${pt(q0)}A${rr} ${rr} 0 0 ${sp>0?1:0} ${pt(q1)}`}
+   o+=`<path d="${pk}" fill="none" stroke="#2a0c12" stroke-opacity="${f(.5*clamp(Math.abs(th)/15))}" stroke-width="1.1" stroke-linecap="round"/>`}
+  // The graft: Kitchener stitch in cream along GitDiscuss's cuff, worked from the outside edge in.
+  const gp=seg(jt,.6,.7),ug=S+SK.L-SK.cuff;
+  if(gp>0){let gz='',last=null;const n=Math.round(nS*2*gp);for(let j=0;j<=n;j++){const v=R-j*SH/2;last=Mp(ug+(j%2?1.3:-1.3),v);gz+=(j?'L':'M')+pt(last)}
+   if(n>0)o+=`<path d="${gz}" fill="none" stroke="#3a1a10" stroke-opacity=".4" stroke-width="2" stroke-linejoin="round" transform="translate(.4 .8)"/><path d="${gz}" fill="none" stroke="#f6ecd2" stroke-width="1.3" stroke-linejoin="round"/>`;
+   if(gp<1&&last){const tip=V.add(last,V.mul(unit(V.sub(last,Mp(ug,R+4))),-2)),eye=Mp(ug+12,R+15);
+    o+=`<path d="M${pt(tip)}L${pt(eye)}" stroke="#55555c" stroke-width="${f(2.2*s)}" stroke-linecap="round"/><path d="M${pt(tip)}L${pt(eye)}" stroke="url(#metal)" stroke-width="${f(1.4*s)}" stroke-linecap="round"/>`+skYarn(eye,Mp(ug+4,R+30),frog,SK.col.cream[1])}}
+  // Needles and ball. At rest one needle stays through Jarvis's cuff; while knitting both work the live edge and the ball feeds it.
+  const knitLeg=jt>.3&&jt<.6,heel=jt>=.7&&(jt<1||model.turning),work=knitLeg||heel;
+  const uL=knitLeg?(kn<=5?-SK.L+SK.cuff+kn*SK.rw:S+(kn-5)*SK.rw):heel?S:-SK.L+SK.cuff;
+  const g=jt===0?c.glow:0,lift=work?0:3*g*(fr?1:.4);
+  if(jt<=.3||jt===1&&!model.turning){
+   // Parked: the needle through Jarvis's live cuff stitches (gone once the sock is finished).
+   if(jt<1){o+=skNeedle(Mp(uL,-6+lift),Mp(uL,R+14+lift),s);
+    if(g>.3){const tp=Mp(uL+1.5,R*(.4+.12*fr));o+=skNeedle(tp,Mp(uL+10+3*fr,R+16),s*g)}
+    o+=skBall(Mp(-SK.L+4,R+19),9*s,clamp((g-.2)/.8)*.8,SK.col.cream)}
+  }else if((work||frog)&&!(jt>=.6&&jt<.7)){
+   const ballC=heel?SK.col.heel:SK.col.cream,B=heel?Mp(S/2,R+19):Mp(uL-8,R+19),tp=Mp(uL-1.2,R*(.36+.22*fr));
+   if(!frog){o+=skYarn(Mp(uL+.5,R*(.4+.22*fr)),B,false,ballC[1])+skNeedle(tp,Mp(uL+11+3*fr,R+17),s)+skNeedle(Mp(uL,-6),Mp(uL,R+14),s)}
+   else o+=skYarn(Mp(uL,R-SH),B,true,ballC[1]);
+   o+=skBall(B,9*s,1,ballC);
+  }
+  if(jt===1){const outline=skOutline(Mp,rows,R);o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Sock heel: tap or press Enter to frog it and separate the widgets"><title>Tap the sock to frog it</title><path d="${outline}" fill="transparent" stroke="transparent" stroke-width="12" stroke-linejoin="round"/><path class="ringfocus" d="${outline}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+  // While it turns: the angle in cross-stitch on a cotton tag over Jarvis's end, clear of the ball.
+  if(model.turning&&jt===1){const up=sg>0?a.y-34>50:a.y+h+40>590;o+=xTag(P.x-74,up?a.y-24:a.y+h+24,signed(th).replace('−','-'))}
+  return o;
+ }
+};
+
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
   about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime) were built, and stays as the plainest point of comparison.'},
@@ -2912,7 +3036,7 @@ const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...H
 let anim=0,shadeAnim=0,morphSwitch=0,drag=null,togDrag=null;
 const J=()=>JOINS[model.join];
 // Each angled join keeps its own angle while another join is picked.
-const ANG={hinge:-20,pin:15,bjoint:-15,fan:30};
+const ANG={hinge:-20,pin:15,bjoint:-15,fan:30,sock:30};
 let angAnim=0;
 
 const hingeY=y=>fitHinge(fitHinge(y,peakBend(),ctx().h),model.angle,ctx().h);
