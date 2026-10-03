@@ -1083,6 +1083,125 @@ function pianoDraw(id,w,h,small,st){
  return wrap(t+fibres);
 }
 
+/* ---------- Toy oven shade ---------- */
+// The Stow kind in felt, from the felt play kitchen: the cushion is put in the oven. It lets its stuffing out to a strip and
+// is lifted while a cream felt toy oven pops up behind it, door hanging open. The cushion is pushed back into the oven,
+// shrinking with depth, darkening and squashing to get through the door, then the door swings up and shuts with a bounce
+// that knocks fibres loose. The tea towel on the handle swings, the knobs are turned, the oven light comes on in the status
+// colour behind the window, the name and value are stitched on the control panel and two wisps of wool steam rise and fade.
+// The pleat colours, lifted a little so they read as light through the window rather than as felt.
+const OVEN_C={amber:'#f0b43c',blue:'#6f9ad6',red:'#e0533f',green:'#86c25a'};
+function ovenParts(st,small){
+ const H0=small?CH:H,HF=small?48:58,un=model.shDir===0,u=1-st;
+ let dfl,sq=0,fib=0,lift,ov,go,door,lat=0,lit,knob,emb,steam=0,swing=0,bounce=0;
+ if(!un){dfl=ease(seg(st,.04,.22));sq=Math.sin(Math.PI*seg(st,.2,.28))*.08;const fb=seg(st,.2,.34);fib=fb>0&&fb<1?fb:0;
+  lift=ease(seg(st,.28,.38));ov=backOut(seg(st,.28,.4));go=ease(seg(st,.4,.6));
+  // The door is swung up, falls shut under its own weight and bounces once on the latch.
+  const d=seg(st,.6,.71),r=seg(st,.71,.79);door=1-d*d+(r>0&&r<1?Math.sin(Math.PI*r)*.12:0);
+  const lt=seg(st,.71,.85);lat=lt>0&&lt<1?lt:0;swing=seg(st,.71,1);
+  knob=ease(seg(st,.76,.88));const l=seg(st,.82,.92);lit=l*(1-.3*(1-l)*(.5+.5*Math.sin(l*31)));
+  emb=seg(st,.84,.96);steam=seg(st,.86,.995)}
+ else{lit=1-seg(u,0,.08);knob=1-ease(seg(u,0,.1));emb=1-seg(u,.2,.3);
+  // The door drops open and knocks its stop, then the cushion springs back out, a touch too far.
+  const d=seg(u,.1,.22),r=seg(u,.22,.3);door=d*d-(r>0&&r<1?Math.sin(Math.PI*r)*.14*(1-r):0);
+  go=1-lerp(ease(seg(u,.3,.5)),backOut(seg(u,.3,.5)),.6);ov=1-ease(seg(u,.5,.6));lift=1-ease(seg(u,.5,.6));
+  dfl=1-ease(seg(u,.62,.86));const k=seg(u,.86,1);bounce=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.5)*.08:0}
+ return{H0,HF,un,dfl,sq,fib,lift,ov,go,door,lat,lit,knob,emb,steam,swing,bounce,h:Math.round(lerp(H0,HF,dfl))};
+}
+// Layout from the strip's final height: control panel on top with a knob at each end, the drop-down door below it.
+function ovenGeo(w,small){
+ const g=small?{HF:48,bx0:10,by0:5,by1:21,dy0:24,dy1:43,yb:45,kr:5.5,di:12,tw:14}:{HF:58,bx0:12,by0:6,by1:25,dy0:29,dy1:52,yb:54,kr:7,di:14,tw:18};
+ const bx1=w-g.bx0,dx0=g.bx0+g.di,dx1=bx1-g.di;
+ return{...g,bx1,dx0,dx1,cw:dx1-dx0,ch:g.dy1-g.dy0,wx0:dx0+8,wx1:dx1-g.tw-22,wy0:g.dy0+(small?5:6),wy1:g.dy1-3,
+  hy:g.dy0+(small?2.4:3),hx0:dx0+10,hx1:dx1-10,tx:dx1-g.tw-9,cy:(g.by0+g.by1)/2,k1:g.bx0+g.kr+5,k2:bx1-g.kr-5};
+}
+function ovenKnob(x,y,r,ang,id){
+ let ticks='';for(let i=0;i<5;i++){const a=(-135+i*67.5-90)*Math.PI/180,R=r+2.3;ticks+=`<circle cx="${f(x+Math.cos(a)*R)}" cy="${f(y+Math.sin(a)*R)}" r=".55" fill="#f7e8c9" opacity=".7"/>`}
+ const a=(ang-90)*Math.PI/180;
+ return ticks+`<circle cx="${f(x+.5)}" cy="${f(y+1.1)}" r="${r}" fill="#000" opacity=".45" filter="url(#sh)"/><circle cx="${x}" cy="${y}" r="${r}" fill="#efe1c2" filter="url(#g-${id})"/>`+
+  `<circle cx="${x}" cy="${y}" r="${f(r-1.6)}" fill="none" stroke="#8a6a48" stroke-opacity=".55" stroke-width=".7" stroke-dasharray="1.4 1.2"/>`+
+  `<path d="M${f(x+Math.cos(a)*r*.2)} ${f(y+Math.sin(a)*r*.2)}L${f(x+Math.cos(a)*r*.78)} ${f(y+Math.sin(a)*r*.78)}" stroke="#c4372a" stroke-width="${f(r*.26)}" stroke-linecap="round"/>`;
+}
+function ovenDraw(id,w,h,small,st){
+ const P=ovenParts(st,small),s=SKIN[id],G=ovenGeo(w,small);
+ const wrap=t=>{if(P.sq>1e-4)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
+  return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${t}</g>`:t};
+ let fibres='';
+ if(P.fib)for(const cx of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
+  fibres+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
+ if(P.ov<=0)return wrap(casing(id,w,h)+fibres);
+ const{bx0,bx1,by0,by1,dx0,dx1,dy0,dy1,cw,ch,yb,kr,wx0,wx1,wy0,wy1,hy,hx0,hx1,cy}=G,C=OVEN_C[labelStatus(id)],panel=mixHex(s.band,'#1a0d05',.45);
+ const os=Math.max(.01,P.ov),grow=`transform="translate(${w/2} ${yb}) scale(${f(os*1000)/1000}) translate(${-w/2} ${-yb})" opacity="${f(clamp(os*3))}"`;
+ let t=`<defs>${feltFilters(id,s.seed)}<radialGradient id="tol-${id}" cx=".5" cy=".6" r=".65"><stop stop-color="#fff2cf"/><stop offset=".3" stop-color="${C}"/><stop offset="1" stop-color="${C}" stop-opacity="0"/></radialGradient>`+
+  `<linearGradient id="toc-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0d0603" stop-opacity=".8"/><stop offset=".6" stop-color="#0d0603" stop-opacity="0"/></linearGradient>`+
+  `<linearGradient id="tow-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e2b47a"/><stop offset="1" stop-color="#7b4e27"/></linearGradient>`+
+  `<clipPath id="tcv-${id}"><rect x="${dx0}" y="${dy0}" width="${cw}" height="${ch}" rx="2.5"/></clipPath></defs>`;
+ // Behind the cushion: feet, the cream felt body, the control panel and its knobs, and the open oven with its rack and light.
+ const body=rr4(6,3,w-12,yb-3,[10,10,7,7]);
+ t+=`<g ${grow}>`;
+ for(const x of [bx0+10,bx1-26])t+=`<path d="${rr4(x,yb-3,16,G.HF-yb+2.5,[2,2,6,6])}" fill="#5a3a22" filter="url(#g-${id})"/>`;
+ t+=`<path d="${body}" fill="#000" opacity=".45" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${body}" fill="#ecdcb9" filter="url(#f-${id})"/>`+
+  `<path d="${rr4(9.5,6.5,w-19,yb-10,[7,7,5,5])}" fill="none" stroke="#8a6a48" stroke-opacity=".6" stroke-width="1" stroke-dasharray="3.4 2.6"/>`;
+ const pn=rr4(bx0,by0,bx1-bx0,by1-by0,[5,6,4,5]);
+ t+=`<path d="${pn}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.3)"/><path d="${pn}" fill="${panel}" filter="url(#g-${id})"/>`+
+  `<path d="${rr4(bx0+2.5,by0+2.5,bx1-bx0-5,by1-by0-5,[3,4,2,3])}" fill="none" stroke="#e3b866" stroke-opacity=".5" stroke-width=".8" stroke-dasharray="2.2 1.8"/>`;
+ t+=ovenKnob(G.k1,cy,kr,lerp(-135,40,P.knob),id)+ovenKnob(G.k2,cy,kr,lerp(-135,90,P.knob),id);
+ t+=`<rect x="${dx0}" y="${dy0}" width="${cw}" height="${ch}" rx="2.5" fill="#2b1a10"/>`+
+  (P.lit>0?`<rect x="${dx0}" y="${dy0}" width="${cw}" height="${ch}" rx="2.5" fill="url(#tol-${id})" opacity="${f(P.lit*.95)}"/>`:'')+
+  `<rect x="${dx0}" y="${dy0}" width="${cw}" height="${ch}" rx="2.5" fill="url(#toc-${id})"/>`+
+  `<path d="M${dx0+3} ${f(dy0+ch*.66)}H${dx1-3}M${dx0+3} ${f(dy0+ch*.66+2.2)}H${dx1-3}" stroke="#a89f92" stroke-opacity=".6" stroke-width=".7"/></g>`;
+ // The cushion: lifted, then pushed back through the door, shrinking with depth, squashing to fit and darkening.
+ // Once it fits inside the opening it is clipped to it, so it has gone in rather than shrunk in front.
+ const g=P.go,gp=g>0?Math.pow(g,.75):g,sx=lerp(1,cw*.7/w,g),sy=lerp(1,ch*.6/h,gp),tx=lerp(w/2,(dx0+dx1)/2,g),ty=lerp(h/2-8*P.lift,dy0+ch*.62,g);
+ // The felt's fuzzy edge stands about 1.5px proud of the casing, so the cushion has to clear the opening by that much.
+ const inside=(w/2-EDGE+1.5)*sx<=cw/2-1&&ty+(EDGE-1.5-h/2)*sy>=dy0+.5&&ty+(h/2+1.5)*sy<=dy1,dk=clamp(g)*.62;
+ t+=`<g${inside?` clip-path="url(#tcv-${id})"`:''}><g transform="translate(${f(tx)} ${f(ty)}) scale(${f(sx*1000)/1000} ${f(sy*1000)/1000}) translate(${-w/2} ${-h/2})">`+
+  casing(id,w,h).replace(/<defs>[\s\S]*?<\/defs>/,'')+(dk>0?`<path d="${rr4(EDGE,EDGE,w-2*EDGE,h-2*EDGE,s.r)}" fill="#120804" opacity="${f(dk)}"/>`:'')+'</g>'+
+  (inside&&P.lit>0?`<rect x="${dx0}" y="${dy0}" width="${cw}" height="${ch}" fill="${C}" opacity="${f(P.lit*.22)}"/>`:'')+'</g>';
+ // The door, hinged along its bottom edge. Open, only its lining shows as a sliver toward you; closing, its face rises
+ // and darkens as it turns away from the lamp. The window is a hole, so the oven's inside shows through it.
+ t+=`<g ${grow}>`;
+ const a=clamp(P.door,-.2,1.1)*Math.PI/2,k=Math.cos(a)-.2*Math.sin(a);
+ if(Math.abs(k)>.01){const win=rr4(wx0,wy0,wx1-wx0,wy1-wy0,[4,4,4,4]),dr=rr4(dx0-1.5,dy0-.5,cw+3,ch+.5,[3,3,2,2]);
+  t+=`<g transform="translate(0 ${dy1}) scale(1 ${f(k*1000)/1000}) translate(0 ${-dy1})">`+
+   `<path d="${dr+win}" fill-rule="evenodd" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.2)"/>`+
+   `<path d="${dr+win}" fill-rule="evenodd" fill="${k>0?'#f1e3c3':'#b89a72'}" filter="url(#g-${id})"/>`+
+   (k>0?`<path d="${dr+win}" fill-rule="evenodd" fill="#fff6e6" opacity="${f(.3*Math.sin(a))}"/>`+
+    `<path d="${rr4(dx0+2,dy0+2,cw-4,ch-4,[2,2,1,1])}" fill="none" stroke="#8a6a48" stroke-opacity=".55" stroke-width=".8" stroke-dasharray="2.6 2"/>`+
+    `<path d="${rr4(wx0-2,wy0-2,wx1-wx0+4,wy1-wy0+4,[5,5,5,5])}" fill="none" stroke="${panel}" stroke-opacity=".8" stroke-width="1.2" stroke-dasharray="2.4 1.6"/>`+
+    `<path d="M${wx0+6} ${wy1-2}L${wx0+12} ${wy0+2}M${wx0+11} ${wy1-2}L${wx0+15} ${f(wy0+4)}" stroke="#fff" stroke-opacity=".3" stroke-width="1.2" stroke-linecap="round"/>`+
+    `<rect x="${hx0-1.5}" y="${f(hy-1)}" width="3" height="3.4" rx="1" fill="#6b4425"/><rect x="${hx1-1.5}" y="${f(hy-1)}" width="3" height="3.4" rx="1" fill="#6b4425"/>`+
+    `<rect x="${hx0-3}" y="${f(hy-2.6)}" width="${hx1-hx0+6}" height="2.8" rx="1.4" fill="url(#tow-${id})"/><path d="M${hx0-1} ${f(hy-2)}H${hx1+1}" stroke="#fff" stroke-opacity=".35" stroke-width=".6"/>`:'')+'</g>';
+  // Light spilling from the window: drawn unscaled, which is safe because the light is only on once the door is shut.
+  if(P.lit>0&&k>.8)t+=`<path d="${win}" fill="${C}" opacity="${f(P.lit*.35)}" filter="url(#sh)" transform="translate(0 .5)"/>`;
+  // A gingham tea towel hangs over the handle and swings when the door is slammed.
+  const to=clamp((k-.6)/.35);
+  // It hangs from wherever the handle is, so it rides the door through the last of its swing and the bounce.
+  if(to>0){const tw=G.tw,x=G.tx,y=dy1-(dy1-hy)*k-1.6,L=dy1+(small?2.4:3.4)-y,sw=14*Math.sin(P.swing*Math.PI*3)*Math.pow(1-P.swing,1.5);
+   const cloth=`M${x} ${f(y)}H${x+tw}V${f(y+L-2)}Q${x+tw} ${f(y+L)} ${x+tw-2} ${f(y+L)}H${x+2}Q${x} ${f(y+L)} ${x} ${f(y+L-2)}Z`;
+   let ck='';for(let i=1;i<3;i++)ck+=`M${f(x+tw*i/3)} ${f(y+3)}V${f(y+L)}`;for(let j=1;j*5<L-2;j++)ck+=`M${x} ${f(y+3+j*5)}H${x+tw}`;
+   t+=`<g opacity="${f(to)}" transform="rotate(${f(sw)} ${f(x+tw/2)} ${f(y)})"><path d="${cloth}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(.8 1.3)"/><path d="${cloth}" fill="#f4ead8" filter="url(#g-${id})"/>`+
+    `<path d="${ck}" stroke="#c8463c" stroke-opacity=".75" stroke-width="2.2"/><path d="M${x} ${f(y)}H${x+tw}V${f(y+3)}H${x}Z" fill="#7b4e27" opacity=".35"/><path d="M${x+1.5} ${f(y+L-1)}h${tw-3}" stroke="#f4ead8" stroke-width="1.4" stroke-dasharray=".8 1"/></g>`}}
+ t+='</g>';
+ // Fibres knocked loose from the door's top corners as it slams.
+ if(P.lat)for(const cx of [dx0+4,dx1-4])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*14*(.4+P.lat),fy=dy0-2+dy*6*(.6+P.lat)-6*P.lat;
+  fibres+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.lat*90)})" fill="none" stroke="#ecdcb9" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.lat)}"/>`}
+ // The name in gilt satin stitch and the value in cream cross-stitch, stitched on left to right between the knobs.
+ if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?13:15,c=small?1.6:2,wf=small?11:12.5;
+  const x0=G.k1+kr+(small?8:10),x1=G.k2-kr-(small?8:10),xp=xpaths(dt.num,c),nw=measure(nm,`italic 700 ${nf}px Georgia,serif`),ww=measure(dt.word,`italic ${wf}px Georgia,serif`);
+  const word=nw+12+xp.w+5+ww<=x1-x0,vw=xp.w+(word?5+ww:0),vx=x1-vw,vy=cy-3.5*c;
+  t+=`<g ${grow}><clipPath id="toe-${id}"><rect x="${f(x0-4)}" y="${by0}" width="${f((x1-x0+8)*P.emb)}" height="${by1-by0}"/></clipPath><g clip-path="url(#toe-${id})">`+
+   `<text x="${x0}" y="${f(cy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="#e7c06a">${nm}</text>`+
+   `<text x="${x0}" y="${f(cy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="url(#satin)">${nm}</text>`+
+   `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".3" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="#c9ae7e"/><path d="${xp.d2}" stroke="#f6e8c8"/></g>`+
+   (word?`<text x="${f(vx+xp.w+5)}" y="${f(cy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="#f1e2c0">${dt.word}</text>`:'')+'</g></g>'}
+ // Two wisps of wool steam curl up off the top of the oven once it is lit, sway and fade, so the resting strip is still.
+ if(P.steam>0&&P.steam<1)for(let j=0;j<2;j++){const p=seg(P.steam,j*.3,j*.3+.7);if(p<=0||p>=1)continue;
+  const x=w*(.34+.3*j)+Math.sin(p*5+j*2)*4,y=4-p*(small?22:28),o=Math.sin(Math.PI*p)*.85,sc=(small?.8:1)*(.7+.5*p);
+  t+=`<path d="M0 0q-3.5 -3.5 0 -7t0 -7" transform="translate(${f(x)} ${f(y)}) scale(${f(sc*100)/100}) rotate(${f(Math.sin(p*4+j)*14)})" fill="none" stroke="#f4ead8" stroke-width="2.4" stroke-linecap="round" opacity="${f(o)}"/>`}
+ return wrap(t+fibres);
+}
+
 /* ---------- Zipper geometry ---------- */
 const zTop=h=>EDGE+Math.min(14,(h-2*EDGE)*.3);
 // Where the slider sits (widget-local y) and how far the two halves lean apart, from join progress.
@@ -3172,7 +3291,7 @@ JOINS.fishing={label:'Fishing game',kind:'Reel',gap:FI.gap,ms:4600,msDrag:4200,r
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -3217,7 +3336,12 @@ const SHADES={
   about:'The Tip shade kind (gothic\'s misericord) done in felt, from the felt toy pianos of stop-motion nurseries: the cushion is the piano\'s lid. The cotton display is put away and the stuffing lets out to a strip, landing with a squash that shakes fibres loose. Then the whole cushion tips back on its top edge like a fallboard opening: it foreshortens toward the hinge, lightens as its face turns up to the lamp and throws a shadow down onto what it uncovers, gathers speed, knocks the stop and drops forward a little before it rests with only its rolled edge showing. Under it is a walnut felt name board with a gilt running stitch and a row of felt keys, white over a dark well with thick black keys in twos and threes. A glissando runs up the keys, each dipping as it passes, and three felt quavers in the cushion\'s colour float up off them, sway and fade, so the resting strip is still. <b>Note stickers are the status</b>, the coloured dots beginners put on keys, pressed on one by one: amber running, blue idle or waiting, red needs you, green passed (Jarvis three amber and one blue, all blue when paused; GitDiscuss two red, one blue and one green; Checks six green and one red). <b>The name is satin-stitched in gilt on the name board and the key value cross-stitched in cream beside it.</b> Unshading drops the lid shut with a clunk and the cushion refills with a bounce. Joined pairs stay joined, piano to piano.',
   sayOn:'Shaded: each cushion tips back like a piano lid, uncovering felt keys with status stickers and a name board.',sayOff:'Unshaded: the lids drop shut and the cushions refill.',
   height:(st,small)=>pianoParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:pianoDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:pianoDraw},
+ oven:{label:'Toy oven',kind:'Stow',ms:3400,ownStrip:true,
+  about:'The Stow kind (wire\'s jeweller\'s case, gothic\'s aumbry) done in felt, from the felt play kitchen: the cushion is put in the oven. The cotton display is put away and the stuffing lets out to a strip, landing with a squash that shakes fibres loose. The cushion is lifted while a cream felt toy oven pops up behind it on walnut bun feet, its door hanging open. Then the cushion is pushed back into the oven: it shrinks with depth, squashes to get through the door and darkens as it goes in. The door is swung up and falls shut with a bounce that knocks fibres off its corners, and the gingham tea towel over its handle swings and settles. The two knobs are turned, the oven light comes on behind the window in the status colour (amber running, blue paused, red needs you, green passed) with the cushion glowing inside, the name is satin-stitched in gilt on the control panel with the value cross-stitched in cream, and two wisps of wool steam curl up and fade. Unshading turns the oven off, drops the door open and the cushion springs back out, a touch too far, before the oven folds away and the cushion refills.',
+  sayOn:'Shaded: each cushion is put in a felt toy oven, the oven light shows its status and its name and value are stitched on the control panel.',sayOff:'Unshaded: the ovens are switched off, the doors drop open and the cushions spring back out and refill.',
+  height:(st,small)=>ovenParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:ovenDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
