@@ -541,7 +541,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -4112,6 +4112,128 @@ MIXES.antbee={label:'Ants meet bees',kind:'Half-coupler · Swarm',pair:'hoopfelt
   sepPh:'Separate · an ant and a bee at home',nearPh:'Nearby · the ant and the bee stir',readyPh:'Ready · chalked',
   mid:(jt,dir)=>dir>0?(jt<.23?'Joining · closing in ':jt<.47?'Joining · the chains build out ':jt<.56?'Joining · searching, then the grip ':jt<.72?'Joining · hauling in ':jt<.86?'Joining · drawing the wax ':'Joining · the honey kindles '):(jt>.86?'Releasing · the light goes out ':jt>.72?'Releasing · taking the wax back ':jt>.55?'Releasing · letting the casings out ':jt>.47?'Releasing · the grip lets go ':'Releasing · going home '),
   turn:d=>'Pulling the chains · '+Math.round(d.deg*100)+'%'}};
+
+/* ---------- Mix: the group decides the shade (model C, for shades). A joined stone and felt pair goes to bed under one felt quilt. ---------- */
+// Stone has no Tuck shade of its own; felt has one (its page's Bedtime quilt). Apart, each widget shades in its own skin: Jarvis's wall
+// lowers to its frieze, and GitDiscuss and Checks are each tucked under a quilt. Joined, the group shades in the first of its skins that
+// can tuck: GitDiscuss's quilt is unrolled on across the coupler and over Jarvis, and Jarvis's name is stitched on it beside GitDiscuss's.
+// The quilt is laid from a roll that travels from the foot end, so it reads as one cloth; the stone's pinnacles stand up out of the bedding.
+const QL={cs:11,r0:9.5,
+ b:{q:['#3f807a','#2a5f5a','#dcd2b4','#b4524a'],ink:'#173f3b',ink2:'#6f9e98',bind:'#1d433f'},
+ c:{q:['#88506f','#653953','#e8d5c6','#c99a3e'],ink:'#4a1f3c',ink2:'#a77892',bind:'#43203a'}};
+const qlParts=st=>({drop:seg(st,.28,.4),roll:ease(seg(st,.4,.64)),tuck:ease(seg(st,.63,.72)),blk:seg(st,.7,.77),emb:seg(st,.76,.92),tie:seg(st,.88,.98)});
+// How far GitDiscuss's quilt reaches over Jarvis: none apart, all of the way once the tab is buttoned.
+const qlSpan=c=>ease(seg(c.jt,.72,1));
+const qlVal=id=>id==='a'?{nm:'Jarvis',num:'03',word:model.a.run?'running':'paused',col:model.a.run?'#e39a35':'#8193b8'}:
+ id==='b'?{nm:'GitDiscuss',num:'02',word:model.b.run?'to decide':'paused',col:model.b.run?'#e39a35':'#8193b8'}:{nm:'Checks',num:'12/14',word:'',col:'#6aa046'};
+// Cross-stitched numerals in stage coordinates (the display layer's glyphs).
+function qlCross(str,c,x0,y0){let x=0,d1='',d2='';
+ for(const ch of str){const g=GLYPH[ch];if(!g){x+=2;continue}for(let i=0;i<35;i++)if(g[i]==='1'){const[p,q]=xCell(x0+(x+i%5)*c,y0+Math.floor(i/5)*c,c);d1+=p;d2+=q}x+=6}
+ return{d1,d2,w:(x-1)*c}}
+const qlDefs=()=>`<defs><linearGradient id="ql-g" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6e6" stop-opacity=".2"/><stop offset=".4" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#1a0d05" stop-opacity=".35"/></linearGradient>`+
+ `<linearGradient id="ql-sh" x1="0" x2="1"><stop stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></linearGradient>`+
+ `<linearGradient id="ql-gl" x1="0" x2="1"><stop stop-color="#000" stop-opacity=".34"/><stop offset="1" stop-color="#000" stop-opacity="0"/></linearGradient>`+
+ `<linearGradient id="ql-gr" x1="0" x2="1"><stop stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".34"/></linearGradient>`+
+ `<radialGradient id="ql-lump" cx=".42" cy=".36" r=".62"><stop stop-color="#fff6e2" stop-opacity=".5"/><stop offset="1" stop-color="#fff6e2" stop-opacity="0"/></radialGradient>`+
+ ['b','c'].map(id=>{const q=QL[id].q;return `<linearGradient id="ql-r-${id}" x1="0" x2="1"><stop stop-color="${q[1]}"/><stop offset=".3" stop-color="${q[0]}"/><stop offset=".44" stop-color="${q[2]}"/><stop offset=".58" stop-color="${q[0]}"/><stop offset="1" stop-color="#140c08"/></linearGradient>`+
+  `<linearGradient id="ql-s-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="${QL[id].ink2}"/><stop offset=".45" stop-color="${QL[id].ink}"/><stop offset="1" stop-color="#0d0805"/></linearGradient>`}).join('')+'</defs>';
+// A signature block: a cream square appliquéd on, the name in satin stitch and the value cross-stitched beside it, stitched left to right.
+// The wool knot to its right is the widget's status: amber running, blue-grey paused, green for Checks.
+function qlBlock(id,Q,qid,cx,cy,small,pop,emb,tie){
+ if(pop<=0)return '';
+ const v=qlVal(id),nf=small?13:14,wf=small?10.5:11,c=small?1.7:1.9,nw=fcMeasure(v.nm,`italic ${nf}px Georgia,serif`),ww=v.word?fcMeasure(v.word,`italic ${wf}px Georgia,serif`):0;
+ const xs0=qlCross(v.num,c,0,0),bw=Math.round(10+nw+11+xs0.w+(ww?5+ww:0)+10),bh=small?22:26,x0=cx-bw/2,y0=cy-bh/2,s=backOut(pop);
+ let o=`<g transform="translate(${f(cx)} ${f(cy)}) scale(${f(s*1000)/1000}) translate(${f(-cx)} ${f(-cy)})">`+
+  `<rect x="${f(x0)}" y="${f(y0+1.4)}" width="${bw}" height="${bh}" rx="2.5" fill="#000" opacity=".35" filter="url(#sh)"/>`+
+  `<rect x="${f(x0)}" y="${f(y0)}" width="${bw}" height="${bh}" rx="2.5" fill="#f6ecd6"/><rect x="${f(x0)}" y="${f(y0)}" width="${bw}" height="${bh}" rx="2.5" fill="url(#ql-g)"/>`+
+  `<rect x="${f(x0+2.2)}" y="${f(y0+2.2)}" width="${f(bw-4.4)}" height="${f(bh-4.4)}" rx="1.6" fill="none" stroke="${Q.ink2}" stroke-width=".9" stroke-dasharray="2.2 1.8"/>`;
+ if(emb>0){const xn=x0+10,xv=xn+nw+11,X=qlCross(v.num,c,xv,cy-3.5*c),cid=`ql-e-${qid}-${id}`;
+  o+=`<clipPath id="${cid}"><rect x="${f(x0)}" y="${f(y0)}" width="${f(bw*emb)}" height="${bh}"/></clipPath><g clip-path="url(#${cid})">`+
+   `<text x="${f(xn)}" y="${f(cy)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${nf}" fill="url(#ql-s-${qid})">${v.nm}</text>`+
+   `<g fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${X.d1+X.d2}" stroke="#000" stroke-opacity=".2" transform="translate(.4 .6)"/><path d="${X.d1}" stroke="${Q.ink2}"/><path d="${X.d2}" stroke="${Q.ink}"/></g>`+
+   (ww?`<text x="${f(xv+X.w+5)}" y="${f(cy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="${Q.ink}">${v.word}</text>`:'')+'</g>'}
+ o+='</g>';
+ if(tie>0){const k=backOut(tie),kx=x0+bw+8;
+  o+=`<g transform="translate(${f(kx)} ${f(cy)}) scale(${f(k*1000)/1000})"><circle r="3.6" fill="#000" opacity=".35" transform="translate(.5 1)"/><circle r="3.2" fill="${v.col}"/><path d="M-1.6 .3q1.4 -1.9 3 -.3" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width=".7"/><circle cx="-1" cy="-1.1" r=".8" fill="#fff" opacity=".5"/></g>`}
+ return o;
+}
+// One quilt: GitDiscuss's (qid b, which also covers Jarvis as span grows) or Checks's own. Drawn in stage coordinates over the casings.
+function qlQuilt(qid,c,st,span){
+ const P=qlParts(st);if(P.drop<=0)return '';
+ const m=model[qid],small=qid==='c',w=small?CW:W,h=small?c.ch:c.h,Q=QL[qid],cs=QL.cs,o=lerp(4.5,1.5,P.tuck);
+ const y0=m.y+1-o,y1=m.y+h+o,R=m.x+w+3,L=qid==='b'?lerp(m.x-3,model.a.x-4,span):m.x-3;
+ // A roll forms again at the leading edge while the quilt is drawn over Jarvis or back off it.
+ const mv=span>0&&span<1?Math.sin(PI*span):0,rr=Math.max(lerp(QL.r0,4,P.roll)*(1-P.tuck),5*mv);
+ const X=lerp(lerp(R-QL.r0,L+4,P.roll),L,P.tuck);
+ // Joined, the cloth crosses the gap held up by the boss in its middle, so its hem sags either side of it.
+ const gx0=model.a.x+W,gx1=model.b.x,gap=qid==='b'&&span>0&&gx1>gx0+4;
+ const dip=x=>gap&&x>gx0&&x<gx1?3.5*span*Math.abs(Math.sin(2*PI*(x-gx0)/(gx1-gx0))):0;
+ const lr=5*P.tuck*(1-mv),n=Math.max(2,Math.ceil((R-X)/6)),pts=[[X,y0,lr]];
+ for(let i=1;i<n;i++)pts.push([lerp(X,R,i/n),y0,0]);
+ pts.push([R,y0,5],[R,y1,5]);for(let i=n-1;i>0;i--){const x=lerp(X,R,i/n);pts.push([x,y1+dip(x),0])}pts.push([X,y1,lr]);
+ const qd=rpoly(pts),cl=`ql-c-${qid}`;
+ // The laid cloth shows only once the roll has landed on it, so nothing is left hanging at the foot while the roll is in the air.
+ let s=`<g opacity="${f(clamp((P.drop-.7)/.3))}"><clipPath id="${cl}"><path d="${qd}"/></clipPath><path d="${qd}" fill="#000" opacity=".45" filter="url(#sh)" transform="translate(-1 2)"/>`;
+ // Patches anchored at the foot end, so they travel with the cloth as it is unrolled. Seams in running stitch, wool ties on the outer rows.
+ const yA=m.y-4,ni=Math.ceil((R-X)/cs)+1,nj=Math.ceil((y1+5-yA)/cs);let pt='',sm='',ti='';
+ for(let i=0;i<ni;i++)for(let j=0;j<nj;j++){const k=(i%3===1&&j%2===1)?3:(i+j)%2?2:((i>>1)+j)%2?1:0;pt+=`<rect x="${f(R-(i+1)*cs)}" y="${f(yA+j*cs)}" width="${cs+.3}" height="${cs+.3}" fill="${Q.q[k]}"/>`}
+ for(let i=1;i<ni;i++){const x=R-i*cs;if(x>X+2)sm+=`M${f(x)} ${f(y0+1)}V${f(y1+4)}`}
+ for(let j=1;j<nj;j++)sm+=`M${f(X+1)} ${f(yA+j*cs)}H${f(R)}`;
+ // Ties on the first and last seam rows inside the hem, whatever the strip's height.
+ const jt0=Math.ceil((y0+2.5-yA)/cs),jt1=Math.floor((y1-2.5-yA)/cs);
+ for(let i=1;i<ni;i+=2){const x=R-i*cs;if(x<X+3)break;for(const y of[yA+jt0*cs,yA+jt1*cs])ti+=`M${f(x-1.4)} ${f(y-1.4)}l2.8 2.8m0-2.8l-2.8 2.8`}
+ s+=`<g clip-path="url(#${cl})"><g filter="url(#g-${qid})">${pt}</g><path d="${sm}" stroke="#fbf0d6" stroke-opacity=".5" stroke-width=".8" stroke-dasharray="2 1.7"/>`+
+  `<path d="${ti}" stroke="#fbf0d6" stroke-width="1" stroke-linecap="round"/><rect x="${f(X)}" y="${f(y0)}" width="${f(R-X)}" height="${f(y1+5-y0)}" fill="url(#ql-g)"/>`;
+ // Over the gap: the cloth dips at the two casing ends and is pushed up into a lump by the boss and tab under it.
+ if(gap){const bx=gx0+CP.bx,by=m.y+h/2,lk=span*clamp((bx+24-X)/30),lx=bx+6,lrx=26;
+  s+=`<g opacity="${f(lk)}"><rect x="${f(gx0-2)}" y="${f(y0)}" width="10" height="${f(y1+5-y0)}" fill="url(#ql-gl)"/><rect x="${f(gx1-8)}" y="${f(y0)}" width="10" height="${f(y1+5-y0)}" fill="url(#ql-gr)"/>`+
+   `<ellipse cx="${f(lx+3)}" cy="${f(by+5)}" rx="${f(lrx)}" ry="15" fill="#000" opacity=".22" filter="url(#sh)"/><ellipse cx="${f(lx)}" cy="${f(by)}" rx="${f(lrx)}" ry="15" fill="url(#ql-lump)"/>`+
+   `<path d="M${f(lx-lrx*.7)} ${f(by+9)}Q${f(lx)} ${f(by+15)} ${f(lx+lrx*.7)} ${f(by+9)}" fill="none" stroke="#000" stroke-opacity=".18" stroke-width="1.4"/></g>`}
+ s+='</g>';
+ // The binding, a running stitch along the top, and the ends rolled under (the far end from the start, the near end once tucked).
+ s+=`<path d="${qd}" fill="none" stroke="${Q.bind}" stroke-width="2.4" stroke-opacity=".9"/>`+stitch(`M${f(X+6)} ${f(y0+2.8)}H${f(R-6)}`,'#fbf0d6',.55,.8,'2.2 1.8')+
+  `<path d="M${f(R-1.6)} ${f(y0+5)}V${f(y1-5)}" stroke="#0d0805" stroke-opacity=".45" stroke-width="2.4"/>`;
+ if(lr>.3)s+=`<path d="M${f(X+1.6)} ${f(y0+5)}V${f(y1-5)}" stroke="#0d0805" stroke-opacity="${f(.45*lr/5)}" stroke-width="2.4"/>`;
+ // Tucking: creases pull in at the corners as the overhang goes under, then smooth away.
+ const cr=Math.sin(PI*P.tuck);
+ if(cr>.02){let d='';for(const[x,dx]of[[X,1],[R,-1]])for(const[y,dy]of[[y0,1],[y1,-1]])d+=`M${f(x+dx*3)} ${f(y+dy*2)}l${f(dx*9)} ${f(dy*6)}M${f(x+dx*3)} ${f(y+dy*7)}l${f(dx*7)} ${f(dy*3)}`;
+  s+=`<path d="${d}" stroke="#0d0805" stroke-opacity="${f(.4*cr)}" stroke-width="1.1" stroke-linecap="round" fill="none"/>`}
+ s+='</g>';
+ // The roll: the rest of the quilt, rolled, laid out from the foot end. It drops onto the foot first, then travels, getting thinner.
+ if(rr>.5){const dy=P.drop<1?-30*(1-backOut(P.drop)):0,op=clamp(P.drop*3),yt=y0-2+dy,yb=y1+2+dy;let rows='';
+  for(let j=1;j<nj;j++){const y=yA+j*cs+dy;if(y>yt+3&&y<yb-3)rows+=`M${f(X-rr+1)} ${f(y)}H${f(X+rr-1)}`}
+  s+=`<g opacity="${f(op)}"><rect x="${f(X-rr-8)}" y="${f(y0)}" width="8" height="${f(y1-y0)}" fill="url(#ql-sh)" opacity="${f(clamp(rr/4))}"/>`+
+   `<rect x="${f(X-rr)}" y="${f(yt)}" width="${f(2*rr)}" height="${f(yb-yt)}" rx="${f(Math.min(rr,6))}" fill="url(#ql-r-${qid})" stroke="${Q.bind}" stroke-width="1.2"/>`+
+   `<path d="${rows}" stroke="#fbf0d6" stroke-opacity=".45" stroke-width=".8" stroke-dasharray="2 1.7"/></g>`}
+ // Signature blocks, one per widget under this quilt, each over its own casing.
+ const cy=m.y+h/2+1,pop=P.blk,emb=P.emb,tie=P.tie;
+ s+=qlBlock(qid,Q,qid,m.x+w/2,cy,small,pop,emb,tie);
+ if(qid==='b'&&span>.01)s+=qlBlock('a',Q,qid,model.a.x+W/2,cy,false,pop*seg(span,.72,.9),emb*seg(span,.82,1),tie*seg(span,.93,1));
+ // The join light: a French knot tied on the lump over the boss, gold while both run, cold blue if either is paused.
+ if(gap&&tie>0){const k=backOut(tie)*span,kx=gx0+CP.bx+4,ky=m.y+h/2-5,cold=!(model.a.run&&model.b.run);
+  s+=cold?`<g transform="translate(${f(kx)} ${f(ky)}) scale(${f(k*1000)/1000})"><circle r="3.7" fill="#9fb4dc"/><circle cx="-1.1" cy="-1.2" r="1" fill="#fff" opacity=".6"/></g>`:fknot(kx,ky,3.7*k);
+  const g=Math.sin(PI*seg(tie,.1,.7));if(g>.02)s+=sparkle(kx-3,ky-4,g)}
+ return s;
+}
+MIXES.quilt={...MIXES.coupler,label:'Shared quilt',kind:'Dominant skin · shade',shadeMs:3600,unshadeMs:2600,
+ shK:st=>seg(st,0,.3),
+ stack:[['Model','Dominant skin (C), for the shade','the group decides how its members shade, as Model C decides the skin of a widget docked into a group'],
+  ['Gothic','No Tuck','stone has no cover of its own. Alone, Jarvis shades as its page does: the wall lowers to its carved frieze, with its name and one value'],
+  ['Felt','Tuck: a patchwork quilt','from the felt page\'s Bedtime: a quilt pieced in the cushion\'s own felts, bound, tied with wool, with a cream signature block'],
+  ['Rule','The first skin that can tuck','a joined group shades in the first of its skins with a Tuck shade, and the others go under it. GitDiscuss\'s quilt is drawn over the coupler and over Jarvis'],
+  ['Readability','One block per widget','each widget keeps its own signature block, over its own casing, with its name and one value, so the strip still reads widget by widget'],
+  ['Motion','Felt','the quilt is laid in 12 fps stop-motion with shifting fibres; the stone never moves']],
+ about:'The stone & felt coupler\'s widgets: Jarvis is carved stone and GitDiscuss and Checks are felt, joined by the stone boss and felt button tab. The earlier dominant-skin mixes (turned to stone, turned to felt) let a group decide a docked widget\'s skin. This one lets the group decide how its members <b>shade</b>. Shade the widgets apart, then join them and shade again, or join them while they are shaded.',
+ join:{...MIXES.coupler.join,about:MIXES.coupler.join.about+' Joined while shaded, the quilt is drawn on over the coupler and Jarvis as the boss seats, and drawn back off before the tab lets go.'},
+ shade:{label:'Shared quilt',kind:'Tuck · the group decides',
+  about:'<b>Apart</b>, each widget shades in its own skin. Stone has no Tuck, so Jarvis\'s wall lowers to its frieze with its name and one value. GitDiscuss and Checks are put to bed as on the felt page: the cushion lets out its stuffing, and a quilt rolled up in its own felts drops onto the foot end with a bounce. It is unrolled over the strip, the roll thinning as it goes and casting a shadow ahead of it. The overhang is tucked under at the top, bottom and both ends, with creases that pull in and smooth away. A cream signature block is appliquéd on, and the name is satin-stitched and the value cross-stitched left to right, with a wool knot beside it as the status (amber running, blue-grey paused, green for Checks). <b>Joined</b>, the group decides: GitDiscuss\'s quilt is unrolled on, across the gap and the coupler, and over Jarvis. The cloth sags at the casing ends and is pushed up into a lump by the boss and tab, and the stone\'s pinnacles stand up out of the bedding. Jarvis gets a signature block of its own on GitDiscuss\'s quilt, and a gold French knot is tied on the lump as the join light (cold blue if either widget is paused). Joining or releasing while shaded draws the quilt over Jarvis or back off it. Unshading plays it back, and the tab can still be tugged through the cloth.'},
+ // The quilts go in under the tab's release hit, so its focus ring still shows through the cloth.
+ over(c){const s=MIXES.coupler.over.call(this,c),st=model.st;if(st<=.28)return s;const q=qlDefs()+qlQuilt('b',c,st,qlSpan(c))+qlQuilt('c',c,st,0),i=s.indexOf('<g class="hit"');return i<0?s+q:s.slice(0,i)+q+s.slice(i)},
+ text:{...MIXES.coupler.text,
+  intro:'Jarvis is carved stone; GitDiscuss and Checks are felt. Shade them apart, then join them and shade again: joined, they go to bed under one felt quilt.',
+  joined:'Joined: the felt tab is buttoned over the stone boss. Shade now and the pair goes to bed under one quilt. Tug the tab to release.',
+  get shadeOn(){return model.jt===1?'Shaded together: the group shades in felt, so one quilt is unrolled over GitDiscuss, the coupler and Jarvis, and both names are stitched on it.':'Shaded apart: Jarvis\'s wall lowers to its frieze (stone has no quilt), and GitDiscuss and Checks are each tucked under their own.'},
+  shadeOff:'Unshaded: the blocks are unpicked, the quilts are rolled back up and lifted off, and the casings fill out again.'}};
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
