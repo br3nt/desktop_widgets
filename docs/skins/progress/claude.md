@@ -1,5 +1,6 @@
-- [ ] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/felt.html: SyntaxError: Unexpected identifier 's'
+- [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/felt.html: SyntaxError: Unexpected identifier 's'
 prototypes/skins/claude/felt.html: ["Uncaught SyntaxError: Unexpected identifier 's' @line 2469"]
+  - Fixed: the bees join's `about` string had two bare apostrophes ("the top chain's", "the bottom chain's") that ended the single-quoted string; both are now escaped. A grep for possessives and contractions outside comments finds no others. Not checked in a parser or browser (node and Playwright were blocked this run).
 - [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/elven.html: SyntaxError: Identifier 'ASP' has already been declared — the astrolabe join's flare state reused the aspen shade's `ASP` name; renamed the astrolabe one to `ASTP` (4 references), no other duplicate top-level names remain.
 prototypes/skins/claude/elven.html: ["Uncaught SyntaxError: Identifier 'ASP' has already been declared @line 1923"]
 - [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/felt.html: SyntaxError: Unexpected identifier 's'
