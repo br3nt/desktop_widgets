@@ -5138,6 +5138,171 @@ MIXES.pinned={label:'Pinned voussoirs',kind:'Pairwise seam · Wedge',pair:'stone
    return r<.6?'Releasing · drawing the pin, lifting the springer ':'Releasing · parting '},
   turn:d=>'Pulling the springer · '+Math.round(d.deg*100)+'%'}}};
 
+/* ---------- Mix: containment (model E) for the Reel kind. A Hollow shell hauls a felt cushion up onto its slip. ----------
+   Every earlier container (stone niche, felt pocket, wire hoop, swan boat) was a place the other widget is set down in. Here the
+   container fetches its contents: a winch on Jarvis's back casts a silk line with an iron hook into a felt loop on GitDiscuss, a
+   cradle of telescoping chitin plates slides out from under Jarvis's foot, and three heaves haul the cushion along it until a
+   thorn at the far end flicks up behind it. The cradle runs under the cushion's foot and the thorns stand off its ends, so the
+   display, tabs and buttons are never covered. Joining: plates, cast, catch, heaves H0 to H0+3*HL, latch, light. */
+const HU={gap:30,N:5,over:12,H0:.4,HL:.4/3,BW:[3.8,13.6]};
+const HU_HOOK='M0 .4V9C0 15.6 7.6 15.6 7.6 8.6';
+function huGeo(c){const h=c.h,u=clamp((h-HS)/(H-HS)),k=lerp(.55,1,u),A=model.a,B=model.b,root=A.x+W-16,X1=A.x+W+HU.gap+W+6,len=(X1-root-HU.over)/HU.N+HU.over;
+ return{h,u,k,A,B,root,X1,len,step:len-HU.over,ty:A.y+h-5,D:{x:A.x+W-32,y:A.y+8-13*k},S:{x:A.x+W-9.5,y:A.y-.5*k},H0:{x:A.x+W+7*k,y:A.y+15*k},
+  L:{x:B.x+22,y:B.y+8-12*k},LJ:{x:A.x+W+HU.gap+22,y:A.y+8-12*k}}}
+const huFwd=()=>model.dir>0&&!model.th0.rev,huHeld=c=>huFwd()&&model.lit0>0&&(c.jt>0||model.busy);
+// Where everything is at jt. p: each plate's way out (0 stowed, 1 out); cast: the hook's flight (0 at rest, 1 in the loop);
+// sag: the line's slack; latch: the far thorn (0 flat, 1 up); lit: the join light; heave: [index, phase] while hauling.
+function huSt(c){
+ const jt=c.jt,g=huHeld(c)?1:jt===0?c.glow:0,N=HU.N;
+ if(jt===0)return{p:[.22*g,0,0,0,0],cast:0,sag:0,latch:0,lit:0,g,pawl:4*g};
+ if(huFwd()){const p=[...Array(N)].map((_,i)=>i?dart(seg(jt,.03+i*.036,.1+i*.036)):Math.max(.22*g*(1-seg(jt,0,.03)),dart(seg(jt,.0,.08)))),cast=seg(jt,.2,.38);
+  let sag=0,hv=null;
+  if(jt<.38)sag=26*ease(cast)-22*Math.sin(PI*cast);
+  else if(jt<HU.H0)sag=26;
+  else if(jt<HU.H0+3*HU.HL){const i=Math.min(2,Math.floor((jt-HU.H0)/HU.HL)),q=(jt-HU.H0-i*HU.HL)/HU.HL,s0=i?9:26;hv=[i,q];
+   sag=q<.3?lerp(s0,0,ease(q/.3)):q<.75?-1.4*Math.sin(PI*seg(q,.3,.75)):9*ease(seg(q,.75,1))}
+  else sag=lerp(9,4,ease(seg(jt,.8,.9)));
+  return{p,cast,sag,hv,latch:backOut(seg(jt,.8,.88)),lit:seg(jt,.88,1),g:g*(1-seg(jt,0,.15)),pawl:jt<.16?4*g*(1-seg(jt,0,.1)):jt<.4?22*ease(seg(jt,.16,.2))*(1-ease(seg(jt,.36,.4))):0}}
+ // Releasing (and a rejoin partway through it, which plays it backwards): light out, thorn down, hook shaken free and wound home, the cushion slides off, the plates go back in.
+ const r=1-jt,sh=seg(r,.14,.32),p=[...Array(N)].map((_,i)=>1-dart(seg(r,.74+(N-1-i)*.04,.84+(N-1-i)*.04)));
+ return{p,cast:1-ease(seg(sh,.25,1)),shake:sh<.25?Math.sin(sh/.25*PI*3)*(1-sh/.25):0,sag:sh<.25?lerp(4,10,seg(r,0,.14)):10*(1-ease(seg(sh,.25,.7))),
+  latch:1-ease(seg(r,.05,.16)),lit:1-seg(r,0,.08),g:0,pawl:22*Math.sin(PI*seg(r,.12,.34))}}
+function huPlate(x0,len,ty,hh,k,i){const x1=x0+len,a=x0+len*.27,b=x0+len*.73;
+ const body=`M${f(x0)} ${f(ty)}L${f(x1-7*k)} ${f(ty-1.4*k)}Q${f(x1+1.2*k)} ${f(ty-.8*k)} ${f(x1+1.2*k)} ${f(ty+4*k)}Q${f(x1+.6*k)} ${f(ty+hh-1.6*k)} ${f(x1-5*k)} ${f(ty+hh)}`+
+  `Q${f(b)} ${f(ty+hh+3.6*k)} ${f((x0+x1)/2)} ${f(ty+hh-2*k)}Q${f(a)} ${f(ty+hh+3.6*k)} ${f(x0)} ${f(ty+hh)}Z`;
+ return `<path d="${body}" fill="${INK}" transform="translate(0 ${f(2*k)})"/><path d="${body}" fill="url(#ho-shell)"/><path d="${body}" fill="url(#ho-sheen)"/>`+
+  `<rect x="${f(x0)}" y="${f(ty)}" width="${f(6*k)}" height="${f(hh)}" fill="${INK}" opacity=".45"/>`+
+  `<path d="M${f(x0+9*k)} ${f(ty+1.7*k)}L${f(x1-9*k)} ${f(ty+.4*k)}" stroke="#e3eaf2" stroke-width="${f(1.3*k)}" stroke-linecap="round" opacity="${i?.45:.55}"/>`+
+  `<path d="M${f(x0+len/2)} ${f(ty+hh-2*k)}L${f(x0+len/2+1.2*k)} ${f(ty+hh-7*k)}" stroke="${INK}" stroke-width="${f(1.2*k)}"/>`+
+  `<path d="${body}" fill="none" stroke="${INK}" stroke-width="${f(1.7*k)}" stroke-linejoin="round" filter="url(#ho-wob)"/>`}
+// A chitin thorn standing on the cradle, drawn upright with its tip leaning back over the cushion; rot turns it about its base.
+const huThornD=k=>hoTaper([...Array(11)].map((_,i)=>{const t=i/10;return[-8*k*t*t,-26*k*t]}),5.6*k,.5);
+const huThorn=(x,y,rot,k,op=1)=>`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)})" opacity="${f(op)}"><path d="${huThornD(k)}" fill="${INK}" transform="translate(1 1.6)" opacity=".6"/><path d="${huThornD(k)}" fill="#1a2232" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/><path d="M${f(-.6*k)} ${f(-3*k)}Q${f(-1.4*k)} ${f(-14*k)} ${f(-6.6*k)} ${f(-23*k)}" fill="none" stroke="#c9d6e6" stroke-width="${f(.8*k)}" opacity=".5"/></g>`;
+// The winch on Jarvis's back: an iron A-frame riveted to the shell, a drum of pale silk with a toothed flange, a pawl, a crank with a bone knob and a glass hub (the join light).
+function huWinch(rd,pawl,lit,run){
+ const tone=run?'#ffd98a':'#b8ccff';let o='';
+ if(lit>0)o+=`<circle r="16" fill="${tone}" opacity="${f(.4*lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+ o+=`<path d="M-11 12L-2.5 -1M11 12L2.5 -1" stroke="${INK}" stroke-width="3.8" stroke-linecap="round"/><path d="M-11 12L-2.5 -1M11 12L2.5 -1" stroke="#4d586b" stroke-width="1.5" stroke-linecap="round"/>`+
+  `<path d="M-14.5 12.6H14.5" stroke="${INK}" stroke-width="3.2" stroke-linecap="round"/><circle cx="-12" cy="12.6" r=".8" fill="#9aa6b6"/><circle cx="12" cy="12.6" r=".8" fill="#9aa6b6"/>`;
+ let te='';for(let i=0;i<12;i++){const a=(rd+i*30)*PI/180;te+=`M${f(7.4*Math.cos(a))} ${f(7.4*Math.sin(a))}L${f(8.9*Math.cos(a))} ${f(8.9*Math.sin(a))}`}
+ o+=`<path d="${te}" stroke="${INK}" stroke-width="1.6"/><circle r="7.6" fill="url(#ho-iron)" stroke="${INK}" stroke-width="1.3"/><circle r="5.7" fill="#d9e0e8" stroke="${INK}" stroke-width=".6"/>`;
+ let wd='';for(let i=0;i<5;i++){const a=(rd*1.0+i*72)*PI/180;wd+=`M${f(2.2*Math.cos(a))} ${f(2.2*Math.sin(a))}L${f(5.4*Math.cos(a+.25))} ${f(5.4*Math.sin(a+.25))}`}
+ o+=`<path d="${wd}" stroke="#8e9bb0" stroke-width=".7"/>`;
+ o+=`<g transform="translate(-13.5 -3.4) rotate(${f(14-pawl)})"><path d="M0 -1.3L6.4 .2L0 1.3Z" fill="#2c3340" stroke="${INK}" stroke-width=".7"/><circle r="1.4" fill="#9aa6b6" stroke="${INK}" stroke-width=".5"/></g>`;
+ const ca=rd*PI/180,kx=f(10.5*Math.cos(ca)),ky=f(10.5*Math.sin(ca));
+ o+=`<path d="M0 0L${kx} ${ky}" stroke="${INK}" stroke-width="3" stroke-linecap="round"/><path d="M0 0L${kx} ${ky}" stroke="#6b7486" stroke-width="1.1" stroke-linecap="round"/><circle cx="${kx}" cy="${ky}" r="2.4" fill="#e9e2cf" stroke="${INK}" stroke-width=".8"/>`;
+ return o+`<circle r="2.5" fill="${pvGlass(lit,run)}" stroke="${INK}" stroke-width=".7"/><circle cx="-.7" cy="-.8" r=".6" fill="#fff" opacity=".8"/>`}
+// The felt loop on GitDiscuss's top-left corner: a teal felt tab box-stitched on, with a cream cord loop standing up out of it.
+function huLoop(G,perk,pull){const{B,k}=G,x=B.x+22,y=B.y+8,lh=lerp(7,12,perk)*k,lean=lerp(-5,0,perk)*k+pull.x,ap={x:x+lean,y:y-lh*2+pull.y};
+ const cord=`M${f(x-6*k)} ${f(y)}Q${f(ap.x)} ${f(ap.y)} ${f(x+6*k)} ${f(y)}`,tab=rr4(B.x+13,B.y+5,18*k,10*k,[3,3,3,3]);
+ return `<path d="${tab}" fill="${FS.b.band}" filter="url(#g-b)"/>`+stitch(rr4(B.x+15,B.y+7,14*k,6*k,[2,2,2,2]),'#f7e8c9',.8,.8,'1.6 1.4')+
+  `<g fill="none" stroke-linecap="round"><path d="${cord}" stroke="#3b2a1c" stroke-width="${f(3.2*k)}"/><path d="${cord}" stroke="#eadcbd" stroke-width="${f(2*k)}"/><path d="${cord}" stroke="#a88d63" stroke-width="${f(.7*k)}" stroke-dasharray="1.4 1.4"/></g>`}
+// The hook placed by where its bowl sits (seat) and how it is turned (rot, degrees; 0 hangs straight down). Returns the drawing and its eye.
+function huHook(seat,rot,k){const a=rot*PI/180,co=Math.cos(a),si=Math.sin(a),bx=HU.BW[0]*k,by=HU.BW[1]*k,ex=seat.x-(bx*co-by*si),ey=seat.y-(bx*si+by*co);
+ const eye={x:ex+3.6*k*si,y:ey-3.6*k*co},t=`translate(${f(ex)} ${f(ey)}) rotate(${f(rot)}) scale(${f(k*100)/100})`;
+ return{eye,d:`<g transform="${t}"><path d="${HU_HOOK}" fill="none" stroke="${INK}" stroke-width="3.4" stroke-linecap="round"/><path d="${HU_HOOK}" fill="none" stroke="#5d6778" stroke-width="1.4" stroke-linecap="round"/>`+
+  `<path d="M7.6 8.6L9.8 4L6.1 6.3Z" fill="#ece7da" stroke="${INK}" stroke-width=".7"/><circle cy="-1.6" r="2" fill="none" stroke="${INK}" stroke-width="1.7"/><circle cy="-1.6" r="2" fill="none" stroke="#7d8ca3" stroke-width=".6"/></g>`}}
+const huLine=(p,q,sag,k,lit,tone)=>{const c={x:(p.x+q.x)/2,y:(p.y+q.y)/2+sag*k},d=`M${Pt(p)}Q${Pt(c)} ${Pt(q)}`;
+ return(lit>0?`<path d="${d}" fill="none" stroke="${tone}" stroke-width="4" opacity="${f(.35*lit)}" filter="url(#soft)"/>`:'')+`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${f(2.4*k)}" opacity=".75"/><path d="${d}" fill="none" stroke="#e6ecf2" stroke-width="${f(1.1*k)}"/>`};
+const huLen=(p,q,sag)=>{const d=Math.hypot(q.x-p.x,q.y-p.y)||1;return d+8*sag*sag/(3*d)};
+// Ready: how strongly the cradle and the line are chalked in (held from Ready into the join, then fading).
+const huGh=(c,r)=>c.jt===0?seg(r.g,.8,1)*.85:huFwd()&&huHeld(c)?.85*(1-seg(c.jt,.04,.22)):0;
+// The far thorn rides the outer plate: where that plate's end is.
+const huX4=(G,p4)=>lerp(G.A.x+W-G.len-4,G.root+(HU.N-1)*G.step,p4)+G.len;
+// Everything that lies along the cradle is drawn behind the widgets, so none of it can cross GitDiscuss's tabs or buttons, wherever GitDiscuss stands.
+function huUnder(c){const G=huGeo(c),r=huSt(c),jt=c.jt,{k,root,len,step,ty,A,X1}=G,rest=A.x+W-len-4;let o='';
+ for(let i=HU.N-1;i>=0;i--){const p=r.p[i];if(p<=.001)continue;const x0=lerp(rest,root+i*step,p),op=seg(p,0,.2);
+  o+=`<g opacity="${f(op)}">${huPlate(x0,len,ty,(13-i*.8)*k,k,i)}</g>`;
+  // The near thorn stands on the first plate in the gap, the cushion's stop.
+  if(!i)o+=huThorn(x0+(A.x+W+HU.gap-8-root),ty+3*k,0,k,op)}
+ // Lying flat, the far thorn stays behind the cushion; it comes in front only as it flicks up (see huOver).
+ const p4=r.p[HU.N-1],x4=huX4(G,p4);if(p4>.001&&r.latch<=0)o+=huThorn(x4-4*k,ty+4*k,100,k,seg(x4,A.x+W+8,A.x+W+40));
+ // Each plate clicks out with a chalk tick at its end.
+ if(huFwd()&&jt>0)for(let i=0;i<HU.N;i++){const t=i?seg(jt,.1+i*.036,.16+i*.036):seg(jt,.08,.14);if(t>0&&t<1)o+=pvTicks({x:root+i*step+len,y:ty+5*k},t,k*.7)}
+ const gh=huGh(c,r);
+ if(gh>0)o+=`<g fill="none" stroke="#e9edf1" stroke-width="1" stroke-dasharray="3 2.6" opacity="${f(gh)}"><path d="M${f(root)} ${f(ty)}H${f(X1)}V${f(ty+11*k)}H${f(root)}Z"/>`+
+  `<path d="${huThornD(k)}" transform="translate(${f(A.x+W+HU.gap-8)} ${f(ty+3*k)})"/><path d="${huThornD(k)}" transform="translate(${f(X1-4*k)} ${f(ty+4*k)})"/></g>`;
+ return o}
+function huOver(c){
+ const G=huGeo(c),r=huSt(c),jt=c.jt,{k,A,B,D,S,H0,L,LJ,ty,root,X1,len,step}=G,fwd=huFwd(),run=model.a.run&&model.b.run,tone=run?'#ffd98a':'#b8ccff';
+ let o='',fx='';
+ // Where the hook's bowl is: hanging at rest (leaning toward the gap when near), flying an arc, seated in the loop.
+ // At rest the hook hangs from its eye, so a lean (near) swings the bowl about the eye.
+ const rot0=-16*r.g,a0=rot0*PI/180,bx=HU.BW[0]*k,by=HU.BW[1]*k,rest={x:H0.x+bx*Math.cos(a0)-by*Math.sin(a0),y:H0.y+bx*Math.sin(a0)+by*Math.cos(a0)};
+ const cast=r.cast,fl=fwd?dart(cast):cast,arc=(fwd?62:40)*k*Math.sin(PI*cast);
+ const seat={x:lerp(rest.x,L.x,fl)+(r.shake||0)*3*k,y:lerp(rest.y,L.y-1.4*k,fl)-arc+(r.shake?-Math.abs(r.shake)*5*k:0)};
+ const src={x:S.x+3.4*k,y:S.y};let rot=rot0;
+ if(cast>0){const a=Math.atan2(seat.y-src.y,seat.x-src.x)*180/PI-90;rot=fwd?lerp(rot0,a,ease(seg(cast,0,.4)))+(1-cast)*cast*160:lerp(rot0,a,ease(seg(cast,0,.3)))}
+ const hk=huHook(seat,rot,k),eye=hk.eye,len0=huLen(src,{x:H0.x,y:H0.y-3.6*k},0),rd=-(huLen(src,eye,r.sag*k)-len0)/(6.2*k)*180/PI;
+ // The winch and the sheave on the strap's spike, the line over them.
+ o+=`<path d="M${f(D.x)} ${f(D.y-5.7*k)}L${f(S.x)} ${f(S.y-3.6*k)}" stroke="${INK}" stroke-width="${f(2.2*k)}" opacity=".75"/><path d="M${f(D.x)} ${f(D.y-5.7*k)}L${f(S.x)} ${f(S.y-3.6*k)}" stroke="#e6ecf2" stroke-width="${f(1*k)}"/>`;
+ o+=`<g transform="translate(${f(D.x)} ${f(D.y)}) scale(${f(k*100)/100})">${huWinch(rd,r.pawl,r.lit,run)}</g>`;
+ o+=`<g transform="translate(${f(S.x)} ${f(S.y)}) scale(${f(k*100)/100})"><circle r="3.7" fill="url(#ho-brass)" stroke="${INK}" stroke-width="1"/><circle r="1.1" fill="${INK}"/></g>`;
+ // The felt loop: it perks up when near, and leans toward the line while the hook is in it.
+ const tight=r.hv?(r.hv[1]>.3&&r.hv[1]<.75?1:0):0,pull=cast>=1?{x:-2.4*k*(1+tight),y:-1.2*k*tight}:{x:0,y:0};
+ o+=huLoop(G,Math.max(huHeld(c)?1:r.g,ease(seg(cast,0,.3))),pull);
+ o+=huLine(src,eye,r.sag,k,r.lit,tone)+hk.d;
+ if(r.g>0&&(jt===0||fwd))o+=`<circle cx="${f(L.x)}" cy="${f(L.y)}" r="${f(9*k)}" fill="url(#ho-eye)" opacity="${f(.7*r.g)}"/>`;
+ // The far thorn rides the outer plate; once the cushion is on it flicks up behind it, in front of the cushion's corner (lying flat it is in huUnder).
+ const p4=r.p[HU.N-1],x4=huX4(G,p4);
+ if(p4>.001&&r.latch>0)o+=huThorn(x4-4*k,ty+4*k,lerp(100,0,r.latch),k,seg(x4,A.x+W+8,A.x+W+40));
+ // Sparks and chalk: the hook bites; the cushion's foot drags; the thorn knocks up; the cradle's lip glints as the light comes on.
+ if(fwd&&jt>0){
+  const cb=seg(jt,.37,.42);if(cb>0&&cb<1)fx+=hoSpark(L,Math.sin(PI*cb),7*k);
+  if(r.hv&&r.hv[1]>.3&&r.hv[1]<.95)fx+=pvDust({x:B.x+W-14,y:B.y+c.h-2},seg(r.hv[1],.3,.95),4,10*k,71+r.hv[0]*13,'#9fd0c6');
+  const lk=seg(jt,.84,.9);if(lk>0&&lk<1)fx+=hoSpark({x:x4-6*k,y:ty-2*k},Math.sin(PI*lk),8*k)+pvTicks({x:x4-6*k,y:ty},lk,k*.8);
+  const gl=seg(jt,.9,1);if(gl>0&&gl<1)fx+=`<g opacity="${f(Math.sin(PI*gl))}">${sparkle(lerp(root+20,X1-10,gl),ty+5*k,.6*k)}</g>`}
+ if(!fwd&&jt>0&&jt<1){const r1=1-jt,lk=seg(r1,.05,.12);if(lk>0&&lk<1)fx+=hoSpark({x:x4-4*k,y:ty+2*k},.7*Math.sin(PI*lk),6*k);
+  const sh=seg(r1,.14,.2);if(sh>0&&sh<1)fx+=hoSpark(L,.8*Math.sin(PI*sh),6*k)}
+ o+=fx;
+ // Ready: the taut line into the loop, chalked in where it will be (the cradle and its thorns are chalked in huUnder).
+ const gh=huGh(c,r);
+ if(gh>0){const hz=huHook({x:LJ.x,y:LJ.y-1.4*k},-90+Math.atan2(LJ.y-src.y,LJ.x-src.x)*180/PI,k);
+  o+=`<path d="M${Pt(src)}L${Pt(hz.eye)}" fill="none" stroke="#e9edf1" stroke-width="1" stroke-dasharray="3 2.6" opacity="${f(gh)}"/>`}
+ if(jt===1){const x0=Math.min(D.x-16*k,S.x-8),y0=D.y-16*k;
+  o+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Winch and hook: tap the winch, or pull the line, or press Enter, to unhook GitDiscuss and slide it off the cradle"><title>Tap the winch, or pull the line, to release</title>`+
+   `<path d="M${Pt(src)}L${Pt(eye)}" stroke="transparent" stroke-width="16" fill="none"/><circle cx="${f(D.x)}" cy="${f(D.y)}" r="${f(15*k)}" fill="transparent"/><circle cx="${f(seat.x)}" cy="${f(seat.y-6*k)}" r="${f(11*k)}" fill="transparent"/>`+
+   `<rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(L.x+14*k-x0)}" height="${f(L.y+14*k-y0)}" rx="4" fill="none" stroke="#e9c46e" stroke-width="1.5"/></g>`}
+ return o}
+MIXES.slip={label:'Hauled up the slip',kind:'Containment · Reel',pair:'hollowfelt',smooth:true,slow:1.9,sepMs:2600,readyPull:.4,room:{x:10,top:14,bottom:16},
+ stack:[['Model','Containment (E), for the Reel kind','the Reel round gave every skin a line that hauls its partner in; every earlier container was a place the other widget is set down in. This one fetches what it holds'],
+  ['Container','Hollow','the first container drawn by Hollow (after gothic\'s niche, felt\'s pocket, wire\'s hoop and elven\'s swan boat): a cradle of five telescoping chitin plates that slides out from under Jarvis\'s foot, with a thorn standing in the gap and a thorn at the far end that flicks up to hold'],
+  ['The reel','Hollow','an iron winch on Jarvis\'s back with a drum of pale silk, a pawl, a crank with a bone knob and a glass hub; the line runs over a brass sheave on the strap\'s spike to an iron hook barbed with shell'],
+  ['Contents','Felt','GitDiscuss is the felt page\'s cushion, unchanged except for a cream cord loop on a teal tab sewn to its top-left corner, the one thing the reel can catch'],
+  ['Openings','None needed','the cradle runs under the cushion\'s foot and the thorns stand off its ends, so the display, the tabs and the buttons are never covered'],
+  ['Motion','Hollow hauls, felt gives','the plates and the hook dart and the winch heaves and pauses; the felt squashes at every heave and sheds fibres where its foot drags']],
+ about:'Jarvis wears the Hollow skin and GitDiscuss and Checks the felt skin. In the Reel round each skin cast a line and hauled its partner in, and each container mix so far (stone niche, felt pocket, wire hoop, swan boat) had the other widget set down in it. Here the two ideas meet: the container fetches its contents. A slipway works this way, with a winch hauling a boat up onto its cradle, and a Hollow shell has the parts for it: an iron winch, pale silk, a hook barbed with shell and plates that telescope out like a beetle\'s segments.',
+ join:{label:'Hauled up the slip',kind:'Containment · Reel',gap:HU.gap,
+  about:'Apart, an iron winch stands on Jarvis\'s back by the strap, its silk line running over a brass sheave on the strap\'s spike to an iron hook hanging in the gap, and GitDiscuss has a cream cord loop on a felt tab at its top-left corner. <b>Near:</b> the hook leans toward GitDiscuss, the first chitin plate peeks out from under Jarvis\'s foot, the loop stands up and glows. <b>Ready:</b> the cradle, its two thorns and the taut line into the loop are chalked in where they will be. Joining: five chitin plates telescope out from under Jarvis\'s foot one after another, each clicking out with a chalk tick, and run under GitDiscuss\'s foot; a thorn stands on the first plate in the gap and another lies flat at the far end. The pawl lifts and the hook is cast in a high arc, tumbling, while the drum pays out; it drops into the loop with a spark and the line falls slack. Then three heaves: each takes up the slack, yanks GitDiscuss a third of the way along the cradle while its felt squashes and fibres drag off its foot, and pauses with the line easing. Once the cushion\'s end is against the near thorn, the far thorn flicks up behind it with a spark and a chalk tick, the line settles, the winch\'s glass hub kindles as the join light (amber while both run, cold blue-white if either is paused) and a glint runs along the cradle\'s lip. The cradle and the winch scale down with any shade. <b>Release:</b> tap the winch, pull the line or the hook, or press Enter. The light goes out, the far thorn folds flat, the hook is shaken out of the loop and wound home, GitDiscuss slides off the cradle, and the plates telescope back in, outermost first.'},
+ shade:{label:'Plain draw-in, shell and felt',kind:'Page baseline',
+  about:'Not a brainstorm item. The carapace draws in to its chalk nameplate and the felt lets out its stuffing to the nameplate band; the winch, the cradle and its thorns shrink with them, so a shaded cushion stays on its slip.'},
+ casing:(id,w,h)=>id==='a'?hoCasing(w,h,'plain'):feltCushion(id,w,h),
+ readyPose:{},
+ state:()=>({rev:1}),
+ // The haul: nothing moves until the hook has caught, then three yanks of a third each; releasing, one smooth slide off the cradle.
+ travel:t=>{if(huFwd()){let e=0;for(let i=0;i<3;i++)e+=ease(seg(seg(t,HU.H0+i*HU.HL,HU.H0+(i+1)*HU.HL),.3,.75))/3;return e}return 1-ease(seg(1-t,.28,.8))},
+ under:huUnder,over:huOver,
+ // The felt gives at the catch and at every yank, and squashes once more as the thorn knocks up behind it.
+ squash(c,id){if(id!=='b'||!huFwd()||c.jt===0||c.jt===1)return 0;const jt=c.jt,r=huSt(c);
+  const v=r.hv&&r.hv[1]>.3&&r.hv[1]<.75?.4*Math.sin(PI*seg(r.hv[1],.3,.75)):.25*Math.sin(PI*seg(jt,.37,.42))+.3*Math.sin(PI*seg(jt,.84,.92));return v>.01?v:0},
+ grab(p){return{x0:p.x,y0:p.y,deg:0}},
+ pull(d,p){const dist=Math.hypot(p.x-d.x0,p.y-d.y0);if(dist>3)d.moved=true;d.deg=clamp(dist/70);return 1-.36*d.deg},
+ text:{intro:'Jarvis is a Hollow carapace shell with a winch on its back; GitDiscuss and Checks are felt, and GitDiscuss has a cord loop on its corner. Drag a nameplate toward the other widget, or use the state buttons.',
+  join:'A cradle of chitin plates slides out from under Jarvis\'s foot, the hook is cast into GitDiscuss\'s loop, and three heaves of the winch haul the cushion along the cradle until a thorn flicks up behind it.',
+  joined:'Joined: GitDiscuss sits on Jarvis\'s chitin cradle between two thorns, the hook still in its loop, and the winch\'s glass glows. Drag either nameplate to move the pair. Tap the winch, or pull the line, to release.',
+  sep:'The light goes out, the thorn folds flat, the hook is shaken free and wound home, GitDiscuss slides off the cradle, and the plates go back in.',
+  get hold(){return 'Held mid-join · '+T().mid(model.jt,1).trim().replace(/^Joining · /,'')+'. Use the scrubber to step through the animation.'},
+  near:'Nearby: the hook leans toward GitDiscuss, a chitin plate peeks out from under Jarvis and the felt loop stands up. Move closer.',
+  ready:'Ready: the cradle and the taut line into the loop are chalked in. Release to haul it in.',
+  back:'The line takes up again and the thorn stands; still held.',cancel:'Pull cancelled.',
+  shadeOn:'Shaded: the shell draws in and the felt lets out its stuffing; the winch and the cradle shrink with them and keep hold.',shadeOff:'Unshaded: the shell and the cushion open again.',
+  sepPh:'Separate · a Hollow winch and a felt loop',nearPh:'Nearby · the hook leans toward the loop',readyPh:'Ready · the cradle is chalked out',
+  mid:(jt,dir)=>{if(dir>0&&!model.th0.rev){if(jt<.2)return'Joining · the cradle slides out ';if(jt<.37)return'Joining · the hook is cast ';if(jt<HU.H0)return'Joining · it catches the loop ';
+    if(jt<HU.H0+3*HU.HL)return`Joining · heave ${Math.min(3,1+Math.floor((jt-HU.H0)/HU.HL))} of 3 `;return jt<.88?'Joining · the far thorn flicks up ':'Joining · the winch\'s glass kindles '}
+   // A rejoin partway through a release plays the release backwards, so it says so.
+   const r=1-jt,w=dir>0?'Rejoining · ':'Releasing · ';return w+(r<.06?'the light goes out ':r<.16?'the thorn folds flat ':r<.3?'the hook is shaken free and wound home ':r<.76?'sliding off the cradle ':'the plates go back in ')},
+  turn:d=>'Pulling the line · '+Math.round(d.deg*100)+'%'}};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1,g:0,gT:0,mq:null,mo:null};
@@ -5391,7 +5556,8 @@ stage.addEventListener('pointermove',e=>{
  const id=drag.id,m=model[id],raw={x:clamp(s[id].x+dx,10,1200-W-10),y:clamp(s[id].y+dy,TOP,bottom)};
  const t=targetFor(id),dist=Math.hypot(raw.x-t.x,raw.y-t.y);
  drag.state=dist<=READY?'ready':dist<=NEAR?'near':'idle';
- const pull=drag.state==='ready'?.88:drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
+ // A reel mix (hauled up the slip) pulls less at Ready, so the heaves still have some distance to haul.
+ const pull=drag.state==='ready'?(X().readyPull??.88):drag.state==='near'?Math.pow(1-dist/NEAR,.8)*.6:0;
  m.x=lerp(raw.x,t.x,pull);m.y=lerp(raw.y,t.y,pull);
  model.glow=drag.state==='ready'?1:drag.state==='near'?.15+.6*Math.pow((NEAR-dist)/(NEAR-READY),.8):0;
  if(drag.state==='ready')say(T().ready);else if(drag.state==='near')say(T().near);
