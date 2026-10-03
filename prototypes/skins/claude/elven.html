@@ -317,7 +317,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=38,SEP=170,NEAR=120,READY=40,TOP=70,SNAP=46;
@@ -701,6 +701,28 @@ const JOINS={
    (jt>.9?'Releasing · the silk dims ':jt>.8?'Releasing · the spindle tugs the arrow free ':jt>.58?'Releasing · the arrow is wound home ':jt>.55?'Releasing · it is nocked again ':'Releasing · the casings part '),
   about:'The Reel join kind in elven, after gothic\'s windlass and felt\'s fishing game. In a Reel join one widget casts a line, catches the other and hauls it in, so the closing itself is the animation. Here the line is spider silk and the cast is a bowshot. On Jarvis\'s stem stands a slender crescent bow of silver, bracketed to the knops, with recurved horns that curl into spirals, a moonstone at the grip and two leaves round it. Behind the grip turns a small spindle of moonstone wound with silk, and the silk is tied onto the arrow just behind its head. The arrow has a silver leaf blade, a pale shaft, leaf fletchings and a moonstone nock. On GitDiscuss\'s stem is a lancet target of night glass on two silver arms, with a silver ring to strike, a moonstone above it and a leaf below. <b>Near:</b> the bow is drawn a little, and the grip and the target\'s moonstone glow. <b>Ready:</b> the silk and the arrow standing in the target are traced in dashed moonlight. Joining: the bow is drawn (the string comes back over the stem and the horns flex) and loosed. The string shivers, the spindle spins back as the silk pays out, and the arrow flies across the gap in a low arc, turning along it, with the silk sagging behind. It sinks into the ring with a glint and quivers. Then come three turns of the spindle. Each takes up the slack and hauls GitDiscuss a third of the way in while the bow leans with the pull, and the silk falls a little slack between turns, while GitDiscuss stands still. The arrow levels as it comes in. Last, the silk kindles as the join light, dew beads along it catching the light one by one, the spindle and the target\'s moonstone glowing (moonlight while both widgets run, a cold grey if either is paused), and a glint runs along the silk to the arrow. Shaded, the bow, spindle, arrow and target all shrink with the casings, and the silk carries more of the gap. Nothing moves at rest. <b>Release:</b> tap the arrow or the silk, or focus it and press Enter. The silk dims, the spindle tugs and the arrow works loose with a glint, the spindle winds it back tail first along a low arc onto the string, the string shivers, and the casings part. (Drop Jarvis onto GitDiscuss instead and the spindle winds Jarvis along the silk.)',
   over:c=>drawSilk(c)
+ },
+ stay:{label:'Leaf-eye stay',kind:'Angle · stay',angled:true,a0:30,gap:-6,
+  get hooks(){return STH},
+  // At 0° there is no swing, so the join and release take less time.
+  get slow(){return lyN(model.angle)?1.7:1.05},get msOut(){return lyN(model.angle)?4200:2500},
+  bend(jt){return stBend(jt)},
+  txt:{join:'The casings meet at the corner, slender silver brackets grow from both roofs, a stay with four leaf-shaped eyes grows from the pivot on GitDiscuss and is set over the moonstone pin on Jarvis, then lifted while GitDiscuss swings open and dropped onto its eye.',
+   joined:'Joined by a leaf-eye stay, one eye per 15°. Drag GitDiscuss\'s nameplate to swing it (the stay lifts and rides over the pin), use the Angle slider, or press ↑ ↓; tap the stay or its pin to release.',
+   release:'The pin dims, the stay is lifted while GitDiscuss swings closed, then it draws back into its pivot, the brackets fold away and the casings part.',
+   stop:'The stay draws back into its pivot and the brackets fold away.',
+   hold:'Held mid-join: the stay has grown from its pivot on GitDiscuss and hangs lifted over the pin, about to be set on its first eye. Use the scrubber to step through it.',
+   ready:'Ready: the brackets, the stay and GitDiscuss\'s swing are traced in moonlight. Release to set the stay.',near:'Nearby: the roofs glimmer where the brackets will grow. Move closer.',
+   readyPh:'Ready · the stay is traced',nearPh:'Nearby · the roofs glimmer'},
+  phase:(jt,dir)=>{const n=lyN(model.angle),pe=stPe();
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<.44)return'Joining · the brackets grow from the roofs ';if(jt<.56)return'Joining · the stay grows from its pivot ';
+    if(jt<.62)return'Joining · the stay is set on eye 1 ';if(n&&jt<.66)return'Joining · the stay is lifted ';if(n&&jt<.84)return'Joining · GitDiscuss swings open ';
+    if(n&&jt<.88)return`Joining · the stay drops onto eye ${n+1} `;return'Joining · the pin kindles '}
+   if(jt>pe)return'Releasing · the pin dims ';if(n&&jt>.84)return'Releasing · the stay is lifted ';if(n&&jt>.66)return'Releasing · GitDiscuss swings closed ';
+   if(jt>.6)return'Releasing · the stay rests on eye 1 ';if(jt>.56)return'Releasing · the stay is lifted off ';if(jt>.42)return'Releasing · the stay draws back into its pivot ';
+   return jt>.3?'Releasing · the brackets fold away ':'Releasing · the casings part '},
+  about:'The Stay angle kind in elven, after gothic\'s casement stay and hollow\'s bone stay. In a Stay the angle is held by a brace across the opening, not by a pivot\'s friction or by what fills the gap. The casings meet with their squared ends almost touching and GitDiscuss turns on the inside corner they share, as on the lily. Here the brace is a slender silver stay with four leaf-shaped eyes, one per 15°, a vine engraved along it, a moonstone boss at its pivot and a leaf finial. It is pivoted on a curling silver bracket on GitDiscuss and its eyes drop over a moonstone-headed pin on a bracket on Jarvis: over the roofs when GitDiscuss is lowered, under the keels when it is raised. The eye distances are computed from the pivot geometry, so at full and shaded height the pin sits exactly in eye k+1 at 15k°. <b>Near:</b> the roofs glimmer where the brackets will grow. <b>Ready:</b> the brackets, the stay with its eyes and GitDiscuss\'s swing are traced in dashed moonlight. Joining: the casings close, the brackets grow from the roofs, each with a tendril curling at its foot and a leaf, and the stay grows from the pivot (its eyes opening as it passes them, the leaf unfurling at its tip), held lifted. It is set on eye 1 with a glint. Then it is lifted, GitDiscuss swings 5° past its angle and settles, and the stay drops onto its eye. The pin\'s moonstone kindles as the join light (moonlight while both widgets run, a cold grey if either is paused) and a glint runs along the stay. <b>Angle:</b> −45° to +45° in 15° steps. Drag GitDiscuss\'s nameplate, use the slider, or focus the nameplate or the stay and press ↑ ↓. The stay lifts and rides over the pin with its eyes sliding past, and drops onto the nearest eye with a glint when GitDiscuss stops. Crossing level, it is lifted off one side and set on the other. A moonstone tag reads the angle and the eye. Nothing moves at rest. <b>Release:</b> tap the stay or its pin, or focus it and press Enter.',
+  over:c=>drawStay(c)
  }
 };
 /* ---------- Lily petals: moon-white petals wedged into the opening, one per 15° (Wedge) ---------- */
@@ -808,6 +830,118 @@ function drawLily(c){
  // The hit area is the open lily; closed at 0°, it is just the two hearts, so GitDiscuss's nameplate stays free to turn.
  if(jt===1){const cr=10*k+4,hd=Math.abs(th)>=1?`M${P(Q)}L${P(O(A0,R*1.05))}A${f(R*1.05)} ${f(R*1.05)} 0 0 ${sg>0?1:0} ${P(O(A0+th,R*1.05))}Z`:[5,h-5].map(y=>`M${f(Q.x-cr)} ${f(a.y+y)}a${f(cr)} ${f(cr)} 0 1 0 ${f(2*cr)} 0a${f(cr)} ${f(cr)} 0 1 0 ${f(-2*cr)} 0Z`).join('');
   o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Water lily: GitDiscuss at ${signed(model.angle)}, ${LY.names[lyN(model.angle)]}. Up and down arrows open or close it a petal; Enter releases the lily and separates the widgets"><title>Tap the lily to release; drag GitDiscuss's nameplate round the heart to open or close it</title><path d="${hd}" fill="transparent"/><circle cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(10*k+4)}" fill="transparent"/><path class="ringfocus" d="${hd}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return o}
+/* ---------- Leaf-eye stay: a silver stay pivoted on GitDiscuss drops one of its eyes over a moonstone pin on Jarvis (Stay) ---------- */
+// The Stay angle kind in elven. GitDiscuss turns on the inside corner (bottom when lowered, top when raised), as on the lily. A curling
+// silver bracket on each roof (each keel when raised) carries the pin on Jarvis and the stay's pivot on GitDiscuss; the stay's four eyes
+// sit at the pivot-to-pin distance for 0°, 15°, 30° and 45°, so the eye it rests on counts the angle.
+// Joining: brackets .3–.44, the stay grows .42–.56 (lifted), set on eye 1 by .6; then lifted .62–.66, GitDiscuss swings .66–.84, dropped by .88.
+const ST={lv:0,tgt:0,drop:-1e9,loop:false,side:1,last:0};
+const stPe=()=>lyN(model.angle)?.88:.62;
+function stBend(jt){
+ if(jt>=1)return model.angle;const n=lyN(model.angle);if(!n||jt<.66)return 0;if(jt>=.84)return model.angle;
+ const u=seg(jt,.66,.84),A=Math.abs(model.angle),top=A+5;
+ return lySg(model.angle)*(u<.62?lerp(0,top,ease(u/.62)):lerp(top,A,back(seg(u,.62,1),1.3)))}
+// How far the stay is lifted off the pin while joining (1 = lifted clear).
+function stLiftJ(jt){if(jt<.56)return 1;if(jt<.6)return 1-ease(seg(jt,.56,.6));if(!lyN(model.angle)||jt<.62)return 0;
+ if(jt<.66)return ease(seg(jt,.62,.66));if(jt<.84)return 1;return 1-ease(seg(jt,.84,.88))}
+// Geometry, measured from the casings' tops (y 0) on Jarvis and from GitDiscuss's turning corner Pb, unturned.
+function stGeo(a,b,h,sg,kk){
+ const py=sg<0?5:h-5,ra=50*kk,rb=24*kk,hg=24*kk,ry=sg>0?5-hg:h-5+hg,roof=sg>0?5:h-5;
+ const Q={x:a.x+W-3,y:a.y+py},Pb={x:b.x+3,y:b.y+py},pin={x:-ra,y:ry-py},piv={x:rb,y:ry-py};
+ const R=(p,t)=>{const r=t*PI/180,c=Math.cos(r),s=Math.sin(r);return{x:p.x*c-p.y*s,y:p.x*s+p.y*c}};
+ const holes=[0,1,2,3].map(i=>{const p=R(piv,sg*15*i);return Math.hypot(p.x-pin.x,p.y-pin.y)});
+ return{Q,Pb,R,ra,rb,hg,holes,L:holes[3]+9*kk,Pn:{x:Q.x+pin.x,y:Q.y+pin.y},Jb:{x:Q.x-ra-5*kk,y:a.y+roof},piv,gb:{x:rb+5*kk,y:roof-py}}}
+// A bracket: a slim silver stem from its foot B toward its eye T (grown g of the way), a tendril curling at its foot and one leaf.
+function stStem(B,T,kk,g,side){if(g<=.01)return '';const E={x:lerp(B.x,T.x,g),y:lerp(B.y,T.y,g)},hd=Math.atan2(T.y-B.y,T.x-B.x),nx=-Math.sin(hd),ny=Math.cos(hd);
+ const C={x:(B.x+E.x)/2+nx*side*3*kk*g,y:(B.y+E.y)/2+ny*side*3*kk*g},d=`M${P(B)}Q${P(C)} ${P(E)}`;
+ let o=`<ellipse cx="${f(B.x)}" cy="${f(B.y)}" rx="${f(5*kk)}" ry="${f(1.7*kk)}" transform="rotate(${f(hd*180/PI+90)} ${f(B.x)} ${f(B.y)})" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".6"/>`;
+ o+=`<path d="${d}" fill="none" stroke="${NIGHT}" stroke-width="${f(3.6*kk)}" stroke-linecap="round" opacity=".75"/><path d="${d}" fill="none" stroke="#dfe6f7" stroke-width="${f(1.9*kk)}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="${f(.6*kk)}" stroke-linecap="round" opacity=".8"/>`;
+ const M={x:lerp(B.x,E.x,.3),y:lerp(B.y,E.y,.3)},c=widths(curlPts(M,hd-side*1.25,12*kk*seg(g,.3,1),1.7*PI,-side,18),1.5*kk,.3);
+ if(g>.3)o+=`<path d="${ribbon(c)}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".3"/>`;
+ const N={x:lerp(B.x,E.x,.62),y:lerp(B.y,E.y,.62)};
+ return o+leaf(N.x,N.y,hd*180/PI+side*52,.5*kk*back(seg(g,.55,1),1.4))}
+// The stay, from its pivot Pv at stage angle deg, grown to length Lv of L: a tapering silver rod with a vine engraved along it,
+// four leaf-shaped eyes (each with a count of dots), a moonstone boss at the pivot and a leaf finial.
+function stBar(Pv,deg,G,Lv,kk,lit,on){if(Lv<=.5)return '';const {holes,L}=G,x1=Math.min(Lv,L),w=x=>lerp(3.2,2.1,x/L)*kk/2;
+ let top='',bot='';for(let i=0;i<=12;i++){const x=x1*i/12;top+=(i?'L':'M')+f(x)+' '+f(-w(x));bot=`L${f(x)} ${f(w(x))}`+bot}
+ const rod=top+`Q${f(x1+w(x1)*1.6)} 0 ${f(x1)} ${f(w(x1))}`+bot+'Z';
+ let eyes='',holesD='',dots='';
+ holes.forEach((x,i)=>{const s=back(seg(Lv-x+6*kk,0,10*kk),1.4);if(s<=.01)return;const hl=6.6*kk*s,hw=8.6*kk*s,il=3.9*kk*s,iw=4.2*kk*s;
+  eyes+=`M${f(x-hl)} 0Q${f(x)} ${f(-hw)} ${f(x+hl)} 0Q${f(x)} ${f(hw)} ${f(x-hl)} 0Z`;holesD+=`M${f(x-il)} 0Q${f(x)} ${f(-iw)} ${f(x+il)} 0Q${f(x)} ${f(iw)} ${f(x-il)} 0Z`;
+  // Dots counting the eye sit on its pivot side, as many as fit before the eye below (shaded, the eyes crowd).
+  for(let j=0;j<=i;j++){const cx=x-hl-2.4*kk-j*2.2*kk;if(cx<(i?holes[i-1]+6.6*kk+1.2:5*kk))break;dots+=`<circle cx="${f(cx)}" cy="0" r="${f(.55*kk)}" fill="#33416e" opacity="${op(s)}"/>`}});
+ let vine='';if(x1>12*kk){vine='M'+f(8*kk)+' 0';for(let x=8*kk;x<x1-5*kk;x+=1.5)vine+=`L${f(x)} ${f(Math.sin(x/(1.45*kk))*.75*kk)}`}
+ const shape=`<path d="${rod}"/><path d="${eyes}"/>`;
+ let o=`<g transform="translate(${f(Pv.x)} ${f(Pv.y)}) rotate(${f(deg)})">`;
+ o+=`<g fill="${NIGHT}" opacity=".45" transform="translate(${f(.8*kk)} ${f(1.9*kk)})">${shape}</g><g fill="none" stroke="${NIGHT}" stroke-width="${f(1.3*kk+.4)}" stroke-linejoin="round" opacity=".7">${shape}</g>`;
+ o+=`<g fill="url(#silver)">${shape}</g>`;
+ if(vine)o+=`<path d="${vine}" fill="none" stroke="#6f80ad" stroke-width=".5" opacity=".9"/>`+(lit>0?`<path d="${vine}" fill="none" stroke="${on?'#fffbe6':'#e0e2ea'}" stroke-width=".7" opacity="${op(lit*.8)}"/>`:'');
+ o+=`<path d="${holesD}" fill="${NIGHT}" stroke="#8ea2d2" stroke-width=".5"/>`+dots;
+ o+=leaf(-2*kk,0,150,.42*kk*back(seg(Lv/L,0,.2),1.4))+leaf(-2*kk,0,210,.42*kk*back(seg(Lv/L,0,.2),1.4));
+ o+=`<circle r="${f(4.4*kk)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".7"/><circle r="${f(2.3*kk)}" fill="url(#moonstone)"/>`;
+ return o+leaf(x1-1,0,0,.75*kk*back(seg(Lv/L,.86,1),1.5))+'</g>'}
+// The pin's moonstone head, drawn over the stay (the pin passes through the eye); lit is the join light.
+function stPin(Pn,kk,lit,on){let o='';
+ if(lit>0)o+=`<circle cx="${f(Pn.x)}" cy="${f(Pn.y)}" r="${f((10+10*lit)*kk)}" fill="url(#halo)" opacity="${op(lit*(on?1:.55))}"/>`;
+ o+=`<circle cx="${f(Pn.x)}" cy="${f(Pn.y)}" r="${f(3.7*kk)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".7"/><circle cx="${f(Pn.x)}" cy="${f(Pn.y)}" r="${f(2.2*kk)}" fill="url(#moonstone)"/>`;
+ if(lit>.05)o+=`<circle cx="${f(Pn.x)}" cy="${f(Pn.y)}" r="${f(2.2*kk)}" fill="${on?'#fff8e0':'#d8dbe2'}" opacity="${op(lit*.75)}"/>`+star(Pn.x,Pn.y,(2.4+3*lit)*kk+1,lit*(on?.95:.5),on?'#fff':'#d8dbe2');
+ return o}
+// While turning: a moonstone tag beside Jarvis reads the angle and the eye (or that the stay is lifted).
+function stTag(x,y,a,lifted,opc){const n=lyN(a),hw=62,font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;let ic='';
+ for(let i=0;i<4;i++){const x0=10-hw+i*7.6,on=!lifted&&i===n;ic+=`<path d="M${f(x0-3)} 0Q${f(x0)} -6.4 ${f(x0+3)} 0Q${f(x0)} 6.4 ${f(x0-3)} 0Z" fill="${on?'#dfe6f8':'none'}" stroke="${on?'#6f84bd':'#a3abc4'}" stroke-width=".8"/>`}
+ return `<g opacity="${op(opc)}" pointer-events="none" transform="translate(${f(x)} ${f(y)})"><rect x="-${hw+2}" y="-16" width="${2*hw+4}" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-${hw}" y="-14" width="${2*hw}" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>${ic}`+
+  `<text x="18" y="1" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${signed(a)}</text><text x="18" y="11" text-anchor="middle" ${font} font-size="7.5" letter-spacing="1" fill="#5d6584">${lifted?'STAY LIFTED':'ON EYE '+(n+1)+' OF 4'}</text></g>`}
+const stTurning=()=>!!(drag&&drag.bend&&drag.moved)||model.angTo!==undefined;
+// Joined, the stay is lifted while GitDiscuss turns and dropped (with a glint at the pin) once it stops.
+function stLoop(){if(ST.loop)return;ST.loop=true;ST.last=performance.now();
+ requestAnimationFrame(function st(now){if(J()!==JOINS.stay||model.jt!==1){ST.loop=false;return}
+  const dt=clamp(now-ST.last,0,50);ST.last=now;
+  if(reduce.matches)ST.lv=ST.tgt;else if(ST.lv<ST.tgt)ST.lv=Math.min(1,ST.lv+dt/170);else if(ST.lv>ST.tgt){ST.lv=Math.max(0,ST.lv-dt/150);if(ST.lv===0)ST.drop=now}
+  render();if(ST.lv!==ST.tgt||now-ST.drop<520)requestAnimationFrame(st);else ST.loop=false})}
+function stFit(a,hh){const h=2*hh,s=-3,sg=lySg(a),py=sg<0?5:h-5,kk=Math.max(clamp(h/H,.34,1),.6),ys=[-4,h+6,sg>0?-26-22*kk:h+26+22*kk,sg>0?h+42:-42];
+ for(const t0 of a?[a,a+sg*5]:[0]){const t=t0*PI/180,ry=(u,v)=>py+u*Math.sin(t)+(v-py)*Math.cos(t);
+  ys.push(ry(s,0),ry(s,h),ry(s+W,0),ry(s+W,h),ry(s+W/2,-17),ry(s+W/2,h+12))}
+ const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn),hi=592-mx;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+const STH={s:()=>-3,py:(a,hh)=>a<0?5:2*hh-5,det:[-45,-30,-15,0,15,30,45],max:45,snap:15,hang:()=>0,fit:stFit,
+ name:a=>({num:signed(a),cap:'eye '+(lyN(a)+1)+' of 4',stop:true}),
+ grip:'Swing GitDiscuss on the leaf-eye stay: drag round the corner, or use the up and down arrows; each eye is 15 degrees',slider:'GitDiscuss angle on the leaf-eye stay, in degrees: one eye per 15',
+ ph:a=>signed(a)+' · eye '+(lyN(a)+1)+' of 4',
+ say:a=>{const n=lyN(a);return n?'GitDiscuss rests at '+signed(a)+', the stay on eye '+(n+1)+' of 4, '+(a<0?'under the keels.':'over the roofs.'):'GitDiscuss rests level, the stay on its first eye.'}};
+function drawStay(c){
+ const a=model.a,b=model.b,h=c.h,jt=c.jt,k=clamp(h/H,.34,1),kk=Math.max(k,.6),now=performance.now(),dir=model.dir,on=a.run&&b.run;
+ const sg=lySg(model.angle),G=stGeo(a,b,h,sg,kk),{Q,Pn}=G;
+ if(jt<1){ST.lv=0;ST.tgt=0;ST.side=sg}
+ // Near: the roofs glimmer where the brackets will grow. Ready: brackets, stay and swing traced in moonlight about the corner they will share.
+ if(jt===0){const g=c.glow;if(g<=0)return '';const t=model.angle,RQ=p=>{const r=G.R(p,t);return{x:Q.x+r.x,y:Q.y+r.y}},gb=RQ(G.gb),pv=RQ(G.piv);
+  let o='';for(const p of[G.Jb,gb])o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((6+8*g)*kk)}" fill="url(#halo)" opacity="${op(g)}"/>`;
+  if(g<1)return o;const dg=Math.atan2(Pn.y-pv.y,Pn.x-pv.x),E={x:pv.x+Math.cos(dg)*G.L,y:pv.y+Math.sin(dg)*G.L},ds=`fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3"`;
+  o+=`<path d="M${P(G.Jb)}L${P(Pn)}M${P(gb)}L${P(pv)}M${P(pv)}L${P(E)}" ${ds}/>`;
+  for(const x of G.holes)o+=`<circle cx="${f(pv.x+Math.cos(dg)*x)}" cy="${f(pv.y+Math.sin(dg)*x)}" r="${f(3.4*kk)}" ${ds}/>`;
+  const r0=Math.hypot(G.piv.x,G.piv.y),p0={x:Q.x+G.piv.x,y:Q.y+G.piv.y};
+  if(Math.abs(t)>=1)o+=`<path d="M${P(p0)}A${f(r0)} ${f(r0)} 0 0 ${t>0?1:0} ${P(pv)}" ${ds} opacity=".7"/>`;
+  return o+star(Pn.x,Pn.y,6,.95)}
+ // GitDiscuss's half turns with it about its corner Pb.
+ const th=stBend(jt),RB=p=>{const r=G.R(p,th);return{x:G.Pb.x+r.x,y:G.Pb.y+r.y}},Pv=RB(G.piv),Gb=RB(G.gb);
+ // Joined: lifted while GitDiscuss turns; crossing level, it is lifted off one side and fades in on the other.
+ const turning=jt===1&&stTurning();
+ if(jt===1){const tg=turning?1:0;if(tg!==ST.tgt){ST.tgt=tg;setTimeout(stLoop,0)}if(!tg&&ST.lv===0)ST.side=sg}
+ // A turn heading across level fades the stay out as it nears level, and in on the new side, finishing as it drops.
+ const cross=sg!==ST.side||(model.angTo!==undefined?lySg(model.angTo)!==ST.side:!!(drag&&drag.bend));
+ const al=jt===1&&cross&&(turning||ST.lv>0)?Math.max(clamp((Math.abs(th)-1)/5),turning?0:1-ST.lv):1;
+ const gB=ease(seg(jt,.3,.44)),gS=ease(seg(jt,.42,.56)),lv=jt===1?ST.lv:stLiftJ(jt),pe=stPe(),kd=ease(seg(jt,pe,1)),lit=kd*(on?1:.45);
+ const dist=Math.hypot(Pn.x-Pv.x,Pn.y-Pv.y),deg=Math.atan2(Pn.y-Pv.y,Pn.x-Pv.x)*180/PI+sg*lv*Math.atan2(9*kk,dist)*180/PI;
+ let o='';
+ if(al>.01)o+=`<g opacity="${op(al)}">`+stStem(G.Jb,Pn,kk,gB,-sg)+stStem(Gb,Pv,kk,gB,sg)+stBar(Pv,deg,G,G.L*gS,kk,lit,on)+stPin(Pn,kk,lit,on)+'</g>';
+ // Glints: as the stay is set on eye 1, as it drops onto its eye, along it as the pin kindles, and on every drop after a turn.
+ if(dir>0&&jt<1){for(const [s0,s1] of lyN(model.angle)?[[.58,.64],[.86,.92]]:[[.58,.64]]){const gk=seg(jt,s0,s1);if(gk>0&&gk<1)o+=star(Pn.x,Pn.y,(5+4*gk)*kk+1,Math.sin(PI*gk))}
+  const gk=seg(jt,pe,1);if(gk>0&&gk<1){const r=deg*PI/180,x=G.L*gk;o+=star(Pv.x+Math.cos(r)*x,Pv.y+Math.sin(r)*x,4.5*kk+1,Math.sin(PI*gk))}}
+ if(jt===1){const e=(now-ST.drop)/520;if(e>=0&&e<1)o+=`<circle cx="${f(Pn.x)}" cy="${f(Pn.y)}" r="${f((5+14*e)*kk)}" fill="none" stroke="#e6edff" stroke-width="${f(1.2*(1-e)+.2)}" opacity="${op(1-e)}"/>`+star(Pn.x,Pn.y,(5+4*Math.sin(PI*e))*kk+1,Math.sin(PI*e))}
+ const dop=jt===1?model.dial:dir>0?seg(jt,pe,Math.min(1,pe+.05)):0;
+ if(dop>0)o+=stTag(Q.x-100,sg>0?a.y+h+24:a.y-24,jt===1?model.angle:th,jt===1&&ST.lv>.5,dop);
+ // The hit area is the stay and the pin, so GitDiscuss's nameplate stays free to turn it.
+ if(jt===1){const r=deg*PI/180,E={x:Pv.x+Math.cos(r)*G.L,y:Pv.y+Math.sin(r)*G.L};
+  o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Leaf-eye stay: GitDiscuss at ${signed(model.angle)}, the stay on eye ${lyN(model.angle)+1} of 4. Up and down arrows swing GitDiscuss an eye; Enter lifts the stay off and separates the widgets"><title>Tap the stay or its pin to release; drag GitDiscuss's nameplate to swing it</title><path d="M${P(Pv)}L${P(E)}" stroke="transparent" stroke-width="16" stroke-linecap="round"/><circle cx="${f(Pn.x)}" cy="${f(Pn.y)}" r="${f(10*kk+3)}" fill="transparent"/><path class="ringfocus" d="M${P(Pv)}L${P(E)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
  return o}
 /* ---------- Silk arrow drawing (Reel) ---------- */
 // A crescent bow stands on Jarvis's stem with a moonstone spindle of spider silk behind its grip; GitDiscuss's stem carries a lancet target
