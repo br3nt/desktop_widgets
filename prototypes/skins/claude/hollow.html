@@ -2492,7 +2492,11 @@ const MORPHS={
  weave:{label:'Silk weave',kind:'Weave',
   about:'Checks grows by weaving more of itself, with the same pale needle and red thread as the silk stitch. The shell keeps its height; what it gains is cloth, hung under its belly. <b>Weave:</b> the box darts down, an iron rod is let down on two short chains from behind the belly, and pale silk warps drop from it left to right, each with a little bounce, every fourth weighted with a red bead. Then the needle shuttles across, a row at a time, left to right and back, its weft trailing behind it, and the cloth fills from the top with run 418 woven in as the rows reach it: the fourteen waymarks (twelve crosses, two open red rings for the checks still waiting), the pass rate, and a band of red lozenges along the foot. Last, the needle hems the cloth in a red running stitch and ties it off with a knot. <b>Tapestry:</b> the shell darts wider, the rod with it, and a second cloth is warped and woven beside the first, naming deploy-preview and e2e-safari waiting for Brent. <b>Shrinking</b> unpicks: the hem comes out, the needle draws the weft back row by row from the bottom, the warps are wound back up to the rod and the rod is drawn up behind the belly. The bead weights stay on as a fringe, so the finished cloth looks hung, not printed.',
   sizes:['Swatch','Weave','Tapestry'],slider:'Checks size, swatch to tapestry',ms:[3000,1800],ax:0,dims:g=>weaveDims(g),travel:t=>ease(seg(t,0,.3)),
-  say:(to,from,n)=>to>from?(to-from>1?'An iron rod drops under Checks, and the needle weaves a cloth, then a second beside it: Checks is a tapestry.':to===2?'The shell widens and the needle warps and weaves a second cloth beside the first: Checks is a tapestry.':'An iron rod drops under the shell, warps fall, and the needle weaves run 418 into a cloth row by row.'):'The needle unpicks the cloth row by row and the warps are wound back up: Checks shrinks to '+article(n)+'.'}
+  say:(to,from,n)=>to>from?(to-from>1?'An iron rod drops under Checks, and the needle weaves a cloth, then a second beside it: Checks is a tapestry.':to===2?'The shell widens and the needle warps and weaves a second cloth beside the first: Checks is a tapestry.':'An iron rod drops under the shell, warps fall, and the needle weaves run 418 into a cloth row by row.'):'The needle unpicks the cloth row by row and the warps are wound back up: Checks shrinks to '+article(n)+'.'},
+ burrow:{label:'Burrow',kind:'Dig',
+  about:'Checks grows the way an underground town does: by digging. Nothing is added to the shell; the room is broken out of rock. <b>Den:</b> the box darts down and a slab of dark rock rises out of a bank of fog under the shell, overshoots a touch and settles against its belly with a puff of dust, roots hanging from its ragged underside. A pale crack runs along the stone joints and round the outline of an arch, then the stones fall out one by one from the middle, turning as they drop and fade, and dust lifts off the new floor. Fourteen glow-worms let themselves down from the ceiling on silk: twelve light teal for the checks that passed, two hang dark in red rings for the ones still waiting. Last, a parchment sheet is pinned up under them: run 418 on main, 86% passed. <b>Warren:</b> the shell and its rock dart wider, and a second chamber is cracked and broken out through a short passage from the den, its sheet naming deploy-preview and e2e-safari waiting for Brent. <b>Shrinking</b> plays it backwards: the stones leap back into their places, the cracks close and the rock sinks into the fog. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a den or warren fills it back to a shell first, and unshading digs it out again.',
+  sizes:['Shell','Den','Warren'],slider:'Checks size, shell to warren',ms:[3000,1800],ax:0,dims:g=>burDims(g),travel:t=>ease(seg(t,0,.25)),
+  say:(to,from,n)=>to>from?(to-from>1?'A rock rises under Checks and two chambers are broken out of it: Checks is a warren.':to===2?'The rock widens and a second chamber is broken out beside the den: Checks is a warren.':'A rock rises under the shell, cracks, and its stones fall out to leave a den lit by glow-worms.'):'The stones leap back into place and the rock '+(to?'closes up':'sinks into the fog')+': Checks shrinks to '+article(n)+'.'}
 };
 // Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
 for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
@@ -2821,6 +2825,115 @@ function weave(el,w,h){
  if(nd&&nd.op>0)o+=needle(nd.tip,nd.a,.25,nd.op);
  svg.innerHTML=o;
 }
+
+/* ---------- Morph: burrow (Checks) ---------- */
+// g runs 0 shell, 1 den, 2 warren. Checks grows by digging: a rock rises out of the fog under its belly and chambers are broken out of it.
+// Each step: the box darts to its new size, the rock face cracks pale along a chamber's outline, its stones fall away one by one,
+// then the chamber is furnished. Every frame is drawn from g alone, so shrinking throws the stones back into place and the rock sinks.
+const BRW=468,BRH=214,BRT=58;
+// The den, and the warren's second chamber with a short passage through from the den (tx..x0, ty..y1).
+const BRC=[{x0:30,x1:246,y0:92,ym:120,y1:184},{x0:262,x1:446,y0:92,ym:120,y1:184,tx:246,ty:150}];
+const burOn=()=>model.morph==='burrow'&&model.g>0;
+function burDims(g){g=clamp(g,0,2);return[Math.round(lerp(CW,BRW,backSoft(seg(clamp(g-1),0,.16)))),Math.round(lerp(CH,BRH,backSoft(seg(clamp(g),0,.14))))]}
+const brRnd=s=>()=>(s=(s*16807)%2147483647)/2147483647;
+// Where the arched ceiling is at x, and the chamber's outline (the arch, plus the passage for the second chamber).
+const brCx=c=>(c.x0+c.x1)/2,brA=c=>(c.x1-c.x0)/2;
+const brArch=(c,x)=>c.ym-(c.ym-c.y0)*Math.sqrt(Math.max(0,1-Math.pow((x-brCx(c))/brA(c),2)));
+const brCham=c=>{const arch=`V${c.ym}A${brA(c)} ${c.ym-c.y0} 0 0 1 ${c.x1} ${c.ym}V${c.y1}`;
+ return c.tx!==undefined?`M${c.tx} ${c.y1}V${c.ty+7}Q${c.tx} ${c.ty} ${c.tx+7} ${c.ty}H${c.x0}${arch}Z`:`M${c.x0} ${c.y1}${arch}Z`};
+// Each chamber's face is cut into a jittered grid of stones, ordered by when they fall: the den from its middle out, the warren from the passage on.
+const BRK=BRC.map((c,i)=>{const rnd=brRnd(7+i*131),x0=c.tx??c.x0,X=6,Y=3,V=[];
+ for(let yi=0;yi<=Y;yi++){V.push([]);for(let xi=0;xi<=X;xi++)V[yi].push([lerp(x0,c.x1,xi/X)+(xi>0&&xi<X?(rnd()-.5)*16:0),lerp(c.y0,c.y1,yi/Y)+(yi>0&&yi<Y?(rnd()-.5)*14:0)])}
+ const st=[],crack=[];
+ for(let yi=0;yi<Y;yi++)for(let xi=0;xi<X;xi++){const q=[V[yi][xi],V[yi][xi+1],V[yi+1][xi+1],V[yi+1][xi]],cx=q.reduce((a,p)=>a+p[0],0)/4,cy=q.reduce((a,p)=>a+p[1],0)/4;
+  const o=i?(cx-x0)/(c.x1-x0):Math.hypot((cx-brCx(c))/brA(c),(cy-(c.y0+c.y1)/2)/(c.y1-c.y0));
+  st.push({d:'M'+q.map(p=>f(p[0])+' '+f(p[1])).join('L')+'Z',cx,cy,o:o+rnd()*.18,r:(rnd()-.5)*70,dx:(rnd()-.5)*14})}
+ const mx=Math.max(...st.map(s=>s.o));st.forEach(s=>s.o/=mx);
+ // One path per joint line, so each crack runs its own length (a dash pattern restarts on every subpath).
+ for(let yi=1;yi<Y;yi++)crack.push('M'+V[yi].map(p=>f(p[0])+' '+f(p[1])).join('L'));
+ for(let xi=1;xi<X;xi++)crack.push('M'+V.map(r=>f(r[xi][0])+' '+f(r[xi][1])).join('L'));
+ return{st,crack}});
+// The rock: a floating slab with a ragged underside, stretched to the box's width; hanging roots.
+function brRock(w){const rnd=brRnd(29),n=16,b=[];
+ for(let i=0;i<=n;i++)b.push([lerp(22,w-22,i/n),BRH-17+(i%2?6:-1)+rnd()*5+(i%5===2?9:0)]);
+ const d=`M10 ${BRT}C2 ${BRT+30} 0 ${BRT+74} 8 ${BRH-52}C12 ${BRH-32} 15 ${BRH-24} ${f(b[0][0])} ${f(b[0][1])}`+b.slice(1).map(p=>`L${f(p[0])} ${f(p[1])}`).join('')+
+  `C${w-15} ${BRH-24} ${w-12} ${BRH-32} ${w-8} ${BRH-52}C${w} ${BRT+74} ${w-2} ${BRT+30} ${w-10} ${BRT}C${f(w*.7)} ${BRT-5} ${f(w*.3)} ${BRT-3} 10 ${BRT}Z`;
+ let roots='';for(const[u,L]of[[.13,20],[.36,12],[.58,21],[.83,14]]){const x=lerp(22,w-22,u),y=BRH-22,pts=[];
+  for(let k=0;k<=8;k++)pts.push([x+Math.sin(k*1.3+u*9)*2.6*k/8,y+L*k/8]);roots+=`<path d="${taper(pts,2.8,.3)}" fill="${INK}"/>`}
+ return{d,roots}}
+// A puff of dust along y, between x0 and x1, at progress k.
+function brDust(x0,x1,y,k,n=7){if(k<=0||k>=1)return '';let o='';const rnd=brRnd(53+Math.round(x0));
+ for(let i=0;i<n;i++){const x=lerp(x0,x1,(i+.5)/n)+(rnd()-.5)*10,s=Math.sign(x-(x0+x1)/2)||1;
+  o+=`<circle cx="${f(x+s*10*k*rnd())}" cy="${f(y-14*k*(.5+rnd()))}" r="${f(1.6+4*k*rnd())}" fill="#c9d3e0" opacity="${f3(.5*Math.sin(Math.PI*k))}"/>`}
+ return o}
+// What each chamber holds: glow-worms for run 418's checks under a pinned sheet in the den; a sheet naming the waiting checks in the warren.
+function brSheet(i,k){if(k<=0)return '';const d=dart(clamp(k/.7)),x=i?282:46,y=(i?110:134)-6*(1-d),w=i?146:184,h=i?68:40;
+ let o=`<g opacity="${f3(seg(k,0,.3))}"><rect x="${x+1.5}" y="${f(y+3)}" width="${w}" height="${h}" rx="2" fill="${INK}" opacity=".55"/><rect x="${x}" y="${f(y)}" width="${w}" height="${h}" rx="2.4" fill="url(#parchG)" stroke="${INK}" stroke-width="1.1"/>`;
+ if(!i)o+=`<text class="dser" x="${x+12}" y="${f(y+15)}" font-size="10" font-style="italic" fill="#5c4a36" letter-spacing=".5">ii · main branch, run 418</text>`+
+  `<text class="dtx" x="${x+12}" y="${f(y+31)}" style="font-size:10.5px"><tspan class="dn">86%</tspan><tspan dx="4">passed · 2 dark, waiting</tspan></text>`;
+ else{o+=`<text class="dser" x="${x+11}" y="${f(y+13)}" font-size="10" font-style="italic" fill="#5c4a36" letter-spacing=".5">iii · awaiting approval</text>`;
+  for(const[dy,name]of[[29,'deploy-preview'],[53,'e2e-safari']])o+=`<circle cx="${x+16}" cy="${f(y+dy-4)}" r="3.2" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.4"/>`+
+   `<text class="dser" x="${x+26}" y="${f(y+dy)}" font-size="12.5" fill="#231b14">${name}</text><text class="dser" x="${x+26}" y="${f(y+dy+11)}" font-size="10.5" font-style="italic" fill="#5c4a36">waiting for Brent</text>`}
+ return o+'</g>'}
+function burrow(el,w,h){
+ const svg=el.querySelector('.casing');
+ if(!burOn()){if(svg.dataset.bk){svg.dataset.bk='';el.querySelector('.lampdot').style.left=''}return}
+ const g=model.g,still=g===Math.round(g);
+ el.querySelector('.lampdot').style.left=(w-38)+'px';
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'digging')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.bk===key)return;svg.dataset.bk=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const T=[clamp(g),clamp(g-1)],rk=seg(T[0],.03,.22),R=brRock(w);
+ // Per chamber: when its face cracks, when its stones fall, when it is furnished.
+ const ph=[{cr:seg(T[0],.26,.38),fa:[.36,.62],t:T[0],fu:seg(T[0],.84,.95)},{cr:seg(T[1],.2,.32),fa:[.3,.58],t:T[1],fu:seg(T[1],.66,.8)}];
+ let o=`<defs><linearGradient id="brRk" gradientUnits="userSpaceOnUse" x1="0" y1="${BRT}" x2="0" y2="${BRH}"><stop stop-color="#4a5262"/><stop offset=".35" stop-color="#2c323d"/><stop offset=".8" stop-color="#191d24"/><stop offset="1" stop-color="#101318"/></linearGradient>`+
+  `<linearGradient id="brIn" gradientUnits="userSpaceOnUse" x1="0" y1="90" x2="0" y2="186"><stop stop-color="#05070b"/><stop offset=".6" stop-color="#0d121a"/><stop offset="1" stop-color="#1a2230"/></linearGradient>`;
+ BRC.forEach((c,i)=>o+=`<clipPath id="brC${i}"><path d="${brCham(c)}"/></clipPath>`);
+ o+='</defs>';
+ let rock='',front='';
+ // The chambers: dark hollows with a shadowed rim, opened once the face has cracked; the stones over them fall away to show them.
+ BRC.forEach((c,i)=>{const P=ph[i];if(P.cr<=0)return;const cd=brCham(c);
+  rock+=`<path d="${cd}" fill="url(#brIn)"/><g clip-path="url(#brC${i})"><path d="${cd}" fill="none" stroke="${INK}" stroke-width="9" opacity=".7"/>`;
+  for(let x=c.x0+14+i*6;x<c.x1-10;x+=23+(x%7))rock+=`<ellipse cx="${x}" cy="${c.y1-1.5}" rx="${3+x%4}" ry="2" fill="#2a3240"/>`;
+  rock+=`</g><path d="M${(c.tx??c.x0)+3} ${c.y1-.6}H${c.x1-3}" stroke="#c9d6e6" stroke-width=".8" opacity=".3"/>`;
+  // The passage through from the den: the den's wall is cut away there and the rim runs on, so the two hollows read as one.
+  if(i&&P.t>=P.fa[0])rock+=`<rect x="${c.tx-6}" y="${c.ty+1.4}" width="10" height="${c.y1-c.ty-2.4}" fill="url(#brIn)"/>`;
+  const rim=i?`M${BRC[0].x1} ${c.ty}H${c.x0}V${c.ym}A${brA(c)} ${c.ym-c.y0} 0 0 1 ${c.x1} ${c.ym}V${c.y1}H${BRC[0].x1}`:cd;
+  rock+=`<path d="${rim}" fill="none" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round"/>`});
+ // The den's glow-worms: fourteen threads let down from the ceiling, twelve lit teal for the passed checks and two dark red rings for the ones still waiting.
+ if(ph[0].t>.6){const c=BRC[0],t=ph[0].t,amb=seg(t,.7,.9);
+  if(amb>0)rock+=`<ellipse cx="${brCx(c)}" cy="114" rx="96" ry="26" fill="url(#leakT)" opacity="${f3(.3*amb)}"/>`;
+  for(let j=0;j<14;j++){const k=seg(t,.64+.013*j,.72+.013*j);if(k<=0)break;const x=52+j*13.2,ay=brArch(c,x)+1,L=Math.min(10+(j%3)*4+(j%2)*3,126-ay),y=ay+L*backSoft(k);
+   rock+=`<path d="M${f(x)} ${f(ay)}V${f(y)}" stroke="#dfe5ee" stroke-width=".6" opacity=".7"/>`;
+   rock+=j<12?`<circle cx="${f(x)}" cy="${f(y+2)}" r="7" fill="url(#leakT)" opacity="${f3(seg(k,.4,1))}"/><circle cx="${f(x)}" cy="${f(y+2)}" r="2.2" fill="url(#tealG)" stroke="${INK}" stroke-width=".6"/>`:
+    `<circle cx="${f(x)}" cy="${f(y+2.6)}" r="2.7" fill="#1a0d10" stroke="${REDHI}" stroke-width="1.3"/>`}}
+ // The stones of each face, seamless with the rock until it cracks; then they loosen and fall out toward you, turning, and fade.
+ // The warren's stones only appear once the rock has widened under them (they match it, so nothing pops).
+ BRC.forEach((c,i)=>{const P=ph[i],[a,b]=P.fa;if(P.t>=b+.1||i&&P.t<.16)return;let s='';
+  // Each stone is cut to the chamber's outline in its own frame, so the cut piece falls whole.
+  for(const S of BRK[i].st){const k=seg(P.t,a+(b-a-.1)*S.o,a+(b-a-.1)*S.o+.1);if(k>=1)continue;
+   const e=k*k;s+=`<g opacity="${f3(1-seg(k,.45,1))}" transform="translate(${f(S.cx+S.dx*k)} ${f(S.cy+48*e)}) rotate(${f(S.r*k)}) scale(${f3(1+.14*k)}) translate(${f(-S.cx)} ${f(-S.cy)})"><g clip-path="url(#brC${i})"><path d="${S.d}" fill="url(#brRk)"/>`+
+    (k>0?`<path d="${S.d}" fill="none" stroke="${INK}" stroke-width="1.2" opacity="${f3(seg(k,0,.15))}"/>`:'')+'</g></g>'}
+  rock+=`<g filter="url(#rock)">${s}</g><g clip-path="url(#brC${i})">`;
+  // The crack runs pale along the stone joints and the chamber's outline, then fades as the stones go.
+  if(P.cr>0){const op=f3(1-seg(P.t,a+.04,b));rock+=`<g fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="${op}">`+BRK[i].crack.map(d=>`<path d="${d}" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="${f3(1-P.cr)}" stroke="#eef4fb" stroke-width="1.1"/>`).join('')+
+   `<path d="${brCham(c)}" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="${f3(1-P.cr)}" stroke="#eef4fb" stroke-width="2.4" opacity=".8"/></g>`}
+  rock+='</g>'});
+ // Dust: where the rock docks under the belly, and off each chamber's floor as its stones fall.
+ front+=brDust(8,40,BRT+8,seg(T[0],.16,.32),4)+brDust(w-40,w-8,BRT+8,seg(T[0],.16,.32),4);
+ BRC.forEach((c,i)=>{const[a,b]=ph[i].fa;front+=brDust(c.tx??c.x0,c.x1,c.y1-2,seg(ph[i].t,a+.06,b+.12))});
+ // The sheets are pinned up last.
+ BRC.forEach((c,i)=>{const P=ph[i];if(P.fu<=0)return;const x=i?282:46,y=i?110:134,w2=i?146:184;front+=brSheet(i,P.fu)+pin(x+7,y+6,seg(P.fu,.5,.85))+pin(x+w2-7,y+6,seg(P.fu,.62,1))});
+ // The whole rock rises out of a bank of fog, overshoots a touch and settles under the belly.
+ const ry=56*(1-backSoft(rk)),fog=Math.sin(Math.PI*rk);
+ o+=(fog>.01?`<ellipse cx="${f(w/2)}" cy="${BRH-6}" rx="${f(w*.62)}" ry="34" fill="url(#fogCold)" opacity="${f3(fog)}"/>`:'')+
+  `<g opacity="${f3(seg(rk,0,.35))}" transform="translate(0 ${f(ry)})"><path d="${R.d}" fill="${INK}" transform="translate(0 2.6)"/>${R.roots}<path d="${R.d}" fill="url(#brRk)" filter="url(#rock)"/>`+
+  `<path d="M12 ${BRT+6}C5 ${BRT+34} 4 ${BRT+70} 10 ${BRH-54}" fill="none" stroke="#c9d6e6" stroke-width="1" opacity=".22"/><path d="M24 ${BRH-26}Q${f(w/2)} ${BRH-34} ${w-24} ${BRH-27}" fill="none" stroke="${INK}" stroke-width="1.1" opacity=".5"/>`+
+  rock+`<path d="${R.d}" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round" filter="url(#wob)"/>${front}</g>`;
+ o+=casing('c',w,CH,true,'body')+curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,1);
+ svg.innerHTML=o;
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -2990,8 +3103,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDV'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVB'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):mr||cu||fg||wc||ln||ck||rt||tp?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc||ln||ck||rt||tp?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc||ln||ck||rt||tp?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -3001,7 +3114,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h)}
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
