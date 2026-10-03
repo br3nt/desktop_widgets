@@ -42,7 +42,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Hollow · Shade · Nested husks — Added selectable three-course chalk nesting, a readable 36 px summary slot, reverse extension and independent Checks shade with drawer restoration; retained all six joins and plain summary; 221 simulated DOM, animation, geometry, touch and regression checks passed; full-page visual review blocked by denied Chrome access and sandbox browser launch.
 - [x] Gothic · Shade · Folding triptych — Finished selectable carved wood leaves, staged folding and seating into a brass-edged summary strip, reverse unfolding and independent Checks shade; retained all six joins and earlier shade options; 510 simulated DOM, animation, focus, touch and regression checks passed; visual review blocked by unavailable browser access and sandbox rendering failures.
 - [x] Felt · Shade · Concertina pleats — Added selectable three-stage wool folds, a scalloped 36 px hem, flat summary labels, reverse unfolding and independent Checks shade; retained all six joins and prior shades; 348 simulated DOM, animation, geometry and touch checks passed; full-page visual review blocked by denied Chrome access.
-- [ ] Elven · Shade · Quill sheath
+- [x] Elven · Shade · Quill sheath — Added selectable sequential silver rib withdrawal, a closing chased cap, readable 36 px summary spine and reverse extension with independent Checks shade; preserved all six joins and earlier shades; 317 simulated interaction, animation, geometry and touch checks passed; full-page visual review blocked by unavailable browser access and sandbox browser launch.
 - [ ] Wire · Shade · Stone strand
 - [ ] Hollow · Shade · Silk blind
 - [ ] Gothic · Shade · Stone course stack
