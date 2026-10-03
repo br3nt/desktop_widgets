@@ -3470,7 +3470,11 @@ const MORPHS={
  nautilus:{label:'Nautilus',kind:'Coil',
   about:'Checks grows the way a nautilus does: it lays down a chambered shell behind itself and lives in the newest part. The shell is drawn cut open, the way a nautilus is sawn in half to show its chambers: a logarithmic spiral that gets 2.2 times wider each turn, with walls of pale nacre between the chambers and the siphuncle, a dotted tube, threading through them all. The shell\'s mouth stays behind Checks\' right end, so as the coil grows it <b>rolls</b>. A small shell turns fast behind the casing, then comes out under its right end and slows as it widens. Each time the mouth moves on, a new wall is laid across the tube with a glint, sealing off a chamber. A new chamber is full of water. Two chambers later the siphuncle pumps it dry: the water level drops with a few bubbles and the chamber lights teal. So the two newest chambers, still flooded and ringed in red, are the two checks waiting for approval, and the twelve lit chambers behind them are the checks that passed. Older chambers keep a faint light, deeper in the coil. The water always lies level, however the shell turns. <b>Coil:</b> a pinned parchment gives run 418 on main and its pass rate. <b>Great coil:</b> the shell rolls on and seals seven more chambers, and the light moves with Checks; a second parchment names deploy-preview and e2e-safari, waiting for Brent. <b>Shrinking</b> rolls it back, unsealing the chambers. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a coil rolls it back to a shell first, and unshading grows it again.',
   sizes:['Shell','Coil','Great coil'],slider:'Checks size, shell to great coil',ms:[3400,2000],ax:0,dims:g=>nauDims(g),travel:t=>ease(seg(t,0,.25)),
-  say:(to,from,n)=>to>from?(to-from>1?'A shell grows out from behind Checks and rolls as it widens, sealing a chamber at a time; it rolls on to a great coil, the two newest chambers still flooded.':to===2?'The coil rolls on and seals seven more chambers. The light moves with Checks: the two newest are flooded, the twelve behind them lit. Checks is a great coil.':'A small shell grows out from behind Checks and rolls as it widens, sealing a chamber at a time: twelve drained and lit, the two newest still flooded.'):'The coil rolls back, unsealing its chambers'+(to?'':', and draws in behind Checks')+': Checks shrinks to '+article(n)+'.'}
+  say:(to,from,n)=>to>from?(to-from>1?'A shell grows out from behind Checks and rolls as it widens, sealing a chamber at a time; it rolls on to a great coil, the two newest chambers still flooded.':to===2?'The coil rolls on and seals seven more chambers. The light moves with Checks: the two newest are flooded, the twelve behind them lit. Checks is a great coil.':'A small shell grows out from behind Checks and rolls as it widens, sealing a chamber at a time: twelve drained and lit, the two newest still flooded.'):'The coil rolls back, unsealing its chambers'+(to?'':', and draws in behind Checks')+': Checks shrinks to '+article(n)+'.'},
+ earwig:{label:'Earwig wing',kind:'Fan',
+  about:'Checks grows the way an earwig opens its hind wing, the most tightly folded wing of any insect: a fan of veins and clear membrane, folded like a paper fan, then folded in half again and tucked under a short wing case. <b>Wing:</b> the box darts down and, in a puff of fog, the folded bundle slides out from under the shell\'s belly, pleats dark and light. The folded half flips over at the knee and straightens with a glint, then the whole fan springs open from its pale base, swings a touch past its rest and locks with a second glint, the pleats flattening into one pale membrane. Its veins run out from the base, a fine vein between each pair, and a ring vein ties them together near the edge, as on the real wing. A smoky band comes up across the membrane with run 418 written on arcs: <i>12 / 14 passed · 2 waiting</i> and <i>run 418 · main · 86%</i>. The fourteen panel tips are the checks: twelve light teal one by one, left to right, and the last two show red rings. <b>Both wings:</b> a second short wing case darts out from behind Checks\' right end, and the second wing slides out from under it and opens the same way. Its band names deploy-preview and e2e-safari, waiting for Brent, and only its two middle tips are marked, in red. <b>Shrinking</b> plays it backwards: the fan folds, the knee folds over and the wing slides back under its case. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a winged Checks folds it back to a shell first, and unshading opens it again.',
+  sizes:['Shell','Wing','Both wings'],slider:'Checks size, shell to both wings',ms:[3400,2200],ax:0,dims:g=>ewDims(g),travel:t=>ease(seg(t,0,.2)),
+  say:(to,from,n)=>to>from?(to-from>1?'A folded wing slides out from under Checks, flips open at the knee and springs into a fan; a second wing case darts out and its wing opens too: Checks has both wings.':to===2?'A second wing case darts out from behind Checks, and its wing slides out, flips open at the knee and springs into a fan naming the two waiting checks.':'A folded wing slides out from under Checks, flips open at the knee and springs into a fan: twelve tips lit, two in red rings.'):'The fan folds, the knee folds over and the wing slides back under its case: Checks shrinks to '+article(n)+'.'}
 };
 // Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
 for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
@@ -3995,6 +3999,81 @@ function nautilus(el,w,h){
  for(const i of[0,1]){const k=seg(T[i],i?.76:.84,i?.92:.96);if(k<=0)continue;const y=i?152:92;o+=nauSheet(i,k)+pin(25,y+6,seg(k,.5,.85))+pin(125,y+6,seg(k,.62,1))}
  svg.innerHTML=o;
 }
+
+/* ---------- Morph: earwig wing (Checks) ---------- */
+// g runs 0 shell, 1 wing, 2 both wings. An earwig folds its hind wing like a fan, folds the fan in half and tucks it under a short wing case.
+// Opening, the wing slides out, the folded half flips over at the knee, and the fan springs open from its base, the pleats flattening into one clear membrane.
+// Wing angles are degrees from straight down, positive to the right. Rest sizes leave every phase finished, so nothing moves at rest.
+const EW=[{px:138,py:70,R:124,n:14},{px:400,py:70,R:104,n:10}];
+const ewOn=()=>model.morph==='earwig'&&model.g>0;
+function ewDims(g){g=clamp(g,0,2);const a=backSoft(seg(clamp(g),0,.14)),b=backSoft(seg(clamp(g-1),0,.14));return[Math.round(CW+240*b),Math.round(lerp(CH,204,a))]}
+// One wing: sl slides it out of its slit, kn flips the folded half out at the knee, spT springs the fan open, tx brings up the smoky band and its words, lt lights the tips.
+function ewWing(i,w,h,sl,kn,spT,tx,lt){
+ if(sl<=0)return '';
+ const{px,py,R,n}=EW[i],H=R/2,dy=-(1-ease(sl))*(H+4),c=-Math.cos(Math.PI*ease(kn)),sp=backSoft(spT),cy=py+dy;
+ const rm=r=>r<=H?r:H+(r-H)*c,pt=(a,r)=>{const q=rm(r),t=a*Math.PI/180;return[px+q*Math.sin(t),cy+q*Math.cos(t)]};
+ const A=Array.from({length:n+1},(_,k)=>lerp(lerp(-6,6,k/n),lerp(-86,86,k/n),sp)),D=P=>'M'+P.map(p=>f(p[0])+' '+f(p[1])).join('L');
+ const rim=(a,b,r,m)=>Array.from({length:m+1},(_,j)=>pt(lerp(a,b,j/m),r));
+ // Pleats: alternate panels fold toward and away from the light, and flatten as the fan opens.
+ const pc=.07+.5*(1-clamp(sp));
+ let defs=`<radialGradient id="ewM${i}" gradientUnits="userSpaceOnUse" cx="${px}" cy="${f(cy)}" r="${R}"><stop stop-color="#e3eaf2" stop-opacity=".5"/><stop offset=".55" stop-color="#9fb8d8" stop-opacity=".24"/><stop offset=".86" stop-color="#8a80c4" stop-opacity=".22"/><stop offset="1" stop-color="#7fd6c2" stop-opacity=".36"/></radialGradient>`+
+  `<clipPath id="ewC${i}"><rect x="0" y="${py-10}" width="${w}" height="${h}"/></clipPath>`,mem='',pl='',vn='';
+ // Each panel is an inner wedge out to the knee and an outer band beyond it, so the inner half stays whole while the outer half is folded back over it.
+ for(let k=0;k<n;k++){const kq=rim(A[k],A[k+1],H,4),d=D([pt(A[k],0)].concat(kq))+'Z'+D(kq.concat(rim(A[k+1],A[k],R,6)))+'Z';
+  mem+=`<path d="${d}" fill="url(#ewM${i})"/>`;pl+=`<path d="${d}" fill="${k%2?INK:'#e3eaf2'}" opacity="${f3(k%2?pc:pc*.4)}"/>`;
+  // A thin vein runs in from the edge between each pair of main veins.
+  const m=(A[k]+A[k+1])/2;vn+=`<path d="${D([pt(m,R*.56),pt(m,R)])}" stroke="${INK}" stroke-width=".7" opacity=".55"/>`}
+ for(const a of A){const d=D([pt(a,22),pt(a,H),pt(a,R)]);vn+=`<path d="${d}" stroke="${INK}" stroke-width="1.4"/><path d="${d}" stroke="#c9d6e6" stroke-width=".5" opacity=".35"/>`}
+ // The ring vein ties the main veins together near the edge, as on a real earwig's wing.
+ vn+=`<path d="${D(A.map(a=>pt(a,R*.8)))}" stroke="${INK}" stroke-width="1"/>`;
+ // While the outer half is still folded back, the outline runs round the knee and the folded-over edge shows inside it.
+ const er=rim(A[0],A[n],c<0?H:R,48),edge=D(er);
+ let o=`<defs>${defs}</defs><g clip-path="url(#ewC${i})"><path d="${D([pt(A[0],0)].concat(er))}Z" fill="${INK}" opacity=".35" transform="translate(1.5 2.6)"/>${mem}${pl}<g fill="none" stroke-linecap="round">${vn}</g>`+
+  `<path d="${edge}" fill="none" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round" filter="url(#wob)"/>`+
+  (c<0?`<path d="${D(rim(A[0],A[n],R,24))}" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>`:'')+
+  `<path d="${D(rim(A[0]+3,A[n]-3,R-2.4,40))}" fill="none" stroke="#e3eaf2" stroke-width=".6" opacity=".4"/>`;
+ // The crease at the knee, while the folded half is still over.
+ if(kn<1)o+=`<path d="${D([pt(A[0]-2,H),pt(A[n]+2,H)])}" stroke="#e3eaf2" stroke-width="1.2" opacity="${f3(.6*(1-kn))}"/>`;
+ // The base: a pale stiff lobe the fan turns on.
+ o+=`<path d="${D([pt(A[0],0)].concat(rim(A[0],A[n],24,16)))}Z" fill="#b7c6d9" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/><path d="${D(rim(A[0]+8,A[n]-8,17,12))}" fill="none" stroke="#eef3f8" stroke-width="1" opacity=".55"/>`;
+ // The smoky band behind the words, then the words on arcs that read upright.
+ if(tx>0){const r0=R*.37,r1=R*.73,ln=i?[[R*.64,10.5,'deploy-preview · e2e-safari',''],[R*.48,10,'waiting for Brent','italic']]:[[R*.62,12.5,`12 / 14 passed · <tspan fill="${REDHI}">2 waiting</tspan>`,''],[R*.47,10.5,'run 418 · main · 86%','italic']];
+  o+=`<path d="${D(rim(A[0]+3,A[n]-3,r1,40).concat(rim(A[n]-3,A[0]+3,r0,30)))}Z" fill="#05070b" opacity="${f3(.62*tx)}"/>`;
+  ln.forEach(([r,fs,t,st],j)=>{const a=pt(-76,r),b=pt(76,r),tp=`<path id="ewT${i}${j}" d="M${f(a[0])} ${f(a[1])}A${f(r)} ${f(r)} 0 0 0 ${f(b[0])} ${f(b[1])}"/>`;
+   o+=`<defs>${tp}</defs><text class="dser" font-size="${fs}" font-style="${st||'normal'}" fill="#e8eef5" stroke="${INK}" stroke-width="3" stroke-linejoin="round" style="paint-order:stroke" letter-spacing=".5" opacity="${f3(seg(tx,j*.25,.75+j*.25))}"><textPath href="#ewT${i}${j}" startOffset="50%" text-anchor="middle">${t}</textPath></text>`})}
+ // The tips: on the first wing the fourteen checks, twelve lit teal and the last two in red rings; on the second the two waiting checks in red, the rest unlit.
+ for(let k=0;k<n;k++){const p=pt((A[k]+A[k+1])/2,R*.9),red=i?k===4||k===5:k>=12,l=seg(lt,k/(n+3),k/(n+3)+.22);
+  if(red){if(l>0)o+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="${f(3.6+3*(1-l))}" fill="#1a0d10" stroke="${REDHI}" stroke-width="1.3" opacity="${f3(l)}"/>`}
+  else if(!i){if(l>0)o+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="9" fill="url(#leakT)" opacity="${f3(.55*l)}"/><circle cx="${f(p[0])}" cy="${f(p[1])}" r="3" fill="url(#tealG)" stroke="${INK}" stroke-width=".6" opacity="${f3(Math.min(1,l*1.5))}"/>`}
+  else if(sp>.9)o+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="1.8" fill="#2a3546" stroke="${INK}" stroke-width=".6" opacity="${f3(seg(sp,.9,1))}"/>`}
+ // A glint as the knee straightens, and one at the base as the fan locks open.
+ const gk=seg(kn,.7,1),gs=seg(spT,.75,1);
+ if(gk>0&&gk<1){const q=pt(0,H);o+=spark({x:q[0],y:q[1]},Math.sin(Math.PI*gk)*.85,7)}
+ if(gs>0&&gs<1){const q=pt(0,20);o+=spark({x:q[0],y:q[1]},Math.sin(Math.PI*gs)*.85,8)}
+ return o+'</g>'}
+// The second wing's case: a short plate of chitin that darts out from behind Checks' right end.
+function ewCase(k){if(k<=0)return '';const x=-196*(1-backSoft(k)),d='M262 46C300 31 420 30 460 44C472 52 470 70 456 79Q402 87 330 81Q290 78 262 80Z';
+ return `<defs><clipPath id="ewK"><rect x="262" y="0" width="300" height="210"/></clipPath></defs><g clip-path="url(#ewK)"><g transform="translate(${f(x)} 0)"><path d="${d}" fill="${INK}" transform="translate(0 2.6)"/><path d="${d}" fill="url(#shell)" filter="url(#chitin)"/><path d="${d}" fill="url(#sheen)"/>`+
+  `<path d="M290 41C340 31 410 31 448 43C410 36 340 36 290 44Z" fill="#e3eaf2" opacity=".5"/><g fill="none" stroke-linecap="round"><path d="M282 58Q370 50 456 58" stroke="${INK}" stroke-width="1.4" opacity=".8"/><path d="M282 59.4Q370 51.4 456 59.4" stroke="#c9d6e6" stroke-width=".7" opacity=".25"/>`+
+  `<path d="M300 79L301 73M340 82L341 76M380 84L381 78M420 83L421 77" stroke="${INK}" stroke-width="1.3"/></g><path d="${d}" fill="none" stroke="${INK}" stroke-width="2.3" stroke-linejoin="round" filter="url(#wob)"/></g></g>`}
+function earwig(el,w,h){
+ const svg=el.querySelector('.casing');
+ if(!ewOn()){if(svg.dataset.ek)svg.dataset.ek='';return}
+ const g=model.g,still=g===Math.round(g);
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'opening its wings')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.ek===key)return;svg.dataset.ek=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const u=clamp(g),v=clamp(g-1),fog=Math.sin(Math.PI*seg(u,.08,.32));
+ const fog2=Math.sin(Math.PI*seg(v,.2,.42));
+ let o=fog>.01?`<ellipse cx="138" cy="90" rx="70" ry="22" fill="url(#fogCold)" opacity="${f3(.7*fog)}"/>`:'';
+ o+=ewWing(0,w,h,seg(u,.1,.28),seg(u,.28,.42),seg(u,.44,.64),seg(u,.68,.8),seg(u,.78,.98));
+ o+=ewWing(1,w,h,seg(v,.24,.38),seg(v,.38,.5),seg(v,.52,.7),seg(v,.72,.84),seg(v,.82,.97))+ewCase(seg(v,.06,.26));
+ // A puff of fog where the second wing comes out from under its case.
+ if(fog2>.01)o+=`<ellipse cx="400" cy="94" rx="58" ry="20" fill="url(#fogCold)" opacity="${f3(.6*fog2)}"/>`;
+ o+=casing('c',CW,CH,true,'body')+curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,1);
+ svg.innerHTML=o;
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -4169,8 +4248,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBN'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNE'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):mr||cu||fg||wc||ln||ck||rt||tp||se||ur||ns?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc||ln||ck||rt||tp||se||ur||ns?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc||ln||ck||rt||tp||se||ur||ns?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -4182,7 +4261,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs||((ur||ns)&&s>0)?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h)}
   // After the morphs, which can also move Checks' parchment, so the seal's withdraw wins.
   snailSeal(el,id,w,h,s,small?'teal':m.run?'amber':'cold');reelShell(el,id,w,h,s,small?'teal':m.run?'amber':'cold');abdomen(el,id,w,h,s,small?'teal':m.run?'amber':'cold');
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
