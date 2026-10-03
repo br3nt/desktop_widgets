@@ -51,7 +51,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Wire · Shade · Flattened hoop — Added selectable closing copper arcs, gathered roots, a rigid readable plaque and reverse opening with independent Checks shade; preserved all seven joins and prior shades; 357 simulated state, animation, geometry and touch checks plus text-fit checks passed; visual review blocked by denied Chrome access and sandbox SVG rendering failure.
 - [x] Hollow · Shade · Ink closure — Added selectable opposing painted edges, staged silhouette withdrawal, a readable 36 px black plaque and reverse opening with independent Checks shade; retained all six joins and earlier shades; 407 simulated interaction, animation, geometry and touch checks passed; visual review blocked by denied Chrome access and sandbox SVG renderer failure.
 - [x] Gothic · Shade · Slit shutter — Added selectable staged iron descent, retracting stone base, readable 36 px inscription slots and reverse opening with independent Checks shade; retained all six joins and prior shades; 856 simulated state, animation, geometry, touch and regression checks plus native-font text-fit checks passed; full-page visual review blocked by denied Chrome access.
-- [ ] Felt · Shade · Pocket tuck
+- [x] Felt · Shade · Pocket tuck — Added selectable upward casing travel into a sewn top pocket, a readable double-layer band and broad coral expand tab with reverse motion and independent Checks shade; retained all six joins and prior shades; 506 simulated state, animation, geometry, touch and regression checks passed; full-page visual review blocked by denied Chrome access.
 - [ ] Elven · Shade · Enamel ribbon
 - [ ] Wire · Shade · Spool winding
 - [ ] Hollow · Shade · Reed bundle
