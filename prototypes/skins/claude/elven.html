@@ -197,6 +197,9 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <radialGradient id="waxG" cx=".42" cy=".18" r=".95"><stop stop-color="#fdfdff"/><stop offset=".5" stop-color="#eaeff8"/><stop offset=".85" stop-color="#c7d1e6"/><stop offset="1" stop-color="#aab7d6"/></radialGradient>
  <radialGradient id="paneG"cx=".32" cy=".18" r="1"><stop stop-color="#fbfcff"/><stop offset=".55" stop-color="#e7ebf4"/><stop offset="1" stop-color="#cfd6e5"/></radialGradient>
  <filter id="rollShade" x="-10%" y="-400%" width="120%" height="900%"><feGaussianBlur stdDeviation="2.4"/></filter>
+ <linearGradient id="sgGlass" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f4f7ff" stop-opacity=".7"/><stop offset=".42" stop-color="#c3d0f0" stop-opacity=".3"/><stop offset=".45" stop-color="#8a9bd0" stop-opacity=".42"/><stop offset="1" stop-color="#34406e" stop-opacity=".62"/></linearGradient>
+ <linearGradient id="sgIris" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ff9db0"/><stop offset=".2" stop-color="#ffd27a"/><stop offset=".4" stop-color="#8ee6a0"/><stop offset=".6" stop-color="#7fc8ff"/><stop offset=".8" stop-color="#b9a4ff"/><stop offset="1" stop-color="#ff9db0"/></linearGradient>
+ <filter id="sgSoft" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.4"/></filter>
  <filter id="soft" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2.4"/></filter>
  <linearGradient id="frostG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f3f7ff"/><stop offset=".5" stop-color="#dde6f6"/><stop offset="1" stop-color="#c3d0ea"/></linearGradient>
  <linearGradient id="mistG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e9f0fc"/><stop offset=".6" stop-color="#c9d6ee"/><stop offset="1" stop-color="#a9b9da"/></linearGradient>
@@ -575,6 +578,21 @@ const JOINS={
   phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.42?'Joining · the arms reach ':jt<.5?'Joining · the rosette opens ':jt<.74?'Joining · stringing the harp ':jt<.86?'Joining · a strum, the rosette kindles ':'Joining · turning to '+HARP.ph(model.angle)+' '):(jt>.88?'Releasing · turning level ':jt>.8?'Releasing · the rosette dims ':jt>.62?'Releasing · the strings slacken ':jt>.55?'Releasing · the rosette folds ':'Releasing · the casings part '),
   about:'An angle made into an instrument. The two silver stems on the joining ends become the pillars of a small harp, and the angle is something you can hear in your head: turning GitDiscuss shortens the strings on the inside of the angle and lengthens the ones on the outside, as a shorter string sounds higher. <b>Near:</b> the knops glow and a slim silver arm peeks out of each stem. <b>Ready:</b> dashed ghost strings and a rosette hang between the stems, with a star. Joining: the casings close to a span apart (wide enough for the full turn). A tapered silver arm with a moonstone bead reaches from each casing to the middle of the gap, and a rosette opens there like a lute\'s soundhole: a silver ring round dark glass with a six-petal flower of arcs, a star at its pin. Then six strings are drawn across the gap from Jarvis\'s stem to GitDiscuss\'s, top to bottom, each a travelling bead of light, and each is plucked as it is tied off: the outer pair to the stems\' moonstone knops, the inner four to small silver pegs. They are pale moonstone on the outside, white gold in the middle and silver inside. The harp is strummed top to bottom with a glint, the rosette\'s moonstone kindles as the join light, and GitDiscuss turns to its angle with one soft overshoot. <b>The stops are just intervals:</b> they sit where the outer pair\'s lengths stand in the ratios of consonant intervals: level is unison (1:1), then a perfect fourth (4:3), a perfect fifth (3:2), a major sixth (5:3) and an octave (2:1) either way. The stop angles are worked out from the full-size harp\'s real string geometry when the page loads (shaded, the stops and their names stay the same). Near a stop the turn is sticky, and arriving on one strums the strings (shorter strings shiver faster); anywhere between is a valid resting place, to ±50°. The rosette turns half as far as GitDiscuss. To turn: drag GitDiscuss\'s nameplate round the rosette, use the Angle slider, or focus GitDiscuss\'s nameplate or the rosette and press ↑ ↓ to step between intervals (Shift+↑ ↓ for 1°). Tap GitDiscuss\'s nameplate without dragging to strum. While it turns, a hairline pointer hangs from the rosette over an arc of stars, one per stop (gold for the octaves, large for unison), and a moonstone tag reads the angle and the interval, or the strings\' ratio between stops; the arc leaves out whatever either casing covers. The pair refits vertically to stay on the stage; drag Jarvis\'s nameplate to move it. Shaded, the harp shrinks with the casings and keeps only its outer strings, still tied to the knops. Nothing moves at rest. <b>Release:</b> click the rosette, or focus it and press Enter. GitDiscuss turns level, the moonstone dims, the strings go slack and draw back to Jarvis\'s stem one by one, the rosette folds, the arms draw back into the stems and the casings part.',
   over:c=>drawHarp(c)
+ },
+ prism:{label:'Starglass',kind:'Angle',angled:true,a0:-30,slow:1.3,msOut:2900,
+  get hooks(){return SG},
+  get gap(){return 2*harpS(ctx().h/2)},
+  bend(jt){return JOINS.branch.bend(jt)},
+  txt:{join:'The casings close a span apart, silver arms set a ruled crystal in the gap, a moonbeam runs from Jarvis\'s stem into it and splits into colours; then GitDiscuss turns into its colour.',
+   joined:'Joined in starglass light: the crystal splits Jarvis\'s moonbeam into colours that fall on GitDiscuss\'s stem. Drag GitDiscuss\'s nameplate round the crystal, use the Angle slider, or press ↑ ↓ to turn it into the next colour. Tap its nameplate to send a pulse of light; click the crystal to release.',
+   release:'GitDiscuss turns level, the colours fold back into white, the moonbeam goes out, the crystal is lifted out and the arms draw back into the stems.',
+   stop:'The light goes out and the arms draw back into the stems.',
+   hold:'Held mid-join: the moonbeam is passing into the crystal. Use the scrubber to step through the light splitting.',
+   ready:'Ready: a ghost crystal and moonbeam hang between the stems. Release to set the crystal.',near:'Nearby: the stems\' moonstones glow and silver arms peek out. Move closer.',
+   readyPh:'Ready · the crystal is ghosted',nearPh:'Nearby · the arms peek out'},
+  phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.4?'Joining · the arms reach ':jt<.5?'Joining · the crystal is set ':jt<.6?'Joining · the moonbeam runs ':jt<.66?'Joining · white light through ':jt<.78?'Joining · the light splits ':jt<.86?'Joining · the crystal kindles ':'Joining · turning to '+SG.ph(model.angle)+' '):(jt>.88?'Releasing · turning level ':jt>.7?'Releasing · the colours fold into white ':jt>.6?'Releasing · the moonbeam goes out ':jt>.55?'Releasing · the crystal is lifted out ':'Releasing · the casings part '),
+  about:'An angle you read by its colour. A crystal ruled with fine lines, the way a grating or a feather\'s barbs split light, stands in the gap and splits a moonbeam into its colours. <b>Near:</b> the moonstones at the middle of both stems glow and slim silver arms peek out toward each other. <b>Ready:</b> a dashed ghost of the crystal hangs between the stems with the moonbeam and a hint of the fan. Joining: the casings close to a span apart (wide enough for the full turn). Jarvis\'s two knops reach out on bowed silver arms with leaves and hold a slender six-sided crystal by its tips. GitDiscuss\'s knops reach to a silver ring round the crystal\'s waist, which is the pivot. The crystal sets with a flash. A moonbeam runs from the moonstone on Jarvis\'s stem into the crystal, white light passes straight through to the moonstone on GitDiscuss\'s stem, and then the light splits: the colours fan out above and below the white, violet bent least and rose most (at 12°, 21°, 30°, 39° and 48°, as a grating bends them), and they fall on GitDiscuss\'s silver stem as a little spectrum of spots. The crystal\'s rulings shimmer, it kindles as the join light, and GitDiscuss turns to its angle with one soft overshoot. <b>The fan stays with Jarvis and GitDiscuss turns through it:</b> the spots slide along its stem, and the colour that falls on the moonstone at its middle names the angle. Level is white moonlight; raised or lowered it catches violet, sea blue, leaf green, amber and rose. Those eleven are soft stops. Between them the moonstone sits in the dark between two colours, which is still a valid resting place, to ±50°. Arriving on a colour sends a pulse of light down the beam into the moonstone. To turn: drag GitDiscuss\'s nameplate round the crystal, use the Angle slider, or focus GitDiscuss\'s nameplate or the crystal and press ↑ ↓ to step between colours (Shift+↑ ↓ for 1°). Tap GitDiscuss\'s nameplate without dragging to send a pulse. While it turns, a hairline pointer hangs from the ring over an arc of stars in the stops\' colours, and a moonstone tag reads the angle and the colour. The pair refits vertically to stay on the stage; drag Jarvis\'s nameplate to move it. Shaded, the crystal shrinks with the casings and keeps its colours. Nothing moves at rest. <b>Release:</b> click the crystal, or focus it and press Enter. GitDiscuss turns level, the colours fold back into the white beam, the moonbeam goes out from the crystal back to Jarvis\'s stem, the crystal is lifted out, the arms draw back into the stems and the casings part.',
+  over:c=>drawPrism(c)
  }
 };
 /* ---------- Weave drawing ---------- */
@@ -1116,6 +1134,125 @@ function harpDial(K,bd,k,op,s,hh,FB,rr){const RD=harpRD(hh),pt=(t,r)=>{const a=(
  const n=harpName(bd),c=pt(bd/2,RD+28),font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;
  o+=`<g transform="translate(${P(c)})"><rect x="-52" y="-16" width="104" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-50" y="-14" width="100" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>`+
   `<text y="1" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${n.num}${n.stop&&n.ratio!=='1:1'?' · '+n.ratio:''}</text><text y="11" text-anchor="middle" ${font} font-size="8" letter-spacing="1.1" fill="${n.stop&&n.ratio==='2:1'?'#8a6414':'#5d6584'}">${n.cap.toUpperCase()}</text></g>`;
+ return o+'</g>'}
+/* ---------- Starglass drawing ---------- */
+// A ruled crystal at the pivot splits the moonbeam from Jarvis's stem as a grating does: the white goes straight on, and each colour is bent a fixed angle up and down, violet least and rose most.
+// The fan stays with Jarvis; GitDiscuss turns through it, and the colour that falls on the moonstone at the middle of its stem names the angle.
+const SGC=[['moonlight','white',[242,245,255]],['violet','violet',[185,164,255]],['sea blue','blue',[127,200,255]],['leaf green','green',[142,230,160]],['amber','amber',[255,210,122]],['rose','rose',[255,157,176]]];
+const SGA=[0,12,21,30,39,48],SDET=[...SGA.slice(1).map(x=>-x).reverse(),...SGA];
+const rgbS=c=>`rgb(${c.map(Math.round).join(',')})`;
+function sgName(a){const A=Math.abs(a),d=SDET.find(x=>Math.abs(a-x)<.3);
+ if(d!==undefined){const i=SGA.indexOf(Math.abs(d));return{num:signed(a),cap:SGC[i][0],stop:true,i,col:SGC[i][2]}}
+ let i=0;while(i<SGA.length-1&&SGA[i+1]<A)i++;
+ if(i===SGA.length-1)return{num:signed(a),cap:'beyond rose',stop:false,i:-1,col:SGC[i][2]};
+ const t=(A-SGA[i])/(SGA[i+1]-SGA[i]);return{num:signed(a),cap:SGC[i][1]+'–'+SGC[i+1][1],stop:false,i:-1,col:SGC[i][2].map((v,j)=>lerp(v,SGC[i+1][2][j],t))}}
+// A pulse of light: down the moonbeam, a flash in the crystal, then along GitDiscuss's line into its moonstone.
+const SGP={t0:-1e9,amp:0};let sgLoop=false,sgLast=null;
+function sgPulse(amp=1){if(reduce.matches)return;SGP.t0=performance.now();SGP.amp=amp;
+ if(sgLoop)return;sgLoop=true;(function st(now){if(!branchOn()||J()!==JOINS.prism||now>SGP.t0+1100){sgLoop=false;render();return}render();requestAnimationFrame(st)})(SGP.t0)}
+const SG={s:(a,hh)=>harpS(hh),det:SDET,hang:hh=>harpRD(hh)+44,fit:harpFit,name:sgName,
+ grip:'Turn GitDiscuss through the starglass light: drag round the crystal, or use the up and down arrows',slider:'GitDiscuss turn in the starglass light, in degrees',
+ ph:a=>{const n=sgName(a);return n.num+' · '+n.cap},
+ say:a=>{const n=sgName(a);return n.stop?(n.i?'GitDiscuss turns into the '+n.cap+' light, at '+n.num+': the crystal bends '+n.cap+' onto the moonstone on its stem.':'GitDiscuss turns level, into the straight white moonlight.'):n.cap==='beyond rose'?'GitDiscuss rests at '+n.num+', past the rose light, where its moonstone is dark. It turns to ±50°.':'GitDiscuss rests at '+n.num+', in the dark between the '+n.cap.replace('–',' and the ')+' light. It turns freely between the colours, to ±50°.'},
+ arrive:a=>{if(sgName(a).stop)sgPulse(1)},
+ // Dragging onto a colour sends a softer pulse, once per colour.
+ cross:a=>{const d=SDET.find(x=>Math.abs(a-x)<.4);if(d!==undefined){if(d!==sgLast){sgLast=d;sgPulse(.6)}}else if(!SDET.some(x=>Math.abs(a-x)<DWIN))sgLast=null},
+ grab:a=>{sgLast=SDET.find(x=>Math.abs(a-x)<.4)??null},
+ tap:()=>{sgPulse(1);const n=sgName(model.angle);say('A pulse of light runs down the moonbeam'+(n.stop?' and into GitDiscuss\'s moonstone, '+n.cap+'.':'; between colours, little of it reaches GitDiscuss\'s moonstone.'))}};
+// A bowed, tapering silver arm from p to q (bow bends it to the left of p→q), grown to fraction g from p.
+const sgCtl=(p,q,bow)=>{const dx=q.x-p.x,dy=q.y-p.y,L=Math.hypot(dx,dy)||1;return{x:(p.x+q.x)/2-dy/L*bow,y:(p.y+q.y)/2+dx/L*bow}};
+const sgQ=(p,c,q,t)=>{const u=1-t;return{x:u*u*p.x+2*u*t*c.x+t*t*q.x,y:u*u*p.y+2*u*t*c.y+t*t*q.y}};
+function sgArm(p,q,bow,g,k){if(g<=.01)return '';const c=sgCtl(p,q,bow);
+ const S=growPts(arcS([...Array(13)].map((_,i)=>({...sgQ(p,c,q,i/12),w:k*lerp(3.2,1.3,i/12)+.4}))),g,8);
+ if(S.length<2)return '';return `<path d="${ribbon(S,1.5)}" fill="${NIGHT}"/><path d="${ribbon(S)}" fill="url(#silver)"/>`}
+// The crystal: a slender six-sided prism standing on its tips, half-width cw and half-height ch about K, scaled by sc.
+function sgCrystal(K,cw,ch,sc){const t=Math.min(cw*1.2,ch*.45);return 'M'+[[0,-ch],[cw,-ch+t],[cw,ch-t],[0,ch],[-cw,ch-t],[-cw,-ch+t]].map(([x,y])=>f(K.x+x*sc)+' '+f(K.y+y*sc)).join('L')+'Z'}
+// Shaded, the knops crowd the middle of the stem, so the moonstone goes in bare and small, without its silver ring.
+function sgBezel(p,r,fill,op,thin){if(r<=.3)return '';if(thin)r*=.7;return (thin?'':`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r+1.6)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".7"/>`)+`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r)}" fill="url(#moonstone)"/>`+(op>.01?`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r)}" fill="${fill}" opacity="${f(op*100)/100}"/>`:'')}
+function drawPrism(c){
+ const h=c.h,hh=h/2,jt=c.jt,k=moonK(hh),dir=model.dir,s=harpS(hh),u0=s+11.5,ul=s+8,cw=5*k+1.5,ch=clamp(hh*.58,11,38),rr=cw+4*k+1,kv=hh-16,br0=3*k+.6;
+ const sA={x:model.a.x+W-11.5,y:model.a.y+hh},sB={x:model.b.x+11.5,y:model.b.y+hh};
+ let o='';
+ if(jt===0){const g=c.glow;if(g<=0)return o;
+  const M={x:(sA.x+sB.x)/2,y:(sA.y+sB.y)/2};
+  for(const p of[sA,sB])o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(6+9*g)}" fill="url(#halo)" opacity="${f(g)}"/>`+sgBezel(p,br0*g,'#fff',.5*g,kv<12);
+  for(const sg of[-1,1])o+=sgArm({x:sA.x,y:sA.y+sg*kv},{x:M.x,y:M.y+sg*ch},sg*14*k,.3*g,k)+sgArm({x:sB.x,y:sB.y+sg*kv},{x:M.x+rr*.7,y:M.y+sg*rr*.7},-sg*10*k,.3*g,k);
+  if(g>=1){const L=sB.x-M.x-4;let fan='';for(const d of[-30,-12,12,30]){const a=d*PI/180;fan+=`M${P(M)}L${f(M.x+Math.cos(a)*L*.7)} ${f(M.y+Math.sin(a)*L*.7)}`}
+   o+=`<path d="M${f(sA.x+4)} ${f(sA.y)}L${f(sB.x-4)} ${f(sB.y)}${fan}" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" opacity=".6"/><path d="${sgCrystal(M,cw,ch,1)}" fill="${NIGHT}" fill-opacity=".5" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3"/>`+star(M.x,M.y,6,.9)}
+  return o}
+ const K={x:model.a.x+W+s,y:model.a.y+hh},bd=JOINS.prism.bend(jt),br=bd*PI/180;
+ const FB=(u,v)=>({x:K.x+u*Math.cos(br)-v*Math.sin(br),y:K.y+u*Math.sin(br)+v*Math.cos(br)});
+ // Phase values: arms (ar), crystal (cr), Jarvis's moonstone (em), the beam (bm), the white light (wt), the fan opening (fo), the glow (gl).
+ let ar,cr,em,bm,wt,fo,gl,flash=0,glint=0;
+ if(dir>0){ar=seg(jt,.3,.42);cr=back(seg(jt,.38,.5),1.6);flash=Math.sin(PI*seg(jt,.46,.54));em=ease(seg(jt,.48,.54));bm=seg(jt,.52,.6);wt=seg(jt,.6,.66);fo=ease(seg(jt,.66,.78));gl=ease(seg(jt,.76,.86));glint=seg(jt,.78,.9)}
+ else{ar=seg(jt,.55,.6);cr=ease(seg(jt,.56,.62));em=ease(seg(jt,.6,.64));bm=seg(jt,.62,.66);wt=seg(jt,.66,.7);fo=ease(seg(jt,.7,.82));gl=ease(seg(jt,.8,.88))}
+ let pu=-1,pa=0;if(jt===1&&!reduce.matches){const p=(performance.now()-SGP.t0)/1000;if(p>=0&&p<1.1){pu=p;pa=SGP.amp}}
+ const E={x:K.x-u0,y:K.y},C=FB(u0,0),B0={x:K.x-s-8,y:K.y},rg=seg(ar,.7,1);
+ // Jarvis's knops hold the crystal by its tips on bowed arms, each with a leaf; GitDiscuss's reach to the ring round its waist.
+ let lv='';
+ for(const sg of[-1,1]){const p={x:E.x,y:K.y+sg*kv},q={x:K.x,y:K.y+sg*(ch+1)},bw=sg*14*k;o+=sgArm(p,q,bw,ar,k);
+  const ls=seg(ar,.6,1);if(ls>0){const m=sgQ(p,sgCtl(p,q,bw),q,.42);lv+=leaf(m.x,m.y,sg*-118,.62*k*back(ls,1.4))+leaf(m.x,m.y,sg*-62,.45*k*back(seg(ar,.75,1),1.4))}
+  o+=sgArm(FB(u0,sg*kv),FB(rr*.72,sg*rr*.72),-sg*10*k,ar,k)}
+ o+=lv;
+ const ring=sw=>`M${P(FB(0,-rr))}A${f(rr)} ${f(rr)} 0 0 ${sw} ${P(FB(0,rr))}`,ringD=sw=>`<g opacity="${f(rg)}"><path d="${ring(sw)}" fill="none" stroke="${NIGHT}" stroke-width="${f(2.6*k+1.2)}"/><path d="${ring(sw)}" fill="none" stroke="url(#silverV)" stroke-width="${f(1.5*k+.4)}"/></g>`;
+ if(rg>0)o+=ringD(0);
+ // The moonbeam, from Jarvis's stem to the crystal.
+ if(em>0)o+=`<circle cx="${f(E.x)}" cy="${f(E.y)}" r="${f(12*k)}" fill="url(#halo)" opacity="${f(em)}"/>`;
+ if(bm>0){const e={x:lerp(B0.x,K.x,bm),y:K.y};o+=`<path d="M${P(B0)}L${P(e)}" stroke="#cfdcff" stroke-width="${f(5*k)}" stroke-linecap="round" opacity=".16"/><path d="M${P(B0)}L${P(e)}" stroke="#fff" stroke-width="${f(1+.5*k)}" stroke-linecap="round" opacity=".9"/>`;
+  if(dir>0&&bm<1)o+=`<circle cx="${f(e.x)}" cy="${f(e.y)}" r="7" fill="url(#halo)"/>`+star(e.x,e.y,3.4,1)}
+ // The fan: white straight on, each colour at its own angle. A ray that meets GitDiscuss's stem ends in a spot there; one that misses fades short.
+ let rays='',spots='',cW=0;const cc=[0,0,0];
+ if(wt>0)SGA.forEach((d0,i)=>{for(const sg of i?[-1,1]:[1]){
+  const op=i?seg(fo,0,.35):1;if(op<=.01)continue;
+  const d=sg*d0*fo,ph=(d-bd)*PI/180,col=rgbS(SGC[i][2]),hit=Math.abs(ph)<1.3&&Math.abs(ul*Math.tan(ph))<=hh-8.6-3.2*k,Lr=(hit?ul/Math.cos(ph):ul*.72)*(i?1:wt);
+  const a=d*PI/180,nx=-Math.sin(a),ny=Math.cos(a),Q={x:K.x+Math.cos(a)*Lr,y:K.y+Math.sin(a)*Lr},w1=(hit?2.2:3.2)*k+.4;
+  rays+=`<path d="M${f(K.x+nx*.5)} ${f(K.y+ny*.5)}L${f(Q.x+nx*w1)} ${f(Q.y+ny*w1)}L${f(Q.x-nx*w1)} ${f(Q.y-ny*w1)}L${f(K.x-nx*.5)} ${f(K.y-ny*.5)}Z" fill="${col}" opacity="${f((hit?.24:.1)*op)}"/><path d="M${P(K)}L${P(Q)}" stroke="${col}" stroke-width="${i?.9:1.2}" opacity="${f((hit?.8:.28)*op)}"/>`;
+  if(hit&&(i||wt>=1))spots+=`<circle cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(5.5*k+1)}" fill="${col}" opacity="${f(.4*op)}" filter="url(#sgSoft)"/><ellipse transform="translate(${P(Q)}) rotate(${f(bd)})" rx="${f(1.3*k+.4)}" ry="${f(3.2*k+.6)}" fill="${col}" opacity="${f(.95*op)}"/>`;
+  // How much of this colour falls on the moonstone at the middle of GitDiscuss's stem.
+  const x=Math.exp(-(((d-bd)/2.6)**2))*op*(i||wt>=1?1:0);cW+=x;for(let j=0;j<3;j++)cc[j]+=SGC[i][2][j]*x}});
+ o+=rays;
+ if(wt>0)o+=star(K.x,K.y,(4+3*fo)*k,.85*wt);
+ // The crystal, its rulings shimmering in the spectrum once the light splits.
+ if(cr>.01){const sc=cr,d=sgCrystal(K,cw,ch,sc),t=Math.min(cw*1.2,ch*.45),n=Math.max(4,Math.round(ch/3.2));
+  if(gl>0)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f((16+16*gl)*k)}" fill="url(#halo)" opacity="${f(gl)}"/>`;
+  o+=`<path d="${d}" fill="${NIGHT}" fill-opacity=".4" stroke="${NIGHT}" stroke-width="2"/><path d="${d}" fill="url(#sgGlass)"/><path d="${d}" fill="#f4f8ff" opacity="${f(gl*.16)}"/>`;
+  let rl='';for(let i=1;i<n;i++){const y=-ch+i*2*ch/n,hw=(Math.abs(y)>ch-t?cw*(ch-Math.abs(y))/t:cw)*.82;rl+=`M${f(K.x-hw*sc)} ${f(K.y+y*sc)}L${f(K.x+hw*sc)} ${f(K.y+y*sc)}`}
+  o+=`<path d="${rl}" stroke="url(#sgIris)" stroke-width=".55" opacity="${f(.15+.55*fo)}"/>`;
+  o+=`<path d="M${f(K.x)} ${f(K.y-ch*sc)}L${f(K.x)} ${f(K.y+ch*sc)}" stroke="#eef3ff" stroke-width=".55" opacity=".5"/><path d="${d}" fill="none" stroke="#eef3ff" stroke-width=".8"/><path d="M${f(K.x-cw*.62*sc)} ${f(K.y-ch*.4*sc)}L${f(K.x-cw*.62*sc)} ${f(K.y+ch*.18*sc)}" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>`;
+  if(glint>0&&glint<1)o+=star(K.x,K.y-ch*sc+2*ch*sc*glint,5*k,Math.sin(PI*glint))}
+ if(rg>0){o+=ringD(1);for(const sg of[-1,1]){const q=FB(rr*.72,sg*rr*.72);o+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${f((1.5*k+.5)*rg)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".5"/>`}}
+ if(flash>0)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(24*flash*k)}" fill="url(#halo)"/>`+star(K.x,K.y,13*flash*k,flash);
+ // Jarvis's moonstone sends the beam; GitDiscuss's takes the colour that falls on it.
+ const bs=Math.max(seg(ar,0,.4),em),ci=Math.min(1,cW),col=cW>.001?rgbS(cc.map(v=>v/cW)):'#fff';
+ o+=sgBezel(E,br0*bs,'#fff',.6*em,kv<12);
+ o+=spots;
+ if(ci>.02)o+=`<circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f(10*k+2)}" fill="${col}" opacity="${f(.55*ci)}" filter="url(#sgSoft)"/>`;
+ o+=sgBezel(C,br0*seg(ar,0,.4),col,.85*ci,kv<12);
+ if(pu>=0){const u1=seg(pu,0,.35),u2=seg(pu,.42,.78),lit=Math.max(.25,ci);
+  if(u1>0&&u1<1){const e={x:lerp(B0.x,K.x,u1),y:K.y};o+=`<circle cx="${f(e.x)}" cy="${f(e.y)}" r="8" fill="url(#halo)" opacity="${f(pa)}"/>`+star(e.x,e.y,4*pa+1,1)}
+  const fl=Math.sin(PI*seg(pu,.3,.55));if(fl>0)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(20*fl*k)}" fill="url(#halo)" opacity="${f(pa)}"/>`+star(K.x,K.y,9*fl*k,fl*pa);
+  if(u2>0&&u2<1){const e=FB(ul*u2,0);o+=`<circle cx="${f(e.x)}" cy="${f(e.y)}" r="6" fill="${col}" opacity="${f(.5*pa*lit)}" filter="url(#sgSoft)"/>`+star(e.x,e.y,3.6*pa+1,lit,col)}
+  const cf=Math.sin(PI*seg(pu,.72,1.05));if(cf>0)o+=`<circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f(14*k*cf+2)}" fill="${col}" opacity="${f(.6*cf*pa*lit)}" filter="url(#sgSoft)"/>`+star(C.x,C.y,7*k*cf,cf*pa*lit,'#fff')}
+ const dop=jt===1?model.dial:dir>0?seg(jt,.84,.9):0;
+ if(dop>0)o+=sgDial(K,bd,k,dop,s,hh,FB,rr);
+ if(jt===1){const n=sgName(model.angle);
+  o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Starglass crystal: GitDiscuss turned to ${n.num}, ${n.stop?'in the '+n.cap+' light':'between colours, '+n.cap}. Up and down arrows turn it to the next colour, Shift with an arrow by one degree; Enter releases the crystal and separates the widgets"><title>Click the crystal to release; drag GitDiscuss's nameplate round it to turn</title><path d="${sgCrystal(K,cw+4,ch+3,1)}" fill="transparent"/><circle class="ringfocus" cx="${f(K.x)}" cy="${f(K.y)}" r="${f(ch+5)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return o}
+// While turning: a hairline pointer hangs from the ring over an arc of stars in the stops' colours, and a tag reads the angle and the colour.
+function sgDial(K,bd,k,op,s,hh,FB,rr){const RD=harpRD(hh),pt=(t,r)=>{const a=(90+t)*PI/180;return{x:K.x+Math.cos(a)*r,y:K.y+Math.sin(a)*r}};
+ const br=bd*PI/180,hid=p=>{const dx=p.x-K.x,dy=p.y-K.y,u=dx*Math.cos(br)+dy*Math.sin(br),v=-dx*Math.sin(br)+dy*Math.cos(br);return(u>s-6&&Math.abs(v)<hh+7)||(dx<-s-2&&Math.abs(dy)<hh+7)};
+ let arc='',pen=false;for(let t=-AMAX;t<=AMAX;t+=1){const p=pt(t,RD);if(hid(p)){pen=false;continue}arc+=(pen?'L':'M')+P(p);pen=true}
+ let o=`<g opacity="${f(op*100)/100}" pointer-events="none"><path d="${arc}" fill="none" stroke="#dfe8ff" stroke-width=".8" opacity=".45"/>`;
+ for(const d of SDET){const p=pt(d,RD),on=Math.abs(bd-d)<.3,i=SGA.indexOf(Math.abs(d)),col=rgbS(SGC[i][2]);if(hid(p))continue;
+  if(on)o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="8" fill="${col}" opacity=".5" filter="url(#sgSoft)"/>`;
+  o+=star(p.x,p.y,(i?2.8:3.8)*(on?1.35:1),on?1:.8,col)}
+ // The pointer starts below the crystal's lower tip, so it never crosses the glass.
+ const p0=FB(0,clamp(hh*.58,11,38)+3),p1=FB(0,RD-6),q=FB(0,RD-2.5);
+ o+=`<path d="M${P(p0)}L${P(p1)}" stroke="${NIGHT}" stroke-width="2.2" opacity=".6"/><path d="M${P(p0)}L${P(p1)}" stroke="#e6ecfa" stroke-width=".9"/><g transform="translate(${P(q)}) rotate(${f(bd)})"><path d="M0 -3.6L2.4 0L0 3.6L-2.4 0Z" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".7"/></g>`;
+ // The tag hangs at half the turn, below the casings, with a swatch of the colour on GitDiscuss's moonstone.
+ const n=sgName(bd),c=pt(bd/2,RD+28),font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;
+ o+=`<g transform="translate(${P(c)})"><rect x="-54" y="-16" width="108" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-52" y="-14" width="104" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>`+
+  `<circle cx="-38" r="7.4" fill="${NIGHT}"/><circle cx="-38" r="5.8" fill="${rgbS(n.col)}" opacity="${n.stop?1:.5}"/><text x="9" y="1" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${n.num}</text><text x="9" y="11" text-anchor="middle" ${font} font-size="8" letter-spacing=".8" fill="#5d6584">${n.cap.toUpperCase()}</text></g>`;
  return o+'</g>'}
 /* ---------- Runic seal drawing ---------- */
 // Four invented runes, each split on the seam (x = 0): Jarvis carries the left halves, GitDiscuss the right.
