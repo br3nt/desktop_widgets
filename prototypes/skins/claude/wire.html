@@ -169,7 +169,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -1116,8 +1116,77 @@ const JOINS={
     s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Weaver ants: tap them, or press Enter, to send them home and separate the widgets"><title>Tap the ants to send them home</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="8" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
    return s;
   }
+ },
+ box:{label:'Box clasp',kind:'Lock',gap:52,slow:1.9,held:0,
+  about:'The Lock round done in wire, from the jeweller\'s box clasp with figure-eight safeties, the lock on a good bracelet. Jarvis\'s end carries a brass end plate on a wrapped stem, and from it a folded tongue: a strip of springy brass doubled back on itself, with a knurled thumb-piece standing up near its root. GitDiscuss\'s end carries the box: a hollow brass box with a twisted-wire rim, a slot in its side, a small notch cut in its face just inside the mouth, three gold granules and an amber cabochon in a coiled bezel. On the box\'s top and bottom edges lie two wire figure-eights, each looped round a peg and folded back over the box. <b>Near:</b> the safeties lift off the box and the stone warms. <b>Ready:</b> a dashed ghost of the box lies over the tongue. Joining: the safeties lift as the pendants close, and the box swallows the tongue. Its mouth presses the thumb-piece flat as it passes, and when the tongue is fully home the thumb-piece springs up into the notch with a click and a spark. Then the safeties flip over one after the other, top first, and each snaps onto a peg on the end plate. Last the cabochon kindles: it is the join light, <b>amber</b> while both widgets run and <b>labradorite</b> if either is paused, and a glint runs along the rim. The clasp scales with any shade. <b>Release:</b> tap the clasp, or focus it and press Enter: the light goes out, the safeties flip back, the thumb-piece is pressed down and the tongue slides out of the box.',
+  sayJoin:'The box swallows the tongue, the thumb-piece clicks up into the notch, and the two figure-eight safeties flip over onto their pegs.',
+  sayJoined:'Locked by a box clasp. Drag either nameplate to move the pair. Tap the clasp to open it.',
+  sayRelease:'The safeties flip back, the thumb-piece is pressed down and the tongue slides out of the box.',
+  sayReady:'Ready: release and the box will close over the tongue.',sayNear:'Nearby: the safeties lift off the box. Move closer.',
+  end(side,lit,h){return lit>0?`<circle cx="${side>0?W-6:6}" cy="${f(h/2)}" r="18" fill="#ffb15e" opacity="${f(lit*.32)}" filter="url(#soft)"/>`:''},
+  under(){return ''},
+  over(c){
+   const jt=c.jt,sc=lerp(.6,1,clamp((c.h-HS)/(H-HS))),BH=34*sc,TH=Math.max(7,11*sc),R8=BH/2-1.2*sc,on=model.a.run&&model.b.run;
+   const root=c.a.x+W+12,ya=c.a.y+c.h/2,yb=c.b.y+c.h/2,pu=seg(jt,.5,.6),shake=1.3*Math.sin(Math.PI*3*pu)*(1-pu),mouth=c.b.x-40+shake;
+   // The thumb-piece is pressed flat while the mouth passes over it, and springs up into the notch once the tongue is home.
+   const pop=seg(jt,.5,.55),up=jt>=.5?ease(pop)+.3*Math.sin(Math.PI*pop):jt>0?clamp((mouth-root-3)/6):1;
+   let s='';
+   s+=wire(`M${f(c.a.x+W-5)} ${f(ya)}H${f(c.a.x+W+4)}`,'copper',2.4)+wire(band(c.a.x+W,ya,false,3,7,2.3),'copper',1.1);
+   s+=wire(`M${f(c.b.x+5)} ${f(yb)}H${f(c.b.x-3)}`,'copper',2.4)+wire(band(c.b.x+1,yb,false,3,7,2.3),'copper',1.1);
+   // The tongue: a strip doubled back at its tip, the fold line along the upper leaf.
+   const tp=rrect(root-2,ya-TH/2,32,TH,TH/2);
+   s+=`<path d="${tp}" transform="translate(1 2)" fill="#000" opacity=".3"/><path d="${tp}" fill="url(#cb-brass)" stroke="#2a1d08" stroke-width=".8"/><path d="M${f(root+11)} ${f(ya+.5)}H${f(root+27)}" stroke="#6b4517" stroke-width=".8" fill="none"/><path d="M${f(root+11)} ${f(ya-.6)}H${f(root+26)}" stroke="#fff2c0" stroke-width=".5" opacity=".6" fill="none"/>`;
+   s+=boxLip(root+3,ya,TH,up);
+   // End plate on Jarvis, with the pegs the safeties catch.
+   const pp=rrect(c.a.x+W+3,ya-BH/2,9,BH,3);
+   s+=`<path d="${pp}" transform="translate(1.2 2.5)" fill="#000" opacity=".35"/><path d="${pp}" fill="url(#cb-brass)" stroke="#2a1d08" stroke-width=".9"/><path d="M${f(c.a.x+W+5.5)} ${f(ya-BH/2+5)}V${f(ya+BH/2-5)}" stroke="#fff2c0" stroke-width=".6" opacity=".5"/>`;
+   for(const k of [-1,1])s+=boxPeg(root-4.5,ya+k*R8,sc);
+   if(c.ghost>0&&jt===0)s+=`<g fill="none" stroke="#f3c96a" stroke-width="1.1" stroke-dasharray="2.2 2.2" opacity="${f(c.ghost*.85)}"><path d="${rrect(root,ya-BH/2,38,BH,3.5)}"/><rect x="${f(root+3)}" y="${f(ya-TH*.45)}" width="6" height="${f(TH*.9)}" rx="1"/><ellipse cx="${f(root+21)}" cy="${f(ya)}" rx="${f(5.5+2.5*sc)}" ry="${f(lerp(3.6,7.2,(sc-.6)/.4))}" stroke-opacity=".7"/></g>`;
+   // The box on GitDiscuss.
+   const bp=rrect(mouth,yb-BH/2,38,BH,3.5),nc={x:mouth+3,y:yb-TH*.45,w:6,h:TH*.9};
+   s+=`<path d="${bp}" transform="translate(1.5 3)" fill="#000" opacity=".38"/><path d="${bp}" fill="url(#cb-brass)" stroke="#2a1d08" stroke-width="1"/><path d="${rrect(mouth+3,yb-BH/2+3,32,BH-6,2)}" fill="none" stroke="#6b4517" stroke-width=".6" opacity=".8"/>`;
+   s+=twisted(rrect(mouth+.8,yb-BH/2+.8,36.4,BH-1.6,3),'brass',1.2);
+   s+=`<rect x="${f(mouth-.4)}" y="${f(yb-TH/2-1)}" width="1.9" height="${f(TH+2)}" fill="#120a04"/>`;
+   s+=`<rect x="${f(nc.x)}" y="${f(nc.y)}" width="${nc.w}" height="${f(nc.h)}" rx="1" fill="#140c05" stroke="#2a1d08" stroke-width=".6"/>`;
+   if(jt>0)s+=`<clipPath id="bx-nc"><rect x="${f(nc.x)}" y="${f(nc.y)}" width="${nc.w}" height="${f(nc.h)}" rx="1"/></clipPath><g clip-path="url(#bx-nc)">${boxLip(root+3,ya,TH,up)}</g>`;
+   if(pop>0&&pop<1)s+=`<rect x="${f(nc.x-2)}" y="${f(nc.y-2)}" width="10" height="${f(nc.h+4)}" rx="2" fill="none" stroke="#fff4d0" stroke-width=".9" opacity="${f(1-pop)}"/>`+sparkle(root+8,ya-TH/2-1,Math.sin(Math.PI*pop)*.5);
+   for(const k of [-1,0,1])s+=`<circle cx="${f(mouth+34)}" cy="${f(yb+k*6*sc)}" r="${f(1.1+.3*sc)}" fill="url(#st-gold)" stroke="#3a2606" stroke-width=".4"/>`;
+   // The cabochon is the join light.
+   const L=seg(jt,.86,.97),warm=Math.max(L,jt===0?model.glow*.4:0),sx=mouth+21,rx=5.5+2.5*sc,ry=lerp(3.6,7.2,(sc-.6)/.4);
+   if(warm>0)s+=`<ellipse cx="${f(sx)}" cy="${f(yb)}" rx="${f(rx+8)}" ry="${f(ry+8)}" fill="${on||L<.5?'#ffb15e':'#8fa6c4'}" opacity="${f(.55*warm)}" filter="url(#soft)"/>`;
+   const ell=`M${f(sx-rx-1.3)} ${f(yb)}a${f(rx+1.3)} ${f(ry+1.3)} 0 1 0 ${f(2*rx+2.6)} 0a${f(rx+1.3)} ${f(ry+1.3)} 0 1 0 ${f(-2*rx-2.6)} 0`;
+   s+=`<ellipse cx="${f(sx)}" cy="${f(yb)}" rx="${f(rx+1.6)}" ry="${f(ry+1.6)}" fill="#1a1006"/><ellipse cx="${f(sx)}" cy="${f(yb)}" rx="${f(rx)}" ry="${f(ry)}" fill="url(#${L>.5&&!on?'st-lab':'st-amber'})"/>`+
+    `<ellipse cx="${f(sx)}" cy="${f(yb)}" rx="${f(rx)}" ry="${f(ry)}" fill="#1a0c04" opacity="${f(.5*(1-warm))}"/><ellipse cx="${f(sx-rx*.35)}" cy="${f(yb-ry*.45)}" rx="${f(rx*.36)}" ry="${f(ry*.2)}" fill="#fff" opacity=".65" transform="rotate(-18 ${f(sx-rx*.35)} ${f(yb-ry*.45)})"/>`+wire(coilsAlong(ell,2.1,1.6),'brass',.75);
+   // The figure-eight safeties: each turns over about its peg on the box, out of the face and over onto the end plate's peg.
+   // Lifted in Near and Ready, they stay lifted when the join starts (the engine clears the glow on drop).
+   if(jt===0){if(model.glow>0)this.held=.5*model.glow;else if(!model.busy)this.held=0}
+   const lift=jt>0?lerp(this.held,.45,ease(seg(jt,.25,.5))):.5*model.glow;
+   [[-1,.56],[1,.66]].forEach(([k,t0])=>{
+    const u=seg(jt,t0,t0+.12),b=seg(jt,t0+.12,t0+.17),th=u<1?lerp(lift,Math.PI,ease(u)):Math.PI-.14*Math.sin(Math.PI*b);
+    s+=boxPeg(mouth+8,yb+k*R8,sc)+boxEight(mouth+8,yb+k*R8,th,sc);
+    if(b>0&&b<1)s+=sparkle(root-4.5,ya+k*R8,Math.sin(Math.PI*b)*.45)});
+   const gl=seg(jt,.9,1);if(gl>0&&gl<1)s+=sparkle(lerp(mouth+3,mouth+35,gl),yb-BH/2+1,Math.sin(Math.PI*gl)*.4);
+   if(jt===1){const x0=root-12,y0=yb-BH/2-6;
+    s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Box clasp: tap it, or press Enter, to flip the safeties back, press the thumb-piece and separate the widgets"><title>Tap the clasp to open it</title><rect x="${f(x0)}" y="${f(y0)}" width="54" height="${f(BH+12)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="54" height="${f(BH+12)}" rx="7" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
+   return s;
+  }
  }
 };
+/* ---------- Box clasp parts ---------- */
+// The knurled thumb-piece: standing up (u=1) it is lit and casts a shadow; pressed flat (u=0) it is dark.
+function boxLip(x,y,TH,u){
+ const h=TH*.86,o=clamp(u,0,1.4),r=`x="${f(x)}" y="${f(y-h/2)}" width="6" height="${f(h)}" rx="1.2"`;
+ return `<rect ${r} transform="translate(${f(1.6*o)} ${f(1.8*o)})" fill="#000" opacity="${f(.4*clamp(o))}"/><g transform="translate(${f(-.5*o)} ${f(-.6*o)})"><rect ${r} fill="#7a5220" stroke="#2a1d08" stroke-width=".6"/><rect ${r} fill="url(#cb-brass)" opacity="${f(clamp(o))}"/></g>`+
+  `<path d="M${f(x+1.5-.5*o)} ${f(y-h/2+1.5-.6*o)}V${f(y+h/2-1.5-.6*o)}M${f(x+3-.5*o)} ${f(y-h/2+1.5-.6*o)}V${f(y+h/2-1.5-.6*o)}M${f(x+4.5-.5*o)} ${f(y-h/2+1.5-.6*o)}V${f(y+h/2-1.5-.6*o)}" stroke="#3a2606" stroke-width=".5" opacity="${f(.4+.4*clamp(o))}"/>`;
+}
+const boxPeg=(x,y,sc)=>`<circle cx="${f(x+.6)}" cy="${f(y+1)}" r="${f(1.2+sc)}" fill="#000" opacity=".35"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(1.2+sc)}" fill="url(#st-gold)" stroke="#2a1d08" stroke-width=".5"/>`;
+// A figure-eight (a Gerono lemniscate) with one loop round the peg at (x,y); th 0 lies back over the box, π reaches over to the end plate.
+function boxEight(x,y,th,sc){
+ const Lp=12.5,A=Lp/1.178,B=6.6*Math.max(sc,.85),cs=Math.cos(th),sn=Math.sin(th),P=[];
+ for(let i=0;i<=44;i++){const t=i/44*2*Math.PI,X=A*Math.cos(t);P.push([x+(Lp/2+X)*cs,y+B*Math.sin(t)*Math.cos(t)-2.2*sn])}
+ const d=poly(P)+'Z';
+ return `<path d="${d}" transform="translate(${f(1+2.5*sn)} ${f(1.6+3*sn)})" fill="none" stroke="#000" stroke-width="2" opacity=".3"/>`+wire(d,'brass',1.15);
+}
 /* ---------- Weaver ants geometry ---------- */
 const ANT_SC=.9,ANT_L=22.8*ANT_SC;
 // One beaded wire ant, thorax at the origin, facing +x. o: walk 0..1 and gait phase ph, fwd/back reach of the front/hind legs, antenna wave, gaster stone and how lit it is, larva in the jaws.
