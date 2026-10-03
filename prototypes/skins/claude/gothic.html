@@ -279,7 +279,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the voussoirs, drag the stones or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one stone, and the keystone's gilded boss releases. On the casement stay, drag the stay or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one hole in the stay, and the gilt pin releases. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. On the windlass, drag up on the wheel to lift its pawl and let GitDiscuss roll back, or tap the wheel. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the voussoirs, drag the stones or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one stone, and the keystone's gilded boss releases. On the casement stay, drag the stay or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one hole in the stay, and the gilt pin releases. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. On the windlass, drag up on the wheel to lift its pawl and let GitDiscuss roll back, or tap the wheel. On the hot rivets, tap the rivets (or press Enter on them) to knock their heads off. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -2282,6 +2282,104 @@ const JOINS={
   grab(p){return JOINS.fan.grab.call(this,p)},
   move(d,p){return JOINS.fan.move.call(this,d,p)},
   key(e,hit){if(hit.id!=='stayHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
+ },
+ /* Hot rivets: an iron strap runs out of each end pier, the two lap across the gap, and three red-hot rivets are headed over through both (Rivet). */
+ rivet:{label:'Hot rivets',kind:'Rivet',gap:30,ms:2.6,sepMs:3000,
+  say:{join:'The facades close a hand\'s width apart and an iron strap runs out of each end pier, GitDiscuss\'s lapping over Jarvis\'s until the holes line up. Three red-hot rivets go in, each headed over with two hammer blows, and the middle one gets a gilt cap whose glass kindles.',
+   joined:'Joined: the two straps are riveted through, three rose heads cooled black and a gilt cap on the middle one, glowing. Drag either nameplate to move the pair. Tap the rivets to knock their heads off and release.',
+   sep:'The cap\'s light goes out and it is prised off; the hammer knocks each rivet\'s head off, middle first, the straps draw back into their piers and the facades part.',
+   hold:'Held mid-join: one rivet headed and cooling, the next going in white-hot. Use the scrubber to step through the animation.',
+   ready:'Ready: both straps and the three rivets are chalked across the gap. Release to rivet them.',near:'Nearby: the strap ends stir in their keepers and glow red. Move closer.',readyPh:'Ready · the straps and rivets are marked out',nearPh:'Nearby · the strap ends warm',
+   back:'The hammer is set down; still riveted.'},
+  phase:(jt,dir)=>dir>0?(jt<.32?'Joining · closing in ':jt<.48?'Joining · the straps run out and lap ':jt<.88?'Joining · heading the rivets ':'Joining · the gilt cap kindles '):(jt>.9?'Releasing · the cap comes off ':jt>.58?'Releasing · knocking off the heads ':jt>.4?'Releasing · the straps draw back ':'Releasing · parting '),
+  dragPh:()=>'Knocking off the rivets',
+  about:'Medieval smiths joined iron hot: a rivet was heated white in the forge, pushed through holes drilled in two lapped bars, and its tail hammered over into a domed head while it was still soft, so it shrank as it cooled and drew the bars tight. Church doors, screens and tie bars are full of them, and the best heads were dressed into little roses. Here each facade keeps a wrought-iron strap in a keeper on its end pier, only its end showing. Jarvis\'s is the wide one, its edges punched with a row of dots and its end a cusped trefoil; GitDiscuss\'s is narrower and ends in a spear with two curled lobes. <b>Near:</b> the strap ends stir out of their keepers and glow dull red. <b>Ready:</b> both straps and the three rivets are chalked across the gap. Joining: the facades close a hand\'s width apart, Jarvis\'s strap runs out across the gap to GitDiscuss\'s pier and GitDiscuss\'s runs back over it to Jarvis\'s, and a glint runs along the holes as they line up. Then the rivets go in one at a time, first on Jarvis\'s pier, then on GitDiscuss\'s, then the middle one over the gap. Each comes in toward the wall glowing yellow-hot, lands with a puff of grit, and a smith\'s hammer swings down on it twice. Each blow throws sparks and spreads the head, and the second dresses it into a faceted rose. The heads cool through orange and cherry red to black. Last a gilt quatrefoil cap is struck onto the middle rivet, and its glass boss kindles as the join light: amber while both widgets run, cold blue if either is paused. The straps stay on the end piers and in the gap, clear of the windows, nameplates and tabs. Shaded, the straps and rivets scale down with the wall. <b>Release:</b> tap the rivets, or focus them and press Enter. The light goes out and the cap is prised off, the hammer knocks each head off in turn, middle first (each flies off spinning with a spark), the straps draw back into their keepers, and the facades part.',
+  geo(h){const u=clamp((h-HS)/(H-HS));return{s:lerp(.55,1,u),cy:lerp(h/2+2,64,u)}},
+  // Strap reach (Jarvis's, GitDiscuss's), the keepers' x on each widget, and each rivet's offset from GitDiscuss's strap tip.
+  get LJ(){return W+this.gap+25-350},get LG(){return W+this.gap+38-364},OFF:[12,42,72],
+  // Rivets go in Jarvis-side, GitDiscuss-side, then the middle; each takes 12% of the timeline.
+  T0:[.48,.68,.58],TL:.12,PS:[.3,.12,.21],
+  st(c){const jt=c.jt,q=1-jt,fwd=model.dir>0;
+   if(jt===0)return{ext:.08+.07*c.glow,warm:c.glow,u:[-1,-1,-1],pop:[0,0,0],ham:null,cap:0,lit:0,al:0};
+   if(fwd){const u=this.T0.map(t=>jt<t?-1:Math.min(4,(jt-t)/this.TL));
+    return{ext:.08+.07*c.glow+(.92-.07*c.glow)*ease(seg(jt,.32,.45)),warm:Math.max(model.lit0>0?1:0,c.glow)*(1-seg(jt,.3,.46)),u,pop:[0,0,0],al:seg(jt,.44,.5),cap:seg(jt,.88,.93),lit:seg(jt,.92,1)}}
+   return{ext:.08+.92*(1-ease(seg(q,.42,.58))),warm:0,u:[4,4,4],pop:this.PS.map(p=>seg(q,p+.05,p+.11)),hv:this.PS.map(p=>seg(q,p,p+.05)),al:0,cap:1-seg(q,.05,.12),lit:1-seg(q,0,.07)}},
+  // The hammer's lift (degrees about the hand) for a rivet at u: two blows, then lifted away.
+  swing(u){if(u<.2||u>.9)return null;
+   const a=u<.42?(v=>v<.55?lerp(30,46,ease(v/.55)):46*(1-Math.pow((v-.55)/.45,2)))(seg(u,.2,.42)):u<.68?(v=>v<.5?44*ease(v/.5):44*(1-Math.pow((v-.5)/.5,2)))(seg(u,.42,.68)):34*ease(seg(u,.68,.85));
+   return{a,o:seg(u,.2,.27)*(1-seg(u,.82,.9))}},
+  hammer(x,y,s,a,mx,o){const T=d=>`translate(${f(x+d)} ${f(y+d*1.5)}) scale(${f(mx*s*100)/100} ${f(s*100)/100}) rotate(${f(a)} 36 -8)`,
+   H='<path d="M-4.4 0H4.4V-12Q4.4 -16.6 0 -18.4Q-4.4 -16.6 -4.4 -12Z"/>',G='<rect x="3" y="-10" width="38" height="4" rx="1.6"/>';
+   return `<g opacity="${f(o)}"><g transform="${T(2.4*s)}" fill="#000" opacity=".3">${H}${G}</g><g transform="${T(0)}">`+
+    `<g fill="#6b4a2a" stroke="#2a1a0c" stroke-width=".7">${G}</g><path d="M7 -8.6H39" stroke="#9a7448" stroke-width=".55" opacity=".8"/><rect x="3.4" y="-10.7" width="3.6" height="5.4" rx=".6" fill="#2c2622" stroke="#0c0907" stroke-width=".5"/>`+
+    `<g fill="#3a332c" stroke="#0c0907" stroke-width=".75">${H}</g><path d="M-3 -2V-12.6" stroke="#a0958a" stroke-width=".7" opacity=".7"/><path d="M-4.2 -.5H4.2" stroke="#d6ccbf" stroke-width=".7" opacity=".8"/></g></g>`},
+  // A rivet head seen end on: yellow-hot to black, with a halo while hot; pe dresses it into a faceted rose. k > 1 is still coming in toward the wall.
+  head(x,y,r,ht,pe,s,k=1){const R=r*k,d=(.7+5*(k-1))*s,HT=JOINS.strap;let o='';
+   if(ht>.04)o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(R*2.6)}" fill="#ff7a22" opacity="${f(.55*ht)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+   o+=`<circle cx="${f(x+d*.7)}" cy="${f(y+d)}" r="${f(R)}" fill="#000" opacity="${f(.4/k)}"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(R)}" fill="${ht>.04?HT.hot(ht*.95):'#2c2622'}" stroke="#0c0907" stroke-width="${f(.7*s)}"/>`;
+   if(pe>0){const e=R*.68,lc=ht>.04?HT.hot(Math.max(0,ht-.25)):'#0c0907';
+    o+=`<path d="M${f(x-e)} ${f(y)}H${f(x+e)}M${f(x)} ${f(y-e)}V${f(y+e)}M${f(x-e*.7)} ${f(y-e*.7)}L${f(x+e*.7)} ${f(y+e*.7)}M${f(x+e*.7)} ${f(y-e*.7)}L${f(x-e*.7)} ${f(y+e*.7)}" stroke="${lc}" stroke-width="${f(.5*s)}" opacity="${f(.85*pe)}"/>`}
+   return o+`<circle cx="${f(x-R*.36)}" cy="${f(y-R*.36)}" r="${f(R*.3)}" fill="${ht>.04?'#fff3c8':'#a39686'}" opacity=".75"/>`},
+  over(c){
+   const G=this.geo(c.h),s=G.s,r=this.st(c),jt=c.jt,fwd=model.dir>0||jt===0,A=model.a,B=model.b,HT=JOINS.strap,dust=JOINS.buttress.dust,col=A.run&&B.run?'#ffc861':'#9fb8ff';
+   const yJ=A.y+G.cy,yG=B.y+G.cy,kJ=A.x+350,kG=B.x+38,tJ=kJ+this.LJ*r.ext,tG=kG-this.LG*r.ext,iron='fill="#2c2622"',ol=`stroke="#0c0907" stroke-width="${f(1.4*s)}"`;
+   const hJ=6.5*s,hG=4.25*s;
+   // Jarvis's strap: a wide bar with punched edges and a cusped trefoil end.
+   const shJ=(x0,x1,y)=>`<rect x="${f(x0)}" y="${f(y-hJ)}" width="${f(Math.max(0,x1-3*s-x0))}" height="${f(2*hJ)}"/><circle cx="${f(x1+2*s)}" cy="${f(y)}" r="${f(5.2*s)}"/><circle cx="${f(x1-3*s)}" cy="${f(y-5.2*s)}" r="${f(3.6*s)}"/><circle cx="${f(x1-3*s)}" cy="${f(y+5.2*s)}" r="${f(3.6*s)}"/>`;
+   // GitDiscuss's strap: narrow, ending in a spear with two curled lobes.
+   const shG=(x0,x1,y)=>`<rect x="${f(x0+2*s)}" y="${f(y-hG)}" width="${f(Math.max(0,x1-x0-2*s))}" height="${f(2*hG)}"/><path d="M${f(x0-8*s)} ${f(y)}L${f(x0+1*s)} ${f(y-5*s)}L${f(x0+4*s)} ${f(y)}L${f(x0+1*s)} ${f(y+5*s)}Z"/><circle cx="${f(x0+4*s)}" cy="${f(y-5*s)}" r="${f(2.4*s)}"/><circle cx="${f(x0+4*s)}" cy="${f(y+5*s)}" r="${f(2.4*s)}"/>`;
+   const keeper=(x,y,hh)=>`<rect x="${f(x-3.6*s)}" y="${f(y-hh-2.2*s)}" width="${f(7.2*s)}" height="${f(2*hh+4.4*s)}" rx="${f(1.2*s)}" fill="#3a332c" stroke="#0c0907" stroke-width="${f(.7*s)}"/><path d="M${f(x-2.4*s)} ${f(y-hh-1.2*s)}V${f(y+hh+1.2*s)}" stroke="#a0958a" stroke-width="${f(.6*s)}" opacity=".7"/>`+
+    `<circle cx="${f(x)}" cy="${f(y-hh-.6*s)}" r="${f(1*s)}" fill="#8d8378"/><circle cx="${f(x)}" cy="${f(y+hh+.6*s)}" r="${f(1*s)}" fill="#8d8378"/>`;
+   let o='';
+   // Ready: both straps lapped and the three rivets, chalked across the gap.
+   const gh=jt===0?seg(c.glow,.8,1)*.85:fwd?.7*(1-seg(jt,.32,.46)):0;
+   if(gh>0){const bx=A.x+W+this.gap,tg=bx+38-this.LG;
+    o+=`<g fill="none" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="3 2.4" opacity="${f(gh)}">${shJ(kJ,kJ+this.LJ,yJ)}${shG(tg,bx+38,yJ)}${this.OFF.map(d=>`<circle cx="${f(tg+d)}" cy="${f(yJ)}" r="${f(4.2*s)}"/>`).join('')}</g>`}
+   // Near: the strap ends glow red in their keepers.
+   if(r.warm>0)for(const[x,y]of[[tJ,yJ],[tG,yG]])o+=`<g style="mix-blend-mode:screen" opacity="${f(.85*r.warm)}"><circle cx="${f(x)}" cy="${f(y)}" r="${f(10*s)}" fill="#ff5a1e" opacity=".5" filter="url(#soft)"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(2.6*s)}" fill="#ffb070"/></g>`;
+   // Jarvis's strap, under: shadow, outline then fill (so its lobes read as one forging), punched dots, highlight, keeper.
+   const J0=kJ-5*s;
+   o+=`<g fill="#000" opacity=".35" transform="translate(${f(1.2*s)} ${f(1.8*s)})">${shJ(J0,tJ,yJ)}</g><g ${iron} ${ol}>${shJ(J0,tJ,yJ)}</g><g ${iron}>${shJ(J0,tJ,yJ)}</g>`;
+   let dots='';for(let x=kJ+6*s;x<tJ-6*s;x+=5.5*s)dots+=`<circle cx="${f(x)}" cy="${f(yJ-5.2*s)}" r="${f(.55*s)}"/><circle cx="${f(x)}" cy="${f(yJ+5.2*s)}" r="${f(.55*s)}"/>`;
+   o+=`<g fill="#0c0907" opacity=".8">${dots}</g><path d="M${f(J0)} ${f(yJ-hJ+.8*s)}H${f(tJ-3*s)}" stroke="#9a8f84" stroke-width="${f(.6*s)}" opacity=".6"/>`+keeper(kJ,yJ,hJ);
+   // GitDiscuss's strap, lapped over it.
+   const G1=kG+5*s;
+   o+=`<g fill="#000" opacity=".42" transform="translate(${f(1.1*s)} ${f(1.7*s)})">${shG(tG,G1,yG)}</g><g ${iron} ${ol}>${shG(tG,G1,yG)}</g><g fill="#332c27">${shG(tG,G1,yG)}</g>`+
+    `<path d="M${f(tG+3*s)} ${f(yG-hG+.7*s)}H${f(G1)}" stroke="#a0958a" stroke-width="${f(.55*s)}" opacity=".65"/><path d="M${f(tG+5*s)} ${f(yG)}H${f(G1)}" stroke="#0c0907" stroke-width="${f(.45*s)}" opacity=".5"/>`+keeper(kG,yG,hG);
+   // The holes in the top strap travel with it, and catch a glint in turn as they line up.
+   const X=this.OFF.map(d=>tG+d);
+   X.forEach((x,i)=>{if(x>kG-5*s||(fwd?r.u[i]>=.2:r.pop[i]===0))return;o+=`<circle cx="${f(x)}" cy="${f(yG)}" r="${f(1.9*s)}" fill="#0b0807"/><circle cx="${f(x+.4*s)}" cy="${f(yG+.5*s)}" r="${f(1.1*s)}" fill="#3a2a1a" opacity=".7"/>`;
+    const g=seg(r.al,i*.25,i*.25+.5);if(fwd&&g>0&&g<1){const v=Math.sin(Math.PI*g);o+=`<g opacity="${f(v)}">${sparkle(x,yG,4.5*s*v)}</g>`}});
+   // The rivets. Joining: each comes in hot, lands, takes two blows and cools. Releasing: a blow, then the head flies off.
+   let fx='',ham='';
+   X.forEach((x,i)=>{const y=yJ,mx=i===2?-1:1;
+    if(fwd){const u=r.u[i];if(u<0)return;
+     const k=lerp(1.9,1,ease(seg(u,0,.25))),op=seg(u,0,.08),rr=(2.5+.9*seg(u,.42,.47)+.8*seg(u,.68,.73))*s,ht=u<.42?1:u<.68?.86:.72*(1-seg(u,.68,1.7)),pe=seg(u,.68,.75);
+     if(!(i===1&&r.cap>=1))o+=`<g opacity="${f(op)}">${this.head(x,y,rr,ht,pe,s,k)}</g>`;
+     const ld=seg(u,.22,.45);if(ld>0&&ld<1)fx+=dust(x,y,ld,4,8*s,500+i*9);
+     for(const[h,n,R]of[[.42,8,15],[.68,11,19]]){const t=seg(u,h,h+.18);if(t>0&&t<1){fx+=HT.sparks(x,y,t,n,R*s,520+i*31+n);const v=1-t;fx+=`<g opacity="${f(v)}">${sparkle(x,y-1.5*s,6*s*v)}</g>`}}
+     const w=this.swing(u);if(w)ham+=this.hammer(x,y,s,w.a,mx,w.o)}
+    else{const v=r.hv[i],p=r.pop[i];
+     if(v>0&&v<1||p>0&&p<.4){const a=v<.6?lerp(20,44,ease(v/.6)):44*(1-Math.pow((v-.6)/.4,2));ham+=this.hammer(x,y,s,a,mx,seg(v,0,.25)*(1-seg(p,.1,.4)))}
+     if(p<1){const dx=mx*16*s*p,dy=-26*s*p+34*s*p*p,k=1+.8*p;
+      o+=`<g opacity="${f(1-p)}" transform="rotate(${f(220*p*mx)} ${f(x+dx)} ${f(y+dy)})">${this.head(x+dx,y+dy,4.2*s,0,1,s,k)}</g>`}
+     if(p>0&&p<.6){fx+=HT.sparks(x,y,seg(p,0,.6),7,14*s,560+i*17)+dust(x,y,seg(p,0,.6),4,8*s,580+i*5)}}});
+   // The gilt cap on the middle rivet: a quatrefoil rose with a glass boss, the join light.
+   if(r.cap>0){const x=X[1],y=yJ,k=fwd?lerp(1.7,1,ease(r.cap)):1+.7*(1-r.cap),R=5.4*s*k,run=A.run&&B.run;let qf='';
+    for(let i=0;i<4;i++){const a=(45+90*i)*Math.PI/180;qf+=`<circle cx="${f(x+Math.cos(a)*R*.5)}" cy="${f(y+Math.sin(a)*R*.5)}" r="${f(R*.3)}"/>`}
+    if(r.lit>0)o+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(16*s)}" fill="${col}" opacity="${f(.42*r.lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+    o+=`<g opacity="${f(fwd?seg(r.cap,0,.3):r.cap)}"><circle cx="${f(x+(.7+4*(k-1))*s)}" cy="${f(y+(1.1+5*(k-1))*s)}" r="${f(R)}" fill="#000" opacity=".38"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(R)}" fill="url(#gild)" stroke="#5a3a0c" stroke-width="${f(.8*s)}"/>`+
+     `<g fill="none" stroke="#5a3a0c" stroke-width="${f(.55*s)}" opacity=".8">${qf}</g><circle cx="${f(x)}" cy="${f(y)}" r="${f(R*.36)}" fill="${r.lit>0?mixc([58,47,28],run?[255,200,97]:[159,184,255],r.lit):'#3a2f1c'}" stroke="#5a3a0c" stroke-width="${f(.6*s)}"/>`+
+     (r.lit>0?`<circle cx="${f(x-R*.1)}" cy="${f(y-R*.12)}" r="${f(R*.11)}" fill="#fffbe8" opacity="${f(r.lit)}"/>`:'')+`</g>`;
+    if(fwd&&r.cap<1)fx+=HT.sparks(x,y,seg(r.cap,.5,1),10,22*s,611);
+    const lg=fwd?seg(jt,.93,.99):0;if(lg>0&&lg<1){const v=Math.sin(Math.PI*lg);fx+=`<g opacity="${f(v)}">${sparkle(x,y,9*s*v)}</g>`}}
+   o+=fx+ham;
+   if(jt===1){const x0=kJ-6*s,x1=kG+6*s,hh=16*s;
+    o+=`<g class="hit" id="rivetHit" tabindex="0" role="button" aria-label="Hot rivets: tap, or press Enter, to knock the rivets out and separate the widgets" style="cursor:pointer"><title>Tap the rivets to knock their heads off and release</title><rect x="${f(x0)}" y="${f(yJ-hh)}" width="${f(x1-x0)}" height="${f(2*hh)}" fill="transparent"/><rect class="ringfocus" x="${f(x0-2)}" y="${f(yJ-hh-2)}" width="${f(x1-x0+4)}" height="${f(2*hh+4)}" rx="3" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g>`}
+   return o},
+  grab(p){return{x0:p.x,y0:p.y,moved:false}},
+  move(d,p){if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true},
+  letGo:()=>true
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
