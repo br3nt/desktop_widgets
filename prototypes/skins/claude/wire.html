@@ -194,7 +194,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release; on the briolette fan, drag the fan or GitDiscuss's nameplate (or press ↑ ↓) to open or close it a stone at a time, and tap the fan to release; on the spool and claw, tap the spool, the wire or the claw to unclip it. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release; on the briolette fan, drag the fan or GitDiscuss's nameplate (or press ↑ ↓) to open or close it a stone at a time, and tap the fan to release; on the spool and claw, tap the spool, the wire or the claw to unclip it; on the wrapped-eye stay, drag the stay or GitDiscuss's nameplate (or press ↑ ↓) to swing it a step at a time, and tap the stay to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -1284,8 +1284,132 @@ const JOINS={
   end(side,lit,h){return lit>0?`<circle cx="${side>0?W+14:-14}" cy="${f(h/2)}" r="15" fill="#ffb15e" opacity="${f(lit*.3)}" filter="url(#soft)"/>`:''},
   under(){return ''},
   over(c){return rlOver.call(this,c)}
+ },
+ wstay:{label:'Wrapped-eye stay',kind:'Angle · stay',gap:10,knob:true,
+  get slow(){return model.angle?2:1.6},
+  angle:{def:30,swing:.66,x0:5,ring:0,max:45,snap:15,
+   origin:c=>({x:c.a.x+W+5,y:c.a.y+brPy(model.angle,c.h)}),py:(th,h)=>brPy(th,h),bend:jt=>wsBend(jt),
+   peak:()=>model.angle+5*Math.sign(model.angle),tag:c=>wsTag(c),pad:()=>WS_E+8,
+   // A grab on the stay itself turns about Jarvis's pin, which the stay swings on, at double rate (the stay turns about half as far as GitDiscuss).
+   grab:c=>{const s=Math.sign(model.angle)||1,g=wsGeo(c,model.angle,s);return g.toW(g.Q)},gain:2},
+  about:'The Stay angle kind (gothic\'s casement stay, hollow\'s bone stay, elven\'s leaf-eye stay) done in wire, from the jeweller\'s eye-pin connector: a bar broken into links by wrapped loops, each loop turned with round-nose pliers and its tail wound twice round the neck. Here the bar is twisted square copper with four wrapped eyes, one per 15°: a carnelian between gold seeds on the long first link, a pearl on each short one, and a scroll curl at the end. GitDiscuss turns on the briolette fan\'s brass jump ring at the shared corner (at the foot when it is lowered, at the head when it is raised). A brass post on GitDiscuss carries the stay\'s pivot loop; a copper head pin on Jarvis, standing on two scroll feet and threaded with a stone, takes the eyes. They stand over the roofs when GitDiscuss is lowered and under the bellies when it is raised. The eye distances are worked out from the pivot geometry, so at full and shaded height the pin sits exactly in eye n at 15(n−1)°. <b>Near:</b> the eyes at the corner warm and the frames glimmer where the posts will stand. <b>Ready:</b> a dashed ghost of the ring, both posts and the stay with its eyes at the set angle. <b>Joining:</b> the ring threads both eyes and twists shut, the posts are drawn up hot from the frames, and the stay drops onto its pivot swung high and comes down to ride just over the pin. GitDiscuss swings 5° past its angle and settles, and the stay drops onto its eye with a clink. The pin\'s stone kindles as the join light (amber while either widget runs, labradorite if both are paused) and a glint runs along the bar. <b>Set the angle:</b> −45° to +45° in hard 15° steps. Drag the stay or GitDiscuss\'s nameplate, use the slider, or press ↑ ↓ on the focused stay or nameplate. The stay is lifted off the pin while GitDiscuss swings and drops onto the nearest eye when it stops. Crossing level it fades off one side and back on the other. A tag reads "on eye n of 4", or "lifted, to eye n of 4" while it moves. <b>Release:</b> tap the stay or press Enter: it is lifted, GitDiscuss swings level, the stay swings up off its post, the posts sink and the ring twists open.',
+  sayJoin:'The ring shuts, the posts are drawn up, and the stay comes down over the pin; GitDiscuss swings past and settles, and the stay drops onto its eye.',
+  sayJoined:'Joined on a wrapped-eye stay. Drag the stay or GitDiscuss\'s nameplate to set the angle; drag Jarvis to move the pair. Tap the stay to release.',
+  sayTurn:'The stay is lifted off the pin; it drops onto the nearest eye when GitDiscuss stops.',
+  sayRelease:'The stay is lifted, GitDiscuss swings level, the stay comes off and the ring twists open.',
+  sayReady:'Ready: release to set a wrapped-eye stay across them.',sayNear:'Nearby: the eyes warm and the frames glimmer where the posts will stand. Move closer.',
+  end(side,lit,h){return JOINS.brio.end(side,lit,h)},
+  under(){return ''},
+  over(c){return wsOver.call(this,c)}
  }
 };
+/* ---------- Wrapped-eye stay ---------- */
+// The posts stand WS_E beyond the casing edge, WS_U either side of the hinge; WS_R is an eye's radius.
+const WS_E=22,WS_U=49,WS_R=4.2;
+// Geometry in a canonical frame: the hinge O at the origin and the stay's side upward (y < 0). s is +1 when GitDiscuss is
+// lowered (stay over the roofs) and −1 when raised (under the bellies); toW flips y for −1. eyes[k] is the pivot-to-pin distance at 15k°.
+function wsGeo(c,th,s){
+ const h=c.h,py=brPy(s,h),D=s>0?py:h-py,inset=h/2-frameH(h)/2,O={x:c.a.x+W+5,y:c.a.y+py},a=Math.abs(th);
+ const rot=(x,y,deg)=>{const r=deg*Math.PI/180,cs=Math.cos(r),sn=Math.sin(r);return{x:x*cs-y*sn,y:x*sn+y*cs}};
+ const top=-(D+WS_E),root=-(D-inset),Q={x:-WS_U,y:top};
+ const eyes=[0,1,2,3].map(k=>{const p=rot(WS_U,top,15*k);return Math.hypot(p.x-Q.x,p.y-Q.y)});
+ return{O,s,top,root,Q,P:rot(WS_U,top,a),eyes,rotG:(x,y)=>rot(x,y,a),toW:p=>({x:O.x+p.x,y:O.y+s*p.y})};
+}
+// GitDiscuss swings 5° past its angle while the stay rides lifted, then settles.
+function wsBend(jt){const T=model.angle,sg=Math.sign(T);if(jt>=1)return T;if(!sg)return 0;return lerp(lerp(0,T+5*sg,ease(seg(jt,.66,.86))),T,ease(seg(jt,.86,.92)))}
+// One side's posts and stay. o: grow (posts), op, lift (0 on the eye, 1 riding over the pin), arr (swung up on arrival), kin, clank, glint, hit.
+function wsSide(c,th,s,o){
+ const g=wsGeo(c,th,s),bo={x:c.b.x-c.a.x-W-10,y:c.b.y-c.a.y},B=p=>{const q=g.toW(p);return{x:q.x+bo.x,y:q.y+bo.y}},J2=g.toW,cool=!(model.a.run||model.b.run),turn=model.turning&&pivotOn();
+ const lp=(a,b,t)=>({x:lerp(a.x,b.x,t),y:lerp(a.y,b.y,t)}),gr=o.grow,hot=gr<1;
+ const Qr=J2({x:-WS_U,y:g.root}),Qt=J2({x:-WS_U,y:g.top-3}),Pr=B(g.rotG(WS_U,g.root)),Pw=B(g.P),qt=lp(Qr,Qt,gr),pt=lp(Pr,Pw,gr);
+ const tip=p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="5" fill="#ffd28a" opacity=".7" filter="url(#soft)"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="1.7" fill="#fff0c8"/>`;
+ let out=`<g opacity="${f(o.fade??1)}">`;
+ if(gr>0){
+  // Scroll feet on the frame, then the posts drawn up from them.
+  const feet=(m,G)=>[-1,1].map(k=>{const q=G(k*5,3.4);return wire(spiral(q.x,q.y,3.1,1.25,k*s,k>0?Math.PI:0),m,1.05)}).join('');
+  out+=feet(hot?'hot':'copper',(x,y)=>J2({x:-WS_U+x,y:g.root-y}))+feet(hot?'hot':'brass',(x,y)=>B(g.rotG(WS_U+x,g.root-y)));
+  out+=wire(`M${f(Qr.x)} ${f(Qr.y)}L${f(qt.x)} ${f(qt.y)}`,hot?'hot':'copper',1.7)+wire(`M${f(Pr.x)} ${f(Pr.y)}L${f(pt.x)} ${f(pt.y)}`,hot||turn?'hot':'brass',1.7);
+  if(hot)out+=tip(qt)+tip(pt);
+  // The pin's stone, threaded between gold seeds below the eye: the join light.
+  if(gr>.75){const S=J2({x:-WS_U,y:g.top+11}),k=o.kin,on=!cool;
+   if(k>0)out+=`<circle cx="${f(S.x)}" cy="${f(S.y)}" r="11" fill="${on?'#ffb15e':'#9fc4e0'}" opacity="${f(k*(turn?.75:.55))}" filter="url(#soft)"/>`;
+   out+=strandItem({k:'seed',r:1.5,stone:'gold'},S.x,S.y-s*5.4)+strandItem({k:'bead',r:4,stone:k>.5?(on?'amber':'lab'):'jet'},S.x,S.y)+strandItem({k:'seed',r:1.5,stone:'gold'},S.x,S.y+s*5.4)}
+ }
+ if(o.op>0){
+  // The stay, drawn along +x from its pivot loop: twisted links between wrapped eyes, beads on the links, a scroll at the end.
+  const dx=g.Q.x-g.P.x,dy=g.Q.y-g.P.y,L=Math.hypot(dx,dy)||1,phi=Math.atan2(dy,dx)+o.lift*8/L+o.arr*.3,ang=(s>0?phi:-phi)*180/Math.PI;
+  const e=g.eyes,stops=[0,...e],end=e[3]+WS_R+8,m=o.arr>0||turn?'hot':'copper';let st='';
+  for(let k=0;k<4;k++){const x0=stops[k]+WS_R+.4,x1=stops[k+1]-WS_R;if(x1>x0+1)st+=twisted(`M${f(x0)} 0H${f(x1)}`,m,2.3)}
+  st+=twisted(`M${f(e[3]+WS_R)} 0H${f(end)}`,m,2.3)+wire(spiral(end+4,0,4,1.5,1,Math.PI),m,1.2);
+  st+=wire(circ(0,0,WS_R+.6),m,1.35);let bands=band(WS_R+2.6,0,false,2,5.8,1.7);
+  // Each eye's neck wraps sit either side of it, where the link is long enough to take them (a shaded strip packs the eyes close).
+  e.forEach((x,k)=>{st+=wire(circ(x,0,WS_R),m,1.3);const lo=x-stops[k],hi=(k<3?e[k+1]:end+4)-x;
+   if(lo>2*WS_R+10)bands+=band(x-WS_R-2.4,0,false,2,5.8,1.7);if(hi>2*WS_R+10)bands+=band(x+WS_R+2.4,0,false,2,5.8,1.7)});
+  st+=wire(bands,'brass',.85);
+  // A carnelian between gold seeds on the long first link, then a pearl on each short link if there is room.
+  const room=(a,b)=>b-a-2*(WS_R+4.2),r0=clamp(room(0,e[0])/6,0,3.9);
+  if(r0>1.5){const x=e[0]/2;st+=strandItem({k:'seed',r:1.5,stone:'gold'},x-r0-2.4,0)+strandItem({k:'bead',r:f(r0),stone:'carn'},x,0)+strandItem({k:'seed',r:1.5,stone:'gold'},x+r0+2.4,0)}
+  for(let k=0;k<3;k++){const r=clamp((room(e[k],e[k+1])-1)/2.2,0,3.3);if(r>1.3)st+=strandItem({k:'bead',r:f(r),stone:'pearl'},(e[k]+e[k+1])/2,0)}
+  if(o.glint>0&&o.glint<1)st+=sparkle(end*o.glint,0,Math.sin(Math.PI*o.glint)*.55);
+  out+=`<g transform="translate(${f(Pw.x)} ${f(Pw.y)}) rotate(${f(ang)})" opacity="${f(o.op)}">${st}</g>`;
+  if(o.clank>0){const q=J2(g.Q);out+=sparkle(q.x-6,q.y-s*4,o.clank*.6)}
+  if(o.hit)out+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Wrapped-eye stay: drag it or press the arrow keys to swing GitDiscuss in 15 degree steps; tap it or press Enter to release" transform="translate(${f(Pw.x)} ${f(Pw.y)}) rotate(${f(ang)})"><title>Drag the stay to set the angle; tap it to release</title><rect x="-10" y="-11" width="${f(end+22)}" height="22" rx="9" fill="transparent" style="cursor:grab;touch-action:none"/><rect class="ringfocus" x="-10" y="-11" width="${f(end+22)}" height="22" rx="9" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+ }
+ // Over the stay: the pin's balled tip through its eye, and the cap on GitDiscuss's post through the pivot loop.
+ if(gr>=1)out+=`<circle cx="${f(Qt.x)}" cy="${f(Qt.y)}" r="1.9" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".5"/><circle cx="${f(Pw.x)}" cy="${f(Pw.y)}" r="2.2" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".5"/>`;
+ return out+'</g>';
+}
+function wsOver(c){
+ const jt=c.jt,h=c.h,now=performance.now(),A=model.angle,turn=model.turning&&pivotOn(),moving=!reduce.matches;
+ const th=jt===0?0:swingAt(jt),s=Math.sign(th)||Math.sign(A)||1;let out='';
+ if(jt===0){
+  this.lt=null;this.side=s;this.fade=null;
+  const g=wsGeo(c,0,s);
+  if(c.ghost>0){
+   // The ghost shows the stay as it will sit, at the set angle.
+   const G=wsGeo(c,A,s),Q=G.toW(G.Q),P=G.toW(G.P),Qr=G.toW({x:-WS_U,y:G.root}),Pr=G.toW(G.rotG(WS_U,G.root)),ux=(Q.x-P.x),uy=(Q.y-P.y),L=Math.hypot(ux,uy)||1,R0=6*brS(h);
+   let d=circ(G.O.x,G.O.y,f(R0))+`M${f(Qr.x)} ${f(Qr.y)}L${f(Q.x)} ${f(Q.y)}M${f(Pr.x)} ${f(Pr.y)}L${f(P.x)} ${f(P.y)}`;
+   const at=t=>({x:P.x+ux/L*t,y:P.y+uy/L*t}),e1=at(G.eyes[3]+WS_R+8);d+=`M${f(P.x)} ${f(P.y)}L${f(e1.x)} ${f(e1.y)}`;
+   for(const t of G.eyes){const q=at(t);d+=circ(q.x,q.y,WS_R)}
+   out+=`<path d="${d}" fill="none" stroke="#ffe3a8" stroke-width="1.1" stroke-dasharray="3 3" opacity="${f(c.ghost*.85)}"/>`;
+  }
+  // Near: the frames glimmer where the posts will stand.
+  else if(model.glow>0){const bo={x:c.b.x-c.a.x-W-10,y:c.b.y-c.a.y},a=g.toW({x:-WS_U,y:g.root}),q=g.toW({x:WS_U,y:g.root}),b={x:q.x+bo.x,y:q.y+bo.y},k=model.glow;
+   for(const p of [a,b])out+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="9" fill="#ffb15e" opacity="${f(k*.6)}" filter="url(#soft)"/>`+sparkle(p.x,p.y-s*2,k*.45)}
+  return out;
+ }
+ // The brass jump ring at the corner, as on the briolette fan: it threads both eyes and twists shut as the pendants close.
+ const R0=6*brS(h),O={x:c.a.x+W+5,y:c.a.y+brPy(s,h)},base=s>0?-90:90,shut=ease(seg(jt,.38,.5)),gap=jt<1?1.3*(1-shut):0,rm=jt<1&&shut<1||turn?'hot':'brass',rop=jt<1?seg(jt,.12,.3):1;
+ if(gap<.02)out+=wire(circ(O.x,O.y,f(R0)),rm,1.5*brS(h),rop);
+ else{const g0=(base+180)*Math.PI/180,a0=g0+gap/2,a1=g0+2*Math.PI-gap/2;out+=wire(`M${f(O.x+R0*Math.cos(a0))} ${f(O.y+R0*Math.sin(a0))}A${f(R0)} ${f(R0)} 0 1 1 ${f(O.x+R0*Math.cos(a1))} ${f(O.y+R0*Math.sin(a1))}`,rm,1.5*brS(h),rop)}
+ const sp=Math.sin(Math.PI*seg(jt,.48,.56));if(sp>.03)out+=sparkle(O.x,O.y+(s>0?R0:-R0),sp*.55);
+ if(jt<1){
+  this.lt=null;this.side=s;this.fade=null;
+  const u=seg(jt,.56,.7);
+  return out+wsSide(c,th,s,{grow:ease(seg(jt,.4,.56)),op:seg(jt,.56,.62),arr:Math.pow(1-u,2)*(1-u),lift:1-seg(jt,.92,.95)*seg(jt,.92,.95),kin:seg(jt,.95,1),clank:model.dir>0?Math.sin(Math.PI*seg(jt,.945,.985)):0,glint:seg(jt,.95,1)});
+ }
+ // Joined: lifted while GitDiscuss swings (a drag or a step), dropped onto the nearest eye as soon as it stops.
+ const want=model.snapTo!=null||drag&&drag.mode==='angle'&&drag.moved?1:0;
+ if(this.lt==null){this.lt=want;this.l0=this.lv=want;this.ts=-1e9}
+ if(want!==this.lt){this.l0=this.lv;this.lt=want;this.ts=now;if(moving)wsKick(now+(want?160:480))}
+ const u=moving?clamp((now-this.ts)/(want?140:190)):1,lift=this.lv=lerp(this.l0,this.lt,want?ease(u):u*u);
+ const ct=(now-this.ts-190)/260,clank=!want&&moving&&ct>0&&ct<1?Math.sin(Math.PI*ct):0;
+ // Crossing level, the old side fades out as the new one fades in.
+ if(this.side!==s){if(this.side&&moving){this.fade={s:this.side,t0:now};wsKick(now+260)}this.side=s}
+ let fin=1;
+ if(this.fade){const t=clamp((now-this.fade.t0)/240);if(t>=1)this.fade=null;else{fin=t;out+=wsSide(c,0,this.fade.s,{grow:1,op:1,lift:1,arr:0,kin:1,clank:0,glint:0,fade:1-t})}}
+ return out+wsSide(c,th,s,{grow:1,op:1,lift,arr:0,kin:1,clank,glint:0,hit:true,fade:fin});
+}
+let wsLoop=false;
+function wsKick(until){const j=JOINS.wstay;j.until=Math.max(j.until||0,until);if(wsLoop)return;wsLoop=true;
+ requestAnimationFrame(function st(now){if(model.join!=='wstay'||model.jt!==1||now>j.until){wsLoop=false;render();return}render();requestAnimationFrame(st)})}
+// The angle tag, just outside the middle of the stay.
+function wsTag(c){
+ const A=model.angle,s=Math.sign(A)||1,g=wsGeo(c,A,s),P=g.toW(g.P),Q=g.toW(g.Q),up=(JOINS.wstay.lv??0)>.5;
+ const tx=clamp((P.x+Q.x)/2,110,1090),ty=clamp((P.y+Q.y)/2-s*34,20,585),eye=n=>Math.round(Math.abs(n)/15)+1+' of 4',lab=signed(A)+' · '+(up?'lifted, to eye '+eye(snapGoal()):'on eye '+eye(A));
+ return `<rect x="${f(tx-98)}" y="${f(ty-11)}" width="196" height="22" rx="6" fill="url(#st-slab)"/>`+wire(rrect(tx-98,ty-11,196,22,6),'copper',1.1)+
+  `<text x="${f(tx)}" y="${f(ty+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-size="14" fill="#f2b866">${lab}</text>`;
+}
 /* ---------- Spool and claw ---------- */
 // The three hauls (each a turn of the crank) as join progress; the claw is cast over .12–.30 and bites over .30–.36.
 const RL_HV=[[.41,.51],[.59,.69],[.77,.87]];
@@ -1614,7 +1738,8 @@ const coilT=(jt,i)=>({leap:ease(seg(jt,.12+.05*i,.27+.05*i)),taut:ease(seg(jt,.3
 /* ---------- Pivot geometry ---------- */
 // Displayed swing in degrees: level until the ring is shut, then a damped swing that lands exactly on model.angle.
 // Shared by every angled join (JOINS[...].angle): Jump-ring pivot, Caged ball joint, Bent wire and Pearl stays.
-// Optional hooks, set only by the Briolette fan: `bend` (its own stepped swing), `py` (pivot height on the casing), `peak`, `max` and `snap` (hard steps that replace the detents).
+// Optional hooks, set by the Briolette fan and the Wrapped-eye stay: `bend` (its own stepped swing), `py` (pivot height on the casing), `peak`, `max` and `snap` (hard steps that replace the detents);
+// the stay also sets `pad` (room beyond the casings) and `grab`/`gain` (a grab on the join turns about another point, scaled).
 function swingAt(jt){
  const A=J().angle;if(!A)return 0;if(A.bend)return A.bend(jt);
  const u=seg(jt,A.swing,1);if(u<=0)return 0;const k=Math.pow(1-u,2);
@@ -1625,6 +1750,8 @@ const pivY=(A,th,h)=>A.py?A.py(th,h):h/2;
 function pivotSpan(th,h){
  const A=J().angle||JOINS.pivot.angle,r=th*Math.PI/180,py=pivY(A,th,h),ly=py+A.ring*Math.sin(r/2);let lo=0,hi=h;
  for(const x of [A.x0,W+A.x0])for(const y of [-py,h-py]){const v=ly+x*Math.sin(r)+y*Math.cos(r);lo=Math.min(lo,v);hi=Math.max(hi,v)}
+ // A join with parts beyond the casings (the wrapped-eye stay's posts) asks for room on the side they stand.
+ if(A.pad){if((Math.sign(th)||Math.sign(model.angle)||1)>0)lo-=A.pad();else hi+=A.pad()}
  return [lo,hi];
 }
 const fitY=(y,th,h)=>{const [lo,hi]=pivotSpan(th,h);return clamp(y,46-lo,590-hi)};
@@ -1657,8 +1784,10 @@ function tweenAngle(to,ms=260){
 // Where a hard-step join is headed: the step a running tween will land on, else the nearest step.
 const snapGoal=()=>model.snapTo??nearestDetent(model.angle);
 const signed=v=>{v=Math.round(v);return(v>0?'+':v<0?'−':'')+Math.abs(v)+'°'};
+// The point a turn is measured about: the join's own grab point for a grab on the join (tap drags), else the pivot.
+const turnO=d=>{const A=J().angle;return d.tap&&A.grab?A.grab(ctx()):A.origin(ctx())};
 function startTurn(d,p){
- model.snapTo=null;const L=J().angle.origin(ctx());Object.assign(d,{mode:'angle',L,psi0:Math.atan2(p.y-L.y,p.x-L.x),th0:model.angle,raw:model.angle,last:p,group:false});
+ model.snapTo=null;const L=turnO(d);Object.assign(d,{mode:'angle',L,psi0:Math.atan2(p.y-L.y,p.x-L.x),th0:model.angle,raw:model.angle,last:p,group:false});
  ++settleTok;clearTimeout(turnTimer);if(!d.tap){model.turning=true;say(J().sayTurn)}render();
 }
 function stepAngle(dir){
@@ -3483,7 +3612,7 @@ function vineRender(el,svg){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c,page:0},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30,stays:-15,brio:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0,dir:1};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c,page:0},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30,stays:-15,brio:30,wstay:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0,dir:1};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -3620,7 +3749,7 @@ function options(row,set,key,aboutEl){
 // `chosen` is a click on the option itself (not the S key cycling past it).
 function pick(key,id,chosen){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;model.snapTo=null;model.dir=1;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);if(id==='brio')JOINS.brio.shown=brCount(model.angle);model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}if(JOINS[id].phase){JOINS[id].rel=false;JOINS[id].lastJt=model.jt}if(JOINS[id].lockTo)Object.assign(JOINS[id],{lk:1,lkWant:1,lkTok:JOINS[id].lkTok+1,glint:0})}
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;model.snapTo=null;model.dir=1;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);if(id==='brio')JOINS.brio.shown=brCount(model.angle);if(id==='wstay')JOINS.wstay.lt=null;model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}if(JOINS[id].phase){JOINS[id].rel=false;JOINS[id].lastJt=model.jt}if(JOINS[id].lockTo)Object.assign(JOINS[id],{lk:1,lkWant:1,lkTok:JOINS[id].lkTok+1,glint:0})}
  if(key==='shade'){const was=model.shade;model.shade=id;
   // Hoop rim · tree needs a hoop: an unshaded Checks grows into a hoop tree (from the tree morph) so there is one to sink into.
   if(chosen&&id==='rimtree'&&was!==id&&model.st<.5&&!(model.morph==='tree'&&model.g>1.999)){
@@ -3705,13 +3834,13 @@ stage.addEventListener('pointermove',e=>{
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?stripH(false):H)-14;
  if(drag.mode==='angle'){
   // The pair may have shifted to stay on stage, so measure from where Jarvis's loop is now.
-  const L=J().angle.origin(ctx());
+  const L=turnO(drag);
   // A bead grab is a tap until it moves; right over the bead's centre the turn is re-anchored rather than jumping.
   if(drag.tap&&!drag.moved){if(Math.hypot(p.x-drag.start.x,p.y-drag.start.y)<=4){drag.last=p;return}drag.moved=true;model.turning=true;say(J().sayTurn)}
   if(Math.hypot(p.x-L.x,p.y-L.y)<8){drag.inner=true;drag.last=p;return}
   if(L.y!==drag.L.y||drag.inner){drag.th0=drag.raw;drag.psi0=Math.atan2((drag.inner?p:drag.last).y-L.y,(drag.inner?p:drag.last).x-L.x);drag.L=L;drag.inner=false}
   let dp=Math.atan2(p.y-L.y,p.x-L.x)-drag.psi0;dp=Math.atan2(Math.sin(dp),Math.cos(dp));
-  drag.raw=clamp(drag.th0+dp*180/Math.PI,-lim(),lim());drag.last=p;
+  drag.raw=clamp(drag.th0+dp*180/Math.PI*(drag.tap&&J().angle.gain||1),-lim(),lim());drag.last=p;
   const was=model.angle;setAngle(snapAngle(drag.raw));
   if(J().angle.snap)return;
   if(model.detent&&model.angle%model.detent===0&&was!==model.angle)say('Caught on the '+$('#angleOut').textContent+' detent.');return}
