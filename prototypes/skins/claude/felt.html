@@ -220,7 +220,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -1119,6 +1119,8 @@ const hingeOn=()=>!!J().angled&&model.jt===1;
 // Displayed bend: flat until the joint is made, then a soft felt flop that settles on model.angle.
 function bendAt(jt){
  const j=J();if(!j.angled)return 0;
+ // A join that opens in steps (the cheese wedge) supplies its own swing.
+ if(j.bend)return j.bend(jt);
  const u=seg(jt,j.swingAt,1);if(u<=0)return 0;
  // The pin's overshoot is capped so GitDiscuss's corner never swings into Jarvis.
  const v=model.angle*(1-Math.pow(1-u,2.5)*Math.cos(2.4*Math.PI*u));
@@ -1162,7 +1164,8 @@ function hingeSpan(th,h){
 }
 const fitHinge=(y,th,h)=>{const[lo,hi]=hingeSpan(th,h);return clamp(y,46-lo,590-hi)};
 // The flop overshoots to about 1.25 times the angle, so a fresh join is fitted for that peak too.
-const peakBend=()=>1.25*model.angle;
+// A join that lifts past its angle (the cheese wedge) says how far.
+const peakBend=()=>J().peak?J().peak(model.angle):1.25*model.angle;
 const signed=v=>{v=Math.round(v);return(v>0?'+':v<0?'−':'')+Math.abs(v)+'°'};
 
 /* ---------- Button tab geometry ---------- */
@@ -2597,6 +2600,119 @@ JOINS.sock={label:'Sock heel',kind:'Angle · short rows',gap:SK.gap,ms:4800,msDr
  }
 };
 
+/* ---------- Cheese wedge: felt play-food cheese slices are Velcroed into the wedge, one per 15° (Wedge) ---------- */
+// Felt play food comes apart on Velcro, and a wedge of cheese is slices stuck together. Here the wedge between the cushions is
+// built of 15° slices of yellow felt cheese with a red wax rind, each pushed in and pressed shut, so the angle is counted in
+// slices and held by what is in the gap rather than by a pivot's friction. Each joining end carries a Velcro tab (soft loops on
+// Jarvis, grey hooks on GitDiscuss); at 0° the tabs simply meet. The pivot is the inside corner, mid-gap, as on the godet fan.
+const CZ={max:45,det:15,n:3,popMs:420,tr:{n:null,pop:null},tok:0,
+ face:['#f0c446','#e8b63a','#f4cc55'],
+ // Holes per slice: [fraction of the radius, fraction across the slice, radius].
+ holes:[[[.5,.34,2.6],[.74,.7,1.7],[.38,.76,1.3]],[[.62,.42,2.3],[.44,.78,1.6],[.8,.22,1.2]],[[.54,.64,2.8],[.77,.3,1.4],[.38,.24,1.1]]],
+ fluff:[[-.6,-.8,.2],[.4,-1,.9],[1,-.3,1.6],[-1,.2,2.3],[.2,.9,3]]};
+// Slices for an angle, and (while it is dragged) how many fit: the next one goes in once there is nearly room for it.
+const czN=th=>clamp(Math.round(Math.abs(th)/CZ.det),0,CZ.n);
+const czCount=th=>clamp(Math.floor((Math.abs(th)+4)/CZ.det),0,CZ.n);
+// Joining after the tabs meet: one step per slice. k is the slice going in, u how far through its step.
+function czStep(jt){const n=czN(model.angle);if(jt<.4||jt>=1||!n)return null;const x=seg(jt,.4,1)*n,k=Math.min(n-1,Math.floor(x));return{n,k,u:x-k}}
+// GitDiscuss lifts 6° past the slice's far face, holds while it slides in, then presses down onto it with a little squash.
+function czBend(jt){
+ if(jt>=1)return model.angle;const S=czStep(jt);if(!S)return 0;
+ const {k,u}=S,a=k*CZ.det,b=a+CZ.det,top=b+6,v=u<.3?lerp(a,top,ease(u/.3)):u<.68?top:lerp(top,b,backOut(seg(u,.68,1)));
+ return fanSg(model.angle)*v;
+}
+// One slice: apex at P pushed out d along its middle, from stage angle a0 (degrees) through span (signed), radius R.
+function czSlice(P,a0,span,R,d,s,i){
+ if(Math.abs(span)<.3)return'';
+ const mid=(a0+span/2)*Math.PI/180,Q={x:P.x+d*Math.cos(mid),y:P.y+d*Math.sin(mid)};
+ const O=(deg,r)=>({x:Q.x+r*Math.cos(deg*Math.PI/180),y:Q.y+r*Math.sin(deg*Math.PI/180)});
+ const a1=a0+span,sw=span>0?1:0,arc=r=>`M${pt(O(a0,r))}A${f(r)} ${f(r)} 0 0 ${sw} ${pt(O(a1,r))}`,k=Math.min(1,Math.abs(span)/CZ.det);
+ const body=`M${pt(Q)}L${pt(O(a0,R))}A${f(R)} ${f(R)} 0 0 ${sw} ${pt(O(a1,R))}Z`;
+ let o=`<path d="${body}" fill="#000" opacity=".34" filter="url(#sh)" transform="translate(1.2 2.4)"/><path d="${body}" fill="${CZ.face[i%3]}" filter="url(#tagfelt)"/>`;
+ // Holes, recessed: a dark rim up and to the left, the floor catching the light. They squeeze with the slice.
+ for(const [rf,af,rr] of CZ.holes[i%3]){const p=O(a0+span*af,R*rf),r=rr*s*(.55+.45*k);
+  o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r)}" fill="#a86e16"/><circle cx="${f(p.x+.3*r)}" cy="${f(p.y+.35*r)}" r="${f(.7*r)}" fill="#d8a02e"/>`}
+ // Cut faces: a line of shade along each, and the Velcro hooks on the far one as a pale fuzz.
+ o+=`<path d="M${pt(Q)}L${pt(O(a0,R-1))}M${pt(Q)}L${pt(O(a1,R-1))}" stroke="#94620f" stroke-opacity=".6" stroke-width="1"/>`+
+  `<path d="M${pt(O(a1,R*.14))}L${pt(O(a1,R-6*s))}" stroke="#fff4d6" stroke-opacity=".7" stroke-width="1.6" stroke-dasharray=".9 1.3"/>`;
+ // Red wax rind round the outside, with a cream running stitch just inside it.
+ o+=`<path d="${arc(R-2.3*s)}" fill="none" stroke="#6e1b18" stroke-width="${f(5.6*s)}"/><path d="${arc(R-2.3*s)}" fill="none" stroke="#c43a2d" stroke-width="${f(4.2*s)}"/>`+
+  `<path d="${arc(R-3.3*s)}" fill="none" stroke="#f08a6c" stroke-opacity=".55" stroke-width=".8"/>`+
+  `<path d="${arc(R-7*s)}" fill="none" stroke="#fff6e2" stroke-opacity=".8" stroke-width=".9" stroke-dasharray="2.2 1.8"/>`;
+ return o;
+}
+// A Velcro tab sewn on a joining end, x0 to x1 across, running R from the pivot height y0 (dir −1 up, 1 down).
+function czTab(x0,x1,y0,R,dir,hooks,thread,fluff){
+ const x=Math.min(x0,x1),w=Math.abs(x1-x0),y=dir<0?y0-R:y0,rc=`x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(R)}" rx="2.4"`;
+ let o=`<rect ${rc} fill="#000" opacity=".3" filter="url(#sh)" transform="translate(.8 1.6)"/><rect ${rc} fill="${hooks?'#e0dbcd':'#f2ecdd'}" filter="url(#tagfelt)"/>`,d='';
+ // Loops are a soft fuzz that stands up when the hooks come near; hooks are rows of tiny grey crooks.
+ for(let i=0;i<3;i++){const xx=x+w*(i+.5)/3;d+=`M${f(xx)} ${f(y+2.5)}V${f(y+R-2.5)}`}
+ o+=`<path d="${d}" stroke="${hooks?'#8e897d':'#c4b89c'}" stroke-width="${hooks?1.1:f(1.4+1.2*fluff)}" stroke-dasharray="${hooks?'1 1.8':'.6 .9'}" stroke-linecap="round"/>`+
+  `<rect x="${f(x+1.3)}" y="${f(y+1.3)}" width="${f(w-2.6)}" height="${f(R-2.6)}" rx="1.6" fill="none" stroke="${thread}" stroke-width=".8" stroke-dasharray="2 1.5"/>`;
+ return o;
+}
+// Fibres torn loose where Velcro meets or rips, at p, u from 0 to 1.
+function czPuff(p,u){
+ let o='';CZ.fluff.forEach(([dx,dy,rot],i)=>{const x=p.x+dx*12*(.4+u),y=p.y+dy*10*(.5+u)+10*u*u;
+  o+=`<path d="M-3.5 0q1.2-2.6 2.4 0t2.4 0t2.4 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+u*90)})" fill="none" stroke="${i%2?'#f4cc55':'#efe8d6'}" stroke-width="1.1" stroke-linecap="round" opacity="${f(1-u)}"/>`});
+ return o;
+}
+JOINS.cheese={label:'Cheese wedge',kind:'Angle · wedge',gap:FN.gap,moveEnd:.3,angled:true,frame:fanFrame,cap:true,amax:CZ.max,astep:CZ.det,det:CZ.det,swingAt:.4,bend:czBend,
+ peak:a=>Math.sign(a)*Math.max(1.25*Math.abs(a),Math.abs(a)+6),
+ // At 0° there is no cheese to put in, so the join is just the Velcro and takes less time.
+ get ms(){return czN(model.angle)?4600:2000},get msDrag(){return czN(model.angle)?4100:1700},get relMs(){return czN(model.angle)?3600:1500},
+ get hold(){return czN(model.angle)?.55:.35},
+ get ph(){return czN(model.angle)?[[0,.3,.4,1],[0,.16,.24,1]]:[[0,.3,.4,1],[0,.55,.85,1]]},
+ about:'Felt play food comes apart on Velcro, and a felt cheese is a wheel of slices stuck together. Here the wedge between the cushions is <b>built of 15° slices of cheese</b>: yellow felt with recessed holes, a red wax rind round the outside and a cream running stitch inside it. The angle is counted in slices and held by what is in the gap, not by a pivot\'s friction. Each joining end carries a Velcro tab, soft cream loops on Jarvis and grey hooks on GitDiscuss. <b>Near:</b> Jarvis\'s loops fluff up and a slice of cheese hovers over the gap. <b>Ready:</b> a dashed ghost of the wedge, slice lines and all. Joining (12 fps): the cushions close in and the tabs are pressed together with a puff of fibres. Then, for each slice, GitDiscuss is lifted a little past where the slice will end, the slice is pushed in point first, and GitDiscuss is pressed down onto it with a squash and a puff. <b>Angle:</b> −45° to +45° in 15° steps: none, one, two or three slices; for + angles the wedge opens upward, for − angles downward. Drag GitDiscuss\'s nameplate, use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓. Open it and the next slice pops in once there is nearly room, squashed until GitDiscuss settles; close it and the top slice is squeezed out and drops away. A cotton tag shows the angle in cross-stitch while it turns. Jarvis\'s nameplate still moves the pair. <b>Release:</b> tap the cheese (or focus it and press Enter). The slices come out last in, first out, GitDiscuss lifting off each one, then the tabs rip apart and the cushions part.',
+ sayJoin:'The tabs are pressed together, then the cheese goes in a slice at a time.',
+ sayJoined:'Joined by a cheese wedge. Each slice is 15°. Drag GitDiscuss\'s nameplate to add or squeeze out slices; drag Jarvis to move the pair. Tap the cheese to pull it apart.',
+ sayRelease:'The slices come out one by one, the Velcro rips and the cushions part.',
+ sayReady:'Ready: release to fill the gap with cheese.',sayNear:'Nearby: the Velcro loops fluff up and a slice of cheese hovers over the gap. Move closer.',
+ get sayHold(){return czN(model.angle)?'Held mid-slice: a slice of cheese is being pushed in. Use the scrubber to step through it.':'Held mid-press: the Velcro tabs are being pressed together. Use the scrubber to step through it.'},phReady:'Ready · release to wedge the cheese in',
+ sayBend:'Opening the cheese wedge.',turnWord:'Opening',
+ pose:()=>({th:0,ys:0,sq:0}),
+ phase(jt){
+  const S=czStep(jt);
+  if(model.dir<0&&model.busy)return S?`Releasing · slice ${S.k+1} of ${S.n} · `+(S.u>.7?'lifting GitDiscuss off it':S.u>.3?'pulling it out':'closing on the next'):jt>.3?'Releasing · ripping the Velcro':'Releasing · parting';
+  if(jt<.3)return'Joining · closing in';
+  if(!S)return czN(model.angle)?'Joining · pressing the Velcro together':'Joining · Velcro pressed together, flat at 0°';
+  return `Joining · slice ${S.k+1} of ${S.n} · `+(S.u<.3?'lifting GitDiscuss':S.u<.7?'pushing it in':'pressing it shut');
+ },
+ over(c){
+  const a=c.a,b=c.b,h=c.h,jt=c.jt,s=pinScale(h),th=bendAt(jt),F=fanFrame(th,h),sg=F.sg,R=fanR(h),A0=sg>0?-90:90,now=performance.now();
+  const P={x:a.x+W+FN.gap/2,y:a.y+F.oy},Pb={x:b.x-FN.gap/2,y:b.y+F.oy},fr=Math.floor(now/FRAME)%2,g=jt===0?c.glow:0;
+  const O=(deg,r)=>({x:P.x+r*Math.cos(deg*Math.PI/180),y:P.y+r*Math.sin(deg*Math.PI/180)}),sw=sg>0?1:0;
+  const wedge=sp=>`M${pt(P)}L${pt(O(A0,R))}A${f(R)} ${f(R)} 0 0 ${sw} ${pt(O(A0+sp,R))}Z`;
+  let o='';
+  // Ready: a ghost of the finished wedge at the set angle, with its slice lines.
+  if(c.ghost>0&&jt===0){const gn=czN(model.angle),gd=wedge(sg*Math.max(6,gn*CZ.det));let ln='';for(let i=1;i<gn;i++)ln+=`M${pt(P)}L${pt(O(A0+sg*i*CZ.det,R))}`;
+   o+=`<path d="${gd}" fill="#ffc36a" opacity="${f(c.ghost*.4)}" filter="url(#soft)"/><path d="${gd}${ln}" fill="#f4cc55" fill-opacity=".16" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="4 3"/>`}
+  // The tabs: loops on Jarvis's end, hooks on GitDiscuss's, turning with it.
+  o+=czTab(a.x+W-1,P.x-.5,P.y,R,-sg,false,'#1d4c48',g*(fr?1:.6))+`<g transform="rotate(${f(th)} ${f(Pb.x)} ${f(Pb.y)})">${czTab(Pb.x+.5,b.x+1,Pb.y,R,-sg,true,'#a63a50',0)}</g>`;
+  // How many slices are in, and the one moving: pushed in or pulled out while joining, popped in or squeezed out while dragged.
+  const S=czStep(jt),T=CZ.tr;let n=0,mv=null,pop=null;
+  if(jt===1){n=czCount(th);
+   if(T.n!==null&&n!==T.n&&!reduce.matches){T.pop={t:now,dir:Math.sign(n-T.n),i:n>T.n?n-1:T.n-1};const tk=++CZ.tok;setTimeout(()=>stepped(CZ.popMs,()=>render(),tk,k=>k===CZ.tok),0)}
+   T.n=n;if(T.pop){const e=(now-T.pop.t)/CZ.popMs;if(e<1)pop={...T.pop,e:Math.max(0,e)};else T.pop=null}}
+  else{T.n=null;T.pop=null;if(S){n=S.k+(S.u>=.7?1:0);if(S.u>.25&&S.u<.7)mv={i:S.k,d:R*1.15*(1-ease(seg(S.u,.25,.7))),op:seg(S.u,.25,.36)}}}
+  // Slices in the gap share it: each is 15°, squashed while GitDiscuss presses down or the gap is narrower than they are.
+  const w=n?Math.min(CZ.det,Math.abs(th)/n):0;
+  for(let i=0;i<n;i++){const d=pop&&pop.dir>0&&i===pop.i?R*.9*(1-ease(pop.e)):0;o+=czSlice(P,A0+sg*w*i,sg*w,R,d,s,i)}
+  if(mv)o+=`<g opacity="${f(mv.op)}">${czSlice(P,A0+sg*CZ.det*mv.i,sg*CZ.det,R,mv.d,s,mv.i)}</g>`;
+  if(pop&&pop.dir<0){const e=pop.e;o+=`<g opacity="${f(1-e*e)}" transform="translate(0 ${f(34*e*e)})">${czSlice(P,A0+sg*CZ.det*pop.i,sg*CZ.det,R,R*(.15+.9*e),s,pop.i)}</g>`}
+  // Near: a slice hovers over the gap, bobbing a frame at a time.
+  if(g>.02)o+=`<g opacity="${f(clamp(g*1.4))}">${czSlice(P,A0,sg*CZ.det,R,R*(1.7-.45*g)+(fr?2.5:0),s,0)}</g>`;
+  // Fibres: where the tabs meet, and at the outside of each slice as GitDiscuss is pressed onto it.
+  if(jt>.3&&jt<.4)o+=czPuff({x:P.x,y:P.y-sg*R*.5},seg(jt,.3,.4));
+  if(S&&S.u>.68&&S.u<.92)o+=czPuff(O(A0+sg*(S.k+1)*CZ.det,R*.72),seg(S.u,.68,.92));
+  if(jt===1){const d=wedge(sg*Math.max(Math.abs(th),6));
+   o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Cheese wedge: tap or press Enter to pull the slices out and separate the widgets"><title>Tap the cheese to pull it apart</title><path d="${d}" fill="transparent" stroke="transparent" stroke-width="14" stroke-linejoin="round"/><path class="ringfocus" d="${d}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+  // While it turns: the angle in cross-stitch on a pinned cotton tag on the wedge's open side (the other side if that leaves the desktop).
+  if(model.turning&&jt===1){const up=sg>0?a.y-34>50:a.y+h+40>590;o+=xTag(P.x,up?a.y-26:a.y+h+26,signed(th).replace('−','-'))}
+  return o;
+ }
+};
+
 /* ---------- Bees: felt bees festoon across the gap and draw out a little comb (Swarm) ---------- */
 // Nothing is fixed to either cushion. Honeybees bridge gaps by hanging on to each other's legs in chains (festooning),
 // and festoons are where they make wax: so two chains of five hang between the cushions' ends, and a three-cell comb
@@ -3627,7 +3743,7 @@ const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...H
 let anim=0,shadeAnim=0,morphSwitch=0,drag=null,togDrag=null;
 const J=()=>JOINS[model.join];
 // Each angled join keeps its own angle while another join is picked.
-const ANG={hinge:-20,pin:15,bjoint:-15,fan:30,sock:30};
+const ANG={hinge:-20,pin:15,bjoint:-15,fan:30,sock:30,cheese:30};
 let angAnim=0;
 
 const hingeY=y=>fitHinge(fitHinge(y,peakBend(),ctx().h),model.angle,ctx().h);
