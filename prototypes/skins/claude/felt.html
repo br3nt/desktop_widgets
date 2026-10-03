@@ -208,7 +208,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -909,6 +909,90 @@ function bedDraw(id,w,h,small,st){
   const zs=(small?4:5)+i*1.4,x=G.cx0+(small?4:6)+p*(16+i*7)+Math.sin(p*7+i)*2,y=G.cy0-2-p*(20+i*6),o=Math.sin(Math.PI*p);
   const zd=`M${f(x-zs/2)} ${f(y-zs/2)}H${f(x+zs/2)}L${f(x-zs/2)} ${f(y+zs/2)}H${f(x+zs/2)}`;
   t+=`<g opacity="${f(o)}" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${zd}" stroke="#2a1608" stroke-opacity=".45" stroke-width="${f(zs*.42+1)}" transform="translate(.5 .9)"/><path d="${zd}" stroke="#f3e6c8" stroke-width="${f(zs*.42)}"/><path d="${zd}" stroke="${B.ink2}" stroke-width=".6" stroke-dasharray="1.2 1.2"/></g>`}
+ return wrap(t+fibres);
+}
+
+/* ---------- Washing line shade ---------- */
+// The cushion is pegged out to air. It lets its stuffing out and draws in from its ends, two turned wooden props pop up
+// there and a twisted cotton line is strung between them. The flat felt gathers up onto the line, then drops down the
+// front folded over it, with its back half peeking out below. Two spring pegs clip it on, and the cotton laundry name tape
+// on its face is woven with the name and stitched with the value. One gust sways it and it settles, so the resting strip
+// is still. Taking it in runs the other way: the pegs spring off, the felt is lifted off the line, the props fold away.
+function lineParts(st,small){
+ const H0=small?CH:H,HF=small?46:56,un=model.shDir===0,u=1-st;
+ let dfl,sq=0,fib=0,nar,post,line,fold,drop,peg,emb,sway=0,off=0,bounce=0;
+ if(!un){dfl=ease(seg(st,.04,.22));sq=Math.sin(Math.PI*seg(st,.2,.28))*.08;const fb=seg(st,.2,.34);fib=fb>0&&fb<1?fb:0;
+  nar=ease(seg(st,.24,.32));post=backOut(seg(st,.3,.4));line=ease(seg(st,.4,.47));fold=ease(seg(st,.47,.55));drop=backOut(seg(st,.55,.65));
+  peg=seg(st,.65,.77);emb=seg(st,.77,.88);const k=seg(st,.84,1);sway=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.6):0}
+ else{off=ease(seg(u,0,.14));peg=1;emb=1;drop=1-ease(seg(u,.12,.22));fold=1-ease(seg(u,.22,.32));line=1-ease(seg(u,.32,.4));post=1-ease(seg(u,.4,.5));
+  nar=1-ease(seg(u,.44,.52));dfl=1-ease(seg(u,.52,.76));const k=seg(u,.76,.96);bounce=k>0&&k<1?Math.sin(k*Math.PI*3)*Math.pow(1-k,1.5)*.08:0}
+ return{H0,HF,un,dfl,sq,fib,nar,post,line,fold,drop,peg,emb,sway,off,bounce,h:Math.round(lerp(H0,HF,dfl))};
+}
+// Layout from the strip's final height, so nothing moves once it has landed. ld(x) is the line's sag at x.
+function lineGeo(w,small){
+ const HF=small?46:56,p0=small?8:10,p1=w-p0,ly=small?8:9,sag=small?2.5:3.5,px0=p0+(small?9:12),px1=p1-(small?9:12);
+ return{HF,p0,p1,ly,sag,px0,px1,pb:HF-(small?7:8),th:small?19:23,pg:small?9:11,tin:small?18:22,
+  ld:x=>{const t=(x-p0)/(p1-p0);return ly+sag*4*t*(1-t)}};
+}
+function lineDraw(id,w,h,small,st){
+ const P=lineParts(st,small),s=SKIN[id],G=lineGeo(w,small),{p0,p1,ly,px0,px1,pb}=G;
+ const wrap=t=>{if(P.sq>1e-4)t=`<g transform="translate(${w/2} ${h}) scale(${f((1+P.sq*.12)*1000)/1000} ${f((1-P.sq)*1000)/1000}) translate(${-w/2} ${-h})">${t}</g>`;
+  return P.bounce?`<g transform="scale(1 ${f((1+P.bounce)*1000)/1000})">${t}</g>`:t};
+ let fibres='';
+ if(P.fib)for(const cx of [16,w-16])for(const[dx,dy,rot]of FLUFF){const fx=cx+dx*20*(.4+P.fib),fy=h-6+dy*7*(.6+P.fib)+12*P.fib*P.fib;
+  fibres+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(fx)} ${f(fy)}) rotate(${f(rot*60+P.fib*90)})" fill="none" stroke="${s.body}" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-P.fib)}"/>`}
+ if(P.nar<=0)return wrap(casing(id,w,h)+fibres);
+ const sc=(o,ax,ay,sx,sy)=>`<g transform="translate(${f(ax)} ${f(ay)}) scale(${f(sx*1000)/1000} ${f(Math.max(.02,sy)*1000)/1000}) translate(${f(-ax)} ${f(-ay)})">${o}</g>`;
+ let t=`<defs><linearGradient id="wlw-${id}" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#f3d9a8"/><stop offset=".45" stop-color="#c8955a"/><stop offset="1" stop-color="#7a4f26"/></linearGradient>`+
+  `<radialGradient id="wlk-${id}" cx=".36" cy=".3" r=".8"><stop stop-color="#f6dcaa"/><stop offset=".55" stop-color="#b07a42"/><stop offset="1" stop-color="#5a3414"/></radialGradient></defs>`;
+ // The two turned props, popping up from the table at the ends the felt has drawn in from.
+ if(P.post>0){const rw=small?3.6:4.4,br=small?3:3.6;let o='';
+  for(const x of [p0,p1])o+=`<path d="M${f(x-rw/2)} ${f(ly)}V${G.HF-5}L${f(x-rw/2-3)} ${G.HF-1.5}H${f(x+rw/2+3)}L${f(x+rw/2)} ${G.HF-5}V${f(ly)}Z" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1 1.2)"/>`+
+   `<path d="M${f(x-rw/2)} ${f(ly)}V${G.HF-5}L${f(x-rw/2-3)} ${G.HF-1.5}H${f(x+rw/2+3)}L${f(x+rw/2)} ${G.HF-5}V${f(ly)}Z" fill="url(#wlw-${id})" stroke="#4a2c12" stroke-opacity=".5" stroke-width=".5"/>`+
+   `<path d="M${f(x-rw/2-.6)} ${f(ly+5)}h${f(rw+1.2)}M${f(x-rw/2-.6)} ${G.HF-9}h${f(rw+1.2)}" stroke="#4a2c12" stroke-opacity=".45" stroke-width=".8"/>`+
+   `<circle cx="${f(x+.5)}" cy="${f(ly-br+.6)}" r="${br}" fill="#000" opacity=".3"/><circle cx="${x}" cy="${f(ly-br)}" r="${br}" fill="url(#wlk-${id})" stroke="#4a2c12" stroke-width=".5"/><circle cx="${f(x-br*.35)}" cy="${f(ly-br*1.4)}" r="${f(br*.3)}" fill="#fff" opacity=".45"/>`;
+  t+=Math.abs(P.post-1)<1e-3?o:sc(o,0,G.HF,1,P.post)}
+ // The flat felt draws in from its ends, then gathers up onto the line as it is thrown over.
+ if(P.fold<1){const X0=lerp(0,px0-2,P.nar),X1=lerp(w,px1+2,P.nar),c=`<g transform="translate(${f(X0)} 0)">${casing(id,X1-X0,h)}</g>`;
+  t+=P.fold>0?sc(c,w/2,ly,1,1-P.fold):c}
+ else t+=`<defs>${feltFilters(id,s.seed)}</defs>`;
+ // The twisted cotton line, strung from the left prop to the right one.
+ const cq=`M${p0} ${ly}Q${f(w/2)} ${f(ly+2*G.sag)} ${p1} ${ly}`,lineSvg=P.line>0?`<clipPath id="wlc-${id}"><rect x="${p0-4}" y="0" width="${f((p1-p0+8)*P.line)}" height="${G.HF}"/></clipPath>`+
+  `<g clip-path="url(#wlc-${id})" fill="none" stroke-linecap="round"><path d="${cq}" stroke="#2a1608" stroke-opacity=".35" stroke-width="2.2" transform="translate(.4 1.2)"/><path d="${cq}" stroke="#efe4cc" stroke-width="1.7"/><path d="${cq}" stroke="#a8916a" stroke-width="1.7" stroke-dasharray="1.1 1.9"/>`+
+  `<path d="M${p0-2.6} ${ly-1.2}l5.2 2.4M${p0-2.6} ${ly+1.2}l5.2-2.4M${p1-2.6} ${ly-1.2}l5.2 2.4M${p1-2.6} ${ly+1.2}l5.2-2.4" stroke="#efe4cc" stroke-width="1.2" opacity="${f(seg(P.line,.85,1))}"/></g>`:'';
+ // The felt folded over the line: its back half (the band's felt) peeks out below, the front carries the name tape.
+ if(P.fold>=1&&P.drop>0){const yt=x=>G.ld(x)-2.6,ym=yt(w/2),y0=yt(px0),y1=yt(px1),cy=2*ym-(y0+y1)/2;
+  const front=`M${px0} ${f(y0+3)}Q${px0} ${f(y0)} ${px0+3} ${f(y0-.2)}Q${f(w/2)} ${f(cy)} ${px1-3} ${f(y1-.2)}Q${px1} ${f(y1)} ${px1} ${f(y1+3)}V${pb-6}Q${px1} ${pb} ${px1-6} ${pb}H${px0+5}Q${px0} ${f(pb+.6)} ${px0} ${pb-5}Z`;
+  const back=`M${px0+3} ${pb-10}H${px1-1}V${f(pb+1.5)}Q${px1-1} ${f(pb+4.6)} ${px1-5} ${f(pb+4.6)}H${px0+9}Q${px0+3} ${f(pb+3.8)} ${px0+3} ${pb}Z`;
+  const hy=pb-(small?2:3.5),hem=`M${px0+4.5} ${f(y0+6)}V${hy-1.5}Q${px0+4.5} ${hy} ${px0+8} ${hy}H${px1-8}Q${px1-4.5} ${hy} ${px1-4.5} ${hy-1.5}V${f(y1+6)}`;
+  let p=`<path d="${back}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.6 1.4)"/><path d="${back}" fill="${s.band}" filter="url(#g-${id})"/>`+
+   `<path d="${front}" fill="#000" opacity=".42" filter="url(#sh)" transform="translate(.8 1.6)"/><path d="${front}" fill="${s.body}" filter="url(#f-${id})"/>`+
+   `<path d="M${px0+3} ${f(y0+1.3)}Q${f(w/2)} ${f(cy+1.3)} ${px1-3} ${f(y1+1.3)}" fill="none" stroke="#fff3e2" stroke-opacity=".3" stroke-width="1.6"/><path d="M${px0+2} ${f(y0+4.6)}Q${f(w/2)} ${f(cy+4.6)} ${px1-2} ${f(y1+4.6)}" fill="none" stroke="#1d0f06" stroke-opacity=".14" stroke-width="2"/>`+
+   `<path d="${hem}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.4" stroke-dasharray="4 3" transform="translate(.4 .7)"/><path d="${hem}" fill="none" stroke="#f7e8c9" stroke-opacity=".85" stroke-width="1.2" stroke-dasharray="4 3" stroke-linecap="round"/>`;
+  // The laundry name tape: cream cotton with turned-under ends tacked down, the name woven in red, the value cross-stitched in navy.
+  const tx0=px0+G.tin,tx1=px1-G.tin,tcy=Math.round((ly+G.sag+pb)/2+(small?0:1)),ty=tcy-G.th/2,tw=tx1-tx0;
+  p+=`<rect x="${tx0}" y="${f(ty+1.3)}" width="${tw}" height="${G.th}" rx="1.4" fill="#000" opacity=".35" filter="url(#sh)"/><rect x="${tx0}" y="${ty}" width="${tw}" height="${G.th}" rx="1.4" fill="#f6eedb"/><rect x="${tx0}" y="${ty}" width="${tw}" height="${G.th}" fill="url(#woven)"/>`+
+   `<path d="M${tx0+3.5} ${ty}v${G.th}M${tx1-3.5} ${ty}v${G.th}" stroke="#6b4a2a" stroke-opacity=".22" stroke-width="1.2"/><path d="M${tx0+2} ${ty+2}l1.6 1.8l-1.6 1.8l1.6 1.8l-1.6 1.8M${tx1-2} ${ty+2}l-1.6 1.8l1.6 1.8l-1.6 1.8l1.6 1.8" transform="translate(0 ${f(G.th/2-5.6)})" fill="none" stroke="#a3241c" stroke-opacity=".7" stroke-width=".8"/>`;
+  if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?13.5:15.5,c=small?1.7:2.1,wf=small?11:12.5;
+   const x0=tx0+(small?9:12),x1=tx1-(small?9:12),xp=xpaths(dt.num,c),nw=measure(nm,`italic 700 ${nf}px Georgia,serif`),ww=measure(dt.word,`italic ${wf}px Georgia,serif`);
+   const word=nw+12+xp.w+5+ww<=x1-x0,vw=xp.w+(word?5+ww:0),vx=x1-vw,vy=tcy-3.5*c;
+   p+=`<clipPath id="wle-${id}"><rect x="${f(x0-4)}" y="${ty}" width="${f((x1-x0+8)*P.emb)}" height="${G.th}"/></clipPath><g clip-path="url(#wle-${id})">`+
+    `<text x="${x0}" y="${f(tcy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="#a3241c">${nm}</text>`+
+    `<text x="${x0}" y="${f(tcy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="url(#satin)">${nm}</text>`+
+    `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".2" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="#5c6f99"/><path d="${xp.d2}" stroke="#1f2d4d"/></g>`+
+    (word?`<text x="${f(vx+xp.w+5)}" y="${f(tcy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="#1f2d4d">${dt.word}</text>`:'')+'</g>'}
+  // Drops down the front of the line with an overshoot, then one gust sways it from the line.
+  if(P.sway)p=`<g transform="translate(${f(w/2)} ${ly}) skewX(${f(P.sway*5)}) translate(${f(-w/2)} ${-ly})">${p}</g>`;
+  t+=lineSvg+(Math.abs(P.drop-1)<1e-3?p:sc(p,0,ly,1,P.drop))}
+ else t+=lineSvg;
+ // Two spring pegs clip the fold to the line, the left one first; taking it in, they spring off up and away.
+ if(P.fold>=1&&P.peg>0){const pw=small?5:6,ph=small?17:20;
+  [[px0+G.pg,-6,0],[px1-G.pg,5,.4]].forEach(([x,rot,d],i)=>{const k=backOut(seg(P.peg,d,d+.6));if(k<=0)return;
+   const y=G.ld(x)-(small?5:6),dy=-16*(1-k)-24*P.off,r=rot+(i?1:-1)*40*P.off,op=f(Math.min(1,k*3)*(1-P.off)),x0=x-pw/2;
+   const body=`M${f(x0+1)} ${f(y)}H${f(x0+pw-1)}Q${f(x0+pw)} ${f(y)} ${f(x0+pw)} ${f(y+2)}V${f(y+ph-3)}Q${f(x0+pw)} ${f(y+ph)} ${f(x)} ${f(y+ph)}Q${f(x0)} ${f(y+ph)} ${f(x0)} ${f(y+ph-3)}V${f(y+2)}Q${f(x0)} ${f(y)} ${f(x0+1)} ${f(y)}Z`;
+   t+=`<g opacity="${op}" transform="translate(0 ${f(dy)}) rotate(${f(r)} ${f(x)} ${f(y+ph/2)})"><path d="${body}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(.8 1.4)"/><path d="${body}" fill="url(#wlw-${id})" stroke="#4a2c12" stroke-opacity=".6" stroke-width=".5"/>`+
+    `<path d="M${f(x)} ${f(y+1)}V${f(y+ph-2)}" stroke="#4a2c12" stroke-opacity=".35" stroke-width=".6"/><path d="M${f(x0-.4)} ${f(y+ph*.42)}h${f(pw+.8)}m0 1.6h${f(-pw-.8)}" stroke="#d8dde2" stroke-width="1"/><circle cx="${f(x0+pw+.4)}" cy="${f(y+ph*.42+.8)}" r="1.3" fill="none" stroke="#d8dde2" stroke-width=".8"/>`+
+    `<path d="M${f(x0+.8)} ${f(y+ph*.42+.4)}h${f(pw-1.6)}" stroke="#fff" stroke-opacity=".7" stroke-width=".4"/></g>`})}
  return wrap(t+fibres);
 }
 
@@ -2579,7 +2663,7 @@ let beBuzz=0;
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -2614,7 +2698,12 @@ const SHADES={
   about:'Felt stop-motion\'s favourite scene, the little one put to bed. The cotton display is put away and the stuffing lets out to a strip, landing with a squash that shakes fibres loose. Then a doll\'s bed is built around it, seen side on: a walnut felt headboard with a domed top, a stitched heart and a turned knob, a lower footboard and a side rail pop up from the table, and a cream ticking pillow puffs up, propped against the headboard. The cushion draws in and lies down with its head end on the pillow. A patchwork quilt in the cushion\'s own felts is pulled up over it from behind the footboard, with a dark binding, running-stitch seams and wool ties at the corners, and the cream sheet is turned down over its top edge with a scalloped hem and a feather stitch. <b>The name and key value are stitched onto the quilt\'s signature block</b>, the cream square quilters sign: the name in satin stitch, the value in cross-stitch beside it. Three felt Zs drift up off the pillow and fade, so the resting strip is still. Unshading gets it up: the sheet is thrown back, the quilt is flung off, the pillow and the bed fold away and the cushion refills with a bounce. Joined pairs stay joined, bed to bed.',
   sayOn:'Shaded: each cushion is put to bed under a patchwork quilt, its name and value stitched on the quilt.',sayOff:'Unshaded: the quilts are thrown off, the beds fold away and the cushions refill.',
   height:(st,small)=>bedParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:bedDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:bedDraw},
+ washing:{label:'Washing line',kind:'Hang',ms:3000,ownStrip:true,
+  about:'A new shade kind, Hang: the cushion is pegged out to air. The cotton display is put away and the stuffing lets out to a flat strip, landing with a squash that shakes fibres loose. The felt draws in from its ends, two turned wooden props with ball tops pop up from the table there, and a twisted cotton line is strung from one to the other and tied off. The felt then gathers up onto the line and drops down the front, folded over it with a bounce: the fold catches the light along the line, and the back half, in the cushion\'s darker band felt, peeks out below the hem. Two spring pegs clip it on, the left one first, each with its silver spring. <b>The name and key value are on a laundry name tape</b>, the cream cotton tape sewn into school jumpers: the name woven in red, the value cross-stitched in navy beside it. One gust sways the felt from the line and it settles, so the resting strip is still. Unshading takes it in: the pegs spring off, the felt is lifted off the line and unfolds, the line is untied, the props fold away and the cushion refills with a bounce. Joined pairs stay joined, line to line.',
+  sayOn:'Shaded: each cushion is pegged out on a washing line, its name and value on a laundry name tape.',sayOff:'Unshaded: the pegs come off, the felt is taken in and the cushions refill.',
+  height:(st,small)=>lineParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:lineDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
