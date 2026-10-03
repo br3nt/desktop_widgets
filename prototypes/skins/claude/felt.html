@@ -220,7 +220,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. On the fishing game, tap the line or the fish to let it go. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. On the fishing game, tap the line or the fish to let it go. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. On the frogged shade, the ball band's dye swatch is the status colour. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -1200,6 +1200,95 @@ function ovenDraw(id,w,h,small,st){
   const x=w*(.34+.3*j)+Math.sin(p*5+j*2)*4,y=4-p*(small?22:28),o=Math.sin(Math.PI*p)*.85,sc=(small?.8:1)*(.7+.5*p);
   t+=`<path d="M0 0q-3.5 -3.5 0 -7t0 -7" transform="translate(${f(x)} ${f(y)}) scale(${f(sc*100)/100}) rotate(${f(Math.sin(p*4+j)*14)})" fill="none" stroke="#f4ead8" stroke-width="2.4" stroke-linecap="round" opacity="${f(o)}"/>`}
  return wrap(t+fibres);
+}
+
+/* ---------- Frogged shade ---------- */
+// The Unravel kind in felt. The cushion's felt relaxes back into the chunky knitting it was fulled from (its name band
+// becomes a contrasting stripe along the top rows), a wooden nostepinne (a yarn-winding stick) slides in along the strip's
+// centre line, and the knitting is frogged from the bottom up, a row at a time, the kinked yarn running from the live
+// stitch to the stick and winding into a cross-wound cake that fattens and turns. The last rows are the stripe, so the
+// cake ends in the band's colour. A paper ball band wraps it with the name and value, and its dye swatch is the status.
+// Unshading knits it back up.
+function frogParts(st,small){
+ const H0=small?CH:H,HF=small?46:56,RH=6.5,N=Math.round(H0/RH),u=seg(st,.27,.84);
+ const ri=Math.min(N,Math.floor(u*N)),fr=u*N-ri,kb=u>=1?0:(N-ri)*RH;
+ return{H0,HF,RH,N,u,ri,fr,kb,knit:ease(seg(st,.04,.16)),stick:ease(seg(st,.12,.22)),tie:seg(st,.2,.27),tail:seg(st,.84,.88),
+  band:ease(seg(st,.87,.93)),emb:seg(st,.92,.99),h:Math.round(Math.max(HF,Math.min(H0,kb)))};
+}
+function frogDraw(id,w,h,small,st){
+ const P=frogParts(st,small),s=SKIN[id],{H0,HF,RH,N,u,ri,fr}=P,SW=6,yc=HF/2,R=small?16:20,sx0=small?6:8,sx1=w-sx0;
+ const cx0=sx0+16,cx1=w-sx0-16,L0=cx1-cx0,cm=(cx0+cx1)/2,STRIPE=4;
+ // The top four rows are the band's felt; they come off last, so the cake ends in that colour.
+ const rowCol=k=>k<STRIPE?s.band:s.body,stripeAt=(N-STRIPE)/N;
+ const wd=clamp(.03*P.tie+.97*u),r=lerp(2.2,R,Math.sqrt(wd)),L=L0*lerp(.12,1,Math.pow(wd,.35));
+ let t=`<defs>${feltFilters(id,s.seed)}<pattern id="fkn-${id}" width="${SW}" height="${RH}" patternUnits="userSpaceOnUse">`+
+  `<path d="M1 .9L3 ${RH-.9}M5 .9L3 ${RH-.9}" fill="none" stroke="#1a0d05" stroke-opacity=".3" stroke-width="2.3" stroke-linecap="round" transform="translate(0 .5)"/>`+
+  `<path d="M1 .9L3 ${RH-.9}M5 .9L3 ${RH-.9}" fill="none" stroke="#fff6e2" stroke-opacity=".24" stroke-width="1.7" stroke-linecap="round"/></pattern>`+
+  `<pattern id="fcw-${id}" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="translate(${f(wd*46)} 0)"><path d="M-1 8L8 -1M-4.5 4.5L4.5 -4.5M2.5 11.5L11.5 2.5" stroke="#1a0d05" stroke-opacity=".32" stroke-width="1.1"/><path d="M-1 -1L8 8" stroke="#fff6e2" stroke-opacity=".2" stroke-width=".9"/></pattern>`+
+  `<linearGradient id="fsh-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff6e2" stop-opacity=".3"/><stop offset=".4" stop-color="#fff6e2" stop-opacity="0"/><stop offset=".7" stop-color="#1a0d05" stop-opacity="0"/><stop offset="1" stop-color="#1a0d05" stop-opacity=".45"/></linearGradient>`+
+  `<linearGradient id="fwd-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#efc58e"/><stop offset=".5" stop-color="#b57d45"/><stop offset="1" stop-color="#6b4220"/></linearGradient></defs>`;
+ // The felt, then the knitting it relaxes into, frogged from the bottom up: the full rows above, and the row being
+ // pulled out only on the side the live stitch hasn't reached yet.
+ if(P.knit<1)t+=casing(id,w,h).replace(/<defs>[\s\S]*?<\/defs>/,'');
+ const shape=rr4(EDGE,EDGE,w-2*EDGE,H0-2*EDGE,s.r),yTop=(N-ri-1)*RH,yBot=yTop+RH,even=ri%2===0;
+ const xl=Math.round(even?lerp(w-EDGE,EDGE,fr)/SW:lerp(EDGE,w-EDGE,fr)/SW)*SW,px0=even?0:xl,px1=even?xl:w;
+ if(ri<N){
+  t+=`<clipPath id="fsc-${id}"><path d="${shape}"/></clipPath><clipPath id="frc-${id}"><rect x="-4" y="-4" width="${w+8}" height="${f(Math.max(0,yTop+4))}"/>`+
+   (u>0?`<rect x="${px0}" y="${f(yTop-.5)}" width="${Math.max(0,px1-px0)}" height="${RH+.5}"/>`:`<rect x="-4" y="${f(yTop-.5)}" width="${w+8}" height="${RH+4}"/>`)+`</clipPath>`;
+  // The felt's dark backing stays under the knitting, so the outline doesn't pop off when the felt is gone.
+  let k=`<g clip-path="url(#frc-${id})"><path d="${rr4(2.5,6,w-5,H0-4.5,s.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/></g>`+
+   `<g clip-path="url(#fsc-${id})"><g clip-path="url(#frc-${id})"><path d="${shape}" fill="${s.body}" filter="url(#g-${id})"/>`+
+   `<rect x="0" y="0" width="${w}" height="${STRIPE*RH}" fill="${s.band}" filter="url(#g-${id})"/><rect x="0" y="0" width="${w}" height="${H0}" fill="url(#fkn-${id})"/></g>`;
+  // Live stitches: loops hanging off the bottom of what is left.
+  // Each half takes the colour of the row it hangs from; the first row's loops are lifted inside the felt's foot.
+  if(u>0){const lb=Math.min(yBot,H0-EDGE-3);let l0='',l1='';
+   for(let x=0;x<w;x+=SW){const on=x>=px0&&x<px1,y=on?lb:yTop,p=`M${x} ${f(y-.6)}q${SW/2} 6 ${SW} 0`;if(on)l0+=p;else if(ri<N-1)l1+=p}
+   for(const[lp,c]of[[l0,rowCol(N-1-ri)],[l1,rowCol(N-2-ri)]])if(lp)k+=`<path d="${lp}" fill="none" stroke="#1a0d05" stroke-opacity=".35" stroke-width="2" transform="translate(0 .7)"/><path d="${lp}" fill="none" stroke="${mixHex(c,'#fff6e2',.22)}" stroke-width="1.6" stroke-linecap="round"/>`}
+  t+=`<g opacity="${f(P.knit)}">${k}</g></g>`}
+ // The yarn: from the live stitch to the cake, kinked from having been knitted. Tied on first, wound in last.
+ const wx=cm+(L/2-3)*Math.sin(wd*Math.PI*18.5),side=v=>v>yc?1:-1;
+ let Pt=null,col=s.body,ph=fr*7;
+ if(P.tie>0&&u<=0){Pt={x:w-EDGE-2,y:H0-RH/2}}
+ else if(u>0&&u<1){Pt={x:xl,y:yTop+RH/2};col=rowCol(N-1-ri)}
+ else if(u>=1&&P.tail<1){const last=(N-1)%2===0;Pt={x:last?EDGE+2:w-EDGE-2,y:RH/2};col=rowCol(0);ph=7}
+ if(Pt){const A={x:wx,y:yc+side(Pt.y)*r*.92};let B=A,Q=Pt;
+  if(u<=0)B={x:lerp(Pt.x,A.x,ease(P.tie)),y:lerp(Pt.y,A.y,ease(P.tie))};
+  if(u>=1)Q={x:lerp(Pt.x,A.x,ease(P.tail)),y:lerp(Pt.y,A.y,ease(P.tail))};
+  const dx=B.x-Q.x,dy=B.y-Q.y,len=Math.hypot(dx,dy)||1,nx=-dy/len,ny=dx/len,n=Math.max(4,Math.round(len/7));
+  let d='';for(let i=0;i<=n;i++){const q=i/n,a=Math.sin(q*n*1.9+ph)*2*(1-q*.7),sg=6*q*(1-q);
+   d+=(i?'L':'M')+f(Q.x+dx*q+nx*a)+' '+f(Q.y+dy*q+ny*a+sg)}
+  t+=`<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="#1a0d05" stroke-opacity=".3" stroke-width="2.8" transform="translate(.5 1.2)"/><path d="${d}" stroke="${col}" stroke-width="2.3"/><path d="${d}" stroke="#fff6e2" stroke-opacity=".35" stroke-width="2.3" stroke-dasharray="1.2 1.8"/></g>`}
+ // The nostepinne: a turned wooden winding stick with a knob at one end and a point at the other, slid in from the right.
+ if(P.stick>0){const tk=small?4:5,dx=(1-P.stick)*w*.45;
+  let k=`<path d="M${sx0+9} ${f(yc-tk/2)}H${sx1-11}L${sx1} ${f(yc)}L${sx1-11} ${f(yc+tk/2)}H${sx0+9}Z" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(0 1.6)"/>`+
+   `<path d="M${sx0+9} ${f(yc-tk/2)}H${sx1-11}L${sx1} ${f(yc)}L${sx1-11} ${f(yc+tk/2)}H${sx0+9}Z" fill="url(#fwd-${id})" stroke="#4a2c12" stroke-opacity=".45" stroke-width=".5"/>`+
+   `<ellipse cx="${sx0+5}" cy="${f(yc+1.2)}" rx="5.4" ry="${f(tk/2+3)}" fill="#000" opacity=".35" filter="url(#sh)"/><ellipse cx="${sx0+5}" cy="${f(yc)}" rx="5.4" ry="${f(tk/2+3)}" fill="url(#fwd-${id})" stroke="#4a2c12" stroke-opacity=".5" stroke-width=".5"/>`+
+   `<path d="M${sx0+9.6} ${f(yc-tk/2-1.4)}v${tk+2.8}M${sx0+12} ${f(yc-tk/2-.6)}v${tk+1.2}" stroke="#4a2c12" stroke-opacity=".5" stroke-width=".8"/><ellipse cx="${sx0+3.6}" cy="${f(yc-tk/2-.6)}" rx="2" ry="1.2" fill="#fff" opacity=".35"/>`;
+  t+=`<g opacity="${f(Math.min(1,P.stick*2))}" transform="translate(${f(dx)} 0)">${k}</g>`}
+ // The cake: cross-wound yarn round the stick, turning as it winds; once the stripe rows come off it ends in the band's felt.
+ if(wd>0){const rc=Math.min(r*.8,L/2),cake=rr4(cm-L/2,yc-r,L,2*r,[rc,rc,rc,rc]),bk=clamp((u-stripeAt)*N*2.5);
+  t+=`<path d="${cake}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(.4 1.8)"/><path d="${cake}" fill="${s.body}" filter="url(#g-${id})"/>`+
+   (bk>0?`<path d="${cake}" fill="${s.band}" filter="url(#g-${id})" opacity="${f(bk)}"/>`:'')+
+   `<path d="${cake}" fill="url(#fcw-${id})"/><path d="${cake}" fill="url(#fsh-${id})"/>`}
+ // The tail, tucked under the cake once the last of the yarn is in.
+ // It starts where the last of the strand went on (the traverse ends at the right), and lies down over the cake's shoulder.
+ if(P.tail>=1){const x=cm+L0/2-3,y=yc-R*.92,d=`M${f(x)} ${f(y)}q-2 6 -8 ${small?8:10}q-3 1.4 -4.4 -.8`;
+  t+=`<path d="${d}" fill="none" stroke="#1a0d05" stroke-opacity=".3" stroke-width="2.6" stroke-linecap="round" transform="translate(.5 1)"/><path d="${d}" fill="none" stroke="${s.band}" stroke-width="2.2" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#fff6e2" stroke-opacity=".35" stroke-width="2.2" stroke-dasharray="1.2 1.8"/>`}
+ // The paper ball band, wrapped on from the top: the name, the value, and a dye swatch in the status colour.
+ if(P.band>0){const bw=L0-(small?36:46),bh=small?20:25,bx=cm-bw/2,by=yc-bh/2,sz=bh-9,swx=bx+bw-sz-6,C=PLEAT_C[labelStatus(id)];
+  let k=`<rect x="${f(bx)}" y="${f(by)}" width="${f(bw)}" height="${bh}" rx="1" fill="#000" opacity=".3" filter="url(#sh)" transform="translate(0 1.2)"/><rect x="${f(bx)}" y="${f(by)}" width="${f(bw)}" height="${bh}" rx="1" fill="#f5ecd6"/>`+
+   `<path d="M${f(bx)} ${f(by+2.2)}h${f(bw)}M${f(bx)} ${f(by+bh-2.2)}h${f(bw)}" stroke="${s.band}" stroke-width="1"/><path d="M${f(bx)} ${f(by+3.6)}h${f(bw)}M${f(bx)} ${f(by+bh-3.6)}h${f(bw)}" stroke="${s.band}" stroke-opacity=".5" stroke-width=".5"/>`+
+   `<rect x="${f(swx)}" y="${f(yc-sz/2)}" width="${sz}" height="${sz}" rx="1.5" fill="${C}" filter="url(#g-${id})"/><rect x="${f(swx+1.6)}" y="${f(yc-sz/2+1.6)}" width="${sz-3.2}" height="${sz-3.2}" rx="1" fill="none" stroke="#fff6e2" stroke-opacity=".7" stroke-width=".7" stroke-dasharray="1.4 1.1"/>`;
+  if(P.emb>0){const dt=pocketData(id),nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?13:15,c=small?1.6:2,wf=small?11:12.5;
+   const x0=bx+(small?8:10),x1=swx-(small?6:8),xp=xpaths(dt.num,c),nw=measure(nm,`italic 700 ${nf}px Georgia,serif`),ww=measure(dt.word,`italic ${wf}px Georgia,serif`);
+   const word=nw+12+xp.w+5+ww<=x1-x0,vw=xp.w+(word?5+ww:0),vx=x1-vw,vy=yc-3.5*c;
+   k+=`<clipPath id="fem-${id}"><rect x="${f(x0-4)}" y="${f(by)}" width="${f((x1-x0+8)*P.emb)}" height="${bh}"/></clipPath><g clip-path="url(#fem-${id})">`+
+    `<text x="${f(x0)}" y="${f(yc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="#a3241c">${nm}</text>`+
+    `<g transform="translate(${f(vx)} ${f(vy)})" fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${xp.d1+xp.d2}" stroke="#000" stroke-opacity=".2" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="#5c6f99"/><path d="${xp.d2}" stroke="#1f2d4d"/></g>`+
+    (word?`<text x="${f(vx+xp.w+5)}" y="${f(yc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="#1f2d4d">${dt.word}</text>`:'')+'</g>'}
+  k+=`<rect x="${f(bx)}" y="${f(by)}" width="${f(bw)}" height="${bh}" fill="url(#fsh-${id})" opacity=".55"/>`;
+  t+=`<clipPath id="fbd-${id}"><rect x="${f(bx-2)}" y="${f(by-2)}" width="${f(bw+4)}" height="${f((bh+4)*P.band)}"/></clipPath><g clip-path="url(#fbd-${id})">${k}</g>`}
+ return t;
 }
 
 /* ---------- Zipper geometry ---------- */
@@ -3291,7 +3380,7 @@ JOINS.fishing={label:'Fishing game',kind:'Reel',gap:FI.gap,ms:4600,msDrag:4200,r
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -3341,7 +3430,12 @@ const SHADES={
   about:'The Stow kind (wire\'s jeweller\'s case, gothic\'s aumbry) done in felt, from the felt play kitchen: the cushion is put in the oven. The cotton display is put away and the stuffing lets out to a strip, landing with a squash that shakes fibres loose. The cushion is lifted while a cream felt toy oven pops up behind it on walnut bun feet, its door hanging open. Then the cushion is pushed back into the oven: it shrinks with depth, squashes to get through the door and darkens as it goes in. The door is swung up and falls shut with a bounce that knocks fibres off its corners, and the gingham tea towel over its handle swings and settles. The two knobs are turned, the oven light comes on behind the window in the status colour (amber running, blue paused, red needs you, green passed) with the cushion glowing inside, the name is satin-stitched in gilt on the control panel with the value cross-stitched in cream, and two wisps of wool steam curl up and fade. Unshading turns the oven off, drops the door open and the cushion springs back out, a touch too far, before the oven folds away and the cushion refills.',
   sayOn:'Shaded: each cushion is put in a felt toy oven, the oven light shows its status and its name and value are stitched on the control panel.',sayOff:'Unshaded: the ovens are switched off, the doors drop open and the cushions spring back out and refill.',
   height:(st,small)=>ovenParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:ovenDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:ovenDraw},
+ frog:{label:'Frogged',kind:'Unravel',ms:4400,ownStrip:true,
+  about:'The Unravel kind (elven\'s spindle, wire\'s spool, gothic\'s unleading) done in felt. Felt is knitting that has been fulled, and here it goes back: the cotton display is put away and the felt relaxes into chunky stocking stitch, its name band turning into a contrasting stripe along the top rows. A turned wooden nostepinne, the stick knitters wind yarn balls on, slides in along the strip\'s centre line, and the loose end at the bottom corner is pulled up and tied on. Then the knitting is frogged (knitters\' slang: "rip it, rip it") from the bottom up, a row every frame or two. The live stitch runs back and forth along each row, leaving a fringe of open loops, and the kinked yarn runs from it to the stick, where it winds into a cross-wound cake that fattens and turns. The cushion shortens as the rows come off. The stripe rows come off last, so the cake ends in the band\'s felt, and the tail is tucked under. <b>A paper ball band is wrapped round the cake</b> with the name printed in red and the key value cross-stitched in navy, and <b>its dye swatch is the status</b>: amber running, blue paused, red needs you, green passed. Nothing moves at rest. Unshading knits it back up row by row. Joined pairs stay joined, cake to cake.',
+  sayOn:'Shaded: each cushion is frogged back into yarn and wound into a cake on a winding stick, its name and value on the ball band.',sayOff:'Unshaded: the yarn is knitted back up and felts into a cushion again.',
+  height:(st,small)=>frogParts(st,small).h,
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:frogDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
