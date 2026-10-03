@@ -285,7 +285,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the voussoirs, drag the stones or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one stone, and the keystone's gilded boss releases. On the casement stay, drag the stay or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one hole in the stay, and the gilt pin releases. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. On the windlass, drag up on the wheel to lift its pawl and let GitDiscuss roll back, or tap the wheel. On the hot rivets, tap the rivets (or press Enter on them) to knock their heads off. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the voussoirs, drag the stones or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one stone, and the keystone's gilded boss releases. On the casement stay, drag the stay or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one hole in the stay, and the gilt pin releases. On the tympanum roll, drag the tympanum up or down the jamb, swing GitDiscuss's nameplate, or focus the tympanum and use the arrow keys; it rolls, so GitDiscuss tips and slides together, one socket per 15°, and the gilt hub releases. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. On the windlass, drag up on the wheel to lift its pawl and let GitDiscuss roll back, or tap the wheel. On the hot rivets, tap the rivets (or press Enter on them) to knock their heads off. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -339,7 +339,7 @@ function casing(id,w,h){
  const bt=model.join==='buttress'&&!small,PT=12,pw=JP-6;
  // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
  // Frieze procession: square too, so the two friezes along the top meet as one band.
- const dl=(model.join==='dial'||model.join==='apse'||model.join==='fan'||model.join==='chevet'||model.join==='strap'||model.join==='frieze'||model.join==='vous'||model.join==='stay')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
+ const dl=(model.join==='dial'||model.join==='apse'||model.join==='fan'||model.join==='chevet'||model.join==='strap'||model.join==='frieze'||model.join==='vous'||model.join==='stay'||model.join==='roll')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
  // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
  const tooth=x=>{const t=[[x,top]];for(const r of JOINS.pier.rows(h))t.push([x,r.y],[x+r.e*JOINS.pier.TO,r.y],[x+r.e*JOINS.pier.TO,r.yb],[x,r.yb]);t.push([x,h]);return t};
@@ -2386,6 +2386,114 @@ const JOINS={
   grab(p){return{x0:p.x,y0:p.y,moved:false}},
   move(d,p){if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true},
   letGo:()=>true
+ },
+ /* Tympanum roll: a half-round tympanum on GitDiscuss's end rolls up and down a door jamb on Jarvis's, so its pivot travels (Roll). */
+ // The hub sits on GitDiscuss's end at mid-wall; the tympanum's rim touches the jamb's face, so turning by t moves the hub R·t along it.
+ roll:{label:'Tympanum roll',kind:'Angle · roll',gap:60,ms:2.3,sepMs:3000,step:15,max:45,slider:'Tympanum roll',R0:50,
+  say:{join:'The facades close a jamb\'s width apart; a door jamb rises out of Jarvis\'s end, a carved tympanum swings out of GitDiscuss\'s and its ball-flower drops into the jamb\'s middle socket, then GitDiscuss rolls along the jamb to its angle and the glass kindles.',
+   joined:'Joined by a tympanum roll, one socket per 15°. Drag the tympanum up or down the jamb, or swing GitDiscuss\'s nameplate: it rolls, so GitDiscuss tips and slides together. Tap the gilt hub to release.',
+   sep:'The glass goes dark, GitDiscuss rolls back level, the tympanum swings in, the jamb sinks and the facades part.',
+   hold:'Held mid-join: the tympanum is seating on the jamb. Use the scrubber to step through the animation.',
+   ready:'Ready: the jamb, the tympanum and the hub\'s path are chalked out. Release to join.',near:'Nearby: the stone warms where the jamb will rise. Move closer.',readyPh:'Ready · the jamb and tympanum are set out',nearPh:'Nearby · the jamb seat warms',
+   tap:'Drag the tympanum along the jamb to roll GitDiscuss; tap the gilt hub to release.'},
+  stepSay(from,to){return to===from?'The tympanum is on the jamb\'s last socket: GitDiscuss at '+signed(to)+'.':'The tympanum rolls '+(to>from?'down':'up')+' the jamb a socket; GitDiscuss at '+signed(to)+', socket '+(Math.round(to/15)+4)+' of 7.'},
+  phase(jt,dir){if(dir>0)return jt<.4?'Joining · closing in ':jt<.5?'Joining · raising the jamb ':jt<.6?'Joining · the tympanum swings out ':jt<.64?'Joining · seating the ball-flower ':jt<.9?'Joining · rolling to '+signed(model.angle)+' · ':'Joining · the glass kindles ';
+   const r=1-jt;return r<.08?'Releasing · the glass goes dark ':r<.32?'Releasing · rolling level ':r<.44?'Releasing · the tympanum swings in ':r<.58?'Releasing · the jamb sinks ':'Releasing · parting '},
+  dragPh(){return'Rolling GitDiscuss along the jamb · '+signed(model.angle)},
+  about:'A new angle kind for gothic, <b>Roll</b>: the joint has no fixed pivot. A tympanum is the half-round carved panel over a church door, set on the door\'s jambs. Here one is turned on its side. GitDiscuss\'s joining end carries a tympanum (an archivolt ring of voussoirs studded with gilt ball-flowers, six lights of glass in cusped tracery, and a gilt hub on the wall\'s middle), and Jarvis\'s end carries a coursed door jamb with a roll moulding, a pinnacle and seven round sockets down its face. The tympanum\'s rim bears on the jamb, so GitDiscuss cannot turn without rolling: <b>as it tips by an angle it slides along the jamb by the same length of rim</b>, down when it bends down and up when it bends up, its hub travelling with it, like the rocker of a rolling lift bridge. One ball-flower sits in one socket every 15°. <b>Near:</b> the stone warms where the jamb will rise, and GitDiscuss\'s end where the tympanum is stowed. <b>Ready:</b> the jamb, the tympanum at the angle it will take and the hub\'s path are chalked out. Joining: the facades close a jamb\'s width apart, the jamb is built up out of Jarvis\'s end with grit at its foot, and the tympanum swings out of GitDiscuss\'s end like a door leaf until its middle ball-flower drops into the jamb\'s middle socket with a knock. Then GitDiscuss rolls to its angle, a little past and back, each socket it passes knocking with a glint, and last the glass kindles light by light as the join light: amber and ruby while both widgets run, cold blue if either is paused. <b>Angle:</b> −45° to +45° in 15° steps. Drag the tympanum up or down the jamb, swing GitDiscuss\'s nameplate, use the slider, or focus the tympanum and press the arrow keys; a parchment label under Jarvis\'s foot reads the angle and the socket. Shaded, the tympanum and jamb shrink less than the wall, so the jamb stands proud of the strip. Nothing moves at rest. <b>Release:</b> tap the gilt hub (or focus the tympanum and press Enter). The glass goes dark, GitDiscuss rolls back level, the tympanum swings in, the jamb sinks and the facades part.',
+  // Level until the ball-flower is seated, then a heavy roll with one small overshoot; releasing, it rolls level once the glass is dark.
+  bend(jt){const A=model.angle;if(jt>=1)return A;if(model.dir>0){const u=seg(jt,.64,.9);return A*(1-Math.pow(1-u,3)*Math.cos(1.6*Math.PI*u))}return A*(1-ease(seg(1-jt,.08,.3)))},
+  // Tympanum and jamb shrink less than the wall when shaded, so the tympanum always clears the jamb's face as it tips.
+  dims(h){const k=lerp(.7,1,clamp((h-HS)/(H-HS)));return{k,R:this.R0*k,cy:(h+8)/2}},
+  geo(c,bend=model.angle){const h=c.h,{k,R,cy}=this.dims(h),th=bend*Math.PI/180,Y=c.b.y+cy;
+   return{h,k,R,th,cy:Y,P:{x:c.b.x,y:Y+R*th},face:c.a.x+W+this.gap-R,big:h>=90}},
+  // The jamb's reach: the hub's travel at ±45° and a socket beyond, never shorter than the wall.
+  jamb(c,R,k){const cy=c.a.y+(c.h+8)/2,e=R*Math.PI/4+12*k;return{y0:Math.min(c.a.y+8,cy-e),y1:Math.max(c.a.y+c.h,cy+e),cy}},
+  range(ang,h){const{k,R,cy}=this.dims(h),th=ang*Math.PI/180,sn=Math.sin(th),cs=Math.cos(th),ty=cy+R*th,e=R*Math.PI/4+12*k;
+   let lo=Math.min(-26,ty-R-6,cy-e-18*k),hi=Math.max(h+40,ty+R+6,cy+e+6);// Jarvis's pinnacles, the label under its foot, the tympanum, the jamb and its pinnacle
+   for(const[x,y]of[[0,-26],[W,-26],[0,h],[W,h]]){const ry=ty+x*sn+(y-cy)*cs;lo=Math.min(lo,ry);hi=Math.max(hi,ry)}
+   const A=TOP-26-lo,B=600-14-hi;return[A,Math.max(A,B)]},
+  detent(b,jt){if(jt===0){model.lastDet=0;return}const n=Math.round(b/this.step);if(n!==model.lastDet&&Math.abs(b-n*this.step)<4){model.lastDet=n;if(!reduce.matches)pawlClick()}},
+  // The jamb, from x0 (Jarvis's end) to its face xf, built up from the foot as g goes 0 to 1, with a socket every 15° of roll.
+  jambSvg(x0,xf,J,R,k,g,seat){if(g<=0)return '';const{y0,y1,cy}=J,yt=y1-(y1-y0)*g,w=xf-x0;
+   let joints='';for(let y=y1-11*k;y>yt+2;y-=11*k)joints+=`M${f(x0)} ${f(y)}H${f(xf)}`;
+   let so='',gl='';for(let n=-3;n<=3;n++){const y=cy+R*n*Math.PI/12,r=3.4*k;if(y<yt+r)continue;
+    so+=`<path d="M${f(xf+.4)} ${f(y-r)}A${f(r)} ${f(r)} 0 0 0 ${f(xf+.4)} ${f(y+r)}Z"/>`;
+    if(!n)gl+=`<circle cx="${f(xf-r-2.4*k)}" cy="${f(y)}" r="${f(.9*k)}" fill="url(#gild)"/>`;
+    if(n===seat)gl+=`<path d="M${f(xf+.4)} ${f(y-r*1.3)}A${f(r*1.3)} ${f(r*1.3)} 0 0 0 ${f(xf+.4)} ${f(y+r*1.3)}" fill="none" stroke="#f6dc8c" stroke-opacity=".5" stroke-width=".7"/>`}
+   const cap=g>=1?`<g fill="url(#lime)" filter="url(#st-v)">${pinnacle((x0+xf)/2,yt,.45*k)}<rect x="${f(x0-1)}" y="${f(yt-2.2*k)}" width="${f(w+2)}" height="${f(2.6*k)}"/></g>`:'';
+   return `<g><rect x="${f(x0+1.5)}" y="${f(yt+2)}" width="${f(w)}" height="${f(y1-yt)}" fill="#000" opacity=".3"/>`+
+    `<g fill="url(#lime)" filter="url(#st-v)"><rect x="${f(x0-1)}" y="${f(yt)}" width="${f(w+1)}" height="${f(y1-yt)}"/><rect x="${f(x0-2)}" y="${f(y1-4*k)}" width="${f(w+4.5*k)}" height="${f(4*k)}"/></g>${cap}`+
+    `<path d="${joints}" stroke="#3a2c1c" stroke-opacity=".38" stroke-width=".6"/>`+
+    `<path d="M${f(xf-4.4*k)} ${f(yt+1)}V${f(y1-4*k)}" stroke="#3a2c1c" stroke-opacity=".45" stroke-width="${f(1.2*k)}"/><path d="M${f(xf-2.6*k)} ${f(yt+1)}V${f(y1-4*k)}" stroke="#fff6e2" stroke-opacity=".55" stroke-width="${f(.9*k)}"/>`+
+    `<g fill="#1d140b" opacity=".85">${so}</g>${gl}</g>`},
+  // The tympanum about its hub P, turned th degrees and swung out to sx of its depth: archivolt with voussoir joints and ball-flowers, six cusped lights, the hub.
+  tymp(P,th,R,k,sx,lit,run,big){if(sx<=.02)return '';const D=Math.PI/180,ar=8*k,r0=7*k,pt=(r,a)=>f(r*Math.cos(a*D))+' '+f(r*Math.sin(a*D));
+   const half=`M0 ${f(-R)}A${f(R)} ${f(R)} 0 0 0 0 ${f(R)}Z`,ri=R-ar,T=`translate(${f(P.x)} ${f(P.y)}) rotate(${f(th)}) scale(${f(sx)} 1)`;
+   const tones=run?['#f2c04a','#c43a48']:['#5d82e6','#2e4fae'],glowC=run?'#ffd98a':'#9fb8ff';
+   let vj='';for(let a=105;a<270;a+=15)vj+=`M${pt(ri,a)}L${pt(R-.4,a)}`;
+   // Six lights, a pointed and cusped head toward the rim, between stone mullions.
+   let gl='',led='';for(let i=0;i<6;i++){const m=90+15+30*i,hw=10.5,a=r0+2.6*k,b=ri-2*k,sh=b-(b-a)*.32;
+    const d=`M${pt(a,m-hw*.5)}L${pt(sh,m-hw)}Q${pt(b-1.5*k,m-hw*.8)} ${pt(b,m)}Q${pt(b-1.5*k,m+hw*.8)} ${pt(sh,m+hw)}L${pt(a,m+hw*.5)}Z`;
+    gl+=`<path d="${d}" fill="#120e16"/>`;const o=seg(lit,i/6*.6,i/6*.6+.4);if(o>0)gl+=`<path d="${d}" fill="${tones[i%2]}" opacity="${f(o)}"/>`;
+    led+=`<path d="${d}"/><path d="M${pt(sh*.98,m-hw*.6)}Q${pt(sh*.86,m)} ${pt(sh*.98,m+hw*.6)}"/>`}
+   // Ball-flowers on the archivolt, one per socket: a gilt ball with three slits.
+   let bf='';for(let n=-3;n<=3;n++){const a=180+15*n,c=pt(R-2.8*k,a).split(' ').map(Number);bf+=`<g transform="translate(${c[0]} ${c[1]})"><circle r="${f(2.8*k)}" fill="url(#gild)" stroke="#5a3a0c" stroke-width=".4"/><path d="M0 0L0 ${f(-2*k)}M0 0L${f(1.7*k)} ${f(1*k)}M0 0L${f(-1.7*k)} ${f(1*k)}" stroke="#6e4a12" stroke-width=".5"/></g>`}
+   let lb='';for(let i=0;i<4;i++){const a=(45+i*90)*D;lb+=`<circle cx="${f(Math.cos(a)*2.6*k)}" cy="${f(Math.sin(a)*2.6*k)}" r="${f(2.6*k)}"/>`}
+   return `<g transform="translate(1.4 2.2)"><g transform="${T}"><path d="${half}" fill="#000" opacity=".3"/></g></g><g transform="${T}">`+
+    (lit>0?`<circle cx="${f(-R*.45)}" r="${f(R*.8)}" fill="${glowC}" opacity="${f(.28*lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`:'')+
+    `<g fill="url(#lime)" filter="url(#st-v)"><path d="${half}"/></g>${gl}<g fill="none" stroke="${LEAD}" stroke-width=".8">${led}</g>`+
+    `<path d="M0 ${f(-ri)}A${f(ri)} ${f(ri)} 0 0 0 0 ${f(ri)}" fill="none" stroke="#3a2c1c" stroke-opacity=".5" stroke-width="${f(1.4*k)}"/><path d="${vj}" stroke="#3a2c1c" stroke-opacity=".45" stroke-width=".6"/>`+
+    `<path d="M0 ${f(-R+1)}A${f(R-1)} ${f(R-1)} 0 0 0 0 ${f(R-1)}" fill="none" stroke="#fff6e2" stroke-opacity=".5" stroke-width=".8"/>${bf}`+
+    `<rect x="${f(-3*k)}" y="${f(-R)}" width="${f(3*k)}" height="${f(2*R)}" fill="#b9aa8a" stroke="#3a2c1c" stroke-opacity=".4" stroke-width=".5"/>`+
+    (sx<1?`<path d="${half}" fill="#1d140b" opacity="${f(.55*(1-sx))}"/>`:'')+
+    `<g transform="translate(.7 1)" fill="#000" opacity=".32">${lb}</g><g fill="url(#gild)" stroke="#5a3a0c" stroke-width=".5">${lb}</g>`+
+    `<circle r="${f(2.3*k)}" fill="${lit>0?mixc([58,47,28],run?[255,200,97]:[159,184,255],lit):'#3a2f1c'}" stroke="#5a3a0c" stroke-width=".6"/>`+
+    (lit>0?`<circle cx="${f(-.6*k)}" cy="${f(-.7*k)}" r="${f(.6*k)}" fill="#fffbe8" opacity="${f(lit)}"/>`:'')+'</g>'},
+  over(c){
+   const jt=c.jt,fwd=model.dir>0,bend=this.bend(jt),G=this.geo(c,bend),{P,R,k,face,big,h}=G,now=performance.now(),run=model.a.run&&model.b.run,x0=c.a.x+W,Jg=this.jamb(c,R,k),D=Math.PI/180;
+   const dust=(x,y,t,m,sp,sd,side)=>JOINS.buttress.dust(x,y,t,m,sp,sd,side);
+   let s='';
+   if(jt===0){this.seated=false;const gho=seg(c.glow,.8,1)*.85;
+    // Ready: the jamb, the tympanum at the angle it will take, and the path its hub will travel, chalked out.
+    if(gho>0){const A=model.angle,cy=Jg.cy,Pg={x:x0+this.gap,y:cy+R*A*D},e=R*Math.PI/4;let tk='';
+     for(let n=-3;n<=3;n++){const y=cy+R*n*Math.PI/12;tk+=`M${f(Pg.x-3)} ${f(y)}H${f(Pg.x+3)}`}
+     s+=`<g fill="none" stroke="#f3d48a" stroke-width=".9" stroke-dasharray="3 2.4" opacity="${f(gho)}"><rect x="${f(x0)}" y="${f(Jg.y0)}" width="${f(face-x0)}" height="${f(Jg.y1-Jg.y0)}"/>`+
+      `<g transform="translate(${f(Pg.x)} ${f(Pg.y)}) rotate(${f(A)})"><path d="M0 ${f(-R)}A${f(R)} ${f(R)} 0 0 0 0 ${f(R)}"/><path d="M0 ${f(-R+8*k)}A${f(R-8*k)} ${f(R-8*k)} 0 0 0 0 ${f(R-8*k)}" opacity=".6"/></g>`+
+      `<path d="M${f(Pg.x)} ${f(cy-e)}V${f(cy+e)}${tk}" opacity=".7"/></g><circle cx="${f(Pg.x)}" cy="${f(Pg.y)}" r="${f(2.6*k)}" fill="#f3d48a" opacity="${f(gho*.8)}"/>`}
+    // Near: the stone warms on Jarvis's end where the jamb will rise, and round the hub's seat on GitDiscuss's.
+    else if(c.glow>0){const g=c.glow,cy=Jg.cy,hb={x:c.b.x,y:c.b.y+(h+8)/2},w=`M${f(x0)} ${f(cy-R*.7)}V${f(cy+R*.7)}M${f(hb.x)} ${f(hb.y-10*k*g)}A${f(10*k*g)} ${f(10*k*g)} 0 0 0 ${f(hb.x)} ${f(hb.y+10*k*g)}`;
+     s+=`<g fill="none" stroke="#f3cf78" stroke-linecap="round" opacity="${f(.85*g)}"><g stroke-width="5" opacity=".3" filter="url(#soft)"><path d="${w}"/></g><path d="${w}" stroke-width="1.6"/></g>`}
+    return s}
+   this.detent(bend,jt);
+   let jb=1,sx=1,lit=1,pulse=0,fx='';
+   if(jt<1){if(fwd){jb=ease(seg(jt,.4,.5));sx=1-Math.pow(1-seg(jt,.5,.6),3);lit=seg(jt,.9,.98);pulse=Math.sin(Math.PI*seg(jt,.6,.66));
+     fx+=dust((x0+face)/2,Jg.y1,seg(jt,.42,.52),7,12*k,331)+dust(face,P.y,seg(jt,.6,.68),6,10*k,347,1);
+     // A knock as the middle ball-flower drops into its socket.
+     const seated=jt>=.6;if(seated&&!this.seated&&!reduce.matches)pawlClick();this.seated=seated}
+    else{const r=1-jt;lit=1-seg(r,0,.08);sx=1-ease(seg(r,.32,.42));jb=1-ease(seg(r,.44,.56));this.seated=false;
+     fx+=dust((x0+face)/2,Jg.y1,seg(r,.46,.58),6,10*k,353)}}
+   else this.seated=true;
+   const seat=sx>=1?Math.round(bend/this.step):99;
+   s+=this.jambSvg(x0,face,Jg,R,k,jb,Math.abs(bend-seat*this.step)<1?seat:99)+this.tymp(P,bend,R,k,sx,lit,run,big)+fx;
+   if(pulse>.05)s+=`<g opacity="${f(pulse)}">${sparkle(face,P.y,pulse*(big?11:7))}</g>`;
+   const hop=jt===1||fwd?Math.sin(Math.PI*clamp((now-model.clickAt)/220)):0;
+   if(hop>.05&&sx>=1)s+=`<g opacity="${f(hop)}">${sparkle(face,P.y,8*hop*k)}</g>`;
+   if(lit>0&&lit<1&&fwd){const v=Math.sin(Math.PI*lit);s+=`<g opacity="${f(v)}">${sparkle(P.x,P.y,v*(big?12:8))}</g>`}
+   if(jt!==1)return s;
+   // While it rolls: a parchment label under Jarvis's foot.
+   if(now<model.turnUntil||drag&&(drag.dial||drag.mode==='angle')){
+    const on=Math.abs(bend/15-Math.round(bend/15))<.02,deg=signed(bend),tl=on?` · socket ${Math.round(bend/15)+4} of 7`:' · rolling',lw=Math.round(('GitDiscuss '+deg+tl).length*6.3+22),lx=x0-12-lw,ly=c.a.y+h+12;
+    s+=`<g><rect x="${f(lx-4)}" y="${f(ly-4)}" width="${lw+8}" height="27" fill="#4a3d2c"/><rect x="${f(lx-3)}" y="${f(ly-3)}" width="${lw+6}" height="25" fill="#cbbd9f"/><rect x="${f(lx)}" y="${f(ly)}" width="${lw}" height="19" fill="#f6ead0" stroke="#1d1612" stroke-width="1.5"/>`+
+     `<text x="${f(lx+lw/2)}" y="${f(ly+13.5)}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#2c2117">GitDiscuss <tspan font-weight="700" fill="#8e1f2b">${deg}</tspan>${tl}</text></g>`}
+   const T=`translate(${f(P.x)} ${f(P.y)}) rotate(${f(bend)})`,hd=`M0 ${f(-R-4)}A${f(R+4)} ${f(R+4)} 0 0 0 0 ${f(R+4)}Z`;
+   s+=`<g class="hit" id="rollHit" tabindex="0" role="slider" aria-label="Tympanum roll: GitDiscuss angle. Arrow keys roll it one socket (15°); Enter separates the widgets" aria-valuemin="${-this.max}" aria-valuemax="${this.max}" aria-valuenow="${Math.round(model.angle)}" aria-valuetext="${signed(model.angle)}, socket ${Math.round(model.angle/15)+4} of 7" style="cursor:ns-resize"><title>Drag the tympanum along the jamb to roll GitDiscuss</title><g transform="${T}"><path d="${hd}" fill="transparent"/><path class="ringfocus" d="${hd}" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g></g>`+
+    `<g class="hit" id="bossHit" role="button" aria-label="Tap the gilt hub to separate the widgets" style="cursor:pointer"><title>Tap the gilt hub to release</title><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${big?10:8}" fill="transparent"/></g>`;
+   return s},
+  // Dragging the tympanum up or down the jamb rolls it: the hub moves R per radian, so the pointer's travel sets the angle.
+  grab(p){return{dial:true,y0:p.y,th0:model.angle,moved:false}},
+  move(d,p){const R=this.dims(ctx().h).R,deg=(p.y-d.y0)/R*180/Math.PI;if(Math.abs(deg)>1.5)d.moved=true;model.angle=magnet(clamp(d.th0+deg,-this.max,this.max))},
+  key(e,hit){if(hit.id!=='rollHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
@@ -4559,7 +4667,7 @@ MORPHS.flabellum={label:'Flabellum',kind:'Fan',sizes:[['facade','Facade',0,'a fa
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30,roll:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -4650,6 +4758,8 @@ function render(){
    if(model.join==='apse'){const E=JOINS.apse.geo(c,bd).E2;el.style.transformOrigin=`0px ${f(h/2)}px`;el.style.transform=bd?`translate(${f(E.x-m.x)}px,${f(E.y-m.y-h/2)}px) rotate(${f(bd*100)/100}deg)`:''}
    // Fan vault, voussoirs and casement stay: GitDiscuss turns about the corner it shares with Jarvis, the bottom one bending down and the top one bending up.
    else if(model.join==='fan'||model.join==='vous'||model.join==='stay'){el.style.transformOrigin=`0px ${J().up(bd)?h:8}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
+   // Tympanum roll: GitDiscuss turns about the hub on its end at mid-wall, and the hub rolls R per radian along the jamb.
+   else if(model.join==='roll'){const R=JOINS.roll.dims(h).R;el.style.transformOrigin=`0px ${f((h+8)/2)}px`;el.style.transform=bd?`translateY(${f(R*bd*Math.PI/180)}px) rotate(${f(bd*100)/100}deg)`:''}
    // Chevet: GitDiscuss always turns down about the foot it shares with Jarvis, so the chapels rise in the wedge above.
    else if(model.join==='chevet'){el.style.transformOrigin=`0px ${h}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
    // Rose dial and strap hinge: GitDiscuss pivots about the middle of the gap (the rose, or the hinge's knuckle).
@@ -4827,7 +4937,7 @@ stage.addEventListener('pointerdown',e=>{
  if(id!=='c'&&model.jt>0&&model.jt<1){++anim;model.busy=false;if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};setJt(model.jt>=.5?1:0);model.path=null;model.dir=1}
  drag={id,start:p,cb:cBase(),saved:{a:{...model.a},b:{...model.b},c:{...model.c}},group:model.jt===1&&id!=='c',state:'idle'};
  // On the rose dial, GitDiscuss's nameplate swings it about the rose (Jarvis still moves the pair).
- if(id==='b'&&model.jt===1&&AJ()){stopAngle();const C=model.join==='apse'?JOINS.apse.geo(ctx(),model.angle).M:model.join==='fan'||model.join==='vous'||model.join==='stay'||model.join==='chevet'||model.join==='strap'?J().geo(ctx()).P:JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
+ if(id==='b'&&model.jt===1&&AJ()){stopAngle();const C=model.join==='apse'?JOINS.apse.geo(ctx(),model.angle).M:model.join==='fan'||model.join==='vous'||model.join==='stay'||model.join==='roll'||model.join==='chevet'||model.join==='strap'?J().geo(ctx()).P:JOINS.dial.geo(ctx()).P;Object.assign(drag,{mode:'angle',group:false,C,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle})}
  // The pair is in the hand: any lift making room for Checks pauses (turning the dial doesn't move it, so that leaves the lift running).
  if(id!=='c'&&drag.mode!=='angle')stopLift();
  stage.setPointerCapture(e.pointerId);
@@ -4835,6 +4945,8 @@ stage.addEventListener('pointerdown',e=>{
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e),dx=p.x-drag.start?.x,dy=p.y-drag.start?.y;
  if(drag.hit){J().move(drag,p);render();return}
+ // The tympanum's hub travels as it rolls, so the nameplate swings about where the hub is now.
+ if(drag.mode==='angle'&&model.join==='roll')drag.C=J().geo(ctx()).P;
  if(drag.mode==='angle'){const a=Math.atan2(p.y-drag.C.y,p.x-drag.C.x);let d=(a-drag.prev)*180/Math.PI;d=((d+540)%360)-180;drag.prev=a;drag.raw=clamp(drag.raw+d,amin(AJ()),AJ().max);if(Math.abs(drag.raw-drag.th0)>1.5)drag.moved=true;model.angle=magnet(drag.raw);render();return}
  const s=drag.saved,[top,bottom]=pairY();
  if(drag.id==='c'){placeBase(drag.cb.x+dx,drag.cb.y+dy);if(model.g%1)model.cMoved=true;render();return}
