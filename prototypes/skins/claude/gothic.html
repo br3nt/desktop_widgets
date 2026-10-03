@@ -105,7 +105,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .av .mw{background:radial-gradient(ellipse 90% 120% at 50% 0%,#fffaf0,#f4e6c6 62%,#e6d1a4);outline-color:#4a2c06;box-shadow:inset 0 0 10px #b8862a40}
 .av .mw.lst{padding:4px 3px 0 5px}.av .mw ul{font:10px/1.5 Georgia,serif;margin-top:1px}.av .mw li:before{margin-right:4px}
 #av2 .rb{position:static;display:block;margin:3px 0 0}
-.wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}
+.wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}#ov1 .tri button,#ov2 .tri button{border-radius:3px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -259,6 +259,12 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="wv av" id="av2" aria-hidden="true">
   <div class="mw col" style="left:13px;top:108px;width:88px;height:66px"><div class="tiny">Pass rate</div><span class="num ok">86%</span><small>run 418</small></div>
   <div class="mw col" style="left:515px;top:108px;width:88px;height:66px"><div class="tiny">Last 10 runs</div><span class="rb"></span><small>main</small></div>
+ </div>
+ <div class="wv" id="ov1"><div class="tri" role="group" aria-label="Checks, one organ pipe per check"></div></div>
+ <div class="wv av" id="ov2">
+  <div class="mw col" aria-hidden="true" style="left:8px;top:216px;width:88px;height:66px"><div class="tiny">Pass rate</div><span class="num ok">86%</span><small>run 418</small></div>
+  <div class="mw lst" aria-hidden="true" style="left:388px;top:216px;width:88px;height:66px"><div class="tiny">Waiting · 2</div><ul><li>deploy-preview</li><li>e2e-safari</li></ul></div>
+  <div class="tri" role="group" aria-label="The last ten runs, one tower pipe per run"></div>
  </div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
@@ -3209,6 +3215,143 @@ MORPHS.altar={label:'Altarpiece',kind:'Unfold',sizes:[['facade','Facade',0,'a fa
  say:(d,S)=>d>0?(S[2]===1?'Checks becomes an altarpiece and opens its wings.':'Feast day: the leaves folded behind the wings swing out, and the rose is lit.'):(S[2]===0?'The wings close and the altarpiece turns back to stone.':'The feast-day leaves fold away behind the wings.'),
  about:'A winged altarpiece showed more the holier the day. On weekdays it stood shut, its wings painted in grisaille, grey monochrome that imitates carved stone. On Sundays the wings were opened onto gold, and on feast days a second pair of leaves, folded away behind the first, swung out as well. Here Checks grows the same way, by unfolding rather than by building. <b>Triptych</b> (416 px): the facade\'s stone flows into the shut altarpiece, a gilt frame under a crocketed gable with a small rose, on a painted predella that carries the nameplate. Its wings show two hooded stone figures in painted niches. A gilt turn-button swings off the seam with a glint, and the heavy wings swing open one after the other, edge-on for a moment, with a shadow cast on the gold behind and a rebound and dust as each meets its stop. Inside, under rows of haloed saints, three gesso cartouches carry the count and run 418 in the centre, the twelve passed on the left and the two waiting by name on the right, and a row of fourteen gems under the centre, one per check, kindles green and red. <b>Feast day</b> (616 px): the outer leaves swing out from behind the open wings and land with dust, the rose in the gable is lit, and the new leaves carry the pass rate and the last ten runs. <b>Shrinking</b> closes it in reverse. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading shuts it and turns it back into the facade first, and unshading opens it again.'};
 
+/* ---------- Morph: organ (Checks) ---------- */
+// g runs 0 facade, 1 positive, 2 great organ. Gothic organs stood in tall oak cases, their front pipes of burnished tin under crocketed gables and gilt pipe-shades.
+// Checks grows by rising: the facade becomes the organ's impost and keeps its nameplate and display, and a case and fourteen pipes, one per check, rise out of it.
+// For the great organ two stone towers rise from the floor beside it, their pipes the last ten runs. Everything is a function of g, so shrinking lowers it all in reverse.
+const OP=[CW,250],OG=[484,300],OF=OP[1]-CH,OFT=OF-5,OST=37,OPW=11;
+const OPX=j=>32+212/14*(j+.5),OPL=[...Array(14)].map((_,j)=>Math.round(124-60*Math.pow(Math.abs(j-6.5)/6.5,1.3)));
+// The pipes rise from the middle outward; oS0 is each one's start on the first step.
+const ORK=[];[6,7,5,8,4,9,3,10,2,11,1,12,0,13].forEach((j,n)=>ORK[j]=n);
+const oS0=j=>.36+.026*ORK[j];
+// The towers' pipes are the last ten runs (409 to 418), each as tall as its count of passed checks: five in the left tower, five in the right.
+// They rise alternately left and right; oTS0 is the start of the n-th (n = 2k + side).
+const ORUN=[14,14,13,14,12,14,14,13,14,12],OTX=[52,432],OPT=206,OTT=46,orSt=v=>v===14?'pass':v===13?'run':'need',oTL=v=>96+(v-12)*26,oTS0=n=>.54+.025*n;
+const orBox=g=>g<1e-6?[CW,CH]:g<=1?OP:[lerp(CW,OG[0],ease(seg(g-1,0,.12))),OG[1]],orDims=k=>[[CW,CH],OP,OG][k];
+// One tin pipe standing on its toe at (x,toe): a cone foot, a gilt-lipped mouth, the body with a burnished highlight, and a status gem on the foot.
+// A waiting pipe is muffled: a red cloth tied round it above the mouth, so it can't speak.
+function orPipe(x,toe,L,w,st,lit,mu){
+ const fh=20*w/11,t=toe-L,m=toe-fh,hw=w/2,gy=toe-fh*.45;
+ let s=`<path d="M${f(x-1.6)} ${toe}L${f(x-hw)} ${f(m)}V${f(t)}H${f(x+hw)}V${f(m)}L${f(x+1.6)} ${toe}Z" fill="url(#orTin)" stroke="#2b2420" stroke-width=".6"/>`+
+  `<path d="M${f(x-hw)} ${f(m)}H${f(x+hw)}" stroke="#2b2420" stroke-width=".5" stroke-opacity=".6"/><ellipse cx="${f(x)}" cy="${f(t)}" rx="${f(hw)}" ry="1.6" fill="#1a1612" stroke="#d9d4c6" stroke-width=".5"/>`+
+  `<path d="M${f(x-hw*.62)} ${f(m)}V${f(m-5)}Q${f(x)} ${f(m-10)} ${f(x+hw*.62)} ${f(m-5)}V${f(m)}Z" fill="#120e0c" stroke="url(#gild)" stroke-width="1.1"/>`+
+  `<circle cx="${f(x)}" cy="${f(gy)}" r="3.4" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/><circle cx="${f(x)}" cy="${f(gy)}" r="2.3" fill="url(#lg-${st})" stroke="#1d1612" stroke-width=".5"/>`;
+ if(lit<1)s+=`<circle cx="${f(x)}" cy="${f(gy)}" r="2.3" fill="#16131f" opacity="${f(.62*(1-lit))}"/>`;
+ if(st==='need'&&mu>0){const y=m-19,e=ease(mu);
+  s+=`<g opacity="${f(Math.min(1,mu*3))}"><rect x="${f(x-hw-1)}" y="${f(y)}" width="${f(w+2)}" height="7" rx="1.5" fill="#8e1f2b" stroke="#3d0b10" stroke-width=".6"/><path d="M${f(x-hw)} ${f(y+2.3)}H${f(x+hw)}M${f(x-hw)} ${f(y+4.7)}H${f(x+hw)}" stroke="#c4505b" stroke-width=".5" opacity=".7"/>`+
+   `<g transform="rotate(${f(55*(1-e))} ${f(x+hw)} ${f(y+3.5)})"><path d="M${f(x+hw)} ${f(y+3)}l5 9l-3 1zM${f(x+hw)} ${f(y+4)}l2 11h-3z" fill="#8e1f2b" stroke="#3d0b10" stroke-width=".5"/></g><circle cx="${f(x+hw+.5)}" cy="${f(y+3.5)}" r="1.8" fill="#a3222f" stroke="#3d0b10" stroke-width=".5"/></g>`}
+ return s;
+}
+// A pipe rising: it comes up out of the case (clipped at the toe line) and settles with a small lift.
+const orRise=(q,L)=>(L+8)*(1-ease(q))-3*Math.sin(Math.PI*seg(q,.7,1));
+// The dark case behind a row of pipes, painted with a gold diaper.
+const orBack=(x0,w,top,bot)=>[`fill="#16121c"`,`fill="url(#orDia)"`,`fill="url(#orDeep)"`].map(p=>`<rect x="${x0}" y="${top}" width="${w}" height="${bot-top}" ${p}/>`).join('');
+// The gilt pipe-shades: scallops hanging under the case top, one over each pipe, in front of the pipe tops.
+function orShade(top,xs,a){
+ let sc='',cu='';for(const x of xs){sc+=`M${f(x-a)} ${top}Q${f(x-a)} ${top+11} ${f(x)} ${top+12}Q${f(x+a)} ${top+11} ${f(x+a)} ${top}`;cu+=`<circle cx="${f(x-a)}" cy="${top+4}" r="1.4"/>`}
+ cu+=`<circle cx="${f(xs[xs.length-1]+a)}" cy="${top+4}" r="1.4"/>`;
+ return `<path d="${sc}" fill="none" stroke="#1d1612" stroke-width="2.6" stroke-opacity=".7"/><path d="${sc}" fill="none" stroke="url(#gild)" stroke-width="1.3"/><g fill="url(#gild)" stroke="#3a2608" stroke-width=".4">${cu}</g>`;
+}
+// Oak stiles with gilt pinnacles, and a crocketed gable from x0 to x1 with its apex ap above `top`, a gilt quatrefoil in it and a fleuron finial.
+function orGable(x0,x1,top,ap,k){
+ const xc=(x0+x1)/2,ya=top-ap;
+ let s=[x0-2,x1-6].map(x=>`<rect x="${x}" y="${top-4}" width="8" height="${1e3}" fill="url(#orOak)" stroke="#2a1a0c" stroke-width=".7"/><path d="M${x+2} ${top}V${top+1e3}" stroke="#d8aa48" stroke-opacity=".5" stroke-width=".6"/>`).join('');
+ s+=`<path d="M${x0} ${top}L${xc} ${ya}L${x1} ${top}Z" fill="#4a2f17" stroke="#2a1a0c" stroke-width=".8"/><path d="M${x0+12} ${top-1.5}L${xc} ${f(ya+5)}L${x1-12} ${top-1.5}" fill="none" stroke="url(#tpGold)" stroke-width="1.4"/>`+
+  `<g transform="translate(${xc} ${f(top-ap*.36)}) scale(${k})"><g fill="url(#gild)" stroke="#3a2608" stroke-width=".5"><circle cx="-3.2" r="3"/><circle cx="3.2" r="3"/><circle cy="-3.2" r="3"/><circle cy="3.2" r="3"/></g><circle r="1.8" fill="#1f3f8a"/></g>`+
+  `<g fill="url(#gild)" stroke="#4a2c06" stroke-width=".5">${crockets(x0,top,xc,ya,1,Math.round(5*k+1),2.4*k)+crockets(x1,top,xc,ya,-1,Math.round(5*k+1),2.4*k)+pinnacle(x0+2,top-4,.7*k)+pinnacle(x1-2,top-4,.7*k)}`+
+  `<circle cx="${xc}" cy="${f(ya-3*k)}" r="${f(3*k)}"/><rect x="${f(xc-1.4*k)}" y="${f(ya-15*k)}" width="${f(2.8*k)}" height="${f(12*k)}"/><circle cx="${xc}" cy="${f(ya-15*k)}" r="${f(2.2*k)}"/><circle cx="${f(xc-4.4*k)}" cy="${f(ya-10*k)}" r="${f(2*k)}"/><circle cx="${f(xc+4.4*k)}" cy="${f(ya-10*k)}" r="${f(2*k)}"/></g>`;
+ return s;
+}
+// The positive in its own frame (OP), without the facade: the case rising behind the toe-board, then the pipes, then the toe-board in front.
+function orPos(tb,cs,pr,mu,lit){
+ let s='',p='',gw='';const dy=(1-ease(cs))*(OFT-OST+60);
+ if(cs>0)s+=`<g clip-path="url(#orClip)"><g transform="translate(0 ${f(dy)})">${orBack(22,232,OST,OFT)+orGable(18,258,OST,32,1)}</g></g>`;
+ for(let j=0;j<14;j++){const q=pr[j];if(q<=0)continue;const st=j<12?'pass':'need';
+  p+=`<g transform="translate(0 ${f(orRise(q,OPL[j]))})">${orPipe(OPX(j),OFT,OPL[j],OPW,st,lit,mu)}</g>`;
+  if(lit>0)gw+=`<circle cx="${f(OPX(j))}" cy="${OFT-9}" r="4.4" fill="${LCOL[st]}" opacity="${f(.7*lit)}"/>`}
+ if(cs>0)p+=`<g transform="translate(0 ${f(dy)})">${orShade(OST,OPL.map((_,j)=>OPX(j)),212/28)}</g>`;
+ s+=`<g clip-path="url(#orClip)">${p}</g>`+(gw?glowG(gw):'');
+ if(tb>0)s+=`<g transform="translate(138 0) scale(${f(Math.max(.02,ease(tb))*1000)/1000} 1) translate(-138 0)"><rect x="14" y="${OFT}" width="248" height="9" fill="#5a3a1e" stroke="#2a1a0c" stroke-width=".8"/>`+
+  `<path d="M14 ${OFT+.8}H262" stroke="url(#tpGold)" stroke-width="1.2"/><path d="M14 ${OFT+5}H262" stroke="#2a1a0c" stroke-opacity=".5" stroke-width=".6"/><path d="M14 ${OFT+10}H262" stroke="#000" stroke-opacity=".3" stroke-width="2"/></g>`;
+ return s;
+}
+// One tower in the great organ's frame, centred on xc: a stone pedestal rising from the floor with a carved recess for its pane,
+// then an oak case with a crocketed gable rising out of the pedestal, and five pipes, one per run.
+function orTower(xc,side,pd,tc,tp,lit){
+ let s='',p='',gw='';const toe=OPT-2;
+ if(pd>0){const dy=(1-ease(pd))*(OG[1]-OPT+16);
+  const b=`<g fill="url(#lime)" filter="url(#st-og)"><rect x="${xc-50}" y="${OPT}" width="100" height="${OG[1]-OPT}"/><rect x="${xc-51.5}" y="${OG[1]-12}" width="103" height="12"/><rect x="${xc-51.5}" y="${OPT-2}" width="103" height="7"/></g>`+
+   `<path d="M${xc-51.5} ${OPT+5}H${xc+51.5}M${xc-51.5} ${OG[1]-12}H${xc+51.5}" stroke="#3a2c1c" stroke-opacity=".4"/><path d="M${xc-51.5} ${OPT-1.2}H${xc+51.5}" stroke="#fff6e2" stroke-opacity=".55"/>`+
+   `<rect x="${xc-47}" y="${OPT+7}" width="94" height="74" fill="#2a1f15" opacity=".45"/><path d="M${xc-47} ${OPT+81}H${xc+47}V${OPT+7}" fill="none" stroke="#fff6e2" stroke-opacity=".55"/>`;
+  s+=`<g clip-path="url(#orFloor)"><g transform="translate(0 ${f(dy)})">${b}</g></g>`}
+ if(tc>0){const dy=(1-ease(tc))*(toe-OTT+56);
+  s+=`<g clip-path="url(#orPed)"><g transform="translate(0 ${f(dy)})">${orBack(xc-42,84,OTT,toe)+orGable(xc-46,xc+46,OTT,40,.8)}</g></g>`;
+  for(let k=0;k<5;k++){const q=tp[k];if(q<=0)continue;const v=ORUN[side*5+k],L=oTL(v),x=xc+(k-2)*15,st=orSt(v);
+   p+=`<g transform="translate(0 ${f(orRise(q,L))})">${orPipe(x,toe,L,12,st,lit,0)}</g>`;
+   if(lit>0)gw+=`<circle cx="${x}" cy="${f(toe-9.8)}" r="4.6" fill="${LCOL[st]}" opacity="${f(.7*lit)}"/>`}
+  p+=`<g transform="translate(0 ${f(dy)})">${orShade(OTT,[0,1,2,3,4].map(k=>xc+(k-2)*15),7.5)}</g>`;
+  s+=`<g clip-path="url(#orPed)">${p}</g>`+(gw?glowG(gw):'')}
+ return s;
+}
+// A pipe speaking as it lands: rings of sound from both sides of its mouth.
+const oSpeak=(x,y,t)=>{const v=Math.sin(Math.PI*t);if(v<.05)return '';let o='';
+ for(const r0 of[3,7]){const r=r0+7*t;o+=`M${f(x+r*.77)} ${f(y-r*.64)}A${f(r)} ${f(r)} 0 0 1 ${f(x+r*.77)} ${f(y+r*.64)}M${f(x-r*.77)} ${f(y-r*.64)}A${f(r)} ${f(r)} 0 0 0 ${f(x-r*.77)} ${f(y+r*.64)}`}
+ return `<path d="${o}" fill="none" stroke="#fff1c0" stroke-width=".9" opacity="${f(.8*v)}"/>`};
+function orRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),[w,h]=orBox(g),cx=w/2,ox=cx-CW/2,oy=h-OP[1],X0=cx-OG[0]/2,Y0=h-OG[1];
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='o'){ms.dataset.key='o';ms._d='';ms._bx=null;fx._s=null;
+  ms.innerHTML=`<defs>${stoneFilter('og',31)}<linearGradient id="orTin" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#4f4c47"/><stop offset=".2" stop-color="#b3afa6"/><stop offset=".34" stop-color="#f4f1e8"/><stop offset=".52" stop-color="#a39f97"/><stop offset=".8" stop-color="#686460"/><stop offset="1" stop-color="#34312d"/></linearGradient>`+
+   `<linearGradient id="orOak" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#3b2412"/><stop offset=".4" stop-color="#7a5230"/><stop offset="1" stop-color="#4a2f17"/></linearGradient>`+
+   `<linearGradient id="orDeep" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".6"/><stop offset=".45" stop-color="#000" stop-opacity="0"/></linearGradient>`+
+   `<pattern id="orDia" width="12" height="12" patternUnits="userSpaceOnUse"><path d="M6 3.4L6.9 6L6 8.6L5.1 6ZM3.4 6L6 5.1L8.6 6L6 6.9Z" fill="#c9a24a" opacity=".32"/></pattern>`+
+   `<clipPath id="orClip"><rect x="-40" y="-80" width="356" height="${OFT+80}"/></clipPath><clipPath id="orFloor"><rect x="-60" y="-100" width="604" height="${OG[1]+100}"/></clipPath>`+
+   `<clipPath id="orPed"><rect x="-60" y="-100" width="604" height="${OPT-2+100}"/></clipPath></defs><g class="ofac">${cas(0)}</g><g class="odyn"></g>`}
+ const bx=f(w)+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${f(w)} ${h}`)}}
+ ms.querySelector('.ofac').setAttribute('transform',`translate(${f(ox)} ${oy+OF})`);
+ // The positive: toe-board, case, pipes from the middle outward, the muffles, then the gems kindle. Whole once the first step is done.
+ const P1=i>0,tb=P1?1:seg(u,.02,.12),cs=P1?1:seg(u,.08,.38),pr=OPL.map((_,j)=>P1?1:seg(u,oS0(j),oS0(j)+.1)),mu=P1?1:seg(u,.8,.88),lit=P1?1:seg(u,.86,1);
+ let d=`<g transform="translate(${f(ox)} ${oy})">${orPos(tb,cs,pr,mu,lit)}</g>`;
+ // The towers, on the second step, once the box has widened: plinths, cases, pipes alternately left and right, then the panes and gems.
+ const pd=P1?seg(u,.1,.34):0,tc=P1?seg(u,.34,.56):0,tl=P1?seg(u,.87,1):0;
+ if(pd>0)d=`<g transform="translate(${f(X0)} ${Y0})">${[0,1].map(sd=>orTower(OTX[sd],sd,pd,tc,[0,1,2,3,4].map(k=>seg(u,oTS0(2*k+sd),oTS0(2*k+sd)+.1)),tl)).join('')}</g>`+d;
+ if(ms._d!==d){ms._d=d;ms.querySelector('.odyn').innerHTML=d}
+ // Dust where the case and the plinths land, glints on the finials, and each pipe speaking as it lands (the muffled two stay silent).
+ const dust=JOINS.buttress.dust,spk=(x,y,t,r)=>{const v=Math.sin(Math.PI*t);return v>.05?`<g opacity="${f(v)}">${sparkle(x,y,r*v)}</g>`:''};
+ let fxs='';
+ if(!P1){const t=seg(u,.36,.5);fxs+=dust(ox+20,oy+OFT,t,4,9,211)+dust(ox+256,oy+OFT,t,4,9,213)+spk(ox+138,oy+OST-47,seg(u,.3,.42),7);
+  for(let j=0;j<14;j++){const s0=oS0(j),x=ox+OPX(j);if(j<12)fxs+=oSpeak(x,oy+OFT-25,seg(u,s0+.09,s0+.2));fxs+=spk(x,oy+OFT-OPL[j]-2,seg(u,s0+.08,s0+.16),4)}}
+ else if(u>0)for(const sd of[0,1]){const xc=X0+OTX[sd],t=seg(u,.32,.46);fxs+=dust(xc-50,h,t,5,12,221+sd)+dust(xc+50,h,t,5,12,231+sd)+spk(xc,Y0+OTT-44,seg(u,.52,.64),6);
+  for(let k=0;k<5;k++){const s0=oTS0(2*k+sd),x=xc+(k-2)*15,L=oTL(ORUN[sd*5+k]);fxs+=oSpeak(x,Y0+OPT-2-20*12/11-5,seg(u,s0+.09,s0+.2))+spk(x,Y0+OPT-2-L-2,seg(u,s0+.08,s0+.16),4)}}
+ if(fx._s!==fxs){fx._s=fxs;fx.innerHTML=fxs}
+ // Displays: the facade keeps its own; the pipes take taps once lit; the tower panes fade in at the end.
+ const o1=$('#ov1'),o2=$('#ov2');
+ if(lit<.01)o1.style.display='none';else Object.assign(o1.style,{display:'block',left:f(ox)+'px',top:oy+'px'});
+ $('#ov1 .tri').style.visibility=lit<1?'hidden':'';
+ if(tl<.01)o2.style.display='none';else Object.assign(o2.style,{display:'block',left:f(X0)+'px',top:Y0+'px',opacity:f(tl)});
+ $('#ov2 .tri').style.visibility=tl<1?'hidden':'';
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+oy+OF)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+oy+OF)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'rising')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function orPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0;let t;
+ if(i===0){const n=OPL.filter((_,j)=>u>=oS0(j)+.1).length;
+  t=u<.1?(up?'setting the toe-board on the facade':'lifting the toe-board away'):u<.37?(up?'the case rises out of the facade':'the case sinks into the facade'):
+   u<.8?(up?'raising pipe '+Math.min(14,n+1)+' of 14':'lowering the pipes, '+n+' still up'):u<.88?(up?'muffling the two waiting pipes':'untying the muffles'):(up?'the pipes kindle':'the pipes go dark')}
+ else t=u<.1?(up?'clearing the floor beside the organ':'the positive stands alone'):u<.34?(up?'the tower plinths rise':'the tower plinths sink'):u<.56?(up?'the tower cases go up':'the tower cases come down'):
+  u<.87?(up?'raising the last ten runs as pipes':'lowering the run pipes'):(up?'the tower panes light':'the tower panes dim');
+ return 'Checks · '+t;
+}
+MORPHS.organ={label:'Organ',kind:'Rise',sizes:[['facade','Facade',0,'a facade'],['positive','Positive',1,'a positive organ'],['great','Great organ',2,'a great organ']],ms:[4000,3000],
+ box:orBox,dims:orDims,render:orRender,phase:orPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes an organ: a case rises out of the facade, and fourteen pipes rise into it, one per check.':'Great organ: two stone towers rise beside it, their pipes the last ten runs.'):(S[2]===0?'The pipes and the case sink back into the facade.':'The towers sink back into the floor.'),
+ about:'Gothic churches housed their organs in tall oak cases: rows of burnished tin pipes stood on a toe-board under crocketed gables, with gilt carving, the pipe-shades, hung over their tops, and the largest organs were flanked by towers of the longest pipes. Here Checks grows by rising, and the facade is never replaced: it becomes the organ\'s impost and keeps its nameplate and its display. <b>Positive</b> (250 px tall): an oak toe-board is set along the cornice, and the case rises out of the facade behind it, dark and diapered in gold, under a crocketed gable with a gilt quatrefoil and a fleuron finial. Fourteen pipes, one per check, rise into it from the middle outward, each settling with a small lift and speaking as it lands, in rings of sound from its gilded mouth. The two waiting checks, deploy-preview and e2e-safari, rise silent and are then muffled with red cloths, and the gems on the pipe feet kindle, twelve green and two red. Hover or tap a pipe to read its check. <b>Great organ</b> (484 px): stone plinths rise out of the floor on both sides and land in dust, oak tower cases rise out of them, and their pipes rise alternately left and right. Those ten pipes are the last ten runs on main, each as tall as its count of passed checks, with a green, amber or red gem (hover or tap one to read its run). Panes in the plinths give the pass rate, 86% on run 418, and the two waiting checks by name. <b>Shrinking</b> lowers it all in reverse. Pick a size, press M, or scrub the slider. Checks grows from its foot and moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading lowers it back into the facade first, and unshading raises it again.'};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
@@ -3412,6 +3555,11 @@ $('#grow').oninput=e=>{if(drag)cancelDrag();
 CHK.forEach((n,j)=>{const b=document.createElement('button'),need=j>11,t=`Check ${j+1} of 14 · ${n} · ${need?'waiting for your approval':'passed'}`;
  b.style.cssText=`left:${triX(j)-7}px;top:157px;width:14px;height:35px`;b.setAttribute('aria-label',t);b.dataset.tip=t;b.dataset.c=need?'need':'pass';
  b.onpointerenter=b.onfocus=b.onclick=()=>showTip(b);b.onpointerleave=b.onblur=hideTip;$('#bv2 .tri').append(b)});
+/* Organ pipes: hover, focus or tap one to read its check, or on the towers its run. */
+const orTipBtn=(box,t,c,css)=>{const b=document.createElement('button');b.style.cssText=css;b.setAttribute('aria-label',t);b.dataset.tip=t;b.dataset.c=c;
+ b.onpointerenter=b.onfocus=b.onclick=()=>showTip(b);b.onpointerleave=b.onblur=hideTip;$(box).append(b)};
+CHK.forEach((n,j)=>orTipBtn('#ov1 .tri',`Pipe ${j+1} of 14 · ${n} · ${j>11?'muffled, waiting for your approval':'passed'}`,j>11?'need':'pass',`left:${f(OPX(j)-7)}px;top:${OFT-OPL[j]}px;width:14px;height:${OPL[j]}px`));
+ORUN.forEach((v,r)=>{const L=oTL(v);orTipBtn('#ov2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${OTX[r>4?1:0]+(r%5-2)*15-7}px;top:${OPT-2-L}px;width:14px;height:${L}px`)});
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
