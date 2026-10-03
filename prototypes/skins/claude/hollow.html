@@ -303,7 +303,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · on the map dividers, drag a leg, the wing or the tag (or GitDiscuss's nameplate) to open or close them, ↑ opens and ↓ closes them a notch, and tap the brass head to release · on the revolving lantern, tap a lantern (or press Enter on its nameplate) to turn its drum to the next screen · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · on the map dividers, drag a leg, the wing or the tag (or GitDiscuss's nameplate) to open or close them, ↑ opens and ↓ closes them a notch, and tap the brass head to release · on the silk web, drag the web (or GitDiscuss's nameplate) to swing GitDiscuss, ↑ ↓ on the focused web move it 15°, and tap the drop at the hub to release · on the revolving lantern, tap a lantern (or press Enter on its nameplate) to turn its drum to the next screen · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -1382,6 +1382,120 @@ const JOINS={
      `<circle class="pinhit" data-part="pin" cx="${f(K.x)}" cy="${f(K.y-2)}" r="14" fill="transparent"><title>Tap the brass head to release</title></circle></g>`}
    return s;
   }
+ },
+ web:{label:'Silk web',kind:'Angle',gap:22,holdAt:.79,msOut:2300,slow:1.45,angled:true,range:45,step:15,angleLabel:'Web angle in degrees',
+  about:'An orb web is spun in the wedge between the shells, and GitDiscuss swings from −45° (raised) to +45° (lowered), turning on the inside corner of the gap, so the web always fills the side that opens. Joining: the shells close to a finger\'s width apart. A silk line is let out from the top of Jarvis\'s strap and drifts across on the air until it catches GitDiscuss\'s, and a second does the same along the bottom. GitDiscuss swings out to its angle, overshooting once, and the two lines stretch with it. A bright point of silk runs out twelve spokes from the hub, alternating sides, then lays the sticky spiral from the rim inward, turn by turn. Dew gathers on the spiral, the drop at the hub kindles as the join light (warm amber while both run, cold blue-white if either is paused), the nearest beads catch its light, and the web shivers once. Whatever the angle, the spokes and spiral are strung to fill the wedge: a wide fan when open, a narrow ladder of loops when nearly level. <b>Angle:</b> drag the web (or GitDiscuss\'s nameplate), use the slider, or focus the web and press the arrow keys (up raises GitDiscuss). Every 15° is a detent: the angle lingers there, the web shivers and its dew glints, and on letting go it settles onto the nearest. The pair moves up or down to stay on the stage. <b>Near:</b> the ends of both straps catch the light. <b>Ready:</b> a dotted ghost of the frame lines and spokes hangs in the gap. <b>Release:</b> tap the drop at the hub (or press Enter on the web). The hub is cut with a flash, the dew falls, the spiral drops away, the spokes spring back to their anchors, GitDiscuss swings level, the frame lines snap back to Jarvis and the shells part.',
+  text:{join:'The shells close; a silk line drifts across the gap, GitDiscuss swings out to its angle, and an orb web is spun in the wedge between them.',
+   joined:'Joined in a silk web. Drag the web (or GitDiscuss\'s nameplate) to swing GitDiscuss; tap the lit drop at the hub to release.',
+   release:'The hub is cut: the dew falls, the spiral drops away, the spokes spring back, GitDiscuss swings level and the frame lines snap.',back:'The silk is drawn back in and the lines let go.',
+   hold:'Held mid-join: the spiral half laid, from the rim inward. Use the scrubber to step through the animation.',
+   ready:'Ready: a ghost of the web hangs in the gap. Release to join.',near:'Nearby: the strap ends catch the light. Move closer.',
+   phReady:'Ready · the web is ghosted',phNear:'Nearby · the strap ends catch the light',get phDrag(){return drag&&drag.pin?'Tap the hub to cut the web':'Swinging GitDiscuss · '+signed(model.angle)}},
+  stepSay:(k,to)=>'GitDiscuss '+(k<0?'rises':'drops')+' a notch; the web holds it at '+signed(to)+'.',
+  phase(dir,jt){const r=1-jt;return dir>0?(jt<.3?'Joining · closing in ':jt<.42?'Joining · a line drifts across ':jt<.56?'Joining · swinging to '+signed(model.angle)+' · ':jt<.7?'Joining · running out the spokes ':jt<.9?'Joining · the spiral, rim inward ':'Joining · dew and light '):(r<.16?'Releasing · the hub is cut ':r<.3?'Releasing · swinging level ':r<.44?'Releasing · the frame lines snap ':'Releasing · parting ')},
+  // GitDiscuss's swing: once the frame lines are across on the way in (one overshoot), after the web is cut on the way out.
+  bend(jt){const A=model.angle;if(jt>=1)return A;if(model.dir>0){const u=seg(jt,.42,.56);return A*(1-Math.pow(1-u,3)*Math.cos(1.6*Math.PI*u))}return A*(1-ease(seg(1-jt,.16,.3)))},
+  // It turns on the inside corner of the gap: the foot when lowered (the web opens upward), the head when raised. At 0° the two agree, so the switch is seamless.
+  py(h,bd){return bd<0?12:h-2},
+  place(h){const bd=this.bend(model.jt);return{o:`${-this.gap/2}px ${this.py(h,bd)}px`,t:bd?`rotate(${f(bd*100)/100}deg)`:''}},
+  // J(t) and G(t) run down the outer edge of each strap, t 0 at the top and 1 at the foot; G turns with GitDiscuss about K.
+  geo(h,bd){const g=this.gap,py=this.py(h,bd),K={x:model.b.x-g/2,y:model.b.y+py},y0=12,y1=h-5;
+   return{K,J:t=>({x:model.a.x+W-3,y:model.a.y+lerp(y0,y1,t)}),G:t=>{const r=rot([g/2+3,lerp(y0,y1,t)-py],bd);return{x:K.x+r[0],y:K.y+r[1]}}}},
+  // The web: a hub (nearer the open side as the wedge widens) and twelve spoke anchors round the frame, clockwise from Jarvis's top.
+  frame(Q,bd,vib=0){const L=(a,b,t)=>({x:lerp(a.x,b.x,t),y:lerp(a.y,b.y,t)}),J0=Q.J(0),G0=Q.G(0),J1=Q.J(1),G1=Q.G(1),th=.5-.14*clamp(bd/20,-1,1),Hh=L(Q.J(th),Q.G(th),.5);
+   const H={x:Hh.x,y:Hh.y+vib},B=[J0,L(J0,G0,1/3),L(J0,G0,2/3),G0,Q.G(.35),Q.G(.65),G1,L(G1,J1,1/3),L(G1,J1,2/3),J1,Q.J(.65),Q.J(.35)];
+   return{H,B,R:Math.max(...B.map(p=>Math.hypot(p.x-H.x,p.y-H.y)))}},
+  // The capture spiral as quadratic pieces from the rim inward: piece q runs from spoke q%12 to the next, sagging a little toward the hub.
+  spiral(F){const{H,B,R}=F,wide=Math.max(Math.hypot(B[3].x-B[0].x,B[3].y-B[0].y),Math.hypot(B[9].x-B[6].x,B[9].y-B[6].y)),n=clamp(Math.round(Math.min(R,wide*1.1)/9),3,9),N=n*12,s=q=>.94-.74*q/N,at=(k,v)=>({x:H.x+v*(B[k%12].x-H.x),y:H.y+v*(B[k%12].y-H.y)}),out=[];
+   for(let q=0;q<N;q++){const a=at(q,s(q)),b=at(q+1,s(q+1)),m={x:(a.x+b.x)/2,y:(a.y+b.y)/2};out.push([a,{x:m.x+(H.x-m.x)*.1,y:m.y+(H.y-m.y)*.1},b])}return out},
+  parts(jt){if(jt>=1)return{top:1,bot:1,spk:1,spi:1,dew:1,lit:1,fall:0,cut:0,snap:0};
+   if(model.dir>0)return{top:seg(jt,.3,.37),bot:seg(jt,.35,.42),spk:seg(jt,.56,.7),spi:seg(jt,.7,.9),dew:seg(jt,.89,.96),lit:seg(jt,.92,.99),fall:0,cut:0,snap:0};
+   const r=1-jt;return{top:1,bot:1,spk:1,spi:1,dew:1,lit:1-seg(r,0,.06),fall:seg(r,0,.12),cut:seg(r,.04,.16),snap:seg(r,.31,.42)}},
+  tone(){return model.a.run&&model.b.run?{glass:'#ffd581',core:'#fff6d8',g:'leakA'}:{glass:'#bcd3f0',core:'#f4f8ff',g:'leakC'}},
+  // The range of Jarvis's y that keeps both shells (and the scrolls over them) on the stage at this angle.
+  fitRange(ang,hh){const h=2*hh,g=this.gap,a=ang*1.12,py=this.py(h,ang),ys=[-36,h+4];
+   for(const p of [[g/2,-30-py],[g/2+W,-30-py],[g/2,h+4-py],[g/2+W,h+4-py]])ys.push(py+rot(p,a)[1]);
+   const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,40-mn),hi=594-mx;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]},
+  fit(y){return clamp(y,...this.fitRange(model.angle,ctx().h/2))},
+  releaseStart(){stopAngle()},
+  key(){$('#a .grip').focus();doSeparate()},
+  arrow(k){stepAngle(k)},
+  // Drags turn about the middle of the gap, which stays put while the pivot changes sides at 0°. A tap on the hub lets a running swing finish.
+  mid(){return{x:model.a.x+W+this.gap/2,y:model.a.y+ctx().h/2}},
+  seamDown(p,t){if(t&&t.closest('[data-part=pin]'))return{seam:true,pin:true,p0:p,moved:0};
+   ++angAnim;model.angTo=undefined;const C=this.mid();return{seam:true,angle:true,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle,moved:false}},
+  seamMove(d,p){if(d.pin){d.moved=Math.max(d.moved,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));return}
+   const C=this.mid(),a=Math.atan2(p.y-C.y,p.x-C.x);let dd=(a-d.prev)*180/Math.PI;dd=((dd+540)%360)-180;d.prev=a;
+   // The web sits close round that middle, so a grab near it turns slowly rather than flicking GitDiscuss to a stop.
+   dd*=clamp(Math.hypot(p.x-C.x,p.y-C.y)/70,.1,1);
+   d.raw=clamp(d.raw+dd,-this.range,this.range);if(Math.abs(d.raw-d.th0)>1.5)d.moved=true;model.angle=magnet(d.raw,this.step);refitPair();render()},
+  seamUp(d){if(d.pin){if(d.moved<10){$('#a .grip').focus();doSeparate()}else render();return}
+   if(d.moved){const to=Math.round(model.angle/this.step)*this.step;animateAngle(to,420);say('GitDiscuss set at '+signed(to)+'; the web takes up the slack.')}
+   else{const el=$('#b');if(d.fromGrip&&el.classList.contains('signed')){signTap('b');return}if(d.fromGrip&&el.classList.contains('lantern')){lanternTap('b');return}
+    if(d.fromGrip&&d.touch&&el.classList.contains('cocooned'))el.classList.toggle('loose');
+    const sv=Math.round(model.angle/this.step)*this.step;if(sv!==model.angle)animateAngle(sv,300);
+    render();say('Drag the web to swing GitDiscuss; tap the drop at the hub to release.')}},
+  seamCancel(d){if(d.angle){model.angle=d.th0;refitPair()}},
+  over(c){
+   const jt=c.jt,now=performance.now(),bd=this.bend(jt),Q=this.geo(c.h,bd);
+   const silk=(d,w,op=1)=>`<path d="${d}" fill="none" stroke="${INK}" stroke-width="${f(w+1.4)}" stroke-linecap="round" opacity="${f(op*.5)}"/><path d="${d}" fill="none" stroke="#e9eef4" stroke-width="${w}" stroke-linecap="round" opacity="${f(op)}"/>`;
+   if(jt===0){this.live=false;this.nk=null;const gl=c.glow;if(gl<=0)return '';
+    let s=glints([Q.J(0),Q.J(1),Q.G(0),Q.G(1)],gl);
+    if(gl>=1){const F=this.frame(Q,0);let d=`M${P(F.B[0])}L${P(F.B[3])}M${P(F.B[6])}L${P(F.B[9])}`;for(const p of F.B)d+=`M${P(F.H)}L${P(p)}`;
+     s+=`<path d="${d}" fill="none" stroke="#e9edf1" stroke-width="1.2" stroke-dasharray="2 3.5" stroke-linecap="round" opacity=".5"/><circle cx="${f(F.H.x)}" cy="${f(F.H.y)}" r="4" fill="none" stroke="#ffe7a8" stroke-width="1.1" stroke-dasharray="2 2"/>`}
+    return s}
+   const k=this.parts(jt),tn=this.tone();
+   // Detents: the web shivers (the hub bobs and every strand follows) and the dew glints. Joining, it shivers once as the hub kindles.
+   if(jt===1){const nk=Math.round(model.angle/this.step);if(Math.abs(model.angle-nk*this.step)<1.2){if(this.nk!=null&&nk!==this.nk)this.flash=now;this.nk=nk}}else this.nk=null;
+   const ft=this.flash?now-this.flash:1e9,fl=jt===1&&ft<520,fk=fl?Math.exp(-ft/150):0;
+   const vib=fl?2.6*fk*Math.sin(ft/26):model.dir>0&&jt<1?2*Math.sin(seg(jt,.93,1)*Math.PI*5)*(1-seg(jt,.93,1)):0;
+   const F=this.frame(Q,bd,vib),{H,B}=F,J0=Q.J(0),G0=Q.G(0),J1=Q.J(1),G1=Q.G(1);
+   let s='',after='',spin=null;
+   if(k.lit>0)s+=`<circle cx="${f(H.x)}" cy="${f(H.y)}" r="34" fill="url(#${tn.g})" opacity="${f(k.lit*.75)}"/>`;
+   // The frame lines: thrown across on the air (the tip billows over, or under, and catches); released, they snap back to Jarvis.
+   const line=(A,Bp,u,sg)=>{if(u<=0)return '';if(k.snap>0){const v=k.snap,e=lerp(Bp.x,A.x,v),ey=lerp(Bp.y,A.y,v)+sg*10*Math.sin(Math.PI*v);return silk(`M${P(A)}Q${f((A.x+e)/2)} ${f((A.y+ey)/2+sg*12*v)} ${f(e)} ${f(ey)}`,1.2,1-seg(v,.75,1))}
+    if(u>=1)return silk(`M${P(A)}L${P(Bp)}`,1.2);
+    const tip={x:lerp(A.x,Bp.x,dart(u)),y:lerp(A.y,Bp.y,u)+sg*30*Math.sin(Math.PI*u)};spin=tip;
+    return silk(`M${P(A)}Q${f((A.x+tip.x)/2)} ${f(Math.min(A.y,tip.y)*(sg<0)+Math.max(A.y,tip.y)*(sg>0)+sg*14*(1-u))} ${P(tip)}`,1.1)};
+   s+=line(J0,G0,k.top,-1)+line(J1,G1,k.bot,1);
+   // Silk dabs where the lines are fixed to the straps.
+   const dab=p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="1.7" fill="#e9eef4" stroke="${INK}" stroke-width=".6"/>`;
+   if(k.snap<1){s+=dab(J0)+dab(J1);if(k.top>=1&&k.snap===0)s+=dab(G0);if(k.bot>=1&&k.snap===0)s+=dab(G1)}
+   // The spokes, run out from the hub in alternating order; released, they spring back from the hub to their anchors.
+   if(k.spk>0&&k.cut<1){const ord=[0,6,3,9,1,7,4,10,2,8,5,11];let d='';
+    ord.forEach((i,q)=>{const u=seg(k.spk,q/12*.75,q/12*.75+.25),Bp=B[i];if(u<=0)return;
+     const a=k.cut>0?{x:lerp(H.x,Bp.x,ease(k.cut)),y:lerp(H.y,Bp.y,ease(k.cut))}:H,e={x:lerp(H.x,Bp.x,u),y:lerp(H.y,Bp.y,u)};d+=`M${P(a)}L${P(e)}`;if(u<1&&!spin)spin=e});
+    s+=silk(d,.9,.95)}
+   // The sticky spiral, laid from the rim inward with the bright point at its end; cut, it falls away.
+   const S=this.spiral(F),N=S.length;
+   if(k.spi>0&&k.cut<.6){const m=k.spi*N,n=Math.floor(m),fr=m-n;let d=`M${P(S[0][0])}`;
+    for(let q=0;q<Math.min(n,N);q++)d+=`Q${P(S[q][1])} ${P(S[q][2])}`;
+    if(n<N&&fr>0){const[a,cq,b]=S[n],c1={x:lerp(a.x,cq.x,fr),y:lerp(a.y,cq.y,fr)},c2={x:lerp(cq.x,b.x,fr),y:lerp(cq.y,b.y,fr)},e={x:lerp(c1.x,c2.x,fr),y:lerp(c1.y,c2.y,fr)};d+=`Q${P(c1)} ${P(e)}`;spin=spin||e}
+    const op=1-seg(k.cut,0,.6);s+=`<g transform="translate(0 ${f(9*k.cut)})" opacity="${f(op)}"><path d="${d}" fill="none" stroke="${INK}" stroke-width="1.8" opacity=".35"/><path d="${d}" fill="none" stroke="#dde6f0" stroke-width=".75" opacity=".9"/></g>`}
+   // Dew on the spiral: the beads nearest the hub catch its light; at a detent they all glint; cut, they fall.
+   if(k.dew>0&&k.fall<1){let d='';const R=F.R;
+    for(let q=2;q<N;q+=1){if((q*7+3)%5)continue;const[a,cq,b]=S[q],p={x:.25*a.x+.5*cq.x+.25*b.x,y:.25*a.y+.5*cq.y+.25*b.y+46*k.fall*k.fall*(1+(q%3)*.3)},
+     r=(1+((q*13)%7)/7*.9)*Math.min(1,k.dew*1.6-(q/N)*.6)+.8*fk,near=1-Math.min(1,Math.hypot(p.x-H.x,p.y-H.y)/R);if(r<=.1)continue;
+     d+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r)}" fill="#cfdbe8" stroke="${INK}" stroke-width=".5"/>`+(k.lit*near>.05?`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r)}" fill="${tn.glass}" opacity="${f(k.lit*near*.9)}"/>`:'')+
+      `<circle cx="${f(p.x-r*.35)}" cy="${f(p.y-r*.35)}" r="${f(r*.38+.3*fk)}" fill="#fff" opacity="${f(.85)}"/>`}
+    s+=`<g opacity="${f(1-k.fall)}">${d}</g>`}
+   // The hub: a tight knot of silk and the drop at its middle, the join light.
+   if(k.spk>0&&k.cut===0){s+=`<g opacity="${f(clamp(k.spk*6))}"><circle cx="${f(H.x)}" cy="${f(H.y)}" r="5.2" fill="none" stroke="#e9eef4" stroke-width=".7" opacity=".8"/><circle cx="${f(H.x)}" cy="${f(H.y)}" r="3.6" fill="#2a3140" stroke="${INK}" stroke-width=".9"/>`+
+     `<circle cx="${f(H.x)}" cy="${f(H.y)}" r="3.6" fill="${tn.glass}" opacity="${f(k.lit)}"/><circle cx="${f(H.x-1.1)}" cy="${f(H.y-1.2)}" r="1.1" fill="${tn.core}" opacity="${f(.5+.5*k.lit)}"/></g>`}
+   // The bright point of silk that does the spinning.
+   if(spin&&model.dir>0&&jt<1)s+=`<circle cx="${f(spin.x)}" cy="${f(spin.y)}" r="6" fill="url(#silkGlow)"/><circle cx="${f(spin.x)}" cy="${f(spin.y)}" r="1.6" fill="#fff"/>`;
+   // Sparks: the lines catching; released, the hub cut and the lines snapping off GitDiscuss.
+   const sp=(a0,a1,p,v)=>{const u=seg(v,a0,a1);if(u>0&&u<1)after+=spark(p,1-u,4+6*u)};
+   if(model.dir>0&&jt<1){sp(.37,.4,G0,jt);sp(.42,.45,G1,jt)}
+   if(model.dir<0&&jt<1){const r=1-jt;sp(.03,.09,H,r);sp(.31,.35,G0,r);sp(.32,.36,G1,r)}
+   this.live=fl;
+   s+=after;
+   if(jt===1){s+=`<g class="hit brackethit" id="seamHit" tabindex="0" role="group" aria-label="Silk web: GitDiscuss at ${signed(model.angle)}. Up arrow raises it a notch (15°) and down arrow lowers it; Enter cuts the hub to separate the widgets"><title>Drag the web to swing GitDiscuss; tap the drop at the hub to release</title>`+
+     `<path d="M${B.map(P).join('L')}Z" fill="transparent" stroke="transparent" stroke-width="12" stroke-linejoin="round"/>`+
+     `<circle class="ringfocus" cx="${f(H.x)}" cy="${f(H.y)}" r="${f(Math.min(F.R,32)+8)}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/>`+
+     `<circle class="pinhit" data-part="pin" cx="${f(H.x)}" cy="${f(H.y)}" r="12" fill="transparent"><title>Tap the drop at the hub to release</title></circle></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -2401,7 +2515,7 @@ function morphTo(id){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:700,y:420}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30,stay:20,dividers:-20},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30,stay:20,dividers:-20,web:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
