@@ -1327,7 +1327,7 @@ function dialSvg(c){
 }
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
-  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet) are built and added here.'},
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet) are built and added here.'},
  strand:{label:'Bead strand',kind:'Distil',ms:1150,ownStrip:true,
   about:'The pendant comes apart into a necklace. The plate and stone fade, the copper frame squeezes flat into a single strung wire, and the beads slide in along it from both clasps, centre beads first, each clicking into place. A flat slab bead carries the name and a cabochon carries the one key value. The round stones between them are the statuses: <b>amber</b> running, <b>labradorite</b> idle or paused, <b>carnelian</b> needs you, <b>malachite</b> passed. Jarvis strings one amber per running agent, GitDiscuss one carnelian per decision, Checks a seed bead per check. Pause a widget and its stones turn to labradorite. The eye loops stay on the ends, so shaded pendants still link by jump ring into one longer strand.',
   sayOn:'Shaded: the frame flattens into a wire and the beads slide on, one stone per status.',
@@ -1388,8 +1388,100 @@ const SHADES={
   about:'The Tuck shade kind (hollow\'s cloak, felt\'s bedtime, gothic\'s Lenten veil, elven\'s star mantle) done in wire, built from chain mail: a sheet of fine European four-in-one, copper rings gone dark, the way a mail coif or a jeweller\'s mesh purse drapes. The display and nameplate fade, and the sheet slides down over the pendant from the top, its hem a row of loose rings rippling as it comes and casting a shadow on the plate below it. A light runs across the rings. The pendant then closes down to a strip and the mail is tucked under top and bottom: creases pull into the sheet and smooth away, and the edges roll under into a coiled lip all round. Two brass wraps go on loose at the ends and snap tight with a glint. Then the name is inlaid into the weave the way mail makers inlay pictures: brass rings close into the field column by column, left to right, each one hot as it goes in, until the name stands in bright rings on the dark mail. Last, a stamped brass tag is hung on a jump ring and drops onto the sheet with the key value and a bezel-set status stone: <b>amber</b> running, <b>labradorite</b> paused, <b>carnelian</b> needs a decision, <b>malachite</b> passing. Unshading unpicks the inlay, unhooks the tag, unrolls the lips and lifts the sheet off. The join ends stay outside the mail, so covered pendants still join.',
   sayOn:'Shaded: a sheet of chain mail drapes over the pendant and is tucked under, the name is inlaid in brass rings, and a stamped tag is hung on with the value.',
   hk:st=>ease(seg(st,.4,.72)),show:st=>1-ease(seg(st,0,.14)),grip:st=>1-ease(seg(st,0,.12)),
-  draw(id,w,h,small,st){return mailTuck(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return mailTuck(id,w,h,small,st)}},
+ charm:{label:'Charm bracelet',kind:'Hang',ms:2800,ownStrip:true,hs:46,chs:42,
+  about:'The Hang shade kind (felt\'s washing line, elven\'s wind chime, hollow\'s cave roots, gothic\'s corona) done in wire, built from the charm bracelet: a brass chain with things hung off it on jump rings, each one swinging when it goes on. The display and nameplate fade and the hammered plate fades away, so the stage shows through. The copper frame draws back from the middle into its two ends and they straighten into twisted posts, bound with coil bands and capped with a curl. A fine brass chain is threaded across from the left post to the right, its free end drooping as it comes and its link still hot, and it hooks onto the right post with a glint. Then the charms are hooked on one by one from the left, each dropping onto its ring and swinging until it hangs still. A hammered brass bar on two rings carries the name and bobs as it lands. Faceted drops on bead caps are the statuses: <b>amber</b> per running Jarvis agent, <b>carnelian</b> per GitDiscuss decision, and for Checks one drop per check, <b>malachite</b> for the 12 passed and carnelian for the 2 waiting. Paused widgets turn their drops to <b>labradorite</b>. Last, a stamped brass tag on one ring carries the one key value and swings the longest. Nothing moves at rest. Unshading unhooks the charms right to left, draws the chain back and opens the posts into the frame. The join ends stay on the posts, so hung bracelets still join.',
+  sayOn:'Shaded: the frame draws back into two posts, a brass chain is strung between them, and the name bar, status drops and value tag are hooked on and swing still.',
+  hk:st=>ease(seg(st,.1,.42)),show:st=>1-ease(seg(st,0,.14)),grip:st=>1-ease(seg(st,0,.12)),
+  draw(id,w,h,small,st){return charmHang(id,w,h,small,st)}}
 };
+// The strip height while shaded: most shades close to HS / CHS, Hang shades want a little room below the chain.
+const stripH=small=>{const o=SHADES[model.shade];return small?(o.chs||CHS):(o.hs||HS)};
+
+/* ---------- Charm bracelet pieces ---------- */
+// A faceted teardrop hung by its tip at (x,y) under a gold bead cap; r is the half-width at the belly.
+function chDrop(x,y,r,stone){
+ const L=2.7*r,d=`M${f(x)} ${f(y)}C${f(x+r*1.3)} ${f(y+r*1.1)} ${f(x+r*1.15)} ${f(y+L)} ${f(x)} ${f(y+L)}C${f(x-r*1.15)} ${f(y+L)} ${f(x-r*1.3)} ${f(y+r*1.1)} ${f(x)} ${f(y)}Z`;
+ let s=`<path d="${d}" fill="url(#st-${stone})" stroke="#1a0d05" stroke-width=".7"/>`+
+  `<path d="M${f(x)} ${f(y+r*.6)}L${f(x-r*.5)} ${f(y+L*.66)}L${f(x)} ${f(y+L-.6)}L${f(x+r*.5)} ${f(y+L*.66)}Z" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width=".6"/>`;
+ if(stone==='lab')s+=`<ellipse cx="${f(x)}" cy="${f(y+L*.64)}" rx="${f(r*.62)}" ry="${f(r*.3)}" transform="rotate(-35 ${f(x)} ${f(y+L*.64)})" fill="url(#st-flash)"/>`;
+ return s+`<ellipse cx="${f(x-r*.38)}" cy="${f(y+L*.56)}" rx="${f(r*.2)}" ry="${f(r*.42)}" fill="#fff" opacity=".55"/>`+
+  `<path d="M${f(x-r*.62)} ${f(y+r*.62)}Q${f(x)} ${f(y-r*.3)} ${f(x+r*.62)} ${f(y+r*.62)}Z" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".5"/>`;
+}
+// Left to right: the name bar, the status drops, the value tag. Checks drops its word if the row would not fit.
+const chCache={};
+function chLayout(id,w,small){
+ const D=strandData(id),P=plaqueData(id),key=id+w+D.beads.join()+P.word;if(chCache[key])return chCache[key];
+ const xa=small?13:15,xb=w-xa,nw=Math.ceil(measure(D.name,'italic bold 14px Georgia,serif'))+20;
+ const vw=word=>Math.ceil(measure(P.num,PL_NUM_F)+(word?4+measure(word,PL_WORD_F):0))+18;
+ const n=D.beads.length,r=n>6?2.6:4.4,pitch=n>6?6.2:14,dw=(n-1)*pitch+2*r;
+ let word=P.word;if(nw+dw+vw(word)+24>xb-xa)word='';
+ const vW=vw(word),nx=xa+6+nw/2,vx=xb-6-vW/2,room=(vx-vW/2)-(nx+nw/2),d0=nx+nw/2+(room-dw)/2+r;
+ const items=[{k:'name',x:nx,wd:nw,text:D.name}];
+ D.beads.forEach((stone,i)=>items.push({k:'drop',x:d0+i*pitch,r,stone,pin:n>6?(i%2?5:2):[3,7,3][i%3]}));
+ items.push({k:'val',x:vx,wd:vW,num:P.num,word});
+ return chCache[key]={xa,xb,items};
+}
+function charmHang(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const full=small?CH:H,r0=Math.min(small?20:26,(full-10)/2);
+ let s='';
+ // The plate and its trimmings fade away, leaving the stage behind.
+ const pf=1-seg(st,.06,.36);
+ if(pf>0)s+=`<g opacity="${f(pf)}">${casing(w,h,small,true)}</g>`;
+ // The frame draws back from the middle into its two ends, which straighten into posts.
+ const e=ease(seg(st,.28,.5)),b=lerp((w-10)/2,0,e),r=Math.min(r0,(h-10)/2,b),po=seg(st,.44,.56);
+ if(po<1){const L=`M${f(5+b)} 5H${f(5+r)}A${f(r)} ${f(r)} 0 0 0 5 ${f(5+r)}V${f(h-5-r)}A${f(r)} ${f(r)} 0 0 0 ${f(5+r)} ${f(h-5)}H${f(5+b)}`,
+  R=`M${f(w-5-b)} 5H${f(w-5-r)}A${f(r)} ${f(r)} 0 0 1 ${w-5} ${f(5+r)}V${f(h-5-r)}A${f(r)} ${f(r)} 0 0 1 ${f(w-5-r)} ${f(h-5)}H${f(w-5-b)}`;
+  s+=wire(L+R,'copper',3.1,f(1-po))}
+ if(po>0){const n=Math.max(2,Math.min(5,Math.floor((h-26)/2.6)));let p='';
+  for(const [x,d] of [[5,1],[w-5,-1]]){p+=twisted(`M${x} ${f(h-6)}V9`,'copper',3.4)+wire(band(x,h/2+9,true,n,9)+band(x,h/2-9,true,2,9),'copper',1.2);
+   p+=wire(spiral(x+d*4.5,6.5,4.2,1.3,d,d>0?Math.PI:0),'copper',1.6)}
+  s+=`<g opacity="${f(po)}">${p}</g>`}
+ // The chain is threaded from the left post to the right; its free end droops and its newest link is hot.
+ const L0=chLayout(id,w,small),{xa,xb}=L0,y0=small?9:10,sag=small?2:2.6,yc=x=>y0+sag*Math.sin(Math.PI*clamp((x-xa)/(xb-xa)));
+ const ct=seg(st,.46,.64);
+ if(ct>0){const P=small?4.6:5.2,front=lerp(xa,xb,ct);let fc='',ed='',hot='';
+  for(let i=0,x=xa;x<=front+.01;i++,x=xa+i*P){
+   const dd=ct<1?Math.pow(Math.max(0,1-(front-x)/26),2)*7:0,y=yc(x)+dd,isHot=ct<1&&front-x<P;
+   const lk=i%2?`M${f(x-P*.62)} ${f(y-dd*.08)}L${f(x+P*.62)} ${f(y+dd*.08)}`:`M${f(x-P*.62)} ${f(y)}a${f(P*.62)} 1.9 0 1 0 ${f(P*1.24)} 0a${f(P*.62)} 1.9 0 1 0 ${f(-P*1.24)} 0`;
+   if(isHot)hot+=lk;else if(i%2)ed+=lk;else fc+=lk}
+  s+=`<path d="${fc+ed}" transform="translate(1.5 3)" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="2.2"/>`+wire(fc,'brass',.9)+wire(ed,'brass',1.3)+(hot?wire(hot,'hot',1.1):'');
+  // A jump ring over each post's curl holds the chain's ends.
+  s+=wire(circ(xa-3,yc(xa)-1,2.6),'brass',.9);
+  if(ct>=1)s+=wire(circ(xb+3,yc(xb)-1,2.6),'brass',.9);
+  const g=Math.sin(Math.PI*seg(st,.64,.71));if(g>.03)s+=sparkle(xb+3,yc(xb)-2,g*.7)}
+ // The charms are hooked on from the left; each drops onto its ring and swings (or bobs) until it hangs still.
+ const its=L0.items,N=its.length;
+ its.forEach((it,i)=>{
+  const t0=.62+.2*i/N,p=seg(st,t0,t0+.08);if(p<=0)return;
+  const q=seg(st,t0+.05,it.k==='val'?1:t0+.18),wob=st>=1?0:Math.sin(q*3*Math.PI)*Math.pow(1-q,1.4);
+  const dy=-12*(1-backOut(p)),op=f(clamp(p*3));
+  if(it.k==='name'){
+   // Two rings, so the bar stays level and bobs instead of swinging.
+   const bh=small?18:20,x0=it.x-it.wd/2,hx=[x0+8,x0+it.wd-8],ty=Math.max(...hx.map(yc))+4.4+dy+2.2*wob;
+   let o=`<rect x="${f(x0+2)}" y="${f(ty+3)}" width="${it.wd}" height="${bh}" rx="4" fill="#000" opacity=".4" filter="url(#soft)"/>`;
+   for(const x of hx)o+=wire(circ(x,(yc(x)+ty)/2+.4,2.4),'brass',.8);
+   o+=`<rect x="${f(x0)}" y="${f(ty)}" width="${it.wd}" height="${bh}" rx="4" fill="url(#cb-brass)" stroke="#3a2408" stroke-width="1"/><rect x="${f(x0)}" y="${f(ty)}" width="${it.wd}" height="${bh}" rx="4" fill="url(#hammer)"/>`+
+    `<path d="M${f(x0+3)} ${f(ty+1.4)}H${f(x0+it.wd-3)}" stroke="#fffbe6" stroke-opacity=".7" stroke-width=".9"/>`;
+   for(const x of hx)o+=`<circle cx="${f(x)}" cy="${f(ty+3.2)}" r="1.3" fill="#140c07"/>`;
+   const tx=(d,fill,a)=>`<text x="${f(it.x)}" y="${f(ty+bh/2+1.4+d)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="14" fill="${fill}" opacity="${a}">${it.text}</text>`;
+   s+=`<g opacity="${op}">${o+tx(.8,'#fff3c4',.6)+tx(0,'#2a1606',1)}</g>`;return}
+  const hy=yc(it.x)+2.6,ang=f((it.k==='val'?10:it.r<3?10:22)*(i%2?-1:1)*wob);
+  let o=wire(circ(it.x,hy,2.3),'brass',.8);
+  if(it.k==='drop'){const py=hy+2.3+it.pin;
+   o+=`<path d="M${f(it.x)} ${f(hy+2)}V${f(py+.6)}" stroke="#b68b34" stroke-width=".8"/>`+chDrop(it.x,py,it.r,it.stone)}
+  else{const th=small?18:20,ty=hy+3.6,x0=it.x-it.wd/2;
+   o+=`<rect x="${f(x0+2)}" y="${f(ty+3)}" width="${it.wd}" height="${th}" rx="${th/2}" fill="#000" opacity=".4" filter="url(#soft)"/>`+
+    `<rect x="${f(x0)}" y="${f(ty)}" width="${it.wd}" height="${th}" rx="${th/2}" fill="url(#cb-brass)" stroke="#3a2408" stroke-width="1"/><rect x="${f(x0)}" y="${f(ty)}" width="${it.wd}" height="${th}" rx="${th/2}" fill="url(#hammer)"/>`+
+    `<path d="M${f(x0+th/2)} ${f(ty+1.4)}H${f(x0+it.wd-th/2)}" stroke="#fffbe6" stroke-opacity=".7" stroke-width=".9"/>`;
+   const tx=(d,fill,a)=>`<text x="${f(it.x)}" y="${f(ty+th/2+.8+d)}" text-anchor="middle" dominant-baseline="central" fill="${fill}" opacity="${a}"><tspan font-family="Georgia,serif" font-weight="bold" font-size="14">${it.num}</tspan>${it.word?`<tspan dx="4" font-family="Georgia,serif" font-style="italic" font-size="11">${it.word}</tspan>`:''}</text>`;
+   o+=tx(.8,'#fff3c4',.6)+tx(0,'#2a1606',1)}
+  s+=`<g opacity="${op}" transform="translate(0 ${f(dy)}) rotate(${ang} ${f(it.x)} ${f(hy)})">${o}</g>`;
+  const g=Math.sin(Math.PI*seg(p,.5,1));if(g>.03&&it.k!=='drop')s+=sparkle(it.x+2,hy-2,g*.5);
+ });
+ return s;
+}
 
 /* ---------- Mail coverlet pieces ---------- */
 // A 5×7 ring font for the inlay: one brass ring per lit cell, set into the field on the field's own 3 px grid.
@@ -2601,9 +2693,9 @@ function toggleShade(force){
 
 /* ---------- Rendering ---------- */
 const shadeK=()=>{const o=SHADES[model.shade];return o.hk?o.hk(model.st):ease(model.st)};
-function ctx(){const h=lerp(H,HS,shadeK());return{a:model.a,b:model.b,h,jt:model.jt,ghost:model.ghost}}
+function ctx(){const h=lerp(H,stripH(false),shadeK());return{a:model.a,b:model.b,h,jt:model.jt,ghost:model.ghost}}
 function render(){
- const c=ctx(),j=J(),sh=SHADES[model.shade],hk=shadeK(),ch=lerp(CH,CHS,hk);
+ const c=ctx(),j=J(),sh=SHADES[model.shade],hk=shadeK(),ch=lerp(CH,stripH(true),hk);
  const lit=Math.max(model.glow,model.jt>0&&model.jt<1?seg(model.jt,.04,.25)*(1-seg(model.jt,.86,1)):0,model.turning&&pivotOn()?.4:0);
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
@@ -2748,7 +2840,7 @@ stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
  if(drag.unwind){const d=Math.hypot(p.x-drag.x0,p.y-drag.y0);if(d>3)drag.moved=true;drag.deg=clamp(d/70);setJt(1-.5*drag.deg);render();return}
  if(!(drag.mode==='angle'&&drag.tap)&&Math.hypot(p.x-drag.start.x,p.y-drag.start.y)>4)drag.moved=true;
- const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?HS:H)-14;
+ const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,top=46,bottom=600-(model.st>.5?stripH(false):H)-14;
  if(drag.mode==='angle'){
   // The pair may have shifted to stay on stage, so measure from where Jarvis's loop is now.
   const L=J().angle.origin(ctx());
@@ -2792,7 +2884,7 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const id=b.dataset.drag;
  if(model.jt>0&&model.jt<1&&id!=='c')return;
  if(id==='b'&&pivotOn()&&k[1]){stepAngle(Math.sign(k[1]));return}
- const bottom=600-(model.st>.5?HS:H)-14,was=[model.a.x,model.a.y,model.b.x,model.b.y]+'';
+ const bottom=600-(model.st>.5?stripH(false):H)-14,was=[model.a.x,model.a.y,model.b.x,model.b.y]+'';
  if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10),ay=pivotOn()?fitY(model.a.y+k[1],model.angle,ctx().h):clamp(model.a.y+k[1],46,bottom);Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
  else if(id==='c'){model.c.x+=k[0];model.c.y+=k[1];clampC();model.cMoved=true}
  else{const m=model[id];m.x=clamp(m.x+k[0],10,1200-W-10);m.y=clamp(m.y+k[1],46,bottom)}
