@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -275,7 +275,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
-$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg>'));
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -1702,7 +1702,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -1723,7 +1723,10 @@ const SHADES={
   about:'In Early English churches (Salisbury, Lincoln, the Temple Church) slender shafts were bound to the piers by <i>shaft rings</i>, annulets of dark, polished Purbeck marble that look as if they were tightened round the stone. Here they bind the whole facade. As the wall lowers, its face breaks into round roll mouldings, thin at first and swelling, and because they stay evenly spaced over whatever wall is left, lowering the wall is what packs them: they close up and meet with a jolt and a puff of grit along the beds, a tight sheaf of rolls running between the end piers. Then the rings come down one at a time, left, right, then the collar in the middle: each drops on loose with a small bounce, then tightens, and the sheaf is drawn in under it and bulges between, the way a bundle gathers under a cord. Grit squeezes out at each ring\'s edge and a glint runs round its gilt fillet. The middle collar is wider and holds a pointed pane of quarry glass, which kindles with a flare (warm while the widget runs, cold if it is paused) and shows the key value in dark ink. <b>The strip is the bound sheaf:</b> the name in the frieze, the cinched rolls, two shaft rings and the lit collar. Unshading plays it back, and joins still work on the shaded pair.'},
  rotulus:{label:'Rotulus',kind:'Roll',ms:3400,h:small=>small?50:58,lowAt:[.16,.74],
   on:'Shaded: the window turns to an illuminated vellum leaf, and as the wall lowers the leaf winds up onto a gilt rod; the value is written on the roll and it is sealed with wax.',off:'Unshaded: the seal comes away, the roll unwinds down the wall as it rises, and the leaf turns back into glass.',
-  about:'Medieval records and liturgy were often kept on a <i>rotulus</i>, a long vellum roll wound on a rod, and a roll that was put away had a note of what it held written on its back (the <i>dorse</i>) and was closed with a pendant wax seal. Here the window becomes the roll. The display fades and the glass turns to an illuminated leaf hanging from the frieze: a red and blue penwork border, a gilded initial in a blue square with a red flourish, the name in red, then lines of brown script. A gilt rod with turned knobs comes in along its foot. Then the wall lowers, and the roll rides down with the foot of the wall, so <b>lowering the wall is what winds the leaf up</b>: the roll climbs, fattening lap by lap, its laps turning over the top, shading the leaf just above it and casting a shadow on the stone below, while the script disappears into it line by line. When it lands under the frieze, a silk tag drops from under it, and a drop of wax falls onto the roll, squashes and is stamped with a quatrefoil, with a glint. The wax is the status: honey amber while running, blue when paused, red for a decision needed, green for passed. Last, the key value is written along the roll beside a small gilded initial. <b>The strip is the sealed roll:</b> the name in the frieze, the value on the dorse, the seal. Unshading plays it back, the leaf unwinding as the wall rises. Joins still work on the shaded pair.'}
+  about:'Medieval records and liturgy were often kept on a <i>rotulus</i>, a long vellum roll wound on a rod, and a roll that was put away had a note of what it held written on its back (the <i>dorse</i>) and was closed with a pendant wax seal. Here the window becomes the roll. The display fades and the glass turns to an illuminated leaf hanging from the frieze: a red and blue penwork border, a gilded initial in a blue square with a red flourish, the name in red, then lines of brown script. A gilt rod with turned knobs comes in along its foot. Then the wall lowers, and the roll rides down with the foot of the wall, so <b>lowering the wall is what winds the leaf up</b>: the roll climbs, fattening lap by lap, its laps turning over the top, shading the leaf just above it and casting a shadow on the stone below, while the script disappears into it line by line. When it lands under the frieze, a silk tag drops from under it, and a drop of wax falls onto the roll, squashes and is stamped with a quatrefoil, with a glint. The wax is the status: honey amber while running, blue when paused, red for a decision needed, green for passed. Last, the key value is written along the roll beside a small gilded initial. <b>The strip is the sealed roll:</b> the name in the frieze, the value on the dorse, the seal. Unshading plays it back, the leaf unwinding as the wall rises. Joins still work on the shaded pair.'},
+ misericord:{label:'Misericord',kind:'Tip',ms:3200,h:small=>small?48:62,lowAt:[.15,.66],
+  on:'Shaded: an oak stall seat swings down over the window, then tips up on its hinge as the wall lowers, showing the carved ledge under it; the value is gilded on the ledge and the supporters\' glass bosses light.',off:'Unshaded: the bosses go dark, the gilding wipes away, and the seat swings down and lifts away as the wall rises.',
+  about:'Choir stalls in gothic churches have hinged oak seats. Tipped up, the underside of each seat shows a small carved ledge, the <i>misericord</i> ("mercy"), for the clergy to lean on through long services, with a carved scene under it and a roundel, the <i>supporter</i>, on a stem at each side. Here the facade is a stall. The display fades as a heavy oak seat swings down from iron hinges under the frieze to cover the window, rebounding against the wall with a puff of dust: grained boards, a moulded border, a carved quatrefoil with a gilt boss and iron straps. Then, as the wall lowers, the seat is tipped up: its face foreshortens and darkens as it turns from the light, its moulded front edge comes round, and its shadow falls on the dark boards of the stall back. The ledge it uncovers rides up with the foot of the wall. When the wall settles, dust drops off the ledge ends, the value is gilded onto the ledge face left to right, and the glass bosses in the two supporters (a carved rose and a sprig of oak leaves) kindle with a flare. They are the status: amber while running, blue when paused, red for a decision, green for passed. <b>The strip is the tipped-up stall:</b> the name in the frieze, the seat\'s edge under it, and the misericord with the value and two lit bosses. Unshading plays it back. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -2086,6 +2089,75 @@ function rotulus(id,w,h,k){
  // A glint runs over the knobs as it finishes.
  const g2=Math.sin(Math.PI*seg(k,.94,1));if(g2>.05)for(const ex of[x0-kr-1.2,x1+kr+1.2])s+=`<g opacity="${f(g2)}">${sparkle(ex-kr*.3,yc-kr*.4,g2*5)}</g>`;
  return s;
+}
+
+/* Misericord: an oak choir-stall seat swings down over the window, then is tipped up on its hinge under the frieze as the wall
+   lowers, showing the carved ledge under it. The ledge carries the value in gilt between two carved supporters; their glass bosses
+   are the status. th is the seat's tilt (0 hanging flat over the window, 90° tipped up so only its front edge shows). */
+const msGlass=id=>id==='a'?(model.a.run?['#fff1c0','#e9a52c','#7a4a08']:['#e2eaff','#5b7fd6','#1c2c66']):id==='b'?['#ffc6b8','#c4323a','#4e0b10']:['#d4f5c0','#46a854','#14461f'];
+function msRose(cx,cy,r,leaf,id){
+ // A carved roundel: a rose of five lobes (left) or a sprig of three oak leaves (right), round a glass boss.
+ let s=`<circle cx="${f(cx+.6)}" cy="${f(cy+.8)}" r="${f(r+.6)}" fill="#000" opacity=".35"/><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="url(#msL-${id})" stroke="#1e1007" stroke-width=".7"/>`;
+ for(let i=0;i<(leaf?3:5);i++){const a=leaf?-Math.PI/2+(i-1)*2.1:-Math.PI/2+i*2*Math.PI/5,px=cx+Math.cos(a)*r*.5,py=cy+Math.sin(a)*r*.5;
+  s+=`<ellipse cx="${f(px)}" cy="${f(py)}" rx="${f(r*(leaf?.24:.3))}" ry="${f(r*(leaf?.44:.36))}" transform="rotate(${f(a*180/Math.PI+90)} ${f(px)} ${f(py)})" fill="#a4723f" stroke="#2a1608" stroke-width=".5"/>`+
+   (leaf?`<path d="M${f(cx+Math.cos(a)*r*.12)} ${f(cy+Math.sin(a)*r*.12)}L${f(cx+Math.cos(a)*r*.86)} ${f(cy+Math.sin(a)*r*.86)}" stroke="#3a210e" stroke-width=".4"/>`:'')}
+ return s+`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="none" stroke="#d9a868" stroke-opacity=".35" stroke-width=".5" transform="translate(-.4 -.4)"/>`;
+}
+function misericord(id,w,h,k){
+ const G=rgGeo(id,w,h),{sm,xa,xb}=G,fb=G.y0-3,foot=sm?3:4,yF=h-foot,T=sm?3.4:4.4,L=(sm?CH:H)-foot-fb,A=yF-fb,Wd=xb-xa,xm=(xa+xb)/2;
+ const op=seg(k,0,.03);if(op<=0)return '';
+ // The seat comes down (with a small rebound against the wall), then is tipped up; the lowering wall never lets it hang past the foot.
+ const down=backOut(seg(k,.01,.13)),up=ease(seg(k,.15,.68));
+ let th=Math.PI/2*(1-down+up);// The limit is 0 at full height (the seat hangs flat) and only bites once the wall has dropped by the seat's thickness.
+ if(th>=0)th=Math.min(Math.PI/2,Math.max(th,Math.acos(clamp((A-T*clamp((L-A)/T))/L))));
+ const ct=Math.cos(th),sn=Math.abs(Math.sin(th)),fH=L*ct,eH=T*sn,yB=fb+fH+eH;
+ const[gl,gb,gd]=msGlass(id),[,num,val]=tpText(id),fs=sm?10:11.5,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`);
+ let s=`<defs><linearGradient id="msO-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#7a4c26"/><stop offset=".5" stop-color="#5e3819"/><stop offset="1" stop-color="#4a2a12"/></linearGradient>`+
+  `<linearGradient id="msL-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#8d5c2f"/><stop offset="1" stop-color="#4b2b12"/></linearGradient>`+
+  `<linearGradient id="msF-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5c3718"/><stop offset="1" stop-color="#341d0b"/></linearGradient>`+
+  `<radialGradient id="msB-${id}" cx=".36" cy=".3" r=".8"><stop stop-color="${gl}"/><stop offset=".5" stop-color="${gb}"/><stop offset="1" stop-color="${gd}"/></radialGradient></defs><g opacity="${f(op)}">`;
+ // The stall's back: dark oak boards behind the seat, seen once it lifts.
+ const rb=seg(k,.08,.14);
+ if(rb>0){let bd='';for(let x=xa+14;x<xb-6;x+=14)bd+=`M${f(x)} ${f(fb)}V${f(yF)}`;
+  s+=`<g opacity="${f(rb)}"><rect x="${f(xa)}" y="${f(fb)}" width="${f(Wd)}" height="${f(A)}" fill="#2a170a"/><path d="${bd}" stroke="#120902" stroke-width="1"/><path d="${bd.replace(/M([\d.]+)/g,(m,x)=>'M'+f(+x+1))}" stroke="#4a2c14" stroke-width=".5" opacity=".6"/>`;
+  // The misericord: a projecting ledge at the foot, its face carrying the value, a supporter roundel on a stem at each end.
+  const lh=sm?13:16,ts=sm?2.5:3,ly1=yF-(sm?2:3),ly0=ly1-lh,lw=tw+(sm?16:22),x0=xm-lw/2,x1=xm+lw/2,rr=sm?6:7.5,cy=(ly0+ly1)/2,cl=x0-(sm?4:5)-rr,cr=x1+(sm?4:5)+rr;
+  for(const[cx,dir]of[[cl,-1],[cr,1]]){const ex=dir<0?x0+3:x1-3;
+   s+=`<path d="M${f(ex)} ${f(ly1-1)}C${f(ex+dir*2)} ${f(ly1+2)} ${f(cx-dir*rr*.2)} ${f(ly1+1.5)} ${f(cx-dir*rr*.55)} ${f(cy+rr*.7)}" fill="none" stroke="#7a4c26" stroke-width="${sm?1.6:2}" stroke-linecap="round"/>`+msRose(cx,cy,rr,dir>0,id)}
+  s+=`<path d="M${f(x0+2)} ${f(ly1+1.5)}H${f(x1-2)}" stroke="#000" stroke-opacity=".45" stroke-width="2"/>`+
+   `<path d="M${f(x0-2)} ${f(ly0)}L${f(x0+3)} ${f(ly0-ts)}H${f(x1-3)}L${f(x1+2)} ${f(ly0)}Z" fill="#a8743f" stroke="#2a1608" stroke-width=".5"/>`+
+   `<path d="M${f(x0-2)} ${f(ly0)}H${f(x1+2)}L${f(x1-2)} ${f(ly1)}H${f(x0+2)}Z" fill="url(#msF-${id})" stroke="#1e1007" stroke-width=".7"/>`+
+   `<path d="M${f(x0)} ${f(ly0+1.4)}H${f(x1)}" stroke="#c99560" stroke-opacity=".4" stroke-width=".5"/>`;
+  // Settling: dust off the ledge ends as the wall comes to rest.
+  const sd=seg(k,.64,.78);if(sd>0&&sd<1)s+=JOINS.buttress.dust(x0,ly0,sd,4,10,id.charCodeAt(0),-1)+JOINS.buttress.dust(x1,ly0,sd,4,10,id.charCodeAt(0)+5,1);
+  // The value is gilded onto the ledge face, left to right.
+  const gt=seg(k,.72,.86);
+  if(gt>0)s+=`<clipPath id="msc-${id}"><rect x="${f(x0)}" y="${f(ly0)}" width="${f(lw*gt)}" height="${f(lh)}"/></clipPath><g clip-path="url(#msc-${id})" font-family="Georgia,serif" font-size="${fs}">`+
+   [['#1a0d04',.6],['',0]].map(([c,o])=>`<text x="${f(xm-tw/2+o)}" y="${f((ly0+ly1)/2+fs*.36+o)}"${c?` fill="${c}"`:''}><tspan font-weight="700" font-size="${fs+1}"${c?'':' fill="#ffe7a2"'}>${num}</tspan><tspan font-style="italic"${c?'':' fill="#efd08a"'}> ${val}</tspan></text>`).join('')+'</g>';
+  // The supporters' glass bosses kindle with a flare: the status.
+  const bk=seg(k,.84,.94),fl=Math.sin(Math.PI*bk),br=sm?2.4:3;
+  for(const cx of[cl,cr]){s+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(br+.6)}" fill="#120a04"/>`;
+   if(bk>0)s+=`<g style="mix-blend-mode:screen" opacity="${f(.55*bk)}"><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(br+2)}" fill="${gb}" filter="url(#lglow)"/></g><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(br)}" fill="url(#msB-${id})" opacity="${f(bk)}"/>`+(fl>.05&&bk<1?`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(br)}" fill="#fffbe8" opacity="${f(.8*fl)}"/>`:'')}
+  const g2=Math.sin(Math.PI*seg(k,.93,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(cl-br*.3,cy-br*.4,g2*5)}</g>`;
+  s+='</g>'}
+ // The seat's shadow falls on the stall back below it.
+ if(rb>0&&yB<yF-1)s+=`<rect x="${f(xa)}" y="${f(yB)}" width="${f(Wd)}" height="${f(Math.max(0,Math.min(sm?4:6,yF-(sm?17.5:22)-yB)))}" fill="url(#tpShT)" opacity="${f(.5*rb)}"/>`;
+ // The seat: its face foreshortens as it tips and darkens as it turns from the light; then its moulded front edge.
+ if(fH>.4){const gy=n=>fb+fH*n;let gr='';
+  for(let i=1;i<(sm?6:9);i++){const t=i/(sm?6:9),y=gy(t);gr+=`M${f(xa+3)} ${f(y)}C${f(xa+Wd*.3)} ${f(y+1.2*ct)} ${f(xa+Wd*.6)} ${f(y-1*ct)} ${f(xb-3)} ${f(y+.4*ct)}`}
+  const mr=Math.min(sm?9:13,L*.3),my=gy(.5);
+  s+=`<rect x="${f(xa)}" y="${f(fb)}" width="${f(Wd)}" height="${f(fH)}" fill="url(#msO-${id})"/><path d="${gr}" fill="none" stroke="#2e1a0a" stroke-opacity=".45" stroke-width=".6"/>`+
+   `<rect x="${f(xa+3)}" y="${f(fb+3*ct)}" width="${f(Wd-6)}" height="${f(Math.max(0,fH-6*ct))}" fill="none" stroke="#a0703f" stroke-opacity=".55" stroke-width=".7"/><rect x="${f(xa+4.5)}" y="${f(fb+4.5*ct)}" width="${f(Wd-9)}" height="${f(Math.max(0,fH-9*ct))}" fill="none" stroke="#1e1007" stroke-opacity=".6" stroke-width=".7"/>`+
+   // A carved quatrefoil in the middle of the seat, and iron strap hinges from the frieze.
+   `<g transform="translate(${f(xm)} ${f(my)}) scale(1 ${f(ct)})" fill="none" stroke-width=".8">${[[mr*.42,0],[-mr*.42,0],[0,mr*.42],[0,-mr*.42]].map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="${f(mr*.5)}" stroke="#2a1608"/><circle cx="${f(x-.5)}" cy="${f(y-.5)}" r="${f(mr*.5)}" stroke="#b07d48" stroke-opacity=".4"/>`).join('')}<circle r="${f(mr*.22)}" fill="url(#gild)" stroke="none"/></g>`+
+   [xa+(sm?16:24),xb-(sm?16:24)].map(x=>`<path d="M${f(x)} ${f(fb)}V${f(fb+Math.min(fH,(sm?10:16)*ct))}" stroke="#1b1612" stroke-width="${sm?2.2:2.8}" stroke-linecap="round"/><circle cx="${f(x)}" cy="${f(fb+Math.min(fH,(sm?10:16)*ct)*.6)}" r=".7" fill="#6d6458"/>`).join('')+
+   `<rect x="${f(xa)}" y="${f(fb)}" width="${f(Wd)}" height="${f(fH)}" fill="#000" opacity="${f(.42*sn)}"/>`}
+ if(eH>.3)s+=`<rect x="${f(xa)}" y="${f(fb+fH)}" width="${f(Wd)}" height="${f(eH)}" rx="${f(Math.min(1.4,eH/2))}" fill="#6b4220" stroke="#1e1007" stroke-width=".5"/><path d="M${f(xa+1)} ${f(fb+fH+.6)}H${f(xb-1)}" stroke="#d6a56c" stroke-opacity="${f(.55*sn)}" stroke-width=".6"/>`;
+ // Hinge knuckles under the frieze
+ for(const x of[xa+(sm?16:24),xb-(sm?16:24)])s+=`<rect x="${f(x-4)}" y="${f(fb-1)}" width="8" height="3" rx="1.2" fill="#1b1612" stroke="#000" stroke-width=".3"/>`;
+ // The seat lands against the wall with a puff of dust from its foot.
+ const ld=seg(k,.05,.15);if(ld>0&&ld<1)s+=JOINS.buttress.dust(xa+12,fb+L,ld,4,10,7,-1)+JOINS.buttress.dust(xb-12,fb+L,ld,4,10,9,1);
+ return s+'</g>';
 }
 
 /* Crypt: the floor stays where the wall stood and the facade sinks into it. Tracery rises in the window first,
@@ -2971,7 +3043,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -2997,15 +3069,18 @@ function render(){
   // Triptych: the display hides once the wings are shut over it. Cornice: it slides up behind the soffit instead of fading.
   // Crypt: the display goes dark before the tracery rises, long before the wall sinks.
   // Rotulus: the display fades first, as the glass turns to vellum.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  // Misericord: the display fades as the seat swings down over it.
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(cn){const cut=Math.max(0,Se-(n.offsetTop-d));n.style.transform=`translateY(${-d}px)`;n.style.clipPath=`inset(${f(cut)}px -24px -24px -24px)`;
     o=cut>=n.offsetHeight?0:n.matches('.tabline,.knob')?1-seg(k,.25,.5):1}
    else if(n.style.transform){n.style.transform='';n.style.clipPath=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);
+  const ms2=el.querySelector('.mssvg'),mkey=ms?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
+  if(ms2.dataset.key!==mkey){ms2.dataset.key=mkey;ms2.setAttribute('width',w);ms2.setAttribute('height',h);ms2.setAttribute('viewBox',`0 0 ${w} ${h}`);ms2.innerHTML=mkey?misericord(id,w,h,k):''}
   const ls=el.querySelector('.rtsvg'),lkey=rt?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(ls.dataset.key!==lkey){ls.dataset.key=lkey;ls.setAttribute('width',w);ls.setAttribute('height',h);ls.setAttribute('viewBox',`0 0 ${w} ${h}`);ls.innerHTML=lkey?rotulus(id,w,h,k):''}
   const gs=el.querySelector('.rgsvg'),gkey=rg?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.b.run}`:'';
