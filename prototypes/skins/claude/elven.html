@@ -672,6 +672,21 @@ const JOINS={
    return jt>.48?'Releasing · the calyx lets go ':'Releasing · the casings part '},
   about:'The Wedge angle kind in elven, after felt\'s cheese wedge, hollow\'s shell shims and gothic\'s voussoirs. Here the wedge is a water lily: the angle is counted in petals and held by what fills the gap, not by a pivot\'s friction. The casings meet with their squared ends almost touching, and GitDiscuss turns on the inside corner they share: the bottom one when it is lowered (the lily opens upward) and the top one when it is raised (the lily hangs down, like a bell). <b>Near:</b> the knops at that corner glow and a single petal drifts over the gap. <b>Ready:</b> the open lily at the set angle is traced in dashed moonlight, petal by petal. Joining: the casings close, and a silver calyx clasps each corner, a bowed arm from each stem\'s knop meeting at a moonstone heart between two small sepals. Then, for each 15°, GitDiscuss lifts a little past where the petal will end, a petal of moon-white glass (a lancet with a silver rim, a midrib and two veins, warm at its base) drifts in on the night air, swaying, and slides in point first to the heart, and GitDiscuss settles onto it with a soft press and a glint up the petal. Last, the petals kindle from the heart outward and the hearts glow as the join light (moonlight while both widgets run, a cold grey if either is paused), and a glint runs along the petal tips. The clasp on the open side lets go as soon as the lily starts to open. <b>Angle:</b> −45° to +45° in 15° steps, so none to three petals. Drag GitDiscuss\'s nameplate round the heart, use the Angle slider, or focus GitDiscuss\'s nameplate or the lily and press ↑ ↓. Open it and the next petal slides in once there is nearly room for it; close it and the top petal is squeezed out and floats away. It always comes to rest on a whole petal. While it turns, a moonstone tag reads the angle and the petal count. The pair refits vertically to stay on the stage; drag Jarvis\'s nameplate to move it. Shaded, the lily shrinks with the casings and keeps its petals. Nothing moves at rest. <b>Release:</b> tap the lily, or focus it and press Enter. It dims, the petals float away last in, first out (GitDiscuss lifting off each and closing on the next), the calyx lets go and the casings part.',
   over:c=>drawLily(c)
+ },
+ silk:{label:'Silk arrow',kind:'Reel',gap:60,slow:1.6,msOut:2800,
+  // Engine hook: joining, the pair waits for the arrow to strike, then closes a third per turn of the spindle.
+  close:t=>skHaul(seg(t,SK.c0,SK.c1)),
+  txt:{join:'The crescent bow on Jarvis\'s stem is drawn and loosed, the arrow flies across trailing spider silk and sinks into the target on GitDiscuss\'s stem, and the moonstone spindle winds GitDiscuss in, turn by turn.',
+   joined:'Joined: the arrow stands in the target and the silk from the spindle is lit, beaded with dew. Drag a nameplate to move the pair; tap the arrow or the silk (or press Enter) to release.',
+   release:'The silk dims, the spindle tugs the arrow free and winds it home onto the bowstring, and the casings part.',
+   stop:'The spindle winds the arrow back to the bow.',
+   hold:'Held mid-join: the arrow is in the target and the spindle has wound GitDiscuss one turn in; the second is about to start. Use the scrubber to step through the shot and the three turns.',
+   ready:'Ready: the silk and the arrow standing in the target are traced in moonlight. Release to loose it.',near:'Nearby: the bow is drawn a little and the target\'s moonstone wakes. Move closer.',
+   readyPh:'Ready · the shot is traced',nearPh:'Nearby · the bow is drawn a little'},
+  phase:(jt,dir)=>dir>0?(jt<.04?'Joining · the arrow is nocked ':jt<.15?'Joining · the bow is drawn ':jt<.29?'Joining · the arrow flies, trailing silk ':jt<SK.c0?'Joining · it strikes the target ':jt<SK.c1?(n=>n%1<.85?'Joining · winding in, turn '+(1+Math.floor(n))+' of 3 ':'Joining · '+(1+Math.floor(n))+' of 3 turns wound ')(Math.min(2.999,seg(jt,SK.c0,SK.c1)*3)):'Joining · the silk kindles '):
+   (jt>.9?'Releasing · the silk dims ':jt>.8?'Releasing · the spindle tugs the arrow free ':jt>.58?'Releasing · the arrow is wound home ':jt>.55?'Releasing · it is nocked again ':'Releasing · the casings part '),
+  about:'The Reel join kind in elven, after gothic\'s windlass and felt\'s fishing game. In a Reel join one widget casts a line, catches the other and hauls it in, so the closing itself is the animation. Here the line is spider silk and the cast is a bowshot. On Jarvis\'s stem stands a slender crescent bow of silver, bracketed to the knops, with recurved horns that curl into spirals, a moonstone at the grip and two leaves round it. Behind the grip turns a small spindle of moonstone wound with silk, and the silk is tied onto the arrow just behind its head. The arrow has a silver leaf blade, a pale shaft, leaf fletchings and a moonstone nock. On GitDiscuss\'s stem is a lancet target of night glass on two silver arms, with a silver ring to strike, a moonstone above it and a leaf below. <b>Near:</b> the bow is drawn a little, and the grip and the target\'s moonstone glow. <b>Ready:</b> the silk and the arrow standing in the target are traced in dashed moonlight. Joining: the bow is drawn (the string comes back over the stem and the horns flex) and loosed. The string shivers, the spindle spins back as the silk pays out, and the arrow flies across the gap in a low arc, turning along it, with the silk sagging behind. It sinks into the ring with a glint and quivers. Then come three turns of the spindle. Each takes up the slack and hauls GitDiscuss a third of the way in while the bow leans with the pull, and the silk falls a little slack between turns, while GitDiscuss stands still. The arrow levels as it comes in. Last, the silk kindles as the join light, dew beads along it catching the light one by one, the spindle and the target\'s moonstone glowing (moonlight while both widgets run, a cold grey if either is paused), and a glint runs along the silk to the arrow. Shaded, the bow, spindle, arrow and target all shrink with the casings, and the silk carries more of the gap. Nothing moves at rest. <b>Release:</b> tap the arrow or the silk, or focus it and press Enter. The silk dims, the spindle tugs and the arrow works loose with a glint, the spindle winds it back tail first along a low arc onto the string, the string shivers, and the casings part. (Drop Jarvis onto GitDiscuss instead and the spindle winds Jarvis along the silk.)',
+  over:c=>drawSilk(c)
  }
 };
 /* ---------- Lily petals: moon-white petals wedged into the opening, one per 15° (Wedge) ---------- */
@@ -780,6 +795,125 @@ function drawLily(c){
  if(jt===1){const cr=10*k+4,hd=Math.abs(th)>=1?`M${P(Q)}L${P(O(A0,R*1.05))}A${f(R*1.05)} ${f(R*1.05)} 0 0 ${sg>0?1:0} ${P(O(A0+th,R*1.05))}Z`:[5,h-5].map(y=>`M${f(Q.x-cr)} ${f(a.y+y)}a${f(cr)} ${f(cr)} 0 1 0 ${f(2*cr)} 0a${f(cr)} ${f(cr)} 0 1 0 ${f(-2*cr)} 0Z`).join('');
   o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Water lily: GitDiscuss at ${signed(model.angle)}, ${LY.names[lyN(model.angle)]}. Up and down arrows open or close it a petal; Enter releases the lily and separates the widgets"><title>Tap the lily to release; drag GitDiscuss's nameplate round the heart to open or close it</title><path d="${hd}" fill="transparent"/><circle cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(10*k+4)}" fill="transparent"/><path class="ringfocus" d="${hd}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
  return o}
+/* ---------- Silk arrow drawing (Reel) ---------- */
+// A crescent bow stands on Jarvis's stem with a moonstone spindle of spider silk behind its grip; GitDiscuss's stem carries a lancet target
+// of night glass. The arrow is loosed across the gap trailing the silk, sinks into the target's ring, and the spindle winds the silk in:
+// three turns that each haul GitDiscuss a third of the way. Shapes scale with k as the casings shade.
+const SK={c0:.34,c1:.86};
+// How far the pair has closed through the haul: still while each turn takes up the slack, then a third per turn, still between turns.
+function skHaul(u){let e=0;for(let i=0;i<3;i++)e+=ease(seg(u,(i+.25)/3,(i+.85)/3))/3;return e}
+function skGeo(h){
+ const k=lerp(.42,1,clamp((h-HS)/(H-HS))),a=model.a,b=model.b,sx=a.x+W-4,m=a.y+h/2,px=b.x+4-4*k;
+ return{k,sx,m,t1:a.y+6,t2:a.y+h-6,ky:[a.y+16,a.y+h-16],yA:m-4*k,yB:b.y+h/2-4*k,S:{x:sx+19*k,y:m+6*k},px,xb:b.x+11.5,T:{x:px+.3*k,y:b.y+h/2-4*k}}}
+const skQ=(A,C,B,t)=>{const u=1-t;return{x:u*u*A.x+2*u*t*C.x+t*t*B.x,y:u*u*A.y+2*u*t*C.y+t*t*B.y}};
+const skRot=(T,deg,dx)=>({x:T.x+dx*Math.cos(deg*PI/180),y:T.y+dx*Math.sin(deg*PI/180)});
+// The flight: from the nocked tip to the target in a low arc, slowing a little; the arrow turns along it.
+function skFly(G,u){const k=G.k,A={x:G.sx+31.6*k,y:G.yA},B=G.T,ar=Math.min(16,.07*Math.hypot(B.x-A.x,B.y-A.y))*k;
+ const pos=v=>{const w=1-Math.pow(1-clamp(v),1.35);return{x:lerp(A.x,B.x,w),y:lerp(A.y,B.y,w)-ar*4*w*(1-w)}};
+ const p=pos(u),p0=pos(u-.01),p1=pos(u+.01);return{x:p.x,y:p.y,deg:Math.atan2(p1.y-p0.y,p1.x-p0.x)*180/PI}}
+// The arrow, its tip at T heading deg: a silver leaf blade, a pale shaft whipped with silk behind the head, leaf fletchings and a moonstone nock.
+const SKF='M-24 0C-26 -3.2 -29 -4.4 -32 -4.6C-30.8 -2.2 -29.4 -.7 -27.5 0C-29.4 .7 -30.8 2.2 -32 4.6C-29 4.4 -26 3.2 -24 0Z',SKB='M0 0C-2 -1.7 -4.6 -2.5 -7 0C-4.6 2.5 -2 1.7 0 0Z';
+function skArrow(T,deg,k,o={}){
+ const g=`transform="translate(${f(T.x)} ${f(T.y)}) rotate(${f(deg)}) scale(${op(k)})"`;
+ if(o.ghost)return `<g ${g} fill="none" stroke="#dfe8ff" stroke-width=".8" stroke-dasharray="2.4 2" opacity=".7"><path d="${SKB}M-7 0H-31"/><path d="${SKF}"/></g>`;
+ let s=`<g ${g}>`;
+ if(o.gl>0)s+=`<rect x="-31" y="-2" width="31" height="4" rx="2" fill="${o.lc}" opacity="${op(.4*o.gl)}" filter="url(#sgSoft)"/>`;
+ s+=`<path d="M-6 .6H-31" stroke="${NIGHT}" stroke-width="1.9" stroke-linecap="round" opacity=".55"/><path d="M-6 0H-31" stroke="#e9eefc" stroke-width="1.1" stroke-linecap="round"/><path d="M-6 -.3H-30" stroke="#fff" stroke-width=".35"/>`;
+ s+=`<rect x="-10.3" y="-.95" width="2.6" height="1.9" rx=".5" fill="#f4f7ff" stroke="#8ea2d2" stroke-width=".3"/>`;
+ s+=`<path d="${SKF}" fill="url(#leafG)" stroke="${NIGHT}" stroke-width=".45"/><path d="M-25 0L-31 -3.9M-25 0L-31 3.9" stroke="#5f8c7a" stroke-width=".35"/>`;
+ s+=`<path d="${SKB}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".45"/><path d="M-.6 0H-6.4" stroke="#7f8fb8" stroke-width=".35"/>`;
+ return s+`<circle cx="-31.6" cy="0" r="1.35" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".35"/>${o.gl>0?`<circle cx="-31.6" cy="0" r="1.35" fill="${o.lc}" opacity="${op(.8*o.gl)}"/>`:''}</g>`}
+// The bow: a crescent from horn to horn, thick at the grip, bracketed to the stem's knops. pull draws the string back over the stem;
+// flex bends the horns in, as the draw and the haul do.
+function skBow(G,pull,vib,flex,gl){
+ const k=G.k,tip=2.2*k*flex,bel=13*k+2.5*k*flex,x0=G.sx+tip,lx=y=>{const v=2*(y-G.t1)/(G.t2-G.t1)-1;return x0+(bel-tip)*(1-v*v)};
+ const limb=Array.from({length:25},(_,i)=>{const y=lerp(G.t1,G.t2,i/24),v=2*i/24-1;return{x:lx(y),y,w:lerp(3.4*k+.5,k+.3,Math.abs(v))}});
+ let s=G.ky.map(y=>`<path d="M${f(G.sx-7)} ${f(y)}L${f(lx(y))} ${f(y)}" stroke="#c9d4ee" stroke-width="${f(1.4*k+.3)}" stroke-linecap="round"/>`).join('');
+ const N={x:G.sx-pull+vib,y:G.yA};
+ s+=`<path d="M${f(x0)} ${f(G.t1)}L${P(N)}L${f(x0)} ${f(G.t2)}" fill="none" stroke="#e6edff" stroke-width=".6" opacity=".9"/>`;
+ s+=`<path d="${ribbon(limb)}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".6"/><path d="${poly(limb.slice(3,22).map(p=>({x:p.x-p.w*.18,y:p.y})))}" fill="none" stroke="#fff" stroke-width=".45" opacity=".75"/>`;
+ // Recurved horns curl forward into small spirals, each ending in a bead.
+ for(const sg of[-1,1]){const c=widths(curlPts({x:x0,y:sg<0?G.t1:G.t2},sg*(PI/2-.55),7*k+2,1.5*PI,-sg,18),k+.3,.3),e=c[c.length-1];
+  s+=`<path d="${ribbon(c)}" fill="url(#silver)"/><circle cx="${f(e.x)}" cy="${f(e.y)}" r="${f(.8*k+.3)}" fill="#fff"/>`}
+ const gx=x0+bel-tip;
+ if(gl>0)s+=`<circle cx="${f(gx)}" cy="${f(G.m)}" r="${f(12*k+4)}" fill="url(#halo)" opacity="${op(gl)}"/>`;
+ s+=leaf(gx-.5,G.m-2.6*k,-74,.34*k,.9)+leaf(gx-.5,G.m+2.6*k,74,.34*k,.9);
+ return s+`<circle cx="${f(gx)}" cy="${f(G.m)}" r="${f(2.4*k+.4)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".5"/><circle cx="${f(gx)}" cy="${f(G.m)}" r="${f(1.5*k+.2)}" fill="url(#moonstone)"/>`}
+// The spindle: an upright silver axle on an arm from the grip, a barrel of wound silk between two moonstone flanges. Wrap lines and a
+// pin on the top flange show it turning (phi); the barrel thins as the silk pays out.
+function skSpindle(G,phi,wound,lit,LC){
+ const k=G.k,S=G.S,hb=3.4*k,wd=(1.4+1.6*wound)*k,rx=4*k,ry=1.3*k;
+ let s=`<path d="M${f(G.sx+12*k)} ${f(G.m+1.5*k)}Q${f(S.x)} ${f(G.m+.5*k)} ${f(S.x)} ${f(S.y-hb-ry)}" fill="none" stroke="url(#silver)" stroke-width="${f(1.1*k+.3)}"/>`;
+ if(lit>0)s+=`<circle cx="${f(S.x)}" cy="${f(S.y)}" r="${f(11*k+3)}" fill="url(#halo)" opacity="${op(lit)}"/>`;
+ s+=`<path d="M${f(S.x)} ${f(S.y-hb-2.2*k)}V${f(S.y+hb+2.6*k)}" stroke="#dfe6f8" stroke-width="${f(1.2*k+.3)}" stroke-linecap="round"/>`;
+ s+=`<rect x="${f(S.x-wd)}" y="${f(S.y-hb)}" width="${f(2*wd)}" height="${f(2*hb)}" fill="#e9eefc" opacity=".92"/>`;
+ for(let i=0;i<6;i++){const a=phi+i*PI/3;if(Math.sin(a)<=0)continue;const x=S.x+wd*Math.cos(a);s+=`<path d="M${f(x)} ${f(S.y-hb)}L${f(x+.9*k*Math.sin(a))} ${f(S.y+hb)}" stroke="#9fb0d8" stroke-width=".4"/>`}
+ for(const y of[S.y-hb,S.y+hb])s+=`<ellipse cx="${f(S.x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".5"/>${lit>0?`<ellipse cx="${f(S.x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" fill="${LC}" opacity="${op(.6*lit)}"/>`:''}`;
+ if(Math.sin(phi)>-.2)s+=`<circle cx="${f(S.x+3*k*Math.cos(phi))}" cy="${f(S.y-hb+.8*k*Math.sin(phi))}" r="${f(.55*k+.2)}" fill="#fff"/>`;
+ return{s,E:{x:S.x+wd,y:S.y}}}
+// The target: a night-glass lancet on two silver arms off GitDiscuss's stem, a moonstone above the strike ring and a leaf below.
+function skTarget(G,glow,lit,on,LC){
+ const k=G.k,px=G.px,y=G.yB,w=3.2*k,top=y-13*k,bot=y+13*k,st={x:px,y:y-7.5*k};
+ let s=[y-5*k,y+5*k].map(v=>`<path d="M${f(px+w*.6)} ${f(v)}L${f(G.xb-2)} ${f(v)}" stroke="#c9d4ee" stroke-width="${f(1.5*k)}" stroke-linecap="round"/>`).join('');
+ s+=`<path d="M${f(px)} ${f(top)}C${f(px+w)} ${f(top+9*k)} ${f(px+w)} ${f(bot-9*k)} ${f(px)} ${f(bot)}C${f(px-w)} ${f(bot-9*k)} ${f(px-w)} ${f(top+9*k)} ${f(px)} ${f(top)}Z" fill="url(#night)" stroke="url(#silver)" stroke-width="${f(1.1*k+.2)}"/>`;
+ s+=leaf(px,y+4.2*k,90,.36*k,.85);
+ const hl=Math.max(glow*.7,lit*(on?1:.4));
+ if(hl>0)s+=`<circle cx="${f(st.x)}" cy="${f(st.y)}" r="${f(10*k+4)}" fill="url(#halo)" opacity="${op(hl)}"/>`;
+ s+=`<circle cx="${f(st.x)}" cy="${f(st.y)}" r="${f(2.2*k+.3)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".5"/><circle cx="${f(st.x)}" cy="${f(st.y)}" r="${f(1.5*k+.2)}" fill="url(#moonstone)"/>`;
+ if(lit>0)s+=`<circle cx="${f(st.x)}" cy="${f(st.y)}" r="${f(1.5*k+.2)}" fill="${LC}" opacity="${op(.85*lit)}"/>`;
+ return s}
+const skRing=G=>`<circle cx="${f(G.px)}" cy="${f(G.yB)}" r="${f(1.8*G.k+.3)}" fill="none" stroke="#eef2ff" stroke-width="${f(.7*G.k+.2)}"/>`;
+function drawSilk(c){
+ const h=c.h,jt=c.jt,dir=model.dir,G=skGeo(h),k=G.k,on=model.a.run&&model.b.run,LC=on?'#e6edff':'#9aa3b8',g=jt===0?c.glow:0;
+ // Phase values: the draw (pull), the string's shiver (vib), the bow's flex, the silk's slack (sag), the spindle's turn (phi) and how full it is.
+ let pull=0,vib=0,flex=0,sag=k,phi=0,wound=1,lit=0,glint=-1,spark=0,deg=0,mode='nock',fl=0,bf=0;
+ if(jt===0)pull=3*k*g;
+ else if(dir>0){
+  pull=jt<.15?9*k*ease(seg(jt,.04,.15)):0;flex=jt<.15?ease(seg(jt,.04,.15)):0;
+  const sv=seg(jt,.15,.32);if(sv>0&&sv<1)vib=2.2*k*Math.sin(sv*PI*9)*(1-sv)*(1-sv);
+  fl=seg(jt,.15,.29);const hu=seg(jt,SK.c0,SK.c1),Hh=skHaul(hu);
+  if(jt>=.15)wound=1-.45*fl*(2-fl)+.3*Hh;
+  let tn=0;for(let i=0;i<3;i++)tn+=ease(seg(hu,i/3,(i+.85)/3));
+  phi=2*PI*(-4*fl*(2-fl)+tn);
+  if(jt>=.15&&jt<.29){mode='fly';sag=(3+9*Math.sin(PI*fl))*k}
+  else if(jt>=.29){mode='lodged';
+   const qv=seg(jt,.29,.42);deg=skFly(G,1).deg*(1-ease(hu))+7*Math.sin(qv*PI*8)*(1-qv)*(1-qv);
+   spark=Math.sin(PI*seg(jt,.29,.36));
+   if(jt<SK.c0)sag=(3+4*seg(jt,.29,SK.c0))*k;
+   else if(jt<SK.c1){const i=Math.min(2,Math.floor(hu*3)),u=hu*3-i;sag=(i?2.5:7)*k*(1-ease(seg(u,0,.25)))+(i<2?2.5*k*ease(seg(u,.85,1)):0);flex=.9*Math.sin(PI*seg(u,.25,.85))}
+   else sag=0;
+   lit=ease(seg(jt,SK.c1,1));if(jt<1)glint=seg(jt,.9,1)}
+ }else{const q=1-jt,tg=seg(q,.1,.2);bf=seg(q,.2,.42);
+  lit=1-seg(q,0,.1);flex=.8*Math.sin(PI*tg);phi=2*PI*(.5*ease(tg)+3.5*ease(bf));wound=.85+.15*bf;
+  spark=Math.sin(PI*seg(q,.17,.25));
+  const sv=seg(q,.42,.56);if(sv>0&&sv<1)vib=1.8*k*Math.sin(sv*PI*8)*(1-sv)*(1-sv);
+  if(q<.2){mode='lodged';sag=0;deg=5*Math.sin(tg*PI*6)*tg}
+  else if(q<.42){mode='back';sag=6*k*Math.sin(PI*bf)}}
+ // Where the arrow's tip is: on the string, in flight, in the target, or wound back tail first.
+ const P0={x:G.sx-pull+vib+31.6*k,y:G.yA};let T=P0;
+ if(mode==='fly'){const F=skFly(G,fl);T=F;deg=F.deg}
+ else if(mode==='lodged')T=G.T;
+ else if(mode==='back'){const u=ease(bf);T={x:lerp(G.T.x,P0.x,u),y:lerp(G.T.y,P0.y,u)-24*k*u*(1-u)};deg=6*Math.sin(bf*PI*3)*(1-bf)}
+ let s=skTarget(G,g,lit,on,LC)+skBow(G,pull,vib,flex,Math.max(g*.7,lit*(on?.6:.3)));
+ const sp=skSpindle(G,phi,wound,lit*(on?.8:.35),LC),E=sp.E,Bd=skRot(T,deg,-9*k);s+=sp.s;
+ // The silk, from the spindle to its whipping behind the arrowhead, sagging by sag at its middle; lit, it glows and dew beads kindle along it.
+ const C={x:(E.x+Bd.x)/2,y:(E.y+Bd.y)/2+2*sag},sd=`M${P(E)}Q${P(C)} ${P(Bd)}`;
+ if(lit>0)s+=`<path d="${sd}" fill="none" stroke="${LC}" stroke-width="${f(3.5*k+1)}" opacity="${op(.45*lit)}" filter="url(#sgSoft)"/>`;
+ s+=`<path d="${sd}" fill="none" stroke="#f4f7ff" stroke-width="${f(.45*k+.35)}" opacity=".85"/>`;
+ if(lit>0)[.3,.55,.78].forEach((t,i)=>{const d=seg(lit,i*.22,i*.22+.5);if(d<=0)return;const p=skQ(E,C,Bd,t);
+  if(on)s+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(4*k+1.5)}" fill="url(#halo)" opacity="${op(d*.8)}"/>`;
+  s+=`<circle cx="${f(p.x)}" cy="${f(p.y+.4*k)}" r="${f((.8*k+.35)*d)}" fill="${on?'#f6f9ff':'#c8ccd6'}" stroke="#8ea2d2" stroke-width=".25"/>`});
+ s+=skArrow(T,deg,k,{gl:lit*(on?1:.4),lc:LC});
+ s+=skRing(G);
+ if(spark>.001)s+=star(G.px-1.5*k,G.yB,(6*k+1)*spark,spark);
+ if(glint>0&&glint<1){const p=skQ(E,C,Bd,glint);s+=star(p.x,p.y,4.5*k+1,Math.sin(PI*glint))}
+ // Ready: the silk and the arrow standing in the target, traced in moonlight.
+ if(jt===0&&g>=1){const B2=skRot(G.T,0,-9*k);s+=`<path d="M${P(E)}L${P(B2)}" stroke="#dfe8ff" stroke-width="${f(.8*k+.3)}" stroke-dasharray="3 2.4" opacity=".75"/>`+skArrow(G.T,0,k,{ghost:1})+star(G.px,G.yB-16*k,5*k+1,.95)}
+ // Near: a star on the arrow's tip.
+ else if(jt===0&&g>0)s+=star(P0.x,P0.y,(4+3*g)*k,g*.9);
+ if(jt===1){const x0=G.sx+2,x1=G.px+4*k,y0=Math.min(G.yA,G.yB)-15*k,y1=Math.max(G.S.y,G.yB)+14*k;
+  s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Silk arrow: tap the arrow or its silk, or press Enter, to wind the arrow home and separate the widgets"><title>Tap the arrow or the silk to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="8" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="8" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return s}
 /* ---------- Swan lock drawing ---------- */
 // Jarvis's stem carries a silver swan whose neck is the hasp; GitDiscuss's stem carries a lancet lock plate with an open catch ring
 // facing Jarvis and a slot at its top tip, where a feather is the key. Shapes are drawn facing right at unit scale, then scaled by k.
@@ -3212,7 +3346,9 @@ function setForkAngle(v){v=clamp(v,-amax(),amax());const sn=AH().snap,d=sn?Math.
  if(branchOn())animateAngle(v,520);else{stopAngle();model.angle=v;if(J().angled&&model.path&&model.jt>0&&model.dir>0)model.path.j=joinedPose('a');if(model.path&&model.jt>0)setJt(model.jt);render()}}
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
- model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,model.dir<0?.55:.3));
+ // A join may set its own closing profile (the silk arrow hauls in turn by turn); the rest close over the first 30%,
+ // and every join parts over the last 55% of a release.
+ model.jt=t;const p=model.path;if(!p)return;const e=model.dir>0&&J().close?J().close(t):ease(seg(t,0,model.dir<0?.55:.3));
  for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
 }
 function tween(from,to,ms,fn){
@@ -3229,6 +3365,8 @@ const say=t=>$('#status').textContent=t;
 
 async function doJoin(fixed='a',ms=3200){
  if(model.jt===1)return;
+ // A join with its own closing profile, rejoined mid-release, starts afresh from where the pair stands.
+ if(model.dir<0&&model.jt>0&&J().close)model.jt=0;
  model.dir=1;
  if(model.jt===0){model.path={s:here(),j:joinedPose(fixed)}}
  else if(!model.path)model.path={s:separatePose(),j:joinedPose('a')};
