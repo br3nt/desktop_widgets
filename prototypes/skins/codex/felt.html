@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Felt joins · Felt · Codex skin studies</title>
+<title>Felt joins & bolster shade · Codex skin studies</title>
 <style>
 :root{color-scheme:light;--paper:#f1ece5;--ink:#292d2a;--muted:#646961;--gold:#a77936;--line:#cdc8bc}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}button,a,select,input{touch-action:manipulation}button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #a8662d;outline-offset:4px}a{color:inherit;text-underline-offset:4px}button{border:1px solid #b9b3a3;border-radius:4px;background:#f6f2e8;color:#343b34}button:hover:not(:disabled){background:#e3d8be}button[hidden],[hidden]{display:none!important}
@@ -44,6 +44,7 @@ footer{max-width:1224px;margin:auto;padding:27px 32px 32px;display:grid;grid-tem
 .bolster-active.rolling>.summary:before{top:2px}.bolster-active.rolling>.summary:after{bottom:2px}
 .bolster-active .summary b,.bolster-active .summary button{flex:none}.bolster-active .summary span{white-space:nowrap;min-width:0}
 .bolster-active.rolling .summary button{width:24px;height:24px;border-radius:5px;background:#b66e53;position:relative;box-shadow:0 1px 2px #624c3944}
+.bolster-active.rolling .summary button:after{content:'';position:absolute;inset:-6px;min-width:36px;min-height:36px}
 #meter.bolster-active.rolling>.summary{left:20px;right:20px;gap:6px;padding:0 5px;font-size:10px}
 #meter.bolster-active .summary b{font-size:10px}#meter.bolster-active .summary button{width:22px}
 </style></head><body>
@@ -268,7 +269,9 @@ for(const id of ['a','b','meter']){
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','bolster-roll');svg.setAttribute('viewBox',`0 0 ${id==='meter'?276:420} ${id==='meter'?78:184}`);svg.setAttribute('aria-hidden','true');$('#'+id).append(svg);
 }
 function paintBolster(id,q){
- const el=$('#'+id),small=id==='meter',height=small?78:184,active=isBolster()&&q>0;
+ const el=$('#'+id),small=id==='meter',height=small?78:184;
+ // Present the tape and lower curl together on the first frame, before any motion.
+ const active=isBolster()&&(q>0||(small?model.shadeChecks&&!model.docked:model.state==='shade'));
  el.classList.toggle('bolster-active',isBolster());el.classList.toggle('rolling',active);
  el.style.setProperty('--roll-height',(height-(height-36)*q)+'px');el.style.setProperty('--roll-clip',((height-36)*q+18)+'px');
  el.querySelector('.bolster-roll').innerHTML=active?bolster(small?276:420,height,q,small):'';
