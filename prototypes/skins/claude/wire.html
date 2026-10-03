@@ -150,7 +150,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -1032,8 +1032,127 @@ const JOINS={
    if(jt===1)s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Pearl stays: drag round the stone or press the arrow keys to turn GitDiscuss; tap it or press Enter to release"><title>Turn the stone to set the angle; tap it to release</title><circle cx="${f(O.x)}" cy="${f(O.y)}" r="17" fill="transparent" style="cursor:grab;touch-action:none"/><circle class="ringfocus" cx="${f(O.x)}" cy="${f(O.y)}" r="15" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
    return s;
   }
+ },
+ ants:{label:'Weaver ants',kind:'Swarm',gap:56,slow:2,lastJt:0,jd:1,lastSt:0,sd:1,sdF:0,
+  about:'The Swarm join kind in wire, from the brief\'s beaded wire bugs: nothing is fixed to either pendant. Weaver ants build their nests by pulling two leaves together: they form living chains across the gap, each ant gripping the one ahead, haul the edges in, and then other workers carry their larvae back and forth like shuttles, gluing the seam with the larvae\'s silk. Each ant here is three beads on one copper wire: a carnelian head and thorax, a gold seed at the waist and a dark jet gaster bound with a brass wrap, with six fine copper legs and elbowed antennae tipped in gold. <b>Near:</b> two scout ants patrol the frame ends, antennae out. <b>Ready:</b> a dashed ghost of three chains spans the gap. Joining: nine ants march in single file, the middle chain\'s and the top chain\'s down Jarvis\'s end, the bottom chain\'s up GitDiscuss\'s, and each walks out over the ones before it to take its place, so the chains grow out into the gap and sway as they search. As the pendants close in the front ants grab the far frame with a glint and the chains shorten, hauling the pendants together. Then a tenth ant carrying a pearl larva walks down the seam, touching it to each frame in turn, and lays a zigzag of silk thread between them. Last the gasters kindle one by one: <b>amber</b> on Jarvis\'s side while it runs, <b>carnelian</b> on GitDiscuss\'s, and the three middle ants are the join light, <b>gold</b> while both run (<b>labradorite</b> for a paused widget, and for the middle ants if either is paused); a glint runs down the silk. Everything stays in the gap and on the frame ends, clear of displays, nameplates and buttons. In a shade only the middle chain stays: the top chain walks off upward and the bottom one downward, and the silk draws in to the strip. <b>Release:</b> tap the ants, or focus them and press Enter: the light goes out, the silk is unpicked, the chains let go and the ants march home before the pendants part.',
+  sayJoin:'Weaver ants march in, form three chains across the gap and haul the pendants together, then stitch the seam with silk.',
+  sayJoined:'Held by weaver ants. Drag either nameplate to move the pair. Tap the ants to send them home.',
+  sayRelease:'The light goes out, the silk is unpicked, the chains let go and the ants march home.',
+  sayReady:'Ready: release and the ants will chain across the gap.',sayNear:'Nearby: two scout ants patrol the frame ends. Move closer.',
+  end(side,lit,h){return lit>0?`<circle cx="${side>0?W-8:8}" cy="${f(h/2)}" r="20" fill="#ffb15e" opacity="${f(lit*.35)}" filter="url(#soft)"/>`:''},
+  under(){return ''},
+  over(c){
+   const jt=c.jt,G=antGeo(c),hk=shadeK();let s='';
+   if(jt!==this.lastJt){this.jd=jt>this.lastJt?1:-1;this.lastJt=jt}
+   if(model.st!==this.lastSt){this.sd=model.st>this.lastSt?1:-1;this.lastSt=model.st}
+   // Ants walking off face away; walking back in they face home. A reversal mid-walk turns them round over a few frames.
+   const sdT=this.sd<0?1:0;this.sdF=model.st===0||model.st===1?sdT:this.sdF+(sdT-this.sdF)*.3;
+   if(jt===0){
+    if(c.ghost>0){const g=antGeo({...c,jt:1,b:{x:c.a.x+W+this.gap,y:c.a.y}});
+     s+=`<g fill="none" stroke="#f3c96a" stroke-width="1" stroke-dasharray="2.2 2.2" opacity="${f(c.ghost*.8)}">`+g.chains.filter(ch=>ch.k===0||c.h>=112).map(ch=>[0,1,2].map(i=>{const p=ch.slot(i,1);
+      return `<g transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(ch.ang*180/Math.PI)}) scale(${ANT_SC})"><ellipse cx="-8" rx="4.4" ry="3.5"/><ellipse rx="3" ry="2"/><ellipse cx="5.4" rx="2.5" ry="2.3"/></g>`}).join('')).join('')+`</g>`}
+    // Two scouts patrol the frame ends while a drag is near; their own frame loop stops with the drag.
+    if(model.glow>0&&drag&&drag.id){antKick();
+     const T=reduce.matches?0:performance.now()/1000,o=clamp(model.glow*2);
+     [[c.a,1,0],[c.b,-1,2.2]].forEach(([w,sd,p0])=>{const v=Math.cos(T*1.7+p0),y=w.y+c.h/2+20*Math.sin(T*1.7+p0)*clamp((c.h-30)/90),x=sd>0?w.x+W-1:w.x+1;
+      s+=`<g opacity="${f(o)}">${antSvg(x,y,Math.atan2(v,sd*.25),ANT_SC,{walk:clamp(Math.abs(v)*4),ph:T*11+p0,wave:.18*Math.sin(T*6+p0)})}</g>`})}
+    return s;
+   }
+   // Silk first, under the chains. The stitcher's larva lays it as it goes.
+   const S=G.stitch,su=seg(jt,.5,.78),sLen=su*S.L,laid=clamp(sLen+10*ANT_SC-S.L0,0,S.Lz);
+   if(laid>0){const pts=polyTo(S.zig,laid),d=poly(pts);
+    s+=`<path d="${d}" fill="none" stroke="#fff" stroke-width="2.6" stroke-opacity=".1" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#eef1fb" stroke-width=".8" stroke-opacity=".85" stroke-linejoin="round"/>`;
+    let acc=0;S.zig.forEach((p,i)=>{if(i)acc+=Math.hypot(p[0]-S.zig[i-1][0],p[1]-S.zig[i-1][1]);if(acc<=laid)s+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="1.2" fill="#f4f6ff" stroke="#5d6b78" stroke-width=".4"/>`});
+    const gl=seg(jt,.9,1);if(gl>0&&gl<1){const q=polyAt(S.zig,gl*S.Lz);s+=sparkle(q.x,q.y,Math.sin(Math.PI*gl)*.42)}}
+   // The chains: middle, top, bottom. Each ant marches in along its path, then holds its place in the chain.
+   const run={a:model.a.run,b:model.b.run},tw=.28*Math.sin(4*Math.PI*seg(jt,.9,.99));let n=0,glow='',ants='';
+   for(const ch of G.chains){
+    const dep=ch.k?ease(seg(hk,.05,.5)):0;
+    for(let i=0;i<3;i++,n++){
+     const u=seg(jt,ch.t0+i*.04,ch.t0+i*.04+.13);if(u<=0){continue}
+     let p,a,walk=0,ph=0,o=clamp(u*8);
+     if(u<1){const P=ch.path(i),L=polyLen(P),sw=u*L;p=polyAt(P,sw);a=tangent(P,sw);walk=clamp(Math.min(u,1-u)*8);ph=sw/2.3;
+      if(this.jd<0)a+=Math.PI*ease(clamp((1-u)/.15))}
+     else{p=ch.slot(i,ch.g);a=ch.ang}
+     // The holding grip (front legs on the ant ahead, ant 0's hind legs on the frame) closes as the ant settles.
+     let hold=ease(seg(u,.8,1));
+     // In a shade the outer chains let go, front ant first, and walk off up (top) or down (bottom).
+     if(dep>0){const di=clamp((dep-(2-i)*.15)/.7);if(di>0){const base=ch.vy*Math.PI/2,tg=base+2*Math.PI*Math.round((a-base)/(2*Math.PI)),mv=ease(seg(di,.2,1)),turn=ease(seg(di,.18,.3));
+       a=lerp(a,tg,ease(seg(di,0,.25)));a+=Math.PI*this.sdF*turn;p={x:p.x,y:p.y+ch.vy*140*mv};walk=Math.max(walk,clamp(Math.min(seg(di,.15,.3),1-seg(di,.9,1))));ph=140*mv/2.3;o*=1-seg(di,.65,1);hold*=1-ease(seg(di,0,.2))}}
+     const opt={fwd:hold*(i<2?1.5:lerp(2+1.6*Math.sin(jt*70+ch.k),4.6+ch.reach/ANT_SC,ch.g)),back:i===0?6*hold:0};
+     if(o<=0)continue;
+     // Kindling: amber on Jarvis's side, carnelian on GitDiscuss's, the middle ants the join light.
+     const side=i===1?'m':(i===0)===(ch.from==='a')?'a':'b',lit=ease(seg(jt,.8+.016*n,.85+.016*n));
+     const st=side==='a'?(run.a?'amber':'lab'):side==='b'?(run.b?'carn':'lab'):(run.a&&run.b?'gold':'lab');
+     if(lit>0&&side==='m'&&o>.5)glow+=`<circle cx="${f(p.x-8*ANT_SC*Math.cos(a))}" cy="${f(p.y-8*ANT_SC*Math.sin(a))}" r="11" fill="${run.a&&run.b?'#ffcf6a':'#8fa6c4'}" opacity="${f(.5*lit*o)}" filter="url(#soft)"/>`;
+     ants+=`<g opacity="${f(o)}">${antSvg(p.x,p.y,a,ANT_SC,{...opt,walk,ph,stone:st,lit,wave:(1-hold)*.12*Math.sin(ph*.7)+hold*(tw+(1-ch.g)*.15*Math.sin(jt*50+i))})}</g>`;
+    }
+    const sp=Math.sin(Math.PI*seg(jt,ch.gs,ch.gs+.06));if(sp>.03&&dep<.2)ants+=sparkle(ch.Q.x,ch.Q.y,sp*.4);
+   }
+   s+=glow+ants;
+   // The stitcher, carrying its pearl larva, on top of everything.
+   if(su>0&&su<1){let sw=sLen,p=polyAt(S.all,sw),a=tangent(S.all,sw,14);if(this.jd<0)a+=Math.PI*ease(clamp((1-su)/.06));
+    const o=clamp(Math.min(su,1-su)*14);s+=`<g opacity="${f(o)}">${antSvg(p.x,p.y,a,ANT_SC,{walk:1,ph:sw/2.3,larva:true,wave:.12*Math.sin(sw/3)})}</g>`}
+   if(jt===1){const x0=G.chains[0].A.x-4,x1=G.chains[0].B.x+4,y0=c.a.y+c.h/2-G.off-12,y1=c.a.y+c.h/2+G.off+12;
+    s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Weaver ants: tap them, or press Enter, to send them home and separate the widgets"><title>Tap the ants to send them home</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="8" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
+   return s;
+  }
  }
 };
+/* ---------- Weaver ants geometry ---------- */
+const ANT_SC=.9,ANT_L=22.8*ANT_SC;
+// One beaded wire ant, thorax at the origin, facing +x. o: walk 0..1 and gait phase ph, fwd/back reach of the front/hind legs, antenna wave, gaster stone and how lit it is, larva in the jaws.
+function antSvg(x,y,ang,sc,o={}){
+ const w=o.walk||0,ph=o.ph||0,wv=o.wave||0;let legs='',ant='';
+ for(const sd of [-1,1])for(let k=0;k<3;k++){
+  const hx=1.4-1.4*k,b=[[6,8],[.6,9.6],[-6,8.6]][k],gp=ph+((k+(sd>0?1:0))%2)*Math.PI;
+  let fx=b[0]+w*2.6*Math.sin(gp),fy=b[1]-w*.9*Math.max(0,Math.cos(gp));
+  if(k===0&&o.fwd){fx+=o.fwd;fy-=Math.min(3,o.fwd*.45)}
+  if(k===2&&o.back){fx-=o.back;fy-=o.back*.3}
+  legs+=`M${f(hx)} ${f(sd*1.7)}L${f(lerp(hx,fx,.42)+(k===0?.8:k===2?-.8:0))} ${f(sd*6.4)}L${f(fx)} ${f(sd*fy)}`;
+ }
+ for(const sd of [-1,1]){const a0=sd*(.85+wv),a1=sd*(.18+wv*.6),e=[7.2+4.2*Math.cos(a0),sd*1.1+4.2*Math.sin(a0)],t=[e[0]+4.6*Math.cos(a1),e[1]+4.6*Math.sin(a1)];
+  ant+=`M7.2 ${f(sd*1.1)}L${f(e[0])} ${f(e[1])}L${f(t[0])} ${f(t[1])}`;o['t'+sd]=t}
+ const lit=o.lit||0,bead=(cx,rx,ry,st)=>`<ellipse cx="${cx}" rx="${rx}" ry="${ry}" fill="url(#st-${st})" stroke="#1a0d05" stroke-width=".5"/>`;
+ return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(ang*180/Math.PI)}) scale(${sc})">`+
+  fine(legs,'copper',.55)+fine(ant,'copper',.45)+fine('M8.2 -1.3Q10.6 -1.7 10.4 -.2M8.2 1.3Q10.6 1.7 10.4 .2','copper',.45)+
+  [-1,1].map(sd=>`<circle cx="${f(o['t'+sd][0])}" cy="${f(o['t'+sd][1])}" r=".85" fill="url(#st-gold)"/>`).join('')+
+  fine('M-12.2 0H7.4','copper',.55)+
+  bead(-8,4.4,3.5,'jet')+(lit>0?`<ellipse cx="-8" rx="4.4" ry="3.5" fill="url(#st-${o.stone||'amber'})" opacity="${f(lit)}"/>`:'')+
+  fine('M-6.3 -3.2Q-5.5 0 -6.3 3.2M-9.9 -3.3Q-9.1 0 -9.9 3.3','brass',.5)+
+  `<ellipse cx="-9.3" cy="-1.4" rx="1.3" ry=".8" fill="#fff" opacity=".5"/>`+
+  `<circle cx="-3.2" r="1.15" fill="url(#st-gold)" stroke="#2a1a06" stroke-width=".35"/>`+bead(0,3,2,'carn')+bead(5.4,2.5,2.3,'carn')+
+  `<circle cx="6.3" cy="-1.5" r=".6" fill="#1a0d05"/><circle cx="6.3" cy="1.5" r=".6" fill="#1a0d05"/><ellipse cx="-.6" cy="-.7" rx=".9" ry=".5" fill="#fff" opacity=".45"/>`+
+  (o.larva?`<ellipse cx="12.4" rx="3.2" ry="2.1" fill="url(#st-pearl)" stroke="#6e5d63" stroke-width=".4"/><path d="M11.4 -1.9V1.9M13.2 -1.8V1.8" stroke="#b9a9a8" stroke-width=".35"/>`:'')+`</g>`;
+}
+// A walked path: the point at arc length s, its smoothed heading, and the path cut at s.
+const polyLen=P=>P.reduce((a,p,i)=>i?a+Math.hypot(p[0]-P[i-1][0],p[1]-P[i-1][1]):0,0);
+function polyAt(P,s){let acc=0;for(let i=1;i<P.length;i++){const dx=P[i][0]-P[i-1][0],dy=P[i][1]-P[i-1][1],l=Math.hypot(dx,dy);if(s<=acc+l||i===P.length-1){const t=l?clamp((s-acc)/l):0;return{x:P[i-1][0]+dx*t,y:P[i-1][1]+dy*t}}acc+=l}return{x:P[0][0],y:P[0][1]}}
+function tangent(P,s,win=4){const L=polyLen(P),a=polyAt(P,clamp(s-win,0,L)),b=polyAt(P,clamp(s+win,0,L));return Math.atan2(b.y-a.y,b.x-a.x)}
+function polyTo(P,s){const out=[P[0]];let acc=0;for(let i=1;i<P.length;i++){const l=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);if(acc+l>=s){const q=polyAt(P,s);out.push([q.x,q.y]);return out}out.push(P[i]);acc+=l}return out}
+// Three chains (middle, top, bottom). The middle and top grow from Jarvis's frame, the bottom from GitDiscuss's; each grows toward the other frame and sways until its front ant grabs it.
+function antGeo(c){
+ const h=c.h,hs=clamp((h-HS)/(H-HS)),off=lerp(12,30,hs),jt=c.jt;
+ const xa=y=>c.a.x+W-frameIn(frameY(y,h),h)+1,xb=y=>c.b.x+frameIn(frameY(y,h),h)-1;
+ const chains=[[0,0,'a',-1,.03],[1,-off,'a',-1,.12],[2,off,'b',1,.21]].map(([k,yo,from,vy,t0])=>{
+  const ly=h/2+yo,A={x:xa(ly),y:c.a.y+ly},B={x:xb(ly),y:c.b.y+ly},P=from==='a'?A:B,Q=from==='a'?B:A;
+  const span=Math.hypot(Q.x-P.x,Q.y-P.y)||1,link=Math.min(28,(span-ANT_L)/2),gs=.4+.015*k,g=ease(seg(jt,gs,gs+.06));
+  const sway=(1-g)*.13*Math.sin(jt*38+k*2),ang=Math.atan2(Q.y-P.y,Q.x-P.x)+sway,ux=Math.cos(ang),uy=Math.sin(ang);
+  const slot=i=>{const d=12.2*ANT_SC+i*link;return{x:P.x+ux*d,y:P.y+uy*d}};
+  const tip=slot(2),reach=Math.max(0,Math.hypot(Q.x-tip.x,Q.y-tip.y)-10.4*ANT_SC),sx=from==='a'?1:-1;
+  // March in along the frame end from above (or below), then out along the chain over the ants already there.
+  const path=i=>{const T=slot(i),ex=P.x+sx*5,y0=from==='a'?c.a.y-34:c.b.y+h+34;return[[ex,y0],[ex,P.y],[T.x,T.y]]};
+  return{k,from,vy,t0,A,B,P,Q,ang,g,gs,reach,slot,path};
+ });
+ // The stitch: a zigzag between the frames, entered from above the gap's middle and left below it.
+ const sh=lerp(12,40,hs),zig=[],N=8;
+ for(let i=0;i<=N;i++){const y=h/2-sh+2*sh*i/N;zig.push(i%2?[xb(y)-2,c.b.y+y]:[xa(y)+2,c.a.y+y])}
+ const mx=(xa(h/2)+xb(h/2))/2,top=[mx,Math.min(c.a.y,c.b.y)-30],bot=[mx,Math.max(c.a.y,c.b.y)+h+30],all=[top,...zig,bot],L0=Math.hypot(zig[0][0]-top[0],zig[0][1]-top[1]);
+ return{chains,off,stitch:{zig,all,L:polyLen(all),L0,Lz:polyLen(zig)}};
+}
+// While a drag is near, the scouts keep walking even when the pointer is still; the loop stops with the drag.
+let antLoop=false;
+function antKick(){if(antLoop||reduce.matches)return;antLoop=true;requestAnimationFrame(function st(){if(!(drag&&drag.id&&model.glow>0&&model.jt===0&&J()===JOINS.ants)){antLoop=false;return}render();requestAnimationFrame(st)})}
 /* ---------- Wire butterfly geometry ---------- */
 // The butterfly shrinks with the casing so it fits a shaded strip. Shapes are for the right-hand wings, body at the origin, head up.
 const bfSc=h=>lerp(.45,1,clamp((h-HS)/(H-HS))),BF_LEG=13;
