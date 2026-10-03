@@ -194,7 +194,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release; on the briolette fan, drag the fan or GitDiscuss's nameplate (or press ↑ ↓) to open or close it a stone at a time, and tap the fan to release; on the spool and claw, tap the spool, the wire or the claw to unclip it; on the wrapped-eye stay, drag the stay or GitDiscuss's nameplate (or press ↑ ↓) to swing it a step at a time, and tap the stay to release; on the tube rivets, tap the rivets to pop them out. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release; on the briolette fan, drag the fan or GitDiscuss's nameplate (or press ↑ ↓) to open or close it a stone at a time, and tap the fan to release; on the spool and claw, tap the spool, the wire or the claw to unclip it; on the wrapped-eye stay, drag the stay or GitDiscuss's nameplate (or press ↑ ↓) to swing it a step at a time, and tap the stay to release; on the tube rivets, tap the rivets to pop them out; on the cradle roll, drag the wheel round the cradle or GitDiscuss's nameplate (or press ↑ ↓) to roll it a stop at a time, and tap the wheel to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -260,6 +260,9 @@ function casing(w,h,small,noFrame,noBezel){
 
 /* ---------- Options ---------- */
 // Each join draws the widgets' joinable ends plus anything under/over them, from one join progress jt (0..1).
+// Cradle roll: the wheel's hub sits RC_X0 out from GitDiscuss's edge (28 from Jarvis's when joined). The cradle has radius RC_R and the wheel
+// half that, both scaled by rcS when shaded; the cradle's centre O is the wheel's radius past the hub, so they touch at Jarvis's side when level.
+const RC_X0=28,RC_R=44;
 const JOINS={
  jumpring:{label:'Jump ring',kind:'Hinge',gap:56,
   about:'Each pendant ends in an eye loop on a wrapped stem. A brass jump ring swings in, threads both loops and twists shut. <b>Near:</b> the loops warm. <b>Ready:</b> a ghost ring appears between them. <b>Release:</b> click the ring, or focus it and press Enter; it twists open and lifts away. The pendants hang a ring\'s width apart, like links in a chain, which is what later lets this join pivot.',
@@ -1313,8 +1316,129 @@ const JOINS={
   end(side,lit,h){return JOINS.box.end(side,lit,h)},
   under(){return ''},
   over(c){return rvOver.call(this,c)}
+ },
+ roll:{label:'Cradle roll',kind:'Angle · roll',gap:56,knob:true,
+  get slow(){return model.angle?2:1.7},
+  angle:{def:30,x0:RC_X0,ring:0,max:45,snap:15,
+   origin:c=>rcHub(rcGeo(c),model.angle),bend:jt=>rcBend(jt),tr:(th,h)=>rcD(th,rcS(h)*RC_R/2),
+   peak:()=>model.angle+3*Math.sign(model.angle),tag:c=>rcTag(c),
+   // A grab on the wheel rolls it round the cradle: the pointer's turn about the cradle's centre is the hub's, the opposite way to GitDiscuss's.
+   grab:c=>rcGeo(c).O,gain:-1},
+  about:'The Roll angle kind (hollow\'s cog roll, elven\'s ribbon roll, gothic\'s tympanum roll) done in wire. Those roll a disc on a disc or on a straight track; this one rolls a small wheel <i>inside</i> a hoop, like a bangle turning in a bigger bangle. Jarvis\'s end carries a cradle: a section of a copper hoop, two wires bound with coil wraps, its ends scrolled, seven gold seeds along its back for the stops, and a fine brass bar threaded with a pearl across its middle. GitDiscuss\'s end carries a wheel of twisted brass wire half the cradle\'s size, six fine spokes and a moonstone-cut hub, held on a forked bail. Because the wheel is exactly half the hoop, a point on its rim moves in a straight line as it rolls (the Tusi couple): the pearl is fixed on the rim and slides straight along the bar, so the further GitDiscuss tips either way, the further the pearl runs out from the cradle. The hub travels as far round the cradle as GitDiscuss turns, so GitDiscuss sinks and swings out a little as it bends down, and rises as it bends up. <b>Near:</b> both ends warm. <b>Ready:</b> a dashed ghost of the cradle, the wheel at the set angle and the arc its hub will travel, a tick per stop. <b>Joining:</b> the cradle is drawn out of Jarvis\'s frame on three stubs, its hoop bent out from the middle and bound; the wheel is drawn out of GitDiscuss\'s on its bail, ring first, then the spokes and the hub. The wheel seats in the cradle with a clink, the bar slides across and the pearl drops onto it, then GitDiscuss rolls to its angle, a little past and back, each stop glinting as it passes. The hub kindles as the join light (amber while either widget runs, labradorite if both are paused) and a glint runs round the rim. <b>Set the angle:</b> −45° to +45° in hard 15° steps. Drag the wheel round the cradle or GitDiscuss\'s nameplate, use the slider, or press ↑ ↓ on the focused wheel or nameplate. A tag reads the angle and the stop. <b>Release:</b> tap the wheel or press Enter: GitDiscuss rolls level, the pearl and bar come off, and wheel and cradle are wound back into their frames as the casings part.',
+  sayJoin:'The cradle and the wheel are drawn out of the frames; the wheel seats with a clink, the pearl drops onto its bar, and GitDiscuss rolls to the set angle.',
+  sayJoined:'Joined on a cradle roll. Drag the wheel round the cradle or GitDiscuss\'s nameplate to set the angle; drag Jarvis to move the pair. Tap the wheel to release.',
+  sayTurn:'Rolling: the wheel rolls round the cradle and the pearl slides along its bar.',
+  sayRelease:'GitDiscuss rolls level, the pearl and bar come off, and the wheel and cradle wind back into the frames.',
+  sayReady:'Ready: release to seat the wheel in the cradle.',sayNear:'Nearby: both ends warm. Move closer.',
+  end(side,lit,h){return lit>0?`<circle cx="${side>0?W+8:-8}" cy="${f(h/2)}" r="16" fill="#ffb15e" opacity="${f(lit*.4)}" filter="url(#soft)"/>`:''},
+  under(){return ''},
+  over(c){return rcOver.call(this,c)}
  }
 };
+/* ---------- Cradle roll ---------- */
+// RC_X0 and RC_R are declared before JOINS.
+const rcS=h=>lerp(.6,1,clamp((h-HS)/(H-HS)));
+// Rolling inside a hoop twice its size, the hub goes as far round the cradle as the wheel turns: it travels r(1−cos θ, sin θ) from level.
+const rcD=(th,r)=>{const t=th*Math.PI/180;return{x:r*(1-Math.cos(t)),y:r*Math.sin(t)}};
+// From Jarvis (or from GitDiscuss while Jarvis is the one being dragged up): the level hub C0 and the cradle's centre O.
+function rcGeo(c,fromB){const h=c.h,s=rcS(h),R=RC_R*s,r=R/2,C0=fromB?{x:c.b.x-RC_X0,y:c.b.y+h/2}:{x:c.a.x+W+RC_X0,y:c.a.y+h/2};return{h,s,R,r,C0,O:{x:C0.x+r,y:C0.y}}}
+const rcHub=(G,th)=>{const d=rcD(th,G.r);return{x:G.C0.x+d.x,y:G.C0.y+d.y}};
+// GitDiscuss rolls 3° past its angle and back.
+function rcBend(jt){const T=model.angle,sg=Math.sign(T);if(jt>=1)return T;if(!sg)return 0;return lerp(lerp(0,T+3*sg,ease(seg(jt,.64,.84))),T,ease(seg(jt,.84,.92)))}
+const rcArc=(O,R,a0,a1)=>{const p=a=>{const t=a*Math.PI/180;return f(O.x+R*Math.cos(t))+' '+f(O.y+R*Math.sin(t))};return `M${p(a0)}A${f(R)} ${f(R)} 0 0 1 ${p(a1)}`};
+const rcCoilCache={};
+// The cradle on Jarvis. g: hoop bent out (0..1), wr: coil binding wound, st: stop seeds set, lit: which stop is lit (index 0..6, or -1), kin.
+function rcCradle(c,G,o){
+ const{O,R,s,h}=G,m=o.hot?'hot':'copper',xa=c.a.x+W,ly=c.a.y,P=(a,rad)=>{const t=a*Math.PI/180;return{x:O.x+rad*Math.cos(t),y:O.y+rad*Math.sin(t)}};
+ let out='';
+ // Three stubs from Jarvis's frame, bound where they meet it: one to the hoop's middle and one either side to its back.
+ const mt=ease(seg(o.jt,.04,.14));
+ // On a shaded strip the outer stubs start inside its frame and slant out to the hoop, which stands proud of the strip.
+ const fh=Math.max(4,frameH(h)/2-4);
+ if(mt>0)for(const a of [180,140,220]){const q=P(a,R+3.5),y=clamp(q.y-ly,h/2-fh,h/2+fh),x0=xa-frameIn(y,h)+1.5,y0=ly+y,x1=lerp(x0,q.x,mt),y1=lerp(y0,q.y,mt);
+  out+=wire(`M${f(x0)} ${f(y0)}L${f(x1)} ${f(y1)}`,m,1.5*s)+wire(band(x0+3*s,y0,false,2,5.4*s,1.6*s),'brass',.8)}
+ if(o.g>0){
+  const sp=60*o.g,a0=180-sp,a1=180+sp;
+  out+=wire(rcArc(O,R+3.5,a0,a1),m,1.3*s)+wire(rcArc(O,R,a0,a1),m,2*s);
+  // The binding is worked out about the cradle's centre and kept per size, then moved into place.
+  if(o.wr>0){const d=rcArc({x:0,y:0},R+1.75,124,236);
+   const cl=o.wr>=1?(rcCoilCache[f(R)]??=coilsAlong(d,2.3*s+.4,2.6*s)):coilsAlong(d,2.3*s+.4,2.6*s,0,o.wr);
+   // R changes continuously while shading, so the cache is emptied now and then.
+   if(Object.keys(rcCoilCache).length>60)for(const key in rcCoilCache)delete rcCoilCache[key];
+   out+=`<g transform="translate(${f(O.x)} ${f(O.y)})">${wire(cl,'copper',.8)}</g>`}
+  // The hoop's ends scroll back on themselves.
+  const sc=seg(o.g,.85,1);if(sc>0)for(const k of [-1,1]){const q=P(180+k*sp,R+1.75),t=(180+k*sp)*Math.PI/180;
+   out+=wire(spiral(q.x+4.6*s*Math.cos(t+k*Math.PI/2),q.y+4.6*s*Math.sin(t+k*Math.PI/2),4.6*s,1.1*sc,k,t-k*Math.PI/2),m,1.2*s)}
+ }
+ // The stops: seven gold seeds on the hoop's back, one per 15°, set from the middle out; the one the wheel rests on kindles.
+ for(let i=0;i<7;i++){const d=Math.abs(i-3),k=seg(o.st,d*.18,d*.18+.46);if(k<=0)continue;const th=15*(i-3),q=P(180-th,R+6*s);
+  if(i===o.lit&&o.kin>0){out+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${f(7*s+2)}" fill="${o.cool?'#9fc4e0':'#ffb15e'}" opacity="${f(o.kin*.55)}" filter="url(#soft)"/>`+
+   strandItem({k:'bead',r:f(2.6*s),stone:o.kin>.5?(o.cool?'lab':'amber'):'gold'},q.x,q.y)}
+  else out+=`<g opacity="${f(k)}">${strandItem({k:'seed',r:f(1.7*s*(.4+.6*backOut(k))),stone:'gold'},q.x,q.y)}</g>`}
+ return out;
+}
+// The wheel on GitDiscuss, drawn in its own turning frame about the hub. o: bail (0..1), ring, spokes, hub, kin, glint, cool, hot.
+function rcWheel(G,Hb,th,o){
+ const{r,s,h}=G,m=o.hot?'hot':'brass',rot=a=>{const t=a*Math.PI/180;return[Math.cos(t),Math.sin(t)]};let st='';
+ // The forked bail: two wires from the rim either side of GitDiscuss's side to its frame, bound together where they meet the rim.
+ if(o.bail>0)for(const k of [-1,1]){const[cx,cy]=rot(26*k),dy=11*s*k,fx=RC_X0+frameIn(h/2+dy,h)-1.5,x0=r*cx,y0=r*cy;
+  st+=wire(`M${f(fx)} ${f(dy)}Q${f(lerp(x0,fx,.35))} ${f(dy*.9)} ${f(lerp(fx,x0,o.bail))} ${f(lerp(dy,y0,o.bail))}`,m,1.3*s)+wire(band(fx-3*s,dy,false,2,5*s,1.5*s),'brass',.75)}
+ if(o.spokes>0)for(let i=0;i<6;i++){const k=seg(o.spokes,i/9,i/9+.4);if(k<=0)continue;const[cx,cy]=rot(30+60*i),a=4*s,b=lerp(a,r-2.4*s,k);
+  st+=wire(`M${f(a*cx)} ${f(a*cy)}L${f(b*cx)} ${f(b*cy)}`,m,.75*s+.15)}
+ if(o.ring>0){const sw=Math.min(359.9,360*o.ring),[ex,ey]=rot(sw);
+  const d=o.ring>=1?circ(0,0,f(r)):`M${f(r)} 0A${f(r)} ${f(r)} 0 ${sw>180?1:0} 1 ${f(r*ex)} ${f(r*ey)}`;st+=twisted(d,m,2.1*s)}
+ if(o.hub>0){const hr=4*s*backOut(o.hub);
+  if(o.kin>0)st+=`<circle r="${f(9*s+3)}" fill="${o.cool?'#9fc4e0':'#ffb15e'}" opacity="${f(o.kin*(o.turn?.75:.55))}" filter="url(#soft)"/>`;
+  st+=wire(circ(0,0,f(hr+1)),m,.8*s)+strandItem({k:'bead',r:f(hr),stone:o.kin>.5?(o.cool?'lab':'amber'):'jet'},0,0)}
+ if(o.glint>0&&o.glint<1){const[cx,cy]=rot(360*o.glint);st+=sparkle(r*cx,r*cy,Math.sin(Math.PI*o.glint)*.5)}
+ return `<g transform="translate(${f(Hb.x)} ${f(Hb.y)}) rotate(${f(th)})">${st}</g>`;
+}
+function rcOver(c){
+ const jt=c.jt,A=model.angle,turn=model.turning&&pivotOn(),cool=!(model.a.run||model.b.run),fwd=model.dir>0;
+ const G=rcGeo(c),{O,R,r,s,h}=G,P=(a,rad)=>{const t=a*Math.PI/180;return{x:O.x+rad*Math.cos(t),y:O.y+rad*Math.sin(t)}};
+ let out='';
+ if(jt===0){
+  if(c.ghost>0){
+   // Ready: the cradle, the wheel at the set angle with its hub, the arc the hub will travel with a tick per stop, and the bar.
+   const g=rcGeo(c,drag&&drag.id==='a'),Q=(a,rad)=>{const t=a*Math.PI/180;return{x:g.O.x+rad*Math.cos(t),y:g.O.y+rad*Math.sin(t)}},Hs=rcHub(g,A),b0=Q(180,g.R),b1=Q(180,.64*g.R);
+   let d=rcArc(g.O,g.R,120,240)+circ(Hs.x,Hs.y,f(g.r))+circ(Hs.x,Hs.y,f(4*g.s))+`M${f(b0.x)} ${f(b0.y)}L${f(b1.x)} ${f(b1.y)}`;
+   out+=`<path d="${d}" fill="none" stroke="#ffe3a8" stroke-width="1.1" stroke-dasharray="3 3" opacity="${f(c.ghost*.85)}"/>`;
+   out+=`<path d="${rcArc(g.O,g.r,135,225)}" fill="none" stroke="#ffe3a8" stroke-width=".9" stroke-dasharray="1.5 2.5" opacity="${f(c.ghost*.7)}"/>`;
+   for(let i=-3;i<=3;i++){const q=Q(180-15*i,g.r);out+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="${i*15===A?2.4:1.3}" fill="#ffe3a8" opacity="${f(c.ghost*(i*15===A?.95:.6))}"/>`}
+  }
+  // Near: both ends warm where cradle and wheel will be drawn out.
+  else if(model.glow>0){const k=model.glow;
+   for(const p of [{x:c.a.x+W-4,y:c.a.y+h/2},{x:c.b.x+4,y:c.b.y+h/2}])out+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(10*s+2)}" fill="#ffb15e" opacity="${f(k*.6)}" filter="url(#soft)"/>`+sparkle(p.x,p.y,k*.4)}
+  return out;
+ }
+ const th=swingAt(jt),hot=jt<1||turn,kin=jt<1?seg(jt,.92,1):1;
+ const moving=model.snapTo!=null||drag&&drag.mode==='angle'&&drag.moved;
+ out+=rcCradle(c,G,{jt,g:ease(seg(jt,.06,.34)),wr:seg(jt,.3,.44),st:seg(jt,.38,.5),lit:kin>0&&!moving?Math.round(th/15)+3:-1,kin,cool,hot});
+ // The wheel rides on GitDiscuss: its hub is RC_X0 out from GitDiscuss's edge, carried round the cradle as it rolls.
+ const d=rcD(th,r),Hb={x:c.b.x-RC_X0+d.x,y:c.b.y+h/2+d.y};
+ out+=rcWheel(G,Hb,th,{bail:ease(seg(jt,.06,.18)),ring:ease(seg(jt,.14,.36)),spokes:seg(jt,.3,.44),hub:seg(jt,.4,.47),kin,cool,hot,turn,glint:fwd&&jt<1?seg(jt,.92,1):0});
+ // Seated: a clink where the rim first meets the cradle.
+ const ck=fwd?Math.sin(Math.PI*seg(jt,.48,.56)):0;if(ck>.03){const q=P(180,R);out+=sparkle(q.x,q.y,ck*.55)}
+ // The bar slides across from the hoop's middle, then the pearl drops onto it. The pearl is fixed on the rim, so it runs straight along the bar.
+ const gb=ease(seg(jt,.5,.58));
+ if(gb>0){const b0=P(180,R),b1=P(180,lerp(R,.64*R,gb));out+=wire(`M${f(b0.x)} ${f(b0.y)}L${f(b1.x)} ${f(b1.y)}`,hot?'hot':'brass',.9*s+.2);
+  if(gb>=1)out+=strandItem({k:'seed',r:f(1.25*s),stone:'gold'},b1.x,b1.y)}
+ const gp=seg(jt,.56,.64);
+ if(gp>0){const t=th*Math.PI/180,px=Hb.x-r*Math.cos(t),py=Hb.y-r*Math.sin(t)-10*s*Math.pow(1-gp,2);
+  out+=`<g opacity="${f(Math.min(1,gp*2))}">${strandItem({k:'bead',r:f(2.7*s),stone:'pearl'},px,py)}</g>`}
+ // Each stop glints at the point of contact as the wheel rolls over it.
+ const mv=jt<1?seg(jt,.62,.66)*(1-seg(jt,.88,.92)):turn?1:0;
+ if(mv>0)for(let i=-3;i<=3;i++){const dd=Math.abs(th-15*i);if(dd<3){const q=P(180-15*i,R);out+=sparkle(q.x,q.y,(1-dd/3)*.55*mv)}}
+ if(jt===1)out+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Cradle roll at ${signed(A)}: drag the wheel round the cradle, or press the arrow keys, to roll GitDiscuss a 15 degree stop at a time; tap it or press Enter to release"><title>Drag the wheel to roll GitDiscuss; tap it to release</title><circle cx="${f(Hb.x)}" cy="${f(Hb.y)}" r="${f(r+8)}" fill="transparent" style="cursor:grab;touch-action:none"/><circle class="ringfocus" cx="${f(Hb.x)}" cy="${f(Hb.y)}" r="${f(r+8)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+ return out;
+}
+// The angle tag, over the joint when GitDiscuss bends down and under it when it bends up.
+function rcTag(c){
+ const A=model.angle,G=rcGeo(c),moving=model.snapTo!=null||drag&&drag.mode==='angle'&&drag.moved,n=Math.round((moving?snapGoal():A)/15)+4;
+ const tx=clamp(G.O.x-6,110,1090),ty=clamp(A>=0?c.a.y-24:c.a.y+c.h+24,20,585),lab=signed(A)+' · '+(moving?'rolling to stop ':'on stop ')+n+' of 7';
+ return `<rect x="${f(tx-98)}" y="${f(ty-11)}" width="196" height="22" rx="6" fill="url(#st-slab)"/>`+wire(rrect(tx-98,ty-11,196,22,6),'copper',1.1)+
+  `<text x="${f(tx)}" y="${f(ty+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-size="14" fill="#f2b866">${lab}</text>`;
+}
 /* ---------- Tube rivets ---------- */
 // The rivet column stands RV_X out from each frame edge (mid-gap when joined). Rivets: 0 top, 1 bottom, 2 middle (the bead rivet).
 // Drops are [rivet, start]; blows are [rivet, moment of contact].
@@ -1846,7 +1970,8 @@ const coilT=(jt,i)=>({leap:ease(seg(jt,.12+.05*i,.27+.05*i)),taut:ease(seg(jt,.3
 // Displayed swing in degrees: level until the ring is shut, then a damped swing that lands exactly on model.angle.
 // Shared by every angled join (JOINS[...].angle): Jump-ring pivot, Caged ball joint, Bent wire and Pearl stays.
 // Optional hooks, set by the Briolette fan and the Wrapped-eye stay: `bend` (its own stepped swing), `py` (pivot height on the casing), `peak`, `max` and `snap` (hard steps that replace the detents);
-// the stay also sets `pad` (room beyond the casings) and `grab`/`gain` (a grab on the join turns about another point, scaled).
+// the stay also sets `pad` (room beyond the casings) and `grab`/`gain` (a grab on the join turns about another point, scaled);
+// the cradle roll sets `tr` (how far the turning point travels as it rolls, as {x,y} for angle th at height h).
 function swingAt(jt){
  const A=J().angle;if(!A)return 0;if(A.bend)return A.bend(jt);
  const u=seg(jt,A.swing,1);if(u<=0)return 0;const k=Math.pow(1-u,2);
@@ -1855,7 +1980,7 @@ function swingAt(jt){
 const pivY=(A,th,h)=>A.py?A.py(th,h):h/2;
 // GitDiscuss's vertical extent relative to Jarvis's top edge at angle th.
 function pivotSpan(th,h){
- const A=J().angle||JOINS.pivot.angle,r=th*Math.PI/180,py=pivY(A,th,h),ly=py+A.ring*Math.sin(r/2);let lo=0,hi=h;
+ const A=J().angle||JOINS.pivot.angle,r=th*Math.PI/180,py=pivY(A,th,h),ly=py+A.ring*Math.sin(r/2)+(A.tr?A.tr(th,h).y:0);let lo=0,hi=h;
  for(const x of [A.x0,W+A.x0])for(const y of [-py,h-py]){const v=ly+x*Math.sin(r)+y*Math.cos(r);lo=Math.min(lo,v);hi=Math.max(hi,v)}
  // A join with parts beyond the casings (the wrapped-eye stay's posts) asks for room on the side they stand.
  if(A.pad){if((Math.sign(th)||Math.sign(model.angle)||1)>0)lo-=A.pad();else hi+=A.pad()}
@@ -3898,7 +4023,7 @@ function fanRender(el,svg){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c,page:0},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30,stays:-15,brio:30,wstay:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0,dir:1};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c,page:0},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30,stays:-15,brio:30,wstay:30,roll:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0,dir:1};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -3979,7 +4104,9 @@ function render(){
   if(id==='b'){
    // Angled joins: GitDiscuss turns the full swing about a point x0 out from its near edge; on the pivot that point rides half the swing round the ring.
    const A=j.angle||{x0:0,ring:0},th=swingAt(model.jt),ph=th*Math.PI/360;
-   el.style.transformOrigin=`-${A.x0}px ${f(pivY(A,th,h))}px`;el.style.transform=th?`translate(${f(A.ring*Math.cos(ph)-A.ring)}px,${f(A.ring*Math.sin(ph))}px) rotate(${f(th)}deg)`:'';
+   // A rolling join also carries that point along as it rolls (A.tr).
+   const T=A.tr&&th?A.tr(th,h):{x:0,y:0};
+   el.style.transformOrigin=`-${A.x0}px ${f(pivY(A,th,h))}px`;el.style.transform=th?`translate(${f(A.ring*Math.cos(ph)-A.ring+T.x)}px,${f(A.ring*Math.sin(ph)+T.y)}px) rotate(${f(th)}deg)`:'';
   }
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
   if(small&&model.g>-1){({bezel:bezelRender,detail:detailRender,festoon:festoonRender,loom:loomRender,vine:vineRender,fan:fanRender}[model.morph]||treeRender)(el,svg);continue}
