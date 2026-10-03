@@ -44,7 +44,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Felt · Shade · Concertina pleats — Added selectable three-stage wool folds, a scalloped 36 px hem, flat summary labels, reverse unfolding and independent Checks shade; retained all six joins and prior shades; 348 simulated DOM, animation, geometry and touch checks passed; full-page visual review blocked by denied Chrome access.
 - [x] Elven · Shade · Quill sheath — Added selectable sequential silver rib withdrawal, a closing chased cap, readable 36 px summary spine and reverse extension with independent Checks shade; preserved all six joins and earlier shades; 317 simulated interaction, animation, geometry and touch checks passed; full-page visual review blocked by unavailable browser access and sandbox browser launch.
 - [x] Wire · Shade · Stone strand — Added selectable staged wire withdrawal into wound collars, unequal jade/amber/pearl stones, crisp summary plaques and reverse expansion with independent Checks shade; retained all seven joins and plain summary; 229 simulated interaction, animation, geometry and touch checks passed; full-page visual review blocked by denied Chrome access.
-- [ ] Hollow · Shade · Silk blind
+- [x] Hollow · Shade · Silk blind — Finished selectable travelling woven silk, a turning chalk spindle, rigid rising hem and red expand pull with reverse unwind and focus restoration; retained all six joins and earlier shades; 314 simulated DOM, animation, geometry and touch checks passed; full-page visual review blocked by denied Chrome access and failed sandbox browser launch.
 - [ ] Gothic · Shade · Stone course stack
 - [ ] Felt · Shade · Drawstring pouch
 - [ ] Elven · Shade · Fan of ribs

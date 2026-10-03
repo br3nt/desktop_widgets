@@ -44,7 +44,9 @@ footer{max-width:1224px;margin:auto;padding:27px 32px 32px;display:grid;grid-tem
 .shade-choice{display:flex;align-items:center;gap:8px;color:#5c6770;font-size:12px}.shade-choice select{max-width:195px;padding:7px;background:#f7f7ef;border:1px solid #a7b7b9;border-radius:4px;color:#28323c}
 /* The silk winds onto a fixed rod; lettering stays on a flat reading band. */
 .silk-winding>.summary{top:8px;height:24px;background:#16232f;box-shadow:none}
-.silk-winding>.summary button{height:24px;width:24px}
+.silk-winding>.summary button{height:24px;width:24px;flex:none}
+.silk-winding>.summary span{white-space:nowrap}
+.silk-winding>.summary button:focus-visible{outline-color:#f2c5a6}
 .silk-winding .husk-frame{overflow:visible}
 </style></head><body>
 <header><div class="eyebrow"><a href="index.html">← Codex / Skin studies</a><span>05 · Hollow</span></div><div class="heading"><div><h1>A quiet seam.<br><span>Two shells become one.</span></h1><p>Chalk lips, deep ink, a small red pull. One hard shell slips beneath its neighbour and settles into a single continuous contour.</p></div><label class="option">Built options<select id="option"><option value="shell-lap">01 — Shell lap · fusion</option><option value="silk-seam">02 — Silk tension seam · binding</option><option value="reed-bolt">03 — Reed gate bolt · sliding</option><option value="shadow-dovetail">04 — Shadow dovetail · silhouette fusion</option><option value="seed-collar">05 — Seed-pod collar · enclosing</option><option value="silk-bridge">06 — Silk suspension bridge · remote</option></select></label></div></header>
@@ -282,13 +284,13 @@ function huskFrame(width,height,q){
 // A rigid lower shell retreats as the membrane winds into the chalk spindle.
 function blindFrame(width,height,q){
  const roll=clamp((q-.06)/.86,0,1),bottom=height-(height-36)*roll;
- const hem=bottom-5,rod=4+2*roll,fold=Math.max(14,hem-11*(1-roll));
+ const hem=bottom-5,rod=4+2*roll,fold=Math.max(14,hem-11*(1-roll)),travel=(height-36)*roll;
  return `<g data-husk-progress="${q}" data-husk-height="${bottom}" data-blind-roll="${roll}">
  <path d="M8 8L18 2H${width-18}L${width-8} 8L${width-10} ${bottom-10}L${width-23} ${bottom}H24L10 ${bottom-7}Z" fill="#263b4a" stroke="#081725" stroke-width="2"/>
  <path d="M17 9H${width-17}L${width-19} ${hem}Q${width*.57} ${hem-3} 19 ${hem}Z" fill="#172634" stroke="#6e838d" stroke-width="1"/>
- <path d="M17 9H${width-17}V${hem}H17Z" fill="url(#blind-weave)"/>
+ <svg x="18" y="10" width="${width-36}" height="${Math.max(0,hem-10)}" overflow="hidden"><g data-silk-travel="${travel}" transform="translate(0 ${-travel})"><rect width="${width-36}" height="${height}" fill="url(#blind-weave)"/></g></svg>
  <path d="M22 ${fold}Q${width*.48} ${fold-5*(1-roll)} ${width-22} ${fold}" fill="none" stroke="#8ea3aa" stroke-opacity="${.48*(1-roll)}" stroke-width="1.2"/>
- <path d="M14 ${hem}Q${width*.46} ${hem+4} ${width-14} ${hem}L${width-20} ${bottom}H25Z" fill="#8ca4a7" stroke="#0b1a28" stroke-width="1.5"/>
+ <path data-shell-hem="${bottom}" d="M14 ${bottom-8}Q${width*.46} ${bottom-4} ${width-14} ${bottom-8}L${width-20} ${bottom}H25Z" fill="#8ca4a7" stroke="#0b1a28" stroke-width="1.5"/>
  <path d="M29 ${bottom-2}H${width-30}" stroke="#d3ddcf" stroke-width="1"/>
  <path d="M18 4H${width-18}" stroke="#071522" stroke-width="${rod*2+3}" stroke-linecap="round"/>
  <path d="M18 4H${width-18}" stroke="#a0b6b4" stroke-width="${rod*2}" stroke-linecap="round"/>
@@ -393,7 +395,7 @@ async function setState(state){
   say(blind()?'The spindle unwinds; silk lowers with the shell, then the full screens return.':'The plates extend in reverse order; screens return at their original size.');
   if(!await animate(1000,t=>{model.husk=from*(1-t);paint()},current))return;
   busy=false;
-  if(wasShade&&state===shadeReturn){leaveShade();paint();say('Shells restored. Screens, pause state and drawer contents retained.');}
+  if(wasShade&&state===shadeReturn){const focusWasSummary=document.activeElement?.closest('.summary');leaveShade();paint();if(focusWasSummary)$(focusWasSummary.closest('#b')?'#b .grip':'#a .grip').focus();say('Shells restored. Screens, pause state and drawer contents retained.');}
   else await baseSetState(state);
  }
 }
