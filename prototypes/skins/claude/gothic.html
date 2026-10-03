@@ -272,6 +272,12 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
   <div class="mw lst" aria-hidden="true" style="left:390px;top:124px;width:88px;height:64px"><div class="tiny">Waiting · 2</div><ul><li>deploy-preview</li><li>e2e-safari</li></ul></div>
   <div class="tri" role="group" aria-label="The last ten runs, one painted band per run on the candle clock"></div>
  </div>
+ <div class="wv" id="fv1"><div class="tri" role="group" aria-label="Checks, one painted medallion per check"></div></div>
+ <div class="wv av" id="fv2">
+  <div class="mw col" aria-hidden="true" style="left:6px;top:128px;width:88px;height:62px"><div class="tiny">Pass rate</div><span class="num ok">86%</span><small>run 418 · main</small></div>
+  <div class="mw lst" aria-hidden="true" style="left:390px;top:128px;width:88px;height:62px"><div class="tiny">Waiting · 2</div><ul><li>deploy-preview</li><li>e2e-safari</li></ul></div>
+  <div class="tri" role="group" aria-label="The last ten runs, one painted sector per run"></div>
+ </div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
 </section>
@@ -4410,6 +4416,147 @@ MORPHS.hearse={label:'Tenebrae hearse',kind:'Kindle',sizes:[['facade','Facade',0
  say:(d,S)=>d>0?(S[2]===1?'Checks becomes a Tenebrae hearse: fifteen candles are set on an iron triangle, and the twelve passed checks and the run are lit.':'Tenebrae: two iron standards rise beside the hearse, a candle clock of the last ten runs, lit, and an unlit candle for the two waiting.'):(S[2]===0?'The candles are snuffed and lifted off, and the hearse is taken down.':'The candle clock is snuffed and the standards sink into the floor.'),
  about:'At Tenebrae, the night office of Holy Week, fifteen candles stood on a triangular iron stand called a hearse and were put out one by one as the psalms were sung, until the church was dark. Here Checks grows by running that the other way: by kindling. The facade stays as the hearse\'s plinth and keeps its nameplate and display. <b>Hearse</b> (252 px tall): an iron sill is set on the cornice and two arms of twisted iron are raised about their gilt feet, gathering speed until they meet at the apex with a clang. A stem rises through the sill to meet them, and a tie bar and a pierced iron quatrefoil go in. Gilt pans bud along the arms, and fifteen candles are lowered onto their prickets from the bottom up, alternately left and right: fourteen of beeswax, one per check, and a white one at the apex for the run. The two waiting checks, deploy-preview and e2e-safari, are tied with red ribbons. Then a lighter on a long brass pole comes round from the left, up one arm and down the other, and each passed candle catches with a flare, its wick blackening, wax running down its side a while later, and a warm light gathering behind the hearse. The two ribboned candles stay unlit. Hover or tap a candle to read its check. <b>Tenebrae</b> (484 px): two iron standards rise out of the floor on tripod feet, and their boards unfold from the shafts. The left one carries a candle clock, the kind marked in bands to tell the hours: here the bands are painted on bottom to top, one per run on main, 409 to 418, green, amber or red, and the lighter lights it, so the newest run burns at the top. Its board gives the pass rate, 86% on run 418. The right one carries a white candle tied with two red ribbons, left unlit, and its board names the two waiting checks. Hover or tap a band to read its run. <b>Shrinking</b> runs it back: the candles are snuffed, lifted off and the iron taken down. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading snuffs it and takes it down first, and unshading raises it again. Nothing moves at rest.'};
 
+/* ---------- Morph: flabellum (Checks) ---------- */
+// g runs 0 facade, 1 flabellum, 2 procession. A flabellum is a liturgical fan. The ninth-century one from Tournus is a strip of pleated, painted vellum
+// that folds into a carved ivory case on a handle; opened, the case's two boards swing round about one pivot until they meet, and the vellum is a full disc.
+// Here the handle rises out of the facade with the case shut, and each board swings through half a turn to meet the other below the pivot.
+// Paint on the vellum folds with it: whatever is painted at angle ψ (−π..π, from the top, fully open) sits at ψ·a/π while the boards are a apart.
+// For the procession two smaller flabella rise on staffs beside it, with banners: the last ten runs painted round one, the two waiting on the other.
+const FLH=252,FLG=[484,FLH],FLF=FLH-CH,FLT=FLF-4,FLX=138,FLY=88,FLR=78,FLBL=82,FSX=[50,434],FSY=70,FSR=40,FSBL=43,FLRC={pass:'#2f7a45',run:'#c08a22',need:'#a3222f'};
+const flBox=g=>g<1e-6?[CW,CH]:g<=1?[CW,FLH]:[lerp(CW,FLG[0],ease(seg(g-1,0,.12))),FLH],flDims=k=>[[CW,CH],[CW,FLH],FLG][k];
+const flP=(cx,cy,p,r)=>[cx+r*Math.sin(p),cy-r*Math.cos(p)],flPt=(cx,cy,p,r)=>{const[x,y]=flP(cx,cy,p,r);return f(x)+' '+f(y)};
+const flAnn=(cx,cy,p0,p1,r0,r1)=>{const L=p1-p0>Math.PI?1:0;return `M${flPt(cx,cy,p0,r1)}A${r1} ${r1} 0 ${L} 1 ${flPt(cx,cy,p1,r1)}L${flPt(cx,cy,p1,r0)}A${r0} ${r0} 0 ${L} 0 ${flPt(cx,cy,p0,r0)}Z`};
+// Medallions leave a gap at the foot, where the boards meet; the vine crosses the band's middle at each one.
+const FLGAP=19*Math.PI/180,FLSTEP=(2*Math.PI-2*FLGAP)/13,flMed=m=>-Math.PI+FLGAP+m*FLSTEP;
+// One board of the ivory case in its own frame, pointing up from the pivot; s -1 is the left board, 1 the right. Carved with a row of lancets, capped in gilt.
+function flBoard(cx,cy,s,L,bw){
+ const x0=s<0?cx-bw:cx,y0=cy-L,y1=cy-4,xm=x0+bw/2,hw=bw*.24,n=Math.floor((y1-y0-14)/11);
+ let o=`<rect x="${f(x0)}" y="${f(y0)}" width="${bw}" height="${f(y1-y0)}" rx="1.2" fill="url(#flIv)" stroke="#5a4426" stroke-width=".6"/>`;
+ for(let k=0;k<n;k++){const yt=y0+9+k*11;o+=`<path d="M${f(xm-hw)} ${f(yt+8)}V${f(yt+3)}Q${f(xm-hw)} ${f(yt)} ${f(xm)} ${f(yt-1)}Q${f(xm+hw)} ${f(yt)} ${f(xm+hw)} ${f(yt+3)}V${f(yt+8)}Z" fill="#2a1d10" opacity=".75"/>`}
+ return o+`<path d="M${f(x0+.9)} ${f(y0+3)}V${f(y1-1)}" stroke="#fffaf0" stroke-opacity=".6" stroke-width=".6"/><rect x="${f(x0-.6)}" y="${f(y0-1.5)}" width="${f(bw+1.2)}" height="5" rx="1.5" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/>`;
+}
+// The two boards a apart, swung about the pivot.
+const flBoards=(cx,cy,a,L,bw)=>[-1,1].map(s=>`<g transform="rotate(${f(s*a*180/Math.PI)} ${cx} ${cy})">${flBoard(cx,cy,s,L,bw)}</g>`).join('');
+// The pleated vellum between boards a apart: n pleats a side, a zigzag outer edge, paint(k) clipped to it, and the folds shaded by how tight they are.
+function flVel(id,cx,cy,a,R,n,r0,paint){
+ if(a<.004)return '';
+ a=Math.min(a,Math.PI-.0015);const k=a/Math.PI,N=2*n,dz=R/30;
+ let e='',dk='',lt='',ln='';
+ for(let j=0;j<=N;j++)e+=(j?'L':'M')+flPt(cx,cy,-a+2*a*j/N,j%2?R-dz:R);
+ for(let j=0;j<N;j++){const p0=-a+2*a*j/N,p1=p0+2*a/N,w=`M${flPt(cx,cy,p0,r0)}L${flPt(cx,cy,p0,R+2)}L${flPt(cx,cy,p1,R+2)}L${flPt(cx,cy,p1,r0)}Z`;
+  if(j%2)dk+=w;else lt+=w;if(j)ln+=`M${flPt(cx,cy,p0,r0)}L${flPt(cx,cy,p0,j%2?R-dz:R)}`}
+ const pg=`M${cx} ${cy}${e.replace('M','L')}Z`;
+ return `<clipPath id="${id}"><path d="${pg}"/></clipPath><g clip-path="url(#${id})"><path d="${pg}" fill="#ecdfbd"/>${paint(k)}`+
+  `<path d="${dk}" fill="#2a1a08" opacity="${f(.08+.4*(1-k))}"/><path d="${lt}" fill="#fff8e6" opacity="${f(.06+.12*(1-k))}"/><path d="${ln}" fill="none" stroke="#4a3418" stroke-width=".5" opacity=".45"/></g>`+
+  `<path d="${e}" fill="none" stroke="#6e4a12" stroke-width="2.2" stroke-linejoin="round"/><path d="${e}" fill="none" stroke="#f0cf7a" stroke-width=".9" stroke-linejoin="round"/>`;
+}
+// A gilt boss over the pivot with a gesso face; inner is its lettering.
+const flBoss=(cx,cy,r,q,inner)=>q<=0?'':`<g opacity="${f(Math.min(1,q*2))}" transform="translate(${cx} ${cy}) scale(${f(.6+.4*ease(q))})"><circle r="${r}" fill="url(#gild)" stroke="#3a2608" stroke-width=".6"/><circle r="${f(r-3)}" fill="url(#flGes)"/><circle r="${f(r-5.4)}" fill="none" stroke="#8e1f2b" stroke-width=".7"/>${inner}</g>`;
+// The flabellum in its own frame (CW × FLH), without the facade.
+function flMain(u,P1){
+ const tb=P1?1:seg(u,.02,.1),rs=P1?1:seg(u,.08,.34),ha=P1?1:seg(u,.34,.4),op=P1?1:seg(u,.4,.78),cm=P1?1:seg(u,.88,.98),a=Math.PI*ease(op);
+ let s='',gw='',lc=0;
+ // The ivory collar on the cornice, gilt-banded.
+ if(tb>0)s+=`<g transform="translate(${FLX} 0) scale(${f(Math.max(.02,ease(tb)))} 1) translate(${-FLX} 0)"><rect x="${FLX-12}" y="${FLT}" width="24" height="8" rx="1.5" fill="url(#flIv)" stroke="#5a4426" stroke-width=".6"/><rect x="${FLX-12}" y="${FLT+2.6}" width="24" height="2.4" fill="url(#gild)"/><path d="M${FLX-12} ${FLT+9}H${FLX+12}" stroke="#000" stroke-opacity=".3" stroke-width="2"/></g>`;
+ // The painted vellum: a lapis band with a gilt vine weaving through fourteen medallions (the checks), and an inscription band inside a gilt edge.
+ const paint=k=>{let p=`<circle cx="${FLX}" cy="${FLY}" r="50.5" fill="none" stroke="#1d3566" stroke-width="21"/><circle cx="${FLX}" cy="${FLY}" r="35.5" fill="none" stroke="#8e1f2b" stroke-width=".8"/>`+
+   `<g fill="none" stroke="url(#gild)" stroke-width="1.3"><circle cx="${FLX}" cy="${FLY}" r="40"/><circle cx="${FLX}" cy="${FLY}" r="61"/></g><circle cx="${FLX}" cy="${FLY}" r="${FLR-1.5}" fill="none" stroke="#c9a24a" stroke-width="3" opacity=".75"/>`;
+  let v='';for(let q=0;q<=156;q++){const t=q/12,ps=flMed(0)+t*FLSTEP;v+=(q?'L':'M')+flPt(FLX,FLY,ps*k,50.5+6.5*Math.sin(Math.PI*t))}
+  p+=`<path d="${v}" fill="none" stroke="#e0b450" stroke-width="1"/>`;
+  for(let m=0;m<13;m++){const[x,y]=flP(FLX,FLY,(flMed(m)+FLSTEP/2)*k,m%2?44:57);p+=`<circle cx="${f(x)}" cy="${f(y)}" r="1.5" fill="#e0b450"/>`}
+  // The inscription is lettered across the pleats, so it only reads once they are nearly flat.
+  p+=`<g font-family="Georgia,serif" font-size="9" letter-spacing="1.4" text-anchor="middle" opacity="${f(seg(k,.85,1))}"><text fill="#6b1820"><textPath href="#flTop" startOffset="50%">&#10016; RUN 418 · MAIN &#10016;</textPath></text>`+
+   `<text fill="#2c2117"><textPath href="#flLL" startOffset="50%">86% PASSED</textPath></text><text fill="#8e1f2b" font-weight="700"><textPath href="#flLR" startOffset="50%">2 WAITING</textPath></text></g>`;
+  // The medallions: gesso until kindled, then green (passed) or red (waiting); they fold with the vellum.
+  for(let m=0;m<14;m++){const ph=flMed(m)*k,[x,y]=flP(FLX,FLY,ph,50.5),q=P1?1:seg(u,.79+.006*m,.81+.006*m);
+   p+=`<g transform="rotate(${f(ph*180/Math.PI)} ${f(x)} ${f(y)})"><ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(Math.max(.4,7*k))}" ry="7" fill="#efe3c4" stroke="url(#gild)" stroke-width="1.6"/>`+
+    (q>0?`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(Math.max(.3,5.9*k))}" ry="5.9" fill="url(#${m>11?'flRd':'flGn'})" opacity="${f(q)}"/>`:'')+'</g>';
+   if(q>0&&q<1)gw+=`<circle cx="${f(x)}" cy="${f(y)}" r="7" fill="${m>11?LCOL.need:LCOL.pass}" opacity="${f(.8*Math.sin(Math.PI*q))}"/>`;lc+=q}
+  return p};
+ // The handle and the case rise out of the facade together; the clasp is unhooked, then the boards swing apart and the vellum opens between them.
+ const dy=(1-ease(rs))*(FLT-FLY+FLBL)-2*Math.sin(Math.PI*seg(rs,.75,1));
+ if(rs>0){let st=`<rect x="${FLX-3}" y="${FLY}" width="6" height="${FLT-FLY+40}" fill="url(#flIv)" stroke="#5a4426" stroke-width=".6"/><g fill="url(#gild)" stroke="#3a2608" stroke-width=".5"><ellipse cx="${FLX}" cy="${FLY+30}" rx="5" ry="2.6"/><ellipse cx="${FLX}" cy="${FLY+58}" rx="5.5" ry="2.8"/></g>`;
+  st+=flVel('flS',FLX,FLY,a,FLR,14,30,paint)+flBoards(FLX,FLY,a,FLBL,9);
+  if(ha<1)st+=`<g transform="rotate(${f(-110*ease(ha))} ${FLX-9.6} ${FLY-64})" opacity="${f(1-seg(ha,.6,1))}"><rect x="${FLX-9.6}" y="${FLY-66}" width="19.2" height="4" rx="1" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/><circle cx="${FLX+7.6}" cy="${FLY-64}" r="1.2" fill="#3a2608"/></g>`;
+  st+=`<circle cx="${FLX}" cy="${FLY}" r="3" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/>`;
+  s+=`<g clip-path="url(#flClip)"><g transform="translate(0 ${f(dy)})">${st}</g></g>`}
+ s+=flBoss(FLX,FLY,31,cm,`<text x=".5" y="-9" text-anchor="middle" font-family="Georgia,serif" font-size="7" letter-spacing="1" fill="#5a3a1a">CHECKS</text><text y="5.5" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="700" fill="#2c2117">12/14</text><text y="15.5" text-anchor="middle" font-family="Georgia,serif" font-size="7.5" font-style="italic" fill="#3b2c1f">passed</text>`);
+ return `<ellipse cx="${FLX}" cy="${FLY}" rx="104" ry="96" fill="url(#flPool)" opacity="${f(lc/14)}"/>`+s+(gw?glowG(gw):'');
+}
+// One processional flabellum in the procession frame, centred on xc: its staff rises from the floor with the case shut, its banner unrolls from the crossbar,
+// and it opens. The left one has the last ten runs painted round it; the right one carries the two waiting as red medallions.
+function flFlank(xc,side,pd,bd,op,cm){
+ if(pd<=0)return '';
+ const a=Math.PI*ease(op),dy=(1-ease(pd))*(FLH-FSY+FSBL+4);
+ let st=`<rect x="${xc-2.2}" y="${FSY}" width="4.4" height="${FLH-FSY-6}" fill="url(#flIv)" stroke="#5a4426" stroke-width=".5"/><path d="M${xc-11} ${FLH}V${FLH-6}L${xc-7} ${FLH-10}H${xc+7}L${xc+11} ${FLH-6}V${FLH}Z" fill="#8a7a62" stroke="#3a2c1c" stroke-width=".6"/>`+
+  `<g fill="url(#gild)" stroke="#3a2608" stroke-width=".5"><ellipse cx="${xc}" cy="${FSY+26}" rx="4" ry="2.2"/><rect x="${xc-45}" y="119.5" width="90" height="3" rx="1.5"/><circle cx="${xc-46}" cy="121" r="2.6"/><circle cx="${xc+46}" cy="121" r="2.6"/><ellipse cx="${xc}" cy="${FLH-14}" rx="4.4" ry="2.2"/></g>`;
+ const paint=side?k=>{let p=`<circle cx="${xc}" cy="${FSY}" r="27" fill="none" stroke="#1d3566" stroke-width="12"/>`;
+   for(let q=0;q<8;q++){const[x,y]=flP(xc,FSY,(-Math.PI+q*Math.PI/4+Math.PI/8)*k,27);p+=`<circle cx="${f(x)}" cy="${f(y)}" r="1.6" fill="#e0b450"/>`}
+   for(const ps of[-Math.PI/2,Math.PI/2]){const ph=ps*k,[x,y]=flP(xc,FSY,ph,27);p+=`<g transform="rotate(${f(ph*180/Math.PI)} ${f(x)} ${f(y)})"><ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(Math.max(.4,5.4*k))}" ry="5.4" fill="url(#flRd)" stroke="url(#gild)" stroke-width="1.3"/></g>`}
+   return p+`<g fill="none" stroke="url(#gild)" stroke-width="1.1"><circle cx="${xc}" cy="${FSY}" r="21"/><circle cx="${xc}" cy="${FSY}" r="33"/></g>`}
+  :k=>{let p='';for(let r=0;r<10;r++){const p0=(-Math.PI+r*Math.PI/5)*k,p1=p0+Math.PI/5*k;p+=`<path d="${flAnn(xc,FSY,p0,p1,21,33)}" fill="${FLRC[orSt(ORUN[r])]}" stroke="#e0b450" stroke-width=".8"/>`}
+   return p+`<g fill="none" stroke="url(#gild)" stroke-width="1.1"><circle cx="${xc}" cy="${FSY}" r="21"/><circle cx="${xc}" cy="${FSY}" r="33"/></g>`};
+ st+=flVel('flF'+side,xc,FSY,a,FSR,10,16,paint)+flBoards(xc,FSY,a,FSBL,5)+`<circle cx="${xc}" cy="${FSY}" r="2.2" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/>`;
+ let s=`<g clip-path="url(#flFloor)"><g transform="translate(0 ${f(dy)})">${st}</g></g>`;
+ // The banner: crimson with a gilt hem and a swallowtail, unrolled down from the crossbar.
+ if(bd>0)s+=`<g transform="translate(0 122) scale(1 ${f(Math.max(.02,ease(bd)))}) translate(0 -122)"><path d="M${xc-46} 122H${xc+46}V194L${xc+23} 202L${xc} 194L${xc-23} 202L${xc-46} 194Z" fill="#7a1a24" stroke="#3d0b10" stroke-width=".7"/>`+
+  `<path d="M${xc-43} 125H${xc+43}V192L${xc+23} 199L${xc} 191L${xc-23} 199L${xc-43} 192Z" fill="none" stroke="#e0b450" stroke-width=".8" stroke-dasharray="3 1.5"/></g>`;
+ return s+flBoss(xc,FSY,17,cm,side?`<text y="5.5" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="700" fill="#8e1f2b">2</text>`:`<text y="4" text-anchor="middle" font-family="Georgia,serif" font-size="9.5" font-weight="700" fill="#2c2117">86%</text>`);
+}
+function flRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),[w,h]=flBox(g),cx=w/2,ox=cx-CW/2,oy=h-FLH,X0=cx-FLG[0]/2,Y0=h-FLH,P1=i>0;
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='fl'){ms.dataset.key='fl';ms._d='';ms._bx=null;fx._s=null;
+  const arc=(r,p0,p1,sw)=>`M${flPt(FLX,FLY,p0,r)}A${r} ${r} 0 0 ${sw} ${flPt(FLX,FLY,p1,r)}`,D=Math.PI/180;
+  ms.innerHTML=`<defs><linearGradient id="flIv" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#a8987a"/><stop offset=".35" stop-color="#f3ead6"/><stop offset=".6" stop-color="#fffaf0"/><stop offset="1" stop-color="#b9a988"/></linearGradient>`+
+   `<radialGradient id="flGn" cx=".38" cy=".32" r=".75"><stop stop-color="#d8f5c4"/><stop offset=".5" stop-color="#3f9a55"/><stop offset="1" stop-color="#1d5232"/></radialGradient>`+
+   `<radialGradient id="flRd" cx=".38" cy=".32" r=".75"><stop stop-color="#ffc2b8"/><stop offset=".5" stop-color="#c0303a"/><stop offset="1" stop-color="#6a1018"/></radialGradient>`+
+   `<radialGradient id="flGes" cx=".5" cy=".4" r=".65"><stop stop-color="#fffaf0"/><stop offset=".7" stop-color="#f1e3c3"/><stop offset="1" stop-color="#dcc69a"/></radialGradient>`+
+   `<radialGradient id="flPool"><stop stop-color="#ffd68a" stop-opacity=".32"/><stop offset=".55" stop-color="#ffc46a" stop-opacity=".1"/><stop offset="1" stop-color="#ffc46a" stop-opacity="0"/></radialGradient>`+
+   `<path id="flTop" d="${arc(65.5,-80*D,80*D,1)}"/><path id="flLL" d="${arc(72,-96*D,-170*D,0)}"/><path id="flLR" d="${arc(72,170*D,96*D,0)}"/>`+
+   `<clipPath id="flClip"><rect x="-40" y="-80" width="356" height="${FLT+80}"/></clipPath><clipPath id="flFloor"><rect x="-60" y="-100" width="604" height="${FLH+100}"/></clipPath></defs><g class="ofac">${cas(0)}</g><g class="odyn"></g>`}
+ const bx=f(w)+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${f(w)} ${h}`)}}
+ ms.querySelector('.ofac').setAttribute('transform',`translate(${f(ox)} ${oy+FLF})`);
+ let d=`<g transform="translate(${f(ox)} ${oy})">${flMain(u,P1)}</g>`;
+ // The procession, on the second step once the box has widened: staffs rise, banners unroll, the flabella open, their bosses go on, the panes light.
+ const tl=P1?seg(u,.88,1):0;
+ if(P1&&u>.1)d=`<g transform="translate(${f(X0)} ${Y0})">${FSX.map((xc,sd)=>flFlank(xc,sd,seg(u,.1+.03*sd,.34+.03*sd),seg(u,.36+.03*sd,.48+.03*sd),seg(u,.48+.04*sd,.76+.04*sd),seg(u,.8+.03*sd,.9+.03*sd))).join('')}</g>`+d;
+ if(ms._d!==d){ms._d=d;ms.querySelector('.odyn').innerHTML=d}
+ // Grit where the collar lands and the staffs come up, a glint as the clasp comes free, and a click where the boards meet.
+ const dust=JOINS.buttress.dust,spk=(x,y,t,r)=>{const v=Math.sin(Math.PI*t);return v>.05?`<g opacity="${f(v)}">${sparkle(x,y,r*v)}</g>`:''};
+ let fxs='';
+ if(!P1)fxs+=dust(ox+FLX-12,oy+FLT+8,seg(u,.08,.2),4,7,261)+dust(ox+FLX+12,oy+FLT+8,seg(u,.08,.2),4,7,263)+spk(ox+FLX+8,oy+FLY-64,seg(u,.34,.42),6)+spk(ox+FLX,oy+FLY+66,seg(u,.76,.84),8);
+ else if(u>0)FSX.forEach((xc,sd)=>{const x=X0+xc,t=seg(u,.14+.03*sd,.32+.03*sd);fxs+=dust(x-12,h,t,4,10,271+sd)+dust(x+12,h,t,4,10,273+sd)+spk(x,Y0+FSY+36,seg(u,.74+.04*sd,.8+.04*sd),6)});
+ if(fx._s!==fxs){fx._s=fxs;fx.innerHTML=fxs}
+ // Displays: the facade keeps its own; the medallions take taps once kindled; the banners' panes fade in at the end.
+ const lit=P1?1:seg(u,.96,1),o1=$('#fv1'),o2=$('#fv2');
+ if(lit<.01)o1.style.display='none';else Object.assign(o1.style,{display:'block',left:f(ox)+'px',top:oy+'px'});
+ $('#fv1 .tri').style.visibility=lit<1?'hidden':'';
+ if(tl<.01)o2.style.display='none';else Object.assign(o2.style,{display:'block',left:f(X0)+'px',top:Y0+'px',opacity:f(tl)});
+ $('#fv2 .tri').style.visibility=tl<1?'hidden':'';
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+oy+FLF)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+oy+FLF)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'opening')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function flPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0;let t;
+ if(i===0){const k=[...Array(14).keys()].filter(m=>u>=.81+.006*m).length;
+  t=u<.1?(up?'setting an ivory collar on the cornice':'lifting the collar away'):u<.34?(up?'the flabellum rises out of the facade, shut in its case':'the flabellum sinks into the facade'):
+   u<.4?(up?'unhooking the clasp':'hooking the clasp shut'):u<.78?(up?'the boards swing round and the vellum unfolds':'the boards swing back and the vellum folds'):
+   u<.88?(up?'kindling medallion '+Math.min(14,k+1)+' of 14':'the medallions dim, '+k+' still lit'):(up?'the boss is set over the pivot':'the boss is lifted off')}
+ else t=u<.1?(up?'clearing the floor beside the flabellum':'the flabellum stands alone'):u<.37?(up?'two processional flabella rise on their staffs':'the staffs sink into the floor'):u<.51?(up?'their banners unroll':'their banners roll up'):
+  u<.8?(up?'the flabella open':'the flabella fold shut'):u<.93?(up?'their bosses are set':'their bosses are lifted off'):(up?'the banners light':'the banners dim');
+ return 'Checks · '+t;
+}
+MORPHS.flabellum={label:'Flabellum',kind:'Fan',sizes:[['facade','Facade',0,'a facade'],['flabellum','Flabellum',1,'an opened flabellum'],['procession','Procession',2,'a flabellum between two processional flabella']],ms:[4200,3000],
+ box:flBox,dims:flDims,render:flRender,phase:flPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes a flabellum: it rises out of the facade shut in its ivory case, and the boards swing round until the painted vellum is a full disc.':'Procession: two processional flabella rise on staffs beside it and open, the last ten runs painted round one, the two waiting on the other.'):(S[2]===0?'The boards swing back, the vellum folds into the case, and the flabellum sinks into the facade.':'The flabella fold shut and sink into the floor.'),
+ about:'A new morph kind for gothic, <b>Fan</b>: Checks grows by turning about one pivot. A <i>flabellum</i> is a liturgical fan, carried beside the altar and in processions. The ninth-century one from the abbey of Tournus is a long strip of pleated vellum, painted in bands, that folds into a carved ivory case on a handle; to open it, the case\'s two boards are swung round about the pivot until they meet, and the vellum stands as a full disc. Here the facade stays as the plinth and keeps its nameplate and display. <b>Flabellum</b> (252 px tall): an ivory collar is set on the cornice, and the handle rises out of the facade through it with the case shut, its boards carved with lancets and capped in gilt. A gilt clasp is unhooked, and the boards swing apart, each through half a turn, until they meet under the pivot with a click. The vellum unfolds between them, its pleats easing from tight shadowed folds to a gentle zigzag edge, and what is painted on it unfolds too: a lapis band with a gilt vine weaving through fourteen medallions, one per check, spaced to leave the foot clear where the boards meet; and, once the pleats lie nearly flat, an inscription band, <i>Run 418 · main</i> across the top, <i>86% passed</i> and <i>2 waiting</i> below. The medallions kindle one by one round the disc, twelve green and the last two, deploy-preview and e2e-safari, red, and a gilt boss is set over the pivot with the count, 12/14. Hover or tap a medallion to read its check, or the boss for the run. <b>Procession</b> (484 px): flabella were carried in pairs, so two smaller ones rise out of the floor on staffs, crimson banners unroll from their crossbars, and they open the same way. The left one has the last ten runs painted round it, 409 from the foot round to 418, green, amber or red, and its banner gives the pass rate; the right one carries the two waiting checks as red medallions, and its banner names them. Hover or tap a painted run to read it. <b>Shrinking</b> folds the vellum back into the cases and lowers them. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading folds it and lowers it first, and unshading raises it again. Nothing moves at rest.'};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
@@ -4633,6 +4780,10 @@ ORUN.forEach((v,r)=>{const L=oTL(v);orTipBtn('#ov2 .tri',`Run ${409+r} · ${v} o
 CHK.forEach((n,j)=>orTipBtn('#hv1 .tri',`Candle ${j+1} of 14 · ${n} · ${j>11?'unlit, waiting for your approval':'passed, lit'}`,j>11?'need':'pass',`left:${f(tnX(j)-6)}px;top:${f(tnBase(j)-TNC-14)}px;width:12px;height:${TNC+14}px`));
 orTipBtn('#hv1 .tri','The white candle at the apex · run 418 on main · 12 of 14 passed · 86%','run',`left:${TNX-6}px;top:${f(tnBase(-1)-TNA-15)}px;width:12px;height:${TNA+15}px`);
 ORUN.forEach((v,r)=>orTipBtn('#hv2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run, burning':''),orSt(v),`left:${TNSX[0]-8}px;top:${f(tnBand(r)-2.8)}px;width:16px;height:5.6px`));
+/* Flabellum: hover, focus or tap a medallion to read its check, the boss for the run, or a painted sector on the left processional flabellum for its run. */
+CHK.forEach((n,j)=>{const[x,y]=flP(FLX,FLY,flMed(j),50.5);orTipBtn('#fv1 .tri',`Medallion ${j+1} of 14 · ${n} · ${j>11?'red, waiting for your approval':'passed'}`,j>11?'need':'pass',`left:${f(x-7)}px;top:${f(y-7)}px;width:14px;height:14px`)});
+orTipBtn('#fv1 .tri','The boss · run 418 on main · 12 of 14 passed · 86%','run',`left:${FLX-22}px;top:${FLY-22}px;width:44px;height:44px`);
+ORUN.forEach((v,r)=>{const[x,y]=flP(FSX[0],FSY,-Math.PI+(r+.5)*Math.PI/5,27);orTipBtn('#fv2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${f(x-6)}px;top:${f(y-6)}px;width:12px;height:12px`)});
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
