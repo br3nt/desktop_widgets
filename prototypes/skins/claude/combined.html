@@ -432,6 +432,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 /* Felt caterpillars: the shaded strip's name and value are sewn into the casing (label and leaf), so the plain strip stays hidden. */
 [data-mix=feltCat] .strip{display:none}
 [data-mix=feltCat][data-shaded="1"] .grip:focus-visible>*{visibility:hidden}
+[data-mix=oneHinge][data-shaded="1"] .grip:focus-visible>*{visibility:hidden}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -541,7 +542,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. In one line, shade the widgets apart and then joined: apart, Jarvis hangs charms on a brass chain and the felt is pegged out on washing lines; joined, the chain and the cotton are tied into one line.Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. In one line, shade the widgets apart and then joined: apart, Jarvis hangs charms on a brass chain and the felt is pegged out on washing lines; joined, the chain and the cotton are tied into one line. In one hinge, shade the widgets apart and then joined: apart, the stone seat tips up toward you and the elven glass tips back away from you; joined, they tip up together on one rod wound with the silver vine. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -4428,6 +4429,156 @@ MIXES.oneLine={...MIXES.couched,label:'One line',kind:'Half-coupler · shade',sh
   get shadeOn(){return model.jt===1?'Shaded together: the inner post and prop fold away and the chain and the cotton are tied into one line, each half hanging its own pieces.':'Shaded apart: Jarvis hangs charms on a brass chain between copper posts, and GitDiscuss and Checks are pegged out on washing lines.'},
   shadeOff:'Unshaded: the pieces come off, the lines and supports go, and the casings come back.'}};
 
+/* ---------- Mix: one hinge (model D, for shades). Gothic's misericord and elven's scrying glass tip on one wound hinge. ---------- */
+// Both Tip shades turn the casing about its top edge, so this pair can share a hinge. Apart, each skin tips its own way: Jarvis's stone
+// seat tips up toward you on iron pintles, gathering speed, knocks its stop and rocks, and leaves an oak misericord ledge; GitDiscuss's
+// and Checks's glass tips back away from you on silver pins, slowly, and leaves a starry night-glass slot. Joined, the authored seam
+// takes over: the silver vine off the tracery winds round one rod along both top edges, the leaf tips up with the stone a beat behind
+// it, and the vine runs on under the two ledges and flowers over the gap as the join light.
+// The casing and everything on its face turn in 3D (the engine's `tilt` hook) until they are edge-on, then the widget drops to its strip.
+const AX={tip:[.08,.42],snap:.54,lag:.035};
+let axJoined=false,axTo=1,axFrom=null;
+// The stone gathers speed into its stop (or, unshading, falls faster and faster), then rocks twice off the stop.
+function axStone(st){const t=seg(st,AX.tip[0],AX.tip[1]);if(st<AX.tip[1])return axTo?90*t*t:90*(1-(1-t)*(1-t));
+ if(!axTo)return 90;const u=seg(st,AX.tip[1],AX.snap);return 90-13*Math.abs(Math.sin(2*PI*u))*Math.pow(1-u,1.6)}
+const axGlass=st=>-90*ease(seg(st,.06,.5));
+// Joined, GitDiscuss follows the stone a beat behind on the shared rod, its curve squeezed so it is edge-on by the snap too.
+const axRaw=(id,st)=>id==='a'?axStone(st):id==='b'&&axJoined?axStone(Math.max(0,AX.tip[0]+(st-AX.tip[0]-AX.lag)*(AX.snap-AX.tip[0])/(AX.snap-AX.tip[0]-AX.lag))):axGlass(st);
+// The tracery and its vine fold down with the stone seat about Jarvis's top edge.
+const axFold=(body,st,op)=>{const y=model.a.y,k=Math.max(.02,Math.cos(axStone(Math.min(st,AX.tip[1]))*PI/180));return `<g opacity="${f(op)}" transform="translate(0 ${f(y)}) scale(1 ${f(k*1000)/1000}) translate(0 ${f(-y)})">${body}</g>`};
+// How far the pair is joined: GitDiscuss is in place and the tracery vine has reached the stone.
+const axJ=c=>ease(seg(c.jt,.55,.95));
+// The tracery is gone before the casings are 5° over; the rod winds only once it has faded, so it never crosses the finial.
+const axP=st=>({pin:ease(seg(st,0,.1)),rod:ease(seg(st,.14,.28)),trace:1-seg(st,.03,.16),show:seg(st,.08,.26),edge:seg(st,.5,.56),dust:seg(st,AX.tip[1],AX.tip[1]+.2),
+ gild:seg(st,.58,.72),stars:seg(st,.6,.8),sheen:seg(st,.7,.96),vine:seg(st,.58,.84),bloom:seg(st,.8,.92),lit:seg(st,.88,1)});
+const axDefs=()=>`<defs><linearGradient id="ax-oak" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#dcad6e"/><stop offset=".5" stop-color="#bd8748"/><stop offset="1" stop-color="#8c5c2c"/></linearGradient>`+
+ `<linearGradient id="ax-lip" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f3cb8c"/><stop offset=".45" stop-color="#b9813f"/><stop offset="1" stop-color="#5a3616"/></linearGradient>`+
+ `<radialGradient id="ax-oakR" cx=".38" cy=".32" r=".8"><stop stop-color="#e8bb7c"/><stop offset=".6" stop-color="#b98244"/><stop offset="1" stop-color="#835222"/></radialGradient>`+
+ `<linearGradient id="ax-sheen" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#e6eeff" stop-opacity=".3"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>`;
+/* The oak misericord ledge left under Jarvis's seat: a moulded shelf over a carved panel, local to the strip. */
+// Carved relief: a dark copy down-right, a light copy up-left, then the oak, so overlapping shapes read as one carving.
+const axRel=sh=>`<g fill="#2e1808" color="#2e1808" transform="translate(.8 1)">${sh}</g><g fill="#f6d39c" color="#f6d39c" opacity=".55" transform="translate(-.5 -.6)">${sh}</g><g fill="url(#ax-oakR)" color="#b98244">${sh}</g>`;
+const axLeaf=(x,y,deg,s)=>`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(deg)}) scale(${s})"><ellipse cx="6" cy="0" rx="6.5" ry="2.2"/><circle cx="3" cy="-2.1" r="1.9"/><circle cx="3" cy="2.1" r="1.9"/><circle cx="6.6" cy="-2.6" r="2"/><circle cx="6.6" cy="2.6" r="2"/><circle cx="10" cy="-1.9" r="1.6"/><circle cx="10" cy="1.9" r="1.6"/><circle cx="12.4" cy="0" r="1.5"/></g>`;
+// A supporter: an acorn between two oak leaves, as misericords carry a small carving either side of the main one.
+const axSupporter=(x,y)=>axLeaf(x-1,y-1,-150,.8)+axLeaf(x+1,y-1,-30,.8)+`<ellipse cx="${x}" cy="${y+4.5}" rx="3.3" ry="4.4"/><path d="M${x-4.3} ${y+2.6}Q${x} ${y-3.4} ${x+4.3} ${y+2.6}Z"/><rect x="${x-.6}" y="${y-4.2}" width="1.2" height="3"/>`;
+const axCup=(x,y)=>`<path d="M${f(x-2.6)} ${y+1.4}l1.8 -2M${f(x-.4)} ${y+1.6}l1.8 -2.4M${f(x+1.8)} ${y+1.2}l1.3 -1.6" stroke="#3a1e08" stroke-width=".55" fill="none"/>`;
+const axPetals=(x,y,n,rad,r,a0)=>Array.from({length:n},(_,i)=>{const a=a0+i*2*PI/n;return `<circle cx="${f(x+Math.cos(a)*rad)}" cy="${f(y+Math.sin(a)*rad)}" r="${r}"/>`}).join('');
+// A carved oak trail between the rose and the value: a waved stem with a leaf at each crest.
+function axTrail(x0,x1,y){let d=`M${x0} ${y}`,lv='';const n=4,p=(x1-x0)/n;
+ for(let i=0;i<n;i++){const xa=x0+i*p,sg=i%2?1:-1;d+=`Q${f(xa+p/2)} ${f(y+sg*7)} ${f(xa+p)} ${y}`;lv+=axLeaf(xa+p/2,y+sg*3.3,sg*-58+(sg<0?-6:6),.52)}
+ return `<path d="${d}" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`+lv}
+const AX_GRAIN=(()=>{let d='';for(const[y,a,p]of[[18,1.2,61],[24,1.6,83],[31,1.1,47],[37,1.4,71]]){d+=`M10 ${y}`;for(let x=10;x<W-20;x+=20)d+=`Q${x+10} ${f(y+a*Math.sin(x/p*7))} ${x+20} ${y}`}
+ return `<path d="${d}" fill="none" stroke="#5a3412" stroke-opacity=".26" stroke-width=".8"/>`})();
+function axOak(P){
+ const w=W,h=HS,run=model.a.run,rx=112,cy=27;let s='';
+ // The well the seat lifted out of, then the carved panel with long runs of grain.
+ s+=`<rect x="2" y="0" width="${w-4}" height="${h}" rx="5" fill="#120c08"/><rect x="6" y="11" width="${w-12}" height="${h-14}" rx="4" fill="url(#ax-oak)" stroke="#3a210c" stroke-width=".8"/>${AX_GRAIN}`;
+ // The ledge: a moulded shelf the width of the seat, throwing a shadow onto the panel.
+ s+=`<rect x="6" y="12" width="${w-12}" height="4" fill="#2a1406" opacity=".3"/><path d="M4 9Q3 4 8 4H${w-8}Q${w-3} 4 ${w-4} 9L${w-6} 12.5H6Z" fill="url(#ax-lip)" stroke="#3a210c" stroke-width=".8"/><path d="M8 5.3H${w-8}" stroke="#ffe2b0" stroke-opacity=".7" stroke-width=".8"/>`;
+ // Supporters at each end, the main carving (a rose, outer petals then inner), and a trail toward the value.
+ s+=axRel(axSupporter(19,cy+1)+axSupporter(w-19,cy+1)+axTrail(rx+16,236,cy))+axCup(19,cy+1)+axCup(w-19,cy+1);
+ s+=axRel(axPetals(rx,cy,5,4.9,4.4,-PI/2))+axRel(axPetals(rx,cy,5,2.6,2.7,-PI/2+PI/5));
+ // The rose's heart is gilded once the seat is up while Jarvis runs; paused, it stays bare oak.
+ const gl=run?P.gild:0;s+=`<circle cx="${rx}" cy="${cy}" r="2.5" fill="#4a2a10"/>`+(gl>0?`<circle cx="${rx}" cy="${cy}" r="2.5" fill="url(#gild)" opacity="${f(gl)}"/>`:'');
+ const sp=Math.sin(PI*gl);if(sp>.03)s+=sparkle(rx+2,cy-3,sp*.5);
+ // Name and value incised: a light lower lip under dark lettering.
+ const nm='<tspan font-style="italic" font-weight="bold" font-size="16">Jarvis</tspan>',v=`<tspan font-weight="bold" font-size="15">03</tspan><tspan dx="5" font-style="italic" font-size="11.5">agents ${run?'running':'paused'}</tspan>`;
+ for(const[dy,fill,op]of[[.8,'#ffe0aa',.55],[0,'#2a1406',1]])s+=`<g font-family="Georgia,serif" fill="${fill}" opacity="${op}"><text x="38" y="${cy+dy}" dominant-baseline="central">${nm}</text><text x="${w-38}" y="${cy+dy}" text-anchor="end" dominant-baseline="central">${v}</text></g>`;
+ // The seat itself, now standing on edge above its pintles: a thin band of limestone.
+ if(P.edge>0)s+=`<rect x="10" y="-3.4" width="${w-20}" height="3.4" rx="1.2" fill="url(#lime)" stroke="#5b4b36" stroke-width=".6" opacity="${f(P.edge)}"/>`;
+ return s}
+/* The night-glass slot left behind GitDiscuss's and Checks's glass, local to the strip. */
+const AX_STARS=Array.from({length:13},(_,i)=>[(i*.618034+.07)%1,(i*.4142+.21)%1,.8+(i*7)%5*.16]);
+const AX_SANS='Optima,Candara,"Segoe UI",sans-serif';
+function axSlot(id,P){
+ const small=id==='c',w=small?CW:W,h=small?CHS:HS,x0=10,x1=w-10,y0=small?4:5,y1=h-(small?4:5),r=(y1-y0)/2,cy=(y0+y1)/2,run=small||model[id].run;
+ const pill=`M${x0+r} ${y0}H${x1-r}A${r} ${r} 0 0 1 ${x1-r} ${y1}H${x0+r}A${r} ${r} 0 0 1 ${x0+r} ${y0}Z`;
+ let s=`<rect x="2" y="0" width="${w-4}" height="${h}" rx="${h/2}" fill="#070814" opacity=".9"/><path d="${pill}" fill="url(#el-night)"/><path d="${pill}" fill="url(#el-moonlit)"/>`;
+ // Stars come out in the glass one by one as the slot is uncovered.
+ AX_STARS.forEach(([u,v,k],i)=>{const op=clamp(P.stars*AX_STARS.length-i);if(op>0)s+=fgStar(x0+r*.8+u*(x1-x0-r*1.6),y0+3+v*(y1-y0-6),k*(small?1.1:1.4),'#dfe8ff',.5*op)});
+ // One slow sheen crosses the glass as it settles; nothing moves at rest.
+ if(P.sheen>0&&P.sheen<1){const sx=lerp(x0-70,x1+10,P.sheen);s+=`<clipPath id="ax-cl-${id}"><path d="${pill}"/></clipPath><g clip-path="url(#ax-cl-${id})"><rect x="${f(sx)}" y="${y0}" width="60" height="${y1-y0}" fill="url(#ax-sheen)" transform="skewX(-24)" transform-origin="${f(sx+30)} ${cy}"/></g>`}
+ s+=`<path d="${pill}" fill="none" stroke="#070814" stroke-width="3.6"/><path d="${pill}" fill="none" stroke="url(#el-silver)" stroke-width="1.7"/>`+granule(x0-3.5,cy,2.2)+granule(x1+3.5,cy,2.2);
+ // The name in silver script, the value in moonlit sans with a gem before it: amber while GitDiscuss waits on a decision, green for Checks.
+ const nf=small?15:18,num=small?'12 / 14':'02',word=small?'passed':run?'need a decision':'paused',vf=small?13:15,wf=small?10:11,ve=x1-r+2;
+ const vw=fcMeasure(num,`600 ${vf}px ${AX_SANS}`)+4+fcMeasure(word,`${wf}px ${AX_SANS}`),gx=ve-vw-9,gem=small?'st-peri':run?'st-amber':'st-lapis';
+ s+=`<text x="${x0+r+2}" y="${f(cy+1)}" dominant-baseline="central" style="font:400 ${nf}px var(--script)" fill="none" stroke="#9fb6ff" stroke-opacity=".3" stroke-width="3">${small?'Checks':'GitDiscuss'}</text>`+
+  `<text x="${x0+r+2}" y="${f(cy+1)}" dominant-baseline="central" style="font:400 ${nf}px var(--script)" fill="#eef2fc">${small?'Checks':'GitDiscuss'}</text>`+
+  `<text x="${f(ve)}" y="${f(cy+.5)}" text-anchor="end" dominant-baseline="central" style="font-family:var(--fsans)"><tspan font-weight="600" font-size="${vf}" fill="#dbe6ff">${num}</tspan><tspan dx="4" font-size="${wf}" fill="#a9b6dc">${word}</tspan></text>`;
+ const lit=P.stars*(run?1:.3);
+ if(lit>.01)s+=`<circle cx="${f(gx)}" cy="${f(cy)}" r="7" fill="${small?'#b9e27a':run?'#f0ac4e':'#8fa6e0'}" opacity="${f(.4*lit)}" filter="url(#soft)"/>`;
+ s+=`<circle cx="${f(gx)}" cy="${f(cy)}" r="3.6" fill="#070814"/><circle cx="${f(gx)}" cy="${f(cy)}" r="2.7" fill="url(#${gem})"/><circle cx="${f(gx-.8)}" cy="${f(cy-.9)}" r=".8" fill="#fff" opacity="${f(.4+.5*lit)}"/>`;
+ // The glass itself, tipped right back so only its edge shows above the slot.
+ if(P.edge>0)s+=`<rect x="16" y="-2.4" width="${w-32}" height="2.4" rx="1.2" fill="#b9c4e2" opacity="${f(.75*P.edge)}"/>`;
+ return s}
+/* The joined seam: one rod along both top edges with the silver vine wound round it, and the vine run on under the ledges. */
+function axHinge(g){
+ const A=model.a,B=model.b,x0=A.x+14,x1=B.x+W-14,K=(A.x+W+B.x)/2,L=Math.max(K-x0,x1-K)*g,a=Math.max(x0,K-L),b=Math.min(x1,K+L);if(b-a<2)return '';
+ const Y=x=>lerp(A.y+2,B.y+2,clamp((x-x0)/(x1-x0))),hx=x=>Y(x)+2.6*Math.sin((x-K)*PI/6);let back='',front='';
+ // The vine's turns: the halves facing you go over the rod, the others behind it.
+ for(let x=a;x<b;x+=1.5){const xe=Math.min(b,x+1.5),d=`M${f(x)} ${f(hx(x))}L${f(xe)} ${f(hx(xe))}`;if(Math.cos(((x+xe)/2-K)*PI/6)>0)front+=d;else back+=d}
+ const rod=`M${f(a)} ${f(Y(a))}L${f(b)} ${f(Y(b))}`;
+ let s=`<g fill="none" stroke-linecap="round"><path d="${back}" stroke="${NIGHT}" stroke-width="2.6"/><path d="${back}" stroke="#8e99bd" stroke-width="1.2"/>`+
+  `<path d="${rod}" stroke="#05070b" stroke-width="4.4"/><path d="${rod}" stroke="#4a5068" stroke-width="3"/><path d="${rod}" stroke="#c9d2ea" stroke-opacity=".6" stroke-width=".7" transform="translate(0 -.8)"/>`+
+  `<path d="${front}" stroke="${NIGHT}" stroke-width="2.8"/><path d="${front}" stroke="#eef2fc" stroke-width="1.4"/></g>`;
+ // Leaves open along it as the winding passes, and a moonstone bud binds the middle, over the seam.
+ for(const[dx,deg]of[[-150,-130],[-62,-52],[62,-128],[150,-50]]){const x=K+dx;if(x<x0||x>x1)continue;s+=elLeaf(x,Y(x)-1.5,deg,.42*backOut(clamp((L-Math.abs(dx)-4)/14)))}
+ return s+fgMoon(K,Y(K),2.3)}
+function axVine(c,P,j){
+ const k=P.vine*j;if(k<=.01)return '';const A=model.a,B=model.b,S=[B.x+34,B.y+HS-3],E=[A.x+W-36,A.y+HS-3],C=[(S[0]+E[0])/2,Math.max(S[1],E[1])+11];
+ const pts=trArc(Array.from({length:29},(_,i)=>{const q=quad(S,C,E,i/28);return{x:q[0],y:q[1],b:false}})),Lt=pts[pts.length-1].s,len=Lt*k;
+ const cut=trCut(pts,len,2.4,.7,.05);let s=granule(S[0],S[1],2.4)+trStem([cut],false);
+ [5,9,19,23].forEach((i,n)=>{const p=pts[i],q=pts[i+1],sg=n%2?1:-1;s+=elLeaf(p.x,p.y,Math.atan2(q.y-p.y,q.x-p.x)*180/PI+sg*60,.5*backOut(clamp((len-p.s-4)/14)))});
+ if(k<1&&cut.length){const e=cut[cut.length-1];s+=sparkle(e.x,e.y,.3)}
+ // The flower opens on the vine over the gap and kindles as the join light; dim if either widget is paused.
+ const M=pts[14],kk=backOut(P.bloom)*seg(j,.85,1),lit=P.lit*seg(j,.9,1)*(A.run&&B.run?1:.22);
+ return s+elBloom(M.x,M.y,kk,.6,lit)}
+function axOver(c,P){
+ const A=model.a,st=model.st,j=axJ(c);let s='';
+ // Iron pintles at the stone seat's top corners and silver pins at the glass's; joined, the rod and its vine take the inner ones' place.
+ if(P.pin>0){const pk=x=>f(P.pin*(x===A.x+W-20||x===model.b.x+16?1-j*P.rod:1));
+  for(const x of[A.x+20,A.x+W-20])s+=`<g opacity="${pk(x)}"><rect x="${f(x-6)}" y="${f(A.y-.6)}" width="12" height="5.2" rx="2.4" fill="#2a2f3a" stroke="#05070b" stroke-width=".6"/><path d="M${f(x-5)} ${f(A.y+.6)}H${f(x+5)}" stroke="#9aa3b4" stroke-opacity=".6" stroke-width=".6"/><circle cx="${f(x)}" cy="${f(A.y+2)}" r="1" fill="#9aa3b4"/></g>`;
+  for(const id of['b','c']){const m=model[id],w=id==='c'?CW:W;for(const x of[m.x+16,m.x+w-16])s+=`<g opacity="${id==='b'?pk(x):f(P.pin)}">${granule(x,m.y+3,2.3)}</g>`}}
+ const g=P.rod*j;if(g>0)s+=axHinge(g);
+ // The stone knocks its stop and shakes a little dust off the pintles.
+ if(axTo&&P.dust>0&&P.dust<1){const u=P.dust;
+  for(let i=0;i<10;i++){const x=A.x+26+i*(W-52)/9+((i*37)%11-5),y=A.y+3+(i*53)%7+30*u*u*(.75+(i%3)*.12);s+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(.8+(i*29)%3*.35)}" fill="#e6dcc6" opacity="${f(.8*(1-u))}"/>`}
+  for(const x of[A.x+20,A.x+W-20])s+=`<ellipse cx="${f(x)}" cy="${f(A.y+5+6*u)}" rx="${f(8+10*u)}" ry="${f(2.5+2*u)}" fill="#d8ccb4" opacity="${f(.35*(1-u))}" filter="url(#soft)"/>`}
+ // The glass catches the light on its pins as it goes edge-on.
+ const gl=axTo?Math.sin(PI*seg(st,.4,.54)):0;
+ if(gl>.03)for(const id of axJoined?['c']:['b','c']){const m=model[id],w=id==='c'?CW:W;s+=sparkle(m.x+16,m.y+1,gl*.5)+sparkle(m.x+w-16,m.y+1,gl*.4)}
+ return s}
+MIXES.oneHinge={...MIXES.tracery,label:'One hinge',kind:'Pairwise seam · shade',shadeMs:3200,unshadeMs:2400,
+ shK:st=>st<AX.snap?0:1,veil:()=>model.st>=AX.snap?1:0,
+ tilt(id){const st=model.st;if(st<=0||st>=AX.snap)return 0;return axFrom?lerp(axFrom[id],axRaw(id,st),seg(Math.abs(st-axFrom.st),0,.08)):axRaw(id,st)},
+ // Reversed partway through a tip, each casing eases from where it is into the new curve; the joined latch only changes at rest.
+ onShade(to){const st=model.st,mid=st>0&&st<AX.snap;axFrom=mid?{st,a:this.tilt('a'),b:this.tilt('b'),c:this.tilt('c')}:null;axTo=to;if(!mid)axJoined=model.jt===1},
+ stack:[['Model','Pairwise seam (D), for the shade','both skins bring their own Tip shade; for a pair someone has authored, the seam decides how they tip together'],
+  ['Gothic offers','The misericord','from the gothic page: the stone seat tips up toward you on iron pintles, heavy, gathering speed into its stop, and leaves an oak ledge carved with a rose and two acorn supporters'],
+  ['Elven offers','The scrying glass','from the elven page: the glass tips back away from you on silver pins, slow and even, and leaves a slot of night glass where the stars come out'],
+  ['The seam','One hinge','joined, the two hinges become one rod along both top edges with the tracery\'s silver vine wound round it. The glass gives up its own way of tipping and goes up with the stone, a beat behind it, and the vine runs on under the ledges to flower over the gap'],
+  ['Readability','Each its own strip','the oak ledge is incised with Jarvis\'s name and value; the glass slot carries the script name and a moonlit value with its gem'],
+  ['Motion','Each its own','stone heavy, with a knock and two rocks and a little dust; glass and silver smooth']],
+ about:'The tracery mix\'s widgets: Jarvis is carved stone and GitDiscuss and Checks are elven night glass, with the silver vine trained up the tracery as their seam. The shared quilt let the group decide how its members shade (Model C), and one line gave every Hang shade a common face (Model A). This tries the third way, a <b>pairwise seam for the shade</b>: the gothic and elven pages each have a Tip shade, and for this one pair there is an authored way to tip together. Shade the widgets apart, then join them and shade again.',
+ join:{...MIXES.tracery.join,about:MIXES.tracery.join.about+' Joined while shaded, the tracery is folded away with the casings; instead the vine winds the rod along the two top edges and runs on under the ledges to flower.'},
+ shade:{label:'One hinge',kind:'Tip · a pairwise seam',
+  about:'<b>Apart</b>, each skin tips its own way about its top edge, with the display and buttons going with the casing. The tracery folds down and fades. <b>Stone:</b> iron pintles appear at the seat\'s top corners, and the seat tips up toward you, foreshortening and gathering speed. It knocks its stop, rocks twice and shakes dust off the pintles, leaving its limestone edge standing above an oak misericord ledge. The ledge is a moulded shelf over a carved panel with an acorn supporter at each end, a rose (its heart is gilded while Jarvis runs), a foliage trail, and the name and value incised. <b>Glass:</b> silver pins appear, and the glass tips back away from you, slow and even, catching the light on its pins as it goes edge-on. It leaves a silver-rimmed slot of night glass where the stars come out one by one, with the name in script and the value in moonlit sans behind a gem (amber while GitDiscuss waits on a decision, green for Checks). One sheen crosses it. <b>Joined</b>, the seam is authored: a rod forms along both top edges from the gap outward, with the silver vine wound round it, leaves opening and a moonstone bud over the seam. The glass gives up its own way of tipping and goes up with the stone on the shared rod, a beat behind it. Then the vine runs on from under the glass slot, under the gap, to the oak ledge, and a moonstone flower opens over the gap and kindles as the join light (dim if either widget is paused). Joining or releasing while shaded winds the rod and grows the vine, or takes them back. Nothing moves at rest. Unshading tips them back down: the stone falls faster and faster.'},
+ // The tracery folds down with the stone seat and fades; the release still works on it, and on the vine when shaded.
+ over(c){const s=MIXES.tracery.over.call(this,c),st=model.st;if(st<=0)return s;const P=axP(st),i=s.indexOf('<g class="hit"'),body=i<0?s:s.slice(0,i),hit=i<0?'':s.slice(i);let o='';
+  if(P.trace>0)o+=axFold(body,st,P.trace);
+  return o+axOver(c,P)+hit},
+ under(c){const st=model.st;if(st<=0)return trBack;const P=axP(st),j=axJ(c);
+  let s=(P.trace>0?axFold(trBack,st,P.trace):'')+axDefs()+`<g opacity="${f(P.show)}"><g transform="translate(${f(model.a.x)} ${f(model.a.y)})">${axOak(P)}</g>`;
+  for(const id of['b','c'])s+=`<g transform="translate(${f(model[id].x)} ${f(model[id].y)})">${axSlot(id,P)}</g>`;
+  return s+axVine(c,P,j)+'</g>'},
+ text:{...MIXES.tracery.text,
+  intro:'Jarvis is carved stone; GitDiscuss and Checks are elven glass. Shade them apart, then join them and shade again: joined, they tip on one hinge.',
+  joined:'Joined: a silver vine is trained up the tracery with a moonstone flower in the oculus. Shade now and the pair tips on one hinge. Pull the vine to release.',
+  mid:(jt,dir)=>model.st<=.5?MIXES.tracery.text.mid(jt,dir):dir>0?(jt<.55?'Joining · closing in ':'Joining · the vine winds the hinge '):(jt>.55?'Releasing · the vine unwinds ':'Releasing · parting '),
+  get sep(){return model.st>.5?'The flower closes, the vine draws back off the rod and from under the ledges, and the widgets part.':MIXES.tracery.text.sep},
+  get shadeOn(){return model.jt===1?'Shaded together: the vine winds one rod along both top edges, the glass tips up with the stone a beat behind it, and the vine flowers under the gap.':'Shaded apart: the stone seat tips up toward you and knocks onto an oak misericord ledge; the glass tips back away from you onto a slot of night glass.'},
+  get shadeOff(){return model.jt===1?'Unshaded: the vine and the rod go, and the seat and the glass tip back down together.':'Unshaded: the seat falls back down onto its ledge and the glass tips forward again.'}}};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1};
@@ -4500,6 +4651,7 @@ function holdJoining(){
 }
 function toggleShade(){
  const to=model.st>.5?0:1,start=model.st,token=++shadeAnim;
+ if(X().onShade)X().onShade(to); // a mix whose shade depends on how it started (one hinge) notes the direction and whether the pair is joined
  // A docked group parked low while shaded rises as it unshades, so the oriel and its ring stay on the stage.
  if(DOCK()&&!to){const y=Math.min(model.a.y,600-10-(H+OR.gap+CH+BELOW()));model.a.y=model.b.y=y}
  // Shade runs on its own stop-motion clock so it can overlap a join.
@@ -4521,6 +4673,12 @@ function render(){
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=x.casing(id,w,h)}
   // A mix whose shade hangs its pieces in the open (one line) fades the casing and the strip away, so the stage shows through.
   const vl=x.veil?x.veil(id):0;svg.style.opacity=vl>0?f(1-vl):'';
+  // A mix whose shade tips the casing about its top edge (one hinge) turns the casing and everything on its face in 3D, nameplate included.
+  const tl=x.tilt?x.tilt(id):0;
+  if(tl||el.dataset.tl){el.dataset.tl=tl?'1':'';el.style.perspective=tl?'1100px':'';el.style.perspectiveOrigin=tl?`${w/2}px 0px`:'';
+   // The face's offsets come from fixed CSS, so they are read once per mix and pair, not on every frame.
+   const ok=model.mix+document.body.dataset.pair;if(!el._tlo||el._tlo.k!==ok)el._tlo={k:ok,n:[...el.querySelectorAll(':scope>.casing,:scope>.grip,:scope>.screen,:scope>.tabline,:scope>.knob,:scope>.mini,:scope>.knot')].map(n=>[n,n.offsetLeft||0,n.offsetTop||0])};
+   for(const[n,L,T]of el._tlo.n){n.style.transformOrigin=tl?`${f(w/2-L)}px ${f(-T)}px`:'';n.style.transform=tl?`rotateX(${f(tl)}deg)`:''}}
   if(!small||x.dock){el.style.transformOrigin=`${small?CW/2:id==='a'?W:0}px ${h}px`;const sq=sqf(id),ly=x.lift?x.lift(c,id):0;
    el.style.transform=(ly?`translate(0,${f(ly)}px) `:'')+(sq?`scale(${f((1+.025*sq)*1000)/1000},${f((1-.045*sq)*1000)/1000})`:'');
    // A mix with a turning joint swings GitDiscuss about the pin: [degrees, origin x, origin y].
