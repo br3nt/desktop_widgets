@@ -543,7 +543,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · S cycles the sizes in Bays sewn on · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. In one line, shade the widgets apart and then joined: apart, Jarvis hangs charms on a brass chain and the felt is pegged out on washing lines; joined, the chain and the cotton are tied into one line. In one hinge, shade the widgets apart and then joined: apart, the stone seat tips up toward you and the elven glass tips back away from you; joined, they tip up together on one rod wound with the silver vine. In bays sewn on, pick Aisle or Nave: each bay is chalked, dropped in, pinned, basted in red, sewn round in cream, has its basting pulled out and its pins taken away, and is then dressed; anything in the way steps aside first and comes back when the bays are unpicked. In wire key, stone lock, turn the key back (drag round it anticlockwise) to draw the bolt, or tap it; the iron knocks at the end of each turn and the wire moves smoothly. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · S cycles the sizes in Bays sewn on · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. In one line, shade the widgets apart and then joined: apart, Jarvis hangs charms on a brass chain and the felt is pegged out on washing lines; joined, the chain and the cotton are tied into one line. In one hinge, shade the widgets apart and then joined: apart, the stone seat tips up toward you and the elven glass tips back away from you; joined, they tip up together on one rod wound with the silver vine. In bays sewn on, pick Aisle or Nave: each bay is chalked, dropped in, pinned, basted in red, sewn round in cream, has its basting pulled out and its pins taken away, and is then dressed; anything in the way steps aside first and comes back when the bays are unpicked. In wire key, stone lock, turn the key back (drag round it anticlockwise) to draw the bolt, or tap it; the iron knocks at the end of each turn and the wire moves smoothly. In pinned voussoirs, set the Angle row (or drag the wedge up or down, or press ↑ ↓ on it) to open or close the wedge a course at a time, and tap the springer to release; stone and shell both move smoothly.Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -3108,6 +3108,7 @@ const MIXES={
   casing:(id,w,h)=>id==='a'?elCasing(w,h):id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${hoCasing(w,h,'plain')}</g>`:hoCasing(w,h,false),
   get readyPose(){return{alpha:HG.rest+60,fold:hgPoise()}},
   get room(){return hgRoom(hgSet)},
+  fitRoom(h){return hgRoom(hgCur*this.state(ctx()).sw,h)},
   // GitDiscuss turns about the pin, so its rotation origin sits half the gap off its left edge.
   turn(c,id){return id==='b'?[hgCur*this.state(c).sw,-HG.gap/2,c.h/2]:null},
   angle(v){hgTo(v)},
@@ -3266,16 +3267,18 @@ MIXES.moonTab={label:'Moonstone & felt tab',kind:'Fallback coupler',pair:'elffel
   turn:d=>'Tugging the tab · '+Math.round(d.deg*100)+'%'}
 };
 // Sets the angle on the pivot: snaps to a stop, swings there with a little overshoot, and keeps the pair on the stage as it goes.
+// A mix with its own angle face (ang) sets the step and the range; a hard face (the wedge) eases onto each step without overshoot.
 function hgTo(v,ms=560,quiet=false){
- v=clamp(Math.round(v/HG.step)*HG.step,-HG.lim,HG.lim);const changed=v!==hgSet;hgSet=v;$('#ang').value=v;$('#angOut').textContent=hgSign(v);
- const from=hgCur,token=++hgAnim;
- if(!quiet&&changed)say(model.jt===1?'GitDiscuss turns to '+hgSign(v)+' on the pin.':'Angle set to '+hgSign(v)+'; GitDiscuss swings to it once joined.');
+ const K=X().ang||HG,old=hgSet;
+ v=clamp(Math.round(v/K.step)*K.step,-K.lim,K.lim);const changed=v!==hgSet;hgSet=v;$('#ang').value=v;$('#angOut').textContent=hgSign(v);
+ const from=hgCur,token=++hgAnim,fn=K.hard?ease:backOut,pad=K.hard?0:4;
+ if(!quiet&&changed)say(X().angSay?X().angSay(v,old):model.jt===1?'GitDiscuss turns to '+hgSign(v)+' on the pin.':'Angle set to '+hgSign(v)+'; GitDiscuss swings to it once joined.');
  // The overshoot is capped a few degrees past the stop, so a long swing never brushes Jarvis.
- stepped(Math.abs(v-from)<.01?0:ms,t=>{hgCur=clamp(lerp(from,v,backOut(t)),Math.min(from,v)-4,Math.max(from,v)+4);hgFit();render()},token,k=>k===hgAnim);
+ stepped(Math.abs(v-from)<.01?0:ms,t=>{hgCur=clamp(lerp(from,v,fn(t)),Math.min(from,v)-pad,Math.max(from,v)+pad);hgFit();render()},token,k=>k===hgAnim);
 }
 // Moves the joined pair up or down only as far as GitDiscuss's swing needs to stay on the stage.
 function hgFit(){
- if(model.mix!=='pivot'||model.jt===0)return;const h=ctx().h,rm=hgRoom(hgCur*MIXES.pivot.state(ctx()).sw,h),lo=TOP+rm.top,hi=Math.max(lo,600-h-14-rm.bottom),y=clamp(model.a.y,lo,hi),d=y-model.a.y;
+ const x=X();if(!x.fitRoom||model.jt===0)return;const h=ctx().h,rm=x.fitRoom(h),lo=TOP+rm.top,hi=Math.max(lo,600-h-14-rm.bottom),y=clamp(model.a.y,lo,hi),d=y-model.a.y;
  if(!d)return;model.a.y+=d;model.b.y+=d;
  if(model.path)for(const k of['s','j'])for(const id of['a','b'])if(model.path[k][id])model.path[k][id].y+=d;
 }
@@ -4892,6 +4895,249 @@ MIXES.wirekey={label:'Wire key, stone lock',kind:'Half-coupler · Lock',pair:'st
   mid:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.63?'Joining · the key flies across ':jt<.88?'Joining · two turns throw the bolt ':'Joining · the lock lights '):(jt>.6?'Releasing · turning the key back ':jt>.4?'Releasing · the key flies home ':'Releasing · parting '),
   turn:d=>'Turning the key back · '+Math.round(d.deg*100)+'%'}};
 
+/* ---------- Mix: pairwise seam for the Wedge kind (model D). Stone voussoirs, each pinned tight with a Hollow shell shim. ----------
+   GitDiscuss turns about the corner it shares with Jarvis: the foot when it bends down (the wedge opens upward), the head when it bends up.
+   Each 15° of the opening is one course, built by both skins: an 11° voussoir hauled in on a lewis and struck home, then a 4° shim of
+   pale shell driven into the joint over it by a crescent strike. Joining, the courses go in between S0 and S1; releasing, they come out
+   between R0 and R1 of the release (1 - jt), last in first out. */
+const PV={step:15,lim:45,hard:true,def:30,stone:11,head:9,lift:5,S0:.48,S1:.9,R0:.06,R1:.46,popMs:900,aria:'GitDiscuss angle on the pinned voussoirs, in degrees'};
+const PV_FACE=['#e9e4d6','#dcd5c3','#efeadf'],PV_MARKS=['M0 -4V4M-2.6 -1.4L0 -4L2.6 -1.4','M-3 -3L3 3M3 -3L-3 3M-3 -3H3','M0 4V-4M-3 -4V-1H3V-4'];
+let pvTn=null,pvPop=null,pvRaf=0,pvTagUntil=0;
+const pvN=(a=hgSet)=>clamp(Math.round(Math.abs(a)/PV.step),0,3);
+// While it turns, the next course goes in once there is nearly room for it.
+const pvCount=th=>clamp(Math.floor((Math.abs(th)+4)/PV.step),0,3);
+const pvUp=b=>b>0||(b===0&&hgSet>=0);
+const pvCourses=n=>n?n+' course'+(n>1?'s':''):'square';
+// GitDiscuss's swing. Joining: for each course it swings 5° past where it will sit, holds while the stone and the shim go in, then settles onto them.
+// Releasing: it lifts off the top course, holds while the shim is knocked out and the stone hauled out, then drops onto the next. No overshoot, so it never crosses 0°.
+// How far the courses have gone in (0 to n) at jt. A rejoin partway through a release carries on from where the release had got to.
+const pvRe=()=>model.th0.pvx!=null&&model.th0.jt>=PV.S0;
+const pvX=(jt,n)=>pvRe()?lerp(model.th0.pvx,n,seg(jt,model.th0.jt,PV.S1)):seg(jt,PV.S0,PV.S1)*n;
+function pvBend(jt){
+ if(jt>=1)return hgCur;const A=hgSet,n=pvN(),sg=A<0?-1:1;if(!n)return 0;let v;
+ if(model.dir>0){if(jt<PV.S0)return 0;if(jt>=PV.S1)return A;const x=pvX(jt,n),k=Math.min(n-1,Math.floor(x)),u=x-k,a=15*k,b=a+15,top=b+PV.lift;
+  v=u<.12?lerp(a,top,ease(u/.12)):u<.84?top:lerp(top,b,ease(seg(u,.84,.96)));
+  if(pvRe())return lerp(model.th0.bend,sg*v,ease(seg(jt,model.th0.jt,model.th0.jt+.12)))}
+ else{const r=1-jt;if(r<PV.R0)return A;if(r>=PV.R1)return 0;const x=seg(r,PV.R0,PV.R1)*n,i=Math.min(n-1,Math.floor(x)),u=x-i,a=15*(n-1-i),b=a+15,top=b+PV.lift;
+  v=u<.1?lerp(b,top,ease(u/.1)):u<.8?top:lerp(top,a,ease(seg(u,.8,.95)))}
+ return sg*v}
+// How much room above and below the pair GitDiscuss needs at angle th: its corners, the strap's cap and the scroll over its far end.
+function pvRoom(th,h=ctx().h){const r=th*PI/180,s=Math.sin(r),co=Math.cos(r),py=pvUp(th)?h:PV.head,ys=[];
+ for(const[x,y]of[[0,0],[0,h],[W,h],[W,10],[W-20,-27]])ys.push(py+x*s+(y-py)*co);
+ return{x:0,top:Math.max(0,-Math.min(...ys)-8),bottom:Math.max(0,Math.max(...ys)-h)}}
+const pvPad=th=>th?th+Math.sign(th)*PV.lift:0;
+// One voussoir springing at C, from screen angle b0 (degrees) through sp (signed), between radii ri and R, pushed out d along its middle.
+function pvStone(C,b0,sp,ri,R,d,i,o){
+ if(Math.abs(sp)<.4)return '';
+ const D=PI/180,mid=b0+sp/2,dv={x:Math.cos(mid*D),y:Math.sin(mid*D)},Q={x:C.x+d*dv.x,y:C.y+d*dv.y},b1=b0+sp,sw=sp>0?1:0;
+ const O=(g,r)=>f(Q.x+r*Math.cos(g*D))+' '+f(Q.y+r*Math.sin(g*D)),at=r=>({x:Q.x+r*dv.x,y:Q.y+r*dv.y});
+ const sec=(r0,r1,g0,g1)=>`M${O(g0,r0)}L${O(g0,r1)}A${f(r1)} ${f(r1)} 0 0 ${sw} ${O(g1,r1)}L${O(g1,r0)}A${f(r0)} ${f(r0)} 0 0 ${1-sw} ${O(g0,r0)}Z`,body=sec(ri,R,b0,b1);
+ let s=`<path d="${body}" fill="#000" opacity=".28" transform="translate(1.2 2)"/><g fill="url(#lime)" filter="url(#st-a)"><path d="${body}"/></g>`+
+  `<path d="${body}" fill="${['#fff3d8','#6e5a3c','#f0dfbd'][i%3]}" opacity="${[.12,.1,.07][i%3]}"/><path d="${body}" fill="url(#pvSh)"/>`;
+ if(o.big){
+  // A drafted margin, the banker mason's mark, and a pierced trefoil glazed with coloured glass (the join light).
+  const dl=3,da=Math.sign(sp)*dl/(R*.6)/D;s+=`<path d="${sec(ri+dl,R-dl,b0+da,b1-da)}" fill="none" stroke="#fff6e2" stroke-opacity=".4" stroke-width=".7"/>`;
+  const mp=at(R*.4);s+=`<path d="${PV_MARKS[i%3]}" transform="translate(${f(mp.x)} ${f(mp.y)}) rotate(${f(mid+90)}) scale(.85)" fill="none" stroke="#4a3a28" stroke-opacity=".6" stroke-width="1" stroke-linecap="round"/>`;
+  const tc=at(R*.7),t=Math.min(5.4,R*.7*Math.abs(sp)*D*.26);let lb='';
+  for(const g of[mid,mid+120,mid+240])lb+=`<circle cx="${f(tc.x+t*.5*Math.cos(g*D))}" cy="${f(tc.y+t*.5*Math.sin(g*D))}" r="${f(t*.55)}"/>`;
+  s+=`<g fill="#2a1d10" opacity=".5" transform="translate(.6 .9)">${lb}</g><g fill="#120e16">${lb}</g>`;
+  if(o.lit>0)s+=`<g fill="${o.tone}" opacity="${f(o.lit)}">${lb}</g><circle cx="${f(tc.x)}" cy="${f(tc.y)}" r="${f(t*2.4)}" fill="${o.tone}" opacity="${f(.42*o.lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+  s+=`<g fill="none" stroke="#1d1612" stroke-width=".7">${lb}</g>`}
+ return s+`<path d="${body}" fill="none" stroke="#3a2c1c" stroke-opacity=".62" stroke-width="1" stroke-linejoin="round"/><path d="M${O(b0+sp*.05,R-1.6)}A${f(R-1.6)} ${f(R-1.6)} 0 0 ${sw} ${O(b1-sp*.05,R-1.6)}" fill="none" stroke="#fff6e2" stroke-opacity=".5" stroke-width=".8"/>`}
+// One shell shim in the joint over a voussoir: its point toward the corner, its head standing proud of the stones with a chipped corner,
+// growth ridges like the rings on a shell, and dark where it is wedged deepest. Returns the drawing and where its head is.
+function pvShim(C,b0,sp,ri,R,d,i,big,lit=0){
+ if(Math.abs(sp)<.3)return '';
+ const D=PI/180,mid=b0+sp/2,Q={x:C.x+d*Math.cos(mid*D),y:C.y+d*Math.sin(mid*D)},b1=b0+sp,sw=sp>0?1:0,Ro=R+(big?6:3),c=big?3:1.6;
+ const O=(g,r)=>f(Q.x+r*Math.cos(g*D))+' '+f(Q.y+r*Math.sin(g*D)),arc=(r,g0,g1)=>`M${O(g0,r)}A${f(r)} ${f(r)} 0 0 ${sw} ${O(g1,r)}`;
+ const body=i%2?`M${O(b0,ri)}L${O(b0,Ro)}A${f(Ro)} ${f(Ro)} 0 0 ${sw} ${O(b1-sp*.3,Ro)}L${O(b1,Ro-c)}L${O(b1,ri)}Z`:`M${O(b0,ri)}L${O(b0,Ro-c)}L${O(b0+sp*.3,Ro)}A${f(Ro)} ${f(Ro)} 0 0 ${sw} ${O(b1,Ro)}L${O(b1,ri)}Z`;
+ const rd=R*.45,deep=`M${O(b0,ri)}L${O(b0,rd)}A${f(rd)} ${f(rd)} 0 0 ${sw} ${O(b1,rd)}L${O(b1,ri)}Z`;
+ let o=`<path d="${body}" fill="${INK}" opacity=".45" transform="translate(1.3 2.2)"/><path d="${body}" fill="${PV_FACE[i%3]}"/><path d="${deep}" fill="#3a4658" opacity=".55"/>`;
+ for(const k of big?[.62,.78,.92]:[.8]){const dd=arc(R*k,b0+sp*.1,b1-sp*.1);
+  o+=`<path d="${dd}" fill="none" stroke="#f3f7fb" stroke-width=".8" opacity=".55" transform="translate(.4 .7)"/><path d="${dd}" fill="none" stroke="${INK}" stroke-width=".8" opacity=".5"/>`}
+ // The join light runs up the shell as a pale sheen.
+ if(lit>0)o+=`<path d="${body}" fill="#fff8e6" opacity="${f(.45*lit)}"/>`;
+ return o+`<path d="${arc(Ro-1.2,b0+sp*.15,b1-sp*.35)}" fill="none" stroke="#f4f8fb" stroke-width="1" stroke-linecap="round" opacity=".85"/><path d="${body}" fill="none" stroke="${INK}" stroke-width="${big?1.4:1}" stroke-linejoin="round" filter="url(#ho-wob)"/>`}
+// The Hollow strike: a pale crescent of radius R swept round K from a0 to a1 (screen degrees), u from 0 to 1.
+function pvSlash(K,a0,a1,u,R){if(u<=0||u>=1)return '';const e=ease(clamp(u/.6)),ac=lerp(a0,a1,e),n=14,O=[],I=[];
+ for(let i=0;i<=n;i++){const t=i/n,g=lerp(a0,ac,t)*PI/180,w=R*.37*Math.sin(PI*t);O.push(`${f(K.x+R*Math.cos(g))} ${f(K.y+R*Math.sin(g))}`);I.unshift(`${f(K.x+(R-w)*Math.cos(g))} ${f(K.y+(R-w)*Math.sin(g))}`)}
+ const d=`M${O.join('L')}L${I.join('L')}Z`,op=1-seg(u,.55,1);
+ return `<path d="${d}" fill="#dfe8f4" opacity="${f(op*.6)}" filter="url(#sh)"/><path d="${d}" fill="#f6f9fd" opacity="${f(op)}"/>`}
+const pvTicks=(p,u,k)=>{const rr=(8+10*ease(u))*k;let t='';for(let i=0;i<6;i++){const g=i*PI/3+.3;t+=`M${f(p.x+Math.cos(g)*rr*.55)} ${f(p.y+Math.sin(g)*rr*.55)}L${f(p.x+Math.cos(g)*rr)} ${f(p.y+Math.sin(g)*rr)}`}
+ return `<path d="${t}" stroke="#e9edf1" stroke-width="${f(1+1.3*(1-u))}" stroke-linecap="round" fill="none" opacity="${f(1-u)}"/>`};
+// Stone dust (or shell grit) shaken from a joint: grains that spread a little and fall.
+function pvDust(p,t,n,spread,seed,col='#ddd2bb'){let s='';
+ for(let k=0;k<n;k++){const a=Math.sin(seed*12.9898+k*78.233)*43758.5453,rn=a-Math.floor(a);
+  s+=`<circle cx="${f(p.x+(rn-.5)*2*spread*(.3+t))}" cy="${f(p.y+2+rn*4+24*t*t)}" r="${f(1.3-.5*t)}" fill="${col}" opacity="${f(.9*(1-t))}"/>`}return s}
+// The lewis: an iron dovetail sunk in the stone's back at B, a shackle, and the crane rope running out along dv.
+function pvLewis(B,dv,op,k){if(op<=.01)return '';const L=300,nx=-dv.y,ny=dv.x,E={x:B.x+dv.x*L,y:B.y+dv.y*L},K={x:B.x+dv.x*4*k,y:B.y+dv.y*4*k},S={x:K.x+dv.x*2.6*k,y:K.y+dv.y*2.6*k};
+ const w0=2.2*k,w1=3.4*k,I={x:B.x-dv.x*5*k,y:B.y-dv.y*5*k},rope=`M${f(S.x)} ${f(S.y)}L${f(E.x)} ${f(E.y)}`,gr=(id,c)=>`<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${f(B.x)}" y1="${f(B.y)}" x2="${f(E.x)}" y2="${f(E.y)}"><stop stop-color="${c}"/><stop offset=".55" stop-color="${c}" stop-opacity=".75"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient>`;
+ return `<g opacity="${f(op)}"><defs>${gr('pvRope','#cdb07a')}${gr('pvRopeD','#2a1d10')}</defs><path d="${rope}" stroke="url(#pvRopeD)" stroke-width="${f(3.4*k)}"/><path d="${rope}" stroke="url(#pvRope)" stroke-width="${f(2.2*k)}" stroke-dasharray="2.4 1.3"/>`+
+  `<path d="M${f(B.x+nx*w0)} ${f(B.y+ny*w0)}L${f(I.x+nx*w1)} ${f(I.y+ny*w1)}L${f(I.x-nx*w1)} ${f(I.y-ny*w1)}L${f(B.x-nx*w0)} ${f(B.y-ny*w0)}Z" fill="#2c2622" stroke="#0c0907" stroke-width=".7"/>`+
+  `<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(2.6*k)}" fill="none" stroke="#0c0907" stroke-width="${f(2.1*k)}"/><circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(2.6*k)}" fill="none" stroke="#7a7066" stroke-width="${f(.9*k)}"/></g>`}
+// The join light's colour: amber while both run, cold blue-white if either is paused; dark glass when unlit.
+const pvGlass=(lit,run)=>{const a=[28,36,51],b=run?[255,212,128]:[196,216,255];return `rgb(${a.map((v,i)=>Math.round(lerp(v,b[i],lit))).join(',')})`};
+MIXES.pinned={label:'Pinned voussoirs',kind:'Pairwise seam · Wedge',pair:'stonehollow',smooth:true,ang:PV,
+ get slow(){return[.8,1.9,2.6,3.4][pvN()]},get sepMs(){return[1500,3600,4800,6000][pvN()]},
+ home:{a:{x:30,y:190},b:{x:590,y:190},c:{x:890,y:470}},
+ stack:[['Model','Pairwise seam (D), for the Wedge kind','the angle round gave every skin a wedge built of 15° pieces; for this known pair the seam is authored, so the wedge is built by both skins together'],
+  ['The course','15°, in two pieces','each 15° of the opening is one course: the step every wedge on the five pages already shares. Here a course is an 11° stone and a 4° shim, one from each skin'],
+  ['Gothic part','Voussoirs and a springer','dressed limestone voussoirs with drafted margins, mason\'s marks and glazed trefoils, hauled in on a lewis and struck home in dust, rising from (or hanging from) a carved springer on the corner'],
+  ['Hollow part','Shell shims and a pin','a shim of pale shell driven into the joint over each voussoir by one crescent strike, as a mason in a ruined town tightens a joint; and an iron pin with a glass cap through the springer'],
+  ['Join light','Shared','the trefoils kindle from the corner out and a pale sheen runs up the shims; the pin\'s glass cap is the light when the wedge is square'],
+  ['Motion','Turn and turn about','the stone is hauled slowly and sways on its rope; the shell darts in and is struck in one blow; GitDiscuss lifts 5° past each course and settles onto it without overshoot']],
+ about:'Jarvis wears the gothic skin and GitDiscuss and Checks the Hollow skin, each as on its own page. Either page alone fills its wedge: gothic with voussoirs, Hollow with shell shims. A mason uses both. Stones are set first, and thin pinnings are driven into the joints to take up the slack. So in this authored seam each skin does what it is good at: stone carries the load and shell tightens it. A standard face (model A) could not do this, because it would let only one side fill the gap.',
+ join:{label:'Voussoirs pinned with shell',kind:'Angle · wedge',gap:0,
+  about:'Jarvis\'s square stone end meets GitDiscuss\'s iron strap, and GitDiscuss turns about the corner they share: the foot when it bends down (the wedge opens upward) and the head when it bends up (the courses hang). <b>Near:</b> the springing corners warm with gold, GitDiscuss\'s strap rivets glint, and a voussoir is lowered on its lewis into the gap. <b>Ready:</b> the courses are chalked out in the corner, each a stone and the thin joint for its shim. Joining: the casings butt square, a carved springer drops onto the corner in dust, and Hollow\'s iron pin is struck through it with a spark. Then, for each course, GitDiscuss swings 5° past where it will sit. Mortar is buttered on the bed, the voussoir is hauled in swaying on its rope and struck home in dust, and the lewis is drawn out. A shim of pale shell then darts point first into the joint over it, lodging proud, and a pale crescent strike drives it home with grit. GitDiscuss settles onto the course. Last, the trefoils kindle from the corner out and a sheen runs up the shims (amber while both widgets run, cold blue if either is paused). <b>Angle:</b> −45° to +45° in 15° steps (none to three courses). Drag the wedge up or down, use the Angle slider, or focus the wedge and press ↑ ↓. Opening drives the next course in once there is nearly room; closing springs the top course out to tumble away. A parchment tag reads the angle and the course count while it moves, and the pair moves to stay on the stage. <b>Release:</b> tap the springer (or focus it and press Enter). The light goes out, and the courses come out last in, first out: GitDiscuss lifts, a hooked strike knocks the shim out, the lewis is keyed in and the stone is hauled out, and GitDiscuss drops onto the next. Then the pin is drawn, the springer lifted, and the casings part. At 0° the springer and the pin alone hold the corner, so the join is quicker.'},
+ shade:{label:'Plain lower, stone and shell',kind:'Page baseline',
+  about:'Not a brainstorm item. The stone wall lowers to its carved frieze and the carapace draws in to its chalk name and a parchment label with one value. The courses shrink with the casings and keep their angle, so a shaded pair stays bent; small stones drop their marks and trefoils.'},
+ casing:(id,w,h)=>id==='a'?stoneCasing(id,w,h,false):id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${hoCasing(w,h,'plain')}</g>`:hoCasing(w,h,false),
+ readyPose:{warm:1},
+ get room(){return pvRoom(pvPad(hgSet))},
+ fitRoom(h){return pvRoom(pvPad(hgCur),h)},
+ // GitDiscuss turns about the shared corner: its own bottom-left corner when bent down, its top-left (by the strap's cap) when bent up.
+ turn(c,id){if(id!=='b')return null;const th=pvBend(c.jt);return[th,0,pvUp(th)?c.h:PV.head]},
+ // The course count is fixed while the wedge is being built or taken down, so the angle waits until the pair is joined or apart.
+ angle(v){if(model.busy&&model.jt>0&&model.jt<1){$('#ang').value=hgSet;say('Set the angle once the wedge is built (or the widgets are apart).');return}
+  const steps=Math.max(1,Math.abs(Math.round(v/PV.step)-Math.round(hgCur/PV.step))),ms=300+260*steps;pvTagUntil=performance.now()+ms+600;setTimeout(()=>{if(model.mix==='pinned')render()},ms+660);hgTo(v,ms)},
+ angSay(v,old){if(model.jt!==1)return 'Angle set to '+hgSign(v)+'; the wedge is built to it once joined.';
+  const tail='; GitDiscuss at '+hgSign(v)+(pvN(v)?' on '+pvCourses(pvN(v))+'.':', square on the springer.');
+  return(old*v>=0&&Math.abs(v)>Math.abs(old)?'A voussoir is hauled in and pinned with shell':old*v>=0?'The top course springs out':'The wedge closes and opens the other way')+tail},
+ angPh:()=>'Setting the wedge · GitDiscuss at '+hgSign(hgCur)+' · '+pvCourses(pvCount(hgCur)),
+ // Dragging the wedge: down bends GitDiscuss down (the wedge opens upward), up bends it up; about 45° for 150 px.
+ angGrab:q=>({y0:q.y,a0:hgCur}),
+ angMove:(d,p)=>d.a0+Math.atan2(p.y-d.y0,150)*180/PI,
+ state(c){const jt=c.jt,n=pvN();if(jt===0)return{jt,warm:c.glow,boss:0,pin:0,lit:0,pulse:0};
+  const fwd=model.dir>0,r=1-jt;
+  // While releasing, also where the courses have got to as a forward position, and GitDiscuss's bend, so a rejoin carries on from there.
+  return{jt,pvx:fwd?null:n-seg(r,PV.R0,PV.R1)*n,bend:pvBend(jt),warm:fwd?(model.lit0>0?1:.6*seg(jt,0,.15))*(1-seg(jt,.36,.46)):0,
+   boss:fwd?seg(jt,.36,.44):1-seg(r,n?PV.R1+.03:.1,n?.58:.22),
+   pin:fwd?seg(jt,.44,.48):1-seg(r,n?PV.R1:.06,n?PV.R1+.04:.1),
+   lit:fwd?(n?seg(jt,PV.S1,.98):seg(jt,.5,.64)):1-seg(r,0,PV.R0),
+   pulse:fwd?Math.sin(PI*(n?seg(jt,.92,1):seg(jt,.56,.7))):0}},
+ over(c){
+  const jt=c.jt,fwd=model.dir>0,bend=pvBend(jt),h=c.h,up=pvUp(bend),sg=up?1:-1,D=PI/180,now=performance.now(),n=pvN(),run=model.a.run&&model.b.run,r=this.state(c);
+  // Shaded, the springer stays wide enough (10) to cover the corner GitDiscuss turns about.
+  const big=h>=90,ri=big?13:10,k=big?1:.6,R=h-PV.head-3,cx=model.a.x+W,Pf={x:cx,y:model.a.y+h},Ph={x:cx,y:model.a.y+PV.head},P=up?Pf:Ph,a0=up?-90:90;
+  const pt=(C,rr,g)=>({x:C.x+rr*Math.cos(g*D),y:C.y+rr*Math.sin(g*D)}),q=p=>f(p.x)+' '+f(p.y),tone=i=>(run?['#f2c04a','#c43a48']:['#86a4f2','#4566c6'])[i%2];
+  let s=`<defs><radialGradient id="pvSh" cx="${f(P.x)}" cy="${f(P.y)}" r="${f(R)}" gradientUnits="userSpaceOnUse"><stop stop-color="#1d140b" stop-opacity=".45"/><stop offset=".5" stop-color="#1d140b" stop-opacity=".12"/><stop offset="1" stop-color="#1d140b" stop-opacity="0"/></radialGradient></defs>`,fx='';
+  // Near: the springing corners warm with gold, on the side the wedge will open.
+  if(r.warm>0){const tu=hgSet>=0,L=big?26:14;let w='';
+   for(const[x,y]of[[cx,model.a.y],[model.b.x,model.b.y]]){const yc=tu?y+h:y+PV.head,ye=tu?yc-L:yc+L;w+=`<path d="M${f(x)} ${f(yc)}V${f(ye)}"/>`}
+   s+=`<g fill="none" stroke="#f3cf78" stroke-linecap="round" opacity="${f(.85*r.warm)}"><g stroke-width="5" opacity=".3" filter="url(#soft)">${w}</g><g stroke-width="1.6">${w}</g></g>`}
+  if(jt===0){pvTn=null;pvPop=null;const g=c.glow,gho=seg(g,.8,1)*.85;
+   if(gho>0){
+    // Ready: the courses chalked out in Jarvis's corner, each a stone and the thin joint its shim will fill.
+    const A=hgSet,gu=A>=0,Pg=gu?Pf:Ph,g0=gu?-90:90,gs=gu?1:-1,m=pvN(A),gp=(rr,gg)=>q(pt(Pg,rr,gg));
+    let gh=`<circle cx="${f(Pg.x)}" cy="${f(Pg.y)}" r="${f(ri)}"/>`;
+    if(m){const g1=g0+gs*15*m,sw=gs>0?1:0;let jl='',sl='';
+     for(let i=0;i<m;i++){const gs0=g0+gs*(15*i+PV.stone);sl+=`M${gp(ri,gs0)}L${gp(R+(big?6:3),gs0)}`;if(i)jl+=`M${gp(ri,g0+gs*15*i)}L${gp(R,g0+gs*15*i)}`}
+     gh+=`<path d="M${gp(ri,g0)}L${gp(R,g0)}A${f(R)} ${f(R)} 0 0 ${sw} ${gp(R,g1)}L${gp(ri,g1)}" fill="#e3eaf2" fill-opacity=".06"/>${jl?`<path d="${jl}" opacity=".75"/>`:''}<path d="${sl}" stroke-dasharray="1.2 2" opacity=".9"/>`}
+    s+=`<g fill="none" stroke="#e3eaf2" stroke-width="1" stroke-dasharray="3 2.4" stroke-linecap="round" opacity="${f(gho)}">${gh}</g>`}
+   else if(g>0){
+    // Near: a voussoir is lowered on its lewis into the gap, swinging a little, and GitDiscuss's strap rivets glint.
+    const Rn=h*.55,Pn={x:(cx+model.b.x)/2,y:Math.min(model.a.y,model.b.y)+h*.95+26*(1-g)},B={x:Pn.x,y:Pn.y-Rn},swy=3*Math.sin(g*9)*(1-g);
+    s+=`<g opacity="${f(clamp(g*1.6)*seg(model.b.x-cx,12,32))}" transform="rotate(${f(swy)} ${f(B.x)} ${f(B.y-300)})">${pvStone(Pn,-97.5,15,Rn*.3,Rn,0,1,{big:false})}${pvLewis(B,{x:0,y:-1},1,.8)}</g>`;
+    s+=hoGlints([16,h/2,h-8].map(y=>({x:model.b.x+9.5,y:model.b.y+y})),g*.7)}
+   return s}
+  // The courses in the wedge. Joined: those that fit; a change in the count while turning drives one in or springs the top one out.
+  const list=[],rr=1-jt,home=(cnt,w)=>{for(let i=0;i<cnt;i++)list.push({i,a:w*i,sp:w})};
+  if(jt===1){const th=Math.abs(bend),cnt=pvCount(th);
+   if(pvTn!=null&&cnt!==pvTn&&!reduce.matches)pvPop={t:now,dir:Math.sign(cnt-pvTn),i:cnt>pvTn?cnt-1:pvTn-1,sg};
+   pvTn=cnt;let e=-1;if(pvPop){e=(now-pvPop.t)/PV.popMs;if(e>=1){pvPop=null;e=-1}}
+   home(cnt,cnt?Math.min(15,th/cnt):0);
+   if(e>=0){const pp=pvPop;if(pp.dir>0){if(list[pp.i])list[pp.i].go=.12+.72*e}else list.push({i:pp.i,a:15*pp.i,sp:15,fly:e,sg:pp.sg})}}
+  else if(fwd){pvTn=null;pvPop=null;
+   if(n&&jt>=PV.S0){if(jt>=PV.S1)home(n,15);else{const x=pvX(jt,n),j=Math.min(n-1,Math.floor(x));home(j,15);list.push({i:j,a:15*j,sp:15,go:x-j})}}}
+  else{pvTn=null;pvPop=null;
+   if(n&&rr<PV.R1){if(rr<PV.R0)home(n,15);else{const x=seg(rr,PV.R0,PV.R1)*n,i=Math.min(n-1,Math.floor(x)),j=n-1-i;home(j,15);list.push({i:j,a:15*j,sp:15,out:x-i})}}}
+  const N=Math.max(n,list.length)||1;let headAt=null;
+  for(const L of list){
+   const lg=L.sg||sg,C=lg>0?Pf:Ph,b0=(lg>0?-90:90)+lg*L.a,spS=lg*L.sp*PV.stone/15,spH=lg*L.sp-spS,b1=b0+spS,midS=b0+spS/2,midH=b1+spH/2;
+   const dS={x:Math.cos(midS*D),y:Math.sin(midS*D)},dH={x:Math.cos(midH*D),y:Math.sin(midH*D)},Ro=R+(big?6:3),head=dd=>({x:C.x+dH.x*(Ro+dd),y:C.y+dH.y*(Ro+dd)});
+   const lit=seg(r.lit,L.i/N*.5,L.i/N*.5+.5);
+   if(L.fly!==undefined){
+    // Sprung out: the stone and its shim shoot out together and turn away; hanging ones tumble down, rising ones fade before they could fall back.
+    const v=L.fly,dd=R*(lg>0?.9:.55)*ease(seg(v,0,lg>0?.6:.4)),ox=C.x+dS.x*(R*.6+dd),oy=C.y+dS.y*(R*.6+dd);
+    s+=`<g opacity="${f(1-(lg>0?seg(v,.3,.65):seg(v,.55,1)))}" transform="translate(0 ${f(lg>0?0:90*k*v*v)}) rotate(${f(lg*(lg>0?40:70)*v)} ${f(ox)} ${f(oy)})">${pvStone(C,b0,spS,ri,R,dd,L.i,{big})}${pvShim(C,b1,spH,ri,R,dd*1.25,L.i,big)}</g>`;
+    if(v<.3)fx+=pvDust(pt(C,R,midS),seg(v,0,.3),6,14*k,611+L.i);continue}
+   let ds=0,opS=1,sway=0,lw=0,lo=0,mo=0,mw=1.6,dh=0,opH=1,rotH=0;
+   if(L.go!==undefined){
+    // Going in: mortar on the bed, the stone hauled in swaying and struck home, the lewis drawn; then the shim darts in proud and is struck home.
+    const u=L.go,hv=seg(u,.12,.42);
+    ds=u<.42?R*.06+R*.9*Math.pow(1-hv,3):R*.06*(1-ease(seg(u,.42,.48)));opS=seg(u,.12,.2);sway=u<.42?1.6*Math.sin(hv*PI*2.5)*(1-hv):0;
+    lw=1-seg(u,.5,.62);lo=34*ease(seg(u,.5,.62));mo=u<.55?seg(u,.04,.2):0;mw=lerp(2.8,1.6,seg(u,.42,.48));
+    if(u>.42&&u<.64){const t=seg(u,.43,.64);fx+=pvDust(pt(C,R,b0),t,5,11*k,631+L.i*7)+pvDust(pt(C,R,b1),t,5,11*k,641+L.i*7)}
+    const gl=Math.sin(PI*seg(u,.42,.5));if(gl>.05){const p=pt(C,R,midS);fx+=`<g opacity="${f(gl)}">${sparkle(p.x,p.y,(big?8:5)*gl)}</g>`}
+    const sv=seg(u,.55,.7);dh=u<.7?R*.14+R*.9*(1-dart(sv)):R*.14*(1-ease(seg(u,.74,.8)));opH=seg(u,.55,.6);
+    const Hd=head(dh),K={x:Hd.x+dH.x*14*k,y:Hd.y+dH.y*14*k};
+    fx+=pvSlash(K,midH+180-lg*80,midH+180+lg*80,seg(u,.7,.86),16*k);
+    if(u>.74&&u<.92)fx+=pvTicks(head(0),seg(u,.74,.92),k);
+    if(u>.76)fx+=pvDust(head(0),seg(u,.76,1),5,6*k,671+L.i*5,'#c9d1db');
+    const sp2=Math.sin(PI*seg(u,.74,.8));if(sp2>.05)fx+=hoSpark(head(0),sp2,6*k)}
+   else if(L.out!==undefined){
+    // Coming out: a hooked strike knocks the shim out to tumble away; the lewis is keyed in and the stone hauled out.
+    const u=L.out,so=seg(u,.14,.34),hv=seg(u,.42,.76);
+    fx+=pvSlash(head(4*k),midH-lg*100,midH+lg*60,seg(u,.08,.22),13*k);
+    dh=R*.8*so*so;opH=1-seg(u,.24,.34);rotH=lg*70*so;
+    if(u>.12&&u<.3)fx+=pvTicks(head(0),seg(u,.12,.3),k*.8);
+    ds=R*.95*hv*hv;opS=1-seg(u,.6,.76);sway=1.4*Math.sin(hv*PI*2)*hv;lw=ease(seg(u,.3,.42));lo=40*(1-lw);
+    if(u>.42&&u<.58){const t=seg(u,.42,.58);fx+=pvDust(pt(C,R,b0),t,4,9*k,651+L.i*7)+pvDust(pt(C,R,b1),t,4,9*k,661+L.i*7)}}
+   // The mortar bed, buttered along the face the stone is laid on.
+   if(mo>0){const p0=pt(C,ri+1,b0),p1=pt(C,ri+1+(R-ri-2)*mo,b0);s+=`<path d="M${q(p0)}L${q(p1)}" stroke="#ece2c8" stroke-width="${f(mw)}" stroke-linecap="round"/>`}
+   if(opS>0){const Bk=dd=>({x:C.x+dS.x*(R+dd),y:C.y+dS.y*(R+dd)});
+    let g=pvStone(C,b0,spS,ri,R,ds,L.i,{big,lit:lit*opS,tone:tone(L.i)})+pvLewis(Bk(ds+lo),dS,lw*opS,k);
+    if(sway){const A=Bk(ds+300);g=`<g transform="rotate(${f(sway)} ${f(A.x)} ${f(A.y)})">${g}</g>`}
+    s+=opS<1?`<g opacity="${f(opS)}">${g}</g>`:g}
+   if(opH>0){const Hc=pt(C,R*.7+dh,midH),g=pvShim(C,b1,spH,ri,R,dh,L.i,big,lit*.8);s+=`<g${opH<1?` opacity="${f(opH)}"`:''}${rotH?` transform="rotate(${f(rotH)} ${f(Hc.x)} ${f(Hc.y)})"`:''}>${g}</g>`}
+   headAt=head(0)}
+  // The springer: a carved corbel under the corner (courses rising) or turned over it (courses hanging), with Hollow's iron pin through it.
+  if(r.boss>0){const dy=fwd?-30*(1-backOut(r.boss)):-22*(1-r.boss),sc=ri/13,lt=n?r.lit*.7:r.lit;
+   const tail=`<path d="M${f(-9*sc)} 0L${f(9*sc)} 0L${f(4*sc)} ${f(13*sc)}Q0 ${f(17*sc)} ${f(-4*sc)} ${f(13*sc)}Z"/><circle cy="${f(15.5*sc)}" r="${f(2.2*sc)}"/>`;
+   s+=`<g transform="translate(${f(P.x)} ${f(P.y+dy)})" opacity="${f(seg(r.boss,0,.3))}">`+(lt>0?`<circle r="${f(ri*1.7)}" fill="${run?'#ffd98a':'#b8ccff'}" opacity="${f(.35*lt)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`:'')+
+    `<g fill="url(#lime)" filter="url(#st-a)"><g transform="scale(1 ${sg})">${tail}</g><circle r="${f(ri)}"/></g><circle r="${f(ri)}" fill="none" stroke="#3a2c1c" stroke-opacity=".6" stroke-width=".9"/><circle r="${f(ri*.74)}" fill="none" stroke="#fff6e2" stroke-opacity=".45" stroke-width=".7"/>`;
+   if(r.pin>0){const pk=r.pin;s+=`<g opacity="${f(clamp(pk*3))}" transform="scale(${f((1+1.2*(1-pk))*100)/100})"><circle r="${f(ri*.55)}" fill="${INK}" opacity=".5" transform="translate(.6 1.2)"/><circle r="${f(ri*.5)}" fill="url(#ho-iron)" stroke="${INK}" stroke-width="1.1"/>`+
+    `<circle r="${f(ri*.3)}" fill="${pvGlass(lt,run)}" stroke="${INK}" stroke-width=".6"/><circle cx="${f(-ri*.1)}" cy="${f(-ri*.11)}" r="${f(ri*.09)}" fill="#fff" opacity=".75"/></g>`}
+   s+='</g>';
+   if(fwd&&jt>0&&r.boss>.6&&r.boss<1)fx+=pvDust(P,seg(r.boss,.6,1),7,16*k,191);
+   const ps=Math.sin(PI*seg(jt,.46,.52));if(fwd&&jt>0&&ps>.05)fx+=hoSpark({x:P.x+2,y:P.y-3},ps,7*k)}
+  s+=fx;
+  if(r.pulse>.05){const p=headAt||P;s+=`<g opacity="${f(r.pulse)}">${sparkle(p.x,p.y,r.pulse*(big?12:7))}</g>`}
+  if(pvPop&&!pvRaf)pvRaf=requestAnimationFrame(()=>{pvRaf=0;render()});
+  if(jt!==1)return s;
+  const ab=Math.abs(bend),cnt=pvCount(ab),a1=a0+bend;
+  // While it turns: a parchment tag under Jarvis's corner (or over it, if the pair sits low).
+  if(now<pvTagUntil||drag&&drag.angle){
+   const deg=hgSign(bend),txt=' · '+pvCourses(cnt),lw=Math.round(('GitDiscuss '+deg+txt).length*6.3+22),lx=cx-16-lw;let ly=model.a.y+h+8;if(ly+24>598)ly=model.a.y-34;
+   s+=`<g><rect x="${f(lx-2)}" y="${f(ly-2)}" width="${lw+4}" height="23" rx="2" fill="${INK}"/><rect x="${f(lx)}" y="${f(ly)}" width="${lw}" height="19" rx="1.5" fill="#e9dfc6"/>`+
+    `<text x="${f(lx+lw/2)}" y="${f(ly+13.5)}" text-anchor="middle" font-family="Georgia,serif" font-size="12" fill="#231b14">GitDiscuss <tspan font-weight="700" fill="#8f1c22">${deg}</tspan>${txt}</text></g>`}
+  const lo=Math.min(a0,a1)-8,hi=Math.max(a0,a1)+8,hs=(r0,r1)=>`M${q(pt(P,r0,lo))}L${q(pt(P,r1,lo))}A${f(r1)} ${f(r1)} 0 0 1 ${q(pt(P,r1,hi))}L${q(pt(P,r0,hi))}A${f(r0)} ${f(r0)} 0 0 0 ${q(pt(P,r0,lo))}Z`;
+  // At 0° the wedge is a line, so the grab area is a band along the joint.
+  const band=ab<4?`<rect x="${f(cx-12)}" y="${f(model.a.y+4)}" width="24" height="${f(h-8)}" fill="transparent"/>`:'';
+  s+=`<g class="hit" id="angleHit" tabindex="0" role="slider" aria-valuemin="-45" aria-valuemax="45" aria-valuenow="${hgSet}" aria-valuetext="${hgSign(hgSet)}, ${pvCourses(pvN())}" aria-label="Pinned voussoirs: drag up or down, or press the arrow keys, to open or close the wedge a course (15°) at a time" style="cursor:ns-resize"><title>Drag the wedge up or down to open or close it</title><path d="${hs(ri+2,R+10)}" fill="transparent"/>${band}<path class="ringfocus" d="${hs(1,R+12)}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`+
+   `<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Springer: tap it, or press Enter, to take the wedge down and separate the widgets; arrow keys open or close the wedge" style="cursor:pointer"><title>Tap the springer to release</title><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${big?14:10}" fill="transparent"/><circle class="ringfocus" cx="${f(P.x)}" cy="${f(P.y)}" r="${big?16:12}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
+  return s;
+ },
+ grab(p){return{x0:p.x,y0:p.y,deg:0}},
+ pull(d,p){const dist=Math.hypot(p.x-d.x0,p.y-d.y0);if(dist>3)d.moved=true;d.deg=clamp(dist/50);return 1-.4*d.deg},
+ get text(){const n=pvN(),A=hgSign(hgSet);return{intro:'Jarvis is gothic stone; GitDiscuss and Checks are Hollow shell and iron. Drag a nameplate toward the other widget, or use the state buttons. The Angle row sets how far GitDiscuss bends, a course of stone and shell for each 15°.',
+  join:n?'The casings butt square, the springer is set and pinned, and each 15° is built of a voussoir hauled in on its lewis and a shell shim struck into the joint over it.':'The casings butt square, and the springer is set on the corner and pinned with iron.',
+  joined:'Joined at '+A+(n?' on '+pvCourses(n)+' of stone pinned with shell':', square on the springer')+'. Drag the wedge (or ↑ ↓) to open or close it; tap the springer to release.',
+  sep:n?'The light goes out; each shim is knocked out and each stone hauled out, last in first out; the pin is drawn, the springer lifted, and the casings part.':'The pin is drawn, the springer lifted, and the casings part.',
+  get hold(){return 'Held mid-join · '+T().mid(model.jt,1).trim().replace(/^Joining · /,'')+'. Use the scrubber to step through the animation.'},
+  near:'Nearby: the corners warm, the strap rivets glint, and a voussoir is lowered on its lewis. Move closer.',
+  ready:'Ready: the courses for '+A+' are chalked out in the corner. Release to join.',
+  back:'The springer settles back; still joined.',cancel:'Release cancelled.',
+  shadeOn:'Shaded: the wall lowers and the shell draws in; the courses shrink with them and keep the angle.',shadeOff:'Unshaded: the wall rises and the shell opens again.',
+  sepPh:'Separate · stone voussoirs and shell shims',nearPh:'Nearby · a voussoir is lowered',readyPh:'Ready · the courses are chalked out',
+  mid:(jt,dir)=>{const n=pvN();
+   if(dir>0){if(jt<.36)return'Joining · closing in ';if(jt<PV.S0)return'Joining · setting the springer and its pin ';if(!n)return'Joining · square at 0°, the pin\'s glass kindles ';if(jt>=PV.S1)return'Joining · the trefoils kindle ';
+    const x=seg(jt,PV.S0,PV.S1)*n,k=Math.min(n-1,Math.floor(x)),u=x-k;return`Joining · course ${k+1} of ${n} · `+(u<.12?'GitDiscuss swings open ':u<.5?'the voussoir is hauled in ':u<.7?'a shell shim darts in ':u<.84?'the shim is struck home ':'GitDiscuss settles ')}
+   const r=1-jt;if(r<PV.R0)return'Releasing · the light goes out ';
+   if(n&&r<PV.R1){const x=seg(r,PV.R0,PV.R1)*n,i=Math.min(n-1,Math.floor(x)),u=x-i;return`Releasing · course ${n-i} of ${n} · `+(u<.1?'GitDiscuss lifts ':u<.34?'the shim is knocked out ':u<.8?'the stone is hauled out ':'GitDiscuss drops ')}
+   return r<.6?'Releasing · drawing the pin, lifting the springer ':'Releasing · parting '},
+  turn:d=>'Pulling the springer · '+Math.round(d.deg*100)+'%'}}};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1,g:0,gT:0,mq:null,mo:null};
@@ -4952,7 +5198,8 @@ async function doJoin(fixed='a',ms=2400){
 }
 async function doSeparate(){
  if(model.jt===0)return;
- if(model.jt===1){model.dir=-1;model.tsign=1}
+ // A release stops any swing still on its way, so the turning joint lets go from its set angle.
+ if(model.jt===1){model.dir=-1;model.tsign=1;++hgAnim;hgCur=hgSet}
  if(model.jt===1||!model.path)model.path={s:separatePose(),j:here()};
  say(T().sep);
  if(await tween(model.jt,0,(X().sepMs||1800)*model.jt,setJt)){model.path=null;model.dir=1;say('Separate. Displays and pages were not touched.')}
@@ -5011,7 +5258,7 @@ function render(){
  $('#over').innerHTML=x.over(c);$('#under').innerHTML=x.under?x.under(c):'';
  const hit=$('#joinHit');if(hit){hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}}}
  // On a turning joint the arrow keys set the angle, from the pin or the arm.
- if(x.angle)$$('#joinHit,#angleHit').forEach(n=>{const k0=n.onkeydown;n.onkeydown=e=>{const d={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(d){e.preventDefault();x.angle(hgSet+d*HG.step);return}if(k0)k0(e)}});
+ if(x.angle)$$('#joinHit,#angleHit').forEach(n=>{const k0=n.onkeydown;n.onkeydown=e=>{const d={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(d){e.preventDefault();x.angle(hgSet+d*(x.ang||HG).step);return}if(k0)k0(e)}});
  if(focused)($('#'+focused)||$('#a .grip')).focus();
  document.body.dataset.shaded=model.st>.5?'1':'';
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
@@ -5024,7 +5271,7 @@ function render(){
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
  const t=x.text,ph={separate:t.sepPh,joining:t.mid(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()};
- $('#phase').textContent=(drag&&drag.angle?'Turning on the pin · '+hgSign(hgCur):drag&&drag.turn?t.turn(drag):drag&&drag.state==='ready'?t.readyPh:drag&&drag.state==='near'?t.nearPh:ph[state])+(x.morph&&(model.g>0||model.gT>0)?' · '+mbPhase():'')+(model.st>.5?' · shaded':'');
+ $('#phase').textContent=(drag&&drag.angle?(x.angPh?x.angPh():'Turning on the pin · '+hgSign(hgCur)):drag&&drag.turn?t.turn(drag):drag&&drag.state==='ready'?t.readyPh:drag&&drag.state==='near'?t.nearPh:ph[state])+(x.morph&&(model.g>0||model.gT>0)?' · '+mbPhase():'')+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -5047,12 +5294,18 @@ function pickHeld(k){hpHeld=k;document.body.dataset.pair=X().pair||'';describe()
 function pick(id){
  if(drag)cancelDrag();
  if(id!==model.mix)mbReset();
- if(id!==model.mix){const was=model.jt,wasDock=DOCK(),wasHome=!!X().home;++anim;++hgAnim;hgCur=hgSet;model.busy=false;model.mix=id;model.path=null;model.jt=0;model.glow=0;startJoinFrom({...REST},0);
+ if(id!==model.mix){const was=model.jt,wasDock=DOCK(),wasHome=!!X().home;++anim;++hgAnim;hgCur=hgSet;model.busy=false;model.mix=id;model.path=null;model.jt=0;model.glow=0;startJoinFrom({...REST},0);pvTn=null;pvPop=null;
+  // The angle takes the new mix's step and range (and its default, on a first visit) before its layout is planned.
+  if(X().angle){const K=X().ang||HG;if(K.def!=null&&!K.seen){K.seen=true;hgSet=K.def}hgSet=clamp(Math.round(hgSet/K.step)*K.step,-K.lim,K.lim);hgCur=hgSet}
   // Into or out of a mix with its own layout the widgets take up that mix's home positions (a fused group with Checks apart,
   // Checks tucked under Jarvis clear of GitDiscuss's swing), or the usual layout.
   if(wasDock||wasHome||X().home){const H0=X().home||HOME;for(const k of ['a','b','c'])if(H0[k])Object.assign(model[k],{x:H0[k].x,y:H0[k].y});if(DOCK())Object.assign(model.c,sepSpot())}
   if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
- document.body.dataset.mix=model.mix;document.body.dataset.pair=X().pair||'';$('#heldRow').hidden=!X().held;$('#matchRow').hidden=!X().pref;$('#motionRow').hidden=!X().motions;$('#sizeRow').hidden=!X().morph;$('#angleRow').hidden=!X().angle;describe();say(T().intro);render();
+ document.body.dataset.mix=model.mix;document.body.dataset.pair=X().pair||'';$('#heldRow').hidden=!X().held;$('#matchRow').hidden=!X().pref;$('#motionRow').hidden=!X().motions;$('#sizeRow').hidden=!X().morph;$('#angleRow').hidden=!X().angle;
+ // The Angle slider takes the mix's own step and range.
+ if(X().angle){const K=X().ang||HG,sl=$('#ang');
+  sl.min=-K.lim;sl.max=K.lim;sl.step=K.step;sl.value=hgSet;sl.setAttribute('aria-label',K.aria||'Angle of GitDiscuss on the pivot, in degrees');$('#angOut').textContent=hgSign(hgSet)}
+ describe();say(T().intro);render();
 }
 function describe(){
  const x=X();
@@ -5088,10 +5341,11 @@ stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
  // Turning the joint: the arm follows the pointer round the pin.
  // The side of the pin and the offset from the arm's line are fixed at the grab, so the arm never jumps or flips.
+ if(e.target.closest('#angleHit')&&model.jt===1&&X().angGrab){e.preventDefault();++hgAnim;drag={angle:true,from:hgSet,...X().angGrab(local(e))};stage.setPointerCapture(e.pointerId);render();return}
  if(e.target.closest('#angleHit')&&model.jt===1){e.preventDefault();++hgAnim;const P=hgPb(ctx()),q=local(e),side=q.x>=P.x?1:-1;
   drag={angle:true,from:hgSet,side,off:Math.atan2(side*(q.y-P.y),side*(q.x-P.x))*180/PI-hgCur};stage.setPointerCapture(e.pointerId);render();return}
  if(e.target.closest('#joinHit')&&model.jt===1){
-  e.preventDefault();++anim;model.busy=false;model.dir=-1;model.tsign=1;model.path={s:separatePose(),j:here()};
+  e.preventDefault();++anim;++hgAnim;hgCur=hgSet;model.busy=false;model.dir=-1;model.tsign=1;model.path={s:separatePose(),j:here()};
   drag={turn:true,moved:false,...X().grab(local(e))};stage.setPointerCapture(e.pointerId);render();return;
  }
  const g=e.target.closest('[data-drag]');if(!g)return;e.preventDefault();gripMoved=false;gripAt={x:e.clientX,y:e.clientY};
@@ -5106,8 +5360,11 @@ stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
  if(drag.angle){
   // Read the angle off the side of the pin it was grabbed on (the needle side points back across it); stops hold within 3°.
-  const P=hgPb(ctx()),dx=p.x-P.x,dy=p.y-P.y;if(Math.hypot(dx,dy)<6)return;
-  let a=Math.atan2(drag.side*dy,drag.side*dx)*180/PI-drag.off;a=clamp(a,-HG.lim,HG.lim);const stop=Math.round(a/HG.step)*HG.step;if(Math.abs(a-stop)<3)a=stop;
+  // A mix with its own drag (the wedge) maps the pointer to an angle itself.
+  const K=X().ang||HG;let a;
+  if(X().angMove)a=X().angMove(drag,p);
+  else{const P=hgPb(ctx()),dx=p.x-P.x,dy=p.y-P.y;if(Math.hypot(dx,dy)<6)return;a=Math.atan2(drag.side*dy,drag.side*dx)*180/PI-drag.off}
+  a=clamp(a,-K.lim,K.lim);const stop=Math.round(a/K.step)*K.step;if(Math.abs(a-stop)<3)a=stop;
   hgCur=a;if(stop!==hgSet){hgSet=stop;$('#ang').value=stop;$('#angOut').textContent=hgSign(stop)}hgFit();render();return;
  }
  if(drag.turn){
