@@ -1,3 +1,5 @@
+- [ ] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/elven.html: SyntaxError: Identifier 'ASP' has already been declared
+prototypes/skins/claude/elven.html: ["Uncaught SyntaxError: Identifier 'ASP' has already been declared @line 1923"]
 - [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/felt.html: SyntaxError: Unexpected identifier 's'
 prototypes/skins/claude/felt.html: ["Uncaught SyntaxError: Unexpected identifier 's' @line 2354"]
   - Fixed: the Sock heel's `about` text is a single-quoted string, and its "heel's side" had a bare apostrophe that ended the string early. It is now escaped (`heel\'s`). A page-wide scan finds no other bare apostrophes inside single-quoted strings; every other match is in a comment or the HTML. I read the rest of the sock code, and every helper it calls (`quadAt`, `fanSg`, `xTag`, `pinScale`, `bendAt` and others) is defined. Not yet checked in a browser or parser (node access was blocked this run).
