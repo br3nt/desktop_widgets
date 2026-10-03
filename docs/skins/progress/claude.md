@@ -1,4 +1,4 @@
-- [ ] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/elven.html: SyntaxError: Identifier 'ASP' has already been declared
+- [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/elven.html: SyntaxError: Identifier 'ASP' has already been declared — the astrolabe join's flare state reused the aspen shade's `ASP` name; renamed the astrolabe one to `ASTP` (4 references), no other duplicate top-level names remain.
 prototypes/skins/claude/elven.html: ["Uncaught SyntaxError: Identifier 'ASP' has already been declared @line 1923"]
 - [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/felt.html: SyntaxError: Unexpected identifier 's'
 prototypes/skins/claude/felt.html: ["Uncaught SyntaxError: Unexpected identifier 's' @line 2354"]
