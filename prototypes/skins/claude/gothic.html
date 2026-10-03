@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -275,7 +275,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
-$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg>'));
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -1792,7 +1792,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -1816,7 +1816,10 @@ const SHADES={
   about:'Medieval records and liturgy were often kept on a <i>rotulus</i>, a long vellum roll wound on a rod, and a roll that was put away had a note of what it held written on its back (the <i>dorse</i>) and was closed with a pendant wax seal. Here the window becomes the roll. The display fades and the glass turns to an illuminated leaf hanging from the frieze: a red and blue penwork border, a gilded initial in a blue square with a red flourish, the name in red, then lines of brown script. A gilt rod with turned knobs comes in along its foot. Then the wall lowers, and the roll rides down with the foot of the wall, so <b>lowering the wall is what winds the leaf up</b>: the roll climbs, fattening lap by lap, its laps turning over the top, shading the leaf just above it and casting a shadow on the stone below, while the script disappears into it line by line. When it lands under the frieze, a silk tag drops from under it, and a drop of wax falls onto the roll, squashes and is stamped with a quatrefoil, with a glint. The wax is the status: honey amber while running, blue when paused, red for a decision needed, green for passed. Last, the key value is written along the roll beside a small gilded initial. <b>The strip is the sealed roll:</b> the name in the frieze, the value on the dorse, the seal. Unshading plays it back, the leaf unwinding as the wall rises. Joins still work on the shaded pair.'},
  misericord:{label:'Misericord',kind:'Tip',ms:3200,h:small=>small?48:62,lowAt:[.15,.66],
   on:'Shaded: an oak stall seat swings down over the window, then tips up on its hinge as the wall lowers, showing the carved ledge under it; the value is gilded on the ledge and the supporters\' glass bosses light.',off:'Unshaded: the bosses go dark, the gilding wipes away, and the seat swings down and lifts away as the wall rises.',
-  about:'Choir stalls in gothic churches have hinged oak seats. Tipped up, the underside of each seat shows a small carved ledge, the <i>misericord</i> ("mercy"), for the clergy to lean on through long services, with a carved scene under it and a roundel, the <i>supporter</i>, on a stem at each side. Here the facade is a stall. The display fades as a heavy oak seat swings down from iron hinges under the frieze to cover the window, rebounding against the wall with a puff of dust: grained boards, a moulded border, a carved quatrefoil with a gilt boss and iron straps. Then, as the wall lowers, the seat is tipped up: its face foreshortens and darkens as it turns from the light, its moulded front edge comes round, and its shadow falls on the dark boards of the stall back. The ledge it uncovers rides up with the foot of the wall. When the wall settles, dust drops off the ledge ends, the value is gilded onto the ledge face left to right, and the glass bosses in the two supporters (a carved rose and a sprig of oak leaves) kindle with a flare. They are the status: amber while running, blue when paused, red for a decision, green for passed. <b>The strip is the tipped-up stall:</b> the name in the frieze, the seat\'s edge under it, and the misericord with the value and two lit bosses. Unshading plays it back. Joins still work on the shaded pair.'}
+  about:'Choir stalls in gothic churches have hinged oak seats. Tipped up, the underside of each seat shows a small carved ledge, the <i>misericord</i> ("mercy"), for the clergy to lean on through long services, with a carved scene under it and a roundel, the <i>supporter</i>, on a stem at each side. Here the facade is a stall. The display fades as a heavy oak seat swings down from iron hinges under the frieze to cover the window, rebounding against the wall with a puff of dust: grained boards, a moulded border, a carved quatrefoil with a gilt boss and iron straps. Then, as the wall lowers, the seat is tipped up: its face foreshortens and darkens as it turns from the light, its moulded front edge comes round, and its shadow falls on the dark boards of the stall back. The ledge it uncovers rides up with the foot of the wall. When the wall settles, dust drops off the ledge ends, the value is gilded onto the ledge face left to right, and the glass bosses in the two supporters (a carved rose and a sprig of oak leaves) kindle with a flare. They are the status: amber while running, blue when paused, red for a decision, green for passed. <b>The strip is the tipped-up stall:</b> the name in the frieze, the seat\'s edge under it, and the misericord with the value and two lit bosses. Unshading plays it back. Joins still work on the shaded pair.'},
+ veil:{label:'Lenten veil',kind:'Tuck',ms:3400,h:small=>small?48:60,lowAt:[.24,.72],
+  on:'Shaded: an iron rod slides in under the frieze and a painted linen veil is let down over the window; as the wall lowers, cords gather its hem into festoons, and the value is brushed onto it.',off:'Unshaded: the paint wipes away, the festoons let down as the wall rises, and the veil rolls back up to its rod.',
+  about:'Through Lent, medieval churches hid their altarpieces and images behind a great linen veil, the <i>Fastentuch</i> or <i>Hungertuch</i> ("hunger cloth"), painted with a border and a cross, hung from an iron rod and raised and lowered on cords. Here the window is put away for the season. The display fades as an iron rod slides in under the frieze, resting in two brackets, with a gilt finial on each end and silk tassels hanging from them. The veil is let down from the rod, unrolling as it falls and gathering speed, lands with a small rebound and swings once; its tempera border, its red cross formée in a quatrefoil and blue ring, and the blue stripe and fringe of its hem cover the whole window. Then, as the wall lowers, cords behind the veil draw its hem up at four gilt rings, so <b>lowering the wall is what gathers the cloth</b>: the hem rises into three festoons, their folds shaded crest and hollow, the painted cross disappears into the gathers, and the dark bay behind shows under the swags. The swags settle with a small bounce, then a painted roundel and the key value are brushed onto the flat band left to right, and the roundel\'s gilt rim catches the light. The roundel and the tassels are the status: honey amber while running, blue when paused, red for a decision, green for passed. <b>The strip is the gathered veil:</b> the name in the frieze, the rod and its tassels, and the value on the cloth above the festoons. Unshading plays it back, the veil letting down as the wall rises and rolling back up to its rod. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -2247,6 +2250,89 @@ function misericord(id,w,h,k){
  for(const x of[xa+(sm?16:24),xb-(sm?16:24)])s+=`<rect x="${f(x-4)}" y="${f(fb-1)}" width="8" height="3" rx="1.2" fill="#1b1612" stroke="#000" stroke-width=".3"/>`;
  // The seat lands against the wall with a puff of dust from its foot.
  const ld=seg(k,.05,.15);if(ld>0&&ld<1)s+=JOINS.buttress.dust(xa+12,fb+L,ld,4,10,7,-1)+JOINS.buttress.dust(xb-12,fb+L,ld,4,10,9,1);
+ return s+'</g>';
+}
+
+/* Lenten veil: through Lent, churches hid their altarpieces and images behind a linen veil (the Fastentuch or Hungertuch), painted
+   with a border and a cross, hung from an iron rod and raised on cords. An iron rod slides in under the frieze and the veil is let
+   down over the window, unrolling as it falls and swinging once. Then, as the wall lowers, cords behind it draw the hem up into
+   festoons, so lowering the wall is what gathers the cloth. yr: the rod; yC: where the cords hold the hem; D: how far the swags droop. */
+const vlSwing=(t,A)=>t>0&&t<1?A*Math.sin(t*Math.PI*3)*(1-t):0;
+// A cross formée: arms flaring from a narrow waist to square ends, reach R.
+const vlCross=R=>{const m=R*.48,n=R*.16;return `M${f(-n)} ${f(-n)}L${f(-m)} ${f(-R)}H${f(m)}L${f(n)} ${f(-n)}L${f(R)} ${f(-m)}V${f(m)}L${f(n)} ${f(n)}L${f(m)} ${f(R)}H${f(-m)}L${f(-n)} ${f(n)}L${f(-R)} ${f(m)}V${f(-m)}Z`};
+function veil(id,w,h,k){
+ const G=rgGeo(id,w,h),{sm,xa,xb}=G,fb=G.y0-3,foot=sm?3:4,yF=h-foot-2,yr=fb+2.4,top=yr+1.2,band=sm?14:17,x0=xa+5,x1=xb-5,Wd=x1-x0,xm=(x0+x1)/2;
+ const op=seg(k,0,.03);if(op<=0)return '';
+ const[sl,sb,sd]=rtWax(id),[,num,val]=tpText(id),fs=sm?10:11.5,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`);
+ // The rod slides in; the veil drops, unrolling as it falls (gathering speed, then a small rebound); then the cords gather it.
+ const rs=ease(seg(k,.02,.1)),dd=seg(k,.1,.24),fall=dd<.8?Math.pow(dd/.8,2):1-.05*Math.sin(Math.PI*(dd-.8)/.2),rr=(sm?3.4:4.6)*(1-clamp(dd/.8));
+ const yEnd=lerp(top+2*rr,yF,fall)-rr,u=ease(seg(k,.26,.74)),yC=lerp(yEnd,top+band,u),D=(yEnd-yC)*(1-.12*Math.sin(Math.PI*seg(k,.72,.82)));
+ // Four cords make three swags; each fold of a swag is an arc hung between the same cords, shallower the higher it is.
+ const ax=[x0,x0+Wd/3,x0+Wd*2/3,x1],xs=[];for(let x=x0;x<x1;x+=3)xs.push(x);xs.push(x1);
+ const sw=x=>{const i=Math.min(2,Math.floor((x-x0)/(Wd/3)));return Math.pow(Math.sin(Math.PI*clamp((x-ax[i])/(ax[i+1]-ax[i]))),.8)};
+ const arc=(q,dy=0)=>xs.map(x=>[x,yC+D*q*sw(x)+dy]),pl=P=>P.map((p,i)=>(i?'L':'M')+f(p[0])+' '+f(p[1])).join(''),hem=arc(1);
+ const cloth=`M${f(x0)} ${f(top)}H${f(x1)}V${f(yC)}`+hem.slice().reverse().map(p=>'L'+f(p[0])+' '+f(p[1])).join('')+'Z',fh=Math.max(0,yC-top);
+ let s=`<defs><linearGradient id="vlL-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f3ebd7"/><stop offset=".6" stop-color="#e6dabd"/><stop offset="1" stop-color="#d4c4a0"/></linearGradient>`+
+  `<linearGradient id="vlR-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f6eedb"/><stop offset=".5" stop-color="#d9caa6"/><stop offset="1" stop-color="#8f7c56"/></linearGradient>`+
+  `<linearGradient id="vlD-${id}" x1="0" x2="1"><stop stop-color="#fffaf0" stop-opacity="0"/><stop offset=".4" stop-color="#fffaf0" stop-opacity=".24"/><stop offset=".62" stop-color="#5a4630" stop-opacity=".14"/><stop offset="1" stop-color="#5a4630" stop-opacity="0"/></linearGradient>`+
+  `<pattern id="vlP-${id}" width="2.4" height="2.4" patternUnits="userSpaceOnUse"><path d="M0 .6H2.4M.6 0V2.4" stroke="#6e5a3c" stroke-opacity=".13" stroke-width=".45"/></pattern>`+
+  `<clipPath id="vlc-${id}"><rect x="${f(x0)}" y="${f(top)}" width="${f(Wd)}" height="${f(fh)}"/></clipPath></defs><g opacity="${f(op)}">`;
+ // The dark bay behind the veil, seen under the swags once the cords lift it.
+ const rc=seg(k,.2,.3);
+ if(rc>0)s+=`<rect x="${f(xa)}" y="${f(fb)}" width="${f(xb-xa)}" height="${f(yF+1-fb)}" fill="#1e150c" opacity="${f(.92*rc)}"/><rect x="${f(xa)}" y="${f(fb)}" width="${f(xb-xa)}" height="5" fill="url(#tpShT)" opacity="${f(.5*rc)}"/>`;
+ // Iron brackets under the frieze, which the rod rests in.
+ s+=`<path d="M${f(xa+1.5)} ${f(fb)}V${f(yr+1.2)}h2M${f(xb-1.5)} ${f(fb)}V${f(yr+1.2)}h-2" stroke="#1b1612" stroke-width="1.4" fill="none" opacity="${f(seg(k,.01,.04))}"/>`;
+ // The rolled veil fades in on the rod as the rod comes to rest, then drops.
+ const ri0=seg(k,.06,.1);
+ if(ri0>0){
+  // The veil swings once as it lands, from the rod.
+  const sk=vlSwing(seg(k,.21,.42),2.2);
+  s+=`<g transform="translate(0 ${f(yr)}) skewX(${f(sk)}) translate(0 ${f(-yr)})" opacity="${f(ri0)}">`;
+  if(D>.5)s+=`<path d="${pl(arc(1,1.2))}" fill="none" stroke="#000" stroke-opacity="${f(.35*clamp((D-.5)/5))}" stroke-width="1.8"/>`;
+  s+=`<path d="${cloth}" fill="url(#vlL-${id})"/><path d="${cloth}" fill="url(#vlP-${id})"/>`;
+  // Soft drape folds down the flat cloth.
+  for(let i=1;i<6;i++)s+=`<rect x="${f(x0+Wd*i/6+(hash(i,5)-.5)*10-6)}" y="${f(top)}" width="12" height="${f(fh)}" fill="url(#vlD-${id})"/>`;
+  // Painted in tempera: a red border, and a red cross formée in a quatrefoil inside a blue ring. Gathering swallows it from below.
+  const Af=(sm?CH:H)-foot-1-top,my=top+Af*.5,R=sm?11:19,mo=1-seg(k,.6,.74);
+  let pd=`<path d="M${f(x0+3)} ${f(yC+2)}V${f(top+3)}H${f(x1-3)}V${f(yC+2)}" fill="none" stroke="#a3222f" stroke-opacity=".75" stroke-width="1.3"/>`+
+   `<path d="M${f(x0+5.5)} ${f(yC+2)}V${f(top+5.5)}H${f(x1-5.5)}V${f(yC+2)}" fill="none" stroke="#a3222f" stroke-opacity=".45" stroke-width=".5"/>`;
+  if(mo>0)pd+=`<g transform="translate(${f(xm)} ${f(my)})" opacity="${f(mo)}"><circle r="${f(R*1.12)}" fill="none" stroke="#2b56b3" stroke-opacity=".6" stroke-width=".9"/>`+
+   [[1,0],[-1,0],[0,1],[0,-1]].map(([a,b])=>`<circle cx="${f(a*R*.48)}" cy="${f(b*R*.48)}" r="${f(R*.5)}" fill="none" stroke="#a3222f" stroke-opacity=".7" stroke-width="1"/>`).join('')+
+   `<path d="${vlCross(R*.62)}" fill="#a3222f" fill-opacity=".85"/></g>`;
+  s+=`<g clip-path="url(#vlc-${id})">${pd}</g>`;
+  // The swags: alternate folds shaded, each fold's crest lit and its underside dark; creases run up into the band from each cord.
+  if(D>.4){const N=4,a=clamp((D-.4)/6);let bands='',lines='',his='';
+   for(let j=0;j<=N;j++){const A0=arc(1-j/(N+1)),A1=arc(1-(j+1)/(N+1));if(j%2===0)bands+=`${pl(A0)}L${A1.slice().reverse().map(p=>f(p[0])+' '+f(p[1])).join('L')}Z`;
+    if(j>0){lines+=pl(A0);his+=pl(arc(1-j/(N+1),-.9))}}
+   let cr='';for(const cx of ax.slice(1,3))for(const dx of[-4,0,4])cr+=`M${f(cx+dx*.15)} ${f(yC-.4)}L${f(cx+dx)} ${f(yC-Math.min(sm?1.6:2.6,D*.5))}`;
+   s+=`<g opacity="${f(a)}"><path d="${bands}" fill="#5a4630" opacity=".16"/><path d="${lines}" fill="none" stroke="#5a4630" stroke-opacity=".45" stroke-width=".6"/><path d="${his}" fill="none" stroke="#fffaf0" stroke-opacity=".55" stroke-width=".6"/>`+
+    `<path d="${cr}" fill="none" stroke="#5a4630" stroke-opacity=".4" stroke-width=".55"/>`+ax.map(x=>`<circle cx="${f(x)}" cy="${f(yC)}" r="1.3" fill="none" stroke="url(#gild)" stroke-width=".8"/>`).join('')+'</g>'}
+  // The blue hem stripe (it runs into the gathers at each cord) and the fringe, shown once the roll has let them out.
+  const hs=seg(dd,.7,.95),a2=clamp(D/4);
+  if(hs>0)s+=`<g opacity="${f(hs)}"><path d="${pl(xs.map(x=>[x,yC+D*sw(x)-Math.min(3.2,3.2*(1-a2)+D*sw(x)*.5)]))}" fill="none" stroke="#2b56b3" stroke-opacity=".75" stroke-width="1.6"/>`+
+   `<path d="${hem.map(p=>`M${f(p[0])} ${f(p[1])}v1.6`).join('')}" stroke="#cdbb90" stroke-width=".6"/></g>`;
+  // The roll at the hem while it falls, unrolling.
+  if(rr>.3){const yc=yEnd;s+=`<rect x="${f(x0-1)}" y="${f(yc-rr)}" width="${f(Wd+2)}" height="${f(2*rr)}" rx="${f(Math.min(rr,1.5))}" fill="url(#vlR-${id})" stroke="#6e5a3c" stroke-width=".5"/><path d="M${f(x0)} ${f(yc-rr*.3)}H${f(x1)}" stroke="#a3222f" stroke-opacity=".5" stroke-width=".6"/>`}
+  s+='</g>'}
+ // The rod: iron with a highlight, a gilt finial on its leading end, rings holding the veil, and a finial screwed on behind it.
+ if(rs>0){const rx1=lerp(xa-2,xb+2,rs),kr=sm?2.2:2.8,ri=seg(k,.09,.13),kb=backOut(seg(k,.1,.14));
+  s+=`<path d="M${f(xa-2)} ${f(yr+1.3)}H${f(rx1)}" stroke="#000" stroke-opacity=".3" stroke-width="2.4"/><path d="M${f(xa-2)} ${f(yr)}H${f(rx1)}" stroke="#1b1612" stroke-width="${sm?2.2:2.6}" stroke-linecap="round"/><path d="M${f(xa-1)} ${f(yr-.6)}H${f(rx1-1)}" stroke="#8a8072" stroke-width=".6" stroke-opacity=".8"/>`;
+  if(ri>0){let rg='';const n=sm?7:9;for(let i=0;i<n;i++)rg+=`<ellipse cx="${f(lerp(x0+6,x1-6,i/(n-1)))}" cy="${f(yr+.4)}" rx="1.5" ry="2.1"/>`;s+=`<g fill="none" stroke="#1b1612" stroke-width=".9" opacity="${f(ri)}">${rg}</g>`}
+  const knob=(x,sc)=>`<g transform="translate(${f(x)} ${f(yr)}) scale(${f(sc)})"><circle r="${kr}" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/></g>`;
+  s+=knob(rx1,1)+(kb>0?knob(xa-2,kb):'')}
+ // Silk tassels hang from the rod ends, swinging as the veil lands and as it settles. Their silk is the status.
+ const ts=seg(k,.11,.16);
+ if(ts>0){const lc=sm?7:10,th=sm?6:8,an=vlSwing(seg(k,.14,.4),16)+vlSwing(seg(k,.72,.9),7),y0=lc+2.4;
+  for(const[x,dir]of[[xa+2.4,1],[xb-2.4,-1]])s+=`<g transform="translate(${f(x)} ${f(yr+1)}) rotate(${f(an*dir)}) scale(${f(ts)})"><path d="M0 0V${lc}" stroke="${sd}" stroke-width=".8"/>`+
+   `<path d="M-1.2 ${y0}L-2.6 ${y0+th}H2.6L1.2 ${y0}Z" fill="${sb}" stroke="${sd}" stroke-width=".5"/><path d="M-1 ${y0+.8}L-1.8 ${y0+th-.4}M0 ${y0+.8}V${y0+th-.4}M1 ${y0+.8}L1.8 ${y0+th-.4}" stroke="${sl}" stroke-opacity=".7" stroke-width=".4"/>`+
+   `<rect x="-1.6" y="${y0-.2}" width="3.2" height="1.3" fill="${sd}"/><circle cy="${lc+1}" r="${sm?1.5:1.9}" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/></g>`}
+ // When it has settled, a painted roundel with the status and the value are brushed on across the flat band, left to right.
+ const pt=seg(k,.8,.94);
+ if(pt>0){const rS=sm?4.6:5.6,tot=2*rS+5+tw,gx=xm-tot/2,ty=top+band*(sm?.48:.45),cx=gx+rS;
+  s+=`<clipPath id="vlt-${id}"><rect x="${f(gx-2)}" y="${f(top)}" width="${f((tot+4)*pt)}" height="${band}"/></clipPath><g clip-path="url(#vlt-${id})">`+
+   `<circle cx="${f(cx)}" cy="${f(ty)}" r="${f(rS)}" fill="${sb}" stroke="url(#gild)" stroke-width="1"/><path d="${vlCross(rS*.72)}" transform="translate(${f(cx)} ${f(ty)})" fill="${sl}"/>`+
+   `<text x="${f(gx+2*rS+5)}" y="${f(ty+fs*.36)}" font-family="Georgia,serif" font-size="${fs}"><tspan font-weight="700" font-size="${fs+1}" fill="#8e1f2b">${num}</tspan><tspan font-style="italic" fill="#2c2117"> ${val}</tspan></text></g>`;
+  const g2=Math.sin(Math.PI*seg(k,.93,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(cx-rS*.4,ty-rS*.5,g2*5)}</g>`}
  return s+'</g>';
 }
 
@@ -3133,7 +3219,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -3159,16 +3245,18 @@ function render(){
   // Triptych: the display hides once the wings are shut over it. Cornice: it slides up behind the soffit instead of fading.
   // Crypt: the display goes dark before the tracery rises, long before the wall sinks.
   // Rotulus: the display fades first, as the glass turns to vellum.
-  // Misericord: the display fades as the seat swings down over it.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  // Misericord: the display fades as the seat swings down over it. Lenten veil: it fades as the rod comes in, before the veil drops.
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(cn){const cut=Math.max(0,Se-(n.offsetTop-d));n.style.transform=`translateY(${-d}px)`;n.style.clipPath=`inset(${f(cut)}px -24px -24px -24px)`;
     o=cut>=n.offsetHeight?0:n.matches('.tabline,.knob')?1-seg(k,.25,.5):1}
    else if(n.style.transform){n.style.transform='';n.style.clipPath=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);
+  const vs=el.querySelector('.vlsvg'),vkey=vl?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
+  if(vs.dataset.key!==vkey){vs.dataset.key=vkey;vs.setAttribute('width',w);vs.setAttribute('height',h);vs.setAttribute('viewBox',`0 0 ${w} ${h}`);vs.innerHTML=vkey?veil(id,w,h,k):''}
   const ms2=el.querySelector('.mssvg'),mkey=ms?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(ms2.dataset.key!==mkey){ms2.dataset.key=mkey;ms2.setAttribute('width',w);ms2.setAttribute('height',h);ms2.setAttribute('viewBox',`0 0 ${w} ${h}`);ms2.innerHTML=mkey?misericord(id,w,h,k):''}
   const ls=el.querySelector('.rtsvg'),lkey=rt?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
