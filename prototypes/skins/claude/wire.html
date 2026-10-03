@@ -125,6 +125,15 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <pattern id="lm-carn" width="6" height="6" patternUnits="userSpaceOnUse"><rect x=".45" y=".5" width="5.1" height="5" rx="2.1" fill="#e0552a" stroke="#3a1006" stroke-width=".6"/><path d="M1.3 4.5Q3 5.4 4.7 4.5" fill="none" stroke="#7c2410" stroke-width=".7"/><ellipse cx="2.2" cy="1.9" rx="1.3" ry=".8" fill="#ffd0b4" opacity=".85"/></pattern>
  <pattern id="lm-amber" width="6" height="6" patternUnits="userSpaceOnUse"><rect x=".45" y=".5" width="5.1" height="5" rx="2.1" fill="#eca84a" stroke="#3a2006" stroke-width=".6"/><path d="M1.3 4.5Q3 5.4 4.7 4.5" fill="none" stroke="#8a5212" stroke-width=".7"/><ellipse cx="2.2" cy="1.9" rx="1.3" ry=".8" fill="#fff1c4" opacity=".85"/></pattern>
  <clipPath id="lm-clip"><rect x="-111" y="44" width="222" height="132"/></clipPath>
+ <!-- Jeweller's case: a copper-sheet case front and lid, wine velvet lining lit from below, ivory label cards. -->
+ <linearGradient id="jc-face" x1="0" y1="0" x2=".25" y2="1"><stop stop-color="#9a5b36"/><stop offset=".45" stop-color="#6e3a20"/><stop offset="1" stop-color="#3f2011"/></linearGradient>
+ <linearGradient id="jc-lid" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5a2e18"/><stop offset=".22" stop-color="#8e5130"/><stop offset=".7" stop-color="#743f22"/><stop offset="1" stop-color="#4a2514"/></linearGradient>
+ <linearGradient id="jc-vt" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#1c0610"/><stop offset="1" stop-color="#060104"/></linearGradient>
+ <linearGradient id="jc-vb" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0b0206"/><stop offset="1" stop-color="#5c1a2e"/></linearGradient>
+ <linearGradient id="jc-vl" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#3a1020"/><stop offset="1" stop-color="#090205"/></linearGradient>
+ <linearGradient id="jc-vr" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#090205"/><stop offset="1" stop-color="#2a0b17"/></linearGradient>
+ <linearGradient id="jc-card" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#f6ecd4"/><stop offset=".7" stop-color="#e5d4b0"/><stop offset="1" stop-color="#c9b48a"/></linearGradient>
+ <pattern id="jc-plush" width="4" height="4" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r=".6" fill="#ff9fb8" fill-opacity=".07"/><circle cx="3" cy="3" r=".55" fill="#000" fill-opacity=".28"/></pattern>
 </defs><path id="probe" fill="none"/></svg>
 <header><div><h1>Wire, beads &amp; stones <span>/ Claude skin study</span></h1><p>Oxidised copper frames, coil-bound cabochon displays, bead buttons. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
@@ -1665,7 +1674,7 @@ function dialSvg(c){
 }
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
-  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail) are built and added here.'},
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case) are built and added here.'},
  strand:{label:'Bead strand',kind:'Distil',ms:1150,ownStrip:true,
   about:'The pendant comes apart into a necklace. The plate and stone fade, the copper frame squeezes flat into a single strung wire, and the beads slide in along it from both clasps, centre beads first, each clicking into place. A flat slab bead carries the name and a cabochon carries the one key value. The round stones between them are the statuses: <b>amber</b> running, <b>labradorite</b> idle or paused, <b>carnelian</b> needs you, <b>malachite</b> passed. Jarvis strings one amber per running agent, GitDiscuss one carnelian per decision, Checks a seed bead per check. Pause a widget and its stones turn to labradorite. The eye loops stay on the ends, so shaded pendants still link by jump ring into one longer strand.',
   sayOn:'Shaded: the frame flattens into a wire and the beads slide on, one stone per status.',
@@ -1738,7 +1747,12 @@ const SHADES={
   // Exact for the large pendants (strip = drawn height + 5); the engine shares one hk, so Checks' strip runs a pixel or two short mid-tip, which is harmless.
   hk:st=>{const t=tbTh(st)*Math.PI/180,hs=stripH(false);return Math.cos(t)<=0?1:clamp((H-(11+(H-11)*Math.cos(t)+(hs-11)*Math.sin(t)))/(H-hs))},
   show:st=>1-ease(seg(st,0,.14)),grip:st=>1-ease(seg(st,0,.12)),
-  draw(id,w,h,small,st){return tiltBail(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return tiltBail(id,w,h,small,st)}},
+ jcase:{label:'Jeweller\'s case',kind:'Stow',ms:3200,ownStrip:true,hs:52,chs:46,
+  about:'A new shade kind, Stow: the widget is put away <i>into depth</i>, not folded, rolled or lowered. Built from the jeweller\'s case, where each piece goes back into a velvet-lined slot and the case is shut with its label facing out. The display goes dark into a glass stone and the nameplate fades. A copper-sheet case front, bound in twisted brass, appears behind the pendant, and the pendant is pushed back into it. It shrinks in perspective, passes through the case mouth, and slides away down a slot lined with wine velvet, lit from below, darkening as it goes. Then a hammered lid slides down out of the top of the mouth, shading the slot as it closes, and shuts on the bottom lip with a small rebound and a glint at both corners. The strip is the shut case front: ivory cards drop into two wire label holders with curled ends, the name on the left and the one key value on the right, and the wire drawer pull between them swings once and hangs still. Last, the cabochon set over the pull kindles as the status: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. Nothing moves at rest, and unshading opens the lid and brings the pendant back out. The join ends stay outside the case, so cased pendants still join.',
+  sayOn:'Shaded: the pendant is pushed back into a velvet-lined case, the lid slides shut, and the case front carries the name and value on ivory cards.',
+  hk:st=>ease(seg(st,.5,.76)),show:st=>1-ease(seg(st,0,.14)),grip:st=>1-ease(seg(st,0,.12)),
+  draw(id,w,h,small,st){return jewelCase(id,w,h,small,st)}}
 };
 // The strip height while shaded: most shades close to HS / CHS, Hang shades want a little room below the chain.
 const stripH=small=>{const o=SHADES[model.shade];return small?(o.chs||CHS):(o.hs||HS)};
@@ -1903,6 +1917,94 @@ function tiltBail(id,w,h,small,st){
    s+=`<g opacity="${f(clamp(pa*2))}">`+wire(`M${f(head)} ${ax}H${f(tip)}`,'brass',1.4)+wire(band(e+dr*8,ax,false,4,7,2.2),'copper',1.1)+
     `<circle cx="${f(head)}" cy="${ax}" r="2.3" fill="url(#st-gold)" stroke="#2a1d08" stroke-width=".6"/></g>`;
    if(g>.03)s+=sparkle(e+dr*8,ax,g*.6)}}
+ return s;
+}
+
+/* ---------- Jeweller's case pieces ---------- */
+// The pendant's depth scale: pushed back into the case, slowing as it goes in.
+const jcS=st=>1-.7*ease(seg(st,.14,.5));
+// The name card on the left, the value card on the right, the stone and pull between them.
+const jcCache={};
+function jcLayout(id,w,small){
+ const P=plaqueData(id),D=strandData(id),key=id+w+P.word+P.stone;if(jcCache[key])return jcCache[key];
+ const fs=small?12.5:14,ws=small?10.5:11.5,nf=`italic bold ${fs}px Georgia,serif`,uf=`bold ${fs}px Georgia,serif`,wf=`italic ${ws}px Georgia,serif`;
+ const nw=Math.ceil(measure(D.name,nf))+16,vw=Math.ceil(measure(P.num,uf)+(P.word?4+measure(P.word,wf):0))+16,e=small?24:30;
+ return jcCache[key]={name:{x:e,wd:nw},val:{x:w-e-vw,wd:vw},px:(e+nw+w-e-vw)/2,fs,ws,text:D.name,num:P.num,word:P.word,stone:P.stone,ht:small?16:19};
+}
+// A wire label holder round a card: a recess, brass rails on three sides with turned-over tops, and a curl at each end.
+function jcHolder(x,y,wd,ht,back){
+ if(back)return `<rect x="${f(x-2.5)}" y="${f(y-1)}" width="${f(wd+5)}" height="${f(ht+3.5)}" rx="2" fill="#160904" opacity=".6"/>`;
+ const r=3.3,cy=y+ht/2;
+ return wire(`M${f(x-1.5)} ${f(y+1)}V${f(y+ht+1.5)}H${f(x+wd+1.5)}V${f(y+1)}`,'brass',1.1)+
+  wire(`M${f(x-1.5)} ${f(y+1)}q0 -2.4 3 -2.4M${f(x+wd+1.5)} ${f(y+1)}q0 -2.4 -3 -2.4`,'brass',.8)+
+  wire(spiral(x-1.5-r,cy,r,1.4,1,0)+spiral(x+wd+1.5+r,cy,r,1.4,-1,Math.PI),'brass',1)+
+  `<circle cx="${f(x-1.5-r)}" cy="${f(cy)}" r="1.2" fill="url(#st-gold)"/><circle cx="${f(x+wd+1.5+r)}" cy="${f(cy)}" r="1.2" fill="url(#st-gold)"/>`;
+}
+function jewelCase(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const full=small?CH:H,r0=small?20:26,hk=ease(seg(st,.5,.76)),sc=jcS(st),cx=w/2,cy=h/2;
+ // The mouth: inset from the case edge, its margins and corners tightening as the case shuts to the strip.
+ const mx=small?12:14,mEnd=small?11:12,mm=lerp(13,mEnd,hk),my0=mm,my1=h-mm,mw=w-2*mx,mH=my1-my0,mr=Math.min(lerp(r0-6,8,hk),mH/2);
+ const fit=Math.min(mw/(w-10),(full-26)/(full-10)),inside=sc<fit,fo=seg(st,.04,.2);
+ const outer=rrect(5,5,w-10,h-10,Math.min(r0,(h-10)/2)),mouth=rrect(mx,my0,mw,mH,mr);
+ const bz=small?[14,22,220,44,9]:[43,29,304,68,10],gl=seg(st,.02,.16);
+ // The pendant, its display gone dark into glass, darkening as it goes deeper.
+ const pend=ps=>{const dk=seg(ps,fit,.3);
+  return `<g transform="translate(${f(cx)} ${f(cy)}) scale(${ps.toFixed(4)}) translate(${f(-w/2)} ${f(-full/2)})">${casing(w,full,small)}<path d="${rrect(...bz)}" fill="url(#tr-glass)" opacity="${f(gl)}"/>`+
+   (dk>0?`<path d="${rrect(5,5,w-10,full-10,r0)}" fill="#05010a" opacity="${f(.85*dk)}"/>`:'')+'</g>'};
+ // The lid slides down out of the top of the mouth, a fixed plate as tall as the shut mouth, and rebounds a little off the bottom lip.
+ const LH=stripH(small)-2*mEnd,rb=Math.sin(Math.PI*seg(st,.76,.84))*(small?2:3),yl=my0+mH*hk-rb,ly=yl-LH/2;
+ const L=jcLayout(id,w,small),cyC=ly-L.ht/2,R=small?4.4:5.4,sy=ly-1.5;
+ let s=`<clipPath id="jcm-${id}"><path d="${mouth}"/></clipPath><clipPath id="jcg-${id}"><rect x="0" y="${f(yl)}" width="${w}" height="${f(Math.max(0,my1-yl))}"/></clipPath>`;
+ s+=`<g opacity="${f(fo)}"><g clip-path="url(#jcm-${id})"><g clip-path="url(#jcg-${id})"><rect x="${mx}" y="${f(my0)}" width="${mw}" height="${f(mH)}" fill="#070205"/>`;
+ if(inside){
+  // The velvet slot: four walls from the mouth back to the pendant, which keeps inside the narrowing mouth.
+  const ps=Math.min(sc,mH*lerp(1,.62,seg(hk,0,.3))/(full-10)),bw=ps*(w-10),bh=ps*(full-10),bx0=cx-bw/2,bx1=cx+bw/2,by0=cy-bh/2,by1=cy+bh/2,x0=mx,x1=w-mx;
+  s+=`<rect x="${mx}" y="${f(my0)}" width="${mw}" height="${f(mH)}" fill="url(#jc-plush)"/><g opacity="${f(seg(fit-sc,0,.08))}"><path d="${poly([[x0,my0],[x1,my0],[bx1,by0],[bx0,by0]])}Z" fill="url(#jc-vt)"/><path d="${poly([[x0,my1],[x1,my1],[bx1,by1],[bx0,by1]])}Z" fill="url(#jc-vb)"/>`+
+   `<path d="${poly([[x0,my0],[bx0,by0],[bx0,by1],[x0,my1]])}Z" fill="url(#jc-vl)"/><path d="${poly([[x1,my0],[bx1,by0],[bx1,by1],[x1,my1]])}Z" fill="url(#jc-vr)"/>`+
+   `<rect x="${mx}" y="${f(my0)}" width="${mw}" height="${f(mH)}" fill="url(#jc-plush)"/>`+
+   `<path d="M${x0} ${f(my0)}L${f(bx0)} ${f(by0)}M${x1} ${f(my0)}L${f(bx1)} ${f(by0)}M${x0} ${f(my1)}L${f(bx0)} ${f(by1)}M${x1} ${f(my1)}L${f(bx1)} ${f(by1)}" stroke="#000" stroke-opacity=".55" stroke-width=".8"/></g>`+pend(ps);
+ }else s+=`<rect x="${mx}" y="${f(my0)}" width="${mw}" height="${f(mH)}" fill="url(#jc-plush)"/>`;
+ // The lid's shadow falls on the slot below its edge.
+ if(hk>0)s+=`<rect x="${mx}" y="${f(yl)}" width="${mw}" height="12" fill="url(#rs-drop)"/>`;
+ s+='</g>';
+ // The lid, carrying the holders, the stone and the pull's posts with it.
+ if(yl>my0+.2){
+  // Mid-shut on the large pendants the travel outruns the plate, so the plate reaches up under the top lip.
+  const lt=Math.min(yl-LH,my0);
+  s+=`<rect x="${mx}" y="${f(lt)}" width="${mw}" height="${f(yl-lt)}" fill="url(#jc-lid)"/><rect x="${mx}" y="${f(lt)}" width="${mw}" height="${f(yl-lt)}" fill="url(#rs-ham)"/>`+
+   `<path d="M${mx} ${f(yl-.9)}H${w-mx}" stroke="#2a1206" stroke-width="1.6"/><path d="M${mx} ${f(yl-2.2)}H${w-mx}" stroke="#f3c29a" stroke-opacity=".45" stroke-width=".8"/>`+
+   jcHolder(L.name.x,cyC,L.name.wd,L.ht,true)+jcHolder(L.val.x,cyC,L.val.wd,L.ht,true)+jcHolder(L.name.x,cyC,L.name.wd,L.ht)+jcHolder(L.val.x,cyC,L.val.wd,L.ht);
+  s+=`<circle cx="${f(L.px)}" cy="${f(sy)}" r="${f(R+1.8)}" fill="#120906"/>`+wire(circ(L.px,sy,R+.9),'brass',.8)+strandItem({k:'bead',r:R,stone:L.stone},L.px,sy);
+ }
+ s+='</g>';
+ // The case front, with the mouth cut out of it, bound in twisted brass with a copper lip round the mouth.
+ s+=`<path d="${outer}${mouth}" fill-rule="evenodd" fill="url(#jc-face)"/><path d="${outer}${mouth}" fill-rule="evenodd" fill="url(#rs-ham)"/>`+
+  twisted(rrect(7.5,7.5,w-15,h-15,Math.min(r0,(h-10)/2)-2.5),'brass',1.9)+wire(mouth,'copper',1.5)+'</g>';
+ // Until it has passed the mouth, the pendant is still in front of the case.
+ if(!inside)s+=pend(sc);
+ // The drawer pull hangs off the lid's edge; it swings toward you once when the lid shuts.
+ const po=clamp((yl-my0-LH*.5)/6);
+ if(po>0){const u=seg(st,.76,.94),Lp=(small?4.5:6)*(1-.55*Math.sin(2*Math.PI*u)*Math.pow(1-u,1.5)),pw=small?8:10,y0=yl-3.5,yb=y0+3.5+Lp;
+  s+=`<g opacity="${f(po)}">`+wire(`M${f(L.px-pw)} ${f(y0)}V${f(y0+(yb-y0)*.45)}Q${f(L.px-pw)} ${f(yb)} ${f(L.px)} ${f(yb)}Q${f(L.px+pw)} ${f(yb)} ${f(L.px+pw)} ${f(y0+(yb-y0)*.45)}V${f(y0)}`,'copper',1.5)+
+   `<circle cx="${f(L.px-pw)}" cy="${f(y0)}" r="1.9" fill="url(#st-gold)" stroke="#2a1d08" stroke-width=".5"/><circle cx="${f(L.px+pw)}" cy="${f(y0)}" r="1.9" fill="url(#st-gold)" stroke="#2a1d08" stroke-width=".5"/></g>`}
+ // The lid shuts with a glint at both lower corners.
+ const g=Math.sin(Math.PI*seg(st,.76,.83));if(g>.03)s+=sparkle(mx+6,my1-1,g*.55)+sparkle(w-mx-6,my1-1,g*.55);
+ // Ivory cards drop into the holders from above, name then value; the holders' rails go back over them.
+ for(const [c,p] of [[L.name,seg(st,.8,.9)],[L.val,seg(st,.85,.95)]]){if(p<=0)continue;
+  const dy=-(L.ht+10)*(1-ease(p)),isN=c===L.name,tx=c.x+c.wd/2,ty=cyC+L.ht/2+.6;
+  // They come out from behind the top lip: clipped to the mouth while they drop.
+  s+=`<clipPath id="jcc-${id}${isN?'n':'v'}"><rect x="0" y="${f(my0)}" width="${w}" height="${f(h)}"/></clipPath><g clip-path="url(#jcc-${id}${isN?'n':'v'})"><g opacity="${f(clamp(p*3))}" transform="translate(0 ${f(dy)})"><rect x="${f(c.x)}" y="${f(cyC)}" width="${c.wd}" height="${L.ht}" rx="1.5" fill="url(#jc-card)"/>`+
+   `<path d="M${f(c.x+3)} ${f(cyC+L.ht-2.5)}H${f(c.x+c.wd-3)}" stroke="#8a6a3c" stroke-opacity=".35" stroke-width=".6"/>`+
+   (isN?`<text x="${f(tx)}" y="${f(ty)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="${L.fs}" fill="#2a1606">${L.text}</text>`:
+    `<text x="${f(tx)}" y="${f(ty)}" text-anchor="middle" dominant-baseline="central"><tspan font-family="Georgia,serif" font-weight="bold" font-size="${L.fs}" fill="#5a1f08">${L.num}</tspan>${L.word?`<tspan dx="4" font-family="Georgia,serif" font-style="italic" font-size="${L.ws}" fill="#3a2410">${L.word}</tspan>`:''}</text>`)+'</g></g>'+
+   jcHolder(c.x,cyC,c.wd,L.ht)}
+ // Last, the stone kindles as the status.
+ const k=seg(st,.9,.98);
+ if(k>0){const bump=Math.sin(Math.PI*k),col=RIM_GLOW[L.stone];
+  s+=`<circle cx="${f(L.px)}" cy="${f(sy)}" r="${f(R*2.5)}" fill="${col}" opacity="${f((L.stone==='lab'?.1:.32)*k+.35*bump)}" filter="url(#soft)"/>`+
+   `<circle cx="${f(L.px)}" cy="${f(sy)}" r="${f(R*.55)}" fill="#fff8e0" opacity="${f(.5*bump)}"/>`;
+  if(bump>.05)s+=sparkle(L.px+R*.6,sy-R*.6,bump*.5)}
  return s;
 }
 
