@@ -723,6 +723,23 @@ const JOINS={
    return jt>.3?'Releasing · the brackets fold away ':'Releasing · the casings part '},
   about:'The Stay angle kind in elven, after gothic\'s casement stay and hollow\'s bone stay. In a Stay the angle is held by a brace across the opening, not by a pivot\'s friction or by what fills the gap. The casings meet with their squared ends almost touching and GitDiscuss turns on the inside corner they share, as on the lily. Here the brace is a slender silver stay with four leaf-shaped eyes, one per 15°, a vine engraved along it, a moonstone boss at its pivot and a leaf finial. It is pivoted on a curling silver bracket on GitDiscuss and its eyes drop over a moonstone-headed pin on a bracket on Jarvis: over the roofs when GitDiscuss is lowered, under the keels when it is raised. The eye distances are computed from the pivot geometry, so at full and shaded height the pin sits exactly in eye k+1 at 15k°. <b>Near:</b> the roofs glimmer where the brackets will grow. <b>Ready:</b> the brackets, the stay with its eyes and GitDiscuss\'s swing are traced in dashed moonlight. Joining: the casings close, the brackets grow from the roofs, each with a tendril curling at its foot and a leaf, and the stay grows from the pivot (its eyes opening as it passes them, the leaf unfurling at its tip), held lifted. It is set on eye 1 with a glint. Then it is lifted, GitDiscuss swings 5° past its angle and settles, and the stay drops onto its eye. The pin\'s moonstone kindles as the join light (moonlight while both widgets run, a cold grey if either is paused) and a glint runs along the stay. <b>Angle:</b> −45° to +45° in 15° steps. Drag GitDiscuss\'s nameplate, use the slider, or focus the nameplate or the stay and press ↑ ↓. The stay lifts and rides over the pin with its eyes sliding past, and drops onto the nearest eye with a glint when GitDiscuss stops. Crossing level, it is lifted off one side and set on the other. A moonstone tag reads the angle and the eye. Nothing moves at rest. <b>Release:</b> tap the stay or its pin, or focus it and press Enter.',
   over:c=>drawStay(c)
+ },
+ bloom:{label:'Bloom rivets',kind:'Rivet',gap:30,part:.3,slow:1.7,msOut:3200,
+  txt:{join:'The casings close, a leaf plate unfurls from each stem and the moonstone glass laps over the silver; three silver buds push up through the eyes, and as a dewdrop falls on each it blooms flat over them.',
+   joined:'Joined: three silver flowers pin the lapped plates, the middle one\'s moonstone heart lit. Drag a nameplate to move the pair; tap the flowers (or press Enter) to release.',
+   release:'The heart dims, the flowers close back into buds, middle first, and draw down through the eyes, the plates furl into their stems and the casings part.',
+   stop:'The buds draw back through the eyes and the plates furl.',
+   hold:'Held mid-join: the plates are lapped and the top bud is blooming over its eye as its dewdrop\'s ripple spreads. Use the scrubber to step through the three rivets.',
+   ready:'Ready: the lapped plates and three flowers are traced in moonlight. Release to set the rivets.',near:'Nearby: the leaf plates peek out of the stems and their tips glimmer. Move closer.',
+   readyPh:'Ready · the rivets are traced',nearPh:'Nearby · the plates peek out'},
+  // One timeline both ways (part:.3 keeps the casings together until the plates have furled), so a reversal never jumps.
+  phase:(jt,dir)=>{const q=(jt-BL0)/BLW,n=Math.min(2,Math.floor(q)),wu=q-n,nm=['top','bottom','middle'][n];
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<.42)return'Joining · the leaf plates unfurl and lap ';if(jt<BL0)return'Joining · the eyes line up ';
+    if(n<3)return`Joining · ${nm} rivet · `+(wu<.3?'a bud pushes up through the eyes ':wu<.55?'a dewdrop falls ':'it blooms flat ');return'Joining · the moonstone heart kindles '}
+   if(jt>BL0+3*BLW)return'Releasing · the heart dims ';if(jt>=BL0)return`Releasing · ${nm} rivet · `+(wu>.55?'the flower closes ':'the bud draws back ');
+   return jt>.42?'Releasing · the eyes part ':jt>.3?'Releasing · the plates furl ':'Releasing · the casings part '},
+  about:'The Rivet join kind in elven, after wire\'s tube rivets, gothic\'s hot rivets and hollow\'s bone trenails. A rivet is a shank put through two lapped plates whose end is then spread into a head wider than the hole, so it cannot come back out. Elven things are not hammered; here the head is spread by growth. Each joining stem keeps a leaf plate furled inside it: on Jarvis a plate of silver with three round lobes and a hairline vine engraved on it, on GitDiscuss a plate of frosted moonstone glass with three pointed lobes, silver-rimmed eyes and fine veins. <b>Near:</b> the plates peek out of the stems and their lobe tips glimmer. <b>Ready:</b> the lapped plates and the three flowers are traced in dashed moonlight across the gap. Joining: the casings close to a 30 px gap, and the plates unfurl from their stems, the glass lapping over the silver with its shadow on it, and a glint runs down the eyes as they line up. Then the rivets are set one at a time, top, bottom, then middle. A closed silver bud, twisted like a furled flower, pushes up through each eye and stands proud of the glass (drawn larger, with its shadow further off). A dewdrop falls out of the night onto it, ripples, and the bud bursts open into a five-petalled flower that lies flat over the eye: the petals are the spread head. Last, the middle flower\'s moonstone heart kindles as the join light and the glass glows faintly from within (moonlight while both widgets run, a cold grey if either is paused), and a glint runs down the lobe tips. Everything stays in the gap and scales with any shade. Nothing moves at rest. <b>Release:</b> tap the flowers, or focus them and press Enter. The heart dims, the flowers close back into buds, middle first, and draw down through the eyes, the plates furl into their stems, and only then do the casings part. Drag a nameplate to move the pair.',
+  over:c=>drawBloom(c)
  }
 };
 /* ---------- Lily petals: moon-white petals wedged into the opening, one per 15° (Wedge) ---------- */
@@ -1061,6 +1078,73 @@ function drawSilk(c){
  else if(jt===0&&g>0)s+=star(P0.x,P0.y,(4+3*g)*k,g*.9);
  if(jt===1){const x0=G.sx+2,x1=G.px+4*k,y0=Math.min(G.yA,G.yB)-15*k,y1=Math.max(G.S.y,G.yB)+14*k;
   s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Silk arrow: tap the arrow or its silk, or press Enter, to wind the arrow home and separate the widgets"><title>Tap the arrow or the silk to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="8" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="8" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return s}
+/* ---------- Bloom rivets drawing (Rivet) ---------- */
+// Jarvis's stem keeps a silver plate with three round lobes, GitDiscuss's a moonstone-glass plate with three pointed lobes. Joined, the glass laps
+// over the silver and their eyes line up mid-gap. Each rivet is a silver bud pushed up through both eyes; a falling dewdrop makes it bloom flat
+// over them, and the petals are the spread head. Plates are drawn in local units: root at x 0 against the stem's edge, eyes at x BLE.
+const BLO=[0,2,1],BLE=23,BL0=.46,BLW=.125;
+const blK=h=>lerp(.55,1,clamp((h-HS)/(H-HS))),blYs=k=>[-22*k,0,22*k];
+function blPlate(k,pointed){const r=8.5*k,ys=blYs(k),T=ys[0]-r,n=14*k;
+ let d=`M0 ${f(-n)}C6 ${f(-n)} 6 ${f(T)} 12 ${f(T)}L${BLE} ${f(T)}`;
+ ys.forEach((y,i)=>{const a=y-r,b=y+r;if(i)d+=`L${BLE} ${f(a)}`;
+  d+=pointed?`Q${f(BLE+r*1.15)} ${f(a+r*.15)} ${f(BLE+r+3*k)} ${f(y)}Q${f(BLE+r*1.15)} ${f(b-r*.15)} ${BLE} ${f(b)}`:`A${f(r)} ${f(r)} 0 0 1 ${BLE} ${f(b)}`});
+ return d+`L12 ${f(-T)}C6 ${f(-T)} 6 ${f(n)} 0 ${f(n)}Z`}
+// A bloom rivet at (x, y): b runs 0 (a closed, twisted bud) to 1 (open flat); p lifts it proud toward the viewer.
+function blFlower(x,y,b,p,k,o={}){
+ const bc=clamp(b),L=lerp(3.4,8,b)*k,wd=lerp(2.3,3.3,bc)*k,tw=(1-bc)*36,hr=lerp(1.3,2.3,bc)*k;
+ const pet=(a,fill,st,dash)=>`<g transform="rotate(${f(a)})"><path d="M0 0Q${f(L*.45)} ${f(-wd)} ${f(L)} 0Q${f(L*.45)} ${f(wd)} 0 0Z" fill="${fill}" stroke="${st}" stroke-width="${dash?.7:.45}"${dash?' stroke-dasharray="2 1.6"':''}/>${dash?'':`<path d="M${f(L*.2)} 0L${f(L*.76)} 0" stroke="#a6b2d4" stroke-width=".35"/>`}</g>`;
+ if(o.ghost)return `<g transform="translate(${f(x)} ${f(y)})" opacity=".6">${[0,1,2,3,4].map(i=>pet(-90+i*72,'none','#dfe8ff',1)).join('')}</g>`;
+ let s=`<circle cx="${f(x+(1.2*p+.5)*k)}" cy="${f(y+(1.6*p+.7)*k)}" r="${f(lerp(2.6*k,L*.85,bc)*(1+.15*p)*(o.s??1))}" fill="${NIGHT}" opacity="${op(.3*(o.op??1))}"/>`;
+ if(o.gl>0&&o.halo)s+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(15*k)}" fill="url(#halo)" opacity="${op(o.gl)}"/>`;
+ s+=`<g transform="translate(${f(x-1.3*p*k)} ${f(y-1.7*p*k)}) scale(${op((o.s??1)*(1+.2*p))})" opacity="${op(o.op??1)}">`;
+ for(let i=0;i<5;i++)s+=pet(-90+i*72+tw,i%2?'#dfe6f8':'#f2f5ff','#8592b8');
+ s+=`<circle r="${f(hr+.7*k)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".4"/><circle r="${f(hr)}" fill="url(#moonstone)"/>`;
+ if(o.gl>0)s+=`<circle r="${f(hr)}" fill="${o.lc}" opacity="${op(.85*o.gl)}"/>`;
+ return s+'</g>'}
+// The pose held at ready carries into the join until the plates unfurl, so they don't drop back when the drag lets go.
+let blFrom=0;
+function drawBloom(c){
+ const h=c.h,jt=c.jt,dir=model.dir,k=blK(h),ys=blYs(k),run=model.a.run&&model.b.run,LC=run?'#e6edff':'#9aa3b8';
+ const xa=model.a.x+W-11.5,xb=model.b.x+11.5,ma=model.a.y+h/2,mb=model.b.y+h/2,ra=xa+3.5,rb=xb-3.5;
+ if(jt===0&&!model.busy)blFrom=c.glow;if(dir<0)blFrom=0;
+ // The near glow fades out as the plates unfurl, rather than cutting off on the first frame of the join.
+ const g=jt===0?(model.busy&&dir>0?blFrom:c.glow):dir>0?blFrom*(1-seg(jt,.3,.42)):0;
+ // How far the plates have unfurled: peeking near, opening fully from .3 to .42 (the casings have closed by .3, and part only after .3 on release).
+ const u=jt===0?.4*g:lerp(blFrom*.4,1,back(seg(jt,.3,.42),1.2)),gl=ease(seg(jt,BL0+3*BLW+.005,1));
+ let s='';
+ if(g>0)s+=[[xa,ma],[xb,mb]].map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="${f(8+10*g)}" fill="url(#halo)" opacity="${op(g*.7)}"/>`).join('');
+ const plate=(x0,m,sx,glass)=>{if(u<=.01)return '';const D=blPlate(k,glass);
+  let o=`<g transform="translate(${f(x0)} ${f(m)}) scale(${op(sx*u)} ${op(lerp(.6,1,clamp(u)))})" opacity="${op(seg(u,0,.2))}">`;
+  if(glass){o+=`<path d="${D}" transform="translate(${f(1.4*sx)} 1.8)" fill="${NIGHT}" opacity=".35"/><path d="${D}" fill="url(#moonstone)" fill-opacity=".8" stroke="url(#silver)" stroke-width="1.1"/>`;
+   if(gl>0)o+=`<path d="${D}" fill="${LC}" opacity="${op(.18*gl)}"/>`;
+   o+=`<path d="${ys.map(y=>`M4 0Q12 ${f(y*.3)} ${f(BLE-5*k)} ${f(y)}`).join('')}" fill="none" stroke="#f4f7ff" stroke-width=".45" opacity=".6"/>`;
+   o+=ys.map(y=>`<circle cx="${BLE}" cy="${f(y)}" r="${f(3.3*k)}" fill="none" stroke="url(#silverR)" stroke-width="${f(1.2*k)}"/><circle cx="${BLE}" cy="${f(y)}" r="${f(2.4*k)}" fill="#05060f"/>`).join('')}
+  else{o+=`<path d="${D}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".7"/><path d="M5 ${f(-9*k)}C10 ${f(-24*k)} 16 ${f(6*k)} 9 ${f(19*k)}M9 ${f(-4*k)}Q12 ${f(-7*k)} 14 ${f(-4*k)}" fill="none" stroke="#7f8fb8" stroke-width=".5"/>`;
+   o+=ys.map(y=>`<circle cx="${BLE}" cy="${f(y)}" r="${f(2.4*k)}" fill="#05060f" stroke="#59627e" stroke-width=".5"/>`).join('')}
+  return o+'</g>'};
+ s+=plate(ra,ma,1,false)+plate(rb,mb,-1,true);
+ // Near: the lobe tips glimmer as the plates peek out.
+ if(g>0)for(const[x0,m,sx]of[[ra,ma,1],[rb,mb,-1]])ys.forEach((y,i)=>s+=star(x0+sx*(BLE+(sx>0?8.5:11.5)*k)*u,m+y*lerp(.6,1,clamp(u)),(2+2*g)*k,g*(.5+.2*i)));
+ // Ready: the lapped plates and the three flowers, traced in moonlight at the meeting point.
+ if(jt===0&&g>=1){const xm=(xa+xb)/2,mm=(ma+mb)/2,dg=(sx,pt)=>`<path d="${blPlate(k,pt)}" transform="translate(${f(xm-sx*BLE)} ${f(mm)}) scale(${sx} 1)" fill="none" stroke="#dfe8ff" stroke-width=".9" stroke-dasharray="3 2.4" opacity=".55"/>`;
+  s+=dg(1,false)+dg(-1,true)+ys.map(y=>blFlower(xm,mm+y,1,0,k,{ghost:1})).join('')}
+ if(jt===0)return s;
+ const xm=(ra+rb)/2,mm=(ma+mb)/2;
+ // The eyes line up: a glint runs down them.
+ {const q=seg(jt,.42,.46);if(q>0&&q<1)s+=star(xm,lerp(mm+ys[0],mm+ys[2],q),4*k+1,Math.sin(PI*q))}
+ BLO.forEach((r,n)=>{const wu=seg(jt,BL0+n*BLW,BL0+(n+1)*BLW);if(wu<=0)return;
+  const ey=mm+ys[r],sz=ease(seg(wu,0,.3)),b=back(seg(wu,.55,.9),1.6),p=sz*(1-ease(seg(wu,.55,.85)));
+  s+=blFlower(xm,ey,b,p,k,{s:sz,op:seg(wu,0,.12),gl:r===1?gl:0,halo:run,lc:LC});
+  // Joining only: the dewdrop falls onto the bud, and its ripple and glint mark the bloom.
+  if(dir>0){const q=seg(wu,.3,.55);if(q>0&&q<1){const y=lerp(ey-Math.min(r===0?58:20+24*k,ey-8),ey-2.5*k,q*q),rr=(1.6+.4*q)*k+.5;
+    s+=`<g opacity="${op(seg(q,0,.25))}"><circle cx="${f(xm)}" cy="${f(y)}" r="${f(rr*3)}" fill="url(#halo)" opacity=".6"/><path d="M${f(xm)} ${f(y-rr*2.2)}Q${f(xm+rr)} ${f(y-rr*.4)} ${f(xm+rr)} ${f(y+rr*.2)}A${f(rr)} ${f(rr)} 0 0 1 ${f(xm-rr)} ${f(y+rr*.2)}Q${f(xm-rr)} ${f(y-rr*.4)} ${f(xm)} ${f(y-rr*2.2)}Z" fill="#eef4ff" fill-opacity=".85" stroke="#b9c8ec" stroke-width=".4"/><circle cx="${f(xm-rr*.35)}" cy="${f(y)}" r="${f(rr*.3)}" fill="#fff"/></g>`}
+   const rq=seg(wu,.55,.85);if(rq>0&&rq<1)s+=`<circle cx="${f(xm)}" cy="${f(ey)}" r="${f(lerp(3,13,ease(rq))*k)}" fill="none" stroke="#dfe8ff" stroke-width=".8" opacity="${op(.75*(1-rq))}"/>`+star(xm,ey,6*k*Math.sin(PI*seg(wu,.55,.7))+.5,Math.sin(PI*seg(wu,.55,.7)))}
+ });
+ // Last, a glint runs down the glass lobe tips.
+ if(dir>0&&jt<1){const q=seg(jt,.9,1);if(q>0)s+=star(xm-(8.5+3)*k,lerp(mm+ys[0],mm+ys[2],q),3.5*k+1,Math.sin(PI*q))}
+ if(jt===1){const x0=xm-20,y0=mm+ys[0]-12*k,hh=ys[2]-ys[0]+24*k;
+  s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Bloom rivets: tap the flowers, or press Enter, to close them, draw them out and separate the widgets"><title>Tap the flowers to release</title><rect x="${f(x0)}" y="${f(y0)}" width="40" height="${f(hh)}" rx="9" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="40" height="${f(hh)}" rx="9" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
  return s}
 /* ---------- Swan lock drawing ---------- */
 // Jarvis's stem carries a silver swan whose neck is the hasp; GitDiscuss's stem carries a lancet lock plate with an open catch ring
@@ -3711,8 +3795,8 @@ function setForkAngle(v){v=clamp(v,-amax(),amax());const sn=AH().snap,d=sn?Math.
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
  // A join may set its own closing profile (the silk arrow hauls in turn by turn); the rest close over the first 30%,
- // and every join parts over the last 55% of a release.
- model.jt=t;const p=model.path;if(!p)return;const e=model.dir>0&&J().close?J().close(t):ease(seg(t,0,model.dir<0?.55:.3));
+ // and every join parts over the last 55% of a release, unless it sets its own `part` (the bloom rivets part over the last 30%, as they closed).
+ model.jt=t;const p=model.path;if(!p)return;const e=model.dir>0&&J().close?J().close(t):ease(seg(t,0,model.dir<0?(J().part??.55):.3));
  for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
 }
 function tween(from,to,ms,fn){
