@@ -2513,6 +2513,130 @@ const JOINS={
      `<g class="ringfocus" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"><circle cx="${f(Cj.x)}" cy="${f(Cj.y)}" r="${f(rc)}"/><circle cx="${f(Cg.x)}" cy="${f(Cg.y)}" r="${f(rc)}"/></g></g>`}
    return o;
   }
+ },
+ /* Climbing claws: GitDiscuss comes in low and climbs an iron ratchet on Jarvis's strap, its claws clicking over the teeth (Slide). */
+ // The Slide join kind in Hollow, after elven's crescent cleats: the shells close offset and the last move is at right angles to the first.
+ // Jarvis's strap keeps a toothed iron rack slid away behind it; GitDiscuss's strap carries three jointed chitin legs folded up against it.
+ // dy holds GitDiscuss below its line while the shells close, then lifts it a tooth at a time; it is 0 at both ends.
+ claw:{label:'Climbing claws',kind:'Slide',gap:30,holdAt:.55,msOut:2600,slow:1.7,
+  about:'The Slide join kind in Hollow, after elven\'s crescent cleats: the shells come together offset and the fixing is a slide along each other\'s edges, so the last move is at right angles to the first. Elven leaves are hung and drop into place; a bug climbs. From the hooked claws a beetle grips bark with, and the pawl-and-ratchet of a cage lift in a mining town. Jarvis\'s strap keeps a toothed iron rack slid away behind it, the teeth flat on top like steps; GitDiscuss\'s strap carries three jointed chitin legs folded up against it, lashed at the root with red silk, each ending in a hooked claw and its smaller twin. <b>Near:</b> the legs twitch and the rack\'s teeth edge out. <b>Ready:</b> the rack, the outstretched legs and the climb are ghosted in chalk. <b>Joining:</b> the shells close with GitDiscuss riding three teeth low, the rack slides out and the legs unfold, the claws reaching the teeth. Then GitDiscuss climbs a tooth at a time: each heave lifts it a little past the next tooth, the claw tips riding out over the slope, and it drops back onto the step with a click, a spark and a puff of grit, three times. The claws clench, and the glass beads in the rack kindle from the top as the join light (amber while both run, cold blue-white if either is paused). Pulling the shells apart does nothing: a claw only lets go when lifted. Everything scales with any shade. Nothing moves at rest. <b>Release:</b> draw the claws down, tap them, or press Enter: the glass goes dark, the claws lift clear of the teeth, GitDiscuss slides down off the rack, the legs fold and the shells part.',
+  text:{join:'The shells close with GitDiscuss riding low; the legs unfold, and GitDiscuss climbs the rack a tooth at a time, its claws clicking over each one.',
+   joined:'Joined: three chitin claws hooked over the rack\'s teeth, the glass lit. Drag either nameplate to move the pair. Draw the claws down, tap them, or press Enter to release.',
+   release:'The glass goes dark, the claws lift clear of the teeth, GitDiscuss slides down off the rack, and the legs fold away.',back:'GitDiscuss climbs back down and the legs fold away.',
+   hold:'Held mid-join: GitDiscuss has climbed one tooth and is dropping onto the second, its claws clicking over. Use the scrubber to step through the climb.',
+   ready:'Ready: the rack, the legs and the climb are ghosted in chalk. Release to climb.',near:'Nearby: the legs twitch and the rack\'s teeth edge out. Move closer.',
+   phReady:'Ready · the climb is ghosted',phNear:'Nearby · the legs twitch',phDrag:'Draw the claws down, or tap them'},
+  phase(dir,jt){const r=1-jt;
+   if(dir<0)return r<.08?'Releasing · the glass goes dark ':r<.18?'Releasing · the claws lift clear ':r<.4?'Releasing · GitDiscuss slides down ':r<.47?'Releasing · the legs fold ':'Releasing · parting ';
+   if(jt<.06)return'Joining · closing in ';if(jt<.3)return'Joining · GitDiscuss rides low · the rack slides out, the legs unfold ';if(jt<.36)return'Joining · the claws reach the teeth ';
+   if(jt<.72){const c=seg(jt,.36,.72)*3,i=Math.min(2,Math.floor(c)),u=c-i;return'Joining · climbing, tooth '+(i+1)+' of 3'+(u<.5?' · heave ':' · click ')}
+   return jt<.84?'Joining · the claws clench ':'Joining · the glass kindles '},
+  releaseStart(){},
+  key(){$('#a .grip').focus();doSeparate()},
+  seamDown(p){return{seam:true,p0:p}},
+  // Drawing down on the claws pulls GitDiscuss off, as a tap does.
+  seamMove(d,p){if(p.y-d.p0.y>14){drag=null;$('#a .grip').focus();doSeparate()}},
+  seamUp(){$('#a .grip').focus();doSeparate()},
+  tone(){return model.a.run&&model.b.run?{glass:'#ffcf73',core:'#fff3cf'}:{glass:'#c4d8f2',core:'#f4f8ff'}},
+  K(h){return lerp(.62,1,clamp((h-HS)/(H-HS)))},
+  // Tooth pitch: a whole number of teeth between the claw rows, so every claw rests on a step.
+  pitch(h,k){const s=h/4;return s/Math.max(2,Math.round(s/(8*k)))},
+  // Teeth climbed at q (0 to 1): each heave lifts 1.15 teeth, then it drops .15 onto the step and waits.
+  climb(q){const c=clamp(q)*3,i=Math.min(2,Math.floor(c)),u=c-i;return i+(u<.5?1.15*ease(u/.5):u<.62?1.15-.15*Math.pow(seg(u,.5,.62),2):1)},
+  dy(t,h){if(t<=0||t>=1)return 0;const k=this.K(h),p=this.pitch(h,k);
+   if(model.dir>0)return t<.36?3*p*ease(seg(t,0,.24)):t<.72?p*(3-this.climb(seg(t,.36,.72))):0;
+   const r=1-t;return r<.18?0:r<.45?3*p*ease(seg(r,.18,.4)):3*p*(1-ease(seg(r,.45,1)))},
+  // How far the teeth push a claw tip out (toward GitDiscuss) when it is yr below its step: up each slope, and off it at the step's edge.
+  push(yr,p,T){if(yr<-.01||yr>=3*p-.01)return 0;const s=Math.max(0,Math.round(yr/p*1000)/1000),w=s-(Math.ceil(s)-1);return Math.max(0,T*(1-w)-.45*T)},
+  // The rack: an iron bar slid out of Jarvis's strap by e, toothed down its face with flat steps, a glass bead above each claw's step.
+  // o.foot stops it short of the lower shell's foot, so a joined, shaded rack doesn't hang below the strip.
+  rack(ax,ay,h,k,e,o={}){
+   const p=this.pitch(h,k),T=5*k,ys=rows(h),xf=ax+5-(1-e)*16,x0=ax-12,y0=ay+ys[0]-9*k;
+   let M=Math.round((ys[2]-ys[0])/p)+3;if(o.foot)while(M>1&&ay+ys[0]+M*p+4*k>o.foot)M--;
+   const y1=ay+ys[0]+M*p+4*k;
+   let d=`M${f(x0)} ${f(y0)}H${f(xf-2*k)}Q${f(xf)} ${f(y0)} ${f(xf)} ${f(y0+2*k)}V${f(ay+ys[0])}`;
+   for(let m=0;m<M;m++)d+=`H${f(xf+T)}L${f(xf)} ${f(ay+ys[0]+(m+1)*p)}`;
+   // It ends on one more flat step, so the bottom claw has a step under it at the low pose.
+   d+=`H${f(xf+T)}V${f(y1-2*k)}Q${f(xf+T)} ${f(y1)} ${f(xf+T-2*k)} ${f(y1)}H${f(x0)}Z`;
+   if(o.ghost)return `<path d="${d}" fill="none" stroke="#e9edf1" stroke-width="1.1" stroke-dasharray="2.5 3" opacity="${f(o.ghost)}"/>`;
+   let s=`<path d="${d}" fill="${INK}" opacity=".45" transform="translate(1.5 2.5)"/><path d="${d}" fill="url(#iron)" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>`+
+    `<path d="M${f(xf-2.6)} ${f(y0+3*k)}V${f(y1-3*k)}" stroke="#7d8ca3" stroke-width=".7" opacity=".5"/><circle cx="${f(xf-4.5)}" cy="${f(y1-3.4*k)}" r="${f(.9*k+.2)}" fill="#9aa6b6"/>`;
+   ys.forEach((y,i)=>{const c={x:xf-4.5,y:ay+y-p/2},li=seg(o.lit||0,i*.2,i*.2+.6),r=f(1.9*k+.3);
+    if(li>0)s+=`<circle cx="${f(c.x)}" cy="${f(c.y)}" r="${f(7*k+2)}" fill="${o.tn.glass}" opacity="${f(.55*li)}" filter="url(#blur3)"/>`;
+    s+=`<circle cx="${f(c.x)}" cy="${f(c.y)}" r="${r}" fill="#3c3022" stroke="${INK}" stroke-width=".8"/>`;
+    if(li>0)s+=`<circle cx="${f(c.x)}" cy="${f(c.y)}" r="${r}" fill="${o.tn.glass}" opacity="${f(li)}"/><circle cx="${f(c.x-.5*k)}" cy="${f(c.y-.6*k)}" r="${f(.7*k)}" fill="${o.tn.core}" opacity="${f(li)}"/>`});
+   return s},
+  // One of GitDiscuss's legs, rooted on its strap at R: femur and tibia out to a knuckle L px away, then a hooked claw (and its smaller twin)
+  // hanging to the tip. u unfolds it (0 is folded up along the strap); th turns the claw about its knuckle (negative lifts the tip toward GitDiscuss).
+  HOOK:'M1.9 -1.7C4 2.4 2.8 7 -4 9.4C-.9 6.3 -.5 3.4 -1.9 .1Z',
+  // o.fs is the folded scale (short enough in a strip to stay on the shell); o.cl clenches the claw about its own tip.
+  leg(R,k,L,u,th,o={}){
+   const K={x:-L,y:-1.4*k},Mj={x:-L*.48,y:-5.5*k},tf=`translate(${P(R)}) rotate(${f(84*(1-clamp(u)))}) scale(${f(lerp(o.fs??.72,1,u)*100)/100})`,lp=`M0 0L${P(Mj)}L${P(K)}`,
+    hk=`translate(${P(K)}) rotate(${f(th)}) scale(${f(k*100)/100})`+(o.cl?` rotate(${f(8*o.cl)} -4 9.4)`:'');
+   if(o.ghost)return `<g transform="${tf}" fill="none" stroke="#e9edf1" stroke-width="1.1" stroke-dasharray="2.5 3" opacity="${f(o.ghost)}" stroke-linejoin="round"><path d="${lp}"/><path d="${this.HOOK}" transform="${hk}"/></g>`;
+   let s=`<g transform="${tf}"><path d="${lp}" fill="none" stroke="${INK}" stroke-width="${f(3.8*k+1.2)}" stroke-linecap="round" stroke-linejoin="round" opacity=".4" transform="translate(1.4 2.4)"/>`+
+    `<path d="${lp}" fill="none" stroke="${INK}" stroke-width="${f(3.8*k+1.2)}" stroke-linecap="round" stroke-linejoin="round"/><path d="${lp}" fill="none" stroke="#cfd6df" stroke-width="${f(2.3*k+.5)}" stroke-linecap="round" stroke-linejoin="round" filter="url(#wobW)"/>`+
+    `<path d="M${f(-2*k)} ${f(-1.5*k)}L${f(Mj.x+3*k)} ${f(Mj.y+1.2*k)}" stroke="#f1f4f8" stroke-width=".6" opacity=".7"/>`;
+   // Two small spines under the tibia, and red silk lashed round the root.
+   for(const q of[.35,.65]){const x=lerp(Mj.x,K.x,q),y=lerp(Mj.y,K.y,q)+1.4*k;s+=`<path d="M${f(x)} ${f(y)}L${f(x-1.6*k)} ${f(y+2.6*k)}" stroke="${INK}" stroke-width="${f(.7*k+.3)}" stroke-linecap="round"/>`}
+   s+=`<circle cx="${f(Mj.x)}" cy="${f(Mj.y)}" r="${f(1.9*k+.3)}" fill="#b9c2ce" stroke="${INK}" stroke-width=".9"/>`+
+    `<path d="M${f(-1.2*k)} ${f(-3*k)}L${f(1.2*k)} ${f(2.4*k)}M${f(-3.6*k)} ${f(-3.4*k)}L${f(-1.4*k)} ${f(2*k)}" stroke="${RED}" stroke-width="${f(1.1*k+.2)}" stroke-linecap="round"/>`;
+   s+=`<g transform="${hk}"><path d="${this.HOOK}" transform="rotate(-16) scale(.8)" fill="#8a96a6" stroke="${INK}" stroke-width="${f(1/k)}"/>`+
+    `<path d="${this.HOOK}" fill="#ddd6c6" stroke="${INK}" stroke-width="${f(1.2/k)}" stroke-linejoin="round"/><path d="M1.3 -.4C2.6 2.6 1.6 5.6 -2.2 7.9" fill="none" stroke="#fff" stroke-width="${f(.5/k)}" opacity=".7"/>`+
+    `<circle r="2" fill="#b9c2ce" stroke="${INK}" stroke-width="${f(.9/k)}"/></g>`;
+   return s+`<circle r="${f(2.6*k)}" fill="url(#iron)" stroke="${INK}" stroke-width=".9"/></g>`},
+  // A click: a spark at the tip and a few chalk ticks off GitDiscuss's side of it.
+  click(p,v,k){if(v<=0||v>=1)return'';const rr=(4+6*ease(v))*k;let t='';
+   for(const g of[-60,-20,20,60]){const a=g*Math.PI/180;t+=`M${f(p.x+Math.cos(a)*rr*.5)} ${f(p.y+Math.sin(a)*rr*.5)}L${f(p.x+Math.cos(a)*rr)} ${f(p.y+Math.sin(a)*rr)}`}
+   let s=spark(p,1-v,(3+5*v)*k)+`<path d="${t}" stroke="#e9edf1" stroke-width="${f(.8+1.1*(1-v))}" stroke-linecap="round" fill="none" opacity="${f(1-v)}"/>`;
+   // A fleck of grit drops off the step.
+   if(v<.9)s+=`<circle cx="${f(p.x-1.5*k)}" cy="${f(p.y+2*k+16*k*v*v)}" r="${f(.9*k+.2)}" fill="#c9d1db" opacity="${f(.85*(1-v))}"/>`;
+   return s},
+  under(c){
+   const jt=c.jt,h=c.h,dir=model.dir;if(jt===0&&model.st>0)return '';
+   let e=0,lit=0;
+   if(jt===0)e=.4*c.glow;else if(jt===1){e=1;lit=1}
+   // A join from Ready starts from the ready pose, so the rack doesn't pop back in.
+   else if(dir>0){e=Math.max(model.poised?.4:0,backOut(seg(jt,.04,.24)));lit=ease(seg(jt,.84,.98))}
+   else{const r=1-jt;e=1-ease(seg(r,.45,.62));lit=1-seg(r,0,.08)}
+   return this.rack(model.a.x+W,model.a.y,h,this.K(h),e,{lit,tn:this.tone(),foot:Math.max(model.a.y,model.b.y)+h-3})},
+  over(c){
+   const jt=c.jt,h=c.h,dir=model.dir,k=this.K(h),p=this.pitch(h,k),T=5*k,ax=model.a.x+W,ay=model.a.y,bx=model.b.x,by=model.b.y,ys=rows(h),now=performance.now();
+   // The legs live on the strap; on separate shaded shells (some shades hide the straps) they are put away.
+   if(jt===0&&model.st>0)return '';
+   this.live=false;
+   const L=this.gap-.45*T-4*k,root=(x,y,i)=>({x:x+5,y:y+ys[i]-8*k}),tipX=ax+5+.45*T;
+   let u=0,open=0,cl=0;
+   if(jt===0){const g=c.glow;u=.18*g;if(g>0&&drag&&!reduce.matches){this.live=true;u+=.07*g*Math.sin(now/70)}}
+   else if(jt===1){u=1;cl=1}
+   else if(dir>0){u=Math.max(model.poised?.18:0,backOut(seg(jt,.06,.3)));cl=ease(seg(jt,.72,.8))}
+   else{const r=1-jt;cl=1-ease(seg(r,.06,.12));open=ease(seg(r,.08,.18))*(1-ease(seg(r,.4,.47)));u=1-ease(seg(r,.4,.55))}
+   // The tips touch the teeth only once the legs are out and the shells are at their joined spacing.
+   const touch=u>.97&&Math.abs(bx-ax-this.gap)<.6,yr=by-ay,d=Math.max(touch?this.push(yr,p,T):0,open*1.4*T),
+    // Turned about the knuckle so the tip moves out by exactly d (the tip sits B off straight down from the knuckle).
+    B=Math.atan2(4,9.4),th=-(B-Math.asin(clamp(Math.sin(B)-d/(10.2*k),-1,1)))*180/Math.PI,fs=Math.min(.72,Math.max(.1,(ys[0]-8*k-2)/L));
+   let s='';
+   if(jt===0&&c.glow>0){s+=glints([{x:ax+1,y:ay+h/2},{x:bx+6,y:by+h/2}],c.glow*.8);
+    if(c.glow>=1){s+=this.rack(ax,ay,h,k,1,{ghost:.55});const ar=tipX+9*k;
+     ys.forEach((y,i)=>{s+=this.leg(root(ax+this.gap,ay,i),k,L,1,0,{ghost:.6});
+      s+=`<path d="M${f(ar)} ${f(ay+y+3*p)}V${f(ay+y+2*k)}M${f(ar-2.6)} ${f(ay+y+4.6*k)}L${f(ar)} ${f(ay+y+2*k)}L${f(ar+2.6)} ${f(ay+y+4.6*k)}" fill="none" stroke="#e9edf1" stroke-width="1" stroke-dasharray="2 2.2" stroke-linecap="round" opacity=".55"/>`})}}
+   ys.forEach((y,i)=>s+=this.leg(root(bx,by,i),k,L,u,th,{fs,cl}));
+   if(jt===0)return s;
+   const tips=ys.map(y=>({x:tipX,y:by+y}));
+   if(dir>0&&jt<1){
+    // Climbing: a click at every tip as GitDiscuss drops onto each step.
+    const c3=seg(jt,.36,.72)*3;for(let i=0;i<3;i++){const v=seg(c3-i,.5,.85);if(v>0&&v<1)tips.forEach(q=>s+=this.click(q,v,k))}
+    // Clenching: a tick round each tip, top first; then a glint runs down the beads.
+    tips.forEach((q,i)=>{const v=seg(jt,.72+i*.02,.8+i*.02);if(v>0&&v<1)s+=this.click(q,v,k*.8)});
+    const g=seg(jt,.9,1);if(g>0&&g<1)s+=spark({x:ax+.5,y:lerp(ay+ys[0]-p/2,ay+ys[2]-p/2,g)},Math.sin(Math.PI*g),5*k*Math.sin(Math.PI*g)+1)}
+   if(dir<0&&jt<1){const r=1-jt,q=seg(r,.18,.4);
+    // Lifted clear: a glint at each tip. Sliding down: pale streaks trail above the claws.
+    tips.forEach((t,i)=>{const v=seg(r,.08+i*.02,.18+i*.02);if(v>0&&v<1)s+=spark({x:t.x+2*k,y:t.y-3*k},Math.sin(Math.PI*v),4*k*Math.sin(Math.PI*v)+.5)});
+    if(q>0&&q<1){const v=Math.sin(Math.PI*q);tips.forEach(t=>{for(const dx of[3,7]){const x=t.x+dx*k;s+=`<path d="M${f(x)} ${f(t.y-8*k)}L${f(x)} ${f(t.y-8*k-16*k*v)}" stroke="#e9edf1" stroke-width=".8" stroke-linecap="round" opacity="${f(.55*v)}"/>`}})}}
+   if(jt===1){const x0=ax-3,y0=ay+ys[0]-14*k,x1=bx+9,y1=Math.min(ay+ys[2]+3*p+5*k,ay+h-1);
+    s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Climbing claws: draw them down, tap them, or press Enter, to lift the claws, slide GitDiscuss down off the rack and separate the widgets"><title>Draw the claws down, or tap them, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
+   return s;
+  }
  }
 };
 const SHADES={
@@ -4322,6 +4446,8 @@ function setJt(t){
  // and every join parts over the last 55% of a release.
  model.jt=t;const p=model.path;if(!p)return;const e=model.dir>0&&J().close?J().close(t):ease(seg(t,0,model.dir<0?.55:.3));
  for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
+ // A Slide join (the climbing claws) carries GitDiscuss below its line and back up; dy is 0 at both ends.
+ if(J().dy)model.b.y+=J().dy(t,ctx().h);
 }
 function tween(from,to,ms,fn){
  const token=++anim;model.busy=true;
@@ -4371,7 +4497,10 @@ function toggleShade(force){
  if(to===1&&model.g!==0){const keep=keepSize();++shadeAnim;
   morphTo('sheet').then(ok=>{if(ok){model.restore=keep;toggleShade(1)}});return}
  const token=++shadeAnim,ms=((to?sh.msIn:sh.msOut)||520)*Math.abs(to-start),t0=performance.now(),e=sh.linear?(t=>t):ease;model.sdir=to?1:-1;
- (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms),[h0,c0]=footOff();model.st=lerp(start,to,e(t));const[h1,c1]=footOff();shiftFeet(h1-h0,c1-c0);refitPair();render();if(t<1)requestAnimationFrame(step);else if(to===0&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}})(t0);
+ (function step(now){if(token!==shadeAnim)return;const t=reduce.matches?1:clamp((now-t0)/ms),[h0,c0]=footOff();model.st=lerp(start,to,e(t));const[h1,c1]=footOff();shiftFeet(h1-h0,c1-c0);refitPair();
+  // A slide held mid-join rides at a depth scaled to the strip, so its pose is recomputed as the shade changes.
+  if(J().dy&&model.path&&model.jt>0&&model.jt<1)setJt(model.jt);
+  render();if(t<1)requestAnimationFrame(step);else if(to===0&&model.restore){const r=model.restore;model.restore=null;morphTo(r)}})(t0);
  say(to?sh.sayIn:sh.sayOut);
 }
 // How far the shell has cinched toward its shaded height.
