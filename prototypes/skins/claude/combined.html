@@ -541,7 +541,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -3950,6 +3950,168 @@ MIXES.swan={label:'Swan boat',kind:'Containment',pair:'elfhollow',smooth:true,sl
   sepPh:'Separate · a leaf moored at the stem',nearPh:'Nearby · the leaf loosens',readyPh:'Ready · chalked on the water',
   mid:(jt,dir)=>dir>0?(jt<.4?'Joining · the leaf unfurls ':jt<.58?'Joining · lowering it in ':jt<.62?'Joining · the boat dips ':jt<.86?'Joining · tendrils curl up ':'Joining · the swan\'s eye kindles '):(jt>.86?'Releasing · the light goes out ':jt>.6?'Releasing · the tendrils let go ':jt>.42?'Releasing · lifting it out ':'Releasing · the boat furls '),
   turn:d=>'Pulling the swan · '+Math.round(d.deg*100)+'%'}};
+
+/* ---------- Mix: half-couplers as a swarm (model A): wire's weaver ants meet felt's bees in the gap ---------- */
+// Nothing is fixed to either casing. Each skin sends its own living chain from its own side: wire's beaded weaver ants hold
+// each other by the waist, felt's bees hang by their legs as they do when they festoon. The mating face is the grip in the
+// middle, where the front ant's jaws take the front bee's forelegs; then the bees draw a wax cell over it, and its honey is the join light.
+// Slots along the chain, from Jarvis's frame: ant 0, ant 1 (front), bee 1 (front), bee 0. at: when each arrives, the bottom row a beat later.
+const AB={gap:50,rows:[.3,.7],u:[.15,.38,.63,.86],sc:[.85,.8],meet:[.47,.55],haul:[.56,.7],wax:[.72,.86],kindle:[.86,1],
+ at:[[.05,.22],[.23,.4],[.26,.42],[.07,.25]],lag:.03};
+const AB_DEFS=`<defs><radialGradient id="ab-jet" cx=".35" cy=".3" r=".75"><stop stop-color="#8a8f9c"/><stop offset=".35" stop-color="#23252c"/><stop offset="1" stop-color="#050506"/></radialGradient>`+
+ `<radialGradient id="ab-carn" cx=".35" cy=".3" r=".75"><stop stop-color="#ffd0b0"/><stop offset=".4" stop-color="#c4501f"/><stop offset="1" stop-color="#5a1a06"/></radialGradient>`+
+ `<radialGradient id="ab-gold" cx=".35" cy=".3" r=".75"><stop stop-color="#fff4c8"/><stop offset=".5" stop-color="#d9a640"/><stop offset="1" stop-color="#6e4a12"/></radialGradient></defs>`;
+const abFine=(d,w,c='#d08850')=>`<path d="${d}" fill="none" stroke="#1a0d05" stroke-width="${f(w+.7)}" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${c}" stroke-width="${f(w)}" stroke-linecap="round" stroke-linejoin="round"/>`;
+// One beaded wire ant (as on the wire page), thorax at the origin, facing +x. o: walk and gait phase, front/hind leg reach, antenna wave, lit gaster.
+function abAnt(x,y,ang,sc,o={}){
+ const w=o.walk||0,ph=o.ph||0,wv=o.wave||0;let legs='',ant='';const tips=[];
+ for(const sd of [-1,1])for(let k=0;k<3;k++){
+  const hx=1.4-1.4*k,b=[[6,8],[.6,9.6],[-6,8.6]][k],gp=ph+((k+(sd>0?1:0))%2)*PI;
+  let fx=b[0]+w*2.6*Math.sin(gp),fy=b[1]-w*.9*Math.max(0,Math.cos(gp));
+  if(k===0&&o.fwd){fx+=o.fwd;fy-=Math.min(3,o.fwd*.45)}
+  if(k===2&&o.back){fx-=o.back;fy-=o.back*.3}
+  legs+=`M${f(hx)} ${f(sd*1.7)}L${f(lerp(hx,fx,.42)+(k===0?.8:k===2?-.8:0))} ${f(sd*6.4)}L${f(fx)} ${f(sd*fy)}`}
+ for(const sd of [-1,1]){const a0=sd*(.85+wv),a1=sd*(.18+wv*.6),e=[7.2+4.2*Math.cos(a0),sd*1.1+4.2*Math.sin(a0)],t=[e[0]+4.6*Math.cos(a1),e[1]+4.6*Math.sin(a1)];
+  ant+=`M7.2 ${f(sd*1.1)}L${f(e[0])} ${f(e[1])}L${f(t[0])} ${f(t[1])}`;tips.push(t)}
+ const lit=o.lit||0,bead=(cx,rx,ry,st)=>`<ellipse cx="${cx}" rx="${rx}" ry="${ry}" fill="url(#ab-${st})" stroke="#1a0d05" stroke-width=".5"/>`;
+ return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(ang*180/PI)}) scale(${sc})" opacity="${f(o.op??1)}">`+
+  `<ellipse cx="-2" cy="2" rx="12" ry="4.6" fill="#000" opacity=".3" filter="url(#sh)"/>`+
+  abFine(legs,.55)+abFine(ant,.45)+abFine('M8.2 -1.3Q10.6 -1.7 10.4 -.2M8.2 1.3Q10.6 1.7 10.4 .2',.45)+
+  tips.map(t=>`<circle cx="${f(t[0])}" cy="${f(t[1])}" r=".85" fill="url(#ab-gold)"/>`).join('')+abFine('M-12.2 0H7.4',.55)+
+  bead(-8,4.4,3.5,'jet')+(lit>0?`<ellipse cx="-8" rx="4.4" ry="3.5" fill="url(#${o.stone})" opacity="${f(lit)}"/>`:'')+
+  abFine('M-6.3 -3.2Q-5.5 0 -6.3 3.2M-9.9 -3.3Q-9.1 0 -9.9 3.3',.5,'#e6c36a')+`<ellipse cx="-9.3" cy="-1.4" rx="1.3" ry=".8" fill="#fff" opacity=".5"/>`+
+  `<circle cx="-3.2" r="1.15" fill="url(#ab-gold)" stroke="#2a1a06" stroke-width=".35"/>`+bead(0,3,2,'carn')+bead(5.4,2.5,2.3,'carn')+
+  `<circle cx="6.3" cy="-1.5" r=".6" fill="#1a0d05"/><circle cx="6.3" cy="1.5" r=".6" fill="#1a0d05"/><ellipse cx="-.6" cy="-.7" rx=".9" ry=".5" fill="#fff" opacity=".45"/></g>`}
+// One felt bee (as on the felt page), head toward +x, in GitDiscuss's own felt (its appliqué filter). fly: wings a blur that flickers.
+function abBee(x,y,deg,flip,sc,fly,op=1){
+ if(op<.02)return '';const fr=Math.floor(performance.now()/FRAME);
+ const W1=fly?(fr%2?'<ellipse cx="-1.5" cy="-8.2" rx="3" ry="6.4" transform="rotate(-18 -1.5 -3)"/><ellipse cx="1" cy="-7.6" rx="2.6" ry="5.6" transform="rotate(16 1 -3)"/>':
+   '<ellipse cx="-4" cy="-5.2" rx="6.6" ry="2.4" transform="rotate(-34 0 -3)"/><ellipse cx="-3" cy="-4.4" rx="5.8" ry="2.2" transform="rotate(-14 0 -3)"/>'):
+  '<ellipse cx="-3.4" cy="-4.6" rx="6.4" ry="2.8" transform="rotate(-16 -3.4 -4.6)"/><ellipse cx="-5" cy="-3.3" rx="5.6" ry="2.4" transform="rotate(-30 -5 -3.3)"/>';
+ // The felt is lit outside the mirror, so the light falls from the same side as on GitDiscuss's cushion.
+ const sx=`scale(${f((flip?-sc:sc)*1000)/1000} ${f(sc*1000)/1000})`;
+ return `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(deg)})" opacity="${f(op)}"><g transform="${sx}">`+
+  `<ellipse cx="1" cy="2.6" rx="9" ry="5.6" fill="#000" opacity=".34" filter="url(#sh)"/>`+
+  (fly?`<path d="M-11 -2.4q-2 2.4 0 4.8M-14 -3.4q-2.6 3.4 0 6.8" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width=".8" stroke-linecap="round"/>`:'')+
+  `</g><g filter="url(#g-b)"><g transform="${sx}"><ellipse rx="7.6" ry="5.4" fill="#e0a63a"/><circle cx="7.4" cy="-.3" r="3.7" fill="#3b2416"/></g></g><g transform="${sx}">`+
+  `<ellipse cx="-3.7" rx="1.6" ry="4.5" fill="#3b2416"/><ellipse cx=".7" rx="1.6" ry="5.1" fill="#3b2416"/><path d="M-7.6 0l-2 .2" stroke="#3b2416" stroke-width="1.4" stroke-linecap="round"/>`+
+  `<ellipse cx="-1" cy="-2.7" rx="4.2" ry="1.3" fill="#fff8ec" opacity=".3"/><path d="M-6 2.7Q0 5.6 5.4 2.6" fill="none" stroke="#f7e8c9" stroke-opacity=".6" stroke-width=".7" stroke-dasharray="1.5 1.3"/>`+
+  `<circle cx="8.7" cy="-1.3" r=".95" fill="#fff4dc"/><path d="M8.6 -3.4q1.2-3.6 3.8-4.2M7 -3.7q0-3.8 2-5.4" fill="none" stroke="#3b2416" stroke-width=".8" stroke-linecap="round"/>`+
+  `<circle cx="12.4" cy="-7.6" r="1" fill="#e0a63a"/><circle cx="9" cy="-9.1" r="1" fill="#e0a63a"/>`+
+  `<g fill="#f4ead8" fill-opacity="${fly?.55:.86}" stroke="#a8936a" stroke-width=".6" stroke-dasharray="1.4 1.1">${W1}</g></g>`}
+const abHex=(x,y,r)=>{let d='';for(let i=0;i<6;i++){const a=(60*i-90)*PI/180;d+=(i?'L':'M')+f(x+r*Math.cos(a))+' '+f(y+r*Math.sin(a))}return d+'Z'};
+// Walked paths: the point at arc length s, and the heading there.
+const abLen=P=>P.reduce((a,p,i)=>i?a+Math.hypot(p.x-P[i-1].x,p.y-P[i-1].y):0,0);
+function abAt(P,s){let acc=0;for(let i=1;i<P.length;i++){const l=Math.hypot(P[i].x-P[i-1].x,P[i].y-P[i-1].y);if(s<=acc+l||i===P.length-1){const t=l?clamp((s-acc)/l):0;return{x:lerp(P[i-1].x,P[i].x,t),y:lerp(P[i-1].y,P[i].y,t)}}acc+=l}return{...P[0]}}
+const abHead=(P,s,L)=>{const a=abAt(P,clamp(s-4,0,L)),b=abAt(P,clamp(s+4,0,L));return Math.atan2(b.y-a.y,b.x-a.x)};
+const abTurn=(a,b,t)=>{let d=b-a;while(d>PI)d-=2*PI;while(d<-PI)d+=2*PI;return a+d*t};
+// The bottom row lets go in a shade: its ants walk back down the frame and its bees fly off; the top row draws in to the strip's centre line.
+function abGeo(c){
+ const A=model.a,B=model.b,h=c.h,k=ease(shk()),ax=A.x+W-7,bx=B.x+8,jt=c.jt;
+ const m=jt===1?1:ease(seg(jt,...AB.meet)),sag=lerp(7,4,jt===1?1:ease(seg(jt,...AB.haul)))*lerp(1,.6,k);
+ const rows=AB.rows.map((r0,i)=>{const r=i?lerp(r0,.82,k):lerp(r0,.5,k),ya=A.y+h*r,yb=B.y+h*r;
+  // Before they meet each half sticks out from its own casing, drooping toward its tip and swaying as it searches; once met it is one festoon.
+  const sw=Math.sin(performance.now()/260+i*1.9)*seg(jt,.36,.44)*(1-m);
+  const yAt=u=>{const left=u<.5,d=left?u/AB.u[1]:(1-u)/(1-AB.u[2]),free=(left?ya+(2+3*sw)*d*d:yb+(6-4*sw)*d*d);return lerp(free,lerp(ya,yb,u)+sag*4*u*(1-u),m)};
+  const slot=j=>{const u=AB.u[j],x=ax+u*(bx-ax),y=yAt(u),y2=yAt(u+.02);return{x,y,a:Math.atan2(y2-y,.02*(bx-ax))}};
+  return{i,ya,yb,slot,S:[0,1,2,3].map(slot)}});
+ return{A,B,h,k,ax,bx,jt,m,rows}}
+// How far along its way in each creature is. The two that live on the casings (the top row's back ant and back bee) are home at 0; the rest arrive from off the casings.
+const abP=(jt,i,j)=>jt===1?1:seg(jt,AB.at[j][0]+i*AB.lag,AB.at[j][1]+i*AB.lag);
+let abK0=0,abOff=0; // the last shade amount, and whether the bottom row is on its way off (shading in) or back
+function abDraw(c){
+ const G=abGeo(c),jt=c.jt,run=model.a.run&&model.b.run,now=performance.now(),k=G.k;
+ if(k>abK0+1e-4)abOff=1;else if(k<abK0-1e-4)abOff=0;abK0=k;
+ const lit=jt===1?1:seg(jt,...AB.kindle),wax=jt===1?1:ease(seg(jt,...AB.wax));
+ // A join released from ready carries the ready pose (chalk, the stirring ant and bee) into its first frames, when glow is already 0.
+ const held=model.dir>0&&jt<1&&model.lit0>0&&(jt>0||model.busy),stir=jt===0&&!held?c.glow:held?1-seg(jt,0,.07):0;
+ let o=AB_DEFS,top='';
+ // Ready: both chains chalked across the gap where they will hang, a dot for every place (only the top one when shaded).
+ const chalk=jt===0&&c.glow>=1?1:held?1-seg(jt,0,.1):0;
+ if(chalk>0){const F=abGeo({...c,jt:1}),FR=k>.5?F.rows.slice(0,1):F.rows;
+  top+=`<g opacity="${f(chalk)}"><g fill="none" stroke="#f7e8c9" stroke-width="1.1" stroke-dasharray="3 2.6" opacity=".7">${FR.map(R=>`<path d="M${f(F.ax)} ${f(R.ya)}${R.S.map(s=>'L'+f(s.x)+' '+f(s.y)).join('')}L${f(F.bx)} ${f(R.yb)}"/>`).join('')}</g>`+
+   FR.map(R=>R.S.map(s=>`<circle cx="${f(s.x)}" cy="${f(s.y)}" r="1.6" fill="#f7e8c9" opacity=".8"/>`).join('')).join('')+'</g>'}
+ const ants=[],bees=[],grips=[];
+ G.rows.forEach(R=>{const i=R.i,home=i===0;
+  // In a shade the bottom row goes back the way it came. Going home (a release, or the bottom row shading in) they face home.
+  const pe=j=>{const p=abP(jt,i,j);return i?Math.min(p,1-k):p},full=j=>abP(jt,i,j)>=1,back=model.dir<0||(i===1&&k>0&&abOff);
+  // The bottom row's grips let go quickly as a shade starts, while its wax shrinks with the shade.
+  const gop=i?clamp(1-4*k):1,G0=grips.length;
+  // Wire's half: the ants walk down (or up) Jarvis's frame end and out along the chain, the front one over the back one.
+  [0,1].forEach(j=>{const p=pe(j),sl=R.S[j],homePt={x:G.ax,y:G.A.y+G.h*.56};if(p<=0&&!(home&&j===0))return;
+   // Newcomers start where the frame's corner arc meets its straight end, and fade in there.
+   const st=home&&j===0?homePt:{x:G.ax,y:i?G.A.y+G.h-21:G.A.y+21},P=[st,{x:G.ax,y:R.ya},{x:G.ax+6,y:R.ya},sl],L=abLen(P),s=p*L,q=p>=1?sl:abAt(P,s);
+   let a=abHead(P,s,L);if(p>.8)a=abTurn(a,sl.a,seg(p,.8,1));
+   if(back)a=abTurn(a,a+PI,Math.min(seg(1-p,0,.12),seg(p,0,.12)));
+   const settle=seg(p,.85,1),near=home&&j===0?stir:0;
+   ants.push({x:q.x,y:q.y,a,o:{walk:p>0?1-settle:0,ph:s/3,wave:near?.25*Math.sin(now/110):p>0&&p<1?.15*Math.sin(s/4):j===1?.2*(1-G.m)*Math.sin(now/180):0,
+    fwd:j===1?settle*lerp(3.5,5,G.m):0,back:j===0?3*settle:0,op:clamp(p*7+(home&&j===0?1:0)),lit:lit*(i?1-k:1),stone:run?'st-amber':'st-lapis'}});
+   // Each ant holds the waist of the one ahead in its jaws; the back one keeps its hind feet on the frame.
+   if(j===1&&full(1)&&full(0)){const b=R.S[0],e={x:b.x+Math.cos(b.a)*9*AB.sc[0],y:b.y+Math.sin(b.a)*9*AB.sc[0]},w={x:sl.x-Math.cos(sl.a)*3*AB.sc[0],y:sl.y-Math.sin(sl.a)*3*AB.sc[0]};
+    grips.push(abFine(`M${f(e.x)} ${f(e.y-1)}Q${f((e.x+w.x)/2)} ${f((e.y+w.y)/2-2.4)} ${f(w.x)} ${f(w.y)}M${f(e.x)} ${f(e.y+1)}Q${f((e.x+w.x)/2)} ${f((e.y+w.y)/2+2.4)} ${f(w.x)} ${f(w.y)}`,.5))}});
+  // Felt's half: the bees fly in from above (or below) and hang on, the front one from the back one's legs.
+  [3,2].forEach(j=>{const p=pe(j),sl=R.S[j],homePt={x:G.B.x+30,y:G.B.y+G.h*.5};if(p<=0&&!(home&&j===3))return;
+   const st=home&&j===3?homePt:{x:sl.x+34,y:i?Math.min(sl.y+62,592):sl.y-62},C={x:Math.max(st.x,sl.x)+18,y:lerp(st.y,sl.y,.75)},e=ease(p),m1=1-e;
+   let q=p>=1?sl:{x:m1*m1*st.x+2*m1*e*C.x+e*e*sl.x,y:m1*m1*st.y+2*m1*e*C.y+e*e*sl.y};
+   const near=home&&j===3?stir:0,flying=(p>0&&p<1)||near>.3;
+   if(near)q={x:q.x,y:q.y-3*near+Math.sin(now/70)*near};
+   // Facing Jarvis: mirrored, tilted with the chain; in flight, banked along its way (unmirrored, facing home, when going back).
+   // The resting home bee sits level; the bank blends in after take-off and out before landing.
+   const bank=Math.atan2(st.y-sl.y,st.x-sl.x)*.5,rest=home&&j===3&&p<=0?0:sl.a,bw=Math.min(seg(p,0,.15),1-seg(p,.8,1));
+   const deg=lerp(rest,bank,bw)*180/PI,goingHome=back&&p>0&&p<1;
+   bees.push({x:q.x,y:q.y,deg:clamp(deg,-40,40),flip:!goingHome,fly:flying,op:clamp(p*6+(home&&j===3?1:0)),sc:AB.sc[1]});
+   // Hanging on: two dark legs from the front bee's tail end to the back bee's head.
+   if(j===2&&full(2)&&full(3)){const b=R.S[3],hd={x:b.x-Math.cos(b.a)*10*AB.sc[1],y:b.y-Math.sin(b.a)*10*AB.sc[1]+2},tl={x:sl.x+Math.cos(sl.a)*7*AB.sc[1],y:sl.y+Math.sin(sl.a)*7*AB.sc[1]+2};
+    grips.push(`<path d="M${f(tl.x)} ${f(tl.y)}l${f((hd.x-tl.x)/2)} 3L${f(hd.x)} ${f(hd.y)}M${f(tl.x)} ${f(tl.y-1.5)}l${f((hd.x-tl.x)/2)} 2.4L${f(hd.x)} ${f(hd.y-1.8)}" fill="none" stroke="#3b2416" stroke-width=".9" stroke-linecap="round"/>`)}});
+  // The mating face: once both front creatures are out and searching, their forelegs reach; at the meet they grip.
+  if(full(1)&&full(2)){const sa=R.S[1],sb=R.S[2],ah={x:sa.x+Math.cos(sa.a)*10.5*AB.sc[0],y:sa.y+Math.sin(sa.a)*10.5*AB.sc[0]},bh={x:sb.x-Math.cos(sb.a)*10*AB.sc[1],y:sb.y-Math.sin(sb.a)*10*AB.sc[1]+1.5};
+   const reach=G.m,mx=lerp(ah.x+2,(ah.x+bh.x)/2,reach),my=lerp(ah.y,(ah.y+bh.y)/2,reach);
+   grips.push(abFine(`M${f(ah.x)} ${f(ah.y)}L${f(mx)} ${f(my)}`,.55)+`<path d="M${f(bh.x)} ${f(bh.y)}L${f(lerp(bh.x-2,mx,reach))} ${f(lerp(bh.y,my,reach))}" stroke="#3b2416" stroke-width=".9" stroke-linecap="round"/>`);
+   if(model.dir>0&&jt>AB.meet[1]-.02&&jt<AB.meet[1]+.05)top+=sparkle(mx,my-2,.5*Math.sin(PI*seg(jt,AB.meet[1]-.02,AB.meet[1]+.05)));
+   // The wax cell the bees draw over the grip, its honey lit as the join light: amber while both run, cold blue if either is paused.
+   const wk=wax*(i?1-k:1);if(wk>.01){const r=5.4*wk*lerp(.8,1,1-k),cy=my+r+2.2;
+    if(lit>.01)top+=`<circle cx="${f(mx)}" cy="${f(cy)}" r="${f(12*wk)}" fill="${run?'#ffc861':'#9fb8ff'}" opacity="${f(.32*lit*(i?1-k:1))}" filter="url(#soft)"/>`;
+    top+=`<path d="${abHex(mx,cy,r+1)}" fill="#3b2416" opacity=".55" filter="url(#sh)"/><path d="${abHex(mx,cy,r)}" fill="#e8c25a" filter="url(#g-b)"/>`+
+     `<path d="${abHex(mx,cy,r*.62)}" fill="url(#${run?'st-amber':'st-lapis'})" opacity="${f(.25+.75*lit)}"/><path d="${abHex(mx,cy,r-1.2)}" fill="none" stroke="#fff4dc" stroke-width=".6" stroke-dasharray="1.4 1.2" opacity=".75"/>`;
+    if(model.dir>0&&lit>0&&lit<1)top+=sparkle(mx+r*.5,cy-r*.6,.45*Math.sin(PI*lit))}}
+  if(gop<1){const g=grips.splice(G0).join('');if(gop>.01)grips.push(`<g opacity="${f(gop)}">${g}</g>`)}
+ });
+ o+=grips.join('')+ants.map(t=>abAnt(t.x,t.y,t.a,AB.sc[0],t.o)).join('')+bees.map(b=>abBee(b.x,b.y,b.deg,b.flip,b.sc,b.fly,b.op)).join('');
+ if(jt===1){const ys=(k>.5?G.rows.slice(0,1):G.rows).flatMap(R=>R.S.map(s=>s.y)),y0=Math.min(...ys)-14,y1=Math.max(...ys)+18,x0=G.ax-8,w=G.bx+8-x0;
+  top+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="The ants and bees: pull them, tap them, or press Enter, to send them home and separate the widgets"><title>Pull the chains to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(w)}" height="${f(y1-y0)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(w)}" height="${f(y1-y0)}" rx="8" fill="none" stroke="#f7e8c9" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
+ return o+top}
+MIXES.antbee={label:'Ants meet bees',kind:'Half-coupler · Swarm',pair:'hoopfelt',smooth:true,slow:2,sepMs:2800,
+ travel:t=>.85*ease(seg(t,0,.3))+.15*ease(seg(t,...AB.haul)),
+ stack:[['Model','Half-coupler (A), as a swarm','each skin draws its own half, as in Model A; here a half is not hardware but a living chain each skin sends out from its own side'],
+  ['Wire half','Weaver ants','Jarvis\'s copper frame sends out beaded wire ants (carnelian head and thorax, gold waist, jet gaster), each holding the waist of the one ahead, as weaver ants do to pull two leaves together'],
+  ['Felt half','Festooning bees','GitDiscuss\'s cushion sends out felt bees in its own felt, each hanging from the legs of the one behind, as bees do to bridge a gap in the hive'],
+  ['Mating face','The grip','the one fixed thing between the halves: the front ant\'s jaws take the front bee\'s forelegs mid-gap. Any skin whose half ends in a grip can meet any other'],
+  ['The light','Felt','the bees draw a wax cell over the grip and its honey kindles: amber while both run, cold blue if either is paused; the ants\' gasters kindle with it'],
+  ['Motion','Each its own','the ants walk with a tripod gait and turn smoothly; the bees fly in on flickering wings and boil with the felt']],
+ about:'Jarvis wears the wire skin and GitDiscuss and Checks the felt skin, as in the couched wire mix. Every page now has a Swarm join (moths, bats, bees, damselflies, weaver ants), each a living chain in its own skin. This asks whether two swarms from two skins can meet: wire\'s ants and felt\'s bees both build bridges of their own bodies, so each casing builds half a bridge and the two halves grip in the middle. It is Model A, the half-coupler, with a grip as the mating face.',
+ join:{label:'Ant chain meets bee festoon',kind:'Swarm',gap:AB.gap,
+  about:'Apart, one ant sits on Jarvis\'s frame end and one bee rests on GitDiscuss\'s felt end. <b>Near:</b> the ant waves its antennae and the bee lifts and buzzes. <b>Ready:</b> both chains are chalked across the gap with a dot at every place. Joining: the casings close most of the way. Ants walk down (and up) Jarvis\'s frame end and out into the gap, the front ant over the back one, each holding the waist of the one ahead; bees fly in from above and below GitDiscuss and hang on, the front one from the back one\'s legs. The two half-chains sway as they search, then the front ant\'s jaws take the front bee\'s forelegs with a glint and the chains shorten, hauling the casings the last few millimetres. The bees draw a felt wax cell over each grip, and the honey and the ants\' gasters kindle as the join light. <b>Release:</b> pull the chains (drag them, tap them, or focus them and press Enter): the light goes out, the wax is taken back, the grips let go and every ant and bee goes home the way it came.'},
+ shade:{label:'Plain tuck, one chain',kind:'Page baseline',
+  about:'Not a brainstorm item. Jarvis\'s frame tucks to its nameplate strip and the cushion lets out its stuffing to the name band and one cotton label. Only the top chain stays, drawn in to the strip\'s centre line: the bottom row\'s ants walk back down the frame and its bees fly off, and come back the same way on unshading.'},
+ casing:(id,w,h)=>id==='a'?wireCasing(w,h,false):feltCushion(id,w,h),
+ shadeMs:1400,
+ readyPose:{},
+ state:()=>({}),
+ over(c){return abDraw(c)},
+ grab(p){return{x0:p.x,y0:p.y,deg:0}},
+ pull(d,p){const dist=Math.hypot(p.x-d.x0,p.y-d.y0);if(dist>3)d.moved=true;d.deg=clamp(dist/70);return 1-.4*d.deg},
+ text:{intro:'Jarvis is copper wire with an ant on its frame end; GitDiscuss and Checks are stuffed felt, with a bee on GitDiscuss. Drag a nameplate toward the other widget, or use the state buttons.',
+  join:'The casings close in; ants and bees build half a chain each from their own side, grip in the middle and haul the casings together.',
+  joined:'Joined: two living chains, ants from Jarvis and bees from GitDiscuss, gripping mid-gap under lit wax cells. Drag either nameplate to move the pair. Pull the chains to release.',
+  sep:'The light goes out, the wax is taken back, the grips let go and the ants and bees go home.',
+  hold:'Held mid-join: the two half-chains are out and searching for each other. Use the scrubber to step through the animation.',
+  near:'Nearby: the ant waves its antennae and the bee lifts off the felt. Move closer.',
+  ready:'Ready: both chains are chalked across the gap. Release to send them out.',
+  back:'The chains settle back; still joined.',cancel:'Pull cancelled.',
+  shadeOn:'Shaded: the frame tucks and the cushion lets out; the bottom chain goes home and the top one draws in to the strip.',shadeOff:'Unshaded: the casings open and the bottom chain comes back.',
+  sepPh:'Separate · an ant and a bee at home',nearPh:'Nearby · the ant and the bee stir',readyPh:'Ready · chalked',
+  mid:(jt,dir)=>dir>0?(jt<.23?'Joining · closing in ':jt<.47?'Joining · the chains build out ':jt<.56?'Joining · searching, then the grip ':jt<.72?'Joining · hauling in ':jt<.86?'Joining · drawing the wax ':'Joining · the honey kindles '):(jt>.86?'Releasing · the light goes out ':jt>.72?'Releasing · taking the wax back ':jt>.55?'Releasing · letting the casings out ':jt>.47?'Releasing · the grip lets go ':'Releasing · going home '),
+  turn:d=>'Pulling the chains · '+Math.round(d.deg*100)+'%'}};
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
