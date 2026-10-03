@@ -1921,7 +1921,7 @@ function dialSvg(c){
 }
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
-  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool) are built and added here.'},
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil) are built and added here.'},
  strand:{label:'Bead strand',kind:'Distil',ms:1150,ownStrip:true,
   about:'The pendant comes apart into a necklace. The plate and stone fade, the copper frame squeezes flat into a single strung wire, and the beads slide in along it from both clasps, centre beads first, each clicking into place. A flat slab bead carries the name and a cabochon carries the one key value. The round stones between them are the statuses: <b>amber</b> running, <b>labradorite</b> idle or paused, <b>carnelian</b> needs you, <b>malachite</b> passed. Jarvis strings one amber per running agent, GitDiscuss one carnelian per decision, Checks a seed bead per check. Pause a widget and its stones turn to labradorite. The eye loops stay on the ends, so shaded pendants still link by jump ring into one longer strand.',
   sayOn:'Shaded: the frame flattens into a wire and the beads slide on, one stone per status.',
@@ -2004,7 +2004,12 @@ const SHADES={
   about:'The Unravel shade kind (elven\'s spindle opened the round) done in wire: the casing is taken apart into its wire and wound up, the way a jeweller strips a piece and puts the wire back on its spool. The display goes dark into a glass stone and the nameplate fades. A spool with a walnut core and brass flanges drops onto the pendant and bounces. The scroll curls open and the coil bands spring off the frame with a glint. Then the wire comes off as one strand: the coils round the stone unwind one turn after another, then the inner frame and the outer frame are taken off along their length, the free end running round the outline while the strand runs taut to the spool. The spool turns as it takes them up (the holes in its near flange show it), laying the copper on a layer at a time from flange to flange, so the winding grows in steps. The last end whips in, the bare hammered plate fades and the pendant closes down to the spool. A printed paper band wraps round the winding from the top with the name and the one key value, and the stone in the near flange\'s hub kindles as the status: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. Nothing moves at rest, and unshading pays the wire back out onto the frame. The join ends stay outside the flanges on the spool\'s brass arbor, so spooled pendants still join.',
   sayOn:'Shaded: the pendant\'s wire is unwound off its frame onto a spool, and a paper band with the name and value wraps round it.',
   hk:st=>ease(seg(st,.64,.82)),show:st=>1-ease(seg(st,0,.14)),grip:st=>1-ease(seg(st,0,.12)),
-  draw(id,w,h,small,st){return wireSpool(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return wireSpool(id,w,h,small,st)}},
+ hive:{label:'Beehive coil',kind:'Nest',ms:3600,ownStrip:true,hs:56,chs:48,
+  about:'The Nest shade kind (gothic\'s font cover opened the round: the casing telescopes into itself) done in wire, built from the beehive coil, the coiled cone a jeweller winds as a bead cap, and from the conical spring, whose turns are each narrower than the one below so that pressed flat they pass inside one another and lie as one flat spiral. The display goes dark into a glass stone and the nameplate fades. The plate fades away and the copper frame tips back and springs up into a squared beehive of five turns over the stage, the outer turn first, while the stone settles into its foot as a cabochon. Then the beehive telescopes: the top turn drops inside the one below it, then those two into the next, and so on down, until every turn lies round the stone as a flat squared spiral seen from a little above, the far side of each turn dimmed. It seats with a small rebound and a glint at both sides. The display then comes back up inside the stone: the name, then the one key value in the status colour. Last, the bead on the spiral\'s free inner end kindles as the status: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. Nothing moves at rest, and unshading pulls the cone back up and springs it out into the frame. The join ends stay outside the outer turn, so coiled pendants still join.',
+  sayOn:'Shaded: the frame springs up into a beehive coil, which telescopes flat round the display stone; the name and value come back up inside it.',
+  hk:st=>ease(seg(st,.4,.7)),show:st=>1-ease(seg(st,0,.14)),grip:st=>1-ease(seg(st,0,.12)),
+  draw(id,w,h,small,st){return beehiveCoil(id,w,h,small,st)}}
 };
 // The strip height while shaded: most shades close to HS / CHS, Hang shades want a little room below the chain.
 const stripH=small=>{const o=SHADES[model.shade];return small?(o.chs||CHS):(o.hs||HS)};
@@ -2358,6 +2363,74 @@ function wireSpool(id,w,h,small,st){
  if(te>0&&te<1){const E=wsTrace(outer),pe=E[E.length-1],e=ease(te),ex=lerp(pe[0],Tx,e),ey=lerp(pe[1],y-rt,e)-10*Math.sin(Math.PI*e);
   s+=wire(`M${f(ex)} ${f(ey)}Q${f((ex+Tx)/2)} ${f((ey+y-rt)/2+lerp(5,-6,ease(seg(te,0,.3)))*(1-e))} ${f(Tx)} ${f(y-rt)}`,'copper',1.2)}
  const gl=Math.sin(Math.PI*seg(st,.66,.72));if(gl>.03)s+=sparkle(Tx,y-rt,gl*.55);
+ return s;
+}
+
+/* ---------- Beehive coil pieces ---------- */
+// A squared helix seen from a little above: level i is a loop of half-width A, depth B, centred at Y. Levels 0..BH_N, outer to inner.
+const BH_N=5,bhLab={};
+function bhLabel(id,small,room){
+ const P=plaqueData(id),D=strandData(id),key=id+P.word+room;if(bhLab[key])return bhLab[key];
+ let fs=small?12:14;const wd=s=>measure(D.name,`italic bold ${s}px Georgia,serif`)+16+measure(P.num,`bold ${s}px Georgia,serif`)+(P.word?4+measure(P.word,`italic ${s-2.5}px Georgia,serif`):0);
+ while(fs>9&&wd(fs)>room)fs-=.5;
+ return bhLab[key]={name:D.name,num:P.num,word:P.word,stone:P.stone,fs,nw:measure(D.name,`italic bold ${fs}px Georgia,serif`),wd:wd(fs)};
+}
+function beehiveCoil(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const full=small?CH:H,hs=stripH(small),cx=w/2,b0=(hs-10)/2,dB=small?1.9:2.4,a0=w/2-7,dA=small?10:14,bT=b0-BH_N*dB;
+ // Travel: zero once the strip is down to the outer loop's depth, so every level ends on one centre.
+ const X=full-10-2*b0,Tf=full-10-b0-bT,T=Math.max(0,h-10-2*b0)*Tf/X,c=T/Tf,y0=h-5-b0;
+ // The top gap closes first: each level drops inside the one below it in turn.
+ const Lw=.45,gap=k=>seg(c,k/(BH_N-1)*(1-Lw),k/(BH_N-1)*(1-Lw)+Lw)/BH_N;
+ // On seating the inner levels rebound a few px; the stone and text stay on the outer level's centre.
+ const seat=Math.sin(Math.PI*seg(st,.7,.8))*(1-seg(st,.7,.8));
+ const A=[],B=[],Y=[];let fr=0;
+ for(let i=0;i<=BH_N;i++){if(i)fr+=gap(i-1);
+  // Spring: the frame wire tips back and draws up into the cone, the outer level first.
+  const sp=ease(seg(st,.1+.03*i,.26+.03*i)),yc=y0-fr*T-seat*(small?3:4)*i/BH_N;
+  A.push(lerp(w/2-5,a0-i*dA,sp));B.push(lerp((h-10)/2,b0-i*dB,sp));Y.push(lerp(h/2,yc,sp))}
+ const at=t=>{const i=Math.min(BH_N-1,Math.floor(t)),u=t-i,th=t*2*Math.PI,co=Math.cos(th),si=Math.sin(th),e=.3;
+  return[cx+lerp(A[i],A[i+1],u)*Math.sign(co)*Math.pow(Math.abs(co),e),lerp(Y[i],Y[i+1],u)+lerp(B[i],B[i+1],u)*Math.sign(si)*Math.pow(Math.abs(si),e),si]};
+ // Split into runs behind (the far side, higher on screen) and in front.
+ const fronts=[],backs=[];let run=null,side=null,prev=null;
+ for(let k=0,n=BH_N*96;k<=n;k++){const p=at(k/n*BH_N),s=p[2]>=0;
+  if(s!==side){if(run&&run.length>1)(side?fronts:backs).push(run);run=prev?[prev]:[];side=s}run.push(p);prev=p}
+ if(run.length>1)(side?fronts:backs).push(run);
+ // Thinner at rest so the turns stay apart where they bunch at the top and bottom of the spiral.
+ const sp0=ease(seg(st,.1,.3)),wv=lerp(3.1,small?1.6:1.8,sp0),R=small?3.6:4.4;
+ let s='';
+ // The plate and the rest of the casing fade as the frame springs.
+ const po=1-seg(st,.08,.3);if(po>0)s+=`<g opacity="${f(po)}">${casing(w,h,small,true)}</g>`;
+ // The far side of every loop, dimmed once the loops lie back.
+ const bk=backs.map(poly).join(''),bw=wv*lerp(1,.85,sp0);s+=wire(bk,'dim',bw)+(sp0<1?wire(bk,'copper',bw,f(1-sp0)):'');
+ // The frame's own outline hands over to the coil as it starts to spring, so the first frame doesn't snap.
+ const fo=1-seg(st,.1,.2);if(fo>0)s+=wire(rrect(5,5,w-10,h-10,Math.min(small?20:26,(h-10)/2)),'copper',3.1,f(fo));
+ // The display, gone dark into glass, settles into the foot of the cone as a cabochon; the coil comes down round it.
+ const bz=small?[14,22,220,44,9]:[43,29,304,68,10],gp=ease(seg(st,.12,.4)),gh=B[BH_N]-2.4,gw=A[BH_N]-11;
+ const gx=lerp(bz[0],cx-gw,gp),gy=lerp(bz[1],Y[0]-gh,gp),gW=lerp(bz[2],2*gw,gp),gH=lerp(bz[3],2*gh,gp),gr=lerp(bz[4],gh,gp);
+ s+=`<g opacity="${f(seg(st,.02,.16))}"><path d="${rrect(gx-1.2,gy-1.2,gW+2.4,gH+2.4,gr+1.2)}" fill="#120906"/><path d="${rrect(gx,gy,gW,gH,gr)}" fill="url(#tr-glass)"/>`+
+  `<path d="${rrect(gx+gr*.5,gy+1.2,gW-gr,Math.max(1,gH*.32),gH*.16)}" fill="#cfe8ee" opacity="${f(.07+.06*gp)}"/></g>`;
+ // Last, the display comes back up inside the stone: the name, then the value.
+ const L=bhLabel(id,small,2*(a0-BH_N*dA-11)-18),nt=seg(st,.74,.84),vt=seg(st,.8,.9);
+ if(nt>0){const tx=cx-L.wd/2,ty=Y[0]+.5;
+  s+=`<text y="${f(ty)}" dominant-baseline="central"><tspan x="${f(tx)}" dy="${f(3*(1-ease(nt)))}" opacity="${f(nt)}" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="${L.fs}" fill="#f6dcb4">${L.name}</tspan>`+
+   (vt>0?`<tspan x="${f(tx+L.nw+16)}" dy="${f(3*(1-ease(vt))-3*(1-ease(nt)))}" opacity="${f(vt)}" font-family="Georgia,serif" font-weight="bold" font-size="${L.fs}" fill="${RIM_GLOW[L.stone]}">${L.num}</tspan>`+
+    (L.word?`<tspan dx="4" opacity="${f(vt)}" font-family="Georgia,serif" font-style="italic" font-size="${L.fs-2.5}" fill="#c9b494">${L.word}</tspan>`:''):'')+'</text>';
+  if(vt>0)s+=`<circle cx="${f(tx+L.nw+8)}" cy="${f(ty)}" r="1.3" fill="#c9b494" opacity="${f(vt)}"/>`}
+ // The near side of every loop, inner loops first so the outer ones pass in front.
+ s+=wire(fronts.slice().reverse().map(poly).join(''),'copper',wv);
+ // The free inner end carries the status bead; the outer end is turned back into a small curl.
+ // It waits for the inner level to spring, so it never shows out on the frame by the join stem.
+ const ib=seg(st,.4,.5);
+ if(ib>0){const e=prev,o=at(0);
+  s+=`<g opacity="${f(clamp(ib*2))}">`+wire(`M${f(o[0])} ${f(o[1])}q-1 -4.5 -4.5 -4q-2.5 .5 -1.6 3`,'copper',wv*.8)+`<circle cx="${f(e[0])}" cy="${f(e[1])}" r="${f(R+1.4)}" fill="#1a0c04"/>`+strandItem({k:'bead',r:R,stone:L.stone},e[0],e[1])+'</g>';
+  const k=seg(st,.88,.98);
+  if(k>0){const bump=Math.sin(Math.PI*k);
+   s+=`<circle cx="${f(e[0])}" cy="${f(e[1])}" r="${f(R*2.6)}" fill="${RIM_GLOW[L.stone]}" opacity="${f((L.stone==='lab'?.1:.3)*k+.35*bump)}" filter="url(#soft)"/>`;
+   if(bump>.05)s+=sparkle(e[0]+R*.5,e[1]-R*.6,bump*.5)}}
+ // The coil seats with a glint at both sides and at the front.
+ const g=Math.sin(Math.PI*seg(st,.7,.78));
+ if(g>.03)s+=sparkle(cx-A[0],Y[0],g*.55)+sparkle(cx+A[0],Y[0],g*.55)+sparkle(cx,Y[0]+B[0],g*.45);
  return s;
 }
 
