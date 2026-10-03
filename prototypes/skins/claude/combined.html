@@ -541,7 +541,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -3831,6 +3831,125 @@ MIXES.brooch={label:'Penannular brooch',kind:'Pairwise seam',pair:'elffelt',smoo
   sepPh:'Separate · the brooch hangs',nearPh:'Nearby · the brooch lifts',readyPh:'Ready · chalked in',
   mid:(jt,dir)=>dir>0?(jt<.4?'Joining · closing in ':jt<.6?'Joining · the brooch swings up ':jt<.74?'Joining · pinning the felt ':jt<.86?'Joining · the ring turns to lock ':'Joining · the moonstones kindle '):(jt>.86?'Releasing · the moonstones dim ':jt>.74?'Releasing · the ring turns back ':jt>.54?'Releasing · drawing the pin ':jt>.4?'Releasing · the brooch drops ':'Releasing · parting '),
   turn:d=>'Pulling the brooch · '+Math.round(d.deg*100)+'%'}};
+
+/* ---------- Mix: the swan boat (containment: an elven leaf boat carries a Hollow shell) ---------- */
+const SB={gap:30,drop:46,unfurl:[.06,.36],lower:[.42,.58],land:[.56,.86],cup:[.6,.8],kindle:[.86,1]};
+const sbReady=jt=>model.dir>0&&model.lit0>0?1-seg(jt,.06,.16):0;
+// A join released from ready keeps the loosened leaf from its first frame (when glow is already 0) until the unfurl takes over.
+const sbHeld=c=>model.dir>0&&model.lit0>0&&(c.jt>0||model.busy);
+const sbU=(c,P)=>sbHeld(c)?Math.max(P.unfurl,.14*sbReady(c.jt)):c.jt===0?.14*c.glow:P.unfurl;
+// The bob as the shell settles: down first, then two smaller rocks. Release lifts it out without one.
+const sbDip=jt=>{if(model.dir<0)return 0;const v=seg(jt,...SB.land);return v>0&&v<1?5.5*Math.exp(-3.2*v)*Math.sin(2.5*PI*v):0};
+const sbParts=jt=>({unfurl:ease(seg(jt,...SB.unfurl)),cup:seg(jt,...SB.cup),kindle:ease(seg(jt,...SB.kindle))});
+const sbBez=(a,b,c,d,t)=>{const m=1-t;return{x:m*m*m*a.x+3*m*m*t*b.x+3*m*t*t*c.x+t*t*t*d.x,y:m*m*m*a.y+3*m*m*t*b.y+3*m*t*t*c.y+t*t*t*d.y}};
+// The hull at unfurl u: moored at Jarvis's lower knop, growing rightward under GitDiscuss's place to a swan prow past its far end.
+function sbGeo(c,u){
+ const A=model.a,h=c.h,s=clamp((h-HS)/(H-HS)),bx=A.x+W+SB.gap,S={x:A.x+W-11.5,y:A.y+lerp(h/2+5,h-16,clamp((h-80)/12))},e=ease(u);
+ // The rim sits just under GitDiscuss's bead buttons, and only drops to them once the buttons have faded in a shade.
+ const x0=S.x,x1=lerp(S.x+24,bx+W+8,e),gm=lerp(S.y+3,A.y+lerp(h-5,h-2,1-clamp(ease(shk())*5)),e),D=lerp(5,lerp(10,17,s),e),rr=lerp(3,lerp(8,19,s),e);
+ // The sheer: flat under GitDiscuss's tabs and buttons, rising only past them, to the stem at the stern and to the swan at the prow.
+ const L=x1-x0,tl=clamp((bx+54-x0)/L,.15,.45),tr=clamp((bx+356-x0)/L,.55,.92);
+ const gun=t=>t<tl?gm-(gm-S.y)*Math.pow(1-t/tl,2):t>tr?gm-rr*Math.pow((t-tr)/(1-tr),2):gm;
+ const G=[],K=[];for(let i=0;i<=48;i++){const t=i/48,x=x0+L*t,g=gun(t);G.push({x,y:g});K.push({x,y:g+D*Math.pow(Math.sin(PI*t),.55)})}
+ const at=x=>gun(clamp((x-x0)/L)),N=lerp(14,lerp(26,62,s),e),F=G[48];
+ // The swan's neck: out over the water, back, and up to a head that looks ahead.
+ const neck=[F,{x:F.x+16,y:F.y-N*.15},{x:F.x-3,y:F.y-N*.8},{x:F.x+12,y:F.y-N}];
+ return{A,h,s,bx,S,x0,x1,gm,D,G,K,yW:gm+D*.5,at,neck,e,hull:pp(G)+'L'+K.slice().reverse().map(Pt).join('L')+'Z'}}
+function sbNeckPts(G,g){const n=24,m=Math.max(2,Math.round(n*g));return Array.from({length:m+1},(_,i)=>sbBez(...G.neck,g*i/m))}
+function sbHead(p,lit,cold){
+ return elLeaf(p.x-1.5,p.y-1.6,206,.62)+`<path d="M${f(p.x+3.6)} ${f(p.y-1.8)}L${f(p.x+11)} ${f(p.y+1.4)}L${f(p.x+3.8)} ${f(p.y+2)}Z" fill="#e9d9a8" stroke="${NIGHT}" stroke-width=".6"/>`+
+  `<ellipse cx="${f(p.x+.8)}" cy="${f(p.y)}" rx="4.6" ry="3.4" fill="url(#fg-silverR)" stroke="${NIGHT}" stroke-width=".8"/>`+lbStone(p.x+1.4,p.y-.5,1.5,lit,cold)}
+function sbTendril(P,g,dir){
+ if(g<=.01)return '';const pts=Array.from({length:23},(_,i)=>sbBez(...P,g*i/22));elWidths(pts,2.6,lerp(2.4,.8,g));
+ let o=`<path d="${ribbon(pts,1.1)}" fill="${NIGHT}"/><path d="${ribbon(pts)}" fill="url(#el-silver)"/>`;
+ const q=pts[11],r=pts[12];o+=elLeaf(q.x,q.y,Math.atan2(r.y-q.y,r.x-q.x)*180/PI+dir*58,.5*seg(g,.45,.9));
+ // The tip rolls into a small curl against the shell.
+ const k=seg(g,.75,1),T=pts[22];if(k>0)o+=`<path d="${spiral(T.x+dir*2.4*k,T.y-1,2.6*k,1.1,dir,PI*(dir>0?1:0))}" fill="none" stroke="${NIGHT}" stroke-width="2"/><path d="${spiral(T.x+dir*2.4*k,T.y-1,2.6*k,1.1,dir,PI*(dir>0?1:0))}" fill="none" stroke="#e6ecfa" stroke-width=".9"/>`;
+ return o}
+function sbDraw(c){
+ const jt=c.jt,fwd=model.dir>0,P=sbParts(jt),u=sbU(c,P);
+ const G=sbGeo(c,u),dip=sbDip(jt)*.8,cold=!(model.a.run&&model.b.run),lit=jt===1?1:P.kindle,glim=Math.max(lit,.4*(sbHeld(c)?sbReady(jt):jt===0?c.glow:0));
+ const ng=ease(seg(u,.6,1)),A=G.A,h=G.h,bx=G.bx,cup=jt===1?1:ease(P.cup);
+ let o='',top='';
+ // Ready: the whole boat is chalked in moonlight where it will float.
+ if(jt===0&&c.glow>=1){const F=sbGeo(c,1);top+=`<g fill="none" stroke="#dfe8ff" stroke-width="1.1" stroke-dasharray="3 2.6" opacity=".7"><path d="${F.hull}"/><path d="${pp(sbNeckPts(F,1))}"/><path d="M${f(F.x0-14)} ${f(F.yW+3)}H${f(F.x1+30)}" opacity=".5"/></g>`}
+ o+=`<g transform="translate(0 ${f(dip)})"><clipPath id="sb-clip"><path d="${G.hull}"/></clipPath>`;
+ o+=`<path d="${G.hull}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1 2.5)"/><path d="${G.hull}" fill="url(#el-night)"/><path d="${G.hull}" fill="url(#fg-pearl)" opacity=".13"/>`;
+ // Leaf veins: a midrib along the hull and paired veins sweeping up to the rim.
+ const mid=G.G.map((p,i)=>({x:p.x,y:lerp(p.y,G.K[i].y,.42)}));let v='';
+ for(let i=6;i<44;i+=5){const p=mid[i],q=G.G[Math.min(48,i+3)];v+=`M${f(p.x)} ${f(p.y)}Q${f((p.x+q.x)/2)} ${f(p.y)} ${f(q.x)} ${f(q.y+1.4)}`}
+ o+=`<g clip-path="url(#sb-clip)"><path d="${pp(mid.slice(2,47))}${v}" fill="none" stroke="#c9d4ee" stroke-width=".7" opacity=".45"/>`+
+  `<rect x="${f(G.x0-4)}" y="${f(G.yW-dip)}" width="${f(G.x1-G.x0+8)}" height="30" fill="#0a1430" opacity=".42"/></g>`;
+ o+=`<path d="${pp(G.K)}" fill="none" stroke="url(#el-silver)" stroke-width="1" opacity=".7"/><path d="${pp(G.G)}" fill="none" stroke="${NIGHT}" stroke-width="3.6" stroke-linecap="round"/><path d="${pp(G.G)}" fill="none" stroke="url(#el-silverV)" stroke-width="2.2" stroke-linecap="round"/><path d="${pp(G.G)}" fill="none" stroke="#fff" stroke-width=".6" opacity=".8" transform="translate(0 -.6)"/>`;
+ // Furled, the prow is a fiddlehead; it uncurls into the swan's neck as the hull reaches its length.
+ const F=G.G[48];
+ if(ng<1){const r=3.6*(1-ng);o+=`<path d="${spiral(F.x+r*.6,F.y-r,r,1.2,-1,PI/2)}" fill="none" stroke="${NIGHT}" stroke-width="2.6" opacity="${f(1-ng)}"/><path d="${spiral(F.x+r*.6,F.y-r,r,1.2,-1,PI/2)}" fill="none" stroke="#e6ecfa" stroke-width="1.2" opacity="${f(1-ng)}"/>`}
+ if(ng>.02){const pts=elWidths(sbNeckPts(G,ng),4.6,2.4),hd=pts[pts.length-1];o+=`<path d="${ribbon(pts,1.2)}" fill="${NIGHT}"/><path d="${ribbon(pts)}" fill="url(#el-silverV)"/>`;
+  if(ng>.85){const k=seg(ng,.85,1);o+=`<g opacity="${f(k)}">${sbHead(hd,lit,cold)}</g>`}}
+ // The cupping tendrils: each grows from the rim and curls against an end of the shell, clear of the display and controls.
+ const tl=[{x:bx+36,y:G.at(bx+36)+1},{x:bx+30,y:A.y+h*.84},{x:bx+1,y:A.y+h*.8},{x:bx+7,y:A.y+h*.52}];
+ const tr=[{x:bx+358,y:G.at(bx+358)+1},{x:bx+372,y:A.y+h*.86},{x:bx+394,y:A.y+h*.78},{x:bx+384,y:A.y+h*.5}];
+ o+=sbTendril(tl,cup,-1)+sbTendril(tr,cup,1)+'</g>';
+ // The mooring stone stays on Jarvis's knop while the boat bobs.
+ o+=lbStone(G.S.x,G.S.y,2.5,glim*.85,cold);
+ // Still water: three ripple lines across the hull, so it floats rather than sits.
+ if(u>.05){const a=clamp((u-.05)*4);for(const[k,dy,op,da]of[[0,2,.35,'26 7 9 6'],[1,6,.22,'14 9 30 8'],[2,10,.12,'8 10 20 12']])
+  o+=`<path d="M${f(G.x0-8+k*6)} ${f(G.yW+dy)}H${f(G.x1+24-k*10)}" stroke="#b9cdf5" stroke-width=".9" stroke-dasharray="${da}" opacity="${f(op*a)}"/>`}
+ // Landing: two rings spread from the boat; their back halves are drawn behind the widgets (see under).
+ if(fwd&&jt>SB.land[0]&&jt<1)o+=sbRings(G,jt,0);
+ if(fwd&&lit>0&&lit<1&&ng>.9)top+=sparkle(G.neck[3].x+1.4,G.neck[3].y-.5,.55*Math.sin(PI*lit));
+ if(jt===1&&ng>.9){const hd=G.neck[3],x0=G.G[48].x-12,y0=hd.y-10+dip,hh=G.G[48].y-hd.y+24;
+  top+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="The swan prow: pull it, tap it, or press Enter, to lift GitDiscuss out of the boat and separate the widgets"><title>Pull the swan to release</title><rect x="${f(x0)}" y="${f(y0)}" width="46" height="${f(hh)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="46" height="${f(hh)}" rx="8" fill="none" stroke="#dfe8ff" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
+ return o+top;
+}
+function sbRings(G,jt,back){
+ const v=seg(jt,SB.land[0],.95),cx=(G.x0+G.x1)/2,hw=(G.x1-G.x0)/2;let o='';
+ for(const d of[0,.28]){const k=seg(v,d,d+.72);if(k<=0||k>=1)continue;const rx=hw+8+50*k,ry=4+9*k;
+  o+=`<path d="M${f(back?cx-rx:cx+rx)} ${f(G.yW)}A${f(rx)} ${f(ry)} 0 0 1 ${f(back?cx+rx:cx-rx)} ${f(G.yW)}" fill="none" stroke="#c9d8fa" stroke-width="1.1" opacity="${f(.5*(1-k))}"/>`}
+ return o}
+MIXES.swan={label:'Swan boat',kind:'Containment',pair:'elfhollow',smooth:true,slow:1.4,sepMs:2100,room:{x:36,top:0,bottom:30},
+ stack:[['Model','Containment','one widget holds the other; the first container drawn by elven, after gothic\'s reliquary, felt\'s pocket and wire\'s hoop'],
+  ['Container','Elven','a leaf boat: a hull of night glass with a silver rim and leaf veins, moored to Jarvis\'s lower moonstone knop, with a swan\'s neck for a prow'],
+  ['Contents','Hollow','GitDiscuss rides in it as the carapace shell it is on the Hollow page; only its belly goes below the rim, so the display, tabs and buttons all stay clear'],
+  ['Holding','Elven','two silver tendrils grow from the rim and curl against the two ends of the shell, the way the hoop\'s wire or the pocket\'s cuff hold their contents'],
+  ['The light','Elven','the swan\'s moonstone eye and the stone at the mooring are the join light: moon-blue while both run, dim grey if either is paused'],
+  ['Motion','Each its own','the silver unfurls slowly; the shell is heavy, so the boat dips under it, rocks twice and spreads rings across the water']],
+ about:'Jarvis wears the elven skin and GitDiscuss and Checks the Hollow skin, as in the moon dial mix. Elven had never held another skin, only joined one. A leaf that floats is the oldest elven boat there is, and a dark shell carried over still water by moonlight suits Hollow\'s mood. The boat holds GitDiscuss from below, so nothing on the shell\'s face is covered: the rim is flat under the tabs and buttons and rises only past them.',
+ join:{label:'Carried in a swan boat',kind:'Containment',gap:SB.gap,
+  about:'Apart, a small silver leaf with a curled tip floats moored to Jarvis\'s lower moonstone knop. <b>Near:</b> it loosens and lengthens a little, ripples run under it and the moonstone shimmers. <b>Ready:</b> the whole boat, its swan prow and the waterline are chalked in moonlight where GitDiscuss will sit. Joining: GitDiscuss is lifted clear and carried across as the leaf unfurls under its place into a long hull, its curled tip uncoiling into a swan\'s neck. GitDiscuss is lowered in. The boat dips under its weight, rocks twice and sends two rings across the water. Two silver tendrils grow from the rim, leaf out and curl against the ends of the shell, and the swan\'s eye and the mooring stone kindle as the join light. <b>Release:</b> pull the swan (drag it, tap it, or focus it and press Enter). The light goes out, the tendrils let go, GitDiscuss is lifted out and carried off, and the boat furls back into a leaf.'},
+ shade:{label:'Plain lower, afloat',kind:'Page baseline',
+  about:'Not a brainstorm item. The night-glass leaf narrows to its script nameplate and a moonstone value pill, and the carapace draws in to its chalk name and parchment label. The boat shrinks with them: a shallower hull, a lower sheer that stays under the strip\'s text, a shorter neck and smaller tendrils, so a shaded GitDiscuss still floats in it.'},
+ casing:(id,w,h)=>id==='a'?elCasing(w,h):id==='b'?`<g transform="translate(${w} 0) scale(-1 1)">${hoCasing(w,h,'plain')}</g>`:hoCasing(w,h,false),
+ readyPose:{},
+ state:()=>({}),
+ // GitDiscuss is lifted clear while it is carried, lowered in, and rides the boat's bob a little deeper than the hull.
+ lift(c,id){if(id!=='b'||c.jt<=0||c.jt>=1)return 0;return -SB.drop*ease(seg(c.jt,.04,.2))*(1-ease(seg(c.jt,...SB.lower)))+sbDip(c.jt)},
+ under(c){
+  const jt=c.jt,P=sbParts(jt),u=sbU(c,P);if(u<.05)return '';
+  const G=sbGeo(c,u),cx=(G.x0+G.x1)/2,a=clamp((u-.05)*4),ng=ease(seg(u,.6,1)),lit=jt===1?1:P.kindle;
+  // A pool of moonlight under the boat, and the swan's reflection broken by the ripples.
+  let o=`<defs><radialGradient id="sb-pool"><stop stop-color="#9fb8ff" stop-opacity=".2"/><stop offset="1" stop-color="#9fb8ff" stop-opacity="0"/></radialGradient></defs>`+
+   `<ellipse cx="${f(cx)}" cy="${f(G.yW+6)}" rx="${f((G.x1-G.x0)/2+60)}" ry="18" fill="url(#sb-pool)" opacity="${f(a)}"/>`;
+  if(ng>.1){const R=sbNeckPts(G,ng).map(p=>({x:p.x,y:2*G.yW-p.y}));
+   o+=`<path d="${pp(R)}" fill="none" stroke="#c9d6f5" stroke-width="3" stroke-dasharray="5 3 9 4" opacity="${f(.2*ng)}"/>`;
+   if(lit>0){const e=R[R.length-1];o+=`<ellipse cx="${f(e.x+1)}" cy="${f(e.y)}" rx="5" ry="2" fill="#bcd4ff" opacity="${f(.35*lit)}" filter="url(#sh)"/>`}}
+  if(model.dir>0&&jt>SB.land[0]&&jt<1)o+=sbRings(G,jt,1);
+  return o},
+ over(c){return sbDraw(c)},
+ grab(p){return{x0:p.x,y0:p.y,deg:0}},
+ pull(d,p){const dist=Math.hypot(p.x-d.x0,p.y-d.y0);if(dist>3)d.moved=true;d.deg=clamp(dist/70);return 1-.4*d.deg},
+ text:{intro:'Jarvis is elven night glass with a leaf boat moored at its stem; GitDiscuss and Checks are Hollow shells. Drag GitDiscuss toward Jarvis, or use the state buttons.',
+  join:'The leaf unfurls into a swan boat, GitDiscuss is lowered in, and two tendrils curl up to hold it.',
+  joined:'Afloat: GitDiscuss rides in Jarvis\'s swan boat, held by two silver tendrils, its tabs and buttons all clear. Drag either nameplate to move them together. Pull the swan to release.',
+  sep:'The light goes out, the tendrils let go, GitDiscuss is lifted out and the boat furls back into a leaf.',
+  hold:'Held mid-join: GitDiscuss has settled in the boat and the tendrils are curling up. Use the scrubber to step through the animation.',
+  near:'Nearby: the moored leaf loosens and ripples run under it. Move closer.',
+  ready:'Ready: the boat is chalked in on the water. Release to lower GitDiscuss in.',
+  back:'The swan settles back; still afloat.',cancel:'Pull cancelled.',
+  shadeOn:'Shaded: the leaf narrows and the shell draws in; the boat grows shallower and still carries GitDiscuss.',shadeOff:'Unshaded: the leaf and shell open and the boat deepens with them.',
+  sepPh:'Separate · a leaf moored at the stem',nearPh:'Nearby · the leaf loosens',readyPh:'Ready · chalked on the water',
+  mid:(jt,dir)=>dir>0?(jt<.4?'Joining · the leaf unfurls ':jt<.58?'Joining · lowering it in ':jt<.62?'Joining · the boat dips ':jt<.86?'Joining · tendrils curl up ':'Joining · the swan\'s eye kindles '):(jt>.86?'Releasing · the light goes out ':jt>.6?'Releasing · the tendrils let go ':jt>.42?'Releasing · lifting it out ':'Releasing · the boat furls '),
+  turn:d=>'Pulling the swan · '+Math.round(d.deg*100)+'%'}};
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
