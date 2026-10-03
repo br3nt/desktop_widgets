@@ -499,6 +499,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="row" id="heldRow" hidden><span>Held</span></div>
  <div class="row" id="matchRow" hidden><span>Groups</span></div>
  <div class="row" id="motionRow" hidden><span>Motion</span></div>
+ <div class="row" id="sizeRow" hidden><span>Size</span></div>
  <div class="row" id="angleRow" hidden><span>Angle</span><input type="range" id="ang" min="-30" max="30" step="10" value="20" aria-label="Angle of GitDiscuss on the pivot, in degrees"><output id="angOut">+20°</output></div>
  <div class="row"><span>Scrub</span><input type="range" id="scrub" min="0" max="100" value="0" aria-label="Join progress"><output id="scrubOut">0%</output></div>
 </div></header>
@@ -542,7 +543,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. In one line, shade the widgets apart and then joined: apart, Jarvis hangs charms on a brass chain and the felt is pegged out on washing lines; joined, the chain and the cotton are tied into one line. In one hinge, shade the widgets apart and then joined: apart, the stone seat tips up toward you and the elven glass tips back away from you; joined, they tip up together on one rod wound with the silver vine. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · S cycles the sizes in Bays sewn on · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. In one line, shade the widgets apart and then joined: apart, Jarvis hangs charms on a brass chain and the felt is pegged out on washing lines; joined, the chain and the cotton are tied into one line. In one hinge, shade the widgets apart and then joined: apart, the stone seat tips up toward you and the elven glass tips back away from you; joined, they tip up together on one rod wound with the silver vine. In bays sewn on, pick Aisle or Nave: each bay is chalked, dropped in, pinned, basted in red, sewn round in cream, has its basting pulled out and its pins taken away, and is then dressed; anything in the way steps aside first and comes back when the bays are unpicked. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -4579,9 +4580,179 @@ MIXES.oneHinge={...MIXES.tracery,label:'One hinge',kind:'Pairwise seam · shade'
   get shadeOn(){return model.jt===1?'Shaded together: the vine winds one rod along both top edges, the glass tips up with the stone a beat behind it, and the vine flowers under the gap.':'Shaded apart: the stone seat tips up toward you and knocks onto an oak misericord ledge; the glass tips back away from you onto a slot of night glass.'},
   get shadeOff(){return model.jt===1?'Unshaded: the vine and the rod go, and the seat and the glass tip back down together.':'Unshaded: the seat falls back down onto its ledge and the glass tips forward again.'}}};
 
+/* ---------- Mix: bays sewn on (Model B applied to morphing). The structure layer decides what grows; the material decides how. ---------- */
+// Gothic grows by bays: Checks gains an aisle with a gabled chapel front, then a clerestory over its nave. Felt builds each bay
+// as a tailor would: chalk the outline, drop the patch, pin it, baste it with long red tacks (felt's scaffolding), sew it round,
+// pull the basting and the pins out, then dress it. Shrinking runs the same steps backwards, so the bays are unpicked.
+GLYPH['%']='11000110010001000100010001001100011';
+const MB={ms:3600,unMs:2600,sizes:['One bay','Aisle','Nave'],ext:[{l:0,t:0},{l:160,t:40},{l:160,t:108}],m:12,
+ runs:[14,13,14,14,11,14,13,14,14,12],drop:[0,.16],land:[.16,.24],pins:[.22,.34],baste:[.32,.46],sew:[.46,.68],pull:[.68,.8],dress:[.78,1],
+ pinCol:['#d23c3c','#3a6fd0','#e6b83a','#3f9a5a']};
+let mbAnim=0;
+// How far the grown bays reach left of and above Checks at growth g (0 one bay, 1 aisle, 2 nave).
+const mbE=()=>{if(!X().morph||model.g<=0)return{l:0,t:0};const g=model.g;return{l:MB.ext[1].l*clamp(g*4),t:g<=1?MB.ext[1].t*clamp(g*4):lerp(MB.ext[1].t,MB.ext[2].t,clamp((g-1)*4))}};
+// Stitches along a polyline: dashes d long with gaps gp, up to fraction p of its length, slid s px along it (basting being pulled out).
+function mbRun(P,p,d,gp,s=0){const cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=cum[cum.length-1];
+ const at=v=>{let i=1;while(i<P.length-1&&cum[i]<v)i++;const u=clamp((v-cum[i-1])/((cum[i]-cum[i-1])||1));return[lerp(P[i-1][0],P[i][0],u),lerp(P[i-1][1],P[i][1],u)]};
+ let o='';const end=L*p;for(let v=0;v<end;v+=d+gp){const a=v+s;if(a>=L)break;const q=at(a),r=at(Math.min(Math.min(v+d,end)+s,L));o+=`M${f(q[0])} ${f(q[1])}L${f(r[0])} ${f(r[1])}`}
+ return{d:o,L,at}}
+const mbThread=(d,col,w)=>d?`<g fill="none" stroke-linecap="round"><path d="${d}" stroke="#000" stroke-opacity=".3" stroke-width="${w+.4}" transform="translate(.4 .8)"/><path d="${d}" stroke="${col}" stroke-width="${w}"/></g>`:'';
+// A dressmaker's pin pushed in at angle a toward (x,y): k 0 hovers above, 1 is in with only the head and a little steel showing.
+function mbPin(x,y,a,k,col){if(k<=0)return '';const dist=lerp(24,6,ease(k)),ca=Math.cos(a),sa=Math.sin(a),hx=x-ca*dist,hy=y-sa*dist,e=dist>14?[hx+ca*14,hy+sa*14]:[x,y];
+ return `<g opacity="${f(clamp(k*3))}"><path d="M${f(hx)} ${f(hy)}L${f(e[0])} ${f(e[1])}" stroke="#2a2420" stroke-width="1.5" stroke-linecap="round" transform="translate(.6 1)" opacity=".4"/><path d="M${f(hx)} ${f(hy)}L${f(e[0])} ${f(e[1])}" stroke="#d9dde2" stroke-width=".9" stroke-linecap="round"/>`+
+  `<circle cx="${f(hx)}" cy="${f(hy)}" r="2.6" fill="${col}" stroke="#000" stroke-opacity=".35" stroke-width=".6"/><circle cx="${f(hx-.8)}" cy="${f(hy-.9)}" r=".8" fill="#fff" fill-opacity=".75"/></g>`}
+// A French knot that pops on (scaled about its centre) as k goes 0 to 1.
+const mbKnot=(x,y,r,k)=>k<=0?'':k>=1?fknot(x,y,r):`<g transform="translate(${f(x)} ${f(y)}) scale(${f(backOut(k)*100)/100}) translate(${f(-x)} ${f(-y)})">${fknot(x,y,r)}</g>`;
+// Cross-stitch in Checks' greens, sewn cell by cell: only the first n crosses are drawn.
+function mbCross(str,c,x0,y0,n){let x=0,d1='',d2='',k=0;
+ for(const ch of str){const G=GLYPH[ch];for(let i=0;i<35&&k<n;i++)if(G[i]==='1'){k++;const[p,q]=xCell(x0+(x+i%5)*c,y0+Math.floor(i/5)*c,c);d1+=p;d2+=q}x+=6}
+ return d1?`<g fill="none" stroke-linecap="round" stroke-width="${f(c*.36)}"><path d="${d1}" stroke="#285532"/><path d="${d2}" stroke="#43874f"/></g>`:''}
+const mbCells=str=>[...str].reduce((n,ch)=>n+[...GLYPH[ch]].filter(v=>v==='1').length,0);
+// Quilted ashlar courses across a bay, as on the kneelers.
+function mbQuilt(x0,x1,y0,y1){let q='';for(let y=y0,r=0;y<y1;y+=14,r++){q+=`M${x0} ${y}H${x1}`;for(let x=x0+(r%2?17:0)+6;x<x1;x+=34)q+=`M${x} ${y+2}V${Math.min(y+12,y1)}`}
+ return `<path d="${q}" fill="none" stroke="#fff6e4" stroke-opacity=".28" stroke-width="1.6" transform="translate(0 1.1)"/><path d="${q}" fill="none" stroke="#3a2a1d" stroke-opacity=".5" stroke-width="1.1" stroke-dasharray="3.4 2.6"/>`}
+// One bay as it is built; u runs 0..1 through the timeline in MB. B gives its outline, seam, pins and dressing.
+function mbBay(u,B){
+ let o='';const chalk=seg(u,0,.06)*(1-seg(u,.62,.74));
+ // Tailor's chalk marks where the bay goes before the patch arrives.
+ if(chalk>0)o+=`<path d="${B.body}" fill="none" stroke="#f4ead6" stroke-opacity="${f(.6*chalk)}" stroke-width="1.4" stroke-dasharray="5 4"/>`;
+ const q=seg(u,...MB.drop),L=seg(u,...MB.land);if(q<=0)return o;
+ // The patch falls limp and tilted, flops level with an overshoot and squashes as it lands, as the felt voussoirs do.
+ const rot=q<1?B.tilt*(1-q):B.tilt*.3*Math.sin(L*PI*2)*(1-L),sq=L>0&&L<1?Math.sin(PI*L)*(1-.4*L):0;
+ const tr=`translate(0 ${f(-70*(1-q*q))}) rotate(${f(rot)} ${f(B.cx)} ${f(B.by)}) translate(${f(B.cx)} ${f(B.by)}) scale(${f(1+.05*sq)} ${f(1-.09*sq)}) translate(${f(-B.cx)} ${f(-B.by)})`;
+ let p=`<path d="${B.body}" fill="#000" opacity=".5" filter="url(#soft)" transform="translate(0 6)"/><path d="${B.body}" fill="#2e211b" filter="url(#g-m)" transform="translate(1.5 3)"/>`;
+ p+=`<g fill="${SK.c.body}" filter="url(#f-m)"><path d="${B.body}"/>${B.mass}</g><g clip-path="url(#${B.clip})">${B.quilt}</g>`;
+ p+=B.dress(seg(u,...MB.dress));
+ // Basting first, in long red tacks; the running stitch follows it round; then the basting is pulled out by its end and trails away.
+ const bp=seg(u,...MB.baste),pl=seg(u,...MB.pull);
+ if(bp>0&&pl<1){const R=mbRun(B.baste,bp,10,6,pl*pl*B.bl);p+=mbThread(R.d,'#c8322e',1.1);
+  if(pl>0){const e=R.at(R.L),w=26*Math.sin(PI*pl);p+=`<path d="M${f(e[0])} ${f(e[1])}q${f(w*.5)} ${f(-w*.6)} ${f(w)} ${f(-w*.2)}t${f(w*.8)} ${f(-w*.5)}" fill="none" stroke="#c8322e" stroke-width="1.1" stroke-linecap="round" opacity="${f(1-pl)}"/>`}}
+ p+=mbThread(mbRun(B.seam,seg(u,...MB.sew),3.4,2.6).d,'#f7e8c9',1.1);
+ o+=`<g transform="${tr}" opacity="${f(clamp(q*3))}">${p}</g>`;
+ // Pins go in one by one once the patch has landed, and come out after the basting.
+ B.pins.forEach(([x,y,a],i)=>{const k=seg(u,MB.pins[0]+i*.025,MB.pins[0]+.05+i*.025)*(1-seg(u,MB.pull[0]+.03+i*.02,MB.pull[0]+.08+i*.02));o+=mbPin(x,y,a,k,MB.pinCol[i%4])});
+ return o;
+}
+// The aisle: a gabled chapel front sewn on to the left, with a felt rose in the gable and the pass rate in its window.
+function mbAisle(u,h){
+ const body=rpoly([[-150,h,9],[-150,5,3],[-71,-30,2],[8,5,0],[8,h,0]]),pn=pinnacle(-142,5,.78);
+ const kn=[...along(-150,5,-71,-30,1,3,3),...along(8,5,-71,-30,-1,3,3)];
+ return mbBay(u,{body,clip:'mb-ca',tilt:-14,cx:-71,by:h,bl:300,mass:pn.mass,quilt:mbQuilt(-150,8,27,h-9),
+  seam:[[-144,h-6],[-144,8],[-71,-23.5],[1,6.5]],baste:[[-139,h-11],[-139,12],[-71,-17],[-6,10]],
+  pins:[[-140,24,1.1],[-104,-6,1.3],[-40,-4,1.9],[-140,h-14,1.1]],
+  dress(d){
+   let s=`<defs><clipPath id="mb-ca"><path d="${body}"/></clipPath></defs>`,ap=`<path d="${rr4(-140,8,134,13,[5,4,5,4])}" fill="${SK.c.band}"/>`;
+   // The window: a dark reveal, jewel felt pieces sewn round it one by one, and a cotton patch.
+   const x=-130,y=30,w=112,wh=h-39,b=4,pieces=[];
+   for(let i=0;i<6;i++)pieces.push([x+i*w/6+.7,y-b+.6,w/6-1.4,b-1.2],[x+i*w/6+.7,y+wh+.6,w/6-1.4,b-1.2]);
+   for(let j=0;j<2;j++)pieces.push([x-b+.6,y+j*wh/2+.7,b-1.2,wh/2-1.4],[x+w+.6,y+j*wh/2+.7,b-1.2,wh/2-1.4]);
+   ap+=`<rect x="${x-b-3}" y="${y-b-2}" width="${w+2*b+6}" height="${wh+2*b+5}" rx="3" fill="#2a1d16"/>`;
+   const np=Math.floor(seg(d,0,.35)*pieces.length+1e-6);pieces.slice(0,np).forEach(([px,py,pw,ph],i)=>ap+=`<rect x="${f(px)}" y="${f(py)}" width="${f(pw)}" height="${f(ph)}" rx="1" fill="${APP[(i*4+15)%APP.length]}"/>`);
+   s+=`<g filter="url(#g-m)">${ap}</g>`+stitch(rr4(-137,10.6,128,7.8,[4,4,4,4]),'#f3dfb8',.6,.9,'2.4 2.2');
+   s+=`<rect x="${x}" y="${y}" width="${w}" height="${f(wh)}" rx="2" fill="#f4ecdc"/><rect x="${x}" y="${y}" width="${w}" height="${f(wh)}" rx="2" fill="none" stroke="#c9b48e" stroke-width=".8" stroke-dasharray="2 1.6"/>`;
+   s+=mbCross('86%',2.2,x+6,y+4,Math.floor(seg(d,.3,.78)*mbCells('86%')+1e-6));
+   const tx=seg(d,.7,.95);
+   if(tx>0)s+=`<g font-family="Georgia,serif" opacity="${f(tx)}"><text x="${x+50}" y="${y+15}" font-size="10" font-style="italic" fill="#5d4838">passed</text><text x="${x+6}" y="${f(Math.min(y+wh-5,y+32))}" font-size="9.5" fill="#5d4838">run 418 · main</text>`+
+    `<text x="-73" y="17.6" font-size="8.5" letter-spacing="2.2" text-anchor="middle" fill="#fff4dc">PASS RATE</text></g>`;
+   // The rose in the gable is sewn petal by petal, the same felt rose as the join, small.
+   s+=`<g filter="url(#g-m)"><g transform="translate(-71 -9) scale(${f(13/RB*1000)/1000})">${roseFelt(0,seg(d,.05,.62))}</g></g>`;
+   let k='';kn.forEach((p,i)=>k+=mbKnot(p[0],p[1],2.4,seg(d,.1+i*.05,.2+i*.05)));
+   k+=mbKnot(-71,-33.5,3.2,seg(d,.42,.52));if(d>.5)k+=`<g opacity="${f(seg(d,.5,.62))}">${pn.knots}</g>`;
+   return s+k}});
+}
+// The clerestory over the nave: stepped lancets, one per run on main (taller the more passed), and the checks waiting on Brent.
+function mbClere(u){
+ const body=rpoly([[6,12,0],[6,-80,3],[138,-98,2],[270,-80,3],[270,12,0]]),p1=pinnacle(14,-80,.78),p2=pinnacle(262,-80,.78);
+ const kn=[...along(6,-80,138,-98,1,4,2.8),...along(270,-80,138,-98,-1,4,2.8)];
+ return mbBay(u,{body,clip:'mb-cn',tilt:9,cx:138,by:8,bl:540,mass:p1.mass+p2.mass,quilt:mbQuilt(6,270,-58,8),
+  seam:[[11,2],[11,-75],[138,-92.5],[265,-75],[265,2]],baste:[[16,-2],[16,-71],[138,-87],[260,-71],[260,-2]],
+  pins:[[22,-50,1.2],[96,-86,1.5],[190,-86,1.7],[254,-50,1.9]],
+  dress(d){
+   let s=`<defs><clipPath id="mb-cn"><path d="${body}"/></clipPath></defs>`,ap=`<path d="${rr4(16,-76,244,13,[5,4,5,4])}" fill="${SK.c.band}"/>`,gl='';
+   // Each lancet is a dark reveal; its jewel felt flips over from the backing, oldest run first, like the rose's petals.
+   MB.runs.forEach((r,i)=>{const lw=15,x=18+i*(lw+10.4),bot=-26,top=bot-(31-(14-r)*5),dd=`M${f(x)} ${bot}V${top+6}Q${f(x)} ${top} ${f(x+lw/2)} ${top-3}Q${f(x+lw)} ${top} ${f(x+lw)} ${top+6}V${bot}Z`;
+    ap+=`<path d="${dd}" fill="#2a1d16" transform="translate(${f(x+lw/2)} ${bot}) scale(1.22 1.05) translate(${f(-x-lw/2)} ${-bot})"/>`;
+    const pp=seg(d,.12+i*.045,.19+i*.045),sy=Math.max(.1,Math.abs(Math.cos(pp*PI))),on=pp>=.5,col=r>=14?'#3f8f57':r>=12?'#d6a43c':'#a52d2a';
+    gl+=`<g transform="translate(0 ${bot}) scale(1 ${f(sy*100)/100}) translate(0 ${-bot})"><path d="${dd}" fill="${on?col:'#3a2a20'}"/>${on?`<path d="${dd}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".8" stroke-dasharray="1.6 1.6" transform="translate(${f(x+lw/2)} ${bot-2}) scale(.7 .86) translate(${f(-x-lw/2)} ${-bot+2})"/>`:''}</g>`;
+    if(i===9)gl+=mbKnot(x+lw/2,top-6.5,2.6,seg(d,.6,.68))});
+   s+=`<g filter="url(#g-m)">${ap}</g>`+stitch(rr4(19,-73.4,238,7.8,[4,4,4,4]),'#f3dfb8',.6,.9,'2.4 2.2')+`<g filter="url(#g-m)">${gl}</g>`;
+   // A cotton name tape stitched on under the lancets.
+   const tp=seg(d,.66,.8),tx=seg(d,.78,1);
+   if(tp>0)s+=`<g opacity="${f(tp)}"><rect x="18" y="-22" width="240" height="15" rx="2" fill="#f4ecdc"/>${stitch('M20.5 -19.5H255.5M20.5 -8.6H255.5','#b9a27c',.8,.7,'2 1.8')}</g>`;
+   if(tx>0)s+=`<text x="138" y="-11.3" font-family="Georgia,serif" font-size="9" text-anchor="middle" fill="#5d4838" opacity="${f(tx)}"><tspan fill="#a52d2a">2 waiting on Brent</tspan> · deploy-preview · e2e-safari</text>`;
+   s+=`<text x="138" y="-66.4" font-family="Georgia,serif" font-size="8.5" letter-spacing="2.2" text-anchor="middle" fill="#fff4dc" opacity="${f(seg(d,0,.25))}">LAST TEN RUNS · MAIN</text>`;
+   let k='';kn.forEach((p,i)=>k+=mbKnot(p[0],p[1],2.3,seg(d,.1+i*.04,.2+i*.04)));k+=mbKnot(138,-101.5,3.2,seg(d,.44,.54));
+   if(d>.5)k+=`<g opacity="${f(seg(d,.5,.62))}">${p1.knots+p2.knots}</g>`;
+   return s+k}});
+}
+function mbUnder(c){
+ const g=model.g,vis=1-seg(shk(),0,.3);if(g<=0||vis<=0)return '';
+ // The bays fade while the kneeler lets out its stuffing to the strip, and come back when it fills again.
+ let s=`<defs>${feltFilters('m',21)}</defs><g transform="translate(${f(model.c.x)} ${f(model.c.y)})"${vis<1?` opacity="${f(vis)}"`:''}>`;
+ if(g>1)s+=mbClere(clamp(g-1));
+ return s+mbAisle(clamp(g),CH)+'</g>';
+}
+// Room: work out where everything stands at size n. A widget still where the growth last put it goes back from where it was;
+// one moved since starts from where it is now. Checks stays on the stage; the pair (or each widget) steps clear the shortest way.
+function mbPlan(n){
+ const O={};for(const id of['a','b','c']){const m=model[id],q=model.mq&&model.mq[id],o=model.mo&&model.mo[id];O[id]=q&&o&&Math.abs(m.x-q.x)<.5&&Math.abs(m.y-q.y)<.5?{...o}:{x:m.x,y:m.y}}
+ model.mo=O;const e=MB.ext[n],to={a:{...O.a},b:{...O.b},c:{...O.c}};
+ to.c.x=clamp(O.c.x,14+e.l,1200-CW-14);to.c.y=clamp(O.c.y,TOP-20+e.t,600-CH-10);
+ if(n>0){const m=MB.m,R={x0:to.c.x-e.l-m,y0:to.c.y-e.t-m,x1:to.c.x+CW+m,y1:to.c.y+CH+m},g=J().gap;
+  const units=model.jt===1?[[['a','b'],{x:O.a.x,y:O.a.y,w:2*W+g,h:H}]]:[[['a'],{x:O.a.x,y:O.a.y,w:W,h:H}],[['b'],{x:O.b.x,y:O.b.y,w:W,h:H}]];
+  // Each unit placed becomes an obstacle for the next, so Jarvis never steps onto GitDiscuss.
+  const hit=(A,x,y,w,h)=>!(x+w<=A.x||x>=A.x+A.w||y+h<=A.y||y>=A.y+A.h),obs=units.map(u=>({...u[1]}));
+  units.forEach(([ids,U],ui)=>{if(U.x+U.w<=R.x0||U.x>=R.x1||U.y+U.h<=R.y0||U.y>=R.y1)return;
+   const mv=[[0,R.y0-U.y-U.h],[0,R.y1-U.y],[R.x0-U.x-U.w,0],[R.x1-U.x,0]].filter(([dx,dy])=>U.y+dy>=TOP&&U.y+U.h+dy<=600-14&&U.x+dx>=10&&U.x+U.w+dx<=1190&&
+    !obs.some((A,j)=>j!==ui&&hit(A,U.x+dx,U.y+dy,U.w,U.h))).sort((p,q)=>Math.hypot(...p)-Math.hypot(...q))[0];
+   if(mv){for(const id of ids){to[id].x+=mv[0];to[id].y+=mv[1]}obs[ui]={...U,x:U.x+mv[0],y:U.y+mv[1]}}})}
+ return to;
+}
+function mbTo(n){
+ if(!X().morph||n===model.gT&&model.g===n)return;
+ if(model.jt>0&&model.jt<1){say('Let the join finish first, then change the size.');return}
+ if(model.st>.5){say('Unshade first: the bays are sewn on to the full kneeler, not the strip.');return}
+ const g0=model.g,token=++mbAnim,from={},to=mbPlan(n),grow=n>g0,w=Math.min(1,.16/Math.abs(n-g0));
+ for(const id of['a','b','c'])from[id]={x:model[id].x,y:model[id].y};
+ model.gT=n;model.mq={...from};let kd=-1;
+ say(grow?(n===2&&g0<1?'Growing to a nave: an aisle is sewn on, then a clerestory over it.':n===1?'Growing: an aisle bay is chalked, pinned, basted and sewn on to the left.':'Growing: a clerestory is chalked, pinned, basted and sewn on over the nave.')
+  :(n===0?'Shrinking: the bays are unpicked, the basting goes back in and the patches lift away.':'Shrinking: the clerestory is unpicked and lifted away.'));
+ render();
+ // Neighbours step aside while the first patch drops in, and step back while the last one lifts away.
+ stepped((grow?MB.ms:MB.unMs)*Math.abs(n-g0),t=>{model.g=lerp(g0,n,t);
+   // Positions are only written during the step-aside window, so a widget dragged later is left where it was put.
+   const k=ease(grow?clamp(t/w):clamp((t-(1-w))/w)),q={};
+   // Only a widget still where the morph last put it is moved (not one dragged or keyed since), and the pair is left alone mid-join.
+   model.g=t>=1?n:model.g;
+   if(kd<1){for(const id of['a','b','c']){const m=model[id],p=model.mq[id],ours=Math.abs(m.x-p.x)<.5&&Math.abs(m.y-p.y)<.5&&!(id!=='c'&&model.jt>0&&model.jt<1);
+     q[id]=ours?{x:lerp(from[id].x,to[id].x,k),y:lerp(from[id].y,to[id].y,k)}:{x:m.x,y:m.y};Object.assign(m,q[id])}model.mq=q}
+   kd=k;render()},token,k=>k===mbAnim)
+  .then(ok=>{if(ok)say(n===0?'One bay: Checks is a single kneeler again. Anything that stepped aside is back.':n===1?'Aisle: the pass rate is in the chapel window, under a felt rose. Press S or pick Nave to add the clerestory.':'Nave: the last ten runs on main are stepped lancets in the clerestory (green all passed, amber some, red three failing), and the checks waiting on Brent are named on the tape.')});
+}
+// Leaving the mix puts Checks back to one bay at once, and anything it moved back where it was.
+function mbReset(){if(!model.g&&!model.mq)return;++mbAnim;
+ for(const id of['a','b','c']){const q=model.mq&&model.mq[id],o=model.mo&&model.mo[id];if(q&&o&&Math.abs(model[id].x-q.x)<.5&&Math.abs(model[id].y-q.y)<.5)Object.assign(model[id],o)}
+ model.g=model.gT=0;model.mq=model.mo=null}
+function mbPhase(){const g=model.g,n=model.gT;if(g===n)return MB.sizes[n].toLowerCase();
+ const grow=n>g,i=grow?Math.floor(g):Math.ceil(g)-1,u=g-i,bay=i?'clerestory':'aisle';
+ const ph=u<.24?(grow?'drops in':'lifts away'):u<.34?'pinned':u<.46?'basted':u<.68?(grow?'sewn on':'unpicked'):u<.8?(grow?'basting out':'basting in'):(grow?'dressed':'undressed');
+ return (grow?'growing':'shrinking')+' · '+bay+' '+ph}
+MIXES.bays={...MIXES.feltCathedral,label:'Bays sewn on',kind:'Layer stack · morph',morph:true,
+ stack:[['Model','Layer stack (B), for the morph','the brainstorm asked which layer a join or shade belongs to and put them in Structure, with Material rendering them. This asks the same of a morph'],
+  ['Structure','Gothic','decides <i>what</i> grows: bays. An aisle with a gabled chapel front, then a clerestory over the nave, the way a church is extended'],
+  ['Material','Felt','decides <i>how</i>: each bay is a stuffed patch, chalked, pinned, basted, sewn round and dressed. Basting is felt\'s scaffolding: it holds the work while the real seam goes in, then comes out'],
+  ['Ornament','Gothic, with a fallback','the gable rose is the felt rose of the join; the lancets are jewel felt that flips over from its backing, since felt cannot light up'],
+  ['Motion','Felt','12 fps stop-motion; the patches fall limp, flop level and squash, and fibres shift every frame'],
+  ['Display','Felt','cotton patches with cross-stitch numerals, a cotton tape for the names']],
+ about:'The felt cathedral, with Checks able to grow. Gothic grows by bays and felt grows by patches sewn on, so in a layer stack the structure decides <i>what</i> is added and the material decides <i>how</i>. Pick a size with the Size buttons or press S. <b>Aisle</b>: a chapel bay is sewn on to the left, with a gable, a rose and the pass rate in its window. <b>Nave</b>: a clerestory is sewn on over Checks, with the last ten runs on main as stepped lancets and the checks waiting on Brent on a cotton tape. Anything in the way steps aside first and comes back when the bays are unpicked. The join and the shade are the felt cathedral\'s.',
+ join:{...MIXES.feltCathedral.join},
+ shade:{...MIXES.feltCathedral.shade,about:MIXES.feltCathedral.shade.about+' Grown bays fade while the stuffing is let out and come back when it fills again.'},
+ under:mbUnder,
+ text:{...MIXES.feltCathedral.text,intro:'Pick Aisle or Nave (or press S) to grow Checks by bays. Joining and shading work as in the felt cathedral.'}};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1,g:0,gT:0,mq:null,mo:null};
 let anim=0,shadeAnim=0,matchAnim=0,drag=null;
 const X=()=>MIXES[model.mix],J=()=>X().join,T=()=>X().text;
 
@@ -4707,10 +4878,11 @@ function render(){
  $$('#heldRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.held===hpHeld)));
  $$('#matchRow button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.match==='1')===model.match)));
  $$('#motionRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mv===mvKind)));
+ $$('#sizeRow button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.size===model.gT)));
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
  const t=x.text,ph={separate:t.sepPh,joining:t.mid(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()};
- $('#phase').textContent=(drag&&drag.angle?'Turning on the pin · '+hgSign(hgCur):drag&&drag.turn?t.turn(drag):drag&&drag.state==='ready'?t.readyPh:drag&&drag.state==='near'?t.nearPh:ph[state])+(model.st>.5?' · shaded':'');
+ $('#phase').textContent=(drag&&drag.angle?'Turning on the pin · '+hgSign(hgCur):drag&&drag.turn?t.turn(drag):drag&&drag.state==='ready'?t.readyPh:drag&&drag.state==='near'?t.nearPh:ph[state])+(x.morph&&(model.g>0||model.gT>0)?' · '+mbPhase():'')+(model.st>.5?' · shaded':'');
 }
 
 /* ---------- Controls ---------- */
@@ -4722,6 +4894,8 @@ Object.entries(MIXES).forEach(([id,o])=>{const b=document.createElement('button'
 Object.entries(HELD).forEach(([k,o])=>{const b=document.createElement('button');b.dataset.held=k;b.textContent=o.label;b.title='Set a '+o.label.toLowerCase()+' widget in the hoop';b.onclick=()=>pickHeld(k);$('#heldRow').append(b)});
 // Turned to felt: whether a docked widget takes its group's skin. Switching while docked sews the felt on or unpicks it in place.
 [['1','Match my groups'],['0','Keep each skin']].forEach(([v,l])=>{const b=document.createElement('button');b.dataset.match=v;b.textContent=l;b.onclick=()=>setMatch(v==='1');$('#matchRow').append(b)});
+// Bays sewn on: the size Checks grows to.
+MB.sizes.forEach((l,i)=>{const b=document.createElement('button');b.dataset.size=i;b.textContent=l;b.title=['Checks as a single kneeler','Sew an aisle bay on to the left','Sew on the aisle and a clerestory over the nave'][i];b.onclick=()=>mbTo(i);$('#sizeRow').append(b)});
 function setMatch(on){
  if(on===model.match)return;model.match=on;model.mkFall=!on;const from=model.mk,token=++matchAnim;
  stepped(1400*Math.abs((on?1:0)-from),t=>{model.mk=lerp(from,on?1:0,t);render()},token,k=>k===matchAnim);
@@ -4730,12 +4904,13 @@ function setMatch(on){
 function pickHeld(k){hpHeld=k;document.body.dataset.pair=X().pair||'';describe();say('Held: GitDiscuss and Checks are now '+HELD[k].label.toLowerCase()+'.');render()}
 function pick(id){
  if(drag)cancelDrag();
+ if(id!==model.mix)mbReset();
  if(id!==model.mix){const was=model.jt,wasDock=DOCK(),wasHome=!!X().home;++anim;++hgAnim;hgCur=hgSet;model.busy=false;model.mix=id;model.path=null;model.jt=0;model.glow=0;startJoinFrom({...REST},0);
   // Into or out of a mix with its own layout the widgets take up that mix's home positions (a fused group with Checks apart,
   // Checks tucked under Jarvis clear of GitDiscuss's swing), or the usual layout.
   if(wasDock||wasHome||X().home){const H0=X().home||HOME;for(const k of ['a','b','c'])if(H0[k])Object.assign(model[k],{x:H0[k].x,y:H0[k].y});if(DOCK())Object.assign(model.c,sepSpot())}
   if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}}
- document.body.dataset.mix=model.mix;document.body.dataset.pair=X().pair||'';$('#heldRow').hidden=!X().held;$('#matchRow').hidden=!X().pref;$('#motionRow').hidden=!X().motions;$('#angleRow').hidden=!X().angle;describe();say(T().intro);render();
+ document.body.dataset.mix=model.mix;document.body.dataset.pair=X().pair||'';$('#heldRow').hidden=!X().held;$('#matchRow').hidden=!X().pref;$('#motionRow').hidden=!X().motions;$('#sizeRow').hidden=!X().morph;$('#angleRow').hidden=!X().angle;describe();say(T().intro);render();
 }
 function describe(){
  const x=X();
@@ -4754,6 +4929,7 @@ document.addEventListener('keydown',e=>{
  if(e.key.toLowerCase()==='g'&&X().pref)setMatch(!model.match);
  if(e.key.toLowerCase()==='v'&&X().motions){const ks=Object.keys(MV);pickMotion(ks[(ks.indexOf(mvKind)+1)%ks.length])}
  if(e.key.toLowerCase()==='h'&&X().held){const ks=Object.keys(HELD);pickHeld(ks[(ks.indexOf(hpHeld)+1)%ks.length])}
+ if(e.key.toLowerCase()==='s'&&X().morph)mbTo((model.gT+1)%3);
  if(e.key.toLowerCase()==='m'){const ks=Object.keys(MIXES);pick(ks[(ks.indexOf(model.mix)+1)%ks.length])}
 });
 ['a','b'].forEach(id=>{
@@ -4801,7 +4977,7 @@ stage.addEventListener('pointermove',e=>{
  const dx=p.x-drag.start.x,dy=p.y-drag.start.y,s=drag.saved,bottom=600-(model.st>.5?HS:H)-14;
  // A tap is judged in screen pixels, so a finger's wobble on a zoomed-out phone page still counts as a tap.
  if(gripAt&&Math.hypot(e.clientX-gripAt.x,e.clientY-gripAt.y)>(e.pointerType==='touch'?10:4))gripMoved=true;
- if(drag.id==='c'&&!DOCK()){model.c.x=clamp(s.c.x+dx,14,1200-CW-14);model.c.y=clamp(s.c.y+dy,TOP-20,600-CH-10);render();return}
+ if(drag.id==='c'&&!DOCK()){const e=mbE();model.c.x=clamp(s.c.x+dx,14+e.l,1200-CW-14);model.c.y=clamp(s.c.y+dy,TOP-20+e.t,600-CH-10);render();return}
  if(drag.group&&DOCK()){const ax=clamp(s.a.x+dx,10,1200-2*W-10),ay=clamp(s.a.y+dy,TOP,dockBottom());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W,y:ay});render();return}
  if(DOCK()){
   // Checks toward the oriel bay: the same near and ready distances and the same pull as a socket.
@@ -4848,7 +5024,7 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  const bottom=600-(model.st>.5?HS:H)-14;
  if(DOCK()&&(id!=='c'||model.jt===1)){const ax=clamp(model.a.x+k[0],10,1200-2*W-10),ay=clamp(model.a.y+k[1],TOP,dockBottom());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W,y:ay})}
  else if(model.jt===1&&id!=='c'){const g=J().gap,ax=clamp(model.a.x+k[0],10,1200-2*W-g-10-RX()),ay=clamp(model.a.y+k[1],TOP+RT(),bottom-RBOT());Object.assign(model.a,{x:ax,y:ay});Object.assign(model.b,{x:ax+W+g,y:ay})}
- else{const m=model[id],w=id==='c'?CW:W;m.x=clamp(m.x+k[0],14,1200-w-14);m.y=clamp(m.y+k[1],id==='c'?TOP-20:TOP,id==='c'?600-CH-10:bottom)}render();
+ else{const m=model[id],w=id==='c'?CW:W,e=id==='c'?mbE():{l:0,t:0};m.x=clamp(m.x+k[0],14+e.l,1200-w-14);m.y=clamp(m.y+k[1],(id==='c'?TOP-20:TOP)+e.t,id==='c'?600-CH-10:bottom)}render();
 }));
 
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
