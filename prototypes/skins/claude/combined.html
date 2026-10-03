@@ -541,7 +541,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="stackAbout"></div><div id="joinAbout"></div><div id="shadeAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · M cycles the mixes · H cycles the held skin in the hoop setting · G switches "match my groups" in Turned to felt · Esc cancels a drag. Checks has no joining edges, as in the capsule study. In the ruined bug cathedral everything moves smoothly, and its glow-bugs fly only while it joins or releases. The bell on a jump ring moves smoothly too, and its bell rings only as the join completes. In couched wire the copper runs smoothly and the needle works tack by tack, while the felt boils on 12 fps steps. In the penannular brooch the silver swings and turns smoothly and only the felt boils. In the swan boat everything moves smoothly: the silver unfurls slowly and the boat dips and rocks under the shell. In ants meet bees the ants walk and the bees fly smoothly, with flickering wings, while the felt boils on 12 fps steps. In the shared quilt, shade the widgets apart and then joined: apart, stone lowers and felt goes under its own quilt; joined, one quilt is unrolled over both. In one line, shade the widgets apart and then joined: apart, Jarvis hangs charms on a brass chain and the felt is pegged out on washing lines; joined, the chain and the cotton are tied into one line.Felt parts move at 12 frames a second and their fibres shift each frame; stone stays still except in the reliquary bay, where it moves smoothly; in the needle seam the Hollow needle sets a smooth pace and the felt only boils on 12 fps steps; on the iron bracket the stone stays still and the iron moves smoothly; on the tracery the stone stays still and the vine grows smoothly; in the hoop setting the wire moves smoothly; in felt bugs everything is felt, so the pendants and the caterpillar all move at 12 frames a second; in felt caterpillars, tap a shaded caterpillar (or press Enter on its nameplate) to pause or resume its widget; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=92,FRAME=1000/12;
@@ -4235,6 +4235,199 @@ MIXES.quilt={...MIXES.coupler,label:'Shared quilt',kind:'Dominant skin · shade'
   get shadeOn(){return model.jt===1?'Shaded together: the group shades in felt, so one quilt is unrolled over GitDiscuss, the coupler and Jarvis, and both names are stitched on it.':'Shaded apart: Jarvis\'s wall lowers to its frieze (stone has no quilt), and GitDiscuss and Checks are each tucked under their own.'},
   shadeOff:'Unshaded: the blocks are unpicked, the quilts are rolled back up and lifted off, and the casings fill out again.'}};
 
+/* ---------- Mix: one line (model A, for shades). Wire's charm chain and felt's washing line share a hanging face and tie into one line. ---------- */
+// Every Hang shade hangs from one standard face: a line 8 px under the strip's top (7 on Checks), held 11 px in from each end.
+// Each skin draws its own half on it: wire a brass chain on twisted copper posts with charms on jump rings (the wire page's charm
+// bracelet), felt a twisted cotton line on turned props with the felt pegged over it (the felt page's washing line). Joined, the two
+// inner supports fold away and the free ends reach across the gap; the cotton is tied through the chain's end ring, so the pair hangs
+// from one line with one sag, and a glass bead on the knot is the join light.
+Object.assign(METAL,{brass:['#2a1a06','#b68b34','#fbe7a8']});
+const OL={in:11,sag:2.6,jsag:5};
+// Shade beats: the casings shrink (shK) and fade (veil), the supports rise, the line is strung, the ends tie (if joined), then each half hangs its pieces.
+const olP=st=>{const k=seg(st,.9,1);return{veil:seg(st,.18,.4),post:seg(st,.3,.44),line:ease(seg(st,.42,.56)),felt:seg(st,.62,.74),peg:seg(st,.72,.8),
+ tape:seg(st,.78,.84),emb:seg(st,.82,.94),sway:k>0&&k<1?Math.sin(k*3*PI)*Math.pow(1-k,1.6):0}};
+// How far the two lines are tied into one: only once the pair is joined (after the couching) and both lines are strung.
+// A pair shading (or unshading) while already joined strings its line straight across the gap, without the inner supports.
+const olPre=()=>model.st<1&&model.jt===1&&!model.busy;
+const olJ=c=>ease(seg(c.jt,.72,1))*(olPre()?ease(seg(model.st,.42,.56)):seg(model.st,.54,.64));
+const olCirc=(x,y,r)=>`M${f(x-r)} ${f(y)}a${r} ${r} 0 1 0 ${f(2*r)} 0a${r} ${r} 0 1 0 ${f(-2*r)} 0`;
+const olDefs=()=>`<defs><linearGradient id="ol-brass" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fbe7a8"/><stop offset=".45" stop-color="#d1a44c"/><stop offset="1" stop-color="#7a5418"/></linearGradient>`+
+ `<linearGradient id="ol-wd" x1="0" x2="1"><stop stop-color="#f3d9a8"/><stop offset=".45" stop-color="#c8955a"/><stop offset="1" stop-color="#7a4f26"/></linearGradient>`+
+ `<radialGradient id="ol-wk" cx=".36" cy=".3" r=".8"><stop stop-color="#f6dcaa"/><stop offset=".55" stop-color="#b07a42"/><stop offset="1" stop-color="#5a3414"/></radialGradient>`+
+ `<pattern id="ol-woven" width="3" height="2" patternUnits="userSpaceOnUse"><path d="M0 .5H3" stroke="#8a6a44" stroke-opacity=".14" stroke-width=".7"/><path d="M1.5 0V2" stroke="#fff" stroke-opacity=".25" stroke-width=".5"/></pattern></defs>`;
+function olGeo(c){
+ const A=model.a,B=model.b,C=model.c,j=olJ(c);
+ const a={x0:A.x+OL.in,x1:A.x+W-OL.in,y:A.y+8,top:A.y,h:c.h},b={x0:B.x+OL.in,x1:B.x+W-OL.in,y:B.y+8,top:B.y,h:c.h},k={x0:C.x+OL.in-1,x1:C.x+CW-OL.in+1,y:C.y+7,top:C.y,h:c.ch};
+ const own=(L,s)=>x=>{const t=clamp((x-L.x0)/(L.x1-L.x0));return L.y+s*4*t*(1-t)};
+ // Tied, the pair hangs from one line between its two outer supports, with one deeper sag.
+ const whole=x=>{const t=clamp((x-a.x0)/(b.x1-a.x0));return lerp(a.y,b.y,t)+OL.jsag*4*t*(1-t)},ya=own(a,OL.sag),yb=own(b,OL.sag);
+ a.ld=x=>lerp(ya(x),whole(x),j);b.ld=x=>lerp(yb(x),whole(x),j);k.ld=own(k,2);
+ const K={x:(A.x+W+B.x)/2};K.y=a.ld(K.x);
+ return{a,b,k,K,j};
+}
+/* The wire half: twisted copper posts, a brass chain and charms on jump rings. */
+// A twisted copper post from the strip's foot to just over the line, bound near the foot and capped with a curl; it grows up from the foot.
+function olPost(x,ly,foot,d,grow){
+ if(grow<=.01)return '';const top=ly-1.5;
+ const p=wire(`M${f(x)} ${f(foot)}V${f(top)}`,'copper',3.2)+`<path d="M${f(x)} ${f(foot-1)}V${f(top+1)}" stroke="#4a2410" stroke-width="3.2" stroke-dasharray="1 2.6" opacity=".45"/>`+
+  wire(band(x,foot-7,true,3,9),'copper',1.2)+wire(spiral(x+d*3.4,top-2,3,1.3,d,d>0?PI:0),'copper',1.5);
+ return `<g transform="translate(0 ${f(foot)}) scale(1 ${f(grow*1000)/1000}) translate(0 ${f(-foot)})">${p}</g>`;
+}
+// The chain is threaded from the left post; its free end droops and its newest link is hot. Tied, it runs on past the right post to the knot.
+function olChain(G,P){
+ const{a,K,j}=G;if(P.line<=0)return '';
+ // The pitch is fitted to the span so the last link always meets the end ring.
+ const E=lerp(a.x1,K.x-3,j),front=lerp(a.x0,E,P.line),Pt=(E-a.x0)/Math.max(1,Math.round((E-a.x0)/5.2)),free=P.line<1||(j>0&&j<.999);let fc='',ed='',hot='';
+ // The free end's droop eases out as it is hooked on, and swells and settles again while it reaches across to be tied.
+ const amp=P.line<1?7*(1-seg(P.line,.85,1)):3*Math.sin(PI*j);
+ for(let i=0,x=a.x0;x<=front+.01;i++,x=a.x0+i*Pt){
+  const dd=Math.pow(Math.max(0,1-(front-x)/26),2)*amp,y=a.ld(x)+dd,isHot=free&&front-x<Pt;
+  const lk=i%2?`M${f(x-Pt*.62)} ${f(y)}L${f(x+Pt*.62)} ${f(y)}`:`M${f(x-Pt*.62)} ${f(y)}a${f(Pt*.62)} 1.9 0 1 0 ${f(Pt*1.24)} 0a${f(Pt*.62)} 1.9 0 1 0 ${f(-Pt*1.24)} 0`;
+  if(isHot)hot+=lk;else if(i%2)ed+=lk;else fc+=lk}
+ let s=`<path d="${fc+ed}" transform="translate(1.5 3)" fill="none" stroke="#000" stroke-opacity=".3" stroke-width="2.2"/>`+wire(fc,'brass',.9)+wire(ed,'brass',1.3)+(hot?wire(hot,'hot',1.1):'');
+ // A jump ring over each post's curl holds the ends; tied, the right one comes off the folding post and becomes the knot's ring.
+ s+=wire(olCirc(a.x0-3,a.ld(a.x0)-1,2.6),'brass',.9);
+ if(P.line>=1)s+=j<.02?wire(olCirc(a.x1+3,a.ld(a.x1)-1,2.6),'brass',.9):wire(olCirc(E+3,a.ld(E),lerp(2.6,3.2,j)),'brass',1);
+ const g=Math.sin(PI*seg(P.line,.88,1));if(g>.03&&j<.02)s+=sparkle(a.x1+3,a.ld(a.x1)-2,g*.7);
+ return s;
+}
+// A faceted drop hung by its tip under a gold cap: amber per running agent, lapis when paused.
+function olDrop(x,y,r,stone){
+ const L=2.7*r,d=`M${f(x)} ${f(y)}C${f(x+r*1.3)} ${f(y+r*1.1)} ${f(x+r*1.15)} ${f(y+L)} ${f(x)} ${f(y+L)}C${f(x-r*1.15)} ${f(y+L)} ${f(x-r*1.3)} ${f(y+r*1.1)} ${f(x)} ${f(y)}Z`;
+ return `<path d="${d}" fill="url(#st-${stone})" stroke="#1a0d05" stroke-width=".7"/><path d="M${f(x)} ${f(y+r*.6)}L${f(x-r*.5)} ${f(y+L*.66)}L${f(x)} ${f(y+L-.6)}L${f(x+r*.5)} ${f(y+L*.66)}Z" fill="none" stroke="#fff" stroke-opacity=".2" stroke-width=".6"/>`+
+  `<ellipse cx="${f(x-r*.38)}" cy="${f(y+L*.56)}" rx="${f(r*.2)}" ry="${f(r*.42)}" fill="#fff" opacity=".55"/><path d="M${f(x-r*.62)} ${f(y+r*.62)}Q${f(x)} ${f(y-r*.3)} ${f(x+r*.62)} ${f(y+r*.62)}Z" fill="url(#gild)" stroke="#2a1a06" stroke-width=".5"/>`;
+}
+// Left to right: a hammered brass name bar on two rings, three status drops, a stamped value tag. Each is hooked on, drops onto its ring and swings still.
+function olCharms(G,st){
+ const{a}=G,run=model.a.run,word=run?'running':'paused',xa=a.x0+4,xb=a.x1-4,nw=Math.ceil(fcMeasure('Jarvis','italic bold 14px Georgia,serif'))+20;
+ const vW=Math.ceil(fcMeasure('03','bold 14px Georgia,serif')+4+fcMeasure(word,'italic 11px Georgia,serif'))+18,pitch=14,nx=xa+6+nw/2,vx=xb-6-vW/2,dm=(nx+nw/2+vx-vW/2)/2;
+ const items=[{k:'name',x:nx,wd:nw},...[-1,0,1].map((d,i)=>({k:'drop',x:dm+d*pitch,pin:[3,7,3][i]})),{k:'val',x:vx,wd:vW}],N=items.length;
+ let s='';
+ items.forEach((it,i)=>{
+  const t0=.62+.22*i/N,p=seg(st,t0,t0+.08);if(p<=0)return;
+  const q=seg(st,t0+.05,it.k==='val'?1:t0+.18),wob=Math.sin(q*3*PI)*Math.pow(1-q,1.4),dy=-12*(1-backOut(p)),op=f(clamp(p*3));
+  const tx=(x,y,d,fill,o,inner)=>`<text x="${f(x)}" y="${f(y+d)}" text-anchor="middle" dominant-baseline="central" fill="${fill}" opacity="${o}">${inner}</text>`;
+  if(it.k==='name'){
+   // Two rings, so the bar stays level and bobs instead of swinging.
+   const bh=18,x0=it.x-it.wd/2,hx=[x0+8,x0+it.wd-8],ty=Math.max(a.ld(hx[0]),a.ld(hx[1]))+4.4+dy+2.2*wob;
+   let o=`<rect x="${f(x0+2)}" y="${f(ty+3)}" width="${it.wd}" height="${bh}" rx="4" fill="#000" opacity=".4" filter="url(#soft)"/>`;
+   for(const x of hx)o+=wire(olCirc(x,(a.ld(x)+ty)/2+.4,2.4),'brass',.8);
+   o+=`<rect x="${f(x0)}" y="${f(ty)}" width="${it.wd}" height="${bh}" rx="4" fill="url(#ol-brass)" stroke="#3a2408" stroke-width="1"/><rect x="${f(x0)}" y="${f(ty)}" width="${it.wd}" height="${bh}" rx="4" fill="url(#hammer)"/>`+
+    `<path d="M${f(x0+3)} ${f(ty+1.4)}H${f(x0+it.wd-3)}" stroke="#fffbe6" stroke-opacity=".7" stroke-width=".9"/>`+hx.map(x=>`<circle cx="${f(x)}" cy="${f(ty+3.2)}" r="1.2" fill="#140c07"/>`).join('');
+   const nm='<tspan font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="14">Jarvis</tspan>';
+   s+=`<g opacity="${op}">${o+tx(it.x,ty+bh/2+1.4,.8,'#fff3c4',.6,nm)+tx(it.x,ty+bh/2+1.4,0,'#2a1606',1,nm)}</g>`;return}
+  const hy=a.ld(it.x)+2.6,ang=f((it.k==='val'?9:20)*(i%2?-1:1)*wob);
+  let o=wire(olCirc(it.x,hy,2.3),'brass',.8);
+  if(it.k==='drop'){const py=hy+2.3+it.pin;o+=`<path d="M${f(it.x)} ${f(hy+2)}V${f(py+.6)}" stroke="#b68b34" stroke-width=".8"/>`+olDrop(it.x,py,4.4,run?'amber':'lapis')}
+  else{const th=18,ty=hy+3.6,x0=it.x-it.wd/2,v=`<tspan font-family="Georgia,serif" font-weight="bold" font-size="14">03</tspan><tspan dx="4" font-family="Georgia,serif" font-style="italic" font-size="11">${word}</tspan>`;
+   o+=`<rect x="${f(x0+2)}" y="${f(ty+3)}" width="${it.wd}" height="${th}" rx="${th/2}" fill="#000" opacity=".4" filter="url(#soft)"/>`+
+    `<rect x="${f(x0)}" y="${f(ty)}" width="${it.wd}" height="${th}" rx="${th/2}" fill="url(#ol-brass)" stroke="#3a2408" stroke-width="1"/><rect x="${f(x0)}" y="${f(ty)}" width="${it.wd}" height="${th}" rx="${th/2}" fill="url(#hammer)"/>`+
+    `<path d="M${f(x0+th/2)} ${f(ty+1.4)}H${f(x0+it.wd-th/2)}" stroke="#fffbe6" stroke-opacity=".7" stroke-width=".9"/>`+tx(it.x,ty+th/2+.8,.8,'#fff3c4',.6,v)+tx(it.x,ty+th/2+.8,0,'#2a1606',1,v)}
+  s+=`<g opacity="${op}" transform="translate(0 ${f(dy)}) rotate(${ang} ${f(it.x)} ${f(hy)})">${o}</g>`;
+  const g=Math.sin(PI*seg(p,.5,1));if(g>.03&&it.k!=='drop')s+=sparkle(it.x+2,hy-2,g*.5);
+ });
+ return s;
+}
+/* The felt half: turned wooden props, a twisted cotton line, the felt pegged over it with a laundry name tape. */
+function olFelt(id,L,P,G){
+ const s=FS[id],small=id==='c',inner=id==='b'?G.j:0,foot=L.top+L.h-2,px0=L.x0+(small?8:9),px1=L.x1-(small?8:9),pb=L.top+L.h-(small?5:6),mx=(px0+px1)/2;
+ let o='';
+ // The props pop up from the foot at the line's two ends; tied, the inner one folds away.
+ if(P.post>0){const rw=small?3.6:4.2,br=small?2.8:3.3;
+  for(const[x,fold,keep]of[[L.x0,inner,id==='b'?P.inner:1],[L.x1,0,1]]){const gr=backOut(P.post)*(1-fold)*keep;if(gr<=.01)continue;const y0=L.ld(x);
+   const prop=`M${f(x-rw/2)} ${f(y0)}V${f(foot-4)}L${f(x-rw/2-2.6)} ${f(foot)}H${f(x+rw/2+2.6)}L${f(x+rw/2)} ${f(foot-4)}V${f(y0)}Z`;
+   o+=`<g transform="translate(0 ${f(foot)}) scale(1 ${f(gr*1000)/1000}) translate(0 ${f(-foot)})"><path d="${prop}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1 1.2)"/><path d="${prop}" fill="url(#ol-wd)" stroke="#4a2c12" stroke-opacity=".5" stroke-width=".5"/>`+
+    `<path d="M${f(x-rw/2-.6)} ${f(y0+5)}h${f(rw+1.2)}M${f(x-rw/2-.6)} ${f(foot-8)}h${f(rw+1.2)}" stroke="#4a2c12" stroke-opacity=".45" stroke-width=".8"/>`+
+    `<circle cx="${f(x+.5)}" cy="${f(y0-br+.6)}" r="${br}" fill="#000" opacity=".3"/><circle cx="${f(x)}" cy="${f(y0-br)}" r="${br}" fill="url(#ol-wk)" stroke="#4a2c12" stroke-width=".5"/><circle cx="${f(x-br*.35)}" cy="${f(y0-br*1.4)}" r="${f(br*.3)}" fill="#fff" opacity=".45"/></g>`}}
+ // The twisted cotton line, strung left to right and tied off round each prop. Tied, GitDiscuss's reaches back across the gap to the chain's ring.
+ if(P.line>0){const S=id==='b'?lerp(L.x0,G.K.x+3,G.j):L.x0,E=lerp(S,L.x1,P.line),n=Math.max(2,Math.ceil((E-S)/10));let d='';
+  for(let i=0;i<=n;i++){const x=lerp(S,E,i/n);d+=(i?'L':'M')+f(x)+' '+f(L.ld(x))}
+  o+=`<g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="${d}" stroke="#2a1608" stroke-opacity=".35" stroke-width="2.2" transform="translate(.4 1.2)"/><path d="${d}" stroke="#efe4cc" stroke-width="1.7"/><path d="${d}" stroke="#a8916a" stroke-width="1.7" stroke-dasharray="1.1 1.9"/></g>`;
+  const tk=seg(P.line,.85,1),tie=x=>`M${f(x-2.6)} ${f(L.ld(x)-1.2)}l5.2 2.4M${f(x-2.6)} ${f(L.ld(x)+1.2)}l5.2-2.4`;
+  if(tk>0)o+=`<path d="${tie(L.x1)}" stroke="#efe4cc" stroke-width="1.2" opacity="${f(tk)}"/>`+(1-inner>.01?`<path d="${tie(L.x0)}" stroke="#efe4cc" stroke-width="1.2" opacity="${f(tk*(1-inner))}"/>`:'')}
+ // The felt, folded over the line: its band's felt peeks out below, the front carries the name tape.
+ if(P.felt>0){const yt=x=>L.ld(x)-2.4,y0=yt(px0),y1=yt(px1),cy=2*yt(mx)-(y0+y1)/2,v=qlVal(id);
+  const front=`M${f(px0)} ${f(y0+3)}Q${f(px0)} ${f(y0)} ${f(px0+3)} ${f(y0-.2)}Q${f(mx)} ${f(cy)} ${f(px1-3)} ${f(y1-.2)}Q${f(px1)} ${f(y1)} ${f(px1)} ${f(y1+3)}V${f(pb-6)}Q${f(px1)} ${f(pb)} ${f(px1-6)} ${f(pb)}H${f(px0+5)}Q${f(px0)} ${f(pb+.6)} ${f(px0)} ${f(pb-5)}Z`;
+  const back=`M${f(px0+3)} ${f(pb-9)}H${f(px1-1)}V${f(pb+1)}Q${f(px1-1)} ${f(pb+3.4)} ${f(px1-5)} ${f(pb+3.4)}H${f(px0+9)}Q${f(px0+3)} ${f(pb+2.8)} ${f(px0+3)} ${f(pb)}Z`;
+  const hy=pb-2.5,hem=`M${f(px0+4.5)} ${f(y0+6)}V${f(hy-1.5)}Q${f(px0+4.5)} ${f(hy)} ${f(px0+8)} ${f(hy)}H${f(px1-8)}Q${f(px1-4.5)} ${f(hy)} ${f(px1-4.5)} ${f(hy-1.5)}V${f(y1+6)}`;
+  let p=`<path d="${back}" fill="#000" opacity=".35" filter="url(#sh)" transform="translate(.6 1.4)"/><path d="${back}" fill="${s.band}" filter="url(#g-${id})"/>`+
+   `<path d="${front}" fill="#000" opacity=".42" filter="url(#sh)" transform="translate(.8 1.6)"/><path d="${front}" fill="${s.body}" filter="url(#f-${id})"/>`+
+   `<path d="M${f(px0+3)} ${f(y0+1.3)}Q${f(mx)} ${f(cy+1.3)} ${f(px1-3)} ${f(y1+1.3)}" fill="none" stroke="#fff3e2" stroke-opacity=".3" stroke-width="1.6"/><path d="M${f(px0+2)} ${f(y0+4.6)}Q${f(mx)} ${f(cy+4.6)} ${f(px1-2)} ${f(y1+4.6)}" fill="none" stroke="#1d0f06" stroke-opacity=".14" stroke-width="2"/>`+
+   stitch(hem,'#f7e8c9',.85,1.2,'4 3');
+  // The laundry name tape: cream cotton with turned-under ends tacked down, the name woven in red, the value cross-stitched in navy.
+  if(P.tape>0){const tin=small?12:16,tx0=px0+tin,tx1=px1-tin,th=small?14:17,tcy=Math.round((L.y+OL.sag+pb)/2),ty=tcy-th/2,tw=tx1-tx0,tc=(tx0+tx1)/2,k=backOut(P.tape);
+   let t=`<rect x="${f(tx0)}" y="${f(ty+1.3)}" width="${f(tw)}" height="${th}" rx="1.4" fill="#000" opacity=".35" filter="url(#sh)"/><rect x="${f(tx0)}" y="${f(ty)}" width="${f(tw)}" height="${th}" rx="1.4" fill="#f6eedb"/><rect x="${f(tx0)}" y="${f(ty)}" width="${f(tw)}" height="${th}" fill="url(#ol-woven)"/>`+
+    `<path d="M${f(tx0+3.5)} ${f(ty)}v${th}M${f(tx1-3.5)} ${f(ty)}v${th}" stroke="#6b4a2a" stroke-opacity=".22" stroke-width="1.2"/>`;
+   if(P.emb>0){const nf=small?12:13.5,c=small?1.5:1.8,wf=small?10.5:11.5,x0=tx0+(small?8:10),x1=tx1-(small?8:10),X0=qlCross(v.num,c,0,0),nw=fcMeasure(v.nm,`italic 700 ${nf}px Georgia,serif`),ww=v.word?fcMeasure(v.word,`italic ${wf}px Georgia,serif`):0;
+    const word=!!v.word&&nw+12+X0.w+5+ww<=x1-x0,vx=x1-X0.w-(word?5+ww:0),X=qlCross(v.num,c,vx,tcy-3.5*c);
+    t+=`<clipPath id="ol-e-${id}"><rect x="${f(x0-4)}" y="${f(ty)}" width="${f((x1-x0+8)*P.emb)}" height="${th}"/></clipPath><g clip-path="url(#ol-e-${id})">`+
+     `<text x="${f(x0)}" y="${f(tcy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="#a3241c">${v.nm}</text>`+
+     `<text x="${f(x0)}" y="${f(tcy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="#ffd9cf" opacity=".22" transform="translate(-.3 -.5)">${v.nm}</text>`+
+     `<g fill="none" stroke-linecap="round" stroke-width="${f(c*.38)}"><path d="${X.d1+X.d2}" stroke="#000" stroke-opacity=".2" transform="translate(.4 .6)"/><path d="${X.d1}" stroke="#5c6f99"/><path d="${X.d2}" stroke="#1f2d4d"/></g>`+
+     (word?`<text x="${f(vx+X.w+5)}" y="${f(tcy+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="#1f2d4d">${v.word}</text>`:'')+'</g>'}
+   p+=`<g transform="translate(${f(tc)} ${f(tcy)}) scale(${f(k*1000)/1000}) translate(${f(-tc)} ${f(-tcy)})">${t}</g>`}
+  // Thrown over the line: it starts folded up above the line and drops down the front with an overshoot; one gust sways it at the end.
+  const ay=L.ld(mx),sy=lerp(-.35,1,backOut(P.felt)),sv=Math.abs(sy)<.02?.02:sy;
+  if(P.sway)p=`<g transform="translate(${f(mx)} ${f(ay)}) skewX(${f(P.sway*5)}) translate(${f(-mx)} ${f(-ay)})">${p}</g>`;
+  o+=`<g opacity="${f(clamp(P.felt*4))}" transform="translate(0 ${f(ay)}) scale(1 ${f(sv*1000)/1000}) translate(0 ${f(-ay)})">${p}</g>`}
+ // Two spring pegs clip the fold to the line, the left one first.
+ if(P.peg>0){const pw=small?5:6,ph=small?14:17,pg=small?6:8;
+  [[px0+pg,-6,0],[px1-pg,5,.4]].forEach(([x,rot,d])=>{const k=backOut(seg(P.peg,d,d+.6));if(k<=0)return;
+   const y=L.ld(x)-(small?4.5:5.5),dy=-16*(1-k),x0=x-pw/2;
+   const body=`M${f(x0+1)} ${f(y)}H${f(x0+pw-1)}Q${f(x0+pw)} ${f(y)} ${f(x0+pw)} ${f(y+2)}V${f(y+ph-3)}Q${f(x0+pw)} ${f(y+ph)} ${f(x)} ${f(y+ph)}Q${f(x0)} ${f(y+ph)} ${f(x0)} ${f(y+ph-3)}V${f(y+2)}Q${f(x0)} ${f(y)} ${f(x0+1)} ${f(y)}Z`;
+   o+=`<g opacity="${f(Math.min(1,k*3))}" transform="translate(0 ${f(dy)}) rotate(${rot} ${f(x)} ${f(y+ph/2)})"><path d="${body}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(.8 1.4)"/><path d="${body}" fill="url(#ol-wd)" stroke="#4a2c12" stroke-opacity=".6" stroke-width=".5"/>`+
+    `<path d="M${f(x)} ${f(y+1)}V${f(y+ph-2)}" stroke="#4a2c12" stroke-opacity=".35" stroke-width=".6"/><path d="M${f(x0-.4)} ${f(y+ph*.42)}h${f(pw+.8)}m0 1.6h${f(-pw-.8)}" stroke="#d8dde2" stroke-width="1"/><circle cx="${f(x0+pw+.4)}" cy="${f(y+ph*.42+.8)}" r="1.3" fill="none" stroke="#d8dde2" stroke-width=".8"/></g>`})}
+ return o;
+}
+// The tie: the cotton is wound three times through the chain's end ring and knotted, its two tails hanging, and a glass bead slid up
+// against the knot kindles as the join light (amber while both run, cold blue if either is paused).
+function olKnot(G){
+ const{K,j,a}=G,kn=seg(j,.75,1);if(kn<=0)return '';
+ const x=K.x,y=a.ld(K.x),cold=!(model.a.run&&model.b.run),bx=x+9,by=G.b.ld(bx);
+ let s=`<g opacity="${f(clamp(kn*3))}" fill="none" stroke-linecap="round"><path d="M${f(x-1.4)} ${f(y-3.2)}l2 6.2M${f(x+.4)} ${f(y-3.4)}l2 6.2M${f(x+2.2)} ${f(y-3.2)}l1.8 5.8" stroke="#2a1608" stroke-opacity=".4" stroke-width="1.9" transform="translate(.4 .8)"/>`+
+  `<path d="M${f(x-1.4)} ${f(y-3.2)}l2 6.2M${f(x+.4)} ${f(y-3.4)}l2 6.2M${f(x+2.2)} ${f(y-3.2)}l1.8 5.8" stroke="#efe4cc" stroke-width="1.4"/>`+
+  `<path d="M${f(x+1.6)} ${f(y+2.4)}q-1.6 ${f(3*kn)} .4 ${f(7*kn)}M${f(x+3.4)} ${f(y+2.2)}q2 ${f(2.6*kn)} 1 ${f(6*kn)}" stroke="#efe4cc" stroke-width="1.2"/></g>`;
+ const li=seg(kn,.4,1);
+ if(li>.01)s+=`<circle cx="${f(bx)}" cy="${f(by)}" r="11" fill="${cold?'#8fb0e8':'#f0ac4e'}" opacity="${f(.32*li)}" filter="url(#soft)"/>`;
+ s+=`<g opacity="${f(clamp(kn*2))}"><circle cx="${f(bx+.5)}" cy="${f(by+1)}" r="3.4" fill="#000" opacity=".35"/><circle cx="${f(bx)}" cy="${f(by)}" r="3.3" fill="url(#st-${cold?'lapis':'amber'})" stroke="#1a0d05" stroke-width=".6"/>`+
+  `<circle cx="${f(bx)}" cy="${f(by)}" r="1.4" fill="${cold?'#e2ecff':'#fff1c4'}" opacity="${f(.85*li)}"/><circle cx="${f(bx-1.1)}" cy="${f(by-1.2)}" r=".8" fill="#fff" opacity=".7"/></g>`;
+ const g=Math.sin(PI*seg(kn,.55,1));if(g>.03)s+=sparkle(x+1,y-4,g*.6);
+ return s;
+}
+function olDraw(c,P){
+ const G=olGeo(c),{a}=G,foot=a.top+a.h-3;
+ // A pair already joined when it shades never raises its inner supports; they only fold away when the pair is joined while hanging.
+ P.inner=olPre()?0:1;
+ let s=olDefs()+olPost(a.x0,a.ld(a.x0),foot,1,backOut(P.post))+olPost(a.x1,a.ld(a.x1),foot,-1,backOut(P.post)*(1-G.j)*P.inner)+olChain(G,P)+olCharms(G,model.st);
+ s+=olFelt('b',G.b,P,G)+olFelt('c',G.k,P,G)+olKnot(G);
+ // Near or ready while shaded: the gap the line will cross is chalked in, brighter as GitDiscuss comes in.
+ if(c.jt===0&&c.glow>0&&P.line>=1){const x0=a.x1+4,x1=G.b.x0-4;if(x1>x0+2)s+=`<path d="M${f(x0)} ${f(a.ld(a.x1))}Q${f((x0+x1)/2)} ${f((a.ld(a.x1)+G.b.ld(G.b.x0))/2+3)} ${f(x1)} ${f(G.b.ld(G.b.x0))}" fill="none" stroke="#f3e6c8" stroke-width="1.2" stroke-dasharray="3 2.6" opacity="${f(.75*c.glow)}"/>`}
+ return s;
+}
+MIXES.oneLine={...MIXES.couched,label:'One line',kind:'Half-coupler · shade',shadeMs:3600,unshadeMs:2600,
+ shK:st=>seg(st,0,.3),veil:()=>olP(model.st).veil,
+ stack:[['Model','Half-coupler (A), for the shade','every Hang shade hangs from one standard face, so any two skins that can hang can share a line, as the half-couplers let any two skins join'],
+  ['The face','A line and two supports','a line 8 px under the strip\'s top (7 on Checks), held 11 px in from each end on a support, with a ring or a loop at each end. What hangs from it, and how, is up to each skin'],
+  ['Wire half','A charm chain','from the wire page\'s charm bracelet: twisted copper posts, a brass chain, and a name bar, status drops and a value tag on jump rings'],
+  ['Felt half','A washing line','from the felt page\'s washing line: turned wooden props, a twisted cotton line, and the felt pegged over it with a laundry name tape'],
+  ['Tied','One line','joined, the inner supports fold away and the cotton is knotted through the chain\'s end ring: one line, one sag, each half still hanging its own pieces'],
+  ['Motion','Wire smooth, felt stepped','the chain and charms move smoothly; the felt boils on 12 fps steps']],
+ about:'The couched wire mix\'s widgets: Jarvis is copper wire and GitDiscuss and Checks are felt. The shared quilt let the group decide how its members shade. This is the other model applied to the shade: a <b>half-coupler for shades</b>. Every Hang shade hangs from the same face, a line on two supports, and each skin draws its own half on it. Shade the widgets apart, then join them and shade again, or join them while they are shaded.',
+ join:{...MIXES.couched.join,about:MIXES.couched.join.about+' Joined while shaded, the couched scrolls go with the casings; instead the inner post and prop fold away and the chain and the cotton are tied into one line.'},
+ shade:{label:'One line',kind:'Hang · a shared face',
+  about:'The casings shrink to their strips and fade, so the stage shows through. <b>Wire:</b> two twisted copper posts rise at Jarvis\'s ends, and a brass chain is threaded across from the left, its free end drooping and its newest link hot, then hooked on with a glint. A hammered brass name bar on two rings, three faceted drops (amber per running agent, lapis when paused) and a stamped value tag are hooked on one by one, each dropping onto its ring and swinging still. <b>Felt:</b> two turned wooden props pop up at the cushion\'s ends and a twisted cotton line is strung between them and tied off. The felt is thrown over the line and drops down the front with an overshoot, its band\'s felt peeking out below. Two spring pegs clip it on, a cream laundry name tape is tacked on, the name is woven in red and the value cross-stitched in navy, and one gust sways it. <b>Joined</b>, the two lines share a face, so they become one: Jarvis\'s right post and GitDiscuss\'s left prop fold away, the chain runs on past its post and the cotton reaches back across the gap, and the cotton is wound through the chain\'s end ring and knotted. The pair then hangs from one line with one sag, and a glass bead pushed up against the knot is the join light (amber while both run, cold blue if either is paused). Nothing moves at rest. Unshading plays it back.'},
+ // The couched scrolls fade with the casings; the pull and tap still work on them, and untie the line.
+ over(c){const s=cwDraw(c),st=model.st;if(st<=.17)return s;const P=olP(st),i=s.indexOf('<g class="hit"'),hw=i<0?s:s.slice(0,i),hit=i<0?'':s.slice(i);
+  return (P.veil<1?`<g opacity="${f(1-P.veil)}">${hw}</g>`:'')+olDraw(c,P)+hit},
+ text:{...MIXES.couched.text,
+  intro:'Jarvis is copper wire; GitDiscuss and Checks are felt. Shade them apart, then join them and shade again: joined, the chain and the washing line are tied into one line.',
+  joined:'Joined: three copper scrolls couched onto the felt. Shade now and the chain and the cotton line are tied into one. Pull the wires (or the line, when shaded) to release.',
+  // While shaded the couched scrolls are hidden, so the phase line follows the line being tied or untied instead.
+  mid:(jt,dir)=>model.st<=.5?MIXES.couched.text.mid(jt,dir):dir>0?(jt<.4?'Joining · closing in ':jt<.72?'Joining · the ends meet ':'Joining · tying the line '):(jt>.72?'Releasing · untying the line ':jt>.4?'Releasing · the supports rise ':'Releasing · parting '),
+  get sep(){return model.st>.5?'The knot is untied, the chain and the cotton draw back to their own supports, and the widgets part.':MIXES.couched.text.sep},
+  get shadeOn(){return model.jt===1?'Shaded together: the inner post and prop fold away and the chain and the cotton are tied into one line, each half hanging its own pieces.':'Shaded apart: Jarvis hangs charms on a brass chain between copper posts, and GitDiscuss and Checks are pegged out on washing lines.'},
+  shadeOff:'Unshaded: the pieces come off, the lines and supports go, and the casings come back.'}};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1};
@@ -4326,6 +4519,8 @@ function render(){
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   const svg=el.querySelector('.casing'),key=model.mix+document.body.dataset.pair+w+'x'+h+(x.ckey?x.ckey(id):'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=x.casing(id,w,h)}
+  // A mix whose shade hangs its pieces in the open (one line) fades the casing and the strip away, so the stage shows through.
+  const vl=x.veil?x.veil(id):0;svg.style.opacity=vl>0?f(1-vl):'';
   if(!small||x.dock){el.style.transformOrigin=`${small?CW/2:id==='a'?W:0}px ${h}px`;const sq=sqf(id),ly=x.lift?x.lift(c,id):0;
    el.style.transform=(ly?`translate(0,${f(ly)}px) `:'')+(sq?`scale(${f((1+.025*sq)*1000)/1000},${f((1-.045*sq)*1000)/1000})`:'');
    // A mix with a turning joint swings GitDiscuss about the pin: [degrees, origin x, origin y].
@@ -4335,7 +4530,7 @@ function render(){
   // Tabs and buttons sit lowest, so they go first as the casing shrinks.
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{const o=n.matches('.tabline,.knob')?1-clamp(k*5):show;n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(strip);
+  el.querySelector('.strip').style.opacity=f(strip*(1-vl));
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
    const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
