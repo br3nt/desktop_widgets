@@ -105,7 +105,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .av .mw{background:radial-gradient(ellipse 90% 120% at 50% 0%,#fffaf0,#f4e6c6 62%,#e6d1a4);outline-color:#4a2c06;box-shadow:inset 0 0 10px #b8862a40}
 .av .mw.lst{padding:4px 3px 0 5px}.av .mw ul{font:10px/1.5 Georgia,serif;margin-top:1px}.av .mw li:before{margin-right:4px}
 #av2 .rb{position:static;display:block;margin:3px 0 0}
-.wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}#ov1 .tri button,#ov2 .tri button{border-radius:3px}
+.wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}#ov1 .tri button,#ov2 .tri button,#hv1 .tri button,#hv2 .tri button{border-radius:3px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -265,6 +265,12 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
   <div class="mw col" aria-hidden="true" style="left:8px;top:216px;width:88px;height:66px"><div class="tiny">Pass rate</div><span class="num ok">86%</span><small>run 418</small></div>
   <div class="mw lst" aria-hidden="true" style="left:388px;top:216px;width:88px;height:66px"><div class="tiny">Waiting · 2</div><ul><li>deploy-preview</li><li>e2e-safari</li></ul></div>
   <div class="tri" role="group" aria-label="The last ten runs, one tower pipe per run"></div>
+ </div>
+ <div class="wv" id="hv1"><div class="tri" role="group" aria-label="Checks, one candle per check"></div></div>
+ <div class="wv av" id="hv2">
+  <div class="mw col" aria-hidden="true" style="left:6px;top:124px;width:88px;height:64px"><div class="tiny">Pass rate</div><span class="num ok">86%</span><small>run 418 · main</small></div>
+  <div class="mw lst" aria-hidden="true" style="left:390px;top:124px;width:88px;height:64px"><div class="tiny">Waiting · 2</div><ul><li>deploy-preview</li><li>e2e-safari</li></ul></div>
+  <div class="tri" role="group" aria-label="The last ten runs, one painted band per run on the candle clock"></div>
  </div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
@@ -3942,6 +3948,149 @@ MORPHS.organ={label:'Organ',kind:'Rise',sizes:[['facade','Facade',0,'a facade'],
  say:(d,S)=>d>0?(S[2]===1?'Checks becomes an organ: a case rises out of the facade, and fourteen pipes rise into it, one per check.':'Great organ: two stone towers rise beside it, their pipes the last ten runs.'):(S[2]===0?'The pipes and the case sink back into the facade.':'The towers sink back into the floor.'),
  about:'Gothic churches housed their organs in tall oak cases: rows of burnished tin pipes stood on a toe-board under crocketed gables, with gilt carving, the pipe-shades, hung over their tops, and the largest organs were flanked by towers of the longest pipes. Here Checks grows by rising, and the facade is never replaced: it becomes the organ\'s impost and keeps its nameplate and its display. <b>Positive</b> (250 px tall): an oak toe-board is set along the cornice, and the case rises out of the facade behind it, dark and diapered in gold, under a crocketed gable with a gilt quatrefoil and a fleuron finial. Fourteen pipes, one per check, rise into it from the middle outward, each settling with a small lift and speaking as it lands, in rings of sound from its gilded mouth. The two waiting checks, deploy-preview and e2e-safari, rise silent and are then muffled with red cloths, and the gems on the pipe feet kindle, twelve green and two red. Hover or tap a pipe to read its check. <b>Great organ</b> (484 px): stone plinths rise out of the floor on both sides and land in dust, oak tower cases rise out of them, and their pipes rise alternately left and right. Those ten pipes are the last ten runs on main, each as tall as its count of passed checks, with a green, amber or red gem (hover or tap one to read its run). Panes in the plinths give the pass rate, 86% on run 418, and the two waiting checks by name. <b>Shrinking</b> lowers it all in reverse. Pick a size, press M, or scrub the slider. Checks grows from its foot and moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading lowers it back into the facade first, and unshading raises it again.'};
 
+/* ---------- Morph: Tenebrae hearse (Checks) ---------- */
+// g runs 0 facade, 1 hearse, 2 Tenebrae. At Tenebrae, in Holy Week, fifteen candles stood on a triangular iron hearse and were put out one by one.
+// Checks grows by kindling, the office run the other way: an iron triangle is raised on the facade, fourteen candles (one per check) and a white one at the apex
+// (the run) are set on its prickets, and a lighter on a pole lights the passed ones. The waiting two stay unlit, tied with red. For Tenebrae two iron standards
+// rise beside it: a candle clock whose painted bands are the last ten runs, and an unlit candle for the two waiting. Everything is a function of g.
+const TNH=252,TNG=[484,TNH],TNF=TNH-CH,TNT=TNF-5,TNB=TNT-1,TNX=138,TNY=54,TNS=108,TNC=28,TNA=31,TNQ=[138,100],TNR=120,TNSX=[50,434];
+const tnBarY=x=>TNB-(TNB-TNY)*(1-Math.abs(x-TNX)/TNS),tnX=j=>j<7?TNX-14*(7-j):TNX+14*(j-6),tnBase=j=>j<0?TNY-4:tnBarY(tnX(j))-4;
+const tnR=(j,k)=>{const v=Math.sin(j*12.9898+k*78.233)*43758.5453;return v-Math.floor(v)};
+// Candles are set from the bottom up, alternately left and right, the apex last; then lit left side up, the apex, right side down (j -1 is the apex).
+const tnSet=j=>j<0?.672:.42+.018*(2*(j<7?j:13-j)+(j<7?0:1)),TNL=[0,1,2,3,4,5,6,-1,7,8,9,10,11],tnLt=m=>.785+.0135*m;
+const tnWick=j=>[j<0?TNX:tnX(j),tnBase(j)-(j<0?TNA:TNC)-3.2];
+// The candle clock's bands: run 409 at the foot to 418 just under the flame.
+const TNCB=95.5,TNCL=64,tnBand=r=>88-5.6*r;
+const tnBox=g=>g<1e-6?[CW,CH]:g<=1?[CW,TNH]:[lerp(CW,TNG[0],ease(seg(g-1,0,.12))),TNH],tnDims=k=>[[CW,CH],[CW,TNH],TNG][k];
+const tnFlame=(x,y,s)=>`<path d="M${f(x)} ${f(y+1.2)}C${f(x-3.3*s)} ${f(y-1.5*s)} ${f(x-1.6*s)} ${f(y-7*s)} ${f(x)} ${f(y-11.5*s)}C${f(x+1.6*s)} ${f(y-7*s)} ${f(x+3.3*s)} ${f(y-1.5*s)} ${f(x)} ${f(y+1.2)}Z" fill="url(#tnFl)"/><ellipse cx="${f(x)}" cy="${f(y-1.3*s)}" rx="${f(1.1*s)}" ry="${f(1.8*s)}" fill="#5b7fd6" opacity=".65"/>`;
+// A red ribbon tied round a waiting candle, its tails swinging down as it is knotted.
+const tnRibbon=(x,y,w,m)=>{const e=ease(m),hw=w/2;return `<g opacity="${f(Math.min(1,m*3))}"><rect x="${f(x-hw-.8)}" y="${f(y)}" width="${f(w+1.6)}" height="4.6" rx="1" fill="#8e1f2b" stroke="#3d0b10" stroke-width=".5"/><path d="M${f(x-hw)} ${f(y+2.3)}H${f(x+hw)}" stroke="#c4505b" stroke-width=".5" opacity=".7"/>`+
+ `<g transform="rotate(${f(60*(1-e))} ${f(x+hw)} ${f(y+2.3)})"><path d="M${f(x+hw)} ${f(y+2)}l4 7l-2.4 .8zM${f(x+hw)} ${f(y+2.6)}l1.4 8.4h-2.4z" fill="#8e1f2b" stroke="#3d0b10" stroke-width=".4"/></g><circle cx="${f(x+hw+.3)}" cy="${f(y+2.3)}" r="1.4" fill="#a3222f" stroke="#3d0b10" stroke-width=".4"/></g>`};
+// One candle standing on its pricket at (x,base): wax body, the top, a drip once it has burned a while, and the wick (black once lit).
+function tnCandle(x,base,L,w,wax,lit,dl,sd){
+ const t=base-L;
+ let s=`<rect x="${f(x-w/2)}" y="${f(t)}" width="${w}" height="${f(L)}" fill="url(#${wax})" stroke="#5a3f16" stroke-width=".5"/><ellipse cx="${f(x)}" cy="${f(t)}" rx="${w/2}" ry="1.1" fill="${lit?'#e2bf6c':'#f6e5b4'}" stroke="#5a3f16" stroke-width=".4"/>`;
+ if(dl>.3){const xs=x+sd*(w/2-.6);s+=`<path d="M${f(xs)} ${f(t+.3)}V${f(t+dl)}" stroke="#f6e0a2" stroke-width="1.7" stroke-linecap="round"/><circle cx="${f(xs)}" cy="${f(t+dl+.5)}" r="1.15" fill="#f6e0a2" stroke="#7a5a22" stroke-width=".3"/>`}
+ return s+`<path d="M${f(x)} ${f(t)}v-3.2" stroke="${lit?'#1a1410':'#e2d6b8'}" stroke-width=".9" stroke-linecap="round"/>`;
+}
+// A gilt drip pan with its iron stem, standing on the bar; k grows it from the bar.
+const tnPan=(x,base,k,r=5.5)=>k<=0?'':`<g transform="translate(${f(x)} ${f(base+4)}) scale(${f(Math.max(.02,ease(k)))}) translate(${f(-x)} ${f(-base-4)})"><path d="M${f(x)} ${f(base+1.5)}V${f(base+4)}" stroke="#241f1c" stroke-width="1.6"/><path d="M${f(x-r)} ${f(base)}Q${f(x)} ${f(base+3.6)} ${f(x+r)} ${f(base)}Z" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/></g>`;
+// A bar of twisted iron.
+const tnIron=(d,w=4.2)=>`<path d="${d}" fill="none" stroke="#1d1916" stroke-width="${w}" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#8f867c" stroke-width="${f(w*.26)}" stroke-dasharray="2.2 2.4" opacity=".75"/>`;
+// The hearse in its own frame (CW × TNH), without the facade.
+function tnHearse(u,P1){
+ const tb=P1?1:seg(u,.02,.12),br=P1?1:seg(u,.1,.3),bo=P1?1:seg(u,.09,.13),po=P1?1:seg(u,.26,.36),tq=P1?1:seg(u,.33,.42),mu=P1?1:seg(u,.73,.78);
+ let s='',gw='',lc=0;
+ if(tb>0)s+=`<g transform="translate(${TNX} 0) scale(${f(Math.max(.02,ease(tb))*1000)/1000} 1) translate(${-TNX} 0)"><rect x="22" y="${TNT}" width="232" height="8" fill="#2a2420" stroke="#120e0c" stroke-width=".7"/>`+
+  `<path d="M22 ${TNT+.8}H254" stroke="#9a8f82" stroke-opacity=".6" stroke-width=".8"/><path d="M22 ${TNT+9}H254" stroke="#000" stroke-opacity=".3" stroke-width="2"/><g fill="url(#gild)" stroke="#3a2608" stroke-width=".4">${[0,1,2,3,4,5,6,7,8].map(k=>`<circle cx="${29+27.25*k}" cy="${TNT+4}" r="1.3"/>`).join('')}</g></g>`;
+ // The post rises out of the facade through the sill, behind the tracery.
+ if(po>0)s+=`<g clip-path="url(#tnClip)">${tnIron(`M${TNX} ${f(lerp(TNT+30,TNY+3,ease(po)))}V${TNT+30}`,3.4)}</g>`;
+ if(tq>0){const k=Math.max(.02,ease(tq)),xl=TNX-TNS*(1-(TNB-TNR)/(TNB-TNY));
+  s+=`<g transform="translate(${TNX} 0) scale(${f(k)} 1) translate(${-TNX} 0)">${tnIron(`M${f(xl)} ${TNR}H${f(2*TNX-xl)}`,2.6)}</g>`+
+   `<g transform="translate(${TNQ[0]} ${TNQ[1]}) scale(${f(k)})">${['#1d1916',2.1,0,'#8f867c',.6,.5].reduce((a,_,n,A)=>n%3?a:a+`<g fill="none" stroke="${A[n]}" stroke-width="${A[n+1]}" transform="translate(0 ${A[n+2]})"${n?' opacity=".6"':''}><circle r="14.5"/><circle cx="-6.2" r="6"/><circle cx="6.2" r="6"/><circle cy="-6.2" r="6"/><circle cy="6.2" r="6"/></g>`,'')}<circle r="2.4" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/></g>`}
+ // The arms are raised about their feet, gathering speed, and meet at the apex with a clang.
+ if(bo>0){const af=Math.atan2(TNB-TNY,TNS),Lb=Math.hypot(TNS,TNB-TNY),ph=af*br*br;
+  s+=`<g opacity="${f(bo)}">`+[[30,1],[246,-1]].map(([x0,sd])=>tnIron(`M${x0} ${TNB}L${f(x0+sd*Lb*Math.cos(ph))} ${f(TNB-Lb*Math.sin(ph))}`)+`<circle cx="${x0}" cy="${TNB}" r="2.6" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/>`).join('')+'</g>';
+  if(br>.95)s+=`<circle opacity="${f(seg(br,.95,1))}" cx="${TNX}" cy="${TNY+1}" r="3.4" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/>`}
+ // Candles: pans bud, each candle is lowered onto its pricket and settles; ribbons on the waiting two; then the lighter comes round.
+ for(const j of[...Array(14).keys(),-1]){const x=j<0?TNX:tnX(j),b=tnBase(j),L=j<0?TNA:TNC,s0=tnSet(j);
+  s+=tnPan(x,b,P1?1:seg(u,s0-.04,s0),j<0?6.5:5.5);
+  const q=P1?1:seg(u,s0,s0+.05);if(q<=0)continue;
+  const m=TNL.indexOf(j),kq=m<0?0:P1?1:seg(u,tnLt(m),tnLt(m)+.025),dl=kq>0?(4+7*tnR(j,3))*(P1?1:seg(u,tnLt(m)+.02,1)):0;
+  const dy=-26*(1-ease(q))+1.4*Math.sin(Math.PI*seg(q,.75,1)),[wx,wy]=tnWick(j);
+  s+=`<g transform="translate(0 ${f(dy)})" opacity="${f(seg(q,0,.3))}">${tnCandle(x,b,L,j<0?6.4:5.6,j<0?'tnWhite':'tnWax',kq>0,dl,tnR(j,5)<.5?-1:1)}${j>11&&mu>0?tnRibbon(x,b-L*.55,5.6,mu):''}</g>`;
+  if(kq>0){const fs=(j<0?1.15:1)*ease(kq)*(1+.35*Math.sin(Math.PI*kq));s+=tnFlame(wx,wy,fs);gw+=`<circle cx="${wx}" cy="${f(wy-4)}" r="${j<0?6:5}" fill="#ffcf6a" opacity="${f(.85*kq)}"/>`;lc+=kq}}
+ return `<ellipse cx="${TNX}" cy="96" rx="118" ry="86" fill="url(#tnPool)" opacity="${f(lc/13)}"/>`+s+(gw?glowG(gw):'');
+}
+// One iron standard in the Tenebrae frame, centred on xc: it rises from the floor on a tripod foot, its board unfolds from the shaft,
+// and its great candle is lowered onto the pan. The left one is a candle clock with the last ten runs painted on it in bands; the right one waits unlit.
+function tnStand(xc,side,pd,bd,cd,bn,kq,mu){
+ let s='';
+ if(pd>0){const dy=(1-ease(pd))*(TNH-86),leg=d=>`M${xc} 222C${xc+d*6} 232 ${xc+d*16} 240 ${xc+d*21} 247`;
+  const b=tnIron(leg(-1),3)+tnIron(leg(1),3)+tnIron(`M${xc} 222V249`,3)+`<g fill="url(#gild)" stroke="#3a2608" stroke-width=".4"><circle cx="${xc-22}" cy="248.6" r="2.8"/><circle cx="${xc+22}" cy="248.6" r="2.8"/><circle cx="${xc}" cy="249.4" r="2.8"/></g>`+
+   `<rect x="${xc-2.4}" y="97" width="4.8" height="126" fill="url(#tnIr)" stroke="#120e0c" stroke-width=".5"/>`+
+   `<g fill="url(#gild)" stroke="#3a2608" stroke-width=".5"><ellipse cx="${xc}" cy="106" rx="5" ry="3"/><ellipse cx="${xc}" cy="208" rx="6" ry="4"/><ellipse cx="${xc}" cy="222" rx="7" ry="3.4"/><path d="M${xc-12} 96Q${xc} 105 ${xc+12} 96Z"/></g><ellipse cx="${xc}" cy="96" rx="12" ry="1.8" fill="#6e4a12" opacity=".7"/>`;
+  s+=`<g clip-path="url(#tnFloor)"><g transform="translate(0 ${f(dy)})">${b}</g></g>`}
+ if(bd>0)s+=`<g transform="translate(${xc} 0) scale(${f(Math.max(.02,ease(bd)))} 1) translate(${-xc} 0)"><path d="M${xc-48} 196V120L${xc} 108L${xc+48} 120V196Z" fill="#2a2420" stroke="#120e0c" stroke-width=".8"/>`+
+  `<path d="M${xc-46} 120.6L${xc} 109.4L${xc+46} 120.6" fill="none" stroke="#9a8f82" stroke-opacity=".55" stroke-width=".7"/><g fill="url(#gild)" stroke="#3a2608" stroke-width=".4"><circle cx="${xc-2}" cy="116" r="1.5"/><circle cx="${xc+2}" cy="116" r="1.5"/><circle cx="${xc}" cy="114" r="1.5"/><circle cx="${xc}" cy="118" r="1.5"/>`+
+  [[-45,122],[45,122],[-45,193],[45,193]].map(([dx,y])=>`<circle cx="${xc+dx}" cy="${y}" r="1.5"/>`).join('')+'</g></g>';
+ if(cd>0){const dy=-30*(1-ease(cd))+1.6*Math.sin(Math.PI*seg(cd,.75,1)),t=TNCB-TNCL;
+  let c=tnCandle(xc,TNCB,TNCL,9,side?'tnWhite':'tnWax',kq>0,kq>0?4*seg(kq,.5,1):0,1);
+  if(!side)for(let r=0;r<10;r++){const p=bn[r];if(p<=0)continue;const y=tnBand(r)-1.5;
+   c+=`<rect x="${xc-4.5}" y="${f(y)}" width="${f(9*p)}" height="3" fill="${LCOL[orSt(ORUN[r])]}" opacity=".88"/><rect x="${xc-4.5}" y="${f(y)}" width="${f(9*p)}" height="3" fill="url(#tnSh)"/>`}
+  else c+=(mu[0]>0?tnRibbon(xc,t+18,9,mu[0]):'')+(mu[1]>0?tnRibbon(xc,t+36,9,mu[1]):'');
+  s+=`<g transform="translate(0 ${f(dy)})" opacity="${f(seg(cd,0,.3))}">${c}</g>`;
+  if(kq>0){const fs=1.3*ease(kq)*(1+.35*Math.sin(Math.PI*kq));s=`<ellipse cx="${xc}" cy="60" rx="60" ry="70" fill="url(#tnPool)" opacity="${f(kq)}"/>`+s+tnFlame(xc,t-3.2,fs)+glowG(`<circle cx="${xc}" cy="${f(t-8)}" r="7" fill="#ffcf6a" opacity="${f(.85*kq)}"/>`)}}
+ return s;
+}
+// The lighter: a long brass pole with a taper at its tip, carried from wick to wick. W are wick tips in lighting order and LT the times they are lit.
+function tnTap(u,W,LT,a,b){
+ const n=W.length,e=LT[n-1]+.018;if(u<=a||u>=b)return null;let x,y;
+ if(u<LT[0]){const q=ease(seg(u,a,LT[0]));x=lerp(W[0][0]-60,W[0][0],q);y=lerp(W[0][1]+40,W[0][1],q)}
+ else if(u>=e){const q=ease(seg(u,e,b));x=lerp(W[n-1][0],W[n-1][0]+60,q);y=lerp(W[n-1][1],W[n-1][1]+40,q)}
+ else{let m=0;while(m<n-1&&u>=LT[m+1])m++;if(m===n-1){[x,y]=W[m]}else{const q=ease(seg(u,LT[m]+.005,LT[m+1]));x=lerp(W[m][0],W[m+1][0],q);y=lerp(W[m][1],W[m+1][1],q)-6*Math.sin(Math.PI*q)}}
+ return{x,y,o:seg(u,a,a+.015)*(1-seg(u,b-.015,b))};
+}
+// Held from below and to the right, so the pole never reaches above the widget; the small cone on it is the snuffer.
+const tnTaper=(x,y,o)=>`<g opacity="${f(o)}"><path d="M${f(x+1.2)} ${f(y+2)}L${f(x+30)} ${f(y+52)}" stroke="#4a3412" stroke-width="3" stroke-linecap="round"/><path d="M${f(x+1.2)} ${f(y+2)}L${f(x+30)} ${f(y+52)}" stroke="#d9b45e" stroke-width="1.1" stroke-linecap="round"/>`+
+ `<path d="M${f(x+9.5)} ${f(y+12)}l-3.4 -4.2l5.4 -1.6z" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/><path d="M${f(x+1.2)} ${f(y+2)}L${f(x)} ${f(y)}" stroke="#f0e2bc" stroke-width="1.4"/>${tnFlame(x,y-.4,.55)}</g>`;
+function tnRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),[w,h]=tnBox(g),cx=w/2,ox=cx-CW/2,oy=h-TNH,X0=cx-TNG[0]/2,Y0=h-TNH,P1=i>0;
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='tn'){ms.dataset.key='tn';ms._d='';ms._bx=null;fx._s=null;
+  ms.innerHTML=`<defs><linearGradient id="tnWax" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#8e6424"/><stop offset=".3" stop-color="#e2bd6c"/><stop offset=".46" stop-color="#f7e3a8"/><stop offset=".72" stop-color="#cfa452"/><stop offset="1" stop-color="#76541c"/></linearGradient>`+
+   `<linearGradient id="tnWhite" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#9c907a"/><stop offset=".3" stop-color="#ece3cf"/><stop offset=".46" stop-color="#fffaf0"/><stop offset=".72" stop-color="#d9cdb6"/><stop offset="1" stop-color="#857a66"/></linearGradient>`+
+   `<linearGradient id="tnSh" x1="0" y1="0" x2="1" y2="0"><stop stop-opacity=".45"/><stop offset=".35" stop-opacity="0"/><stop offset=".6" stop-opacity="0"/><stop offset="1" stop-opacity=".5"/></linearGradient>`+
+   `<linearGradient id="tnIr" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#1a1614"/><stop offset=".4" stop-color="#6b625a"/><stop offset="1" stop-color="#241f1c"/></linearGradient>`+
+   `<radialGradient id="tnFl" cx=".5" cy=".8" r=".75"><stop stop-color="#fff"/><stop offset=".25" stop-color="#fff2b0"/><stop offset=".55" stop-color="#ffc94a"/><stop offset=".85" stop-color="#f07a1c"/><stop offset="1" stop-color="#c4401a" stop-opacity=".8"/></radialGradient>`+
+   `<radialGradient id="tnPool"><stop stop-color="#ffd68a" stop-opacity=".3"/><stop offset=".5" stop-color="#ffc46a" stop-opacity=".1"/><stop offset="1" stop-color="#ffc46a" stop-opacity="0"/></radialGradient>`+
+   `<clipPath id="tnClip"><rect x="-40" y="-80" width="356" height="${TNT+80}"/></clipPath><clipPath id="tnFloor"><rect x="-60" y="-100" width="604" height="${TNH+100}"/></clipPath></defs><g class="ofac">${cas(0)}</g><g class="odyn"></g>`}
+ const bx=f(w)+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${f(w)} ${h}`)}}
+ ms.querySelector('.ofac').setAttribute('transform',`translate(${f(ox)} ${oy+TNF})`);
+ let d=`<g transform="translate(${f(ox)} ${oy})">${tnHearse(u,P1)}</g>`;
+ // Tenebrae, on the second step once the box has widened: the standards rise, their boards unfold, the candles go on, the runs are painted, the clock is lit.
+ const pd=P1?seg(u,.1,.34):0,bd=P1?seg(u,.34,.46):0,kq=P1?seg(u,.84,.87):0,tl=P1?seg(u,.88,1):0;
+ if(pd>0)d=`<g transform="translate(${f(X0)} ${Y0})">${TNSX.map((xc,sd)=>tnStand(xc,sd,pd,bd,seg(u,.44+.04*sd,.56+.04*sd),[...Array(10).keys()].map(r=>seg(u,.6+.016*r,.63+.016*r)),sd?0:kq,[seg(u,.72,.77),seg(u,.76,.81)])).join('')}</g>`+d;
+ if(ms._d!==d){ms._d=d;ms.querySelector('.odyn').innerHTML=d}
+ // Grit where the sill lands and where the standards come up, a clang where the arms meet, a flare at each new flame, and the lighter.
+ const dust=JOINS.buttress.dust,spk=(x,y,t,r)=>{const v=Math.sin(Math.PI*t);return v>.05?`<g opacity="${f(v)}">${sparkle(x,y,r*v)}</g>`:''};
+ let fxs='';
+ if(!P1){const t=seg(u,.1,.22);fxs+=dust(ox+24,oy+TNT+8,t,4,8,241)+dust(ox+252,oy+TNT+8,t,4,8,243)+spk(ox+TNX,oy+TNY,seg(u,.29,.37),8)+spk(ox+TNX,oy+TNQ[1],seg(u,.4,.47),5);
+  TNL.forEach((j,m)=>{const[x,y]=tnWick(j);fxs+=spk(ox+x,oy+y-6,seg(u,tnLt(m),tnLt(m)+.04),5)});
+  const tp=tnTap(u,TNL.map(tnWick),TNL.map((_,m)=>tnLt(m)),.755,.995);if(tp)fxs+=tnTaper(ox+tp.x,oy+tp.y,tp.o)}
+ else if(u>0){for(const xc of TNSX){const x=X0+xc,t=seg(u,.12,.3);fxs+=dust(x-22,h,t,4,10,251+xc)+dust(x+22,h,t,4,10,253+xc)}
+  const W=[X0+TNSX[0],Y0+TNCB-TNCL-3.2];fxs+=spk(W[0],W[1]-7,seg(u,.84,.89),6)+spk(X0+TNSX[0],Y0+tnBand(9),seg(u,.75,.8),4);
+  const tp=tnTap(u,[W],[.84],.8,.9);if(tp)fxs+=tnTaper(tp.x,tp.y,tp.o)}
+ if(fx._s!==fxs){fx._s=fxs;fx.innerHTML=fxs}
+ // Displays: the facade keeps its own; the candles take taps once all are lit; the boards' panes fade in at the end.
+ const lit=P1?1:seg(u,.96,1),o1=$('#hv1'),o2=$('#hv2');
+ if(lit<.01)o1.style.display='none';else Object.assign(o1.style,{display:'block',left:f(ox)+'px',top:oy+'px'});
+ $('#hv1 .tri').style.visibility=lit<1?'hidden':'';
+ if(tl<.01)o2.style.display='none';else Object.assign(o2.style,{display:'block',left:f(X0)+'px',top:Y0+'px',opacity:f(tl)});
+ $('#hv2 .tri').style.visibility=tl<1?'hidden':'';
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+oy+TNF)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+oy+TNF)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'kindling')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function tnPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0;let t;
+ if(i===0){const n=[...Array(14).keys(),-1].filter(j=>u>=tnSet(j)+.05).length,k=TNL.filter((_,m)=>u>=tnLt(m)+.025).length;
+  t=u<.1?(up?'setting an iron sill on the cornice':'lifting the sill away'):u<.31?(up?'raising the hearse\'s arms':'lowering the hearse\'s arms'):u<.42?(up?'the stem and the iron quatrefoil go in':'taking out the stem and the quatrefoil'):
+   u<.73?(up?'setting candle '+Math.min(15,n+1)+' of 15':'lifting the candles off, '+n+' left'):u<.78?(up?'tying red ribbons on the two waiting candles':'untying the ribbons'):
+   u<.98?(up?'lighting candle '+Math.min(13,k+1)+' of 13':'snuffing the candles, '+k+' still lit'):(up?'the hearse burns':'the lighter comes back')}
+ else t=u<.1?(up?'clearing the floor beside the hearse':'the hearse stands alone'):u<.34?(up?'two iron standards rise from the floor':'the standards sink into the floor'):u<.46?(up?'their boards unfold':'their boards fold away'):
+  u<.6?(up?'setting the great candles':'lifting the great candles off'):u<.775?(up?'painting the last ten runs on the candle clock':'wiping the runs off the candle clock'):u<.81?(up?'tying red ribbons on the waiting candle':'untying the waiting candle\'s ribbons'):u<.88?(up?'lighting the candle clock':'snuffing the candle clock'):(up?'the boards light':'the boards dim');
+ return 'Checks · '+t;
+}
+MORPHS.hearse={label:'Tenebrae hearse',kind:'Kindle',sizes:[['facade','Facade',0,'a facade'],['hearse','Hearse',1,'a candle hearse'],['tenebrae','Tenebrae',2,'a Tenebrae hearse between two standards']],ms:[4400,3200],
+ box:tnBox,dims:tnDims,render:tnRender,phase:tnPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes a Tenebrae hearse: fifteen candles are set on an iron triangle, and the twelve passed checks and the run are lit.':'Tenebrae: two iron standards rise beside the hearse, a candle clock of the last ten runs, lit, and an unlit candle for the two waiting.'):(S[2]===0?'The candles are snuffed and lifted off, and the hearse is taken down.':'The candle clock is snuffed and the standards sink into the floor.'),
+ about:'At Tenebrae, the night office of Holy Week, fifteen candles stood on a triangular iron stand called a hearse and were put out one by one as the psalms were sung, until the church was dark. Here Checks grows by running that the other way: by kindling. The facade stays as the hearse\'s plinth and keeps its nameplate and display. <b>Hearse</b> (252 px tall): an iron sill is set on the cornice and two arms of twisted iron are raised about their gilt feet, gathering speed until they meet at the apex with a clang. A stem rises through the sill to meet them, and a tie bar and a pierced iron quatrefoil go in. Gilt pans bud along the arms, and fifteen candles are lowered onto their prickets from the bottom up, alternately left and right: fourteen of beeswax, one per check, and a white one at the apex for the run. The two waiting checks, deploy-preview and e2e-safari, are tied with red ribbons. Then a lighter on a long brass pole comes round from the left, up one arm and down the other, and each passed candle catches with a flare, its wick blackening, wax running down its side a while later, and a warm light gathering behind the hearse. The two ribboned candles stay unlit. Hover or tap a candle to read its check. <b>Tenebrae</b> (484 px): two iron standards rise out of the floor on tripod feet, and their boards unfold from the shafts. The left one carries a candle clock, the kind marked in bands to tell the hours: here the bands are painted on bottom to top, one per run on main, 409 to 418, green, amber or red, and the lighter lights it, so the newest run burns at the top. Its board gives the pass rate, 86% on run 418. The right one carries a white candle tied with two red ribbons, left unlit, and its board names the two waiting checks. Hover or tap a band to read its run. <b>Shrinking</b> runs it back: the candles are snuffed, lifted off and the iron taken down. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading snuffs it and takes it down first, and unshading raises it again. Nothing moves at rest.'};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
@@ -4159,6 +4308,10 @@ const orTipBtn=(box,t,c,css)=>{const b=document.createElement('button');b.style.
  b.onpointerenter=b.onfocus=b.onclick=()=>showTip(b);b.onpointerleave=b.onblur=hideTip;$(box).append(b)};
 CHK.forEach((n,j)=>orTipBtn('#ov1 .tri',`Pipe ${j+1} of 14 · ${n} · ${j>11?'muffled, waiting for your approval':'passed'}`,j>11?'need':'pass',`left:${f(OPX(j)-7)}px;top:${OFT-OPL[j]}px;width:14px;height:${OPL[j]}px`));
 ORUN.forEach((v,r)=>{const L=oTL(v);orTipBtn('#ov2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${OTX[r>4?1:0]+(r%5-2)*15-7}px;top:${OPT-2-L}px;width:14px;height:${L}px`)});
+/* Tenebrae candles: hover, focus or tap one to read its check, the apex for the run, or a band on the candle clock for its run. */
+CHK.forEach((n,j)=>orTipBtn('#hv1 .tri',`Candle ${j+1} of 14 · ${n} · ${j>11?'unlit, waiting for your approval':'passed, lit'}`,j>11?'need':'pass',`left:${f(tnX(j)-6)}px;top:${f(tnBase(j)-TNC-14)}px;width:12px;height:${TNC+14}px`));
+orTipBtn('#hv1 .tri','The white candle at the apex · run 418 on main · 12 of 14 passed · 86%','run',`left:${TNX-6}px;top:${f(tnBase(-1)-TNA-15)}px;width:12px;height:${TNA+15}px`);
+ORUN.forEach((v,r)=>orTipBtn('#hv2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run, burning':''),orSt(v),`left:${TNSX[0]-8}px;top:${f(tnBand(r)-2.8)}px;width:16px;height:5.6px`));
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
