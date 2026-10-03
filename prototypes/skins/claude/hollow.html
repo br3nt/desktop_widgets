@@ -340,7 +340,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · on the map dividers, drag a leg, the wing or the tag (or GitDiscuss's nameplate) to open or close them, ↑ opens and ↓ closes them a notch, and tap the brass head to release · on the silk web, drag the web (or GitDiscuss's nameplate) to swing GitDiscuss, ↑ ↓ on the focused web move it 15°, and tap the drop at the hub to release · on the moths, tap them, wave across them or press Enter on them to scatter them · on the lever bolt, strike across the lever, tap it or press Enter on it to draw the bolt · on the revolving lantern, tap a lantern (or press Enter on its nameplate) to turn its drum to the next screen · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag · on the hanging sign, tap a board (or press Enter on its nameplate) to pause or resume it · on the hanging bracket, ↑ ↓ on GitDiscuss's nameplate or the focused bracket move it a notch · on the shell articulation, drag the plates up or down to flex the joint (↑ ↓ step it 15°) and tap the lit spiracle to release · on the ink bleed, pull the fused seam down to wet the ink and part it · on the lamppost, tap the lantern or push it down to sink the post · on the mycelium, pull the web down to snap its threads (let go early and they grow back together) or tap it · on the chain stay, drag the chain (or GitDiscuss's nameplate) to lean it out or draw it in, ↑ ↓ on the focused chain move it a link, and tap the bell twice to release · on the map dividers, drag a leg, the wing or the tag (or GitDiscuss's nameplate) to open or close them, ↑ opens and ↓ closes them a notch, and tap the brass head to release · on the silk web, drag the web (or GitDiscuss's nameplate) to swing GitDiscuss, ↑ ↓ on the focused web move it 15°, and tap the drop at the hub to release · on the moths, tap them, wave across them or press Enter on them to scatter them · on the lever bolt, strike across the lever, tap it or press Enter on it to draw the bolt · on the shell shims, drag the shims (or GitDiscuss's nameplate) to open or close the wedge a shim (15°) at a time, ↑ ↓ on the focused shims step it, and tap the shims to knock them out · on the revolving lantern, tap a lantern (or press Enter on its nameplate) to turn its drum to the next screen · the fog sink keeps each shell's foot where it stood, so the strip ends up lower on the stage. Checks has no joining edges, as in the capsule study. Motion is quick and precise: a dart, a pause, a settle. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,TOP=70;
@@ -1710,6 +1710,152 @@ const JOINS={
     const x0=ax-26,y0=ay-34,wd=bx+14-x0,ht=cy+12-y0;
     s+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Lever bolt: strike across the lever, tap it, or press Enter, to draw the bolt and separate the widgets"><title>Strike across the lever, or tap it, to release</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(wd)}" height="${f(ht)}" rx="8" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
    return s;
+  }
+ },
+ /* Shell shims: the wedge between the shells is built of 15° shims of pale shell, each struck home (Wedge). */
+ // The shells meet edge to edge (the negative gap overlaps the empty margin outside each strap) and GitDiscuss turns on a
+ // glass-capped pin at the inside corner. The angle is counted in shims and held by what fills the joint, not by friction.
+ shims:{label:'Shell shims',kind:'Angle · wedge',gap:-6,angled:true,range:45,step:15,popMs:520,tn:null,pop:null,angleLabel:'Wedge angle in degrees',
+  // Held mid-join: the middle shim darting in (or, at 0°, the glass kindling).
+  get holdAt(){const n=this.n();return n?.4+.5*(Math.floor(n/2)+.36)/n:.5},
+  FACE:['#d3dbe5','#c4cdd9','#dbe2ea'],
+  n(a=model.angle){return clamp(Math.round(Math.abs(a)/15),0,3)},
+  // While dragged, the next shim goes in once there is nearly room for it.
+  count(th){return clamp(Math.floor((Math.abs(th)+4)/15),0,3)},
+  // At 0° there is nothing to drive in, so the join is just the pins and takes less time.
+  get slow(){return[.55,1.45,1.75,2.05][this.n()]},get msOut(){return[1100,2400,2900,3400][this.n()]},
+  about:'From the shims a mason drives under a sagging lintel in a ruined town, cut here from pale shell. The wedge between the shells is <b>built of 15° shims</b>, so the angle is counted in shims and held by what fills the joint, not by a pivot\'s friction. Each shim is a shard of pale shell with growth ridges, a chipped corner and a dark point where it is wedged deepest. The shells meet edge to edge, strap to strap, and GitDiscuss turns on a glass-capped iron pin at the inside corner: the foot when it is lowered (the wedge opens upward), the head when it is raised. <b>Near:</b> the strap ends glint and a shim rises out of the fog into the gap. <b>Ready:</b> a chalk ghost of the wedge, shim lines and all. Joining: the shells close until the straps touch, and pins are struck home at head and foot with a spark. Then, for each shim, GitDiscuss darts open a little past where it will sit, the shim darts in point first and lodges proud, a pale crescent strike drives it home (a spark, chalk ticks, grit trickling from its back), and GitDiscuss drops onto it and settles. Last, the glass in the pins kindles as the join light: amber while both run, cold blue-white if either is paused. <b>Angle:</b> −45° to +45° in 15° steps: none, one, two or three shims. Drag the shims or GitDiscuss\'s nameplate, use the slider, or focus the shims and press ↑ ↓. Open it and the next shim darts in and is struck home once there is nearly room; close it and the top shim is squeezed out and tumbles into the fog. The pair moves up or down to stay on the stage. Nothing moves at rest, and in a shade the shims shrink with the strip. <b>Release:</b> tap the shims (or press Enter on them). The glass goes dark and the shims are knocked out last in, first out, GitDiscuss lifting off each one and dropping onto the next; then the pins are drawn and the shells part.',
+  text:{join:'The shells close and are pinned; then the shims go in one at a time, each struck home.',
+   joined:'Joined on shell shims, 15° each. Drag the shims (or GitDiscuss\'s nameplate) to open or close the wedge; tap the shims to knock them out.',
+   release:'The glass goes dark and the shims are knocked out, last in first out; the pins are drawn and the shells part.',back:'The shims are knocked back out and the pins drawn.',
+   get hold(){return JOINS.shims.n()?'Held mid-join: a shim darting into the wedge before it is struck home. Use the scrubber to step through the animation.':'Held mid-join: pinned flat at 0°, the glass kindling. Use the scrubber to step through the animation.'},
+   ready:'Ready: a ghost of the wedge shows in the joint. Release to drive the shims in.',near:'Nearby: the strap ends glint and a shim rises out of the fog. Move closer.',
+   phReady:'Ready · the wedge is ghosted',phNear:'Nearby · a shim rises out of the fog',get phDrag(){return drag&&drag.moved?(Math.abs(model.angle)>=Math.abs(drag.th0)?'Opening':'Closing')+' the wedge · '+signed(model.angle):'Tap the shims to knock them out'}},
+  stepSay(k,to){const n=this.n(to);return'GitDiscuss '+(k<0?'rises':'drops')+' 15°: '+(n?n+' shim'+(n>1?'s hold':' holds')+' it at '+signed(to)+'.':'it rests flat on the pins.')},
+  phase(dir,jt){const n=this.n();
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<.4)return'Joining · the pins are struck home ';if(!n)return'Joining · flat at 0°, the glass kindles ';if(jt>=.9)return'Joining · the glass kindles ';
+    const x=seg(jt,.4,.9)*n,k=Math.min(n-1,Math.floor(x)),u=x-k;return`Joining · shim ${k+1} of ${n} · `+(u<.18?'GitDiscuss darts open ':u<.42?'the shim darts in ':u<.62?'struck home ':'GitDiscuss settles ')}
+   const r=1-jt;if(r<.06)return'Releasing · the glass goes dark ';
+   if(n&&r<.42){const x=seg(r,.06,.42)*n,i=Math.min(n-1,Math.floor(x)),u=x-i;return`Releasing · shim ${i+1} of ${n} · `+(u<.2?'GitDiscuss lifts ':u<.66?'knocked out ':'GitDiscuss drops ')}
+   return r<.5?'Releasing · the pins are drawn ':'Releasing · parting '},
+  // GitDiscuss's swing. Joining: for each shim it darts 6° past where it will sit, holds while the shim goes in, then drops onto it.
+  // Releasing: it lifts off the top shim, holds while that is knocked out, then drops onto the next. It never crosses 0° on the way.
+  bend(jt){const A=model.angle,n=this.n(),sg=A<0?-1:1;if(jt>=1)return A;if(!n)return 0;let v;
+   if(model.dir>0){if(jt<.4)return 0;if(jt>=.9)return A;const x=seg(jt,.4,.9)*n,k=Math.min(n-1,Math.floor(x)),u=x-k,a=15*k,b=k===n-1?Math.abs(A):a+15,top=b+6;
+    v=u<.18?lerp(a,top,dart(u/.18)):u<.62?top:lerp(top,b,backOut(seg(u,.62,.82)))}
+   else{const r=1-jt;if(r<.06)return A;if(r>=.42)return 0;const x=seg(r,.06,.42)*n,i=Math.min(n-1,Math.floor(x)),u=x-i,k=n-1-i,a=15*k,b=k===n-1?Math.abs(A):a+15,top=b+6;
+    v=u<.2?lerp(b,top,dart(u/.2)):u<.66?top:lerp(top,a,backOut(seg(u,.66,.9)))}
+   return sg*Math.max(0,v)},
+  // The pins sit on the joint line at the head and foot; GitDiscuss turns on the foot pin when lowered and the head pin when raised.
+  py(h,bd){return bd<0?14:h-5},
+  place(h){const bd=this.bend(model.jt);return{o:`3px ${this.py(h,bd)}px`,t:bd?`rotate(${f(bd*100)/100}deg)`:''}},
+  tone(){return model.a.run&&model.b.run?{glass:'#ffd581',core:'#fff6d8',g:'leakA'}:{glass:'#bcd3f0',core:'#f4f8ff',g:'leakC'}},
+  // The range of Jarvis's y that keeps both shells (and the scrolls over them) on the stage, allowing for the 6° lift past each shim.
+  fitRange(ang,hh){const h=2*hh,a=ang?Math.sign(ang)*(Math.abs(ang)+7):0,py=this.py(h,ang),ys=[-36,h+4];
+   for(const p of [[-3,-30-py],[W-3,-30-py],[-3,h+4-py],[W-3,h+4-py]])ys.push(py+rot(p,a)[1]);
+   const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,40-mn),hi=594-mx;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]},
+  fit(y){return clamp(y,...this.fitRange(model.angle,ctx().h/2))},
+  releaseStart(){stopAngle();this.tn=null;this.pop=null},
+  key(){$('#a .grip').focus();doSeparate()},
+  arrow(k){stepAngle(k)},
+  // Drags turn about the middle of the joint. A tap (no real movement) knocks the shims out.
+  mid(){return{x:model.a.x+W-3,y:model.a.y+ctx().h/2}},
+  seamDown(p){++angAnim;model.angTo=undefined;const C=this.mid();return{seam:true,angle:true,p0:p,mv:0,prev:Math.atan2(p.y-C.y,p.x-C.x),raw:model.angle,th0:model.angle,moved:false}},
+  seamMove(d,p){d.mv=Math.max(d.mv,Math.hypot(p.x-d.p0.x,p.y-d.p0.y));
+   const C=this.mid(),a=Math.atan2(p.y-C.y,p.x-C.x);let dd=(a-d.prev)*180/Math.PI;dd=((dd+540)%360)-180;d.prev=a;
+   dd*=clamp(Math.hypot(p.x-C.x,p.y-C.y)/70,.1,1);d.raw=clamp(d.raw+dd,-this.range,this.range);
+   if(d.mv>6)d.moved=true;if(!d.moved)return;model.angle=magnet(d.raw,this.step);refitPair();render()},
+  seamUp(d){
+   if(d.moved){const to=Math.round(model.angle/this.step)*this.step,n=this.n(to);animateAngle(to,420);say('GitDiscuss set at '+signed(to)+(n?' on '+n+' shim'+(n>1?'s':'')+'.':', flat on the pins.'));return}
+   // A tap may have stopped a swing between detents: it settles on the nearest, so the shims always fill the wedge.
+   const sv=Math.round(model.angle/this.step)*this.step;
+   if(d.fromGrip){if(sv!==model.angle)animateAngle(sv,300);const el=$('#b');if(el.classList.contains('signed')){signTap('b');return}if(el.classList.contains('lantern')){lanternTap('b');return}
+    if(d.touch&&el.classList.contains('cocooned'))el.classList.toggle('loose');
+    render();say('Drag GitDiscuss\'s nameplate to open or close the wedge; tap the shims to knock them out.');return}
+   model.angle=sv;refitPair();$('#a .grip').focus();doSeparate()},
+  seamCancel(d){if(d.moved){model.angle=d.th0;refitPair()}},
+  // A shim going in, u from 0 to 1 over its step: it darts in point first and lodges proud of the wedge, then a strike drives it home.
+  goIn(u,R){return{d:u<.42?R*.16+R*.9*(1-dart(seg(u,.18,.42))):R*.16*(1-ease(seg(u,.5,.58))),op:seg(u,.18,.24),strike:seg(u,.42,.6),hit:u>.5&&u<.6?seg(u,.5,.6):-1,tick:u>.5&&u<.75?seg(u,.5,.75):-1,grit:u>.52?seg(u,.52,1):-1}},
+  // One shim: apex at Q0 pushed out d along its middle, from screen angle a0 (degrees) through sp (signed), radius R.
+  shim(Q0,a0,sp,R,d,s,i){
+   if(Math.abs(sp)<.4)return '';
+   const rd=Math.PI/180,mid=(a0+sp/2)*rd,Q={x:Q0.x+d*Math.cos(mid),y:Q0.y+d*Math.sin(mid)},a1=a0+sp,sw=sp>0?1:0;
+   const O=(deg,r)=>({x:Q.x+r*Math.cos(deg*rd),y:Q.y+r*Math.sin(deg*rd)}),arc=(r,b0,b1)=>`M${P(O(b0,r))}A${f(r)} ${f(r)} 0 0 ${sw} ${P(O(b1,r))}`,c=Math.min(1.5+5*s,R*.15);
+   // A chipped corner, on alternate sides.
+   const body=i%2?`M${P(Q)}L${P(O(a0,R))}A${f(R)} ${f(R)} 0 0 ${sw} ${P(O(a1-sp*.2,R))}L${P(O(a1,R-c))}Z`:`M${P(Q)}L${P(O(a0,R-c))}L${P(O(a0+sp*.2,R))}A${f(R)} ${f(R)} 0 0 ${sw} ${P(O(a1,R))}Z`;
+   const rr=R*.42,deep=`M${P(Q)}L${P(O(a0,rr))}A${f(rr)} ${f(rr)} 0 0 ${sw} ${P(O(a1,rr))}Z`;
+   let o=`<path d="${body}" fill="${INK}" opacity=".45" transform="translate(1.5 2.5)"/><path d="${body}" fill="${this.FACE[i%3]}"/><path d="${deep}" fill="#3a4658" opacity=".55"/>`;
+   // Growth ridges: an ink line with a pale lip under it, like the rings on a shell.
+   for(const k of[.58,.74,.88]){const dd=arc(R*k,a0+sp*.07,a1-sp*.07);
+    o+=`<path d="${dd}" fill="none" stroke="#f3f7fb" stroke-width="${f(.7+.4*s)}" opacity=".55" transform="translate(.5 .8)"/><path d="${dd}" fill="none" stroke="${INK}" stroke-width="${f(.6+.5*s)}" opacity=".5"/>`}
+   o+=`<path d="${arc(R-1.4*s-.6,a0+sp*.12,a1-sp*.3)}" fill="none" stroke="#f4f8fb" stroke-width="1.1" stroke-linecap="round" opacity=".85"/>`;
+   return o+`<path d="${body}" fill="none" stroke="${INK}" stroke-width="${f(1+.6*s)}" stroke-linejoin="round" filter="url(#wobW)"/>`},
+  // The strike: a pale crescent of radius R swept round K from a0 to a1 (screen degrees).
+  slash(K,a0,a1,u,R){if(u<=0||u>=1)return '';const e=ease(clamp(u/.6)),ac=lerp(a0,a1,e),n=14,O=[],I=[];
+   for(let i=0;i<=n;i++){const t=i/n,g=lerp(a0,ac,t)*Math.PI/180,w=R*.37*Math.sin(Math.PI*t);O.push(`${f(K.x+R*Math.cos(g))} ${f(K.y+R*Math.sin(g))}`);I.unshift(`${f(K.x+(R-w)*Math.cos(g))} ${f(K.y+(R-w)*Math.sin(g))}`)}
+   const d=`M${O.join('L')}L${I.join('L')}Z`,op=1-seg(u,.55,1);
+   return `<path d="${d}" fill="#dfe8f4" opacity="${f(op*.6)}" filter="url(#blur3)"/><path d="${d}" fill="#f6f9fd" opacity="${f(op)}"/>`},
+  ticks(p,u,k){const rr=(9+11*ease(u))*k;let t='';for(let i=0;i<6;i++){const g=i*60*Math.PI/180+.3,v={x:Math.cos(g),y:Math.sin(g)};t+=`M${f(p.x+v.x*rr*.55)} ${f(p.y+v.y*rr*.55)}L${f(p.x+v.x*rr)} ${f(p.y+v.y*rr)}`}
+   return `<path d="${t}" stroke="#e9edf1" stroke-width="${f(1+1.4*(1-u))}" stroke-linecap="round" fill="none" opacity="${f(1-u)}"/>`},
+  grit(p,u,h,j){let s='';for(let i=0;i<6;i++){const v=seg(u,i*.06,.5+i*.08);if(v<=0||v>=1)continue;
+   s+=`<circle cx="${f(p.x-4+i*1.7+Math.sin(i*2.3+j)*2.4)}" cy="${f(p.y+.3*h*v*v)}" r="${f(1.1-.3*(i%2))}" fill="#c9d1db" opacity="${f(.85*(1-v))}"/>`}return s},
+  over(c){
+   const jt=c.jt,h=c.h,now=performance.now(),s=h/H,k=Math.max(.55,s),A=model.angle,bd=this.bend(jt),sg=(bd||A)<0?-1:1,n=this.n(),tn=this.tone();
+   const jx=model.a.x+W-3,ay=model.a.y,top={x:jx,y:ay+14},foot={x:jx,y:ay+h-5},C=sg>0?foot:top,Cf=sg>0?top:foot,pr=3+1.6*s;
+   // The shims reach from the pivot pin to just short of the far pin.
+   const R=Math.max(12,h-22-6*s),A0=sg>0?-90:90,dir=g=>({x:Math.cos(g*Math.PI/180),y:Math.sin(g*Math.PI/180)}),O=(g,r)=>{const v=dir(g);return{x:C.x+r*v.x,y:C.y+r*v.y}};
+   const sector=(sp,r=R)=>`M${P(C)}L${P(O(A0,r))}A${f(r)} ${f(r)} 0 0 ${sg>0?1:0} ${P(O(A0+sg*sp,r))}Z`;
+   if(jt===0){this.tn=null;this.pop=null;this.live=false;const g=c.glow;if(g<=0)return '';
+    const bx=model.b.x+3,by=model.b.y;let o=glints([top,foot,{x:bx,y:by+14},{x:bx,y:by+h-5}],g*.8);
+    if(g>=1){let ln='';for(let i=1;i<n;i++)ln+=`M${P(C)}L${P(O(A0+sg*i*15,R))}`;
+     o+=`<path d="${sector(Math.max(6,n*15))}${ln}" fill="#e9edf1" fill-opacity=".08" stroke="#e9edf1" stroke-width="1.1" stroke-dasharray="2.5 3" stroke-linecap="round" opacity=".6"/>`+
+      [top,foot].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(pr)}" fill="none" stroke="#ffe7a8" stroke-width="1" stroke-dasharray="2 2"/>`).join('')}
+    // Near: a shim rises out of the fog into the gap and hangs there, bobbing.
+    else if(drag&&!reduce.matches){this.live=true;const m={x:(jx+bx)/2,y:ay+h*.62+R*.3*(1-g)+2.5*Math.sin(now/300)};
+     o+=`<g opacity="${f(clamp(g*1.5))}">${this.shim(m,-97.5,15,R*.72,0,s,0)}</g>`}
+    return o}
+   let o='',fx='',pin=1,lit=0;const list=[],r=1-jt,home=(cnt,w)=>{for(let i=0;i<cnt;i++)list.push({i,a:w*i,sp:w})};this.live=false;
+   if(jt===1){
+    // Joined: the shims that fit. A change in the count while dragging darts a shim in (struck home) or squeezes the top one out.
+    // The pop remembers which side the wedge was on, so a shim tumbling out stays put if the angle dips through 0°.
+    const th=Math.abs(bd),cnt=this.count(th);lit=1;
+    if(this.tn!=null&&cnt!==this.tn&&!reduce.matches)this.pop={t:now,dir:Math.sign(cnt-this.tn),i:cnt>this.tn?cnt-1:this.tn-1,sg};
+    this.tn=cnt;let e=-1;if(this.pop){e=(now-this.pop.t)/this.popMs;if(e>=1){this.pop=null;e=-1}else this.live=true}
+    home(cnt,cnt?Math.min(15,th/cnt):0);
+    if(e>=0){const pp=this.pop;if(pp.dir>0){if(list[pp.i])list[pp.i].go=.18+.82*e}else list.push({i:pp.i,a:15*pp.i,sp:15,fly:e,sg:pp.sg})}}
+   else if(model.dir>0){this.tn=null;this.pop=null;pin=ease(seg(jt,.3,.38));lit=n?seg(jt,.9,.98):seg(jt,.42,.62);
+    if(jt>.36&&jt<.44){const u=seg(jt,.36,.44);for(const p of[top,foot])fx+=spark(p,1-u,(4+6*u)*k)}
+    if(n&&jt>=.4){if(jt>=.9)home(n,15);else{const x=seg(jt,.4,.9)*n,q=Math.min(n-1,Math.floor(x)),u=x-q;home(q,15);if(u>=.18)list.push({i:q,a:15*q,sp:15,go:u})}}}
+   else{this.tn=null;this.pop=null;lit=1-seg(r,0,.06);pin=1-ease(seg(r,n?.42:.1,.5));
+    if(n&&r<.42){if(r<.06)home(n,Math.min(15,Math.abs(A)/n));
+     else{const x=seg(r,.06,.42)*n,i=Math.min(n-1,Math.floor(x)),u=x-i,q=n-1-i;home(q,15);list.push({i:q,a:15*q,sp:15,hook:seg(u,.14,.32),fly:u<.25?undefined:seg(u,.25,.7)})}}}
+   // The join light, under the shims: a glow round each pin, the pivot's the stronger.
+   if(lit>0)o+=`<circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f(20+18*s)}" fill="url(#${tn.g})" opacity="${f(.7*lit)}"/><circle cx="${f(Cf.x)}" cy="${f(Cf.y)}" r="${f(12+10*s)}" fill="url(#${tn.g})" opacity="${f(.5*lit)}"/>`;
+   for(const L of list){
+    const lg=L.sg||sg,C=lg>0?foot:top,a0=(lg>0?-90:90)+lg*L.a,sp=lg*L.sp,mid=a0+sp/2,dv=dir(mid),Rs=15*k;let d=0,op=1,G=null;
+    if(L.go!==undefined){G=this.goIn(L.go,R);d=G.d;op=G.op}
+    const Bk={x:C.x+dv.x*(R+d),y:C.y+dv.y*(R+d)};
+    if(L.fly!==undefined){
+     // Knocked or squeezed out: it springs out along its middle, then tumbles down into the fog.
+     const v=L.fly,dd=R*1.05*ease(seg(v,0,.45)),cx=C.x+dv.x*(dd+R*.6),cy=C.y+dv.y*(dd+R*.6);
+     o+=`<g opacity="${f(1-seg(v,.6,1))}" transform="translate(0 ${f(90*k*v*v)}) rotate(${f(sg*150*v)} ${f(cx)} ${f(cy)})">${this.shim(C,a0,sp,R,dd,s,L.i)}</g>`;
+     if(v<.2)fx+=spark(Bk,1-v/.2,(4+6*v/.2)*k)}
+    else o+=(op<1?`<g opacity="${f(op)}">`:'')+this.shim(C,a0,sp,R,d,s,L.i)+(op<1?'</g>':'');
+    if(G){const fl=L.i%2?-1:1;if(G.strike>0){const Kc={x:Bk.x+dv.x*Rs*.5,y:Bk.y+dv.y*Rs*.5};fx+=this.slash(Kc,mid+180-80*fl,mid+180+80*fl,G.strike,Rs)}
+     if(G.hit>=0)fx+=spark(Bk,1-G.hit,(4+7*G.hit)*k);if(G.tick>=0)fx+=this.ticks(Bk,G.tick,k);if(G.grit>=0)fx+=this.grit(Bk,G.grit,h,L.i)}
+    // Released: a hooked strike catches the shim's back and flicks it out.
+    if(L.hook>0&&L.hook<1){const Kc={x:Bk.x+dv.x*Rs*.3,y:Bk.y+dv.y*Rs*.3};fx+=this.slash(Kc,mid-80,mid+80,L.hook,Rs)}}
+   // The pins: iron bosses on the joint line with a glass in each, struck home as the straps meet and drawn as they part.
+   if(pin>0)for(const p of[top,foot]){const rr=pr*(.4+.6*pin);
+    o+=`<g opacity="${f(clamp(pin*2))}"><circle cx="${f(p.x+.8)}" cy="${f(p.y+1.4)}" r="${f(rr)}" fill="${INK}" opacity=".5"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(rr)}" fill="url(#iron)" stroke="${INK}" stroke-width="1.1"/>`+
+     `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(rr*.55)}" fill="#3c3022" stroke="${INK}" stroke-width=".6"/>`+
+     (lit>0?`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(rr*.55)}" fill="${tn.glass}" opacity="${f(lit)}"/><circle cx="${f(p.x-rr*.2)}" cy="${f(p.y-rr*.2)}" r="${f(rr*.2)}" fill="${tn.core}" opacity="${f(lit)}"/>`:'')+'</g>'}
+   o+=fx;
+   if(jt===1){const hd=sector(Math.max(Math.abs(bd),10)),cnt=this.count(bd);
+    o+=`<g class="hit brackethit" id="seamHit" tabindex="0" role="group" aria-label="Shell shims: GitDiscuss at ${signed(A)} on ${cnt} shim${cnt===1?'':'s'}. Up arrow raises it 15° and down arrow lowers it; Enter knocks the shims out to separate the widgets"><title>Drag the shims to open or close the wedge; tap them to knock them out</title>`+
+     `<path d="${hd}" fill="transparent" stroke="transparent" stroke-width="14" stroke-linejoin="round"/>`+[top,foot].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(pr+6)}" fill="transparent"/>`).join('')+
+     `<path class="ringfocus" d="${hd}" fill="none" stroke="#e9edf1" stroke-width="1.4" stroke-dasharray="4 3"/></g>`}
+   return o;
   }
  }
 };
@@ -3092,7 +3238,7 @@ function morphTo(id){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:700,y:420}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30,stay:20,dividers:-20,web:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'silk',shade:'draw',jt:0,st:0,dir:1,path:null,glow:0,ready:false,busy:false,cut:null,peal:0,armed:0,angle:20,angs:{bracket:20,shell:30,stay:20,dividers:-20,web:30,shims:30},angTo:undefined,morph:'unfurl',size:'sheet',g:0,mdir:1,restore:null,cMoved:false,lift:0,placed:0};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 function separatePose(){const g=J().gap;let ax=clamp(model.a.x,34,1200-2*W-g-SEP-34);return{a:{x:ax,y:model.a.y},b:{x:ax+W+g+SEP,y:model.a.y}}}
