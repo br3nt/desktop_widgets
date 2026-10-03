@@ -208,7 +208,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -2425,6 +2425,157 @@ JOINS.sock={label:'Sock heel',kind:'Angle · short rows',gap:SK.gap,ms:4800,msDr
   return o;
  }
 };
+
+/* ---------- Bees: felt bees festoon across the gap and draw out a little comb (Swarm) ---------- */
+// Nothing is fixed to either cushion. Honeybees bridge gaps by hanging on to each other's legs in chains (festooning),
+// and festoons are where they make wax: so two chains of five hang between the cushions' ends, and a three-cell comb
+// is drawn under the top chain. The middle cell's honey glows: that is the join light.
+// The chains hang from x 15 in from each joining end, in the free felt between the display and the end (x 345–390).
+const BE={gap:46,in:15,n:5,ts:[.07,.285,.5,.715,.93],
+ // Top and bottom chain: anchor height and sag at full height. In a shade strip only the top chain stays.
+ ch:[{y:27,sag:21,dir:1},{y:72,sag:24,dir:-1}],
+ // Landing order: the ends first (they hold on to the felt), then inward, the middles last.
+ order:[[0,0],[0,4],[1,0],[1,4],[0,1],[0,3],[1,1],[1,3],[0,2],[1,2]],
+ // Where each bee comes in from (and leaves to): angle in degrees from its place, and a wiggle. Steep, so no path
+ // crosses a display: the top chain comes down from above, the bottom chain up from the desktop below.
+ from:[[-112,1],[-68,-1],[112,-1],[68,1],[-100,-1],[-80,1],[100,1],[80,-1],[-94,1],[86,-1]],
+ t0:.27,dt:.045,fly:.14,body:'#e0a63a',stripe:'#3b2416',wing:'#f4ead8',seam:'#a8936a'};
+// One felt bee, head toward +x. fly: wings a blur that alternates every frame; otherwise folded back.
+// sx, sy squash it wide and flat as it drops onto the chain.
+function beeSvg(x,y,ang,flip,sc,fly,fr,op=1,shadow=true,sx=1,sy=1){
+ if(op<.02)return '';
+ const tf=`translate(${f(x)} ${f(y)}) rotate(${f(ang)}) scale(${(flip?-sc*sx:sc*sx).toFixed(3)} ${(sc*sy).toFixed(3)})`;
+ const W1=fly?(fr%2?'<ellipse cx="-1.5" cy="-8.2" rx="3" ry="6.4" transform="rotate(-18 -1.5 -3)"/><ellipse cx="1" cy="-7.6" rx="2.6" ry="5.6" transform="rotate(16 1 -3)"/>':
+   '<ellipse cx="-4" cy="-5.2" rx="6.6" ry="2.4" transform="rotate(-34 0 -3)"/><ellipse cx="-3" cy="-4.4" rx="5.8" ry="2.2" transform="rotate(-14 0 -3)"/>'):
+  '<ellipse cx="-3.4" cy="-4.6" rx="6.4" ry="2.8" transform="rotate(-16 -3.4 -4.6)"/><ellipse cx="-5" cy="-3.3" rx="5.6" ry="2.4" transform="rotate(-30 -5 -3.3)"/>';
+ let o=`<g transform="${tf}" opacity="${f(op)}">`;
+ if(shadow)o+=`<ellipse cx="1" cy="2.6" rx="9" ry="5.6" fill="#000" opacity=".34" filter="url(#sh)"/>`;
+ // Buzz marks behind a flying bee.
+ if(fly)o+=`<path d="M-11 -2.4q-2 2.4 0 4.8M-14 -3.4q-2.6 3.4 0 6.8" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width=".8" stroke-linecap="round"/>`;
+ o+=`<g filter="url(#tagfelt)"><ellipse rx="7.6" ry="5.4" fill="${BE.body}"/><circle cx="7.4" cy="-.3" r="3.7" fill="${BE.stripe}"/></g>`+
+  `<ellipse cx="-3.7" rx="1.6" ry="4.5" fill="${BE.stripe}"/><ellipse cx=".7" rx="1.6" ry="5.1" fill="${BE.stripe}"/><path d="M-7.6 0l-2 .2" stroke="${BE.stripe}" stroke-width="1.4" stroke-linecap="round"/>`+
+  `<ellipse cx="-1" cy="-2.7" rx="4.2" ry="1.3" fill="#fff8ec" opacity=".3"/><path d="M-6 2.7Q0 5.6 5.4 2.6" fill="none" stroke="#f7e8c9" stroke-opacity=".6" stroke-width=".7" stroke-dasharray="1.5 1.3"/>`+
+  `<circle cx="8.7" cy="-1.3" r=".95" fill="#fff4dc"/><path d="M8.6 -3.4q1.2-3.6 3.8-4.2M7 -3.7q0-3.8 2-5.4" fill="none" stroke="${BE.stripe}" stroke-width=".8" stroke-linecap="round"/>`+
+  `<circle cx="12.4" cy="-7.6" r="1" fill="${BE.body}"/><circle cx="9" cy="-9.1" r="1" fill="${BE.body}"/>`+
+  `<g fill="${BE.wing}" fill-opacity="${fly?.55:.86}" stroke="${BE.seam}" stroke-width=".6" stroke-dasharray="1.4 1.1">${W1}</g></g>`;
+ return o;
+}
+// A pointy-topped hexagon of radius r at (x,y), as a path.
+const beHex=(x,y,r)=>{let d='';for(let i=0;i<6;i++){const a=(60*i-90)*Math.PI/180;d+=(i?'L':'M')+f(x+r*Math.cos(a))+' '+f(y+r*Math.sin(a))}return d+'Z'};
+// Bee heading from a step along a path: rotate by the travel angle, flipped when going left so the wings stay up.
+function beHead(dx,dy){let ang=Math.atan2(dy,dx)*180/Math.PI;const flip=Math.abs(ang)>90;if(flip)ang=ang>0?ang-180:ang+180;return{ang:clamp(ang,-50,50),flip}}
+JOINS.bees={label:'Bees',kind:'Swarm',gap:BE.gap,ms:4600,msDrag:4200,relMs:3600,moveEnd:.27,hold:.6,snip:true,
+ ph:[[0,.27,.82,1],[0,.16,.72,1]],
+ about:'A join with nothing fixed to either cushion. Honeybees cross a gap by hanging on to each other\'s legs in chains, called festooning, and festoons are where they make wax. Here mustard felt bees with brown stripes, French-knot eyes, pipe-cleaner antennae and stitched cream wings do it between the cushions. <b>Near:</b> two bees buzz round the gap while you hold the drag. <b>Ready:</b> a chalk ghost of two festoons and the comb. Joining (12 fps): the cushions settle a hand\'s width apart and ten bees come in one at a time, the top chain\'s from above and the bottom chain\'s from below, in wiggly flight with their wings a blur. The end bees land on the felt first and grip it, then the chains fill in toward the middle, sagging, each bee holding the next. Two festoons hang across the gap, the top one heads to GitDiscuss and the bottom one heads to Jarvis. Then three wax cells are drawn out under the top chain one by one, and honey fills them. The middle cell glows: gold while both agents run, cold blue if either is paused. That is the join light. The bees stay in the free felt at the cushions\' ends and in the gap, clear of the displays, nameplates and buttons. <b>Shade:</b> only the top festoon fits a strip; the bottom chain\'s bees fly off as it narrows, and the comb shrinks and stays under it. <b>Release:</b> tap the bees (or focus them and press Enter). The honey dims, the comb is taken back cell by cell, the bees lift off from the middles outward and fly away, and then the cushions part.',
+ sayJoin:'The cushions settle apart and the bees come in, one at a time.',
+ sayJoined:'Festooned. Drag either nameplate to move the pair. Tap the bees to send them off.',
+ sayRelease:'The honey dims, the comb is taken back, the bees fly off and the cushions part.',
+ sayUnpick:'The bees fly back off and the cushions part.',
+ sayReady:'Ready: a chalk ghost of two festoons. Release to call the bees.',
+ sayNear:'Nearby: two bees buzz round the gap. Move closer.',
+ sayHold:'Held mid-join: the bees are landing. Use the scrubber to step through them one by one.',
+ phReady:'Ready · festoons ghosted in the gap',
+ pose(){return{th:0,ys:0,sq:0}},
+ phase(jt){
+  if(model.dir<0&&model.snip){const u=1-jt;return u<.08?'Releasing · the honey dims':u<.22?'Releasing · taking the comb back':u<.7?'Releasing · the bees fly off':'Releasing · parting'}
+  if(model.dir<0&&model.busy)return 'The bees fly back off';
+  if(jt<.27)return 'Joining · settling apart';
+  if(jt<.82){const n=BE.order.filter((_,k)=>jt>=BE.t0+k*BE.dt+BE.fly).length;return `Joining · bees landed ${n} of 10`}
+  return jt<.92?'Joining · drawing the comb':'Joining · honey';
+ },
+ // Each chain's ends and control point from the cushions' places and height. sk runs 0 at full height to 1 in a strip.
+ chains(c){
+  const h=c.h,sk=clamp((H-h)/(H-HS)),a=model.a,b=model.b;
+  return BE.ch.map((C,i)=>{
+   const y=i===0?lerp(C.y,h/2-4,sk):C.y,sag=i===0?lerp(C.sag,8,sk):C.sag;
+   const A={x:a.x+W-BE.in,y:a.y+y},B={x:b.x+BE.in,y:b.y+y},M=V.mix(A,B,.5);
+   return{A,B,C:{x:M.x,y:M.y+2*sag},dir:C.dir};
+  });
+ },
+ // Every bee from join progress: place, heading, wings, opacity. Plus the comb (cells drawn, honey) and the light.
+ state(c){
+  const jt=c.jt,h=c.h,sk=clamp((H-h)/(H-HS)),s=mtScale(h),bs=lerp(1,.8,sk),ch=this.chains(c);
+  const slot=(ci,i)=>{const L=ch[ci],t=BE.ts[i],p=quadAt(L.A,L.C,L.B,t),an=quadAng(L.A,L.C,L.B,t);
+   // A little disorder so they read as a living chain rather than beads.
+   const j=((ci*5+i)*37%11)/11-.5;return{x:p.x+j*1.6,y:p.y+j*2.2,ang:clamp(an,-40,40)+j*14,flip:L.dir<0}};
+  const forward=!(model.dir<0&&model.snip),u=1-jt;
+  const r={bees:[],cells:[0,0,0],honey:0,light:0,links:[[],[]],ch,s,bs,sk};
+  // Flight progress of the bee landing k-th: 0 out at its start, 1 settled.
+  const prog=k=>{if(forward){const t0=BE.t0+k*BE.dt;return seg(jt,t0,t0+BE.fly)}
+   // Releasing: the last to land leaves first, after the comb is taken back.
+   const t0=.2+(9-k)*.042;return 1-seg(u,t0,t0+BE.fly)};
+  BE.order.forEach(([ci,i],k)=>{
+   const P=slot(ci,i),q=prog(k);let bee;
+   if(q>=1)bee={...P,fly:false,op:1};
+   else if(q<=0)bee=null;
+   else{
+    // In along a curve from 160 px out, with a wiggle across the path that dies away on landing.
+    const [deg,wg]=BE.from[k],th=deg*Math.PI/180,D=160*(forward?1:1.1);
+    const at=qq=>{const ee=1-Math.pow(1-qq,2.2),w=wg*16*Math.sin(qq*Math.PI*2.5)*(1-ee);
+     return{x:P.x+Math.cos(th)*D*(1-ee)-Math.sin(th)*w,y:P.y+Math.sin(th)*D*(1-ee)+Math.cos(th)*w}};
+    // Heading along the path, turned round when running backwards (leaving).
+    const p=at(q),p2=at(Math.min(1,q+.03)),hd=beHead(p2.x-p.x,p2.y-p.y),back=model.dir<0;
+    // On the last tenth it turns to its place in the chain and drops on with a squash.
+    bee=q>.9?{...P,fly:false,op:1,squash:Math.sin(seg(q,.9,1)*Math.PI)*.18}:{x:p.x,y:p.y,ang:hd.ang,flip:back?!hd.flip:hd.flip,fly:true,op:seg(q,0,.12)};
+   }
+   // The bottom chain lifts off as the strip narrows.
+   // Unshading brings them back down, so they face the way they travel.
+   if(bee&&ci===1&&sk>0){const e=seg(sk,0,.6),th=(i<2?-105:i>2?-75:-90)*Math.PI/180,hd=beHead(Math.cos(th)+(i-2)*.05,Math.sin(th)),down=model.shDir===0;
+    if(e>0)bee={x:bee.x+Math.cos(th)*120*ease(e)+(i-2)*6*e,y:bee.y+Math.sin(th)*120*ease(e),ang:hd.ang,flip:down?!hd.flip:hd.flip,fly:true,op:bee.op*(1-seg(sk,.3,.6))}}
+   r.bees.push(bee);
+   if(bee&&!bee.fly)r.links[ci][i]=bee;
+  });
+  if(forward){r.cells=[0,1,2].map(i=>seg(jt,.82+i*.03,.87+i*.03));r.honey=seg(jt,.9,.97);r.light=seg(jt,.94,1)}
+  else{r.light=1-seg(u,0,.06);r.honey=1-seg(u,.02,.1);r.cells=[0,1,2].map(i=>1-seg(u,.08+(2-i)*.04,.14+(2-i)*.04))}
+  return r;
+ },
+ over(c){
+  const jt=c.jt,a=model.a,b=model.b,h=c.h,lit=a.run&&b.run,fr=Math.floor(performance.now()/FRAME);
+  let o='';
+  // Apart: near, two bees buzz round the gap; ready, a chalk ghost of the festoons and comb.
+  if(jt===0&&!(model.busy&&model.dir>0)){
+   const ch=this.chains(c);
+   if(c.ghost>0){let d='',e='';
+    // In a strip only the top festoon is ghosted, as only it stays.
+    ch.filter((_,i)=>i===0||h>HS+.4*(H-HS)).forEach(L=>{d+=`M${pt(L.A)}Q${pt(L.C)} ${pt(L.B)}`;BE.ts.forEach(t=>{const p=quadAt(L.A,L.C,L.B,t);e+=`<ellipse cx="${f(p.x)}" cy="${f(p.y)}" rx="7.6" ry="5.4"/>`})});
+    const M=quadAt(ch[0].A,ch[0].C,ch[0].B,.5),r=6.4*mtScale(h),cw=r*Math.sqrt(3),g5=5*mtScale(h);
+    o+=`<circle cx="${f(M.x)}" cy="${f(M.y+12)}" r="34" fill="#ffc36a" opacity="${f(c.ghost*.35)}" filter="url(#soft)"/>`+
+     `<g fill="none" stroke="#ffe2b0" stroke-opacity=".85" stroke-width="1.1" stroke-dasharray="3 2.5"><path d="${d}"/>${e}<path d="${beHex(M.x-cw/2,M.y+r+g5,r)+beHex(M.x+cw/2,M.y+r+g5,r)+beHex(M.x,M.y+2.5*r+g5,r)}"/></g>`}
+   if(c.glow>0&&drag){const G={x:(a.x+W+b.x)/2,y:(a.y+b.y)/2+h/2},t=fr*FRAME/1000;
+    [0,1].forEach(i=>{const ph=t*(2.1+i*.7)+i*Math.PI,x=G.x+Math.cos(ph)*(16+10*i),y=G.y+Math.sin(ph*1.6+i)*h*.26,
+     x2=G.x+Math.cos(ph+.1)*(16+10*i),y2=G.y+Math.sin((ph+.1)*1.6+i)*h*.26,hd=beHead(x2-x,y2-y);
+     o+=beeSvg(x,y,hd.ang,hd.flip,.85,true,fr+i,clamp(c.glow*1.6))});
+    // Keep them buzzing while the drag is held still: one more frame, only while near and dragging.
+    if(!beBuzz&&!reduce.matches)beBuzz=setTimeout(()=>{beBuzz=0;if(drag&&model.join==='bees'&&model.jt===0&&model.glow>0)render()},FRAME)}
+   return o;
+  }
+  const r=this.state(c),s=r.s;
+  // The legs: each landed bee holds the next one in its chain, and the end bees hold the felt.
+  let legs='';
+  r.links.forEach((L,ci)=>{for(let i=0;i<BE.n;i++){const p=L[i];if(!p)continue;
+   const q=L[i+1];if(q)legs+=`M${f(p.x+2)} ${f(p.y+3.4)}L${f(q.x-2)} ${f(q.y+3.4)}M${f(p.x+4)} ${f(p.y+2)}L${f(q.x-4)} ${f(q.y+4.4)}`;
+   if(i===0||i===BE.n-1){const sg=i===0?-1:1;legs+=`M${f(p.x)} ${f(p.y+3)}l${f(sg*5)} 2.6M${f(p.x+sg*2)} ${f(p.y+2)}l${f(sg*6)} .4`}}});
+  if(legs)o+=`<path d="${legs}" fill="none" stroke="${BE.stripe}" stroke-width="1.1" stroke-linecap="round"/>`;
+  // The comb, hung under the top chain's middle bee: two cells, then one below. Wax first, then honey.
+  const M=r.links[0][2]||quadAt(r.ch[0].A,r.ch[0].C,r.ch[0].B,.5),rr=6.4*s,cw=rr*Math.sqrt(3),y0=M.y+rr+5*s;
+  const cells=[[M.x-cw/2,y0],[M.x+cw/2,y0],[M.x,y0+1.5*rr]],col=lit?'#f2c24e':'#9cc2ea';
+  if(r.cells.some(v=>v>0)){
+   if(r.light>.02)o+=`<circle cx="${f(cells[2][0])}" cy="${f(cells[2][1])}" r="${f(16*s)}" fill="${col}" opacity="${f(.6*r.light)}" filter="url(#soft)"/>`;
+   cells.forEach(([x,y],i)=>{const v=r.cells[i];if(v<.02)return;const R=rr*lerp(.4,1,ease(v));
+    o+=`<path d="${beHex(x+.8,y+1.6,R)}" fill="#000" opacity="${f(.3*v)}" filter="url(#sh)"/><path d="${beHex(x,y,R)}" fill="#e9d6a6" opacity="${f(v)}" filter="url(#tagfelt)"/>`;
+    if(r.honey>0){const hc=i===2&&r.light>0?mixHex('#c98f2a',col,r.light):'#c98f2a';o+=`<path d="${beHex(x,y+.3,R*.66*r.honey)}" fill="${hc}"/>`}
+    o+=`<path d="${beHex(x,y,R*.82)}" fill="none" stroke="${BE.seam}" stroke-opacity="${f(.8*v)}" stroke-width=".7" stroke-dasharray="1.5 1.2"/>`});
+   if(r.light>.02)o+=`<ellipse cx="${f(cells[2][0]-1.2*s)}" cy="${f(cells[2][1]-1.4*s)}" rx="${f(1.6*s)}" ry="${f(1*s)}" fill="#fffbe8" opacity="${f(.8*r.light)}"/>`}
+  // Bees: settled ones first, then the ones in the air over them.
+  const all=r.bees.map((bb,k)=>bb&&{...bb,k}).filter(Boolean);
+  all.filter(bb=>!bb.fly).concat(all.filter(bb=>bb.fly)).forEach(bb=>{
+   const q=bb.squash||0;o+=beeSvg(bb.x,bb.y+q*4,bb.ang,bb.flip,r.bs,bb.fly,fr+bb.k,bb.op,true,1+q*.6,1-q)});
+  if(jt===1){const L=r.ch,x0=L[0].A.x-12,x1=L[0].B.x+12,y0=Math.min(L[0].A.y,L[0].B.y)-12,y1=r.sk>.6?a.y+h+4:Math.max(a.y+h-6,cells[2][1]+rr+4);
+   o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Felt bees: tap or press Enter to send them off and separate the widgets"><title>Tap the bees to send them off</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="14" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(y1-y0)}" rx="14" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+  return o;
+ }
+};
+let beBuzz=0;
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
