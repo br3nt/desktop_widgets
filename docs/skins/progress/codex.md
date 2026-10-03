@@ -40,7 +40,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Elven · Shade · Pressed leaf — Added selectable closing silver bows, a slim almond frame, crisp summary fields, reverse opening and independent Checks shade with drawer restoration; preserved all six joins and plain summary; 209 simulated interaction, animation, geometry and touch checks passed; full-page visual review blocked by denied Chrome access and sandbox browser launch.
 - [x] Wire · Join · Beaded insect clasp — articulated attachment — Added a selectable six-foot copper clasp, sequential tab grip, lowering bead body and wing-lever reverse release; retained all six earlier joins; 121 simulated DOM, animation, geometry, touch and regression checks passed; full-page visual review blocked by denied Chrome access.
 - [x] Hollow · Shade · Nested husks — Added selectable three-course chalk nesting, a readable 36 px summary slot, reverse extension and independent Checks shade with drawer restoration; retained all six joins and plain summary; 221 simulated DOM, animation, geometry, touch and regression checks passed; full-page visual review blocked by denied Chrome access and sandbox browser launch.
-- [ ] Gothic · Shade · Folding triptych
+- [x] Gothic · Shade · Folding triptych — Finished selectable carved wood leaves, staged folding and seating into a brass-edged summary strip, reverse unfolding and independent Checks shade; retained all six joins and earlier shade options; 510 simulated DOM, animation, focus, touch and regression checks passed; visual review blocked by unavailable browser access and sandbox rendering failures.
 - [ ] Felt · Shade · Concertina pleats
 - [ ] Elven · Shade · Quill sheath
 - [ ] Wire · Shade · Stone strand
