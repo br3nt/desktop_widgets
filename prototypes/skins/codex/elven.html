@@ -29,9 +29,19 @@ footer{max-width:1224px;margin:auto;padding:27px 32px 32px;display:grid;grid-tem
 .summary{border:1px solid #90b2a4;border-radius:3px 15px;background:#193740;box-shadow:inset 0 0 0 2px #284d53,0 3px 4px #041c2366;color:#d7e8df;padding:0 10px}.summary b{font:12px Georgia,serif}.summary button{border:1px solid #83b2a4;background:#345e5f;border-radius:50% 15%;color:#ecf5df}.summary .loaded{color:#c1e1ba}footer .swatch{background:#98c4b2;border-radius:50%}.detail-label{color:#698d85}.notes{border-color:#c5d0cc}
 #stage[data-option="scarf"]:has(#release:hover,#release:focus-visible) .scarf-focus{opacity:.22}
 #stage[data-option="scarf"] #release:focus-visible{outline-offset:2px}
+
+/* The bows change curvature; the reading field never scales. */
+.shade-picker{display:grid;gap:3px;font-size:10px;color:#566b6c}.shade-picker select{padding:6px 9px;border:1px solid #afc8bf;border-radius:4px;background:#f5f7f3;color:#283d40;font-size:12px}
+.leaf-frame{display:none;position:absolute;inset:0;width:100%;height:184px;pointer-events:none;z-index:2;overflow:visible}#meter .leaf-frame{height:78px}
+.pressing{height:var(--leaf-height)}
+.pressing> :not(.summary):not(.leaf-frame){visibility:hidden;pointer-events:none}
+.pressing>.leaf-frame{display:block!important}
+.pressing>.summary{display:flex;position:absolute;left:27px;right:27px;top:4px;height:28px;padding:0 8px;gap:8px;z-index:3;border:0;border-radius:9px 2px;background:#122c35;box-shadow:0 0 0 1px #6d9692;color:#e4f0e6;font-size:11px}
+.pressing .summary b,.pressing .summary button{flex:none}.pressing .summary span{white-space:nowrap;min-width:0}.pressing .summary button{width:26px;height:26px}
+#meter.pressing>.summary{left:19px;right:19px;padding:0 4px;gap:5px;font-size:10px}#meter.pressing .summary b{font-size:11px}#meter.pressing .summary button{width:24px}
 </style></head><body>
-<header><div class="eyebrow"><a href="index.html">← Codex / Skin studies</a><span>03 · Elven</span></div><div class="heading"><div><h1 id="heading">Silver learns <span>to branch.</span></h1><p id="description">Two open silver frames become one branching structure. Split tips interleave; a pale enamel collar seats over the graft.</p></div><label class="option">Built options<select id="option"><option value="grafted-ribs">01 — Grafted ribs · fusion</option><option value="bowstring">02 — Bowstring tension · suspended attachment</option><option value="iris">03 — Iris clasp · enclosing attachment</option><option value="ribbon">04 — Calligraphic ribbon · binding attachment</option><option value="moonstone">05 — Floating moonstone · field attachment</option><option value="scarf">06 — Inlaid scarf joint · flush fusion</option></select></label></div></header>
-<div class="toolbar"><nav class="states" aria-label="Assembly state"><button data-state="separate" aria-pressed="true"><span>1</span>Separate</button><button data-state="joining" aria-pressed="false"><span>2</span>Joining</button><button data-state="joined" aria-pressed="false"><span>3</span>Joined</button><button data-state="shade" aria-pressed="false"><span>4</span>Shade</button></nav><div class="actions"><button class="play" id="play">▷ Play connection</button><button id="reset">Reset layout</button><a href="../../capsule-study.html">Original study ↗</a></div></div>
+<header><div class="eyebrow"><a href="index.html">← Codex / Skin studies</a><span>03 · Elven</span></div><div class="heading"><div><h1 id="heading">Silver learns <span>to branch.</span></h1><p id="description">Two open silver frames become one branching structure. Split tips interleave; a pale enamel collar seats over the graft.</p></div><label class="option">Join options<select id="option"><option value="grafted-ribs">01 — Grafted ribs · fusion</option><option value="bowstring">02 — Bowstring tension · suspended attachment</option><option value="iris">03 — Iris clasp · enclosing attachment</option><option value="ribbon">04 — Calligraphic ribbon · binding attachment</option><option value="moonstone">05 — Floating moonstone · field attachment</option><option value="scarf">06 — Inlaid scarf joint · flush fusion</option></select></label></div></header>
+<div class="toolbar"><nav class="states" aria-label="Assembly state"><button data-state="separate" aria-pressed="true"><span>1</span>Separate</button><button data-state="joining" aria-pressed="false"><span>2</span>Joining</button><button data-state="joined" aria-pressed="false"><span>3</span>Joined</button><button data-state="shade" aria-pressed="false"><span>4</span>Shade</button></nav><label class="shade-picker">Shade treatment<select id="shadeOption"><option value="plain">Plain summary · original</option><option value="pressed-leaf">07 — Pressed leaf</option></select></label><div class="actions"><button class="play" id="play">▷ Play connection</button><button id="reset">Reset layout</button><a href="../../capsule-study.html">Original study ↗</a></div></div>
 <div id="viewport"><main id="stage" aria-label="Elven silver joint experiment"><div class="topline"><strong id="phase">SEPARATE / TWO SILVER FRAMES</strong><p id="status" role="status" aria-live="polite">Drag the silver nameplates together, or play the connection. Click the enamel collar to separate.</p></div><div class="stage-mark" aria-hidden="true">silver / 01</div><div class="stage-rule" aria-hidden="true"></div>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="silver" x1="0" y1="0" x2=".2" y2="1"><stop stop-color="#e6efdb"/><stop offset=".32" stop-color="#9cbcb6"/><stop offset=".51" stop-color="#e2eee2"/><stop offset=".7" stop-color="#6a9092"/><stop offset="1" stop-color="#c1d5c5"/></linearGradient>
@@ -65,13 +75,14 @@ footer{max-width:1224px;margin:auto;padding:27px 32px 32px;display:grid;grid-tem
 <div class="summary"><b>GitDiscuss</b><span>02 need a decision</span><button class="expand" aria-label="Expand GitDiscuss">⌄</button></div></section><section id="meter" aria-label="Checks widget"><div class="meter-case"></div><button class="meter-grip" data-drag="meter" aria-label="Move Checks widget">Checks / independent widget ⋮⋮</button><div class="mini-screen"><strong>12 / 14</strong> checks passed<br>2 waiting for approval</div><span class="meter-lens"></span><button id="eject" aria-label="Eject Checks widget" title="Eject from drawer" hidden>↗</button><div class="summary"><b>Checks</b><span>12 / 14 checks passed</span><button id="expandChecks" aria-label="Expand Checks">⌄</button></div><button id="shadeChecks" aria-label="Shade Checks" title="Shade Checks">−</button></section>
 <svg id="joint" viewBox="0 0 92 184" aria-hidden="true"></svg><button id="release" aria-label="Slide enamel collar to separate" title="Slide enamel collar to separate" hidden></button>
 <div class="stage-foot"><span><kbd>1–4</kbd> state views</span><span><kbd>← ↑ ↓ →</kbd> move focused nameplate</span><span>Drag · release to latch · Esc to cancel</span></div></main></div>
-<footer><div><span class="detail-label">THE JOINT</span><h2 id="jointTitle">A living line of silver</h2><p id="jointDescription">Split tips open along matching channels, then slide into one branching rib. Two enamel leaves close over the overlap. Click the pearl-sized collar to release the graft.</p></div><div><span class="detail-label">THE MATERIAL</span><h2>Bows, enamel, open air</h2><p><i class="swatch"></i>Chased silver bows taper into a crescent at the outer end. Pale celadon enamel marks the joint. Opaque blue-black plates keep every readout clear of the tracery.</p></div><div><span class="detail-label">THE EXPERIMENT</span><h2>Six options, four views</h2><p>Joining holds the mechanism halfway. Shade is a plain summary view for this join study; the distinct shade treatments will arrive as separate options. Activity is simulated.</p></div></footer>
+<footer><div><span class="detail-label">THE JOINT</span><h2 id="jointTitle">A living line of silver</h2><p id="jointDescription">Split tips open along matching channels, then slide into one branching rib. Two enamel leaves close over the overlap. Click the pearl-sized collar to release the graft.</p></div><div><span class="detail-label">THE MATERIAL</span><h2>Bows, enamel, open air</h2><p><i class="swatch"></i>Chased silver bows taper into a crescent at the outer end. Pale celadon enamel marks the joint. Opaque blue-black plates keep every readout clear of the tracery.</p></div><div><span class="detail-label">THE EXPERIMENT</span><h2>Six joins, a pressed leaf</h2><p>Choose Pressed leaf, then Shade: the silver bows close into a long almond around a flat reading field. Expand opens them again. Checks shades independently; a loaded Checks stays in the remembered drawer. Joining holds the selected joint halfway. Activity is simulated.</p></div></footer>
 <div class="notes"><span id="optionNote">Elven / 01 · Grafted ribs</span><span>Self-contained · no external assets · no idle animation</span></div>
 <script>
 const $=s=>document.querySelector(s), stage=$('#stage'), W=420;
 const motion=matchMedia('(prefers-reduced-motion: reduce)');
-const model={state:'separate',a:{x:100,y:170,page:0,running:true},b:{x:640,y:170,page:0,running:true},meter:{x:810,y:430},drawer:false,docked:false,limit:3,p:0,joined:false,shadeChecks:false};
-let token=0,drag=null,busy=false,rememberDrawer=false,shadeReturn='joined';
+const model={state:'separate',a:{x:100,y:170,page:0,running:true},b:{x:640,y:170,page:0,running:true},meter:{x:810,y:430},drawer:false,docked:false,limit:3,p:0,joined:false,shadeChecks:false,leaf:0,meterLeaf:0};
+let token=0,drag=null,busy=false,rememberDrawer=false,shadeReturn='joined',meterToken=0;
+const pressed=()=>$('#shadeOption').value==='pressed-leaf';
 const bowstring=()=>$('#option').value==='bowstring';
 const iris=()=>$('#option').value==='iris';
 const ribbon=()=>$('#option').value==='ribbon';
@@ -249,6 +260,39 @@ function updateOption(){
  stage.dataset.option=$('#option').value;
  history.replaceState(null,'','#'+$('#option').value);
 }
+
+function leafFrame(width,height,q){
+ const h=height-(height-36)*q,cy=h/2,l=5,r=width-5,mid=width/2,shoulder=width*(.14-.09*q);
+ // Broad tapered bows meet at the tips; fine split veins nest outside the text.
+ return `<g data-leaf-progress="${q}" data-leaf-height="${h}">
+ <path d="M${l} ${cy}C${shoulder} 2 ${shoulder*2} 2 ${mid} 2C${width-shoulder*2} 2 ${width-shoulder} 2 ${r} ${cy}C${width-shoulder} 7 ${width-shoulder*2} 7 ${mid} 7C${shoulder*2} 7 ${shoulder} 7 ${l} ${cy}Z M${l} ${cy}C${shoulder} ${h-2} ${shoulder*2} ${h-2} ${mid} ${h-2}C${width-shoulder*2} ${h-2} ${width-shoulder} ${h-2} ${r} ${cy}C${width-shoulder} ${h-7} ${width-shoulder*2} ${h-7} ${mid} ${h-7}C${shoulder*2} ${h-7} ${shoulder} ${h-7} ${l} ${cy}Z" fill="url(#silver)" stroke="#c8e0d0" stroke-width=".65"/>
+ <path d="M${l+9} ${cy}Q${width*.14} 7 ${mid} 5Q${width*.85} 7 ${r-9} ${cy}M${l+9} ${cy}Q${width*.16} ${h-7} ${mid} ${h-5}Q${width*.85} ${h-7} ${r-9} ${cy}" fill="none" stroke="#86b8ad" stroke-width="1"/>
+ <path d="M12 ${cy}Q30 ${cy-10} 48 ${10+q*2}M${r-7} ${cy}Q${r-26} ${cy+10} ${r-44} ${h-10-q*2}" fill="none" stroke="#e4efda" stroke-width="1.3"/>
+ <path d="M5 ${cy}L12 ${cy-4}L18 ${cy}L12 ${cy+4}Z M${r} ${cy}L${r-7} ${cy-4}L${r-13} ${cy}L${r-7} ${cy+4}Z" fill="url(#enamel)" stroke="#deecd3" stroke-width=".7"/>
+ </g>`;
+}
+for(const id of ['a','b','meter']){
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','leaf-frame');svg.setAttribute('viewBox',`0 0 ${id==='meter'?276:420} ${id==='meter'?78:184}`);svg.setAttribute('aria-hidden','true');$('#'+id).append(svg);
+}
+function paintLeaf(id,q){
+ const el=$('#'+id),small=id==='meter',h=small?78:184,active=pressed()&&(q>0||(small?model.shadeChecks:model.state==='shade'));
+ el.classList.toggle('pressing',active);el.style.setProperty('--leaf-height',(h-(h-36)*q)+'px');
+ el.querySelector('.leaf-frame').innerHTML=active?leafFrame(small?276:420,h,q):'';
+ if(active)[...el.children].forEach(child=>child.inert=!child.classList.contains('summary'));
+}
+async function shadeMeter(shade){
+ const mine=++meterToken,from=model.meterLeaf;model.shadeChecks=shade;
+ if(pressed()&&!motion.matches){await new Promise(resolve=>{const start=performance.now();function frame(now){if(mine!==meterToken){resolve();return}const t=Math.min(1,(now-start)/850);model.meterLeaf=from+((shade?1:0)-from)*t*t*(3-2*t);paint();if(t<1)requestAnimationFrame(frame);else resolve()}requestAnimationFrame(frame)});}else model.meterLeaf=shade?1:0;
+ if(mine!==meterToken)return;paint();$(shade?'#expandChecks':'#shadeChecks').focus();
+}
+async function selectShade(){
+ stop();model.leaf=0;model.meterLeaf=model.shadeChecks?1:0;++meterToken;
+ if(model.state==='shade')leaveShade();
+ history.replaceState(null,'','#'+(pressed()?'pressed-leaf':$('#option').value));
+ await setState('shade');
+}
+$('#shadeOption').onchange=selectShade;
+
 function paint(){
  for(const id of ['a','b']){
   const el=$('#'+id),m=model[id];el.style.left=m.x+'px';el.style.top=m.y+'px';el.classList.toggle('shaded',model.state==='shade');
@@ -267,6 +311,8 @@ function paint(){
  const tray=$('#tray');tray.style.left=model.a.x+40+'px';tray.style.top=model.a.y+175+'px';tray.classList.toggle('open',model.drawer&&model.state!=='shade');$('#trayBody').inert=!model.drawer||model.state==='shade';
  const meter=$('#meter');if(model.docked){if(meter.parentElement!==$('#bay'))$('#bay').append(meter);meter.style.left='-1px';meter.style.top='0';meter.inert=!model.drawer||model.state==='shade';}else{if(meter.parentElement!==stage)stage.append(meter);meter.style.left=model.meter.x+'px';meter.style.top=model.meter.y+'px';meter.inert=false;}
  meter.classList.toggle('shaded',model.shadeChecks&&!model.docked);$('#shadeChecks').hidden=model.docked;$('#eject').hidden=!model.docked;$('#emptyBay').hidden=model.docked;
+ [...meter.children].forEach(child=>child.inert=child.classList.contains('summary')?!model.shadeChecks:model.shadeChecks);
+ paintLeaf('a',model.leaf);paintLeaf('b',model.leaf);paintLeaf('meter',model.docked?0:model.meterLeaf);
  $('#budgetValue').textContent=model.limit;$('#budget').style.setProperty('--angle',((model.limit-1)*36-90)+'deg');
  const joint=$('#joint'),x=model.a.x+W,y=model.a.y,gap=model.b.x-x;
  joint.style.left=x-46+'px';joint.style.top=y+'px';joint.hidden=(!moonstone()&&!iris()&&model.p===0&&!(bowstring()&&drag?.near))||model.state==='shade';
@@ -281,18 +327,20 @@ function paint(){
  <path d="M-4-7Q1-10 4-6" fill="none" stroke="#fffde5" opacity="${seat}"/>
  </g></g>`;
  const release=$('#release');release.hidden=!model.joined||model.state==='shade'||busy;release.style.left=(moonstone()?x+gap/2-22:ribbon()?x+gap/2-22:iris()?x+23-22:bowstring()?x+gap+6-18:x+gap/2-18)+'px';release.setAttribute('aria-label',scarf()?'Lift scarf wedge and separate':moonstone()?'Return moonstone to its recess and separate':ribbon()?'Lift ribbon crossing to unwind and separate':iris()?'Turn iris rim to separate':bowstring()?'Lift saddle bead to separate':'Slide enamel collar to separate');release.title=release.getAttribute('aria-label');release.style.top=y+((moonstone()||ribbon())?73:iris()?68:75)+'px';release.style.width=((moonstone()||iris()||ribbon())?44:36)+'px';release.style.height=((moonstone()||ribbon())?44:iris()?54:40)+'px';
+ if(model.leaf>0)joint.hidden=true;
  stage.classList.toggle('shade',model.state==='shade');
  document.querySelectorAll('[data-state]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===model.state)));
  $('#play').disabled=busy||model.joined||model.state==='shade';
  $('#phase').textContent=scarf()?{separate:'SEPARATE / COMPLEMENTARY INLAID FACES',joining:'JOINING / TAPERED FACES SLIDE DIAGONALLY',joined:'JOINED / A FLUSH SILVER VEIN',shade:'SHADE / SUMMARY VIEW'}[model.state]:moonstone()?{separate:'SEPARATE / A STONE IN ITS SILVER RECESS',joining:'JOINING / MOONSTONE CROSSES OPEN AIR',joined:'JOINED / A MOONSTONE BETWEEN CRESCENTS',shade:'SHADE / SUMMARY VIEW'}[model.state]:ribbon()?{separate:'SEPARATE / TWO ENAMEL COLLARS',joining:'JOINING / SILVER SWEEPS AROUND THE COLLARS',joined:'JOINED / ONE OPEN FIGURE EIGHT',shade:'SHADE / SUMMARY VIEW'}[model.state]:iris()?{separate:'SEPARATE / AN OPEN SILVER IRIS',joining:'JOINING / COLLAR ENTERS OPEN PETALS',joined:'JOINED / THREE PETALS ENCLOSE THE COLLAR',shade:'SHADE / SUMMARY VIEW'}[model.state]:bowstring()?{separate:'SEPARATE / OPEN EYELETS',joining:'JOINING / CORDS HOOK AND TIGHTEN',joined:'JOINED / A SMALL TRIANGULAR HARP',shade:'SHADE / SUMMARY VIEW'}[model.state]:{separate:'SEPARATE / TWO SILVER FRAMES',joining:'JOINING / SPLIT TIPS INTERLEAVING',joined:'JOINED / ONE BRANCHING RIB',shade:'SHADE / SUMMARY VIEW'}[model.state];
+ if(pressed()&&model.state==='shade')$('#phase').textContent='SHADE / PRESSED SILVER LEAVES';
 }
 const say=t=>$('#status').textContent=t;
 function leaveShade(){if(model.state==='shade'){model.state=shadeReturn;model.drawer=rememberDrawer;}}
 function stop(){++token;busy=false;drag=null;}
-async function setState(state){
+async function baseSetState(state){
  const before={a:{...model.a},b:{...model.b},p:model.p};
  stop();const wasShade=model.state==='shade';if(state==='shade'){
-  if(!wasShade){rememberDrawer=model.drawer;shadeReturn=model.joined?'joined':'separate';model.drawer=false;}
+  if(!wasShade){rememberDrawer=model.drawer;shadeReturn=model.state;model.drawer=false;}
   model.state='shade';
  }else{
   leaveShade();model.state=state;model.joined=state==='joined';model.p=state==='joined'?1:state==='joining'?.55:0;
@@ -303,7 +351,27 @@ async function setState(state){
  }
  paint();if(state!=='shade'&&document.activeElement?.id==='release'&&!model.joined)$('[data-state="separate"]').focus();if(state==='shade'&&document.activeElement?.closest('.module,#tray'))$('[data-state="shade"]').focus();say(scarf()?{separate:'Pale and dark tapered faces. Align within 40 px, then release to seat the inlay.',joining:'Halfway, held still: the two diagonal faces remain offset and the locking wedge is lifted.',joined:'A fine silver vein marks the flush seam. Move either nameplate; focus or hover the wedge to reveal the cut, then click or press Enter to release.',shade:'Plain summary view. Expand restores the screens and the remembered activity drawer.'}[state]:moonstone()?{separate:'The moonstone rests in Jarvis’s crescent. Align within 40 px, then release to float the stone.',joining:'Halfway, held still: the stone has left its recess; the two arcs are still settling around the gap.',joined:'The moonstone holds an open gap between silver crescents. Move either nameplate; click the stone or press Enter on it to release.',shade:'Plain summary view. Expand restores the screens and the remembered activity drawer.'}[state]:ribbon()?{separate:'Two enamel tips face the crossing. Align within 40 px, then release to bind.',joining:'Halfway, held still: a broad silver strap curls around the first collar; the second loop is still open.',joined:'A flat figure eight holds both collars. Move either nameplate; lift the celadon crossing to unwind.',shade:'Plain summary view. Expand restores the screens and the remembered activity drawer.'}[state]:iris()?{separate:'An open iris faces a polished collar. Align within 40 px, then release to clasp.',joining:'Halfway, held still: the polished collar enters three lifted petals. The release rim has not turned yet.',joined:'Three silver petals enclose the collar. Move either nameplate; click the rim or press Enter on it to release.',shade:'Plain summary view. Expand restores the screens and the remembered activity drawer.'}[state]:bowstring()?{separate:'Two intact silver bows. Align the eyelets within 40 px, then release to tension the cords.',joining:'Halfway, held still: two cords reach toward opposite eyelets; slack remains before the saddle seats.',joined:'Two taut cords hold a fixed open gap. Move either nameplate; lift the pale saddle bead to release.',shade:'Plain summary view. Expand restores the screens and the remembered activity drawer.'}[state]:{separate:'Two silver frames. Drag within 40 px, then release to graft the split ribs.',joining:'Halfway, held still: split ribs interleave; the enamel collar remains open above and below the graft.',joined:'The collar has seated around a continuous branching rib. Move either nameplate; click the collar to separate.',shade:'Plain summary view. Expand restores the screens and the remembered activity drawer.'}[state]);
 }
-function restore(){setState(shadeReturn);}
+async function setState(state){
+ if(!pressed())return baseSetState(state);
+ if(state!=='shade'&&model.state!=='shade'&&model.leaf===0)return baseSetState(state);
+ stop();const current=token,from=model.leaf,wasShade=model.state==='shade';busy=true;
+ if(state==='shade'){
+  if(!wasShade){rememberDrawer=model.drawer;shadeReturn=model.state;model.drawer=false;}
+  model.state='shade';paint();say('The silver bows approach; the summary stays at its original type size.');
+  if(document.activeElement?.closest('.module,#tray'))$('[data-state="shade"]').focus();
+  if(!await animate(1100,t=>{model.leaf=from+(1-from)*clamp((t-.18)/.82,0,1);paint()},current))return;
+  busy=false;paint();say('Pressed silver leaves. Expand opens the bows and restores the previous screens and activity drawer.');
+ }else{
+  say('The silver bows open around the retained reading field.');
+  if(!await animate(900,t=>{model.leaf=from*(1-t);paint()},current))return;
+  busy=false;
+  // Restoring the same assembly preserves a hand-positioned layout.
+  if(wasShade&&state===shadeReturn){leaveShade();paint();say('Silver bows restored. Screens, pause state and drawer contents retained.');}
+  else await baseSetState(state);
+ }
+}
+
+function restore(){return setState(shadeReturn);}
 function animate(duration,fn,myToken){return new Promise(resolve=>{if(motion.matches){fn(1);resolve(true);return;}let start=performance.now();function frame(now){if(myToken!==token){resolve(false);return}let t=Math.min(1,(now-start)/duration);fn(t*t*(3-2*t));if(t<1)requestAnimationFrame(frame);else resolve(true)}requestAnimationFrame(frame)})}
 async function join(){
  if(busy||model.joined||model.state==='shade')return;stop();busy=true;const current=token,from={...model.b},fromA={...model.a},targetX=clamp(model.a.x,20,1140-2*W-jointGap()),initial=model.p;model.state='joining';say(scarf()?'The bevels align, pale and dark inlays slide diagonally, then the small wedge seats.':moonstone()?'The crescents align. The moonstone glides from its recess and two fine arcs settle around it.':ribbon()?'The collars align, then a broad silver ribbon sweeps over and under them.':iris()?'The polished collar enters first; three petals close, then the release rim turns.':bowstring()?'Two cords extend into the eyelets, draw taut, then seat beneath the saddle bead.':'Split silver tips interleave, then the enamel collar closes over their shared rib.');
@@ -316,20 +384,20 @@ async function separate(){
  busy=false;model.state='separate';model.p=0;paint();if((moonstone()||iris()||ribbon()||scarf())&&document.activeElement?.id==='release')$('#a .grip').focus();say(scarf()?'The wedge lifts, the tapered inlays slide back and both frames part. Screens and drawer state are retained.':moonstone()?'The arcs withdraw and the moonstone returns to its recess before the frames part. Both displays retain their state.':ribbon()?'The crossing lifts and the silver loop unwinds before the collars part. Both displays retain their state.':iris()?'The rim turns back, petals lift and the collar withdraws. Both displays keep their state.':bowstring()?'The saddle lifts, cords slacken and withdraw into their eyelets. Both frames retain their state.':'The collar withdraws and the silver ribs part. Both displays and the activity drawer retain their state.');
 }
 function drawer(open=!model.drawer){model.drawer=open;if(open&&model.a.y>175){let dy=model.a.y-175;model.a.y-=dy;if(model.joined)model.b.y-=dy;}paint();}
-function insert(){model.docked=true;model.shadeChecks=false;drawer(true);say('Checks seated in Jarvis’s drawer. Its own eject control remains available.');}
+function insert(){++meterToken;model.meterLeaf=0;model.docked=true;model.shadeChecks=false;drawer(true);say('Checks seated in Jarvis’s drawer. Its own eject control remains available.');}
 function eject(){model.docked=false;model.meter.x=Math.min(864,model.a.x+460);model.meter.y=Math.min(470,model.a.y+225);paint();say('Checks is independent again. It has no end sockets.');}
 function page(id,n){model[id].page=(n+3)%3;paint();}
 for(const id of ['a','b']){
  $('#'+id).querySelectorAll('[data-page]').forEach(b=>{b.onclick=()=>page(id,+b.dataset.page);b.onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();page(id,e.key==='Home'?0:e.key==='End'?2:model[id].page+(e.key==='ArrowRight'?1:-1));$('#'+id).querySelector('[aria-selected="true"]').focus();}}});
  $('#'+id+' .next-button').onclick=()=>page(id,model[id].page+1);
  $('#'+id+' .run-button').onclick=()=>{model[id].running=!model[id].running;paint()};
- $('#'+id+' .expand').onclick=()=>{restore();$('#'+id+' [aria-selected="true"]').focus();};
+ $('#'+id+' .expand').onclick=async()=>{await restore();$('#'+id+' [aria-selected="true"]').focus();};
 }
 $('#a .drawer-button').onclick=()=>drawer();$('#b .drawer-button').onclick=()=>page('b',1);$('#closeDrawer').onclick=()=>{drawer(false);$('#a .drawer-button').focus();};$('#insert').onclick=insert;$('#eject').onclick=eject;
 $('#budget').onclick=()=>{model.limit=model.limit%6+1;paint()};$('#release').onclick=separate;$('#play').onclick=join;
-$('#shadeChecks').onclick=()=>{model.shadeChecks=true;paint();$('#expandChecks').focus()};$('#expandChecks').onclick=()=>{model.shadeChecks=false;paint();$('#shadeChecks').focus()};
+$('#shadeChecks').onclick=()=>shadeMeter(true);$('#expandChecks').onclick=()=>shadeMeter(false);
 $('#option').onchange=()=>{updateOption();setState('separate');};document.querySelectorAll('[data-state]').forEach(b=>b.onclick=()=>setState(b.dataset.state));
-function reset(){stop();rememberDrawer=false;Object.assign(model,{state:'separate',drawer:false,docked:false,limit:3,p:0,joined:false,shadeChecks:false});Object.assign(model.a,{x:100,y:170,page:0,running:true});Object.assign(model.b,{x:640,y:170,page:0,running:true});Object.assign(model.meter,{x:810,y:430});paint();say(scarf()?'Drag the silver nameplates together, or play the connection. Lift the scarf wedge to separate.':moonstone()?'Drag the silver nameplates together, or play the connection. Click the floating moonstone to separate.':ribbon()?'Drag the silver nameplates together, or play the connection. Lift the ribbon crossing to unwind.':iris()?'Drag the silver nameplates together, or play the connection. Turn the iris rim to separate.':bowstring()?'Drag the silver nameplates together, or play the connection. Lift the saddle bead to separate.':'Drag the silver nameplates together, or play the connection. Click the enamel collar to separate.');}
+function reset(){stop();++meterToken;model.leaf=0;model.meterLeaf=0;rememberDrawer=false;Object.assign(model,{state:'separate',drawer:false,docked:false,limit:3,p:0,joined:false,shadeChecks:false});Object.assign(model.a,{x:100,y:170,page:0,running:true});Object.assign(model.b,{x:640,y:170,page:0,running:true});Object.assign(model.meter,{x:810,y:430});paint();say(scarf()?'Drag the silver nameplates together, or play the connection. Lift the scarf wedge to separate.':moonstone()?'Drag the silver nameplates together, or play the connection. Click the floating moonstone to separate.':ribbon()?'Drag the silver nameplates together, or play the connection. Lift the ribbon crossing to unwind.':iris()?'Drag the silver nameplates together, or play the connection. Turn the iris rim to separate.':bowstring()?'Drag the silver nameplates together, or play the connection. Lift the saddle bead to separate.':'Drag the silver nameplates together, or play the connection. Click the enamel collar to separate.');}
 $('#reset').onclick=reset;
 const clamp=(v,min,max)=>Math.min(max,Math.max(min,v));
 function move(id,dx,dy,original){
@@ -362,8 +430,10 @@ stage.addEventListener('pointercancel',cancelDrag);stage.addEventListener('lostp
 document.querySelectorAll('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)||busy)return;e.preventDefault();const id=b.dataset.drag;if(id==='meter'&&model.docked)return;move(id,e.key==='ArrowLeft'?-10:e.key==='ArrowRight'?10:0,e.key==='ArrowUp'?-10:e.key==='ArrowDown'?10:0);paint();}));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){cancelDrag();return}if(e.target.matches('input,select,textarea')||e.altKey||e.metaKey||e.ctrlKey)return;if(['1','2','3','4'].includes(e.key)){e.preventDefault();setState(['separate','joining','joined','shade'][+e.key-1]);}});
 if(['bowstring','iris','ribbon','moonstone','scarf'].includes(location.hash.slice(1)))$('#option').value=location.hash.slice(1);
+const leafLink=location.hash==='#pressed-leaf';
 updateOption();
 paint();
+if(leafLink){$('#shadeOption').value='pressed-leaf';selectShade();}
 if(scarf())say('Drag the silver nameplates together, or play the connection. Lift the scarf wedge to separate.');
 if(moonstone())say('Drag the silver nameplates together, or play the connection. Click the floating moonstone to separate.');
 if(ribbon())say('Drag the silver nameplates together, or play the connection. Lift the ribbon crossing to unwind.');
