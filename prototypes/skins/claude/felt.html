@@ -227,7 +227,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. On the fishing game, tap the line or the fish to let it go. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. On the frogged shade, the ball band's dye swatch is the status colour. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the buckled strap, drag GitDiscuss's nameplate to slide the strap to another eyelet (each eyelet is 15°), and tap the strap or the buckle to unbuckle it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. On the fishing game, tap the line or the fish to let it go. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. On the frogged shade, the ball band's dye swatch is the status colour. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -1375,6 +1375,8 @@ function hingeGeo(c){
 function hingeSpan(th,h){
  const F=angFrame(th,h);let lo=0,hi=h;
  for(const lx of [EDGE,W-EDGE])for(const ly of [EDGE,h-EDGE]){const y=hingePt(F,0,0,lx,ly).y;lo=Math.min(lo,y);hi=Math.max(hi,y)}
+ // A join with parts standing off the roofs or bellies (the buckled strap) says how far: [above, below].
+ if(J().pad){const[u,d]=J().pad(th,h);lo=Math.min(lo,-u);hi=Math.max(hi,h+d)}
  return[lo,hi];
 }
 const fitHinge=(y,th,h)=>{const[lo,hi]=hingeSpan(th,h);return clamp(y,46-lo,590-hi)};
@@ -3385,6 +3387,177 @@ JOINS.fishing={label:'Fishing game',kind:'Reel',gap:FI.gap,ms:4600,msDrag:4200,r
  }
 };
 
+/* ---------- Buckled strap: a felt satchel strap buckled across the opening, one eyelet per 15° (Stay) ---------- */
+// The angle is held by a brace across the opening, as on a casement stay. GitDiscuss turns about the inside corner, mid-gap,
+// as on the godet fan. A cream felt post on GitDiscuss's roof carries the strap's root under a horn button; a post on Jarvis's
+// carries a wooden buckle with a brass tongue and a keeper. The strap runs over the roofs when GitDiscuss is lowered (+) and
+// under the bellies when it is raised (−). The eyelets sit 2r·sin(φ+θ/2) from the root, so at full or shaded height the tongue
+// drops into eyelet k+1 at 15k°. At rest the strap is rolled up round its button.
+const SB={gap:FN.gap,max:45,det:15,inn:26,e:16,dropMs:200,col:'#a63a50',dk:'#5e1a2a',lt:'#d06a7e',post:'#ede1c4',
+ tr:{side:null,flip:null,tgt:null,anim:null,until:0,loop:false}};
+// Pivot, post tops (Q on Jarvis, S on GitDiscuss), post feet and eyelet distances on side sg with GitDiscuss turned th.
+function sbGeo(c,sg,th){
+ // GitDiscuss's real pivot (the godet fan's frame), so a fading old side still rides on it.
+ const a=c.a,b=c.b,h=c.h,s=pinScale(h),F=fanFrame(th,h);
+ const yl=sg>0?EDGE-SB.e:h-EDGE+SB.e,yb=sg>0?EDGE+6:h-EDGE-6,dx=SB.inn+SB.gap/2,dy=Math.abs(F.oy-yl);
+ const r=Math.hypot(dx,dy),phi=Math.atan2(dx,dy),dk=k=>2*r*Math.sin(phi+k*SB.det/2*Math.PI/180);
+ return{sg,s,hw:5.5*s,P:{x:a.x+W+SB.gap/2,y:a.y+F.oy},Q:{x:a.x+W-SB.inn,y:a.y+yl},Qb:{x:a.x+W-SB.inn,y:a.y+yb},
+  S:hingePt(F,b.x,b.y,SB.inn,yl),Sb:hingePt(F,b.x,b.y,SB.inn,yb),holes:[0,1,2,3].map(dk),L:dk((SB.max+6)/SB.det)+16*s};
+}
+// The strap's centre line from its root toward the buckle: straight to just past the keeper, then the tail droops toward the felt.
+function sbLine(G){
+ const v=unit(V.sub(G.Q,G.S)),d=Math.hypot(G.Q.x-G.S.x,G.Q.y-G.S.y),n0={x:-v.y,y:v.x},n=n0.y*G.sg>0?n0:V.mul(n0,-1),t0=d+20*G.s,kd=9/12100;
+ return{v,d,at:t=>V.add(V.add(G.S,V.mul(v,t)),V.mul(n,t>t0?kd*(t-t0)*(t-t0):0)),dir:t=>unit(V.add(v,V.mul(n,t>t0?2*kd*(t-t0):0)))};
+}
+// Felt strap round the centre line, from just behind the root to len, with a rounded tip.
+function sbOutline(Ln,len,hw){
+ const n=Math.max(2,Math.ceil((len+6)/6)),Lp=[],Rp=[];
+ for(let i=0;i<=n;i++){const t=-6+(len+6)*i/n,p=Ln.at(t),d=Ln.dir(t);Lp.push(V.add(p,{x:-d.y*hw,y:d.x*hw}));Rp.push(V.add(p,{x:d.y*hw,y:-d.x*hw}))}
+ const d=Ln.dir(len),k=hw*1.2,l=Lp[n],r=Rp[n];
+ return 'M'+Lp.map(pt).join('L')+`C${pt(V.add(l,V.mul(d,k)))} ${pt(V.add(r,V.mul(d,k)))} ${pt(r)}L`+Rp.reverse().map(pt).join('L')+'Z';
+}
+// A cream felt post from its foot B (sewn through the cushion with a box-and-cross) up to T.
+function sbPost(B,T,s){
+ const l=Math.hypot(T.x-B.x,T.y-B.y),w=5.5*s,g=`translate(${f(B.x)} ${f(B.y)}) rotate(${f(angOf(T.x-B.x,T.y-B.y))})`,x0=l*.08,x1=l*.58,y=f(w-2.2*s);
+ const r=`<rect x="-3" y="${f(-w)}" width="${f(l+3+w)}" height="${f(2*w)}" rx="${f(w*.9)}"/>`;
+ return `<g fill="#000" opacity=".38" filter="url(#sh)" transform="translate(1 2)"><g transform="${g}">${r}</g></g><g transform="${g}"><g fill="${SB.post}" filter="url(#tagfelt)">${r}</g>`+
+  `<path d="M${f(x0)} -${y}H${f(x1)}V${y}H${f(x0)}ZM${f(x0)} -${y}L${f(x1)} ${y}M${f(x0)} ${y}L${f(x1)} -${y}" fill="none" stroke="${SB.col}" stroke-width=".8" stroke-dasharray="1.6 1.1" stroke-linecap="round"/></g>`;
+}
+// A buttonhole-stitched eyelet: a dark hole ringed with cream ticks.
+function sbEyelet(p,s){
+ let tk='';for(let i=0;i<10;i++){const a=i*Math.PI/5;tk+=`M${f(p.x+Math.cos(a)*1.9*s)} ${f(p.y+Math.sin(a)*1.9*s)}L${f(p.x+Math.cos(a)*3.4*s)} ${f(p.y+Math.sin(a)*3.4*s)}`}
+ return `<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(3.4*s)}" fill="${SB.dk}" opacity=".45"/><path d="${tk}" stroke="#f4e6c6" stroke-width="${f(.7*s+.15)}" stroke-linecap="round"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(1.9*s)}" fill="#1e0a0e"/>`;
+}
+// The wooden buckle at Q facing v, with a keeper beyond it. Its brass tongue is hinged on the far bar and lies over the
+// eyelet at Q onto the near bar; up (0 to 1) stands it up off the strap, away from the cushion.
+function sbBuckle(G,v,up){
+ const s=G.s,a=angOf(v.x,v.y),ra=a*Math.PI/180,yo=G.hw+3*s,x0=-7.5*s,x1=11.5*s,ins=2.7*s,top=Math.cos(ra)>=0?-1:1;
+ const loc=(x,y)=>({x:x*Math.cos(ra)+y*Math.sin(ra),y:-x*Math.sin(ra)+y*Math.cos(ra)}),sh=loc(1.2,2.4),ts=loc(.8+2.4*up,1.6+4.5*up);
+ const frame=rr4(x0,-yo,x1-x0,2*yo,[2.6*s,2.6*s,2.6*s,2.6*s])+rr4(x0+ins,-yo+ins,x1-x0-2*ins,2*yo-2*ins,[1.2,1.2,1.2,1.2]);
+ const H=9.9*s,Lt=16*s,A=55*up*Math.PI/180,T={x:H-Lt*Math.cos(A),y:G.sg*Lt*Math.sin(A)*.75},tg=`M${f(H)} 0L${f(T.x)} ${f(T.y)}`;
+ const kp=`<rect x="${f(15*s)}" y="${f(-G.hw-1.6*s)}" width="${f(4.6*s)}" height="${f(2*G.hw+3.2*s)}" rx="${f(1.4*s)}"/>`;
+ return `<g transform="translate(${f(G.Q.x)} ${f(G.Q.y)}) rotate(${f(a)})">`+
+  `<g fill="#000" opacity=".36" filter="url(#sh)" transform="translate(${f(sh.x)} ${f(sh.y)})">${kp}<path d="${frame}" fill-rule="evenodd"/></g>`+
+  `<g fill="${SB.post}" filter="url(#tagfelt)">${kp}</g><path d="M${f(17.3*s)} ${f(-G.hw)}V${f(G.hw)}" stroke="${SB.col}" stroke-width=".8" stroke-dasharray="1.5 1.2"/>`+
+  `<path d="${frame}" fill="url(#sbwood)" fill-rule="evenodd" stroke="#4e3014" stroke-width=".7"/><path d="M${f(x0+2*s)} ${f(top*(yo-1.1*s))}H${f(x1-2*s)}" stroke="#fff0cf" stroke-opacity=".5" stroke-width=".7" stroke-linecap="round"/>`+
+  `<path d="${tg}" stroke="#000" stroke-opacity="${f(.4-.12*up)}" stroke-width="${f(2.4*s)}" stroke-linecap="round" transform="translate(${f(ts.x)} ${f(ts.y)})"/>${brassWire(tg,f(1.9*s))}`+
+  `<rect x="${f(H-1.6*s)}" y="${f(-2.6*s)}" width="${f(3.2*s)}" height="${f(5.2*s)}" rx="${f(1.2*s)}" fill="#c9952e" stroke="#3d2706" stroke-width=".5"/></g>`;
+}
+// The rolled-up strap round its button at S: its radius shrinks as the strap is let out, and the spiral turns as it goes.
+function sbRoll(G,len){
+ const s=G.s,hw=G.hw,tk=2.1*s,R=Math.sqrt(hw*hw+Math.max(0,G.L-len)*tk/Math.PI);
+ if(R-hw<.6)return '';
+ const S=G.S,turns=(R-hw)/tk,ph=-G.sg*len/R,n=Math.ceil(turns*24);let sp='';
+ for(let i=0;i<=n;i++){const u=i/n,an=ph+u*turns*2*Math.PI,rr=hw*.9+(R-1.6*s-hw*.9)*u;sp+=(i?'L':'M')+f(S.x+rr*Math.cos(an))+' '+f(S.y+rr*Math.sin(an))}
+ const c=`cx="${f(S.x)}" cy="${f(S.y)}" r="${f(R)}"`;
+ return `<circle ${c} fill="#000" opacity=".38" filter="url(#sh)" transform="translate(1.2 2.4)"/><circle ${c} fill="${SB.col}" filter="url(#tagfelt)"/><circle ${c} fill="none" stroke="${SB.dk}" stroke-width=".9"/>`+
+  `<path d="${sp}" fill="none" stroke="${SB.dk}" stroke-opacity=".75" stroke-width="${f(1.1*s)}"/><path d="${sp}" fill="none" stroke="#f4e6c6" stroke-opacity=".7" stroke-width=".7" stroke-dasharray="1.8 1.6" transform="translate(.5 .6)"/>`;
+}
+// Fibres knocked loose as the tongue drops in.
+const sbFluff=(p,u,s)=>FLUFF.map(([dx,dy,rot],i)=>`<path d="M-3.5 0q1.2-2.6 2.4 0t2.4 0t2.4 0" transform="translate(${f(p.x+dx*13*s*(.4+u))} ${f(p.y+dy*9*s*(.5+u)+9*u*u)}) rotate(${f(rot*60+u*90)}) scale(${f(s)})" fill="none" stroke="${i%2?SB.col:SB.post}" stroke-width="1.1" stroke-linecap="round" opacity="${f(1-u)}"/>`).join('');
+// Everything on one side: both posts, the strap let out to len with its eyelets, the buckle, the roll and the button.
+function sbDraw(c,sg,th,len,up,jt){
+ const G=sbGeo(c,sg,th),Ln=sbLine(G),s=G.s,hw=G.hw;
+ let o=sbPost(G.Sb,G.S,s)+sbPost(G.Qb,G.Q,s);
+ if(len>.5){const d=sbOutline(Ln,len,hw);let st='';
+  o+=`<path d="${d}" fill="#000" opacity=".38" filter="url(#sh)" transform="translate(1.2 2.4)"/><path d="${d}" fill="${SB.col}" filter="url(#tagfelt)"/><path d="${d}" fill="none" stroke="${SB.dk}" stroke-width=".8"/>`;
+  // A cream running stitch down both edges, stopping short of the tip.
+  const n=Math.max(2,Math.ceil(len/6)),e=hw-1.7*s;
+  for(const sd of[-1,1])for(let i=0;i<=n;i++){const t=-2+(len-hw*.8+2)*i/n,q=Ln.at(t),dd=Ln.dir(t);st+=(i?'L':'M')+pt({x:q.x-dd.y*sd*e,y:q.y+dd.x*sd*e})}
+  o+=`<path d="${st}" fill="none" stroke="#f7e8c9" stroke-opacity=".85" stroke-width=".8" stroke-dasharray="2.2 1.8"/>`;
+  G.holes.forEach(t=>{if(t<len-3*s)o+=sbEyelet(Ln.at(t),s)})}
+ // Until the strap comes through it, the buckle sits level on its post.
+ o+=sbBuckle(G,jt<.3?{x:-1,y:0}:Ln.v,up)+sbRoll(G,len)+hornButton(G.S.x,G.S.y,.5*s);
+ return{o,G,Ln};
+}
+// The tongue's lift on the timeline: it stands up as the cushions close, drops into eyelet 1 once the strap is through,
+// lifts while GitDiscuss swings, then drops into its eyelet. g is the near glow (it stands up a little to show it).
+// A join released from Ready (fast) carries on from the Ready pose, so neither the tongue nor the strap snaps back.
+const sbFast=()=>model.dir>0&&model.fast?1:0;
+function sbUp(jt,g){
+ if(jt===0&&!(model.busy&&model.dir>0))return g;
+ if(jt<.3)return lerp(sbFast(),1,ease(seg(jt,.05,.3)));
+ if(jt<.56)return 1;
+ if(jt<.64)return 1-Math.pow(seg(jt,.56,.61),2);
+ if(jt<.7)return ease(seg(jt,.64,.69));
+ if(jt<.9)return 1;
+ return 1-Math.pow(seg(jt,.9,.95),2);
+}
+// How much strap is let out of the roll: the tip pokes out when near, then it unrolls across the gap and through the buckle.
+function sbLen(jt,g,fr,L,s){
+ if(jt===0&&!(model.busy&&model.dir>0))return 4*s+12*s*g*(fr?1:.7);
+ if(jt<.3)return lerp(4*s+12*s*sbFast(),14*s,seg(jt,.08,.3));
+ return lerp(14*s,L,ease(seg(jt,.3,.56)));
+}
+// GitDiscuss swings 5° past its angle with the tongue up, then settles back onto it. Released, it just swings level.
+function sbBend(jt){
+ if(jt>=1)return model.angle;const u=seg(jt,.7,.9);if(u<=0)return 0;
+ if(model.dir<0)return model.angle*ease(u);
+ const A=Math.abs(model.angle)+5;return fanSg(model.angle)*(u<.62?A*ease(u/.62):lerp(A,A-5,ease(seg(u,.62,1))));
+}
+// Joined, the tongue animates on its own clock: up as soon as GitDiscuss turns, dropping in once it stops on an eyelet.
+function sbTv(now){const T=SB.tr,A=T.anim;if(!A)return T.tgt;const e=(now-A.t)/(A.to?160:SB.dropMs);return e>=1?A.to:lerp(A.from,A.to,A.to?ease(e):e*e)}
+// Keeps redrawing (at 12 fps) for ms more, for the tongue and the change of side.
+function sbKick(ms){
+ const T=SB.tr,end=performance.now()+ms;if(end>T.until)T.until=end;if(T.loop)return;T.loop=true;let last=-1;
+ requestAnimationFrame(function step(now){const fr=Math.floor(now/FRAME);if(fr!==last){last=fr;render()}if(now<T.until)requestAnimationFrame(step);else{T.loop=false;render()}});
+}
+JOINS.strap={label:'Buckled strap',kind:'Angle · stay',gap:SB.gap,ms:4600,msDrag:4100,relMs:3400,moveEnd:.3,hold:.44,angled:true,frame:fanFrame,cap:true,amax:SB.max,astep:SB.det,det:SB.det,swingAt:.7,bend:sbBend,
+ peak:a=>fanSg(a)*(Math.abs(a)+5),pad:(th,h)=>{const k=SB.e+18-EDGE;return fanSg(th)>0?[k,0]:[0,k]},
+ ph:[[0,.3,.56,.7,.9,1],[0,.18,.48,.64,.86,1]],
+ about:'A satchel strap used as a stay: the angle is held by a brace across the opening, counted in eyelets. A cream felt post stands on each roof. GitDiscuss\'s carries a raspberry felt strap, rolled up round its horn button at rest, with a cream running stitch down both edges and four buttonhole-stitched eyelets. Jarvis\'s carries a wooden buckle with a brass tongue and a felt keeper. The eyelets are spaced by the pivot geometry, so the tongue drops into eyelet 1 at 0°, 2 at 15°, 3 at 30° and 4 at 45°, and the eyelets between the button and the buckle count the angle. <b>Near:</b> the tip of the strap pokes out of its roll toward Jarvis, and the buckle\'s tongue stands up. <b>Ready:</b> a dashed ghost of the strap at the set angle, eyelets and all. Joining (12 fps): the cushions close in, the strap unrolls across the gap, through the buckle and the keeper, and the tongue drops into eyelet 1 with a puff of fibres. Then the tongue lifts, GitDiscuss swings 5° past its angle and settles, the strap sliding through the buckle, and the tongue drops into its eyelet with a glint. <b>Angle:</b> −45° to +45° in 15° steps. GitDiscuss turns on the inside corner, mid-gap: lowered (+), the strap runs over the roofs; raised (−), under the bellies, and crossing level it fades off one side and onto the other. Drag GitDiscuss\'s nameplate, use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓. The tongue stands up while it turns, the strap slides with the eyelets passing under it, and the tongue drops into the nearest eyelet when it stops. A cotton tag shows the angle in cross-stitch while it turns. Jarvis\'s nameplate still moves the pair. <b>Release:</b> tap the strap or the buckle (or focus it and press Enter). The tongue lifts, GitDiscuss swings level onto eyelet 1, then the strap is unbuckled and rolls back up round its button, and the cushions part.',
+ sayJoin:'The strap unrolls through the buckle, then GitDiscuss swings to the angle and the tongue drops into its eyelet.',
+ sayJoined:'Joined by a buckled strap. Each eyelet is 15°. Drag GitDiscuss\'s nameplate to slide the strap to another eyelet; drag Jarvis to move the pair. Tap the strap to unbuckle it.',
+ sayRelease:'The tongue lifts, the strap rolls back up and the cushions part.',
+ sayReady:'Ready: release to buckle the strap between them.',sayNear:'Nearby: the strap pokes out of its roll and the buckle\'s tongue stands up. Move closer.',
+ sayHold:'Held mid-unroll: the strap is being let out across the gap. Use the scrubber to step through it.',phReady:'Ready · release to buckle the strap',
+ sayBend:'The tongue lifts and the strap slides through the buckle.',turnWord:'Tongue up, sliding',
+ pose:()=>({th:0,ys:0,sq:0}),
+ phase(jt){
+  const k=Math.round(Math.abs(model.angle)/SB.det)+1;
+  if(model.dir<0&&model.busy)return jt>.9?'Releasing · lifting the tongue':jt>.7?'Releasing · GitDiscuss swings level':jt>.64?'Releasing · tongue into eyelet 1':jt>.56?'Releasing · unbuckling':jt>.3?'Releasing · rolling the strap up':'Releasing · parting';
+  return jt<.3?'Joining · closing in':jt<.56?'Joining · unrolling the strap through the buckle':jt<.64?'Joining · tongue into eyelet 1':jt<.7?'Joining · lifting the tongue':jt<.9?'Joining · GitDiscuss swings to '+signed(model.angle):`Joining · tongue into eyelet ${k} of 4`;
+ },
+ over(c){
+  const jt=c.jt,th=bendAt(jt),sg=fanSg(th),now=performance.now(),T=SB.tr,s=pinScale(c.h),g=jt===0?c.glow:0,fr=Math.floor(now/FRAME)%2,L=sbGeo(c,sg,th).L;
+  let o=`<defs><linearGradient id="sbwood" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e6bd82"/><stop offset=".5" stop-color="#b9834a"/><stop offset="1" stop-color="#7a4d22"/></linearGradient>`+
+   `<radialGradient id="horn" cx=".36" cy=".3" r=".8"><stop stop-color="#c99057"/><stop offset=".5" stop-color="#8a5226"/><stop offset="1" stop-color="#4a2810"/></radialGradient></defs>`;
+  // Crossing level, the strap fades off one side and onto the other.
+  if(T.side!==null&&T.side!==sg&&!reduce.matches){T.flip={t:now,from:T.side};sbKick(320)}
+  T.side=sg;
+  // The tongue, the strap let out, and the glint and fibres as the tongue drops in.
+  let up,len,glint=0,puff=-1;
+  if(jt===1){
+   const want=model.turning||drag&&drag.mode==='angle'||Math.abs(model.angle-Math.round(model.angle/SB.det)*SB.det)>.3?1:0;
+   if(T.tgt===null||reduce.matches){T.tgt=want;T.anim=null}
+   else if(want!==T.tgt){T.anim={t:now,from:sbTv(now),to:want};T.tgt=want;sbKick(want?200:640)}
+   up=sbTv(now);len=L;
+   if(T.anim&&T.anim.to===0){const el=now-T.anim.t-SB.dropMs*.85;glint=Math.sin(Math.PI*clamp(el/350));puff=el/400}
+  }else{
+   T.tgt=null;T.anim=null;up=sbUp(jt,g);len=sbLen(jt,g,fr,L,s);
+   const at=(a,b)=>model.dir>0?seg(jt,a,b):1-seg(jt,a,b),inn=(a,b)=>jt>a&&jt<b;
+   if(model.dir>0&&inn(.6,.68)){glint=Math.sin(Math.PI*seg(jt,.6,.66));puff=at(.6,.68)}
+   if(model.dir>0&&inn(.945,1)){glint=Math.sin(Math.PI*seg(jt,.945,.995));puff=at(.945,1)}
+   if(model.dir<0&&inn(.58,.64)){glint=Math.sin(Math.PI*(1-seg(jt,.6,.64)));puff=at(.58,.64)}
+  }
+  // Ready: a ghost of the strap at the set angle, from GitDiscuss's joined place, with its eyelets.
+  if(c.ghost>0&&jt===0){const G=sbGeo({a:c.a,b:{x:c.a.x+W+SB.gap,y:c.a.y},h:c.h},fanSg(model.angle),model.angle),Ln=sbLine(G),d=sbOutline(Ln,G.L,G.hw);let hl='';
+   G.holes.forEach(t=>{const p=Ln.at(t);hl+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(2.6*G.s)}"/>`});
+   o+=`<path d="${d}" fill="#ffc36a" opacity="${f(c.ghost*.4)}" filter="url(#soft)"/><path d="${d}" fill="${SB.lt}" fill-opacity=".16" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="4 3"/><g fill="none" stroke="#ffe2b0" stroke-opacity=".85">${hl}</g>`}
+  const fl=T.flip?(now-T.flip.t)/280:1;
+  if(fl<1)o+=`<g opacity="${f(1-fl)}">${sbDraw(c,T.flip.from,th,len,1,jt).o}</g>`;else T.flip=null;
+  const D=sbDraw(c,sg,th,len,up,jt),G=D.G;
+  o+=fl<1?`<g opacity="${f(fl)}">${D.o}</g>`:D.o;
+  if(glint>.02){const p={x:G.Q.x-5*s,y:G.Q.y-sg*(G.hw+8*s)};o+=`<path d="M${f(p.x)} ${f(p.y-5.5)}l1.3 4.2 4.2 1.3-4.2 1.3-1.3 4.2-1.3-4.2-4.2-1.3 4.2-1.3z" fill="#fffbe8" opacity="${f(glint)}"/>`}
+  if(puff>0&&puff<1)o+=sbFluff({x:G.Q.x,y:G.Q.y-sg*G.hw*.4},puff,s);
+  if(jt===1){const d=sbOutline(D.Ln,len,G.hw),k=Math.round(Math.abs(model.angle)/SB.det)+1;
+   o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Buckled strap, on eyelet ${k} of 4: tap or press Enter to unbuckle it and separate the widgets"><title>Tap the strap or the buckle to unbuckle it</title><path d="${d}" fill="transparent" stroke="transparent" stroke-width="16" stroke-linejoin="round"/><circle cx="${f(G.Q.x)}" cy="${f(G.Q.y)}" r="${f(14*s)}" fill="transparent"/><path class="ringfocus" d="${d}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+  // While it turns: the angle in cross-stitch on a cotton tag over Jarvis's end, on the side away from the strap where there is room.
+  if(model.turning&&jt===1){const a=c.a,h=c.h,y=sg>0?(a.y+h+40<590?a.y+h+26:a.y-50):(a.y-34>50?a.y-26:a.y+h+50);o+=xTag(G.P.x-40,y,signed(th).replace('−','-'))}
+  return o;
+ }
+};
+
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
   about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged) were built, and stays as the plainest point of comparison.'},
@@ -4281,7 +4454,7 @@ const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...H
 let anim=0,shadeAnim=0,morphSwitch=0,drag=null,togDrag=null;
 const J=()=>JOINS[model.join];
 // Each angled join keeps its own angle while another join is picked.
-const ANG={hinge:-20,pin:15,bjoint:-15,fan:30,sock:30,cheese:30};
+const ANG={hinge:-20,pin:15,bjoint:-15,fan:30,sock:30,cheese:30,strap:30};
 let angAnim=0;
 
 const hingeY=y=>fitHinge(fitHinge(y,peakBend(),ctx().h),model.angle,ctx().h);
