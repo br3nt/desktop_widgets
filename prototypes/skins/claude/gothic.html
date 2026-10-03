@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -289,7 +289,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
-$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg><svg class="ulsvg" aria-hidden="true"></svg>'));
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg><svg class="ulsvg" aria-hidden="true"></svg><svg class="nssvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -2425,7 +2425,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -2461,7 +2461,10 @@ const SHADES={
   about:'Medieval churches kept their vessels, books and relics in an <i>aumbry</i>, a cupboard let into the thickness of the wall, with a stone surround and oak doors hung on iron straps. Where it held the reserved sacrament, a lamp was kept burning beside it. Here the window is put away into the wall rather than covered or folded. A chamfered stone surround forms round the bay, and the window (display and all) is drawn back into the wall: it shrinks in perspective toward the middle of the recess and darkens, and the recess walls it leaves behind, coursed stone that darkens with depth, are lit from above, so the sill is the palest and the soffit the darkest. The wall lowers at the same time, so the window is deep in a long, low recess by the time it settles. Then two oak doors on strap hinges swing in from the jambs, the free edges looming larger as they come toward you, and meet in the middle with a small rebound and a puff of dust. A parchment label unrolls across the meeting stiles from the middle out, with the value in red and brown ink, and is nailed at both ends. Last, the hanging lamp beside the label kindles with a flare, and its light pools on the oak. <b>The lamp is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the shut aumbry:</b> the name in the frieze, the doors, the label and the lamp. Nothing moves at rest. Unshading plays it back, the window coming forward out of the wall as it rises. Joins still work on the shaded pair.'},
  unlead:{label:'Unleading',kind:'Unravel',ms:4400,h:small=>small?50:60,lowAt:[.66,.86],
   on:'Shaded: the display turns to leaded glass, and the lead is drawn out of it in one strand onto a reel; the clear quarries drop away, the coloured ones go to a rack, the wall lowers and a label with the value is hung between them.',off:'Unshaded: the label comes away, the wall rises, and the lead runs back off the reel into the window as the glass goes back in behind it.',
-  about:'A medieval window was glazed with pieces of glass held in <i>cames</i>, grooved strips of lead, and when a window was taken down for repair the glazier lifted the cames out and wound the soft lead onto a reel to be melted and recast, setting the precious coloured pieces aside. Here the widget is taken down that way. The display turns into clear diamond quarries in lead, lit from behind, with a few coloured quarries among them. A spoked oak reel is hung on an iron rod from the frieze at the outer end, and a small oak rack on hangers at the inner end. The glazier lifts the end of the came and hooks it to the reel, and then <b>the whole window\'s lead comes out as one strand</b>, every came in turn and out and back across the window. The strand runs taut from the lift point to the reel, the grey coil grows behind the turning spokes, and putty crumbs fall where it lifts. Each clear quarry drops away, turning, once the lead round it is gone, leaving the dark behind the window. Each coloured one is lifted out and carried in an arc to the rack. Then the wall lowers to its frieze, and a parchment label with the value unrolls between reel and rack. <b>The kept quarries are the status:</b> they kindle one by one, Jarvis\'s three amber (blue when paused), GitDiscuss\'s two red and Checks\' six green and one red. <b>The strip is the glazier\'s bench:</b> the name in the frieze, the reel of lead, the value and the saved glass. Nothing moves at rest. Unshading plays it back, the lead running off the reel into the window and the glass flying back up into it. Joins still work on the shaded pair.'}
+  about:'A medieval window was glazed with pieces of glass held in <i>cames</i>, grooved strips of lead, and when a window was taken down for repair the glazier lifted the cames out and wound the soft lead onto a reel to be melted and recast, setting the precious coloured pieces aside. Here the widget is taken down that way. The display turns into clear diamond quarries in lead, lit from behind, with a few coloured quarries among them. A spoked oak reel is hung on an iron rod from the frieze at the outer end, and a small oak rack on hangers at the inner end. The glazier lifts the end of the came and hooks it to the reel, and then <b>the whole window\'s lead comes out as one strand</b>, every came in turn and out and back across the window. The strand runs taut from the lift point to the reel, the grey coil grows behind the turning spokes, and putty crumbs fall where it lifts. Each clear quarry drops away, turning, once the lead round it is gone, leaving the dark behind the window. Each coloured one is lifted out and carried in an arc to the rack. Then the wall lowers to its frieze, and a parchment label with the value unrolls between reel and rack. <b>The kept quarries are the status:</b> they kindle one by one, Jarvis\'s three amber (blue when paused), GitDiscuss\'s two red and Checks\' six green and one red. <b>The strip is the glazier\'s bench:</b> the name in the frieze, the reel of lead, the value and the saved glass. Nothing moves at rest. Unshading plays it back, the lead running off the reel into the window and the glass flying back up into it. Joins still work on the shaded pair.'},
+ nest:{label:'Font cover',kind:'Nest',ms:3600,h:small=>small?54:64,lowAt:[.34,.8],
+  on:'Shaded: a three-stage oak font cover is let down into the bay; as the wall lowers, its stages telescope into each other, the value is gilded onto its base and the orb on its finial is lit.',off:'Unshaded: the orb goes out, the gilding wipes away, the stages draw out of each other as the wall rises, and the cover is hauled up into the frieze.',
+  about:'A new shade kind, <b>Nest</b>: the casing collapses by sliding into itself, like a telescope. Medieval fonts were closed by carved oak covers, painted and gilded, and the tallest of them, at Ufford in Suffolk, Sudbury and Trunch, were built to telescope: their stages slide over one another, so the font can be opened without lifting the whole spire, which hangs from the roof on a chain. Here the display fades, the bay darkens into a niche, and a cover in three stages is let down out of the frieze on its chain, gathering speed until it lands on the sill and rebounds once. Each stage is narrower than the one below, a capped oak box with a row of blind arches painted red, blue and green with gilt edges and bosses, and gilt cresting along the ledge it leaves. The top stage carries a row of spirelets and a gilt finial set with a glass orb. Then the wall lowers under it: the foot rides up with the sill while the finial stays hung from the frieze, so <b>lowering the wall is what nests the stages</b>. The top stage slides down inside the middle one, dust puffs off the ledges as it seats, and then the middle one slides into the base, until only their capped rims show, stepped over the base like a closed spyglass. Last, the key value is gilded onto a black cartouche on the base, left to right, and the orb kindles with a flare. <b>The orb is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the closed cover:</b> the name in the frieze, the stepped stages, the value on the base. Nothing moves at rest. Unshading plays it back, the stages drawing out as the wall rises and the cover hauled back up into the frieze. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -3250,6 +3253,78 @@ function unlead(id,w,h,k){
    `<text x="${f(xl-tw/2)}" y="${f(ym+fs*.36)}" font-family="Georgia,serif" font-size="${fs}"><tspan font-weight="700" font-size="${fs+1}" fill="#8e1f2b">${num}</tspan><tspan font-style="italic" fill="#2c2117"> ${val}</tspan></text></g>`;
   if(lt<1)for(const x of[xl-cw/2,xl+cw/2])s+=`<rect x="${f(x-1.6)}" y="${f(ly0-.6)}" width="3.2" height="${lh+1.2}" rx="1.6" fill="#e8d6ae" stroke="#5a4028" stroke-width=".5"/>`}
  const g2=Math.sin(Math.PI*seg(k,.94,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(ox(oR)+2,ym-2,g2*4.5)}</g>`;
+ return s+'</g>';
+}
+
+/* Font cover: medieval fonts were closed by carved, painted oak covers, and the tallest (Ufford in Suffolk, Sudbury, Trunch) telescope:
+   their stages slide over one another so the font can be opened without lifting the whole spire. The extended cover is let down
+   into the dark bay in three stages, each narrower than the one below, and then the wall lowers under it: the foot rides up with
+   the sill while the finial stays hung from the frieze, so lowering the wall is what nests the stages, the top one down into the
+   middle, then the middle into the base, until only their capped rims show stepped over the base. E: each upper stage's length
+   showing at full height; lip: what still shows of it when nested (its cap). */
+function nsGeo(id){
+ const sm=id==='c',G=rgGeo(id,sm?CW:W,sm?CH:H),fb=G.y0-3,foot=sm?3:4,gap=sm?2:3,base=sm?17:18,crest=sm?5:6,I=sm?11:16;
+ const full=(sm?CH:H)-foot-fb-gap,fin=SHADES.nest.h(sm)-foot-fb-gap,lip=(fin-base-crest)/2;
+ return{sm,xa:G.xa,xb:G.xb,fb,foot,gap,base,crest,I,full,lip,E:(full-base-crest)/2};
+}
+function fontCover(id,w,h,k){
+ const{sm,xa,xb,fb,foot,gap,base,crest,I,full,lip,E}=nsGeo(id),op=seg(k,0,.06);if(op<=0)return '';
+ const yF=h-foot,topY=fb+gap,xm=(xa+xb)/2,cap=lip,dk='#1e150c',dust=JOINS.buttress.dust,[gl,gb,gd]=msGlass(id);
+ // Let down out of the frieze, gathering speed, it lands on the sill and rebounds once.
+ const dn=seg(k,.1,.28),bo=Math.sin(Math.PI*seg(k,.28,.36)),off=-(1-dn*dn)*(full+12)-bo*(sm?1.2:1.8);
+ // The stages nest in turn as the wall comes down: the top one first, then the middle one.
+ const R=E-lip,ex=clamp(full-(yF-topY),0,2*R),a3=Math.min(ex,R)/R,a2=Math.max(0,ex-R)/R,y3=topY+crest+off,y2=y3+E-a3*R,y1=y2+E-a2*R;
+ const X=[[xa+4,xb-4],[xa+4+I,xb-4-I],[xa+4+2*I,xb-4-2*I]];
+ const[,num,val]=tpText(id),fs=sm?9.5:10,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`),lw=tw+(sm?14:18);
+ let s=`<defs><linearGradient id="nsO-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#6e4424"/><stop offset="1" stop-color="#3f240f"/></linearGradient>`+
+  `<linearGradient id="nsC-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c08a52"/><stop offset=".45" stop-color="#7a4c26"/><stop offset="1" stop-color="#4a2a12"/></linearGradient>`+
+  `<radialGradient id="nsB-${id}" cx=".36" cy=".3" r=".8"><stop stop-color="${gl}"/><stop offset=".5" stop-color="${gb}"/><stop offset="1" stop-color="${gd}"/></radialGradient>`+
+  `<clipPath id="nsk-${id}"><rect x="${f(xa-6)}" y="${f(fb)}" width="${f(xb-xa+12)}" height="${f(Math.max(0,yF-fb))}"/></clipPath></defs><g opacity="${f(op)}">`;
+ // The bay darkens into a niche for the cover to hang in.
+ const nb=seg(k,.02,.12);
+ s+=`<rect x="${f(xa)}" y="${f(fb)}" width="${f(xb-xa)}" height="${f(Math.max(0,h-5-fb))}" fill="${dk}" opacity="${f(.92*nb)}"/><rect x="${f(xa)}" y="${f(fb)}" width="${f(xb-xa)}" height="5" fill="url(#tpShT)" opacity="${f(.5*nb)}"/>`+
+  `<rect x="${f(xm-3.2)}" y="${f(fb-1)}" width="6.4" height="2.6" rx="1.2" fill="#1b1612" opacity="${f(nb)}"/>`;
+ // One stage: a capped oak box with a row of painted, gilt-edged blind arches; cresting along the ledge it leaves for the stage above.
+ const COL=['#8e1f2b','#1f3f8a','#25603f'],P=sm?11:14;
+ const stage=(lv,yT,len,skip)=>{const[x0,x1]=X[lv],py0=yT+cap+(sm?1.6:2),py1=yT+len-(sm?1.6:2);
+  let t=`<rect x="${f(x0)}" y="${f(yT+cap)}" width="${f(x1-x0)}" height="${f(Math.max(0,len-cap))}" fill="url(#nsO-${id})" stroke="#1e1007" stroke-width=".6"/>`;
+  if(py1-py0>3){const n=Math.floor((x1-x0-4)/P),o0=x0+(x1-x0-n*P)/2;let gd='',bs='';
+   for(let i=0;i<n;i++){const px=o0+i*P+1.3,pw=P-2.6;if(skip&&px+pw>skip[0]&&px<skip[1])continue;const a=Math.min(pw*.9,(py1-py0)*.5);
+    const d=`M${f(px)} ${f(py1)}V${f(py0+a)}Q${f(px)} ${f(py0+a*.3)} ${f(px+pw/2)} ${f(py0)}Q${f(px+pw)} ${f(py0+a*.3)} ${f(px+pw)} ${f(py0+a)}V${f(py1)}Z`;
+    t+=`<path d="${d}" fill="${COL[(i+lv)%3]}"/>`;gd+=d;bs+=`<circle cx="${f(px+pw/2)}" cy="${f(py0+a*.62)}" r=".75"/>`}
+   t+=`<path d="${gd}" fill="none" stroke="#e0ad40" stroke-width=".55"/><path d="${gd}" fill="none" stroke="#000" stroke-opacity=".35" stroke-width=".5" transform="translate(.6 .7)"/><g fill="url(#gild)">${bs}</g>`}
+  t+=`<rect x="${f(x0)}" y="${f(yT+cap)}" width="${f(x1-x0)}" height="${f(Math.max(0,Math.min(3,len-cap)))}" fill="url(#tpShT)" opacity=".55"/>`+
+   `<rect x="${f(x0-1.4)}" y="${f(yT)}" width="${f(x1-x0+2.8)}" height="${f(cap)}" rx=".6" fill="url(#nsC-${id})" stroke="#1e1007" stroke-width=".5"/><path d="M${f(x0-.8)} ${f(yT+cap-.7)}H${f(x1+.8)}" stroke="#e0ad40" stroke-width=".7"/>`;
+  if(lv<2){let bd='';for(const[l,r]of[[x0,x0+I],[x1-I,x1]])for(let x=l+3;x<r-2;x+=sm?4.4:5)bd+=`M${f(x)} ${f(yT+.2)}L${f(x+1.1)} ${f(yT-2)}L${f(x+2.2)} ${f(yT+.2)}Z`;t+=`<path d="${bd}" fill="url(#gild)" stroke="#3a2608" stroke-width=".3"/>`}
+  return t};
+ s+=`<g clip-path="url(#nsk-${id})">`;
+ // The chain from the frieze to the finial, while it shows.
+ const ty=topY+off;if(ty>fb+.5)s+=`<path d="M${f(xm)} ${f(fb+1)}V${f(ty)}" stroke="#1b1612" stroke-width="1.5" stroke-dasharray="2 1"/>`;
+ // The top stage's crest: spirelets with gilt balls, and the central finial carrying a glass orb, the status.
+ const[t0,t1]=X[2],sh=crest*.85,rr=sm?2:2.4,oy=ty+rr;let sp='',bl='';
+ for(let x=t0+6;x<t1-4;x+=sm?16:20){if(Math.abs(x-xm)<(sm?9:11))continue;sp+=`M${f(x-2.3)} ${f(y3)}L${f(x)} ${f(y3-sh)}L${f(x+2.3)} ${f(y3)}Z`;bl+=`<circle cx="${f(x)}" cy="${f(y3-sh)}" r=".85"/>`}
+ s+=`<path d="${sp}" fill="#7a4c26" stroke="#1e1007" stroke-width=".45"/><g fill="url(#gild)">${bl}</g>`+
+  `<path d="M${f(xm-4.5)} ${f(y3)}Q${f(xm-1.2)} ${f(y3-1.2)} ${f(xm-1)} ${f(oy+rr)}H${f(xm+1)}Q${f(xm+1.2)} ${f(y3-1.2)} ${f(xm+4.5)} ${f(y3)}Z" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/>`;
+ const bk=seg(k,.9,.97),fl=Math.sin(Math.PI*bk);
+ s+=`<circle cx="${f(xm)}" cy="${f(oy)}" r="${f(rr+.5)}" fill="#120a04"/><circle cx="${f(xm)}" cy="${f(oy)}" r="${f(rr)}" fill="url(#nsB-${id})" opacity="${f(.25+.75*bk)}"/>`+
+  (fl>.05&&bk<1?`<circle cx="${f(xm)}" cy="${f(oy)}" r="${f(rr)}" fill="#fffbe8" opacity="${f(.8*fl)}"/>`:'');
+ // Top stage first, so each wider stage below passes in front of it.
+ s+=stage(2,y3,E+base)+stage(1,y2,E+base);
+ // The base carries the value on a black cartouche between its arches.
+ s+=stage(0,y1,base,[xm-lw/2-2,xm+lw/2+2]);
+ const cy=y1+cap+(base-cap)/2,lh=base-cap-(sm?3:3.4),cx0=xm-lw/2;
+ s+=`<rect x="${f(cx0)}" y="${f(cy-lh/2)}" width="${f(lw)}" height="${f(lh)}" rx="1" fill="#1a0f06" stroke="#c99a48" stroke-width=".7"/><rect x="${f(cx0+1.6)}" y="${f(cy-lh/2+1.6)}" width="${f(lw-3.2)}" height="${f(lh-3.2)}" fill="none" stroke="#c99a48" stroke-opacity=".35" stroke-width=".4"/>`;
+ // The value is gilded onto the cartouche, left to right.
+ const gt=seg(k,.82,.9);
+ if(gt>0)s+=`<clipPath id="nsg-${id}"><rect x="${f(cx0)}" y="${f(cy-lh)}" width="${f(lw*gt)}" height="${f(2*lh)}"/></clipPath><g clip-path="url(#nsg-${id})" font-family="Georgia,serif" font-size="${fs}">`+
+  [['#000',.6],['',0]].map(([c,o])=>`<text x="${f(xm-tw/2+o)}" y="${f(cy+fs*.36+o)}"${c?` fill="${c}"`:''}><tspan font-weight="700" font-size="${fs+1}"${c?'':' fill="#ffe7a2"'}>${num}</tspan><tspan font-style="italic"${c?'':' fill="#efd08a"'}> ${val}</tspan></text>`).join('')+'</g>';
+ s+='</g>';
+ // The orb's glow spreads past the clip, over the frieze.
+ if(bk>0)s+=`<g style="mix-blend-mode:screen" opacity="${f(.6*bk)}"><circle cx="${f(xm)}" cy="${f(oy)}" r="${f(rr+3)}" fill="${gb}" filter="url(#lglow)"/></g>`;
+ // Dust: from the foot as the cover lands, and off each ledge as the stage above it seats.
+ const ld=seg(k,.28,.42);if(ld>0&&ld<1)s+=dust(X[0][0]+6,yF,ld,4,10,61,-1)+dust(X[0][1]-6,yF,ld,4,10,63,1);
+ for(const[a,lv,y]of[[a3,1,y2],[a2,0,y1]]){const t=seg(a,.8,1);if(t>0&&t<1)s+=dust(X[lv][0]+I/2,y,t,3,8,70+lv,-1)+dust(X[lv][1]-I/2,y,t,3,8,74+lv,1)}
+ const g2=Math.sin(Math.PI*seg(k,.95,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(xm+rr*.4,oy-rr*.5,g2*5)}</g>`;
  return s+'</g>';
 }
 
@@ -4417,7 +4492,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -4446,7 +4521,7 @@ function render(){
   // Misericord: the display fades as the seat swings down over it. Lenten veil: it fades as the rod comes in, before the veil drops.
   // Corona: it fades as the wall starts to lower, long before the corona comes down.
   // Aumbry: the tabs and buttons fade; the display itself is drawn back into the recess and hidden once the doors are shut.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   const auG=au?auGeo(id,w,h,k):null;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(!au&&n.style.filter)n.style.filter='';
@@ -4456,8 +4531,10 @@ function render(){
    else if(n.style.transform){n.style.transform='';n.style.clipPath='';n.style.transformOrigin=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co||au||ul?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co||au||ul||fc?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);
+  const ns2=el.querySelector('.nssvg'),nskey=fc?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
+  if(ns2.dataset.key!==nskey){ns2.dataset.key=nskey;ns2.setAttribute('width',w);ns2.setAttribute('height',h);ns2.setAttribute('viewBox',`0 0 ${w} ${h}`);ns2.innerHTML=nskey?fontCover(id,w,h,k):''}
   const us=el.querySelector('.ulsvg'),ukey=ul?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(us.dataset.key!==ukey){us.dataset.key=ukey;us.setAttribute('width',w);us.setAttribute('height',h);us.setAttribute('viewBox',`0 0 ${w} ${h}`);us.innerHTML=ukey?unlead(id,w,h,k):''}
   const as=el.querySelector('.ausvg'),akey=au?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
