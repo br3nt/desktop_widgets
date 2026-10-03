@@ -1,3 +1,5 @@
+- [ ] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/felt.html: SyntaxError: Unexpected identifier 's'
+prototypes/skins/claude/felt.html: ["Uncaught SyntaxError: Unexpected identifier 's' @line 2354"]
 - [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/elven.html: SyntaxError: Identifier 'poly' has already been declared
   - Fixed: the Scale and detail morph had added a second `const poly` (line 1569) next to the moonlight bridge's (line 692). The later one, which returns '' for fewer than two points, is now the only declaration. It sits at line 692, so the bridge and the morph's interlace and rims share it, and the bridge's paths (always 25 or more points) draw exactly as before. A scan finds no other duplicate top-level declarations. Not yet checked in a browser (browser and node access were blocked this run).
 - [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/combined.html: SyntaxError: Identifier 'RB' has already been declared
