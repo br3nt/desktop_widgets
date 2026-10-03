@@ -220,7 +220,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -2747,6 +2747,143 @@ JOINS.bees={label:'Bees',kind:'Swarm',gap:BE.gap,ms:4600,msDrag:4200,relMs:3600,
  }
 };
 let beBuzz=0;
+
+/* ---------- Padlock: the busy book's lock page, a felt hasp, a heart padlock and its key (Lock) ---------- */
+// A mustard felt hasp is hinged on GitDiscuss's joining end and hangs limp. Jarvis's end has a cream cord staple, with a
+// stuffed raspberry heart padlock hung open on it and a felt key standing in the keyhole at the heart's point, on a ribbon.
+// Locking: the padlock is lifted off toward you, the hasp flops over the staple, the padlock is put back through the staple
+// and snapped shut, and the key is turned a quarter, from edge-on to face-on. Its sequin is the join light.
+// Everything sits in the free felt at the ends (Jarvis x 352–386, GitDiscuss x 4–40) and in the gap.
+const PL={gap:10,sx:20,rx:16,col:'#d79b35',dk:'#8a5a17',heart:'#b8324f',key:'#c9c2b2',keyDk:'#6d6658',cord:'#efe0bf',rib:'#3f6fa0',patch:'#7c4f16',rest:275,ready:195};
+// Staple S (on Jarvis) and hasp root R (on GitDiscuss), from the cushions' places; s shrinks it all in a strip.
+function plGeo(c){const h=c.h,s=mtScale(h),y=h/2-19*s,D=PL.rx+PL.gap+PL.sx;
+ return{s,S:{x:c.a.x+W-PL.sx,y:c.a.y+y},R:{x:c.b.x+PL.rx,y:c.b.y+y},D,L:D+11*s,hw:7*s}}
+// The hasp's centre line from its root: A is its angle (degrees, y up, 180 points at Jarvis), curl bends it toward the tip.
+function plLine(R,A,curl,L){const P=[],n=16;let x=R.x,y=R.y;
+ for(let i=0;i<=n;i++){P.push({x,y});const a=(A+curl*Math.pow(i/n,1.6))*Math.PI/180;x+=Math.cos(a)*L/n;y-=Math.sin(a)*L/n}return P}
+const plAt=(P,t)=>{const n=P.length-1,u=clamp(t)*n,i=Math.min(n-1,Math.floor(u));return{p:V.mix(P[i],P[i+1],u-i),d:unit(V.sub(P[i+1],P[i]))}};
+function plStrap(P,hw){const n=P.length-1,Lf=[],Rt=[];
+ P.forEach((p,i)=>{const d=unit(V.sub(P[Math.min(n,i+1)],P[Math.max(0,i-1)]));Lf.push(V.add(p,{x:-d.y*hw,y:d.x*hw}));Rt.push(V.add(p,{x:d.y*hw,y:-d.x*hw}))});
+ const d=unit(V.sub(P[n],P[n-1])),k=hw*1.3,l=Lf[n],r=Rt[n];
+ return 'M'+Lf.map(pt).join('L')+`C${pt(V.add(l,V.mul(d,k)))} ${pt(V.add(r,V.mul(d,k)))} ${pt(r)}L`+Rt.reverse().map(pt).join('L')+'Z'}
+const plHeart=(x,y,w,h)=>{const X=u=>f(x-w/2+u*w),Y=v=>f(y+v*h);
+ return `M${X(.5)} ${Y(1)}C${X(.2)} ${Y(.78)} ${X(0)} ${Y(.58)} ${X(0)} ${Y(.33)}C${X(0)} ${Y(.12)} ${X(.16)} ${Y(0)} ${X(.3)} ${Y(0)}C${X(.4)} ${Y(0)} ${X(.47)} ${Y(.06)} ${X(.5)} ${Y(.16)}C${X(.53)} ${Y(.06)} ${X(.6)} ${Y(0)} ${X(.7)} ${Y(0)}C${X(.84)} ${Y(0)} ${X(1)} ${Y(.12)} ${X(1)} ${Y(.33)}C${X(1)} ${Y(.58)} ${X(.8)} ${Y(.78)} ${X(.5)} ${Y(1)}Z`};
+// The staple's cord ring, centred on the staple point; half 1 is its right half (behind a hung shackle), -1 its left (in front).
+const plRing=(S,s,k,half)=>{const rx=5.2*s*k,ry=6.4*s*k,a=`M${f(S.x)} ${f(S.y-ry)}A${f(rx)} ${f(ry)} 0 0 ${half>0?1:0} ${f(S.x)} ${f(S.y+ry)}`;
+ return `<path d="${a}" fill="none" stroke="#2a1608" stroke-opacity=".45" stroke-width="${f(3.6*s)}" transform="translate(.6 1.2)"/><path d="${a}" fill="none" stroke="${PL.cord}" stroke-width="${f(3*s)}"/><path d="${a}" fill="none" stroke="#9c8a66" stroke-width="${f(.7*s)}" stroke-dasharray="${f(1.2*s)} ${f(1.2*s)}"/>`};
+// The padlock hung from the staple point (x,y): its shackle's arch passes through the ring there. o.open lifts the body off
+// the shackle's short leg; o.z lifts it all toward you (bigger, its shadow further off); o.turn turns the key, 0 edge-on, 1 face-on.
+function plLock(x,y,s,o){
+ const z=o.z,k=s*(1+.16*z),bY=14+7*o.open,lt=o.light;
+ let g=`<g transform="translate(${f(x+4*z*s)} ${f(y-10*z*s+o.jolt)}) rotate(${f(o.tilt)}) scale(${f(k*1000)/1000})">`;
+ const heart=plHeart(0,bY,30,28),sh=`translate(${f(1.4+4*z)} ${f(2.6+7*z)})`;
+ const shk=`M-7 ${f(bY+5)}V6A7 7 0 0 1 7 6V19`;
+ // Shadows first: shackle, body, key.
+ g+=`<g fill="#000" opacity="${f(.4-.15*z)}" filter="url(#sh)" transform="${sh}"><path d="${shk}" fill="none" stroke="#000" stroke-width="4.4"/><path d="${heart}"/><rect x="-1.7" y="${f(bY+25)}" width="3.4" height="14"/><circle cy="${f(bY+44)}" r="6"/></g>`;
+ g+=`<path d="${shk}" fill="none" stroke="#7d786e" stroke-width="4.4" stroke-linecap="round"/><path d="${shk}" fill="none" stroke="#d6d0c4" stroke-width="1.3" stroke-linecap="round" transform="translate(-.8 -.6)"/>`;
+ // The key: shank up into the heart's point, bow below, turned edge-on (unlocked) or face-on (locked).
+ const F=Math.max(.14,Math.abs(Math.sin(o.turn*Math.PI/2))),ky=bY+44,rx=6.2*F,ir=2.3*F;
+ g+=`<rect x="-1.7" y="${f(bY+24)}" width="3.4" height="15" rx="1" fill="${PL.key}" filter="url(#tagfelt)"/><path d="M-.6 ${f(bY+26)}V${f(bY+37)}" stroke="#fff8e8" stroke-opacity=".6" stroke-width=".7"/>`;
+ g+=`<path d="M${f(-rx)} ${f(ky)}A${f(rx)} 6.2 0 1 0 ${f(rx)} ${f(ky)}A${f(rx)} 6.2 0 1 0 ${f(-rx)} ${f(ky)}ZM${f(-ir)} ${f(ky)}A${f(ir)} 2.3 0 1 1 ${f(ir)} ${f(ky)}A${f(ir)} 2.3 0 1 1 ${f(-ir)} ${f(ky)}Z" fill="${PL.key}" fill-rule="evenodd" stroke="${PL.keyDk}" stroke-width=".6" filter="url(#tagfelt)"/>`;
+ if(F>.5)g+=`<path d="M${f(-rx*.62)} ${f(ky)}A${f(rx*.62)} 4 0 0 1 ${f(rx*.62)} ${f(ky)}" fill="none" stroke="${PL.keyDk}" stroke-opacity="${f(.8*(F-.5)*2)}" stroke-width=".6" stroke-dasharray="1.3 1.1"/>`;
+ g+=`<path d="M${f(-rx*.7)} ${f(ky-3.6)}q${f(rx*.5)} -2 ${f(rx*1.1)} -.4" fill="none" stroke="#fff8e8" stroke-opacity="${f(.25+.4*F)}" stroke-width=".8" stroke-linecap="round"/>`;
+ // A blue satin ribbon tied through the bow, its tail swinging.
+ g+=`<g transform="rotate(${f(o.sw)} 0 ${f(ky+5)})"><path d="M-1.8 ${f(ky+5)}h3.6l.4 12-2.2-2.2-2.2 2.2z" fill="${PL.rib}"/><path d="M-.3 ${f(ky+6)}v9" stroke="#bcd6ef" stroke-opacity=".7" stroke-width=".7"/></g>`;
+ // The heart: stuffed raspberry felt, blanket-stitched, a cream appliqué round a gold sequin.
+ g+=`<path d="${heart}" fill="${PL.heart}" filter="url(#tagfelt)"/><path d="${heart}" fill="url(#plPuff)"/><path d="${plHeart(0,bY+2.6,24,22.4)}" fill="none" stroke="#f7e3c4" stroke-opacity=".9" stroke-width="1" stroke-dasharray="2 1.7"/>`;
+ const sc=bY+12.5,col=o.lit?'#ffcf5a':'#9cc2ea';
+ if(lt>.02)g+=`<circle cy="${f(sc)}" r="13" fill="${col}" opacity="${f(.7*lt)}" filter="url(#soft)"/>`;
+ g+=`<circle cy="${f(sc)}" r="6" fill="#f4e6c8" filter="url(#tagfelt)"/><circle cy="${f(sc)}" r="4.6" fill="none" stroke="#a8936a" stroke-width=".7" stroke-dasharray="1.4 1.2"/>`+
+  `<circle cy="${f(sc)}" r="3.2" fill="url(#plSeq)"/>`+(lt>.02?`<circle cy="${f(sc)}" r="3.2" fill="${col}" opacity="${f(.55*lt)}"/>`:'')+`<circle cy="${f(sc)}" r=".8" fill="#5e3b0c"/><circle cx="-1.1" cy="${f(sc-1.2)}" r=".7" fill="#fff" opacity=".85"/>`;
+ // The keyhole's stitched collar at the heart's point.
+ g+=`<path d="M-3 ${f(bY+25.4)}q3 2 6 0" fill="none" stroke="#3d0a17" stroke-width="1.1" stroke-linecap="round"/>`;
+ if(o.glint>0){const q=o.glint,r=lerp(1,7,Math.sin(Math.PI*q));g+=`<path d="M0 ${f(sc-r)}L.7 ${f(sc-.7)}L${f(r)} ${f(sc)}L.7 ${f(sc+.7)}L0 ${f(sc+r)}L-.7 ${f(sc+.7)}L${f(-r)} ${f(sc)}L-.7 ${f(sc-.7)}Z" fill="#fffbe6" opacity="${f(Math.sin(Math.PI*q))}"/>`}
+ return g+'</g>';
+}
+JOINS.padlock={label:'Padlock',kind:'Lock',gap:PL.gap,ms:3600,msDrag:3200,relMs:3000,moveEnd:.25,hold:.6,snip:true,
+ ph:[[0,.25,.48,.74,1],[0,.14,.42,.7,1]],
+ about:'The lock page of a felt busy book. A mustard felt hasp with a blanket-stitched slot is hinged on GitDiscuss\'s joining end and hangs limp. Jarvis\'s end has a cream cord staple, and a stuffed raspberry heart padlock hangs open on it, with a grey felt key standing in the keyhole at the heart\'s point on a blue ribbon. <b>Near:</b> the hasp perks up toward the staple and the padlock lifts a little off it. <b>Ready:</b> the hasp reaches out and a warm ghost shows where it will lie. Joining (12 fps): the cushions close, the padlock is lifted off the staple toward you (it grows and its shadow drops away), the hasp flicks up and flops over underneath it with an overshoot, and the staple pops up through the slot. The padlock is lowered back and its open shackle threads through the staple, then it is snapped shut with a jolt that knocks a few fibres loose. Last the key is turned a quarter, from edge-on to face-on, the ribbon swings, and the gold sequin on the heart catches the light: gold while both agents run, cold blue if either is paused. That is the join light. <b>Release:</b> tap the padlock (or focus it and press Enter). The key turns back, the shackle springs open, the padlock is lifted off, the hasp drops and swings, the padlock is hung back on the staple, and the cushions part. It all stays in the free felt at the cushions\' ends and in the gap, clear of the displays, tabs, buttons and nameplates. In a shade strip it shrinks, but the limp hasp and the padlock\'s key still dangle below the strip, as the button tab does.',
+ sayJoin:'The padlock is lifted off, the hasp flops over the staple, and the padlock goes back on.',
+ sayJoined:'Locked. Drag either nameplate to move the pair. Tap the padlock to unlock it.',
+ sayRelease:'The key turns back, the shackle springs open, the hasp drops and the cushions part.',
+ sayUnpick:'The padlock goes back on the staple open, the hasp drops and the cushions part.',
+ sayReady:'Ready: the hasp reaches for the staple. Release to lock them together.',
+ sayNear:'Nearby: the hasp perks up and the padlock lifts off its staple. Move closer.',
+ sayHold:'Held mid-join: the padlock is coming back down onto the staple. Use the scrubber to step through it.',
+ phReady:'Ready · the hasp reaches for the staple',
+ pose:jt=>({th:0,ys:0,sq:model.dir>0||!model.snip?.014*Math.sin(Math.PI*seg(jt,.69,.8)):0}),
+ phase(jt){
+  if(model.dir<0&&model.snip){const u=1-jt;return u<.1?'Releasing · turning the key back':u<.16?'Releasing · the shackle springs open':u<.28?'Releasing · lifting the padlock off':u<.46?'Releasing · the hasp drops':u<.58?'Releasing · hanging the padlock back up':u<.75?'Releasing · the hasp settles':'Releasing · parting'}
+  if(model.dir<0&&model.busy)return 'Unlocking';
+  return jt<.25?'Joining · closing in':jt<.34?'Joining · lifting the padlock off':jt<.48?'Joining · the hasp flops over':jt<.55?'Joining · the staple pops through':jt<.66?'Joining · the padlock goes back on':jt<.74?'Joining · snapped shut':jt<.86?'Joining · turning the key':'Joining · locked';
+ },
+ // Every moving part from join progress: hasp angle and curl, padlock lift, shackle, key, light, ribbon, staple ring.
+ state(c){
+  const jt=c.jt,s=plGeo(c).s;
+  const r={A:PL.rest,curl:-8,z:0,open:1,turn:0,light:0,sw:0,ring:1,over:false,jolt:0,tilt:0,glint:0};
+  if(jt===0&&!(model.busy&&model.dir>0)){const e=Math.pow(c.glow,.85);return{...r,A:lerp(PL.rest,PL.ready,e),curl:lerp(-8,4,e),z:.3*e,tilt:-2.4*e}}
+  if(!(model.dir<0&&model.snip)){
+   // A join from the ready pose carries on from where the hasp was reaching; reversed, it eases back to rest over the last tenth.
+   const g0=model.fast?(model.dir<0?seg(jt,0,.1):1):0,A0=lerp(PL.rest,PL.ready,g0),Ap=Math.min(A0,228),z0=.3*g0;
+   r.z=jt<.24?lerp(z0,.3,ease(seg(jt,0,.24))):jt<.34?lerp(.3,1,ease(seg(jt,.24,.34))):jt<.54?1:1-ease(seg(jt,.54,.66));
+   r.tilt=-8*r.z;
+   if(jt<.32){const e=ease(seg(jt,.1,.32));r.A=lerp(A0,Ap,e);r.curl=lerp(lerp(-8,4,g0),8,e)}
+   else if(jt<.48){const q=seg(jt,.32,.48);r.A=lerp(Ap,180,backOut(q));r.curl=lerp(8,0,q)+22*Math.sin(Math.PI*q)}
+   else{const q=seg(jt,.48,.64);r.A=180;r.curl=-10*Math.sin(3*Math.PI*q)*Math.pow(1-q,2)}
+   r.over=jt>=.48;r.ring=jt<.48?(jt>.42?.55:1):.55+.45*backOut(seg(jt,.48,.55));
+   r.open=1-ease(seg(jt,.66,.71));r.jolt=2.4*s*Math.sin(Math.PI*seg(jt,.69,.77));
+   r.turn=backOut(seg(jt,.74,.86));r.light=seg(jt,.86,.96);r.glint=jt>.9&&jt<1?seg(jt,.9,1):0;
+   const q=seg(jt,.78,1);r.sw=jt<.78?0:16*Math.sin(3*Math.PI*q)*Math.pow(1-q,2);
+   return r;
+  }
+  // Releasing: key back, shackle open, padlock lifted, hasp dropped and swinging, padlock hung back on, then part.
+  const u=1-jt;
+  r.light=1-seg(u,0,.05);r.turn=1-ease(seg(u,0,.1));r.open=Math.min(1.12,backOut(seg(u,.1,.16)));
+  r.z=u<.16?0:u<.44?ease(seg(u,.16,.28)):1-ease(seg(u,.44,.58));r.tilt=-8*r.z;
+  r.over=u<.28;r.ring=u<.28?1:u<.34?.55:.55+.45*seg(u,.34,.4);
+  if(u<.28){r.A=180;r.curl=0}
+  else if(u<.46){const q=seg(u,.28,.46);r.A=lerp(180,286,q*q);r.curl=-14*Math.sin(Math.PI*q)-8*q}
+  else{const k=seg(u,.46,.66);r.A=PL.rest+11*Math.cos(3*Math.PI*k)*(1-k);r.curl=-8}
+  const q=seg(u,0,.3);r.sw=u<.3?-12*Math.sin(2*Math.PI*q)*(1-q):0;
+  return r;
+ },
+ over(c){
+  const G=plGeo(c),s=G.s,r=this.state(c),jt=c.jt,lit=model.a.run&&model.b.run;
+  let o=`<defs><radialGradient id="plSeq" cx=".36" cy=".32" r=".8"><stop stop-color="#fff6c8"/><stop offset=".5" stop-color="#d9a92e"/><stop offset="1" stop-color="#6b4a0e"/></radialGradient>`+
+   `<radialGradient id="plPuff" cx=".4" cy=".3" r=".75"><stop stop-color="#fff0f0" stop-opacity=".22"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#2a0510" stop-opacity=".38"/></radialGradient></defs>`;
+  const P=plLine(G.R,r.A,r.curl,G.L),strap=plStrap(P,G.hw),inner=plStrap(P,G.hw-2.6*s);
+  // Ready: a warm ghost of the hasp lying across the gap onto the staple.
+  if(c.ghost>0&&jt===0){const Q=plLine({x:G.S.x+G.D,y:G.S.y},180,0,G.L);
+   o+=`<circle cx="${f(G.S.x)}" cy="${f(G.S.y)}" r="${f(20*s)}" fill="#ffc36a" opacity="${f(c.ghost*.5)}" filter="url(#soft)"/><path d="${plStrap(Q,G.hw)}" fill="none" stroke="#ffe2b0" stroke-opacity=".85" stroke-width="1.1" stroke-dasharray="3.5 2.6"/>`}
+  // The staple's patch on Jarvis, cross-stitched on.
+  const ps=7*s;o+=`<path d="${rr4(G.S.x-ps,G.S.y-ps,2*ps,2*ps,[2,2,2,2])}" fill="#000" opacity=".3" filter="url(#sh)" transform="translate(.5 1.2)"/><path d="${rr4(G.S.x-ps,G.S.y-ps,2*ps,2*ps,[2,2,2,2])}" fill="${PL.patch}" filter="url(#tagfelt)"/>`+
+   `<path d="M${f(G.S.x-ps+2)} ${f(G.S.y-ps+2)}l${f(2*ps-4)} ${f(2*ps-4)}M${f(G.S.x+ps-2)} ${f(G.S.y-ps+2)}l${f(4-2*ps)} ${f(2*ps-4)}" stroke="#f7e8c9" stroke-opacity=".7" stroke-width=".8" stroke-dasharray="1.6 1.3"/>`;
+  // The ring stands under the hasp until the slot comes down over it; a hung padlock's shackle threads between its halves.
+  const ringAll=plRing(G.S,s,r.ring,1)+plRing(G.S,s,r.ring,-1);
+  if(!r.over&&r.z>=.5)o+=ringAll;
+  // The hasp: mustard felt, a stitched hinge line near its root, a blanket-stitched slot over the staple.
+  o+=`<path d="${strap}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(1.2 2.6)"/><path d="${strap}" fill="${PL.col}" filter="url(#tagfelt)"/>`+
+   `<path d="${inner}" fill="none" stroke="#fff3da" stroke-opacity=".8" stroke-width=".9" stroke-dasharray="2.4 2" stroke-linecap="round"/>`;
+  const H1=plAt(P,12*s/G.L),nH={x:-H1.d.y,y:H1.d.x};
+  o+=`<path d="M${pt(V.add(H1.p,V.mul(nH,G.hw-1)))}L${pt(V.add(H1.p,V.mul(nH,1-G.hw)))}" stroke="${PL.dk}" stroke-width="${f(1.6*s)}" stroke-linecap="round"/>`;
+  const SL=plAt(P,G.D/G.L),sdeg=angOf(SL.d.x,SL.d.y);
+  o+=`<g transform="translate(${f(SL.p.x)} ${f(SL.p.y)}) rotate(${f(sdeg)})"><rect x="${f(-6.4*s)}" y="${f(-2.6*s)}" width="${f(12.8*s)}" height="${f(5.2*s)}" rx="${f(2.6*s)}" fill="none" stroke="#f7e8c9" stroke-width="${f(1.8*s)}" stroke-dasharray="${f(.7*s)} ${f(.8*s)}"/><rect x="${f(-5*s)}" y="${f(-1.6*s)}" width="${f(10*s)}" height="${f(3.2*s)}" rx="${f(1.6*s)}" fill="#2a1406"/></g>`;
+  // The hinge patch on GitDiscuss, box-stitched over the hasp's root.
+  const hp=8*s;o+=`<path d="${rr4(G.R.x-hp,G.R.y-hp-1,2*hp,2*hp+2,[3,3,3,3])}" fill="#000" opacity=".3" filter="url(#sh)" transform="translate(.5 1.4)"/><path d="${rr4(G.R.x-hp,G.R.y-hp-1,2*hp,2*hp+2,[3,3,3,3])}" fill="${PL.dk}" filter="url(#tagfelt)"/>`+
+   `<path d="${rr4(G.R.x-hp+2.4,G.R.y-hp+1.4,2*hp-4.8,2*hp-2.8,[2,2,2,2])}M${f(G.R.x-hp+2.4)} ${f(G.R.y-hp+1.4)}L${f(G.R.x+hp-2.4)} ${f(G.R.y+hp-1.4)}" fill="none" stroke="#f7e8c9" stroke-opacity=".8" stroke-width=".85" stroke-dasharray="2 1.6"/>`;
+  // The padlock: hung on the staple (between the ring's halves, so the shackle threads it), or lifted over everything.
+  const lock=plLock(G.S.x,G.S.y-s,s,{...r,lit});
+  if(r.z<.5)o+=plRing(G.S,s,r.ring,1)+lock+plRing(G.S,s,r.ring,-1);
+  else o+=(r.over?ringAll:'')+lock;
+  // Fibres knocked loose as the shackle snaps shut.
+  if((model.dir>0||!model.snip)&&jt>.69&&jt<.9){const u=seg(jt,.69,.9),cy=G.S.y+24*s;
+   for(const[dx,dy,rot]of FLUFF){const x=G.S.x+dx*24*s*(.5+u),y=cy+dy*16*s*(.8+.6*u)+18*u*u;
+    o+=`<path d="M-4 0q1.5-3 3 0t3 0t3 0" transform="translate(${f(x)} ${f(y)}) rotate(${f(rot*60+u*90)}) scale(${f(s)})" fill="none" stroke="#e98aa0" stroke-width="1.2" stroke-linecap="round" opacity="${f(1-u)}"/>`}}
+  if(jt===1){const k=Math.max(s,.7),x0=G.S.x-18*k,y0=G.S.y-6*k,w=36*k,hh=74*k;
+   o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Felt padlock: tap or press Enter to unlock it and separate the widgets"><title>Tap the padlock to unlock it</title><rect x="${f(x0)}" y="${f(y0)}" width="${f(w)}" height="${f(hh)}" rx="12" fill="transparent"/><rect class="ringfocus" x="${f(x0)}" y="${f(y0)}" width="${f(w)}" height="${f(hh)}" rx="12" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`}
+  return o;
+ }
+};
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
