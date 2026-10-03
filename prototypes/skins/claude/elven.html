@@ -651,8 +651,135 @@ const JOINS={
   phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.56?'Joining · the swan bows through the catch ':jt<.74?'Joining · a feather drifts down ':jt<.8?'Joining · the feather slides into the lock ':jt<.88?'Joining · the feather key turns ':'Joining · the moonstone kindles '):(jt>.92?'Releasing · the moonstone dims ':jt>.84?'Releasing · the key turns back ':jt>.72?'Releasing · the feather floats away ':jt>.58?'Releasing · the swan lifts its head ':'Releasing · the casings part '),
   about:'The Lock join kind in elven, after felt\'s padlock, hollow\'s lever bolt and gothic\'s tracery lock. Where those use iron and keys of metal, this one is a hasp shaped like a swan and a key that is a feather. On Jarvis\'s stem a small silver swan sits on a scrolled console, wing folded, its neck held in an S. On GitDiscuss\'s stem hangs a slender lancet lock plate of night glass rimmed in silver, with a slot at its top tip, a moonstone in its middle and an open silver catch ring on the side facing Jarvis. <b>Near:</b> the swan raises its head and looks toward the lock, half lifting its wing, and the moonstone and its eye glow. <b>Ready:</b> the swan\'s bowed neck and the feather standing in the lock are traced in dashed moonlight. Joining: the casings close, the swan lifts its wing and bows its long neck over the gap, and its head dips down through the catch ring (the ring\'s near rim passes in front of the neck). A white feather drifts down out of the night, swaying and tumbling as feathers fall, lines up edge-on over the slot and slides in quill first. Then it turns a quarter, so its vane opens face-on, and the turn swings the catch ring shut round the neck with a glint. Last, the moonstone in the plate and the swan\'s eye kindle as the join light (moonlight while both widgets run, a cold grey if either is paused), and a glint runs down the neck. Pulling the casings apart does nothing: the lock holds. <b>Release:</b> draw the feather up: it turns back edge-on as you pull, opening the catch, then rises out of the slot, and past a short distance it lets go (let go sooner and it sinks back and turns again). Tapping it, or focusing it and pressing Enter, does the same. The moonstone dims, the feather turns back and floats away into the night, the swan lifts its head out of the catch, folds its wing and the casings part. The swan and the plate stay on their stems while separate. Shaded, the lock shrinks with the casings and the swan\'s neck reaches further. Nothing moves at rest. Drag a nameplate to move the pair.',
   over:c=>drawSwan(c)
+ },
+ lily:{label:'Lily petals',kind:'Angle · wedge',angled:true,a0:30,gap:-6,
+  get hooks(){return LYH},
+  // At 0° there is no petal to put in, so the join is just the clasps and takes less time.
+  get slow(){return lyN(model.angle)?1.8:.9},get msOut(){return lyN(model.angle)?5000:2200},
+  bend(jt){return lyBend(jt)},
+  txt:{join:'The casings meet at the corner, a silver calyx clasps it round a moonstone heart, and moon-white petals drift in point first, one per 15°, while GitDiscuss opens to take each one.',
+   joined:'Joined by a water lily: each petal is 15°. Drag GitDiscuss\'s nameplate round the heart, use the Angle slider, or press ↑ ↓ to open it another petal or close it one; tap the lily to release.',
+   release:'The lily dims, the petals float away last in, first out, GitDiscuss closing on each, then the calyx lets go and the casings part.',
+   stop:'The petals float away and the calyx lets go.',
+   get hold(){return lyN(model.angle)?'Held mid-join: the calyx has clasped the corner and the first petal is about to drift in. Use the scrubber to step through the petals.':'Held mid-join: the calyx has clasped both corners; at 0° no petal goes in. Use the scrubber to step through it.'},
+   ready:'Ready: the open lily is traced in moonlight at the corner. Release to set the petals.',near:'Nearby: the knops at the corner glow and a petal drifts over the gap. Move closer.',
+   readyPh:'Ready · the lily is traced',nearPh:'Nearby · a petal drifts over the gap'},
+  phase:(jt,dir)=>{const S=lyStep(jt),pe=lyPe();
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<LY.ps||(!S&&jt<pe))return'Joining · the calyx clasps the corner ';
+    if(S)return`Joining · petal ${S.k+1} of ${S.n} · `+(S.u<.28?'GitDiscuss lifts ':S.u<.7?'the petal drifts in ':'GitDiscuss settles on it ');return'Joining · the lily kindles '}
+   if(jt>pe)return'Releasing · the lily dims ';
+   if(S)return`Releasing · petal ${S.k+1} of ${S.n} · `+(S.u>.7?'GitDiscuss lifts off it ':S.u>.28?'the petal floats away ':'GitDiscuss closes on the next ');
+   return jt>.48?'Releasing · the calyx lets go ':'Releasing · the casings part '},
+  about:'The Wedge angle kind in elven, after felt\'s cheese wedge, hollow\'s shell shims and gothic\'s voussoirs. Here the wedge is a water lily: the angle is counted in petals and held by what fills the gap, not by a pivot\'s friction. The casings meet with their squared ends almost touching, and GitDiscuss turns on the inside corner they share: the bottom one when it is lowered (the lily opens upward) and the top one when it is raised (the lily hangs down, like a bell). <b>Near:</b> the knops at that corner glow and a single petal drifts over the gap. <b>Ready:</b> the open lily at the set angle is traced in dashed moonlight, petal by petal. Joining: the casings close, and a silver calyx clasps each corner, a bowed arm from each stem\'s knop meeting at a moonstone heart between two small sepals. Then, for each 15°, GitDiscuss lifts a little past where the petal will end, a petal of moon-white glass (a lancet with a silver rim, a midrib and two veins, warm at its base) drifts in on the night air, swaying, and slides in point first to the heart, and GitDiscuss settles onto it with a soft press and a glint up the petal. Last, the petals kindle from the heart outward and the hearts glow as the join light (moonlight while both widgets run, a cold grey if either is paused), and a glint runs along the petal tips. The clasp on the open side lets go as soon as the lily starts to open. <b>Angle:</b> −45° to +45° in 15° steps, so none to three petals. Drag GitDiscuss\'s nameplate round the heart, use the Angle slider, or focus GitDiscuss\'s nameplate or the lily and press ↑ ↓. Open it and the next petal slides in once there is nearly room for it; close it and the top petal is squeezed out and floats away. It always comes to rest on a whole petal. While it turns, a moonstone tag reads the angle and the petal count. The pair refits vertically to stay on the stage; drag Jarvis\'s nameplate to move it. Shaded, the lily shrinks with the casings and keeps its petals. Nothing moves at rest. <b>Release:</b> tap the lily, or focus it and press Enter. It dims, the petals float away last in, first out (GitDiscuss lifting off each and closing on the next), the calyx lets go and the casings part.',
+  over:c=>drawLily(c)
  }
 };
+/* ---------- Lily petals: moon-white petals wedged into the opening, one per 15° (Wedge) ---------- */
+// The Wedge angle kind in elven. The casings meet at the inside corner, where a silver calyx clasps a moonstone heart. GitDiscuss turns on
+// that corner (the bottom one lowered, the top one raised) and each 15° it opens is filled by one lancet petal of moon-white glass, slid in
+// point first, so the angle is counted in petals and held by what fills the gap: a water lily opening one petal at a time.
+const LY={det:15,n:3,ps:.56,popMs:640,tr:{n:null,pop:null},loop:false,names:['closed','one petal','two petals','three petals'],
+ tint:[['#fbf0cf','#e8edfa','#aab9e2'],['#f7ecd8','#eef0fb','#b6c1e8'],['#f1f0d8','#e3ebf8','#a5b9de']]};
+const lyN=a=>clamp(Math.round(Math.abs(a)/LY.det),0,LY.n);
+// While dragged, the next petal goes in once there is nearly room for it.
+const lyCount=a=>clamp(Math.floor((Math.abs(a)+4)/LY.det),0,LY.n);
+const lySg=a=>a<0?-1:1;
+// The petals go in between ps and .9 of the join, then the lily kindles; with none to put in, it kindles straight after the clasps.
+const lyPe=()=>lyN(model.angle)?.9:.6;
+function lyStep(jt){const n=lyN(model.angle);if(!n||jt<LY.ps||jt>=.9)return null;const x=seg(jt,LY.ps,.9)*n,k=Math.min(n-1,Math.floor(x));return{n,k,u:x-k}}
+// GitDiscuss lifts 5° past the petal's far edge, holds while it drifts in, then settles onto it with a soft press.
+function lyBend(jt){
+ if(jt>=1)return model.angle;const n=lyN(model.angle);if(!n||jt<LY.ps)return 0;if(jt>=.9)return model.angle;
+ const {k,u}=lyStep(jt),a=k*LY.det,b=k===n-1?Math.abs(model.angle):a+LY.det,top=b+5;
+ return lySg(model.angle)*(u<.28?lerp(a,top,ease(u/.28)):u<.7?top:lerp(top,b,back(seg(u,.7,1),1.3)))}
+// Jarvis's y range that keeps both casings, GitDiscuss's crest and pendant (at the angle and 5° past it) and the tag on the stage.
+function lyFit(a,hh){const h=2*hh,s=-3,py=a<0?5:h-5,ys=[-4,h+6,a<0?h+44:-44];
+ for(const t0 of a?[a,a+lySg(a)*5]:[0]){const t=t0*PI/180,ry=(u,v)=>py+u*Math.sin(t)+(v-py)*Math.cos(t);
+  ys.push(ry(s,0),ry(s,h),ry(s+W,0),ry(s+W,h),ry(s+W/2,-17),ry(s+W/2,h+12))}
+ const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn),hi=592-mx;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+const LYH={s:()=>-3,py:(a,hh)=>a<0?5:2*hh-5,det:[-45,-30,-15,0,15,30,45],max:45,snap:15,hang:()=>0,fit:lyFit,
+ name:a=>({num:signed(a),cap:LY.names[lyN(a)],stop:true}),
+ grip:'Open or close the lily on GitDiscuss: drag round the heart, or use the up and down arrows; each petal is 15 degrees',slider:'GitDiscuss angle on the lily, in degrees: one petal per 15',
+ ph:a=>signed(a)+' · '+LY.names[lyN(a)],
+ say:a=>{const n=lyN(a);return n?'GitDiscuss rests at '+signed(a)+' on '+LY.names[n]+(a<0?', the lily hanging from the top corner.':', the lily open above the bottom corner.'):'GitDiscuss rests level and the lily is closed: only the clasps hold it.'}};
+// A petal popping in or squeezed out while GitDiscuss is turned is played out over popMs.
+function lyPop(){if(LY.loop||reduce.matches)return;LY.loop=true;
+ requestAnimationFrame(function st(now){const p=LY.tr.pop;if(!p||J()!==JOINS.lily||model.jt!==1){LY.loop=false;LY.tr.pop=null;render();return}
+  if(now-p.t<LY.popMs){render();requestAnimationFrame(st)}else{LY.tr.pop=null;LY.loop=false;render()}})}
+function lyDefs(Q,R,on){return `<defs>${LY.tint.map((t,i)=>`<radialGradient id="lyG${i}" gradientUnits="userSpaceOnUse" cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(R*1.05)}"><stop stop-color="${t[0]}"/><stop offset=".45" stop-color="${t[1]}"/><stop offset="1" stop-color="${t[2]}"/></radialGradient>`).join('')}`+
+ `<radialGradient id="lyL" gradientUnits="userSpaceOnUse" cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(R)}"><stop stop-color="${on?'#fffbe6':'#eceef2'}" stop-opacity=".95"/><stop offset=".5" stop-color="${on?'#dce6ff':'#c3c7d2'}" stop-opacity=".5"/><stop offset="1" stop-color="${on?'#a8c0ff':'#9aa0b0'}" stop-opacity="0"/></radialGradient>`+
+ `<radialGradient id="lyH"><stop stop-color="${on?'#e6edff':'#d4d6dc'}" stop-opacity=".8"/><stop offset=".4" stop-color="${on?'#a8c0ff':'#9ea3b2'}" stop-opacity=".25"/><stop offset="1" stop-color="#a8c0ff" stop-opacity="0"/></radialGradient></defs>`}
+// A petal's outline: a lancet from apex Q spanning stage angles a0 to a0+span (degrees), length R.
+function lyPetalD(Q,a0,span,R){const O=(d,r)=>({x:Q.x+r*Math.cos(d*PI/180),y:Q.y+r*Math.sin(d*PI/180)}),a1=a0+span,m=a0+span/2;
+ return `M${P(Q)}L${P(O(a0,.68*R))}Q${P(O(a0+span*.04,.93*R))} ${P(O(m,1.04*R))}Q${P(O(a1-span*.04,.93*R))} ${P(O(a1,.68*R))}Z`}
+function lyPetal(Q,a0,span,R,i,k,lit){if(Math.abs(span)<.4)return '';
+ const O=(d,r)=>({x:Q.x+r*Math.cos(d*PI/180),y:Q.y+r*Math.sin(d*PI/180)}),a1=a0+span,m=a0+span/2,d=lyPetalD(Q,a0,span,R);
+ let o=`<path d="${d}" fill="${NIGHT}" opacity=".45" transform="translate(.8 1.8)"/><path d="${d}" fill="none" stroke="${NIGHT}" stroke-width="${f(2.2*k+.6)}" stroke-linejoin="round" opacity=".7"/><path d="${d}" fill="url(#lyG${i%3})" opacity=".95"/><path d="${d}" fill="url(#pearl)" opacity=".13"/>`;
+ if(lit>0)o+=`<path d="${d}" fill="url(#lyL)" opacity="${op(lit)}"/>`;
+ // A midrib and two veins, curving out a little toward the tip.
+ o+=`<path d="M${P(O(m,.08*R))}L${P(O(m,.9*R))}" stroke="#8ea2d2" stroke-width="${f(.7*k+.3)}" stroke-linecap="round"/><path d="M${P(O(a0+span*.3,.2*R))}Q${P(O(a0+span*.28,.56*R))} ${P(O(a0+span*.4,.82*R))}M${P(O(a1-span*.3,.2*R))}Q${P(O(a1-span*.28,.56*R))} ${P(O(a1-span*.4,.82*R))}" fill="none" stroke="#a6b5dc" stroke-width=".5" opacity=".8"/>`;
+ return o+`<path d="${d}" fill="none" stroke="url(#silver)" stroke-width="${f(.8*k+.4)}" stroke-linejoin="round"/>`}
+// A petal off its place: pushed out d along its middle, swayed sideways and turned about its own middle.
+function lyMove(Q,a0,span,R,i,k,lit,d,sway,rot,opc){if(opc<=.01)return '';const m=(a0+span/2)*PI/180,cs=Math.cos(m),sn=Math.sin(m),cx=Q.x+cs*.55*R,cy=Q.y+sn*.55*R;
+ return `<g opacity="${op(Math.min(1,opc))}" transform="translate(${f(cs*d-sn*sway)} ${f(sn*d+cs*sway)}) rotate(${f(rot)} ${f(cx)} ${f(cy)})">${lyPetal(Q,a0,span,R,i,k,lit)}</g>`}
+// While turning: a moonstone tag on the lily's open side reads the angle and the petals.
+function lyTag(x,y,a,opc){const n=lyCount(a),hw=60,font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;let ic='';
+ for(let i=0;i<3;i++){const x0=12-hw+i*7.5;ic+=`<path d="M${f(x0)} 7Q${f(x0-3.4)} 1 ${f(x0)} -7Q${f(x0+3.4)} 1 ${f(x0)} 7Z" fill="${i<n?'#dfe6f8':'none'}" stroke="${i<n?'#6f84bd':'#a3abc4'}" stroke-width=".8"/>`}
+ return `<g opacity="${op(opc)}" pointer-events="none" transform="translate(${f(x)} ${f(y)})"><rect x="-${hw+2}" y="-16" width="${2*hw+4}" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-${hw}" y="-14" width="${2*hw}" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>${ic}`+
+  `<text x="14" y="1" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${signed(a)}</text><text x="14" y="11" text-anchor="middle" ${font} font-size="7.5" letter-spacing="1" fill="#5d6584">${LY.names[n].toUpperCase()}</text></g>`}
+function drawLily(c){
+ const a=model.a,b=model.b,h=c.h,jt=c.jt,k=clamp(h/H,.34,1),now=performance.now(),dir=model.dir;
+ const sg=lySg(model.angle),py=sg<0?5:h-5,Q={x:a.x+W-3,y:a.y+py},Pb={x:b.x+3,y:b.y+py},R=(h-10)*.97,A0=sg>0?-90:90,on=model.a.run&&model.b.run;
+ const th=jt===0?0:lyBend(jt),tr=th*PI/180,co=Math.cos(tr),si=Math.sin(tr);
+ const rotB=p=>({x:Pb.x+(p.x-Pb.x)*co-(p.y-Pb.y)*si,y:Pb.y+(p.x-Pb.x)*si+(p.y-Pb.y)*co});
+ const O=(d,r)=>({x:Q.x+r*Math.cos(d*PI/180),y:Q.y+r*Math.sin(d*PI/180)});
+ let o=lyDefs(Q,R,on);
+ // Petals counted while joined; any other state starts the count afresh, so arriving joined never pops a petal.
+ if(jt<1){LY.tr.n=null;LY.tr.pop=null}
+ // Near: the knops at the pivot corner glow and a petal drifts over the gap. Ready: the open lily traced in moonlight.
+ if(jt===0){const g=c.glow;if(g<=0)return '';const yk=sg<0?16:h-16;
+  for(const p of[{x:a.x+W-11.5,y:a.y+yk},{x:b.x+11.5,y:b.y+yk}])o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(6+8*g)}" fill="url(#halo)" opacity="${op(g)}"/>`;
+  if(g<1)return o+lyMove(Q,A0,sg*LY.det,R,0,k,0,R*(.6-.4*g),sg*clamp((b.x-a.x-W)/2,0,60),-sg*16*(1-g),clamp(g*1.4)*.85);
+  const n=lyN(model.angle);let gd='';for(let i=0;i<n;i++)gd+=lyPetalD(Q,A0+sg*LY.det*i,sg*LY.det,R);
+  if(n)o+=`<path d="${gd}" fill="#e6ecff" fill-opacity=".1" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3" stroke-linejoin="round" opacity=".85"/>`;
+  return o+`<circle cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(4*k+2)}" fill="none" stroke="#dfe8ff" stroke-dasharray="2 2"/>`+star(Q.x,Q.y-sg*(n?R*.5:14),6,.95)}
+ // Phase values: the calyx (cl), the lily kindling (kd).
+ const pe=lyPe(),cl=dir>0?ease(seg(jt,.3,LY.ps-.02)):ease(seg(jt,.48,LY.ps)),kd=ease(seg(jt,pe,1)),lit=kd*(on?.8:.35);
+ // Petals in place, and the one moving: drifting in or floating out while joining, popped in or squeezed out while turned.
+ const S=lyStep(jt),T=LY.tr;let n=0,mv=null,pop=null;
+ if(jt===1){n=lyCount(th);
+  if(T.n!==null&&n!==T.n&&!reduce.matches){T.pop={t:now,dir:Math.sign(n-T.n),i:n>T.n?n-1:T.n-1};setTimeout(lyPop,0)}
+  T.n=n;if(T.pop){const e=(now-T.pop.t)/LY.popMs;if(e<1)pop={...T.pop,e:Math.max(0,e)};else T.pop=null}}
+ else{T.n=null;T.pop=null;if(S){n=S.k+(S.u>=.7?1:0);if(S.u>.2&&S.u<.7)mv=S}else if(jt>=.9)n=lyN(model.angle)}
+ if(kd>0)o+=`<circle cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f((n?R*.75:24*k+8)*(.6+.4*kd))}" fill="url(#lyH)" opacity="${op(kd*(on?.6:.4))}"/>`;
+ // The calyx: at each corner a bowed silver arm from each stem's knop meets at a moonstone heart between two sepals.
+ // The clasp on the open side lets go as soon as the lily starts to open; the one at the pivot holds.
+ let arms='',hearts='';
+ for(const top of[true,false]){const hold=top?(th>0?clamp(1-th/6):1):(th<0?clamp(1+th/6):1),g=cl*hold;if(g<=.01)continue;
+  const yk=top?16:h-16,yc=top?5:h-5,ka={x:a.x+W-11.5,y:a.y+yk},kb=rotB({x:b.x+11.5,y:b.y+yk}),ca={x:a.x+W-7,y:a.y+yc},cb=rotB({x:b.x+7,y:b.y+yc});
+  const C={x:(ca.x+cb.x)/2,y:(ca.y+cb.y)/2},bw=(top?-1:1)*2.5*k,sd=top?-1:1,hk=top===(sg<0)||!lyN(model.angle)?kd:0;
+  arms+=sgArm(ka,C,bw,g,k*.8)+sgArm(kb,C,-bw,g,k*.8)+leaf(C.x-1,C.y+sd,90*sd+38,.48*k*back(seg(g,.5,1),1.4))+leaf(C.x+1,C.y+sd,90*sd-38,.48*k*back(seg(g,.5,1),1.4));
+  const hs=back(seg(g,.4,1),1.5);if(hs<=.01)continue;
+  if(hk>0)hearts+=`<circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f((10+10*hk)*k)}" fill="url(#lyH)" opacity="${op(hk)}"/>`;
+  hearts+=`<circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f((3.4*k+.9)*hs)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".7"/><circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f((2*k+.4)*hs)}" fill="url(#moonstone)"/>`;
+  if(hk>.05)hearts+=star(C.x,C.y,(2.5+3*hk)*k+1,hk*(on?.95:.5),on?'#fff':'#d8dbe2')}
+ o+=arms;
+ // Petals in the gap share it: each is 15°, pressed narrower while GitDiscuss settles or the gap is narrower than they are.
+ const w=n?Math.min(LY.det,Math.abs(th)/n):0;
+ for(let i=0;i<n;i++){if(pop&&pop.dir>0&&i===pop.i){const e=ease(pop.e);o+=lyMove(Q,A0+sg*w*i,sg*w,R,i,k,lit,R*.85*(1-e),0,0,e*2.2);continue}o+=lyPetal(Q,A0+sg*w*i,sg*w,R,i,k,lit)}
+ if(mv){const {k:i,u}=mv,fl=seg(u,.2,.5),sl=ease(seg(u,.46,.7)),sw=Math.sin(fl*2.2*PI)*(1-fl);
+  o+=lyMove(Q,A0+sg*LY.det*i,sg*LY.det,R,i,k,0,R*.85*(1-sl)+R*.9*(1-ease(fl)),16*k*sw,22*sw,seg(u,.2,.32))}
+ if(pop&&pop.dir<0){const e=pop.e,sw=Math.sin(e*2*PI)*e;o+=lyMove(Q,A0+sg*LY.det*pop.i,sg*LY.det,R,pop.i,k,lit*(1-e),R*(.1+1.1*e),14*k*sw,sg*30*e,1-e*e)}
+ o+=hearts;
+ // A glint runs up each petal as GitDiscuss settles on it, then along the petal tips as the lily kindles.
+ if(S&&S.u>.7&&S.u<.94){const gk=seg(S.u,.7,.94),p=O(A0+sg*LY.det*(S.k+.5),R*(.1+.9*gk));o+=star(p.x,p.y,4.5*k+1,Math.sin(PI*gk))}
+ if(dir>0&&jt<1){const gk=seg(jt,pe,1);if(gk>0&&gk<1){const p=n?O(A0+sg*Math.abs(th)*gk,R*1.03):Q;o+=star(p.x,p.y,(n?5:8)*k+1,Math.sin(PI*gk))}}
+ const dop=jt===1?model.dial:dir>0?seg(jt,pe,Math.min(1,pe+.05)):0;
+ if(dop>0)o+=lyTag(Q.x,sg>0?a.y-26:a.y+h+26,jt===1?model.angle:th,dop);
+ // The hit area is the open lily; closed at 0°, it is just the two hearts, so GitDiscuss's nameplate stays free to turn.
+ if(jt===1){const cr=10*k+4,hd=Math.abs(th)>=1?`M${P(Q)}L${P(O(A0,R*1.05))}A${f(R*1.05)} ${f(R*1.05)} 0 0 ${sg>0?1:0} ${P(O(A0+th,R*1.05))}Z`:[5,h-5].map(y=>`M${f(Q.x-cr)} ${f(a.y+y)}a${f(cr)} ${f(cr)} 0 1 0 ${f(2*cr)} 0a${f(cr)} ${f(cr)} 0 1 0 ${f(-2*cr)} 0Z`).join('');
+  o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Water lily: GitDiscuss at ${signed(model.angle)}, ${LY.names[lyN(model.angle)]}. Up and down arrows open or close it a petal; Enter releases the lily and separates the widgets"><title>Tap the lily to release; drag GitDiscuss's nameplate round the heart to open or close it</title><path d="${hd}" fill="transparent"/><circle cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(10*k+4)}" fill="transparent"/><path class="ringfocus" d="${hd}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return o}
 /* ---------- Swan lock drawing ---------- */
 // Jarvis's stem carries a silver swan whose neck is the hasp; GitDiscuss's stem carries a lancet lock plate with an open catch ring
 // facing Jarvis and a slot at its top tip, where a feather is the key. Shapes are drawn facing right at unit scale, then scaled by k.
@@ -1091,6 +1218,8 @@ function forkFit(a,hh){const s=forkS(a,hh),t=a*PI/180,ry=(u,v)=>u*Math.sin(t)+v*
 // Each angled join supplies its own pivot offset, stops, names and stage fit; the fork's are the ones above.
 const FORK={s:forkS,det:DET,hang:hh=>hh>40?156:118,fit:forkFit,name:forkName,say:a=>forkSay(a),ph:a=>{const n=forkName(a);return n.num+(n.cap==='fork'?'':' · '+n.cap)}};
 const AH=()=>J().hooks||FORK;
+// A join may set its own range (max), hard steps it always snaps to (snap) and the pivot's height on the casing (py; the middle by default).
+const amax=()=>AH().max??AMAX,pivY=hh=>AH().py?AH().py(model.angle,hh):hh;
 // Crescent pivot: the pin sits a fixed span off each stem, wide enough for the full ±50° turn, so turning never moves GitDiscuss along.
 // Its stops are moon phases, 15° apart: GitDiscuss raised waxes the moon, lowered wanes it.
 const MDET=[-45,-30,-15,0,15,30,45],MPH={'-45':'waxing crescent','-30':'first quarter','-15':'waxing gibbous','0':'full moon','15':'waning gibbous','30':'last quarter','45':'waning crescent'};
@@ -2965,10 +3094,10 @@ function fern(el){
 function pairBox(){
  const R=model.rise,h=ctx().h,j=J();let x0=Math.min(model.a.x,model.b.x),x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(model.a.y,model.b.y),y1=Math.max(model.a.y,model.b.y)+h;
  const bd=j.angled?j.bend(model.jt)*PI/180:0;
- if(bd){const ox=model.b.x-AH().s(model.angle,h/2),oy=model.b.y+h/2,co=Math.cos(bd),si=Math.sin(bd);
+ if(bd){const ox=model.b.x-AH().s(model.angle,h/2),oy=model.b.y+pivY(h/2),co=Math.cos(bd),si=Math.sin(bd);
   for(const u of[0,W])for(const v of[0,h]){const dx=model.b.x+u-ox,dy=model.b.y+v-oy,x=ox+dx*co-dy*si,y=oy+dx*si+dy*co;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}}
  // The fork's parent branch hangs from the knot below the casings, with its leaves and curl.
- if(j.angled&&model.jt>0){const L=AH().hang(h/2),td=(90+j.bend(model.jt)/2)*PI/180,kx=model.a.x+W+AH().s(model.angle,h/2),ky=model.a.y+h/2,tx=kx+Math.cos(td)*L;
+ if(j.angled&&model.jt>0){const L=AH().hang(h/2),td=(90+j.bend(model.jt)/2)*PI/180,kx=model.a.x+W+AH().s(model.angle,h/2),ky=model.a.y+pivY(h/2),tx=kx+Math.cos(td)*L;
   x0=Math.min(x0,tx-20);x1=Math.max(x1,tx+20);y1=Math.max(y1,ky+Math.sin(td)*L)}
  return{x0:x0-8,x1:x1+8,y0:y0+R-22,y1:y1+R+16};
 }
@@ -3055,7 +3184,7 @@ function joinedPose(fixed='a'){
 /* ---------- Bending the fork ---------- */
 let angAnim=0,dialTok=0,dialTimer=0;
 const branchOn=()=>!!J().angled&&model.jt===1;
-const forkKnot=()=>{const hh=ctx().h/2;return{x:model.a.x+W+AH().s(model.angle,hh),y:model.a.y+hh}};
+const forkKnot=()=>{const hh=ctx().h/2;return{x:model.a.x+W+AH().s(model.angle,hh),y:model.a.y+pivY(hh)}};
 // A raised pair pushed down by the fit gives up that much of its rise, so it settles back to where it stood.
 function refitPair(){if(!branchOn())return;const[lo,hi]=AH().fit(model.angle,ctx().h/2),ny=clamp(model.a.y,lo,hi),d=ny-model.a.y;if(d>0)model.rise=Math.max(0,model.rise-d);model.a.y=model.b.y=ny}
 function pairY(){return branchOn()?AH().fit(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
@@ -3064,19 +3193,22 @@ function dialOff(){clearTimeout(dialTimer);++dialTok;model.dial=0}
 function dialSoon(ms=1500){clearTimeout(dialTimer);dialTimer=setTimeout(()=>{const tok=++dialTok,t0=performance.now();
  (function st(now){if(tok!==dialTok)return;const t=reduce.matches?1:clamp((now-t0)/450);model.dial=1-t;render();if(t<1)requestAnimationFrame(st)})(t0)},ms)}
 function animateAngle(to,ms=700){
- stopRise();to=clamp(to,-AMAX,AMAX);model.angTo=to;dialOn();const from=model.angle,tok=++angAnim,t0=performance.now();
+ stopRise();to=clamp(to,-amax(),amax());model.angTo=to;dialOn();const from=model.angle,tok=++angAnim,t0=performance.now();
  (function step(now){if(tok!==angAnim)return;if(!branchOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
-  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*PI*t)),-AMAX-3,AMAX+3);refitPair();render();
+  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*PI*t)),-amax()-3,amax()+3);
+  // A snapping join never overshoots through level, where its pivot would change corner.
+  if(AH().snap&&t<1){const sd=Math.sign(to||from);if(sd&&Math.sign(model.angle)===-sd)model.angle=0}
+  refitPair();render();
   if(t<1)requestAnimationFrame(step);else{model.angTo=undefined;dialSoon();settleRise(300);if(AH().arrive)AH().arrive(to)}})(t0);
 }
 function stopAngle(){++angAnim;if(model.angTo!==undefined){model.angle=model.angTo;model.angTo=undefined;refitPair()}}
 function forkSay(a){const n=forkName(a);return n.cap==='golden angle'?'The fork settles on the golden angle, 137.5°: the turn between one leaf and the next round a stem.':n.cap==='⅖ turn'?'The fork settles at 144°, two fifths of a turn.':n.cap==='straight bough'?'The bough runs straight.':'The fork rests at '+n.num+'. Branches fork at any angle; growth angles only pull softly.'}
 // Arrow keys step to the next growth angle (or the end of the range); with Shift, by one degree.
 function stepAngle(k,fine){const base=model.angTo??model.angle;let to;
- if(fine)to=clamp(Math.round(base)+k,-AMAX,AMAX);
- else{const c=[-AMAX,...AH().det,AMAX];to=k>0?c.find(d=>d>base+.01):c.slice().reverse().find(d=>d<base-.01);if(to===undefined)return}
+ if(fine&&!AH().snap)to=clamp(Math.round(base)+k,-amax(),amax());
+ else{const c=[-amax(),...AH().det,amax()];to=k>0?c.find(d=>d>base+.01):c.slice().reverse().find(d=>d<base-.01);if(to===undefined)return}
  animateAngle(to);say('GitDiscuss '+(J().hooks?'turns':'bends')+' '+(k>0?'down':'up')+' to '+signed(to)+'. '+AH().say(to))}
-function setForkAngle(v){v=clamp(v,-AMAX,AMAX);const d=AH().det.find(x=>Math.abs(v-x)<DWIN);if(d!==undefined)v=d;
+function setForkAngle(v){v=clamp(v,-amax(),amax());const sn=AH().snap,d=sn?Math.round(v/sn)*sn:AH().det.find(x=>Math.abs(v-x)<DWIN);if(d!==undefined)v=d;
  if(branchOn())animateAngle(v,520);else{stopAngle();model.angle=v;if(J().angled&&model.path&&model.jt>0&&model.dir>0)model.path.j=joinedPose('a');if(model.path&&model.jt>0)setJt(model.jt);render()}}
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
@@ -3149,7 +3281,7 @@ function render(){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   if(small){const[gw,gh]=cDims();el.style.width=gw+'px';el.style.height=gh+'px';growth(el)}
-  if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-AH().s(model.angle,h/2))+'px '+f(h/2)+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
+  if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-AH().s(model.angle,h/2))+'px '+f(pivY(h/2))+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
   {const er=svg.querySelector('.endrim');if(er)er.style.opacity=f(rimOp())}
@@ -3173,7 +3305,7 @@ function render(){
  $('#b .grip').setAttribute('aria-label',branchOn()?(j.hooks?(j.hooks.grip||'Turn GitDiscuss on the crescent pivot: drag round the pin, or use the up and down arrows'):'Bend GitDiscuss at the fork: drag round the knot, or use the up and down arrows'):'Move GitDiscuss');
  $('#angle').setAttribute('aria-label',j.hooks?(j.hooks.slider||'GitDiscuss turn on the crescent pivot, in degrees'):'GitDiscuss tilt at the fork, in degrees');
  $('#angleRow').style.display=j.angled?'':'none';
- if(j.angled){const v=model.angTo??model.angle;$('#angle').value=v;$('#angleOut').textContent=signed(v)}
+ if(j.angled){const v=model.angTo??model.angle,ai=$('#angle');ai.min=-amax();ai.max=amax();ai.step=AH().snap||.5;ai.value=v;$('#angleOut').textContent=signed(v)}
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
  $$('#joinRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.opt===model.join)));
@@ -3266,7 +3398,10 @@ stage.addEventListener('pointermove',e=>{
  // Judged in screen pixels, so a tap on a phone (where the stage is scaled down) isn't taken for a drag.
  if(drag.cx!==undefined)drag.far=Math.max(drag.far,Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy));
  if(drag.bend){const K=forkKnot(),a=Math.atan2(p.y-K.y,p.x-K.x);let dd=(a-drag.prev)*180/PI;dd=((dd+540)%360)-180;drag.prev=a;
-  drag.raw=clamp(drag.raw+dd,-AMAX,AMAX);if(Math.abs(drag.raw-drag.th0)>1)drag.moved=true;model.angle=magnet(drag.raw);refitPair();if(AH().cross)AH().cross(model.angle);render();return}
+  drag.raw=clamp(drag.raw+dd,-amax(),amax());if(Math.abs(drag.raw-drag.th0)>1)drag.moved=true;model.angle=magnet(drag.raw);refitPair();
+  // A pivot that changes corner with the angle's sign (the lily) is measured afresh, so the turn doesn't jump as it crosses level.
+  if(AH().py){const K2=forkKnot();drag.prev=Math.atan2(p.y-K2.y,p.x-K2.x)}
+  if(AH().cross)AH().cross(model.angle);render();return}
  if(drag.lift){const j=J(),up=drag.start.y-p.y;drag.moved=Math.max(drag.moved,Math.hypot(p.x-drag.start.x,up));
   // The runic seal slides either way along the seam, one rune step to break; the brooch only lifts.
   if(j.slide){if(Math.abs(up)>1)model.sdir=up>0?-1:1;model.lift=clamp(Math.abs(up)/30)}else model.lift=clamp(up/40);
@@ -3296,7 +3431,7 @@ stage.addEventListener('pointermove',e=>{
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.bend){if(!d.moved){dialSoon(600);render();if(shTapOn())shTap('b');else if(AH().tap)AH().tap();else say(J().txt.joined);return}
-  const dn=AH().det.find(x=>Math.abs(model.angle-x)<DWIN);
+  const sn=AH().snap,dn=sn?Math.round(model.angle/sn)*sn:AH().det.find(x=>Math.abs(model.angle-x)<DWIN);
   if(dn!==undefined)animateAngle(dn,380);else{model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon();settleRise(300)}
   say(AH().say(dn??model.angle));return}
  if(d.lift){if(model.lift>=.5||d.moved<5){doSeparate();return}
