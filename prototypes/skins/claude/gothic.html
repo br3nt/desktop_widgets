@@ -273,7 +273,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the voussoirs, drag the stones or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one stone, and the keystone's gilded boss releases. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the voussoirs, drag the stones or GitDiscuss's nameplate, or focus either and use the arrow keys; each 15° is one stone, and the keystone's gilded boss releases. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. On the windlass, drag up on the wheel to lift its pawl and let GitDiscuss roll back, or tap the wheel. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -1850,6 +1850,110 @@ const JOINS={
   move(d,p){const a=Math.atan2(p.y-d.K.y,p.x-d.K.x);let da=(a-d.prev)*180/Math.PI;da=((da+540)%360)-180;d.prev=a;
    if(Math.hypot(p.x-d.K.x,p.y-d.K.y)>5)d.acc=clamp(d.acc+da,-720,30);
    if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;d.amt=clamp(-d.acc/720);if(d.moved)setJt(1-(.06+.26*d.amt))},
+  letGo:d=>!d.moved||d.amt>.5
+ },
+ /* Windlass: an oak wheel on Jarvis's end pier casts a hook across, catches GitDiscuss's ring and hauls it in, heave by heave (Reel). */
+ windlass:{label:'Windlass',kind:'Reel',gap:26,ms:2.7,sepMs:3000,
+  say:{join:'The pawl lifts and the windlass casts its hook across the gap into GitDiscuss\'s ring; then three heaves of the wheel haul GitDiscuss in, the pawl drops with a knock and the wheel\'s glass kindles.',
+   joined:'Joined: GitDiscuss is hauled up close on a taut rope, the pawl holds the wheel, and the wheel window glows. Drag either nameplate to move the pair. Lift the pawl (drag up on the wheel) to release.',
+   sep:'The pawl is lifted, the wheel runs free and GitDiscuss rolls back; the hook is shaken off the ring and wound home.',
+   hold:'Held mid-join: the hook is in the ring and the wheel is being heaved. Use the scrubber to step through the animation.',
+   ready:'Ready: the taut rope and the hook in the ring are chalked in. Release to cast.',near:'Nearby: the wheel rocks on its pawl and the hook sways. Move closer.',readyPh:'Ready · the rope is marked out',nearPh:'Nearby · the hook sways on its rope',
+   back:'The pawl drops back into the teeth; still hauled in.'},
+  phase:(jt,dir)=>dir>0?(jt<.08?'Joining · the pawl lifts ':jt<.3?'Joining · the hook is cast ':jt<.8?(k=>k%1<.75?'Joining · hauling in, heave '+(1+Math.floor(k))+' of 3 ':'Joining · hauling in, '+(1+Math.floor(k))+' of 3 heaves done ')(Math.min(2.999,seg(jt,.33,.8)*3)):jt<.86?'Joining · the pawl drops ':'Joining · the wheel window lights '):(jt>.9?'Releasing · the pawl is lifted ':jt>.5?'Releasing · the wheel runs free ':jt>.4?'Releasing · the hook is shaken off ':jt>.1?'Releasing · the hook is wound home ':'Releasing · the pawl drops '),
+  dragPh:d=>'Lifting the pawl · '+Math.round(100*(d.amt||0))+'%',
+  about:'Up in the roofs of the great churches the builders left their hoists: the wheels at Salisbury, Canterbury and Beverley that hauled every stone up to the vault. Here a windlass of that kind hauls GitDiscuss in, and its wheel is also a wheel window: an oak rim with an iron tyre, eight spokes, and between them eight panes of ruby and blue glass, each with a stone roundel at its head, round a gilded hub. It stands on an iron bracket on Jarvis\'s end pier. A pawl drops onto the ratchet teeth round its tyre, and a forged hook hangs on its rope below. GitDiscuss\'s end pier carries an iron ring on a plate. (Drop Jarvis onto GitDiscuss instead and the windlass hauls itself along the rope.) <b>Near:</b> the wheel rocks against its pawl, the hook sways and the iron warms. <b>Ready:</b> the taut rope and the hook in the ring are chalked across the gap. Joining: the pawl lifts and the wheel runs back as the hook is cast across in an arc, paying out rope behind it. The hook drops into GitDiscuss\'s ring with a spark and the slack is taken up. Then come three heaves. Each one turns the wheel half a turn, the pawl clicking over the teeth, and drags GitDiscuss a third of the way in with grit at its foot. Between heaves it stands still: stone moves only when it is hauled. The rope pulls the ring round toward the wheel. Last, the pawl drops into the teeth with a knock, and the panes kindle one by one round the wheel: amber and ruby while both widgets run, cold blue if either is paused. That is the join light. The windlass scales down with the wall in any shade. <b>Release:</b> lift the pawl by dragging up on the wheel (let go before halfway and it drops back), or tap the wheel, or focus it and press Enter. The light goes out, the wheel runs free and GitDiscuss rolls back, slowing. The hook is shaken off the ring and wound home to hang, and the pawl drops.',
+  geo(h){const u=clamp((h-HS)/(H-HS));return{u,s:lerp(.5,1,u),cx:365,cy:lerp(h/2+2,58,u)}},
+  // Three heaves of half a turn each; between heaves nothing moves.
+  heave(u){let e=0;for(let i=0;i<3;i++)e+=ease(seg(u,i/3,i/3+.25))/3;return e},
+  // Engine hook: how far the pair has closed at jt. Joining, it waits for the hook and then comes in heave by heave; released, it rolls back free and slows.
+  close(t){if(model.dir>0)return this.heave(seg(t,.33,.8));const r=seg(1-t,.1,.5);return(1-r)*(1-r)},
+  st(c){const jt=c.jt;
+   // sag is the rope's slack; ex is the little it always has off the ring.
+   if(jt===0)return{rot:0,held:0,click:0,cast:0,taut:0,sag:0,ex:1.5,lit:0,un:0,back:0,fwd:1};
+   if(model.dir>0){const cast=seg(jt,.08,.3),hu=seg(jt,.33,.8),h=this.heave(hu),rot=-180*ease(cast)+540*h;
+    return{rot,held:seg(jt,.02,.08)*(1-seg(jt,.3,.34)),click:hu>0&&hu<1?((rot%22.5)+22.5)%22.5/22.5:0,cast,taut:seg(jt,.3,.36),sag:cast<1?9*Math.sin(Math.PI*cast)+3*cast:4.5*(1-seg(jt,.3,.36)),ex:cast<1?1.5:0,lit:seg(jt,.86,1),hu,knock:seg(jt,.8,.86),catchK:seg(jt,.3,.37),un:0,back:0,fwd:1}}
+   const q=1-jt,e=this.close(jt),un=seg(q,.5,.6);
+   return{rot:360-180*(1-e)+180*ease(seg(q,.6,.9)),held:seg(q,0,.1)*(1-seg(q,.9,.97)),click:0,cast:1,taut:(1-.7*seg(q,.12,.35))*(1-seg(q,.5,.56)),sag:10*seg(q,.12,.35)*(1-ease(un)),ex:1.5*un,lit:1-seg(q,0,.08),un,back:seg(q,.6,.9),settle:seg(q,.9,1),drop:seg(q,.9,.97),fwd:0}},
+  // The forged hook, with its seat (where the ring rides) at 0,0 and its eye up and to the left.
+  EYE:[-3,-11.8],
+  hook(x,y,phi,s,o=''){return`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(phi)}) scale(${f(s*1000)/1000})" ${o}><path d="M-3 -10.2V0A3 3 0 0 0 3 0V-2.6L4.7 -1.1" fill="none" stroke="#1b1612" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M-3 -10.2V0A3 3 0 0 0 3 0V-2.6L4.7 -1.1" fill="none" stroke="#4a423a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M-3.4 -8.6V-.4" stroke="#a0958a" stroke-width=".4" opacity=".7"/><circle cx="-3" cy="-11.8" r="1.6" fill="none" stroke="#1b1612" stroke-width="1.2"/></g>`},
+  // The wheel window: panes, roundels, spokes, rim and toothed tyre, turned by rot.
+  wheel(rot,lit,cold,col){const P=(r,a)=>{a*=Math.PI/180;return f(r*Math.cos(a))+' '+f(r*Math.sin(a))},DK=[30,22,30],GL=cold?[[160,184,255],[92,124,226]]:[[214,62,72],[72,108,218]];
+   let s=`<g transform="rotate(${f(rot*10)/10})">`;
+   for(let i=0;i<8;i++){const a0=i*45+5.5,a1=(i+1)*45-5.5,li=seg(lit,i*.07,i*.07+.45);
+    s+=`<path d="M${P(5,a0)}L${P(15.4,a0)}A15.4 15.4 0 0 1 ${P(15.4,a1)}L${P(5,a1)}A5 5 0 0 0 ${P(5,a0)}Z" fill="${mixc(DK,GL[i%2],.18+.8*li)}"/>`}
+   if(lit>0)s+=`<circle r="15" fill="${col}" opacity="${f(.4*lit)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`;
+   s+=`<g fill="none" stroke="#2a1f15" stroke-width=".8">${Array.from({length:8},(_,i)=>{const[x,y]=P(11.8,i*45+22.5).split(' ');return`<circle cx="${x}" cy="${y}" r="2.3"/>`}).join('')}</g>`+
+    `<g stroke="#5c3d22" stroke-width="2.3">${Array.from({length:8},(_,i)=>`<path d="M${P(3.4,i*45)}L${P(16.2,i*45)}"/>`).join('')}</g>`+
+    `<g stroke="#a57a4a" stroke-width=".45" opacity=".75">${Array.from({length:8},(_,i)=>`<path d="M${P(4,i*45-1.5)}L${P(16,i*45-.8)}"/>`).join('')}</g>`+
+    `<circle r="16.6" fill="none" stroke="#5c3d22" stroke-width="2.7"/><circle r="17.4" fill="none" stroke="#a57a4a" stroke-width=".4" opacity=".6"/>`+
+    `<path d="${Array.from({length:16},(_,k)=>`M${P(18.6,k*22.5)}L${P(20.5,k*22.5)}L${P(18.6,k*22.5+15)}Z`).join('')}" fill="#2b2622" stroke="#0d0a08" stroke-width=".35"/>`+
+    `<circle r="18.4" fill="none" stroke="#2b2622" stroke-width="1.4"/><g fill="#8d8378">${Array.from({length:8},(_,i)=>`<circle cx="${P(18.4,i*45).split(' ')[0]}" cy="${P(18.4,i*45).split(' ')[1]}" r=".5"/>`).join('')}</g>`+
+    `<circle r="3.6" fill="url(#gild)" stroke="#3b2a12" stroke-width=".5"/><circle r="1.3" fill="#3b2a12"/></g>`;
+   return s},
+  over(c){
+   const g=this.geo(c.h),r=this.st(c),jt=c.jt,s=g.s,A=model.a,B=model.b,wl=A.run&&B.run,col=wl?'#ffc861':'#9fb8ff',dust=JOINS.buttress.dust,sc=f(s*1000)/1000;
+   const ax=A.x+g.cx,ay=A.y+g.cy,U=(x,y)=>[ax+x*s,ay+y*s],TA=`translate(${f(ax)} ${f(ay)}) scale(${sc})`,iron='fill="#2b2622" stroke="#0d0a08" stroke-width=".6"';
+   const warm=c.glow*(1-seg(jt,.05,.2));
+   // Near: the wheel rocks against its pawl and the hook sways; kept moving while the drag holds still.
+   let rock=0,sway=0;
+   if(jt===0&&c.glow>0&&drag&&!drag.hit){const t=performance.now()/1000,k=c.glow*(c.glow>=1?.5:1);
+    if(reduce.matches){rock=3*c.glow;sway=5*c.glow}else{rock=5*k*Math.sin(t*2.2);sway=9*k*Math.sin(t*2.6+.6)}
+    if(!this.raf&&!reduce.matches)this.raf=requestAnimationFrame(()=>{this.raf=0;if(drag&&model.join==='windlass'&&model.jt===0&&model.glow>0)render()})}
+   // Where the rope leaves the drum, where the hook hangs at rest, and GitDiscuss's ring.
+   const S0=U(5,6),Rs=U(5,31),Pn=[B.x+14,B.y+g.cy+2*s];
+   // The ring hangs from its pin and is pulled round toward the drum as the rope takes up; the hook's bowl rides its far wire.
+   const ringAt=(t,px=Pn[0],py=Pn[1])=>{const ex=S0[0]-px,ey=S0[1]-py,el=Math.hypot(ex,ey)||1;let vx=lerp(0,ex/el,t),vy=lerp(1,ey/el,t);const n=Math.hypot(vx,vy)||1;vx/=n;vy/=n;
+    const w=[px+8.4*s*vx,py+8.4*s*vy],ux=S0[0]-w[0],uy=S0[1]-w[1],ul=Math.hypot(ux,uy)||1;return{c:[px+5*s*vx,py+5*s*vy],seat:[w[0]+3*s*ux/ul,w[1]+3*s*uy/ul]}};
+   const RG=ringAt(r.taut);
+   // The hook's seat: at rest, flying across, in the ring, shaken off, or flying home.
+   const arc=(a,b,u,hh)=>[lerp(a[0],b[0],u),lerp(a[1],b[1],u)-hh*4*u*(1-u)];
+   let Hk=Rs,sw=sway,onRing=false;
+   if(r.fwd){if(r.cast>0&&r.cast<1){const T=ringAt(0).seat,u=ease(r.cast)*.6+r.cast*.4;Hk=arc(Rs,T,u,(26+.1*Math.hypot(T[0]-Rs[0],T[1]-Rs[1]))*s)}else if(r.cast>=1){Hk=RG.seat;onRing=true}}
+   else if(r.un<=0){Hk=RG.seat;onRing=true}
+   else{const L=[RG.seat[0]-4*s,RG.seat[1]-8*s],off=[lerp(RG.seat[0],L[0],ease(r.un)),lerp(RG.seat[1],L[1],ease(r.un))];
+    Hk=r.back>0?arc(L,Rs,ease(r.back),16*s):off;sw=r.settle>0?14*Math.sin(r.settle*Math.PI*3)*(1-r.settle):r.back>0&&r.back<1?-20*Math.sin(Math.PI*r.back):0}
+   // The hook hangs from its eye on the rope, so any sway turns the bowl about the eye.
+   const a0=Math.atan2(this.EYE[1],this.EYE[0]),rotP=(p,d)=>{const t=d*Math.PI/180;return[p[0]*Math.cos(t)-p[1]*Math.sin(t),p[0]*Math.sin(t)+p[1]*Math.cos(t)]};
+   const phi0=(Math.atan2(S0[1]-Hk[1],S0[0]-Hk[0])-a0)*180/Math.PI,e0=rotP(this.EYE,phi0),E=[Hk[0]+s*e0[0],Hk[1]+s*e0[1]],bk=rotP([-s*e0[0],-s*e0[1]],sw);
+   const Hs=[E[0]+bk[0],E[1]+bk[1]],phi=phi0+sw;
+   const sag=r.sag+r.ex,mx=(S0[0]+E[0])/2,my=(S0[1]+E[1])/2+sag*s;
+   const rope=sag>0?`M${f(S0[0])} ${f(S0[1])}Q${f(mx)} ${f(my)} ${f(E[0])} ${f(E[1])}`:`M${f(S0[0])} ${f(S0[1])}L${f(E[0])} ${f(E[1])}`;
+   let o='';
+   if(r.lit>0)o+=`<ellipse cx="${f(ax)}" cy="${f(ay)}" rx="${f(30*s)}" ry="${f(30*s)}" fill="${col}" opacity="${f(.2*r.lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+   // GitDiscuss's ring plate and ring
+   o+=`<g transform="translate(${f(Pn[0])} ${f(Pn[1])}) scale(${sc})"><path d="M0 -6L4.6 0L0 6L-4.6 0Z" fill="#000" opacity=".4" transform="translate(1 1.4)"/><path d="M0 -6L4.6 0L0 6L-4.6 0Z" ${iron}/><path d="M-3.8 -.4L0 -5.2L3.8 -.4" fill="none" stroke="#7d7266" stroke-width=".45" opacity=".7"/><circle r="1.5" fill="#8d8378" stroke="#0d0a08" stroke-width=".4"/>${warm>0?`<path d="M0 -6L4.6 0L0 6L-4.6 0Z" fill="none" stroke="#ffd98a" stroke-width=".9" opacity="${f(.8*warm)}"/>`:''}</g>`;
+   o+=`<circle cx="${f(RG.c[0])}" cy="${f(RG.c[1])}" r="${f(3.4*s)}" fill="none" stroke="#1b1612" stroke-width="${f(1.9*s)}"/><circle cx="${f(RG.c[0])}" cy="${f(RG.c[1])}" r="${f(3.4*s)}" fill="none" stroke="#5a5048" stroke-width="${f(.9*s)}"/>`;
+   // The bracket and pawl plate on the pier, behind the rope and wheel
+   o+=`<g transform="${TA}"><path d="M-3.4 -27.4H4.4V25.6H-3.4Z" fill="#000" opacity=".4"/><path d="M-4.2 -28.4H3.6V24.6H-4.2ZM-12.6 -28.2H-4V-23.6H-12.6Z" ${iron}/><path d="M-3.4 -27.6V23.8" stroke="#7d7266" stroke-width=".45" opacity=".7"/><g fill="#8d8378"><circle cx="-.3" cy="-24.6" r=".8"/><circle cx="-.3" cy="21.2" r=".8"/></g></g>`;
+   // The rope (laid hemp: a dark core twisted with pale strands) and its shadow, then the wheel over it
+   o+=`<path d="${rope}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="${f(2.2*s)}" stroke-linecap="round" transform="translate(${f(1.4*s)} ${f(3*s)})"/><path d="${rope}" fill="none" stroke="#3a2a17" stroke-width="${f(2.4*s)}" stroke-linecap="round"/><path d="${rope}" fill="none" stroke="#b08a52" stroke-width="${f(1.1*s)}" stroke-dasharray="${f(1.3*s)} ${f(1.1*s)}"/>`;
+   // The hook and its shadow go under the wheel, so at rest it hangs from the drum behind it; once caught it is out at the ring.
+   const lift=onRing?0:r.fwd?(r.cast>0&&r.cast<1?Math.sin(Math.PI*r.cast):0):r.back>0?Math.sin(Math.PI*r.back)*.6:0;
+   o+=this.hook(Hs[0]+(1.2+8*lift)*s,Hs[1]+(2+12*lift)*s,phi,s,`opacity="${f(.3*(1-.5*lift))}"`).replace(/stroke="#[0-9a-f]+"/g,'stroke="#000"')+this.hook(Hs[0],Hs[1],phi,s);
+   o+=`<g transform="${TA}"><circle r="20.5" fill="#000" opacity=".35" transform="translate(1.4 2)"/>${this.wheel(r.rot+rock,r.lit,!wl,col)}`;
+   if(warm>0)o+=`<circle r="18.4" fill="none" stroke="#ffd98a" stroke-width="1" opacity="${f(.7*warm)}"/>`;
+   // The pawl rides the teeth while the wheel is heaved, lifts to let it run, and drops with a knock.
+   const pa=-(30*r.held+9*r.click)+(r.knock>0&&r.knock<1?-6*Math.sin(Math.PI*seg(r.knock,0,.5)):0);
+   o+=`<g transform="translate(-9.6 -25.9) rotate(${f(pa)})"><path d="M0 -1.6C3 -1.9 5.8 1 7 5.4L5.6 6.6C4.2 3.2 2.6 1.5 0 1.6Z" ${iron}/><path d="M.4 -1C3 -1.2 5 .8 6.2 4" fill="none" stroke="#8d8378" stroke-width=".4"/><circle r="1.6" fill="url(#gild)" stroke="#3b2a12" stroke-width=".4"/></g></g>`;
+   if(r.lit>0)o+=`<circle cx="${f(RG.c[0])}" cy="${f(RG.c[1])}" r="${f(5*s)}" fill="${col}" opacity="${f(.3*r.lit)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`;
+   // Sparks and grit: the hook catching, each heave dragging the moving widget, and the pawl's knock.
+   if(r.fwd&&jt>0){if(r.catchK>0&&r.catchK<1){const gl=Math.sin(Math.PI*r.catchK);o+=`<g opacity="${f(gl)}">${sparkle(RG.seat[0],RG.seat[1],5*s*gl)}</g>`+dust(RG.c[0],RG.c[1],r.catchK,3,6*s,81)}
+    const p=model.path,am=p&&p.s.a.x!==p.j.a.x&&p.s.b.x===p.j.b.x,fx=am?A.x+W-40:B.x+40,fy=(am?A.y:B.y)+c.h;
+    for(let i=0;i<3;i++){const k=seg(r.hu,i/3,i/3+.25);if(k>0&&k<1)o+=dust(fx,fy-2,k,4,10*s,90+i*7,am?-1:1)}
+    if(r.knock>0&&r.knock<1){const[tx,ty]=U(-3.4,-19.6),gl=Math.sin(Math.PI*r.knock);o+=dust(tx,ty,r.knock,4,6*s,97)+`<g opacity="${f(gl)}">${sparkle(tx,ty,5*s*gl)}</g>`}
+    const lg=seg(jt,.88,.98);if(lg>0&&lg<1){const gl=Math.sin(Math.PI*lg);o+=`<g opacity="${f(gl)}">${sparkle(ax-1.4*s,ay-1.4*s,6*s*gl)}</g>`}}
+   if(!r.fwd&&r.drop>0&&r.drop<1){const[tx,ty]=U(-3.4,-19.6);o+=dust(tx,ty,r.drop,3,5*s,99)}
+   // Ready: the taut rope and the hook in the ring, chalked in where they will be once hauled.
+   const gh=jt===0?seg(c.glow,.8,1)*.85:r.fwd?.7*(1-seg(jt,.08,.3)):0;
+   if(gh>0){const Gr=ringAt(1,A.x+W+this.gap+14,ay+2*s),gp=(Math.atan2(S0[1]-Gr.seat[1],S0[0]-Gr.seat[0])-a0)*180/Math.PI,ge=rotP(this.EYE,gp),GE=[Gr.seat[0]+s*ge[0],Gr.seat[1]+s*ge[1]],ch=`fill="none" stroke="#f3d48a" stroke-width="${f(.9)}" stroke-dasharray="${f(3)} ${f(2.4)}"`;
+    o+=`<g opacity="${f(gh)}"><path d="M${f(S0[0])} ${f(S0[1])}L${f(GE[0])} ${f(GE[1])}" ${ch}/><circle cx="${f(Gr.c[0])}" cy="${f(Gr.c[1])}" r="${f(3.4*s)}" ${ch}/><g transform="translate(${f(Gr.seat[0])} ${f(Gr.seat[1])}) rotate(${f(gp)}) scale(${sc})"><path d="M-3 -10.2V0A3 3 0 0 0 3 0V-2.6L4.7 -1.1M-1.4 -11.8A1.6 1.6 0 1 0 -4.6 -11.8A1.6 1.6 0 1 0 -1.4 -11.8" fill="none" stroke="#f3d48a" stroke-width="${f(.9/s)}" stroke-dasharray="${f(2/s)} ${f(1.6/s)}"/></g></g>`}
+   if(jt===1)o+=`<g transform="${TA}"><g class="hit" id="windHit" tabindex="0" role="button" aria-label="Windlass: lift the pawl (drag up), or press Enter, to separate the widgets" style="cursor:ns-resize"><title>Drag up on the wheel to lift the pawl and let GitDiscuss go</title><rect x="-24" y="-31" width="48" height="56" fill="transparent"/><rect class="ringfocus" x="-26" y="-33" width="52" height="60" rx="3" fill="none" stroke="#f0cf7a" stroke-width="${f(1.5/s)}"/></g></g>`;
+   return o},
+  // Lifting the pawl: drag up on the wheel; past halfway it lets go. A tap releases outright.
+  grab(p){return{x0:p.x,y0:p.y,amt:0,moved:false}},
+  move(d,p){const s=this.geo(ctx().h).s;if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;d.amt=clamp((d.y0-p.y)/(26*s));if(d.moved)setJt(1-.1*d.amt)},
   letGo:d=>!d.moved||d.amt>.5
  },
  /* Voussoirs: the wedge between the facades is built of 15° arch stones, hauled in on a lewis and struck home (Wedge). */
@@ -3639,7 +3743,8 @@ function joinedPose(fixed='a'){
 const pairY=()=>AJ()&&model.jt===1?angRange(model.angle,lowH()):[TOP,600-lowH()-14];
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
- model.jt=t;const p=model.path;if(!p)return;const e=ease(seg(t,0,.4));
+ // A join may set its own closing profile (the windlass hauls in heave by heave); the rest close over the first 40%.
+ model.jt=t;const p=model.path;if(!p)return;const e=J().close?J().close(t):ease(seg(t,0,.4));
  for(const id of ['a','b']){model[id].x=lerp(p.s[id].x,p.j[id].x,e);model[id].y=lerp(p.s[id].y,p.j[id].y,e)}
 }
 function startJoinFrom(th,lit){model.dir=1;model.th0=th;model.lit0=lit}
