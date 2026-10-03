@@ -265,7 +265,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -1657,6 +1657,96 @@ const JOINS={
   move(d,p){const a=Math.atan2(p.y-d.cy,p.x-d.cx);let da=(a-d.prev)*180/Math.PI;da=((da+540)%360)-180;d.prev=a;
    d.deg=clamp(d.deg+da,-this.max-d.th0,this.max-d.th0);if(Math.abs(d.deg)>1.5)d.moved=true;model.angle=magnet(d.th0+d.deg)},
   key(e,hit){if(hit.id!=='strapHit')return false;const k={ArrowRight:1,ArrowDown:1,ArrowLeft:-1,ArrowUp:-1}[e.key];if(!k)return false;e.preventDefault();stepDial(k);return true}
+ },
+ bats:{label:'Bats',kind:'Swarm',gap:28,ms:2.3,sepMs:2600,ORD:[1,0,2],SIDE:[-1,1,-1],
+  say:{join:'The facades close to a finger\'s width. Bats flit in out of the dusk one after another, swoop up under the seam, flip head down and hook their thumbs into the stone either side; then light kindles behind their wings like glass between leads.',
+   joined:'Joined: three bats hang head down across the seam, their wings spread like tracery and lit like glass. Drag either nameplate to move the pair. Tap the bats, or wave across them, to release.',
+   sep:'The light behind the wings goes out; the bats let go, drop, flip and flit away into the dusk, and the facades part.',
+   hold:'Held mid-join: bats in flight, one already hanging. Use the scrubber to step through the animation.',
+   ready:'Ready: the hanging bats are chalked across the seam. Release to call them in.',near:'Nearby: bats stir in the dusk round the gap. Move closer.',readyPh:'Ready · the bats are marked out',nearPh:'Nearby · bats stir in the dusk',
+   back:'The bats settle again; still joined.'},
+  phase:(jt,dir)=>dir>0?(jt<.3?'Joining · closing in ':jt<.84?'Joining · bats flit in and hook on ':'Joining · light behind the wings '):(jt>.9?'Releasing · the light goes out ':jt>.34?'Releasing · the bats drop and flit away ':'Releasing · parting '),
+  dragPh:()=>'Shooing the bats',
+  about:'Nothing is fixed to either facade: the bats of the tower come down at dusk and hang in the joint. A bat\'s wing is skin stretched between long finger bones, which is close to what a traceried window is: thin dark bars with panes between. So here the bones are the leads, and the skin is the glass. <b>Near:</b> two bats flit out of the dusk and loop up and down over the gap while you hold the facades close. <b>Ready:</b> three hanging bats are chalked across the seam. Joining: the facades close to a finger\'s width. Then three bats come in one after another from high on either side, in the jinking flight bats have, wings beating. Each one swoops low past its place, rises under the seam, flips over head down and hooks the claw on each wrist into the stone of both end piers with a little grit. It mantles its wings once and spreads them flat. The middle bat lands first and is the largest; the other two hang tilted a little above and below. When all three hang, light kindles in their wings, pane by pane and bat by bat: amber and ruby while both widgets run, cold blue if either is paused, and their eyes catch it. The wings stay inside the end piers, clear of the windows, the nameplates and the buttons. Nothing moves at rest. In a shade only the middle bat fits; the others fly off as the strip narrows and come back when it opens. <b>Release:</b> tap the bats, wave across them (a short drag), or focus them and press Enter. The light goes out, and one after another they let go, drop, flip head up and flit away into the dusk, and then the facades part.',
+  // One wing, the right, in a bat's own units: shoulder, wrist (with its thumb claw) and three finger tips, and where the skin meets the body.
+  WG:{sh:[2.2,-3],wr:[23,-9.5],F:[[36,-1.5],[27,8.5],[15,10.5]],root:[2.6,7]},
+  wingPaths(){if(this._wp)return this._wp;const{sh,wr,F,root}=this.WG,pt=p=>f(p[0])+' '+f(p[1]),
+    sc=(a,b)=>{const m=[(a[0]+b[0])/2,(a[1]+b[1])/2];return[m[0]+(wr[0]-m[0])*.3,m[1]+(wr[1]-m[1])*.3]};
+   return this._wp={out:`M${pt(sh)}L${pt(wr)}L${pt(F[0])}Q${pt(sc(F[0],F[1]))} ${pt(F[1])}Q${pt(sc(F[1],F[2]))} ${pt(F[2])}Q${pt(sc(F[2],root))} ${pt(root)}Z`,
+    pan:[`M${pt(wr)}L${pt(F[0])}Q${pt(sc(F[0],F[1]))} ${pt(F[1])}Z`,`M${pt(wr)}L${pt(F[1])}Q${pt(sc(F[1],F[2]))} ${pt(F[2])}Z`,`M${pt(wr)}L${pt(F[2])}Q${pt(sc(F[2],root))} ${pt(root)}L${pt(sh)}Z`],
+    bones:`M${pt(wr)}L${pt(F[0])}M${pt(wr)}L${pt(F[1])}M${pt(wr)}L${pt(F[2])}`,arm:`M${pt(sh)}L${pt(wr)}`,edge:`M${pt(sh)}L${pt(wr)}L${pt(F[0])}`,
+    claw:`M${pt(wr)}q-.4 -2.4 -2.4 -3.1q1.2 1.2 1.1 2.6`}},
+  // A bat seen face on, head down, its body centred on 0,0. sp spreads the wings (1 = flat), fl turns them about the shoulder (a wing beat), lit kindles the skin.
+  BODY:'M0 -7.6C2.6 -7.6 3.6 -3.4 3.4 .6C3.2 4.4 2.2 6.4 0 6.6C-2.2 6.4 -3.2 4.4 -3.4 .6C-3.6 -3.4 -2.6 -7.6 0 -7.6Z',
+  HEAD:'M0 5.4C2.1 5.4 3.1 7 3 8.8L3.6 14.2L1.4 11.2Q0 12.4 -1.4 11.2L-3.6 14.2L-3 8.8C-3.1 7 -2.1 5.4 0 5.4Z',
+  bat(x,y,rot,o){const P=this.wingPaths(),sc=o.sc||1,sp=clamp(o.sp??1,.2,1.12),fl=o.fl||0,lit=o.lit||0,op=o.op??1,[sx,sy]=this.WG.sh;
+   const wing=`translate(${sx} ${sy}) rotate(${f(fl)}) scale(${f(sp*100)/100} 1) translate(${-sx} ${-sy})`,both=g=>`<g transform="${wing}">${g}</g><g transform="scale(-1 1)"><g transform="${wing}">${g}</g></g>`;
+   const tf=`translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${f(sc*100)/100})`;
+   if(o.shadow)return`<g transform="${tf}" opacity="${f(op)}">${both(`<path d="${P.out}"/>`)}<path d="${this.BODY}"/><path d="${this.HEAD}"/></g>`;
+   if(o.ghost)return`<g transform="${tf}" opacity="${f(op)}" fill="#f3d48a" fill-opacity=".07" stroke="#f3d48a" stroke-width="${f(.9/sc)}" stroke-dasharray="${f(2.4/sc)} ${f(1.8/sc)}">${both(`<path d="${P.out}"/>`)}<path d="${this.BODY}"/><path d="${this.HEAD}"/></g>`;
+   const cold=!(model.a.run&&model.b.run),LIT=cold?[[169,193,255],[85,119,224],[207,220,255]]:[[255,190,92],[210,60,70],[255,217,138]],DK=[43,31,39];
+   const pans=P.pan.map((d,i)=>`<path d="${d}" fill="${mixc(DK,LIT[i],lit*.9)}"/>`).join('');
+   return`<g transform="${tf}" opacity="${f(op)}">`+
+    both(`${pans}<path d="${P.out}" fill="none" stroke="#120c10" stroke-width=".8" stroke-linejoin="round"/><path d="${P.bones}" fill="none" stroke="#120c10" stroke-width="1.15" stroke-linecap="round"/><path d="${P.arm}" fill="none" stroke="#120c10" stroke-width="1.7" stroke-linecap="round"/><path d="${P.edge}" fill="none" stroke="#b9a58e" stroke-opacity=".32" stroke-width=".45"/><path d="${P.claw}" fill="#120c10" stroke="#d9cdb1" stroke-opacity=".35" stroke-width=".3"/>`)+
+    `<path d="${this.BODY}" fill="#1d1519" stroke="#9c8774" stroke-opacity=".38" stroke-width=".5"/><path d="M-1.6 -4.8Q0 -3.4 1.6 -4.8M-1.9 -1.6Q0 -.2 1.9 -1.6M-1.8 1.6Q0 3 1.8 1.6" fill="none" stroke="#5e4b42" stroke-opacity=".55" stroke-width=".4"/>`+
+    `<path d="M-1.3 -7.2l-.7 -2.3M1.3 -7.2l.7 -2.3" stroke="#120c10" stroke-width=".7" stroke-linecap="round"/><path d="${this.HEAD}" fill="#1d1519" stroke="#9c8774" stroke-opacity=".38" stroke-width=".5"/>`+
+    `<g fill="${lit>0?mixc([90,70,60],LIT[0],lit):'#5a463c'}"><circle cx="-1.2" cy="8.9" r=".6"/><circle cx="1.2" cy="8.9" r=".6"/></g><path d="M-.5 10.2h1" stroke="#0c0809" stroke-width=".5"/></g>`},
+  // Where each bat hangs: the middle one largest, the others tilted a little. Outer bats need a tall wall; in a shade they fly off as it lowers.
+  slots(c){const A=model.a,B=model.b,h=c.h,s=lerp(.62,1,clamp((h-HS)/(H-HS))),mx=(A.x+W+B.x)/2,y0=(A.y+B.y)/2;
+   return[[.22,.9,-6],[.5,1.08,0],[.78,.92,5]].map(([fr,k,tl],i)=>({x:mx+(i-1)*1.5*s,y:y0+8+(h-19)*fr,sc:s*k,rot:tl,off:i===1?0:clamp((100-h)/16)}))},
+  st(c,k){const jt=c.jt;
+   if(model.dir>0){const t0=.22+.15*k;return{u:seg(jt,t0,t0+.3),m:seg(jt,t0+.3,t0+.37),lit:seg(jt,.84+.04*k,.92+.04*k),dr:0,aw:0}}
+   const q=1-jt;return{u:1,m:1,lit:1-seg(q,0,.1),dr:seg(q,.08+.08*k,.18+.08*k),aw:seg(q,.13+.08*k,.5+.08*k)}},
+  // Flight in: a jinking curve from high on one side to a point below the slot, then up, over head down, and hooked on.
+  flyIn(T,k,u){const sd=this.SIDE[k],Sx=T.x+[-250,260,-120][k],Sy=Math.max(-30,T.y-[170,140,240][k]),Ux=T.x+sd*8,Uy=T.y+30*T.sc,ph=u*Math.PI*2*9+k*1.3;
+   if(u<.76){const v=u/.76,Pz=[[Sx,Sy],[lerp(Sx,T.x,.25),Sy+110],[T.x+sd*110,Uy+40],[Ux,Uy]],q=JOINS.stiff.at(Pz,ease(v)*.4+v*.6),j=9*(1-v)*Math.sin(v*Math.PI*7+k*1.7);
+    return{x:q.p[0]+q.nx*j,y:q.p[1]+q.ny*j,rot:180+24*q.tx,fl:-42*Math.sin(ph),sp:.78+.22*Math.cos(ph),op:seg(u,0,.12),air:1}}
+   const w=seg(u,.76,1),amp=1-seg(w,.4,.78);
+   return{x:lerp(Ux,T.x,ease(w)),y:Uy+(T.y-Uy)*backOut(w),rot:180-22*sd*(1-ease(seg(w,0,.4)))+sd*180*ease(seg(w,.1,.7))+T.rot*seg(w,.5,1),fl:-42*Math.sin(ph)*amp,sp:1-(1-(.78+.22*Math.cos(ph)))*amp,op:1,air:1-seg(w,.6,1)}},
+  // Flight out: let go, drop, flip head up and flit off high to the far side.
+  flyOut(T,k,r){const sd=this.SIDE[k],bx=T.x,by=T.y+10*T.sc*ease(r.dr),ph=r.aw*Math.PI*2*7+k,Ex=T.x+sd*300,Ey=T.y-280;
+   const fold=lerp(1,.38,seg(r.dr,0,.5)),rot=T.rot+sd*180*ease(seg(r.dr,.3,1));
+   if(r.aw<=0)return{x:bx,y:by,rot,fl:0,sp:fold,op:1,air:seg(r.dr,.2,1)};
+   const a=r.aw*r.aw*.4+r.aw*.6,q=JOINS.stiff.bz([[bx,by],[bx+sd*20,by+50],[Ex-sd*100,Ey+80],[Ex,Ey]],a),wb=seg(r.aw,0,.18);
+   return{x:q[0],y:q[1],rot:lerp(rot,sd*196,wb),fl:-42*Math.sin(ph)*wb,sp:lerp(fold,.78+.22*Math.cos(ph),wb),op:1-seg(r.aw,.7,1),air:Math.max(seg(r.dr,.2,1),wb)}},
+  over(c){
+   const S=this.slots(c),jt=c.jt,fwd=model.dir>0,dust=JOINS.buttress.dust,col=model.a.run&&model.b.run?'#ffc861':'#9fb8ff',mx=S[1].x,y0=(model.a.y+model.b.y)/2,h=c.h;
+   let s='',sh='',hang='',air='',fx='',glow='';
+   if(jt===0){if(c.glow<=0)return '';
+    // Ready: the three hanging bats chalked in. Near: two bats loop up and down over the gap, mostly vertically, so they stay off the windows.
+    if(c.glow>=1)S.filter(q=>q.off<1).forEach(q=>s+=this.bat(q.x,q.y,q.rot,{sc:q.sc,ghost:1,op:.85}));
+    const now=performance.now()/1000,g=Math.min(1,c.glow*1.4);
+    for(let j=0;j<2;j++){const t=now*(1.05+.3*j)+j*2.2,x=mx+24*Math.sin(t*1.9+j)+7*Math.sin(t*5.3+j),y=y0+h/2-14+(h/2+42)*Math.sin(t)*(.95-.2*j),ph=now*21+j*3;
+     const lo=Math.min(model.a.x+W,model.b.x)-14,hi=Math.max(model.a.x+W,model.b.x)+14;
+     s+=this.bat(clamp(clamp(x,lo,Math.max(lo,hi)),20,1180),clamp(y,16,585),180+12*Math.cos(t*1.9+j),{sc:.6,sp:.78+.22*Math.cos(ph),fl:-40*Math.sin(ph),op:.9*g*(c.glow>=1?.45:1)})}
+    // Keep them flitting while the drag holds still.
+    if(drag&&!drag.hit&&!this.raf&&!reduce.matches)this.raf=requestAnimationFrame(()=>{this.raf=0;if(drag&&model.join==='bats'&&model.jt===0&&model.glow>0)render()});
+    return s}
+   const now=performance.now();
+   this.ORD.forEach((si,k)=>{const T=S[si],r=this.st(c,k);if(T.off>=1||(fwd&&r.u<=0))return;
+    let p=fwd?this.flyIn(T,k,r.u):this.flyOut(T,k,r),lit=r.lit;
+    // Settling: one mantle of the wings, and a small bob.
+    if(fwd&&r.m>0&&r.m<1){p.sp*=1-.42*Math.sin(Math.PI*seg(r.m,0,.65))+.06*Math.sin(Math.PI*seg(r.m,.65,1));p.y+=1.4*T.sc*Math.sin(Math.PI*r.m)}
+    // A bat that no longer fits the strip flies off upward as it narrows.
+    if(T.off>0){const sd=this.SIDE[k],ph=now/38+k;p={x:p.x+sd*60*T.off,y:p.y-100*T.off,rot:lerp(p.rot,180,seg(T.off,0,.3)),fl:-42*Math.sin(ph)*seg(T.off,0,.2),sp:p.sp,op:p.op*(1-T.off),air:Math.max(p.air,seg(T.off,0,.25))};lit*=1-T.off}
+    const o={sc:T.sc,sp:p.sp,fl:p.fl,lit,op:p.op};
+    const da=p.air,dx=1.4+10*da,dy=2+16*da;
+    if(da<1)sh+=this.bat(p.x+dx,p.y+dy,p.rot,{...o,shadow:1,op:p.op*.34*(1-da)});
+    if(p.air>.02)air+=this.bat(p.x,p.y,p.rot,o);else hang+=this.bat(p.x,p.y,p.rot,o);
+    if(lit>0)glow+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(26*T.sc)}" fill="${col}" opacity="${f(.3*lit*p.op)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+    // Claws into the stone: a little grit at each wrist; letting go, a little more falls.
+    const wx=23*T.sc,wy=T.y-9.5*T.sc;
+    if(fwd&&r.m>0&&r.m<1)fx+=dust(T.x-wx,wy,seg(r.m,0,.8),4,7*T.sc,k*11+3)+dust(T.x+wx,wy,seg(r.m,0,.8),4,7*T.sc,k*11+7);
+    if(!fwd&&r.dr>0&&r.dr<1)fx+=dust(T.x-wx,wy,r.dr,3,6*T.sc,k*13+5)+dust(T.x+wx,wy,r.dr,3,6*T.sc,k*13+9);
+    if(fwd&&lit>.4&&lit<1){const g=Math.sin(Math.PI*seg(lit,.4,1));fx+=`<g opacity="${f(g)}">${sparkle(p.x+1.2*T.sc,p.y+8.9*T.sc,3.4*g*T.sc)}</g>`}});
+   s+=glow+`<g fill="#000">${sh}</g>`+hang+air+fx;
+   if(jt===1){const s0=S[1].sc/1.08,x0=mx-38*s0,y1=y0+8,hh=h-19;
+    s+=`<g class="hit" id="batsHit" tabindex="0" role="button" aria-label="Bats: tap them, wave across them, or press Enter, to separate the widgets" style="cursor:pointer"><title>Tap the bats, or wave across them, to release</title><rect x="${f(x0)}" y="${f(y1)}" width="${f(76*s0)}" height="${f(hh)}" fill="transparent"/><rect class="ringfocus" x="${f(x0-2)}" y="${f(y1-2)}" width="${f(76*s0+4)}" height="${f(hh+4)}" rx="3" fill="none" stroke="#f0cf7a" stroke-width="1.5"/></g>`}
+   return s},
+  // A tap or a wave across them: either way they scatter.
+  grab(p){return{x0:p.x,y0:p.y,moved:false}},
+  move(d,p){if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true},
+  letGo:()=>true
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
@@ -3012,12 +3102,12 @@ async function doSeparate(){
  else if(model.dir>0){model.th0={...REST};model.lit0=0}
  if(model.jt===1||!model.path)model.path={s:separatePose(),j:here()};
  say(J().say.sep);
- if(await tween(model.jt,0,(J().sepMs||1600)*model.jt,setJt)){model.path=null;model.dir=1;model.lampOff=[0,0];model.lampAt=0;say('Separate. Displays and pages were not touched.')}
+ if(await tween(model.jt,0,(J().sepMs||1600)*model.jt,setJt)){model.path=null;model.dir=1;model.glow=0;model.lampOff=[0,0];model.lampAt=0;say('Separate. Displays and pages were not touched.')}
 }
 function holdJoining(){
  ++anim;model.busy=false;stopAngle();
  if(model.jt===0||model.jt===1||!model.path){const s=model.jt===1?separatePose():here();model.path={s,j:model.jt===0?joinedPose('a'):here()}}
- startJoinFrom({...REST},0);setJt(.62);render();say(J().say.hold);
+ model.glow=0;startJoinFrom({...REST},0);setJt(.62);render();say(J().say.hold);
 }
 function toggleShade(force){
  const to=force??(model.st>.5?0:1);
@@ -3162,7 +3252,7 @@ CHK.forEach((n,j)=>{const b=document.createElement('button'),need=j>11,t=`Check 
  b.onpointerenter=b.onfocus=b.onclick=()=>showTip(b);b.onpointerleave=b.onblur=hideTip;$('#bv2 .tri').append(b)});
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
-$('#scrub').oninput=e=>{++anim;model.busy=false;stopAngle();
+$('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
  if(model.jt===0||model.jt===1||!model.path){model.path=model.jt===1?{s:separatePose(),j:here()}:{s:here(),j:joinedPose('a')};startJoinFrom({...REST},0)}
  setJt(e.target.value/100);if(model.jt===0||model.jt===1)model.path=null;render()};
 $('#angle').oninput=e=>setDialAngle(+e.target.value);
