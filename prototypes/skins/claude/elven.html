@@ -321,7 +321,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. With the ribbon roll, drag GitDiscuss's nameplate to roll it round Jarvis's roundel (it settles on the nearest 15° star); tap the roundels to release. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=38,SEP=170,NEAR=120,READY=40,TOP=70,SNAP=46;
@@ -744,6 +744,29 @@ const JOINS={
    return jt>.42?'Releasing · the eyes part ':jt>.3?'Releasing · the plates furl ':'Releasing · the casings part '},
   about:'The Rivet join kind in elven, after wire\'s tube rivets, gothic\'s hot rivets and hollow\'s bone trenails. A rivet is a shank put through two lapped plates whose end is then spread into a head wider than the hole, so it cannot come back out. Elven things are not hammered; here the head is spread by growth. Each joining stem keeps a leaf plate furled inside it: on Jarvis a plate of silver with three round lobes and a hairline vine engraved on it, on GitDiscuss a plate of frosted moonstone glass with three pointed lobes, silver-rimmed eyes and fine veins. <b>Near:</b> the plates peek out of the stems and their lobe tips glimmer. <b>Ready:</b> the lapped plates and the three flowers are traced in dashed moonlight across the gap. Joining: the casings close to a 30 px gap, and the plates unfurl from their stems, the glass lapping over the silver with its shadow on it, and a glint runs down the eyes as they line up. Then the rivets are set one at a time, top, bottom, then middle. A closed silver bud, twisted like a furled flower, pushes up through each eye and stands proud of the glass (drawn larger, with its shadow further off). A dewdrop falls out of the night onto it, ripples, and the bud bursts open into a five-petalled flower that lies flat over the eye: the petals are the spread head. Last, the middle flower\'s moonstone heart kindles as the join light and the glass glows faintly from within (moonlight while both widgets run, a cold grey if either is paused), and a glint runs down the lobe tips. Everything stays in the gap and scales with any shade. Nothing moves at rest. <b>Release:</b> tap the flowers, or focus them and press Enter. The heart dims, the flowers close back into buds, middle first, and draw down through the eyes, the plates furl into their stems, and only then do the casings part. Drag a nameplate to move the pair.',
   over:c=>drawBloom(c)
+ },
+ // part:.3 keeps the casings together on release until the arms have drawn back (the roll is drawn from Jarvis's place).
+ roll:{label:'Ribbon roll',kind:'Angle · roll',angled:true,a0:30,part:.3,
+  get gap(){return RL.gap},
+  get hooks(){return RLH},
+  // At 0° there is no roll, so the join and release take less time.
+  get slow(){return model.angle?1.75:1.25},get msOut(){return model.angle?4400:3200},
+  bend(jt){return rlBend(jt)},
+  txt:{join:'The casings close a span apart, a silver roundel unfurls on a curling arm from each stem, two silk ribbons are wound round them crossing between, and GitDiscuss rolls round Jarvis\'s roundel to its angle.',
+   joined:'Joined by a ribbon roll, one star per 15°. Drag GitDiscuss\'s nameplate to roll it round Jarvis\'s roundel (the ribbons wind off one and onto the other), use the Angle slider, or press ↑ ↓; tap the roundels to release.',
+   release:'The hub dims, GitDiscuss rolls back level, the ribbons are unwound, the roundels furl and the arms draw back into the stems.',
+   stop:'The ribbons are unwound and the roundels furl back into the stems.',
+   hold:'Held mid-join: the roundels are up and the moon-white ribbon is being wound round them, crossing between. Use the scrubber to step through the binding.',
+   ready:'Ready: the roundels, their crossed ribbons and the arc GitDiscuss will roll along are traced in moonlight. Release to bind them.',near:'Nearby: the stems glimmer and small roundels peep out. Move closer.',
+   readyPh:'Ready · the roll is traced',nearPh:'Nearby · the roundels peep out'},
+  phase:(jt,dir)=>{const r=!!model.angle,pe=rlPe();
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<.4)return'Joining · the arms reach out ';if(jt<.52)return'Joining · the roundels unfurl ';
+    if(jt<.62)return'Joining · the moon-white ribbon is wound ';if(jt<.7)return'Joining · the green ribbon is wound across it ';
+    if(r&&jt<.88)return'Joining · GitDiscuss rolls to star '+(rlN(model.angle)+4)+' ';return'Joining · the hub kindles '}
+   if(jt>pe)return'Releasing · the hub dims ';if(r&&jt>.7)return'Releasing · GitDiscuss rolls level ';if(jt>.58)return'Releasing · the green ribbon is unwound ';
+   if(jt>.5)return'Releasing · the moon-white ribbon is unwound ';if(jt>.4)return'Releasing · the roundels furl ';return jt>.3?'Releasing · the arms draw back ':'Releasing · the casings part '},
+  about:'The Roll angle kind in elven, after hollow\'s cog roll. In a Roll the joint has no fixed pivot: GitDiscuss rolls round Jarvis like a coin round a coin, so the point it turns on travels. Hollow does it with teeth; elven things are bound, not geared. This is the rolling joint of the Jacob\'s ladder toy and of some fine instrument hinges: two equal discs held together by two ribbons that cross between them, each fixed to one disc, wrapped round its inner side, crossing at the point where the discs touch and wrapped round the other, so the discs can only roll on each other, never slip or part. Here the discs are silver roundels with an openwork of six leaves round a moonstone hub, each on a curling silver arm from its stem; one ribbon is moon-white silk, the other sea-green, each clasped at both ends by a small silver leaf. A moonstone on the rim of GitDiscuss\'s roundel shows it turning. <b>Near:</b> the stems glimmer and small roundels peep out of them. <b>Ready:</b> the roundels, the crossed ribbons and the arc GitDiscuss\'s hub will travel are traced in dashed moonlight. <b>Joining:</b> the casings close a span apart, the arms curl out of the stems, and the roundels unfurl on them with a turn. The moon-white ribbon is wound from the top of Jarvis\'s roundel down through the point of contact and round under GitDiscuss\'s, and clasped with a glint; the sea-green one is wound the other way across it, from the bottom of Jarvis\'s up over GitDiscuss\'s. Then GitDiscuss rolls to its angle, a little past and back: its hub travels round Jarvis\'s roundel, the point of contact walks round both, one ribbon winds off Jarvis\'s roundel and onto GitDiscuss\'s while the other winds back, and GitDiscuss turns twice as far as its hub travels. Last, Jarvis\'s hub and the star at the contact kindle as the join light (moonlight while both widgets run, a cold grey if either is paused) and a glint runs along both ribbons. <b>Angle:</b> −45° to +45°, one star per 15°: drag GitDiscuss\'s nameplate, use the slider, or press ↑ ↓. Each 15° stop the roll passes glints at the point of contact, and it settles on the nearest; a moonstone tag reads the angle and its star, one of seven. The roundels scale down in a shade strip. Nothing moves at rest. <b>Release:</b> tap the roundels, or focus them and press Enter. The hub dims, GitDiscuss rolls back level, the ribbons are unwound last first, the roundels furl and the arms draw back before the casings part.',
+  over:c=>drawRoll(c)
  }
 };
 /* ---------- Lily petals: moon-white petals wedged into the opening, one per 15° (Wedge) ---------- */
@@ -963,6 +986,119 @@ function drawStay(c){
  // The hit area is the stay and the pin, so GitDiscuss's nameplate stays free to turn it.
  if(jt===1){const r=deg*PI/180,E={x:Pv.x+Math.cos(r)*G.L,y:Pv.y+Math.sin(r)*G.L};
   o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Leaf-eye stay: GitDiscuss at ${signed(model.angle)}, the stay on eye ${lyN(model.angle)+1} of 4. Up and down arrows swing GitDiscuss an eye; Enter lifts the stay off and separates the widgets"><title>Tap the stay or its pin to release; drag GitDiscuss's nameplate to swing it</title><path d="M${P(Pv)}L${P(E)}" stroke="transparent" stroke-width="16" stroke-linecap="round"/><circle cx="${f(Pn.x)}" cy="${f(Pn.y)}" r="${f(10*kk+3)}" fill="transparent"/><path class="ringfocus" d="M${P(Pv)}L${P(E)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return o}
+/* ---------- Ribbon roll: GitDiscuss's silver roundel rolls round Jarvis's, bound by two crossed silk ribbons (Roll) ---------- */
+// The Roll angle kind in elven, after hollow's cog roll. Two equal roundels of radius R stand in the gap on arms from the stems: Jarvis's
+// hub C, and GitDiscuss's hub 2R to its right, touching at the gap's middle M. Each ribbon is clasped to both roundels and crosses at the
+// point of contact, so they can only roll on each other: when GitDiscuss's hub has travelled α round C, GitDiscuss has turned θ = 2α.
+// That is one turn by θ about a point R·tan(θ/4) below M (above it for a raise), which the casing's transform origin follows (the oy hook).
+// Joining: arms .3–.43, roundels unfurl .36–.52, moon-white ribbon wound .5–.62, sea-green one .58–.7, GitDiscuss rolls .7–.88, kindle.
+const RL={gap:72,last:null,flash:-1e9,loop:false};
+const rlR=hh=>20*Math.max(clamp(2*hh/H,.34,1),.6);
+const rlN=a=>clamp(Math.round(a/15),-3,3);
+const rlPe=()=>model.angle?.88:.72;
+function rlBend(jt){
+ if(jt>=1)return model.angle;if(!model.angle||jt<.7)return 0;if(jt>=.88)return model.angle;
+ const u=seg(jt,.7,.88),A=Math.abs(model.angle),top=A+5,sg=model.angle<0?-1:1;
+ return sg*(u<.62?lerp(0,top,ease(u/.62)):lerp(top,A,back(seg(u,.62,1),1.3)))}
+// The geometry for Jarvis at a, casing height h, GitDiscuss turned th degrees; roll() carries any point of GitDiscuss's (unturned) into place.
+function rlGeo(a,h,th){
+ const hh=h/2,R=rlR(hh),kk=R/20,M={x:a.x+W+RL.gap/2,y:a.y+hh},C={x:M.x-R,y:M.y},al=th*PI/360;
+ const O={x:M.x,y:M.y+R*Math.tan(th*PI/720)},t=th*PI/180,co=Math.cos(t),si=Math.sin(t);
+ const roll=p=>{const dx=p.x-O.x,dy=p.y-O.y;return{x:O.x+dx*co-dy*si,y:O.y+dx*si+dy*co}};
+ return{R,kk,M,C,th,al:th/2,roll,B:{x:C.x+2*R*Math.cos(al),y:C.y+2*R*Math.sin(al)},T:{x:C.x+R*Math.cos(al),y:C.y+R*Math.sin(al)},
+  sA:{x:a.x+W-11.5,y:M.y},sB:roll({x:a.x+W+RL.gap+11.5,y:M.y})}}
+// Points round a ribbon circle about c from d0° to d1°.
+function rlArc(c,r,d0,d1){const n=Math.max(2,Math.ceil(Math.abs(d1-d0)/5)),out=[];
+ for(let i=0;i<=n;i++){const d=(d0+(d1-d0)*i/n)*PI/180;out.push({x:c.x+r*Math.cos(d),y:c.y+r*Math.sin(d)})}return out}
+// The two ribbons, each from its clasp on Jarvis's roundel through the contact to its clasp on GitDiscuss's. The moon-white one runs from
+// Jarvis's top down the inside to the contact and on under GitDiscuss's; the sea-green one from Jarvis's foot up over GitDiscuss's.
+// What winds off one roundel winds onto the other, so each keeps its length (180° of ribbon) at every angle.
+function rlBands(G){const {C,B,R,al,th}=G;
+ return[rlArc(C,R,-90,al).concat(rlArc(B,R,al+180,90+th).slice(1)),rlArc(C,R,90,al).concat(rlArc(B,R,al+180,270+th).slice(1))]}
+// The first u of a point list, by length.
+function rlCut(pts,u){if(u>=1)return pts;if(u<=0)return [];const L=[0];
+ for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));
+ const s=u*L[L.length-1],out=[pts[0]];
+ for(let i=1;i<pts.length;i++){if(L[i]<=s){out.push(pts[i]);continue}const v=(s-L[i-1])/((L[i]-L[i-1])||1);out.push({x:lerp(pts[i-1].x,pts[i].x,v),y:lerp(pts[i-1].y,pts[i].y,v)});break}
+ return out}
+const rlAt=(pts,u)=>{const c=rlCut(pts,clamp(u,.001,1));return c[c.length-1]};
+const RLC=[['#e9edf8','#ffffff','#8d9cc4'],['#9ccbb4','#e6f6ec','#4f7f6c']];
+// A silk ribbon: a dark edge, the silk, a sheen down its middle and a fine weave; lit brightens the sheen.
+function rlRibbon(pts,col,kk,lit,on){if(pts.length<2)return '';const d=poly(pts),w=3.3*kk,j='fill="none" stroke-linejoin="round"';
+ return `<path d="${d}" ${j} stroke="${NIGHT}" stroke-width="${f(w+1.3)}" opacity=".7"/><path d="${d}" ${j} stroke="${col[0]}" stroke-width="${f(w)}"/>`+
+  `<path d="${d}" ${j} stroke="${col[2]}" stroke-width="${f(w*.86)}" stroke-dasharray=".5 1.5" opacity=".4"/><path d="${d}" ${j} stroke="${col[1]}" stroke-width="${f(w*.36)}" opacity=".7"/>`+
+  (lit>0?`<path d="${d}" ${j} stroke="${on?'#fffbe6':'#e0e2ea'}" stroke-width="${f(w*.36)}" opacity="${op(lit*.7)}"/>`:'')}
+// A ribbon's clasp: a silver bead with a small silver leaf pointing on round the rim, past the ribbon's end.
+function rlClasp(p,q,kk,s){if(s<=.02)return '';const deg=Math.atan2(p.y-q.y,p.x-q.x)*180/PI;
+ return `<g transform="translate(${P(p)}) rotate(${f(deg)}) scale(${op(s*kk)})"><path d="M-1 0C2 -2.6 6 -3 9 0C6 3 2 2.6 -1 0Z" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".5"/><path d="M0 0H7" stroke="#7f8fb8" stroke-width=".4"/><circle r="1.9" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".5"/></g>`}
+// A roundel at c turned deg: a silver rim and a night-glass face with six openwork silver leaves round a moonstone hub. mark adds a moonstone
+// on GitDiscuss's rim (it shows the roundel turning); lit kindles the hub (Jarvis's is the join light).
+function rlDisc(c,R,deg,kk,sc,o={}){if(sc<=.02)return '';const Rd=R-1.9*kk,Rf=Rd-2.4*kk,r0=3.6*kk,r1=Rf-1.8*kk,sx=(r1-r0)/15,sy=sx*.8,lit=o.lit||0;
+ const pet=`M${f(r0)} 0C${f(r0+4*sx)} ${f(-4.6*sy)} ${f(r0+10*sx)} ${f(-5.2*sy)} ${f(r1)} 0C${f(r0+10*sx)} ${f(5.2*sy)} ${f(r0+4*sx)} ${f(4.6*sy)} ${f(r0)} 0Z`;
+ let s=`<g transform="translate(${P(c)}) scale(${op(sc)})">`;
+ if(lit>0)s+=`<circle r="${f((12+12*lit)*kk)}" fill="url(#halo)" opacity="${op(lit*(o.on?1:.55))}"/>`;
+ s+=`<circle cx="${f(.8*kk)}" cy="${f(1.9*kk)}" r="${f(Rd)}" fill="${NIGHT}" opacity=".45"/><circle r="${f(Rd)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><circle r="${f(Rf)}" fill="#151b36" stroke="#c9d4ee" stroke-width=".5"/>`;
+ s+=`<g transform="rotate(${f(deg)})">`;
+ for(let i=0;i<6;i++)s+=`<g transform="rotate(${i*60})"><path d="${pet}" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".45"/><path d="M${f(r0+1)} 0H${f(r1-1.5*kk)}" stroke="#7f8fb8" stroke-width=".4"/><circle cx="${f(Rf-1.4*kk)}" cy="0" r="${f(.55*kk)}" fill="#dfe6f7" transform="rotate(30)"/></g>`;
+ if(o.mark)s+=`<circle cx="${f(Rd-1.1*kk)}" cy="0" r="${f(1.4*kk)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".45"/>`;
+ s+=`</g><circle r="${f(4.3*kk)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".7"/><circle r="${f(2.4*kk)}" fill="url(#moonstone)"/>`;
+ if(lit>.05)s+=`<circle r="${f(2.4*kk)}" fill="${o.on?'#fff8e0':'#d8dbe2'}" opacity="${op(lit*.75)}"/>`+star(0,0,(2.4+3*lit)*kk+1,lit*(o.on?.95:.5),o.on?'#fff':'#d8dbe2');
+ return s+'</g>'}
+// While rolling: a moonstone tag below Jarvis reads the angle and the star (one per 15°, the fourth level).
+function rlTag(x,y,a,opc){const n=rlN(a)+3,hw=64,font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;let ic='';
+ for(let i=0;i<7;i++){const on=i===n;ic+=star(12-hw+i*6.2,0,on?3.8:2.3,on?1:.75,on?'#5f78b8':'#a3abc4')}
+ return `<g opacity="${op(opc)}" pointer-events="none" transform="translate(${f(x)} ${f(y)})"><rect x="-${hw+2}" y="-16" width="${2*hw+4}" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-${hw}" y="-14" width="${2*hw}" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>${ic}`+
+  `<text x="22" y="1" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${signed(a)}</text><text x="22" y="11" text-anchor="middle" ${font} font-size="7.5" letter-spacing="1" fill="#5d6584">STAR ${n+1} OF 7</text></g>`}
+// Joined, each star the roll passes glints at the contact; this keeps drawing until the glint has faded.
+function rlLoop(){if(RL.loop)return;RL.loop=true;
+ requestAnimationFrame(function st(now){if(J()!==JOINS.roll||model.jt!==1||now-RL.flash>520){RL.loop=false;render();return}render();requestAnimationFrame(st)})}
+function rlFit(a,hh){const h=2*hh,ys=[-22,h+44];
+ for(const t0 of a?[a,a+Math.sign(a)*5]:[0]){const t=t0*PI/180,oy=hh+rlR(hh)*Math.tan(t0*PI/720),ry=(u,v)=>oy+(u+RL.gap/2)*Math.sin(t)+(v-oy)*Math.cos(t);
+  ys.push(ry(0,0),ry(0,h),ry(W,0),ry(W,h),ry(W/2,-17),ry(W/2,h+12))}
+ const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn),hi=592-mx;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+const RLH={s:()=>RL.gap/2,oy:(bd,hh)=>hh+rlR(hh)*Math.tan(bd*PI/720),det:[-45,-30,-15,0,15,30,45],max:45,snap:15,hang:()=>0,fit:rlFit,
+ name:a=>({num:signed(a),cap:'star '+(rlN(a)+4)+' of 7',stop:true}),
+ grip:'Roll GitDiscuss round Jarvis\'s roundel: drag round the joint, or use the up and down arrows; each star is 15 degrees',slider:'GitDiscuss angle on the ribbon roll, in degrees: one star per 15',
+ ph:a=>signed(a)+' · star '+(rlN(a)+4)+' of 7',
+ say:a=>a?'GitDiscuss has rolled to '+signed(a)+', star '+(rlN(a)+4)+' of 7: its hub has travelled '+Math.abs(a/2)+'° round Jarvis\'s roundel and it has turned twice that.':'GitDiscuss rests level, the ribbons crossing evenly between the roundels.'};
+function drawRoll(c){
+ const a=model.a,b=model.b,h=c.h,jt=c.jt,now=performance.now(),dir=model.dir,on=a.run&&b.run;
+ if(jt<1)RL.last=null;
+ // Near: the stems glimmer and small roundels peep out. Ready: the roundels, ribbons and the hub's path traced where they will be.
+ if(jt===0){const g=c.glow;if(g<=0)return '';const hh=h/2,R=rlR(hh),kk=R/20,pA={x:a.x+W-11.5,y:a.y+hh},pB={x:b.x+11.5,y:b.y+hh};
+  let o='';for(const p of[pA,pB])o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((7+9*g)*kk)}" fill="url(#halo)" opacity="${op(g)}"/>`;
+  if(g<1){const pk=.25+.2*g;return o+rlDisc({x:pA.x+(4+6*g)*kk,y:pA.y},R,-40*g,kk,pk)+rlDisc({x:pB.x-(4+6*g)*kk,y:pB.y},R,40*g,kk,pk,{mark:true})}
+  const G=rlGeo(a,h,model.angle),ds=`fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3"`,C0={x:G.M.x+G.R,y:G.M.y};
+  o+=`<path d="M${P(G.sA)}L${P(G.C)}M${P(G.sB)}L${P(G.B)}" ${ds}/><circle cx="${f(G.C.x)}" cy="${f(G.C.y)}" r="${f(G.R-1.9*G.kk)}" ${ds}/><circle cx="${f(G.B.x)}" cy="${f(G.B.y)}" r="${f(G.R-1.9*G.kk)}" ${ds}/>`;
+  for(const bd of rlBands(G))o+=`<path d="${poly(bd)}" ${ds} opacity=".85"/>`;
+  if(Math.abs(model.angle)>=1)o+=`<path d="M${P(C0)}A${f(2*G.R)} ${f(2*G.R)} 0 0 ${model.angle>0?1:0} ${P(G.B)}" ${ds} opacity=".65"/>`+star(C0.x,C0.y,3.5,.6);
+  return o+star(G.T.x,G.T.y,6,.95)}
+ const th=rlBend(jt),G=rlGeo(a,h,th),{R,kk,C,B,T}=G,[b1,b2]=rlBands(G);
+ const gA=ease(seg(jt,.3,.4)),gB=ease(seg(jt,.33,.43)),uA=seg(jt,.36,.48),uB=seg(jt,.4,.52);
+ const u1=seg(jt,.5,.62),u2=seg(jt,.58,.7),pe=rlPe(),kd=ease(seg(jt,pe,1)),lit=kd*(on?1:.45);
+ // The arms curl out of the stems to the hubs (GitDiscuss's rolled with it), then the roundels unfurl on them with a turn.
+ let o=stStem(G.sA,C,kk,gA,-1)+stStem(G.sB,B,kk,gB,1);
+ o+=rlDisc(C,R,-150*(1-uA),kk,back(uA,1.6),{lit,on})+rlDisc(B,R,th+150*(1-uB),kk,back(uB,1.6),{mark:true});
+ // The ribbons are wound on from Jarvis's clasps, the sea-green one across the moon-white; a glint runs at each winding end.
+ o+=rlRibbon(rlCut(b1,u1),RLC[0],kk,lit,on)+rlRibbon(rlCut(b2,u2),RLC[1],kk,lit,on);
+ o+=rlClasp(b1[0],b1[1],kk,back(seg(jt,.5,.53),1.6))+rlClasp(b2[0],b2[1],kk,back(seg(jt,.58,.61),1.6));
+ const n1=b1.length-1,n2=b2.length-1;
+ o+=rlClasp(b1[n1],b1[n1-1],kk,back(seg(jt,.62,.65),1.6))+rlClasp(b2[n2],b2[n2-1],kk,back(seg(jt,.7,.73),1.6));
+ if(dir>0&&jt<1){
+  for(const [bd,u] of[[b1,u1],[b2,u2]])if(u>0&&u<1){const p=rlAt(bd,u);o+=star(p.x,p.y,3.6*kk+1,.9)}
+  for(const [bd,s0] of[[b1,.62],[b2,.7]]){const gk=seg(jt,s0,s0+.05);if(gk>0&&gk<1){const p=bd[bd.length-1];o+=star(p.x,p.y,(4+4*gk)*kk+1,Math.sin(PI*gk))}}
+  const gk=seg(jt,pe,1);if(gk>0&&gk<1)for(const bd of[b1,b2]){const p=rlAt(bd,gk);o+=star(p.x,p.y,4.2*kk+1,Math.sin(PI*gk))}}
+ // The point of contact kindles with the hub.
+ if(lit>.05)o+=star(T.x,T.y,(2+2.5*lit)*kk+1,lit*(on?.9:.45),on?'#fff':'#d8dbe2');
+ // Joined: each star the roll passes glints at the contact.
+ if(jt===1){const n=Math.floor(model.angle/15);if(RL.last!==null&&n!==RL.last&&!reduce.matches){RL.flash=now;setTimeout(rlLoop,0)}RL.last=n;
+  const e=(now-RL.flash)/480;if(e>=0&&e<1)o+=`<circle cx="${f(T.x)}" cy="${f(T.y)}" r="${f((4+12*e)*kk)}" fill="none" stroke="#e6edff" stroke-width="${f(1.2*(1-e)+.2)}" opacity="${op(1-e)}"/>`+star(T.x,T.y,(4+4*Math.sin(PI*e))*kk+1,Math.sin(PI*e))}
+ const dop=jt===1?model.dial:dir>0?seg(jt,pe,Math.min(1,pe+.05)):0;
+ if(dop>0)o+=rlTag(a.x+W-100,a.y+h+26,jt===1?model.angle:th,dop);
+ // The hit area is the two roundels, so GitDiscuss's nameplate stays free to roll it.
+ if(jt===1)o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Ribbon roll: GitDiscuss at ${signed(model.angle)}, star ${rlN(model.angle)+4} of 7. Up and down arrows roll GitDiscuss a star (15°); Enter unwinds the ribbons and separates the widgets"><title>Tap the roundels to release; drag GitDiscuss's nameplate to roll it</title>`+
+  [C,B].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(R+3)}" fill="transparent"/>`).join('')+[C,B].map(p=>`<circle class="ringfocus" cx="${f(p.x)}" cy="${f(p.y)}" r="${f(R+3)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/>`).join('')+'</g>';
  return o}
 /* ---------- Silk arrow drawing (Reel) ---------- */
 // A crescent bow stands on Jarvis's stem with a moonstone spindle of spider silk behind its grip; GitDiscuss's stem carries a lancet target
@@ -1590,6 +1726,8 @@ const FORK={s:forkS,det:DET,hang:hh=>hh>40?156:118,fit:forkFit,name:forkName,say
 const AH=()=>J().hooks||FORK;
 // A join may set its own range (max), hard steps it always snaps to (snap) and the pivot's height on the casing (py; the middle by default).
 const amax=()=>AH().max??AMAX,pivY=hh=>AH().py?AH().py(model.angle,hh):hh;
+// The height GitDiscuss turns about at bend bd: a rolling joint (oy) has no fixed pivot, so its turning point moves with the bend.
+const pivOY=(bd,hh)=>AH().oy?AH().oy(bd,hh):pivY(hh);
 // Crescent pivot: the pin sits a fixed span off each stem, wide enough for the full ±50° turn, so turning never moves GitDiscuss along.
 // Its stops are moon phases, 15° apart: GitDiscuss raised waxes the moon, lowered wanes it.
 const MDET=[-45,-30,-15,0,15,30,45],MPH={'-45':'waxing crescent','-30':'first quarter','-15':'waxing gibbous','0':'full moon','15':'waning gibbous','30':'last quarter','45':'waning crescent'};
@@ -3846,7 +3984,7 @@ function brise(el){
 function pairBox(){
  const R=model.rise,h=ctx().h,j=J();let x0=Math.min(model.a.x,model.b.x),x1=Math.max(model.a.x,model.b.x)+W,y0=Math.min(model.a.y,model.b.y),y1=Math.max(model.a.y,model.b.y)+h;
  const bd=j.angled?j.bend(model.jt)*PI/180:0;
- if(bd){const ox=model.b.x-AH().s(model.angle,h/2),oy=model.b.y+pivY(h/2),co=Math.cos(bd),si=Math.sin(bd);
+ if(bd){const ox=model.b.x-AH().s(model.angle,h/2),oy=model.b.y+pivOY(j.bend(model.jt),h/2),co=Math.cos(bd),si=Math.sin(bd);
   for(const u of[0,W])for(const v of[0,h]){const dx=model.b.x+u-ox,dy=model.b.y+v-oy,x=ox+dx*co-dy*si,y=oy+dx*si+dy*co;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}}
  // The fork's parent branch hangs from the knot below the casings, with its leaves and curl.
  if(j.angled&&model.jt>0){const L=AH().hang(h/2),td=(90+j.bend(model.jt)/2)*PI/180,kx=model.a.x+W+AH().s(model.angle,h/2),ky=model.a.y+pivY(h/2),tx=kx+Math.cos(td)*L;
@@ -4037,7 +4175,7 @@ function render(){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h,lit=small?true:m.run;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
   if(small){const[gw,gh]=cDims();el.style.width=gw+'px';el.style.height=gh+'px';growth(el)}
-  if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-AH().s(model.angle,h/2))+'px '+f(pivY(h/2))+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
+  if(id==='b'){const bd=j.angled?j.bend(model.jt):0;el.style.transformOrigin=f(-AH().s(model.angle,h/2))+'px '+f(pivOY(bd,h/2))+'px';el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}
   const svg=el.querySelector('.casing'),key=w+'x'+h+(lit?'L':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}
   {const er=svg.querySelector('.endrim');if(er)er.style.opacity=f(rimOp())}
