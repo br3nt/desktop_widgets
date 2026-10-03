@@ -273,7 +273,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div><div id="tip" role="tooltip"></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M takes Checks to its next size in the picked morph (from the largest it goes back to the first) · Esc cancels a drag. On the rose dial, drag round the rose or drag GitDiscuss's nameplate to set the angle, or focus either and use the arrow keys. On the apse wall, drag the canted wall or GitDiscuss's nameplate, or focus either and use the arrow keys; pick 22.5° or 30° steps beside the slider. On the fan vault, drag the fan or GitDiscuss's nameplate, or focus either and use the arrow keys; tap the springer boss to release. On the chevet, drag the chapels or GitDiscuss's nameplate, or focus either and use the arrow keys; it bends down only, one chapel per 22.5°, and the apse boss at the foot releases. On the lead came, grab the soldered seam and pull down to draw the knife. On the compound pier, drag the lamp out of the bearer's hand. On the nave doors, drag the bar up to lift it; on the portcullis, drag the grille up to winch it. On the frieze procession, drag the procession left, back toward Jarvis, to lead it home. On the stiff-leaf, pull the boss down to break it off. On the bats, tap them, wave across them or press Enter on them to scatter them. On the tracery lock, grab the key and turn it back anticlockwise, two full turns, to draw the bolt. The crypt shade keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the inscription drum, click the drum (or focus it and use Enter or the arrow keys) to turn it a line. Checks has no joining edges, as in the capsule study. Stone moves slowly and smoothly, with weight; nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,JP=50,TOP=70;
@@ -1755,6 +1755,102 @@ const JOINS={
   grab(p){return{x0:p.x,y0:p.y,moved:false}},
   move(d,p){if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true},
   letGo:()=>true
+ },
+ lock:{label:'Tracery lock',kind:'Lock',gap:22,ms:2.2,sepMs:2700,KY:15,
+  say:{join:'The facades close to a hand\'s breadth. The keyhole cover swings aside, the great key is lifted off its ring and pushed into the lock, and two turns shoot the bolt across the joint into GitDiscuss\'s staple.',
+   joined:'Joined: the door lock is shut, the key stands in it, and the red cloth behind the lock\'s tracery glows. Drag either nameplate to move the pair. Turn the key back to release.',
+   sep:'The light goes out, the key turns back twice and the bolt draws home; the key is pulled, hung back on its ring, and the facades part.',
+   hold:'Held mid-join: the key is in the lock, about to turn. Use the scrubber to step through the animation.',
+   ready:'Ready: the thrown bolt, the staple and the key in the lock are chalked in. Release to lock them.',near:'Nearby: the key stirs on its ring and the keyhole cover lifts. Move closer.',readyPh:'Ready · the bolt is marked out',nearPh:'Nearby · the key stirs on its ring',
+   back:'The key turns home again and the bolt shoots back; still locked.'},
+  phase:(jt,dir)=>dir>0?(jt<.36?'Joining · closing in ':jt<.62?'Joining · the key goes in ':jt<.86?'Joining · two turns throw the bolt ':'Joining · the lock lights '):(jt>.68?'Releasing · turning the key back ':jt>.42?'Releasing · the key is hung up ':'Releasing · parting '),
+  dragPh:d=>'Turning the key back · '+Math.round(100*(d.amt||0))+'%',
+  about:'Gothic church doors were shut with iron box locks, and the best were made like small buildings: the case was pierced with tracery and crested along its top, and red cloth or leather was laid behind the tracery so its openings showed colour. Many needed two turns of the key to shoot the bolt all the way. Here Jarvis\'s end pier carries such a lock: two pointed lights under an oculus, cut through the iron over red cloth, a gilt escutcheon with a hinged cover over the keyhole, and a slot in the face where the bolt\'s thumb shows how far it is thrown. The great key, its bow a pierced quatrefoil with a gilt boss, hangs flat against the stone from a ring under the case. GitDiscuss\'s end pier carries an iron staple on an arched plate. <b>Near:</b> the key stirs on its ring, the cover lifts and the iron warms. <b>Ready:</b> the thrown bolt, the staple and the key in the lock are chalked in. Joining: the facades close to a hand\'s breadth and the cover swings aside. The key is lifted off its ring and comes out toward you (it grows and its shadow drops away), turning to point into the lock, so its shank shortens out of sight, and it is pushed home with a little grit. Then it turns twice. Each turn gathers speed and ends with a knock, and the bit drives the bolt half its throw: the bolt runs out of the case\'s side across the joint into the staple, the thumb runs along its slot, and each knock throws grit and a spark at the staple. Last, the red cloth behind the tracery kindles, and light leaks round the key: amber and ruby while both widgets run, cold blue if either is paused. That is the join light. The lock scales down with the wall in any shade. <b>Release:</b> turn the key back: grab it and drag round it anticlockwise, two full turns, and the bolt draws home a half at a time as you go (let go before halfway and it turns home and locks again). Or tap it, or focus it and press Enter. The light goes out, the key turns back twice, is pulled toward you, and is hung back on its ring, the cover drops, and the facades part.',
+  geo(h){const u=clamp((h-HS)/(H-HS));return{u,s:lerp(.5,1,u),cx:365,cy:lerp(h/2+3,62,u)}},
+  // Pierced iron over the cloth: two pointed lights under an oculus, cut out of the plate (even-odd), with cusps in their heads.
+  PLATE:'M-15 -24H15V0H-15Z'+[[-12,-2],[2,12]].map(([a,b])=>`M${a} -2V-12Q${a} -16.5 ${(a+b)/2} -19.5Q${b} -16.5 ${b} -12V-2Z`).join('')+'M-2.6 -20.5A2.6 2.6 0 1 0 2.6 -20.5A2.6 2.6 0 1 0 -2.6 -20.5Z',
+  CUSP:[[-12,-2],[2,12]].map(([a,b])=>`M${a} -15.8L${a+2} -14.2L${a} -12.6ZM${b} -15.8L${b-2} -14.2L${b} -12.6Z`).join(''),
+  CREST:[-15,-9,-3,3,9,15].map(x=>`M${x-2.2} -26.5L${x} -31L${x+2.2} -26.5ZM${x-1} -32A1 1 0 1 0 ${x+1} -32A1 1 0 1 0 ${x-1} -32Z`).join(''),
+  // The key's bow: a quatrefoil outline (four arcs meeting at the diagonals) pierced with four holes.
+  BOW:'M3.38 -3.38A3.4 3.4 0 0 1 3.38 3.38A3.4 3.4 0 0 1 -3.38 3.38A3.4 3.4 0 0 1 -3.38 -3.38A3.4 3.4 0 0 1 3.38 -3.38Z'+[[3.6,0],[-3.6,0],[0,3.6],[0,-3.6]].map(([x,y])=>`M${x-1.1} ${y}A1.1 1.1 0 1 0 ${x+1.1} ${y}A1.1 1.1 0 1 0 ${x-1.1} ${y}Z`).join(''),
+  KEEPER:'M-7.5 -5Q0 -10 7.5 -5V13Q0 17 -7.5 13Z',
+  // How far the bolt is thrown, from the key's turn: the bit drives it in the last fifth of each turn.
+  thr(r){const q=x=>x*x;return .5*q(seg(r,290,360))+.5*q(seg(r,650,720))},
+  st(c){const jt=c.jt,q=1-jt,tn=t=>2*t*t-t*t*t,CO=84;
+   if(jt===0)return{cov:22*c.glow,e:0,ks:1,rot:0,lit:0,k1:0,k2:0};
+   if(model.dir>0){const L=seg(jt,.36,.56),P=seg(jt,.56,.62),k1=seg(jt,.72,.77),k2=seg(jt,.84,.9);
+    // Each turn gathers speed and stops with a knock (a small kick back), so the bolt slams.
+    return{cov:lerp(22*c.glow,CO,ease(seg(jt,.28,.38))),e:ease(L),ks:P>0?lerp(1.45,1,P*P):lerp(1,1.45,ease(seg(L,0,.7))),
+     drv:360*tn(seg(jt,.62,.72))+360*tn(seg(jt,.74,.84)),rot:360*tn(seg(jt,.62,.72))+360*tn(seg(jt,.74,.84))-14*Math.sin(Math.PI*k1)*(1-k1)-14*Math.sin(Math.PI*k2)*(1-k2),lit:seg(jt,.86,1),k1,k2}}
+   // Releasing: the turns are even, so a drag round the key can follow the hand exactly.
+   const W1=seg(q,.32,.4),F=seg(q,.4,.56),e=1-ease(F);
+   return{cov:CO*(1-ease(seg(q,.5,.58))),e,ks:F>0?lerp(1,1.45,e):lerp(1,1.45,ease(W1)),rot:720*(1-seg(q,.06,.32)),lit:1-seg(q,0,.12),k1:0,k2:0}},
+  keyIron(fs){const e=6+15*fs;let s=`<path d="${this.BOW}" fill-rule="evenodd"/>`;
+   // Shank, collar and bit shorten as the key turns to point into the lock.
+   if(fs>.04)s=`<path d="M-1.15 5V${f(e)}H1.15V5Z"/><path d="M1.15 ${f(e-5.2*fs)}H5.6V${f(e-3.4*fs)}H3.9V${f(e-2*fs)}H5.6V${f(e)}H1.15Z"/><rect x="-2.2" y="${f(5.6+1.4*fs)}" width="4.4" height="${f(Math.max(.5,1.7*fs))}" rx=".5"/>`+s;
+   return s},
+  caseFace(r,warm,col,wl,th){const lit=r.lit,cl=mixc([70,15,24],wl?[255,128,74]:[150,176,255],lit*.9);
+   let s=`<rect x="-17.5" y="-25" width="38" height="54" rx="1.2" fill="#000" opacity=".42"/><path d="${this.CREST}" fill="#2b2622" stroke="#0d0a08" stroke-width=".5"/>`+
+    `<rect x="-19" y="-27" width="38" height="54" rx="1.2" fill="#2b2622" stroke="#0d0a08" stroke-width=".7"/><path d="M-18.2 26.2V-26.2H18.2" fill="none" stroke="#7d7266" stroke-width=".5" opacity=".7"/>`+
+    `<rect x="-15" y="-24" width="30" height="24" fill="${cl}"/><path d="M-12 -24V0M-7 -24V0M-2 -24V0M3 -24V0M8 -24V0M13 -24V0" stroke="#000" stroke-width=".35" opacity=".25"/>`;
+   if(lit>0)s+=`<rect x="-14" y="-23" width="28" height="22" fill="${col}" opacity="${f(.6*lit)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`;
+   s+=`<path d="${this.PLATE}" fill-rule="evenodd" fill="#2b2622" stroke="#0d0a08" stroke-width=".5"/><path d="${this.CUSP}" fill="#2b2622"/><path d="M-15 -23.6H15" stroke="#7d7266" stroke-width=".4" opacity=".6"/>`+
+    `<g fill="#8d8378">${[[-17,-25.5],[17,-25.5],[-17,25.5],[17,25.5],[-17,1.2],[17,1.2]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r=".85"/>`).join('')}</g>`+
+    // The slot the bolt's thumb rides in, and the gilt escutcheon with its keyhole
+    `<rect x="-13" y="2.3" width="27" height="3.4" rx="1.7" fill="#0d0a08"/><circle cx="${f(-11+23*th)}" cy="4" r="1.7" fill="#4a423a" stroke="#0d0a08" stroke-width=".4"/><circle cx="${f(-11.4+23*th)}" cy="3.5" r=".6" fill="#b3a898"/>`+
+    `<path d="M0 8L5.2 12.6Q6.6 15 5.2 17.4L0 23L-5.2 17.4Q-6.6 15 -5.2 12.6Z" fill="url(#gild)" stroke="#3b2a12" stroke-width=".5"/><circle cy="14.2" r="1.7" fill="#0b0807"/><path d="M-.9 14.8H.9L1.4 19.6H-1.4Z" fill="#0b0807"/>`;
+   if(warm>0)s+=`<rect x="-19" y="-27" width="38" height="54" rx="1.2" fill="none" stroke="#ffd98a" stroke-width="1" opacity="${f(.75*warm)}"/>`;
+   return s},
+  over(c){
+   const g=this.geo(c.h),r=this.st(c),jt=c.jt,s=g.s,A=model.a,B=model.b,wl=A.run&&B.run,col=wl?'#ffc861':'#9fb8ff',KY=this.KY,sc=f(s*1000)/1000;
+   const ax=A.x+g.cx,ay=A.y+g.cy,U=(x,y)=>[ax+x*s,ay+y*s],TA=`translate(${f(ax)} ${f(ay)}) scale(${sc})`,bx=B.x+14,by=B.y+g.cy,TB=`translate(${f(bx)} ${f(by)}) scale(${sc})`;
+   const warm=c.glow*(1-seg(jt,.3,.5)),dust=JOINS.buttress.dust,iron='fill="#2b2622" stroke="#0d0a08" stroke-width=".6"';
+   const th=this.thr(r.drv??r.rot),ext=Math.max(0,(B.x-A.x+14+3*s-g.cx)/s-21)*th;
+   let o='';
+   // Light spilling onto the stone round the lock
+   if(r.lit>0)o+=`<ellipse cx="${f(ax)}" cy="${f(ay)}" rx="${f(26*s)}" ry="${f(38*s)}" fill="${col}" opacity="${f(.2*r.lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+   // The staple's back plate on GitDiscuss, the bolt (behind the case, so only the thrown part shows), the case, then the staple's front
+   o+=`<g transform="${TB}"><path d="${this.KEEPER}" fill="#000" opacity=".4" transform="translate(1.2 1.6)"/><path d="${this.KEEPER}" ${iron}/><path d="M-6.8 -4.4Q0 -8.8 6.8 -4.4" fill="none" stroke="#7d7266" stroke-width=".45" opacity=".7"/><rect x="-6" y=".6" width="12" height="7" fill="#0b0807"/><circle cy="-4.2" r="1" fill="#8d8378"/><circle cy="11.6" r="1" fill="#8d8378"/>${warm>0?`<path d="${this.KEEPER}" fill="none" stroke="#ffd98a" stroke-width=".9" opacity="${f(.8*warm)}"/>`:''}</g>`;
+   o+=`<g transform="${TA}"><rect x="0" y="1.8" width="${f(21+ext)}" height="4.4" rx=".7" fill="#3a332c" stroke="#0d0a08" stroke-width=".5"/><path d="M1 2.5H${f(20.4+ext)}" stroke="#a0958a" stroke-width=".45" opacity=".75"/>${ext>.5?`<rect x="${f(19+ext)}" y="2.6" width="2" height="2.8" fill="#000" opacity=".3"/>`:''}</g>`;
+   o+=`<g transform="${TA}">${this.caseFace(r,warm,col,wl,th)}</g>`;
+   o+=`<g transform="${TB}"><path d="M-6.8 0V8.2H6.8V0Z" fill="none" stroke="#2b2622" stroke-width="1.9"/><path d="M-7.6 -.6H7.6" stroke="#8d8378" stroke-width=".4"/></g>`;
+   o+=`<g transform="${TA}"><path d="M18.2 0V8.2H22.8V0Z" fill="none" stroke="#2b2622" stroke-width="1.6"/><path d="M17.6 -.5H23.4" stroke="#8d8378" stroke-width=".4"/>`;
+   // Light leaking round the key once it is in
+   if(r.lit>0)o+=`<circle cy="${KY}" r="7.4" fill="${col}" opacity="${f(.5*r.lit)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`;
+   // The keyhole cover, hinged at the top of the escutcheon
+   const CV='M0 9.5C3 10 3.6 13 3 17L0 21.6L-3 17C-3.6 13 -3 10 0 9.5Z';
+   o+=`<g transform="rotate(${f(r.cov)} 0 9.5)"><path d="${CV}" fill="#000" opacity=".35" transform="translate(.8 1)"/><path d="${CV}" fill="#2b2622" stroke="#0d0a08" stroke-width=".5"/><path d="M-1.6 12Q0 10.6 1.6 12" stroke="#8d8378" stroke-width=".4" fill="none"/></g><circle cy="9.5" r=".95" fill="url(#gild)"/>`;
+   const RING=`<path d="M4.6 27V29.6M7.4 27V29.6" stroke="#2b2622" stroke-width="1.2"/><circle cx="6" cy="31.4" r="2.1" fill="none" stroke="#2b2622" stroke-width="1.1"/><path d="M4.4 30.2A2.1 2.1 0 0 1 7.2 29.8" fill="none" stroke="#8d8378" stroke-width=".4"/>`;
+   // Hanging at rest, the key passes through its ring; once lifted, the ring is behind it.
+   if(r.e>0)o+=RING;
+   o+='</g>';
+   // The key: flat on the stone at rest, then out toward you and turned to point into the lock, so its shank shortens away.
+   const e=r.e,ux=lerp(6,0,e)+14*Math.sin(Math.PI*e),uy=lerp(37,KY,e)-10*Math.sin(Math.PI*e),[kx,ky]=U(ux,uy);
+   let sway=0;
+   if(jt===0&&c.glow>0&&drag&&!drag.hit){sway=reduce.matches?4*c.glow:7*c.glow*(c.glow>=1?.4:1)*Math.sin(performance.now()/1000*2.4);
+    // Keep it swaying while the drag holds still.
+    if(drag&&!drag.hit&&!this.raf&&!reduce.matches)this.raf=requestAnimationFrame(()=>{this.raf=0;if(drag&&model.join==='lock'&&model.jt===0&&model.glow>0)render()})}
+   const rot=r.rot+16*Math.sin(Math.PI*e),fs=1-ease(seg(e,.25,.9)),kop=Math.max(clamp((c.h-(g.cy+58*s))/6),seg(e,.15,.35)),ka=(r.ks-1)/.45,ks=s*r.ks,body=this.keyIron(fs);
+   if(kop>0){const KT=(x,y)=>`translate(${f(x)} ${f(y)}) rotate(${f(sway)} 0 ${f(-5.6*s)}) rotate(${f(rot)}) scale(${f(ks*1000)/1000})`;
+    o+=`<g transform="${KT(kx+(1+5*ka)*s,ky+(1.6+8*ka)*s)}" fill="#000" opacity="${f(kop*.32*(1-.4*ka))}">${body}</g>`+
+     `<g transform="${KT(kx,ky)}" opacity="${f(kop)}"><g fill="#2f2a25" stroke="#0d0a08" stroke-width=".55">${body}</g><path d="M-2.2 -5.4A3.4 3.4 0 0 1 2.2 -5.4" fill="none" stroke="#a0958a" stroke-width=".5" opacity=".7"/><circle r="1.5" fill="url(#gild)" stroke="#3b2a12" stroke-width=".4"/></g>`}
+   if(r.e===0)o+=`<g transform="${TA}">${RING}</g>`;
+   // Grit as the key goes home; grit and a spark at the staple as each turn knocks the bolt on.
+   if(model.dir>0&&jt>0){const pc=seg(jt,.6,.67),[hx,hy]=U(0,KY);if(pc>0&&pc<1)o+=dust(hx,hy,pc,4,6*s,51);
+    [[r.k1,4,8,4],[r.k2,6,12,6]].forEach(([k,n,sp,sz],i)=>{if(k<=0||k>=1)return;const tx=bx+3*s,ty=by+4*s,gl=Math.sin(Math.PI*k);o+=dust(tx,ty,k,n,sp*s,61+i*7)+`<g opacity="${f(gl)}">${sparkle(tx+2*s,ty-1*s,sz*s*gl)}</g>`});
+    const lg=seg(jt,.86,.97);if(lg>0&&lg<1){const[gx,gy]=U(4.6,10),gl=Math.sin(Math.PI*lg);o+=`<g opacity="${f(gl)}">${sparkle(gx,gy,5*s*gl)}</g>`}}
+   // Ready: the thrown bolt, the staple where it will be, and the key in the lock, chalked in.
+   const gh=jt===0?seg(c.glow,.8,1)*.85:model.dir>0?.7*(1-seg(jt,.36,.62)):0;
+   if(gh>0){const kx0=(W+this.gap+14-g.cx)/s;
+    o+=`<g transform="${TA}" fill="none" stroke="#f3d48a" stroke-width="${f(.9/s)}" stroke-dasharray="${f(3/s)} ${f(2.4/s)}" opacity="${f(gh)}"><rect x="19" y="1.8" width="${f(kx0+3-19)}" height="4.4" fill="#f3d48a" fill-opacity=".08"/><circle cy="${KY}" r="6.4"/><path d="${this.KEEPER}" transform="translate(${f(kx0)} 0)"/></g>`}
+   if(jt===1)o+=`<g transform="${TA}"><g class="hit" id="lockHit" tabindex="0" role="button" aria-label="Tracery lock: turn the key back, or press Enter, to separate the widgets"><title>Turn the key back (anticlockwise) to unlock</title><rect x="-22" y="-33" width="44" height="64" fill="transparent"/><rect class="ringfocus" x="-24" y="-35" width="48" height="68" rx="3" fill="none" stroke="#f0cf7a" stroke-width="${f(1.5/s)}"/></g></g>`;
+   return o},
+  // Turning the key back: anticlockwise round the keyhole, two full turns to draw the bolt; a tap releases outright.
+  grab(p){const g=this.geo(ctx().h),K={x:model.a.x+g.cx,y:model.a.y+g.cy+this.KY*g.s};return{x0:p.x,y0:p.y,K,prev:Math.atan2(p.y-K.y,p.x-K.x),acc:0,amt:0,moved:false}},
+  move(d,p){const a=Math.atan2(p.y-d.K.y,p.x-d.K.x);let da=(a-d.prev)*180/Math.PI;da=((da+540)%360)-180;d.prev=a;
+   if(Math.hypot(p.x-d.K.x,p.y-d.K.y)>5)d.acc=clamp(d.acc+da,-720,30);
+   if(Math.hypot(p.x-d.x0,p.y-d.y0)>4)d.moved=true;d.amt=clamp(-d.acc/720);if(d.moved)setJt(1-(.06+.26*d.amt))},
+  letGo:d=>!d.moved||d.amt>.5
  }
 };
 /* Lead came: solder colour from cold lead grey (0) to white heat (1). */
