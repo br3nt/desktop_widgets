@@ -208,7 +208,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -958,7 +958,9 @@ function hingeFrame(th,h){
  return{th,sg,yi,ox:EDGE,shr:12*Math.abs(th)/HMAX,oy:sg>0?h-EDGE-yi:EDGE+yi,cos:Math.cos(r),sin:Math.sin(r)};
 }
 // The safety pin and the button joint turn GitDiscuss about the pin (or button) itself, in the middle of the gap at mid-height.
+// A join with its own frame (the godet fan) supplies it.
 function angFrame(th,h){
+ if(J().frame)return J().frame(th,h);
  if(!J().midPivot)return hingeFrame(th,h);
  const r=th*Math.PI/180;return{th,ox:-J().gap/2,oy:h/2,shr:0,cos:Math.cos(r),sin:Math.sin(r)};
 }
@@ -2215,6 +2217,91 @@ JOINS.bunting={label:'Bunting',kind:'Bridge',gap:BU.gap,ms:3800,msDrag:3400,relM
  }
 };
 
+/* ---------- Godet fan: a pleated felt folding fan fills the wedge as GitDiscuss turns ---------- */
+// The fan's rivet is the pivot, in the middle of the gap at the inside corner: the bottom for + angles (the fan opens upward),
+// the top for − angles (it opens downward). Its near guard is held to Jarvis by two felt loops; GitDiscuss straps the far guard
+// with two press-stud straps. Sticks run out to a third of the way, then the pleated felt leaf, bound in a scalloped raspberry edge.
+const FN={gap:16,max:45,det:15,n:12,col:'#a63a50',dk:'#5e1a2a',lt:'#eddcb8',sh:'#c19f6c',ts:[.3,.76],tg:[.17,.6]};
+const fanSg=th=>th>0?1:th<0?-1:model.angle<0?-1:1;
+function fanFrame(th,h){const sg=fanSg(th),r=th*Math.PI/180;return{th,sg,ox:-FN.gap/2,oy:sg>0?h-EDGE-4:EDGE+4,shr:0,cos:Math.cos(r),sin:Math.sin(r)}}
+const fanR=h=>Math.max(17,h-2*EDGE-14);
+// A wooden fan guard (a long flat stick) from the rivet along angle A.
+const fanGuard=(P,A,R,s)=>`<g transform="translate(${f(P.x)} ${f(P.y)}) rotate(${f(A)})"><rect x="-5" y="${f(-3.2*s+1.6)}" width="${f(R+7)}" height="${f(6.4*s)}" rx="${f(3.2*s)}" fill="#000" opacity=".38" filter="url(#sh)"/>`+
+ `<rect x="-5" y="${f(-3.2*s)}" width="${f(R+7)}" height="${f(6.4*s)}" rx="${f(3.2*s)}" fill="url(#fnwood)" stroke="#4e3014" stroke-width=".6"/><path d="M3 ${f(-1.2*s)}H${f(R-2)}M${f(R*.4)} ${f(.9*s)}H${f(R-6)}" stroke="#fff0cf" stroke-opacity=".38" stroke-width=".6" stroke-linecap="round"/></g>`;
+// A raspberry felt loop or strap from x0 to x1 at height y, with a stitched end; snap adds a press stud at x1.
+function fanStrap(x0,x1,y,s,col,snap,glint){
+ const hw=4*s,x=Math.min(x0,x1),w=Math.abs(x1-x0),sd=x1<x0?1:-1;
+ let o=`<rect x="${f(x)}" y="${f(y-hw+1.4)}" width="${f(w)}" height="${f(2*hw)}" rx="${f(hw*.7)}" fill="#000" opacity=".38" filter="url(#sh)"/><rect x="${f(x)}" y="${f(y-hw)}" width="${f(w)}" height="${f(2*hw)}" rx="${f(hw*.7)}" fill="${col}" filter="url(#tagfelt)"/>`+
+  `<path d="M${f(x0-sd*3)} ${f(y-hw+1.6)}v${f(2*hw-3.2)}" stroke="#f7e8c9" stroke-opacity=".85" stroke-width=".9" stroke-dasharray="1.5 1.2"/>`;
+ if(snap){const sx=x1+sd*3.6*s;o+=`<circle cx="${f(sx)}" cy="${f(y)}" r="${f(2.5*s)}" fill="url(#metal)" stroke="#3a3a40" stroke-width=".5"/><circle cx="${f(sx)}" cy="${f(y)}" r="${f(.9*s)}" fill="#55555c"/>`;
+  if(glint>.02)o+=`<path d="M${f(sx+2)} ${f(y-9)}l1.1 2.9 2.9 1.1-2.9 1.1-1.1 2.9-1.1-2.9-2.9-1.1 2.9-1.1z" fill="#fffbe8" opacity="${f(glint)}"/>`}
+ return o;
+}
+JOINS.fan={label:'Godet fan',kind:'Angle · fan',gap:FN.gap,ms:3200,msDrag:2800,relMs:2600,moveEnd:.3,hold:.46,angled:true,frame:fanFrame,cap:true,amax:FN.max,astep:FN.det,det:FN.det,swingAt:.6,
+ ph:[[0,.3,.52,.6,1],[0,.2,.5,.6,1]],
+ about:'A dressmaker\'s godet is a wedge let into a seam so the cloth can open out; here the wedge is a pleated felt folding fan, so the angle between the cushions is filled rather than strained. Twelve pleats of oatmeal felt, each a lit face and a shaded fold, ride on wooden sticks out to a third of their length and are bound with a scalloped raspberry edge and a cream running stitch. Folded, it stands in Jarvis\'s end like a slat, held by two raspberry loops on its near guard, with a horn button for its rivet; GitDiscuss has two press-stud straps folded back on its own end. <b>Near:</b> the fan peeks open a few pleats toward GitDiscuss, and GitDiscuss\'s straps lift. <b>Ready:</b> a ghost of the open fan shows in the gap. Joining (12 fps): the cushions close to a thumb\'s width, the straps flop over the far guard one at a time and the studs snap shut with a glint, then GitDiscuss swings to the angle with an overshoot and the fan opens with it, pleat by pleat, a French knot showing in each crease once it has room. <b>Angle:</b> −45° to +45°, with a detent every 15°. For + angles the rivet sits at the bottom and the fan opens upward; for − angles it sits at the top and the fan hangs open downward. Drag GitDiscuss\'s nameplate, use the Angle slider, or focus GitDiscuss\'s nameplate and press ↑ ↓. A cotton tag shows the angle in cross-stitch while it turns. Jarvis\'s nameplate still moves the pair. <b>Release:</b> tap the fan (or focus it and press Enter). It folds shut as GitDiscuss swings level, the studs pop, the straps fold back and the cushions part.',
+ sayJoin:'GitDiscuss straps the fan\'s far guard, then swings to the angle and the fan opens with it.',
+ sayJoined:'Joined by a godet fan. Drag GitDiscuss\'s nameplate to open or close it; drag Jarvis to move the pair. Tap the fan to unstrap it.',
+ sayRelease:'The fan folds shut, the studs pop and the cushions part.',
+ sayReady:'Ready: release to strap the fan between them.',sayNear:'Nearby: the fan peeks open and GitDiscuss\'s straps lift. Move closer.',
+ sayHold:'Held mid-strap: the second strap is flopping over the fan\'s guard. Use the scrubber to step through it.',phReady:'Ready · release to strap the fan',
+ sayBend:'Opening the godet fan.',turnWord:'Opening',
+ pose:()=>({th:0,ys:0,sq:0}),
+ phase(jt){
+  if(model.dir<0&&model.busy)return jt>.6?'Releasing · folding the fan shut':jt>.44?'Releasing · popping the studs':jt>.3?'Releasing · unstrapping':'Releasing · parting';
+  return jt<.3?'Joining · closing in':jt<.42?'Joining · strapping the guard (1 of 2)':jt<.52?'Joining · strapping the guard (2 of 2)':jt<.6?'Joining · snapping the studs':'Joining · opening the fan';
+ },
+ // The fan's peek (overlay only), and each strap's flop (−1 folded back on GitDiscuss, 1 over the guard) and snap glint.
+ state(c){
+  const jt=c.jt,g=c.glow;
+  if(jt===0&&!(model.busy&&model.dir>0))return{peek:8*g,e:[-1+.45*g,-1+.45*g],gl:[0,0]};
+  const g0=model.dir>0&&model.fast?1:0,base=lerp(-1+.45*g0,-.55,ease(seg(jt,0,.3)));
+  const e=[[.3,.4],[.4,.5]].map(([s0,s1])=>jt<s0?base:lerp(-.55,1,backOut(seg(jt,s0,s1))));
+  const gl=[.4,.5].map(s1=>model.dir>0?Math.sin(Math.PI*seg(jt,s1,s1+.08)):0);
+  return{peek:8*g0*(1-seg(jt,0,.25)),e,gl};
+ },
+ over(c){
+  const a=c.a,b=c.b,h=c.h,jt=c.jt,s=pinScale(h),r=this.state(c),th=bendAt(jt),F=fanFrame(th,h),sg=F.sg,R=fanR(h),r0=R*.32;
+  const P={x:a.x+W+FN.gap/2,y:a.y+F.oy},Pb={x:b.x-FN.gap/2,y:b.y+F.oy};
+  const O=(deg,rr)=>({x:P.x+rr*Math.cos(deg*Math.PI/180),y:P.y+rr*Math.sin(deg*Math.PI/180)});
+  const A0=sg>0?-90:90,span=th+sg*r.peek,A1=A0+span,k=Math.abs(span)/FN.max;
+  let o=`<defs><linearGradient id="fnwood" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#e6bd82"/><stop offset=".5" stop-color="#b9834a"/><stop offset="1" stop-color="#7a4d22"/></linearGradient>`+
+   `<radialGradient id="horn" cx=".36" cy=".3" r=".8"><stop stop-color="#c99057"/><stop offset=".5" stop-color="#8a5226"/><stop offset="1" stop-color="#4a2810"/></radialGradient></defs>`;
+  // Ready: a ghost of the fan open at the set angle.
+  if(c.ghost>0&&jt===0){const ga=Math.abs(model.angle)<4?sg*8:model.angle,q=O(A0+ga,R),sw=ga>0?1:0,d=`M${pt(P)}L${pt(O(A0,R))}A${f(R)} ${f(R)} 0 0 ${sw} ${pt(q)}Z`;
+   o+=`<path d="${d}" fill="#ffc36a" opacity="${f(c.ghost*.4)}" filter="url(#soft)"/><path d="${d}" fill="${FN.lt}" fill-opacity=".18" stroke="#ffe2b0" stroke-opacity=".85" stroke-dasharray="4 3"/>`}
+  // The leaf: one lit face and one shaded fold per pleat, scalloped at the rim; the sticks show below it.
+  // A shade-height fan has fewer, wider pleats, so they still read.
+  const n=clamp(Math.round(R/9),5,FN.n);
+  let lt='',dk='',edge=`M${pt(O(A0,R))}`,sticks='',kn='';const bul=(1.1+2.6*k)*s,ko=clamp((Math.abs(span)/n-.9)/1.6);
+  for(let i=0;i<n;i++){const a0=A0+span*i/n,a1=A0+span*(i+1)/n,am=(a0+a1)/2;
+   const q1=`Q${pt(O((a0+am)/2,R+bul))} ${pt(O(am,R))}`,q2=`Q${pt(O((am+a1)/2,R+bul))} ${pt(O(a1,R))}`;
+   lt+=`M${pt(O(a0,r0))}L${pt(O(a0,R))}${q1}L${pt(O(am,r0))}Z`;dk+=`M${pt(O(am,r0))}L${pt(O(am,R))}${q2}L${pt(O(a1,r0))}Z`;edge+=q1+q2;
+   if(i<n-1&&ko>0){const p=O(a1,R-6.5*s);kn+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(1.7*s)}" fill="${i%2?FN.col:'#e3b343'}" stroke="#3a1a08" stroke-opacity=".5" stroke-width=".5" opacity="${f(ko)}"/>`}}
+  for(let i=1;i<n;i++)sticks+=`M${pt(P)}L${pt(O(A0+span*i/n,r0+5))}`;
+  const outline=`M${pt(P)}L${pt(O(A0,R))}${edge.slice(edge.indexOf('Q'))}Z`;
+  let st='';for(let i=0;i<=20;i++)st+=(i?'L':'M')+pt(O(A0+span*i/20,R-3.6*s));
+  o+=`<path d="${outline}" fill="#000" opacity=".36" filter="url(#sh)" transform="translate(1.2 2.4)"/>`+
+   `<path d="${sticks}" fill="none" stroke="#4e3014" stroke-width="${f(2.6*s)}" stroke-linecap="round"/><path d="${sticks}" fill="none" stroke="#c99a5e" stroke-width="${f(1.6*s)}" stroke-linecap="round"/>`+
+   `<g filter="url(#tagfelt)"><path d="${lt}" fill="${FN.lt}"/><path d="${dk}" fill="${FN.sh}"/></g>`+
+   `<path d="${edge}" fill="none" stroke="${FN.dk}" stroke-width="${f(5*s)}" stroke-linejoin="round"/><path d="${edge}" fill="none" stroke="${FN.col}" stroke-width="${f(3.8*s)}" stroke-linejoin="round"/>`+
+   (k>.04?`<path d="${st}" fill="none" stroke="#fff6e2" stroke-opacity="${f(.85*clamp(k*4))}" stroke-width=".9" stroke-dasharray="2.2 1.8"/>`:'')+kn;
+  // Guards: the near one on Jarvis, the far one turning with GitDiscuss.
+  o+=fanGuard(P,A0,R,s)+fanGuard(P,A1,R,s);
+  // Jarvis's two loops round the near guard, sewn to its end.
+  for(const t of FN.ts){const y=P.y-sg*t*R;o+=fanStrap(a.x+W-EDGE-8,P.x+4.5*s,y,s,FN.col,false,0)}
+  // GitDiscuss's two straps: folded back on its end at rest, they flop over the far guard and snap shut.
+  let gs='';const xa=b.x+EDGE+8,xe=Pb.x-4.5*s;
+  FN.tg.forEach((t,i)=>{const e=r.e[i],y=Pb.y-sg*t*R;if(Math.abs(e)<.04)return;
+   gs+=`<g transform="translate(${f(xa)} 0) scale(${f(e*1000)/1000} 1) translate(${f(-xa)} 0)">${fanStrap(xa,xe,y,s,e<0?FN.dk:FN.col,e>.6,r.gl[i])}</g>`});
+  o+=`<g transform="rotate(${f(th)} ${f(Pb.x)} ${f(Pb.y)})">${gs}</g>`+hornButton(P.x,P.y,.6*s);
+  if(jt===1)o+=`<g class="hit tap" id="pullHit" tabindex="0" role="button" aria-label="Godet fan: tap or press Enter to unstrap it and separate the widgets"><title>Tap the fan to unstrap it</title><path d="${outline}" fill="transparent" stroke="transparent" stroke-width="14" stroke-linejoin="round"/><path class="ringfocus" d="${outline}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
+  // While it turns: the angle in cross-stitch on a pinned cotton tag on the fan's open side (the other side if that leaves the desktop).
+  if(model.turning&&jt===1){const up=sg>0?a.y-34>50:a.y+h+40>590;o+=xTag(P.x,up?a.y-26:a.y+h+26,signed(th).replace('−','-'))}
+  return o;
+ }
+};
+
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
   about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime) were built, and stays as the plainest point of comparison.'},
@@ -2825,7 +2912,7 @@ const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...H
 let anim=0,shadeAnim=0,morphSwitch=0,drag=null,togDrag=null;
 const J=()=>JOINS[model.join];
 // Each angled join keeps its own angle while another join is picked.
-const ANG={hinge:-20,pin:15,bjoint:-15};
+const ANG={hinge:-20,pin:15,bjoint:-15,fan:30};
 let angAnim=0;
 
 const hingeY=y=>fitHinge(fitHinge(y,peakBend(),ctx().h),model.angle,ctx().h);
