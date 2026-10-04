@@ -283,6 +283,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="wv" id="xv2"><div class="tri" role="group" aria-label="Checks, one coloured quarry of light per check, round the middle light"></div></div>
  <div class="wv" id="sv1"><div class="tri" role="group" aria-label="Checks, one stone figure per check"></div></div>
  <div class="wv" id="sv2"><div class="tri" role="group" aria-label="The last ten runs, one stone figure per run"></div></div>
+ <div class="wv" id="mz1"><div class="tri" role="group" aria-label="Checks, one enamel stud per check round the labyrinth's rim"></div></div>
+ <div class="wv" id="mz2"><div class="tri" role="group" aria-label="The last ten runs and the two waiting, as studs round the side labyrinths"></div></div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
 </section>
@@ -6526,6 +6528,161 @@ MORPHS.statues={label:'Statue-columns',kind:'Gather',sizes:[['facade','Facade',0
  say:(d,S)=>d>0?(S[2]===1?'Checks becomes a portal: twelve stone figures climb over the cornice and stand shoulder to shoulder, and the portal head comes down onto them. The two waiting stand outside it.':'The royal portal: two plinths rise beside it and ten more figures, one per run, climb up and carry two side doors.'):(S[2]===0?'The portal head lifts off, and the figures step down behind the facade.':'The side heads lift off, the figures for the runs step down, and the plinths sink into the floor.'),
  about:'A morph of the <b>Gather</b> kind, which hollow\'s bivouac opened: nothing new is carved, and the larger form is built of bodies. On the Royal Portal at Chartres (about 1145) the column shafts of the doorways are people: tall, narrow kings, queens and prophets stand where the shafts should be, each on a socle and under a little canopy, and the lintels and arches rest on them. Here the facade stays at the foot and keeps its nameplate and display. <b>Portal</b> (260 px tall): a ledge is laid along the cornice, and a portal head (an archivolt with gilt studs, a tympanum painted blue with gilt stars, a lintel and a dark embrasure) rises from behind the facade and waits in the air. Small stone figures climb up over the cornice at both ends and waddle along the ledge, rocking from corner to corner of their socles, to stand shoulder to shoulder in front of the colonnettes, the middle places filled first. Only when all twelve stand does the head come down onto their canopies, with a thud that makes them all give a little. Their nimbi kindle gold, ringed green, one per passed check. The two waiting (deploy-preview and e2e-safari) climb up at the ends of the ledge, outside the portal, with red rings: they are not let in under it. The tympanum is gilded: CHECKS, 12 / 14, passed · 86%, and on the lintel RUN 418 · MAIN · 2 WAITING. <b>Royal portal</b> (480 px): like Chartres, three doors. Two plinths rise out of the floor beside the portal and their heads rise and wait; five figures climb onto each, one for each of the last ten runs, and the heads come down onto them. Their nimbi are ringed in their runs\' colours (green all passed, amber 13, red 12). The left tympanum gives the pass rate, the right the two waiting by name. Hover or tap a figure to read its check or run. <b>Shrinking</b> plays it back: the heads lift off and the figures walk back and climb down behind the wall. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest.'};
 
+/* ---------- Morph: labyrinth (Checks) ---------- */
+// g runs 0 facade, 1 labyrinth, 2 three labyrinths. A Ripple morph: the larger form spreads out in rings from one touch, the way still water takes a falling drop.
+// Here the touch is a mason's single blow on a punch: the stone rings, and its rings freeze where they stand as the dark marble circuits of a labyrinth (after Chartres, about 1200;
+// Lucca has one carved upright on a porch pier). The first ring runs furthest and becomes the rim; each later one stops inside it. Everything is a function of g.
+// Frames: the labyrinth's own is CW wide, the three labyrinths' MZW wide, both with x from their left edge and y down from the top of the box.
+const MZH=300,MZW=480,MZF=MZH-CH,MZY=116,MZWALL=[33,40.5,48,55.5,63,70.5,78];
+const mzBox=g=>g<1e-6?[CW,CH]:g<=1?[CW,MZH]:[lerp(CW,MZW,ease(seg(g-1,0,.12))),MZH],mzDims=k=>[[CW,CH],[CW,MZH],[MZW,MZH]][k];
+const mzP=(cx,cy,r,a)=>[cx+r*Math.cos(a*D2R),cy+r*Math.sin(a*D2R)];
+// A ring caught in stone (s 0..1): it runs out past its mark, falls back short and settles, as a ripple would if it stopped.
+const mzRing=s=>s<.6?1.06*(1-Math.pow(1-s/.6,2)):1+.06*Math.pow(1-(s-.6)/.4,2)*Math.cos(3*Math.PI*(s-.6)/.4);
+// A circle broken by gaps (axes in degrees) hw px either side of each axis.
+function mzArcs(cx,cy,r,gaps,hw){
+ if(!gaps.length||hw<.05)return circ(f(cx),f(cy),f(r));
+ const d=hw/r/D2R,G=[...gaps].sort((a,b)=>a-b);let s='';
+ G.forEach((a,n)=>{const b=n+1<G.length?G[n+1]:G[0]+360,a0=a+d,a1=b-d;if(a1<=a0)return;const[x0,y0]=mzP(cx,cy,r,a0),[x1,y1]=mzP(cx,cy,r,a1);
+  s+=`M${f(x0)} ${f(y0)}A${f(r)} ${f(r)} 0 ${a1-a0>180?1:0} 1 ${f(x1)} ${f(y1)}`});
+ return s;
+}
+// Gaps per wall (innermost first) and the turn walls across them, [axis, side of the gap, inner wall, outer wall]: the four axes make the Chartres cross.
+const MZG=[[90],[0,90,180,270],[0,90,180,270],[0,90,180,270],[0,90,180,270],[0,90,180,270],[90]],MZT=[];
+for(const a of[0,180,270])MZT.push([a,-1,1,2],[a,-1,3,4],[a,1,2,3],[a,1,4,5]);
+MZT.push([90,-1,5,6],[90,-1,3,4],[90,-1,1,2],[90,1,4,5],[90,1,2,3],[90,1,0,1]);
+// Studs sit on the rim's cusps (numbered clockwise from the entrance at the foot): the two waiting guard the entrance, the twelve passed run up and round.
+const MZN=[2,4,6,8,10,12,15,17,19,21,23,25,0,27],MZRN=[0,2,4,6,8,11,13,15,17,19];
+const mzCusp=(N,n)=>90+(n+.5)*360/N;
+const mzPlate=(x,y,t1,s1,t2)=>svT(x,y+(t2?3:5),t1,s1,'#3b2408','font-weight="700"')+(t2?svT(x,y+14,t2,8,'#4a3010','font-style="italic" font-weight="700"'):'');
+const MZM={c:[138,MZY],R:100,band:[85.5,11],walls:MZWALL,gaps:MZG,turns:MZT,N:28,cr:4.4,plate:29,id:'mzA',fs:7.6,
+ top:'✠ CHECKS · RUN 418 · MAIN ✠',bot:'12 PASSED · 86% · 2 WAITING',studs:MZN.map((n,j)=>[n,LCOL[j>11?'need':'pass']]),pt:(x,y)=>mzPlate(x,y,'12 / 14',15,'86%')};
+const MZL={c:[57,120],R:44,band:[34.5,9],walls:[18.5,23,27.5],gaps:[[270],[0,180],[90]],turns:[[0,-1,0,1],[180,1,0,1],[0,1,1,2],[180,-1,1,2]],N:20,cr:3.2,plate:15,id:'mzL',fs:6.4,
+ top:'PASS RATE',bot:'RUNS 409–418',studs:MZRN.map((n,r)=>[n,LCOL[orSt(ORUN[r])]]),pt:(x,y)=>mzPlate(x,y,'86%',10.5)};
+const MZR={...MZL,c:[423,120],id:'mzR',top:'WAITING',bot:'FOR YOU',studs:[[0,LCOL.need],[19,LCOL.need]],pt:(x,y)=>mzPlate(x,y,'2',15)};
+// One labyrinth at progress q: s per ring (rim, band, then the walls outermost first), cut (the turns), lu(n) and kin(n) per cusp, pl the plate, tq the lettering.
+function mzRound(S,q){
+ const[x,y]=S.c,T=[S.R,S.band[0],...[...S.walls].reverse()],rr=T.map((t,m)=>t*mzRing(q.s[m])),op=m=>f(seg(q.s[m],.3,.75)),nW=S.walls.length,bw=S.band[1];
+ if(q.s[0]<=0)return '';
+ // The first ring smooths the ashlar into polished stone as it goes.
+ let s=`<circle cx="${x}" cy="${y}" r="${f(rr[0])}" fill="url(#lime)"/><circle cx="${x}" cy="${y}" r="${f(rr[0])}" fill="url(#mzPol)"/>`;
+ if(q.s[1]>0)s+=`<g opacity="${op(1)}"><circle cx="${x}" cy="${y}" r="${f(rr[1])}" fill="none" stroke="#2a2733" stroke-width="${bw}"/><circle cx="${x}" cy="${y}" r="${f(rr[1]-bw/2+.4)}" fill="none" stroke="#8a85a0" stroke-opacity=".5" stroke-width=".6"/></g>`;
+ const hw=4*q.cut;
+ S.walls.forEach((r0,k)=>{const m=1+nW-k;if(q.s[m]<=0)return;const d=mzArcs(x,y,rr[m],S.gaps[k],hw);
+  s+=`<g opacity="${op(m)}"><path d="${d}" fill="none" stroke="#2f2c38" stroke-width="3.4"/><path d="${d}" fill="none" stroke="#9a94b0" stroke-opacity=".35" stroke-width=".8"/></g>`});
+ if(q.cut>0){let td='';for(const[a,sd,ki,ko]of S.turns){const ri=S.walls[ki],ro=S.walls[ko],[x0,y0]=mzP(x,y,ri,a+sd*hw/ri/D2R),[x1,y1]=mzP(x,y,ro,a+sd*hw/ro/D2R);td+=`M${f(x0)} ${f(y0)}L${f(x1)} ${f(y1)}`}
+  s+=`<path d="${td}" stroke="#2f2c38" stroke-width="3.4" stroke-linecap="round" opacity="${f(q.cut)}"/>`}
+ // Rim: lunations pop out round it, a marble border and a pale moulding inside them, and the studs in alternate cusps.
+ let cu='',st='';const sk=new Map(S.studs);
+ for(let n=0;n<S.N;n++){const lu=q.lu(n);if(lu<=0)continue;const sc=lu<.7?lu/.7*1.15:1.15-.15*seg(lu,.7,1),[cx,cy]=mzP(x,y,S.R,mzCusp(S.N,n));
+  cu+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(S.cr*sc)}"/>`;
+  if(sk.has(n)){const kq=q.kin(n),col=sk.get(n),r=S.cr*.62;st+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*sc)}" fill="#3a3440"/>`;
+   if(kq>0)st+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r*2)}" fill="${col}" opacity="${f(.7*kq)}" filter="url(#lglow)" style="mix-blend-mode:screen"/><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="${col}" opacity="${f(kq)}" stroke="url(#gild)" stroke-width=".9"/><circle cx="${f(cx-r*.3)}" cy="${f(cy-r*.3)}" r="${f(r*.3)}" fill="#fff" opacity="${f(.7*kq)}"/>`+(kq<1?`<g opacity="${f(Math.sin(Math.PI*kq))}">${sparkle(cx,cy,S.cr*1.6*Math.sin(Math.PI*kq))}</g>`:'')}}
+ s+=`<g fill="#d6cab0" stroke="#2f2c38" stroke-width=".9">${cu}</g><circle cx="${x}" cy="${y}" r="${f(Math.max(0,rr[0]-1.6))}" fill="none" stroke="#2f2c38" stroke-width="3.4"/><circle cx="${x}" cy="${y}" r="${f(Math.max(0,rr[0]-4.2))}" fill="none" stroke="#fff6e2" stroke-opacity=".6" stroke-width=".8"/>${st}`;
+ // The brass plate at the centre swells out of the punch mark, engraved with a six-lobed rose; then the lettering.
+ if(q.pl>0){const pr=S.plate*ease(q.pl);let ro='';for(let n=0;n<6;n++){const[px,py]=mzP(x,y,pr*.48,n*60-90);ro+=`<circle cx="${f(px)}" cy="${f(py)}" r="${f(pr*.34)}"/>`}
+  s+=`<circle cx="${x}" cy="${y}" r="${f(pr+1.6)}" fill="#2f2c38"/><circle cx="${x}" cy="${y}" r="${f(pr)}" fill="url(#gild)"/><g fill="none" stroke="#8a6420" stroke-opacity=".3" stroke-width=".6">${ro}</g><circle cx="${x}" cy="${y}" r="${f(Math.max(0,pr-1.4))}" fill="none" stroke="#6e4a12" stroke-opacity=".6" stroke-width=".7"/>`}
+ if(q.tq>0){const rt=S.band[0]-bw/2+2,rb=S.band[0]+bw/2-2,[a0,b0]=mzP(x,y,rt,190),[a1,b1]=mzP(x,y,rt,350),[c0,d0]=mzP(x,y,rb,170),[c1,d1]=mzP(x,y,rb,10);
+  s+=`<g opacity="${f(q.tq)}"><path id="${S.id}t" d="M${f(a0)} ${f(b0)}A${rt} ${rt} 0 0 1 ${f(a1)} ${f(b1)}" fill="none"/><path id="${S.id}b" d="M${f(c0)} ${f(d0)}A${rb} ${rb} 0 0 0 ${f(c1)} ${f(d1)}" fill="none"/>`+
+   `<g font-family="Georgia,serif" font-size="${S.fs}" font-weight="700" fill="#eadcb8" letter-spacing="1.1" text-anchor="middle"><text><textPath href="#${S.id}t" startOffset="50%">${S.top}</textPath></text><text><textPath href="#${S.id}b" startOffset="50%">${S.bot}</textPath></text></g>`+
+   `${S.pt(x,y)}</g>`}
+ // The travelling crests, bright on the leading edge with a shadow behind.
+ rr.forEach((r,m)=>{const v=q.s[m];if(v>0&&v<1)s+=`<circle cx="${x}" cy="${y}" r="${f(r)}" fill="none" stroke="#fff6e2" stroke-opacity="${f(.85*(1-v))}" stroke-width="1.6"/><circle cx="${x}" cy="${y}" r="${f(Math.max(.5,r-2.8))}" fill="none" stroke="#2a1d10" stroke-opacity="${f(.25*(1-v))}" stroke-width="1.4"/>`});
+ return s;
+}
+const mzFull={s:[1,1,1,1,1,1,1,1,1],cut:1,lu:()=>1,kin:()=>1,pl:1,tq:1};
+const mzMid=n=>Math.min(n,27-n);
+const mzQ1=u=>({s:[...Array(9)].map((_,m)=>seg(u,.245+.04*m,.465+.04*m)),cut:ease(seg(u,.78,.84)),lu:n=>seg(u,.44+.012*mzMid(n),.48+.012*mzMid(n)),kin:n=>seg(u,.84+.004*mzMid(n),.88+.004*mzMid(n)),pl:seg(u,.9,.95),tq:seg(u,.93,1)});
+// The great ring of the second blow runs out at an easing pace; it reaches the side centres at MZTA, and they ring out in turn.
+const MZRR=280,MZTA=.3+.32*(1-Math.pow(1-Math.hypot(240-57,MZY-120)/MZRR,1/1.6));
+const mzQ2=u=>({s:[...Array(5)].map((_,m)=>seg(u,MZTA+.035*m,MZTA+.18+.035*m)),cut:ease(seg(u,.78,.83)),lu:n=>{const k=Math.min(n,19-n);return seg(u,MZTA+.12+.012*k,MZTA+.16+.012*k)},kin:n=>{const k=Math.min(n,19-n);return seg(u,.83+.008*k,.87+.008*k)},pl:seg(u,.8,.88),tq:seg(u,.9,1)});
+const mzJoints=(x0,y0,x1,y1)=>{let jd='',r=0;for(let y=y0+14;y<y1;y+=14,r++){jd+=`M${x0} ${y}H${x1}`;for(let x=x0+(r%2?17:0)+6;x<x1;x+=34)jd+=`M${x} ${y-14}V${y}`}
+ return `<path d="${jd}" fill="none" stroke="#4a3b2a" stroke-opacity=".3" stroke-width=".8"/><path d="${jd}" fill="none" stroke="#fff7e6" stroke-opacity=".22" stroke-width=".8" transform="translate(0 .9)"/>`};
+const mzQuat=(x,y,r)=>`<g transform="translate(${x} ${y})"><circle r="${r}" fill="none" stroke="#2a1d10" stroke-opacity=".3"/><g fill="#24180d" opacity=".3">${[[1,0],[-1,0],[0,1],[0,-1]].map(([a,b])=>`<circle cx="${f(a*r*.4)}" cy="${f(b*r*.4)}" r="${f(r*.42)}"/>`).join('')}</g><circle r="${f(r*.18)}" fill="url(#gild)"/></g>`;
+// The labyrinth's wall (ashlar with quatrefoils in the spandrels), its cornice and cresting, and the two side piers with gablets and plaques.
+const MZPAN=`<rect x="4" y="8" width="268" height="${MZF-8}" fill="url(#lime)" filter="url(#st-m0)"/>${mzJoints(4,8,272,MZF)}`+[[24,30],[252,30],[24,200],[252,200]].map(([x,y])=>mzQuat(x,y,9)).join('');
+const MZCOR=`<rect x="0" y="5" width="276" height="7" fill="url(#lime)" filter="url(#st-m0)"/><path d="M0 5.6H276" stroke="#fff6e2" stroke-opacity=".6"/><path d="M0 11.6H276" stroke="#2a1d10" stroke-opacity=".5"/>`+
+ `<g fill="#cbbd9f" stroke="#6d5d46" stroke-width=".4">${[...Array(27)].map((_,n)=>{const x=8+10*n;return `<path d="M${x-2.6} 5.2L${x} 1.6L${x+2.6} 5.2Z"/><circle cx="${x}" cy="1.6" r="1.2"/>`}).join('')}</g>`;
+// Each pier steps in 4 px beside the facade, so it never covers the facade's edge; its joints are clipped to its outline.
+const MZPIER=[`M8 ${MZH}V36L57 14L106 36V${MZF}H102V${MZH}Z`,`M378 ${MZH}V${MZF}H374V36L423 14L472 36V${MZH}Z`];
+const MZWING=`<g clip-path="url(#mzPr)">`+[8,374].map((x0,n)=>{const x1=x0+98,xm=x0+49;
+ return `<path d="${MZPIER[n]}" fill="url(#lime)" filter="url(#st-m0)"/>${mzJoints(x0,36,x1,MZH-11)}<path d="M${x0} 36.6L${xm} 14.6L${x1} 36.6" fill="none" stroke="#fff6e2" stroke-opacity=".55"/><path d="M${x0} 38H${x1}" stroke="#3a2c1c" stroke-opacity=".35"/>`+
+  `<path d="M${x0} ${MZH-11}H${x1}" stroke="#3a2c1c" stroke-opacity=".38"/><path d="M${x0} ${MZH-9.8}H${x1}" stroke="#fff6e2" stroke-opacity=".45"/>`+
+  `<g fill="url(#gild)" stroke="#3a2608" stroke-width=".4"><rect x="${xm-1}" y="4" width="2" height="9"/><circle cx="${xm}" cy="3.4" r="1.9"/><circle cx="${xm-3}" cy="7" r="1.4"/><circle cx="${xm+3}" cy="7" r="1.4"/></g>`+
+  `<rect x="${x0+8}" y="177" width="82" height="32" rx="1.5" fill="#3a2a18" opacity=".18"/><path d="M${x0+8} 177.6H${x0+90}" stroke="#2a1d10" stroke-opacity=".45"/><path d="M${x0+8} 208.6H${x0+90}" stroke="#fff8e8" stroke-opacity=".55"/>`}).join('')+'</g>';
+const MZPLQ=svT(57,190,'LAST TEN RUNS',6,'#6e4a12','letter-spacing="1" font-weight="700"')+svT(57,203,'6 of 10 all green',8.4,'#3b2c1f','font-style="italic"')+
+ svT(423,191,'deploy-preview',8.6,'#3b2c1f','font-weight="700"')+svT(423,203,'e2e-safari',8.6,'#3b2c1f','font-weight="700"');
+// A mason's punch held on the mark and a round mallet on a handle that swings about (30,-44): ang 40 raised, 0 on the punch.
+const mzTools=(X,Y,sh,ang,lf)=>sh<=0?'':`<g opacity="${f(sh)}" transform="translate(${f(X)} ${f(Y-lf)})"><path d="M-1 -1L-2 -24H2L1 -1Z" fill="#4a4550" stroke="#1d1a20" stroke-width=".5"/><path d="M-2.6 -24H2.6V-27.4H-2.6Z" fill="#6a6470" stroke="#1d1a20" stroke-width=".4"/>`+
+ `<g transform="rotate(${f(ang)} 33 -46)"><path d="M6 -33L35 -47" stroke="${WDK}" stroke-width="2.8" stroke-linecap="round"/><path d="M6 -33.6L35 -47.6" stroke="${WLT}" stroke-width=".8" stroke-opacity=".7"/>`+
+ `<ellipse cx="1" cy="-33.4" rx="8.4" ry="6.2" transform="rotate(-25 1 -33.4)" fill="${WOOD}" stroke="${WDK}" stroke-width=".8"/><path d="M-5 -35Q0 -39 6 -37" fill="none" stroke="${WLT}" stroke-opacity=".7" stroke-width=".8"/></g></g>`;
+// One blow: the tools come in (a), the mallet swings and lands at h, and they lift away. Returns the tools and the flash, dust and sparks of the blow.
+function mzBlow(X,Y,u,a,h,sd,mk){
+ const sh=seg(u,a,a+.04)*(1-seg(u,h+.03,h+.07)),ang=40*(1-Math.pow(seg(u,h-.04,h),2)),lf=10*seg(u,h+.03,h+.07),fl=seg(u,h,h+.06);let s=mzTools(X,Y,sh,ang,lf);
+ if(fl>0&&fl<1)s+=`<circle cx="${f(X)}" cy="${f(Y)}" r="${f(4+22*fl)}" fill="#fff4d8" opacity="${f(.55*(1-fl))}" filter="url(#lglow)" style="mix-blend-mode:screen"/><g opacity="${f(1-fl)}">${sparkle(X,Y,8*(1-fl))}</g>`+JOINS.buttress.dust(X,Y,fl,7,14,sd);
+ // The punch mark stays until the plate swells over it; the second blow lands on the plate, so it leaves none.
+ if(mk&&u>=h&&u<h+.7)s+=`<circle cx="${f(X)}" cy="${f(Y)}" r="1.6" fill="url(#gild)" opacity="${f(1-seg(u,h+.64,h+.7))}"/>`;
+ return s;
+}
+function mzRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),[w,h]=mzBox(g),cx=w/2,ox=cx-CW/2,oy=h-MZH,X0=cx-MZW/2,P1=i>0,dust=JOINS.buttress.dust;
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='mz'){ms.dataset.key='mz';ms._d='';ms._bx=null;fx._s=null;
+  ms.innerHTML=`<defs><radialGradient id="mzPol" cx=".4" cy=".34" r=".7"><stop stop-color="#fffaf0" stop-opacity=".42"/><stop offset=".6" stop-color="#fffaf0" stop-opacity=".08"/><stop offset="1" stop-color="#3a2c1c" stop-opacity=".12"/></radialGradient>`+
+   `<clipPath id="mzUp"><rect x="-700" y="-400" width="1900" height="${MZF+400}"/></clipPath><clipPath id="mzFl"><rect x="-700" y="-400" width="1900" height="${MZH+400}"/></clipPath>`+
+   `<clipPath id="mzWv"><rect x="106" y="8" width="268" height="${MZF-8}"/><path d="${MZPIER[0]}"/><path d="${MZPIER[1]}"/></clipPath><clipPath id="mzPr"><path d="${MZPIER[0]}"/><path d="${MZPIER[1]}"/><rect x="50" y="-10" width="14" height="26"/><rect x="416" y="-10" width="14" height="26"/></clipPath></defs><g class="ofac">${cas(0)}</g><g class="odyn"></g>`}
+ const bx=f(w)+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${f(w)} ${h}`)}}
+ ms.querySelector('.ofac').setAttribute('transform',`translate(${f(ox)} ${oy+MZF})`);
+ let d='',e='';
+ // The labyrinth: a wall rises from behind the facade, the mallet strikes the punch once, and nine rings run out and freeze;
+ // the turns are cut, lunations pop out round the rim, the studs kindle, the brass plate swells from the mark and the lettering is gilded.
+ {const pr=P1?1:ease(seg(u,0,.14));
+  if(pr>0){const q=P1?mzFull:mzQ1(u);
+   d+=`<g transform="translate(${f(ox)} ${oy})"><g clip-path="url(#mzUp)"><g transform="translate(0 ${f(MZF*(1-pr))})">${MZPAN}${mzRound(MZM,q)}${MZCOR}</g></g></g>`;
+   if(!P1){const ld=seg(u,.12,.22);if(ld>0&&ld<1)for(const x of[20,138,256])e+=dust(ox+x,oy+MZF,ld,4,10,700+x);
+    e+=mzBlow(ox+138,oy+MZY,u,.13,.24,710,1);
+    const cd=seg(u,.78,.86);if(cd>0&&cd<1)[0,90,180,270].forEach((a,n)=>{const[px,py]=mzP(ox+138,oy+MZY,55,a);e+=dust(px,py,cd,3,6,720+n)})}}}
+ // Three labyrinths: the wall opens out, two piers rise from the floor, the mallet strikes the centre again, and one great ring runs out across the stone;
+ // where it reaches the piers' centres two smaller labyrinths ring out, then their studs kindle (one per run on the left), their plates swell and the plaques are lettered.
+ if(P1&&u>0){const wr=ease(seg(u,.1,.22));let s='';
+  if(wr>0){const q1=mzQ2(u),pl=seg(u,.9,1);
+   s+=`<g clip-path="url(#mzFl)"><g transform="translate(0 ${f((MZH+2)*(1-wr))})">${MZWING}${mzRound(MZL,q1)}${mzRound(MZR,q1)}${pl>0?`<g opacity="${f(pl)}">${MZPLQ}</g>`:''}</g></g>`}
+  d=`<g transform="translate(${f(X0)} ${oy})">${s}</g>`+d;
+  // The great ring passes over the labyrinth already laid, so it is drawn above everything on the wall.
+  const cs=seg(u,.3,.62);if(cs>0&&cs<1){const R=MZRR*(1-Math.pow(1-cs,1.6));
+   d+=`<g transform="translate(${f(X0)} ${oy})" clip-path="url(#mzWv)"><circle cx="240" cy="${MZY}" r="${f(R)}" fill="none" stroke="#fff6e2" stroke-opacity="${f(.95*(1-seg(cs,.55,1)))}" stroke-width="2.4"/><circle cx="240" cy="${MZY}" r="${f(Math.max(.5,R-3.6))}" fill="none" stroke="#2a1d10" stroke-opacity="${f(.55*(1-seg(cs,.55,1)))}" stroke-width="2.4"/></g>`}
+  const ld=seg(u,.2,.3);if(ld>0&&ld<1)for(const x of[14,100,380,466])e+=dust(X0+x,oy+MZH-2,ld,4,10,730+x);
+  e+=mzBlow(ox+138,oy+MZY,u,.2,.3,740,0);
+  const gl=seg(u,MZTA-.01,MZTA+.06);if(gl>0&&gl<1)for(const S of[MZL,MZR])e+=`<g opacity="${f(Math.sin(Math.PI*gl))}">${sparkle(X0+S.c[0],oy+S.c[1],7*Math.sin(Math.PI*gl))}</g>`;
+  const cd=seg(u,.78,.85);if(cd>0&&cd<1)for(const S of[MZL,MZR])[0,180].forEach((a,n)=>{const[px,py]=mzP(X0+S.c[0],oy+S.c[1],23,a);e+=dust(px,py,cd,3,5,750+n+S.c[0])})}
+ if(ms._d!==d){ms._d=d;ms.querySelector('.odyn').innerHTML=d}
+ if(fx._s!==e){fx._s=e;fx.innerHTML=e}
+ // Displays: the facade keeps its own; the studs take taps once they are lit.
+ const v1=P1||u>.99,v2=P1&&u>.99;
+ for(const[id,v,x]of[['#mz1',v1,ox],['#mz2',v2,X0]]){const n=$(id);if(!v)n.style.display='none';else Object.assign(n.style,{display:'block',left:f(x)+'px',top:oy+'px'})}
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+oy+MZF)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+oy+MZF)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'rings spreading through the stone')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function mzPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0;let t;
+ if(i===0){const n=[...Array(9)].filter((_,m)=>u>=.465+.04*m).length;
+  t=u<.14?(up?'a wall rises from behind the facade':'the wall sinks behind the facade'):u<.245?(up?'a mason sets a punch on the centre and strikes it once':'the rings close on the punch mark'):
+   u<.78?(up?'the stone rings, and each ring freezes where it stands, '+n+' of 9 set':'the rings run back into the centre, '+n+' still set'):u<.84?(up?'the turns are cut through the circuits':'the turns close up'):
+   u<.9?(up?'fourteen studs kindle round the rim, one per check':'the studs go dark'):(up?'the brass plate swells from the mark and the lettering is gilded':'the lettering fades and the plate shrinks into the mark')}
+ else t=u<.22?(up?'the wall opens out and two piers rise from the floor':'the piers sink into the floor'):u<.3?(up?'the mallet comes down on the centre again, harder':'the mallet lifts away'):
+  u<MZTA?(up?'one great ring runs out across the stone':'the great ring runs back to the centre'):u<.78?(up?'where it lands, two more labyrinths ring out':'the side labyrinths close in on their centres'):
+  u<.9?(up?'their studs kindle, one per run on the left':'their studs go dark'):(up?'their plates swell and the plaques are lettered':'the plaques fade');
+ return 'Checks · '+t;
+}
+MORPHS.maze={label:'Labyrinth',kind:'Ripple',sizes:[['facade','Facade',0,'a facade'],['maze','Labyrinth',1,'a labyrinth'],['mazes','Three labyrinths',2,'three labyrinths']],ms:[5200,3400],
+ box:mzBox,dims:mzDims,render:mzRender,phase:mzPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes a labyrinth: a mason strikes the stone once, and its rings freeze where they stand as dark marble circuits.':'Three labyrinths: the wall opens out, the mallet strikes again, and the great ring rings out two more where it lands.'):(S[2]===0?'The rings run back into the punch mark, and the wall sinks behind the facade.':'The side labyrinths close in on their centres, and the piers sink into the floor.'),
+ about:'A morph of the <b>Ripple</b> kind, which elven\'s dewfall opened: the larger form spreads out in rings from one touch, the way still water takes a falling drop. Stone takes a blow the same way: a mason sounds a block by striking it, and true stone rings. Here the rings freeze where they stand, and what they leave is a pavement labyrinth after the one laid in the nave at Chartres about 1200, with its rim of lunations, its turns along four axes that make a cross, and the brass plate that once sat at its centre (Lucca has a smaller one carved upright on a porch pier). The facade stays at the foot and keeps its nameplate and display. <b>Labyrinth</b> (300 px tall): an ashlar wall with quatrefoils in its spandrels rises from behind the facade. A mason sets an iron punch on its centre and brings a round mallet down on it once: a flash, a puff of grit, a gilt mark. Nine rings run out from the mark. The first smooths the ashlar into polished stone as it goes, overshoots and settles as the rim; each later one stops a little further in, wobbles and darkens into a marble band, so the inscription band and the seven walls are rings caught as they stopped. Then the turns are cut through the walls, lunations pop out round the rim, and fourteen enamel studs kindle in alternate cusps, one per check: twelve green running up and round, the two waiting (deploy-preview and e2e-safari) red, guarding the entrance at the foot. The brass plate swells out of the mark with a six-lobed rose engraved on it, reading 12 / 14 and 86%, and the band is lettered CHECKS · RUN 418 · MAIN over the top and 12 PASSED · 86% · 2 WAITING under it. Hover or tap a stud to read its check. <b>Three labyrinths</b> (480 px): the wall opens out and two gabled piers rise from the floor. The mallet strikes the centre again, harder, and one great ring runs out across all the stone. Where it reaches the piers\' centres, each rings out a smaller labyrinth of its own: the left one\'s ten studs are the last ten runs in their colours (green all passed, amber 13, red 12), with 86% on its plate and LAST TEN RUNS · 6 of 10 all green on a plaque below; the right one holds the two waiting, and its plaque names them. <b>Shrinking</b> plays it back: the rings run back into the mark, and the wall sinks behind the facade. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest.'};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30,roll:30,cwt:30,scr:30,lace:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
@@ -6780,6 +6937,12 @@ CHK.forEach((n,j)=>{const[x,y]=GLROS[j];orTipBtn('#gv1 .tri',`Rosette ${j+1} of 
 /* Statue-columns: hover, focus or tap a figure to read its check, or at the side doors its run. */
 CHK.forEach((n,j)=>{const x=j<12?SVJ[j]:SVWT[j-12];orTipBtn('#sv1 .tri',`Figure ${j+1} of 14 · ${n} · ${j>11?'outside the portal, waiting for your approval':'under the lintel, passed'}`,j>11?'need':'pass',`left:${x-8}px;top:${SVB-68}px;width:16px;height:68px`)});
 ORUN.forEach((v,r)=>orTipBtn('#sv2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${svSX(r<5?1:0,r%5)-8}px;top:${SVB-68}px;width:16px;height:68px`));
+/* Labyrinth: hover, focus or tap a stud to read its check, the plate for the run, or on the side labyrinths a run or a waiting check. */
+const mzStud=(S,n,r)=>{const[x,y]=mzP(S.c[0],S.c[1],S.R,mzCusp(S.N,n));return `left:${f(x-r)}px;top:${f(y-r)}px;width:${2*r}px;height:${2*r}px`};
+CHK.forEach((n,j)=>orTipBtn('#mz1 .tri',`Stud ${j+1} of 14 · ${n} · ${j>11?'red, guarding the entrance, waiting for your approval':'green, passed'}`,j>11?'need':'pass',mzStud(MZM,MZN[j],6)));
+orTipBtn('#mz1 .tri','The brass plate · run 418 on main · 12 of 14 passed · 86%','run',`left:${138-29}px;top:${MZY-29}px;width:58px;height:58px`);
+ORUN.forEach((v,r)=>orTipBtn('#mz2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),mzStud(MZL,MZRN[r],5)));
+[[0,12],[19,13]].forEach(([n,j])=>orTipBtn('#mz2 .tri',`${CHK[j]} · waiting for your approval`,'need',mzStud(MZR,n,5)));
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
