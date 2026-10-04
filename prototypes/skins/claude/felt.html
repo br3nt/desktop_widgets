@@ -1683,6 +1683,158 @@ function ironDraw(id,w,h,small,st){
  if(pf)t+=`<g fill="#fbf6ec" stroke="#cdbfa8" stroke-opacity=".5" stroke-width=".5" filter="url(#g-${id})">${pf}</g>`;
  return t;
 }
+
+/* ---------- Jigsaw shade ---------- */
+// The Tessellate kind (gothic's Cosmati band, elven's leaf tesserae, wire's honeycomb) done in felt, from the felt
+// jigsaws in the toy cupboard: the cushion is cut into its own puzzle and set again as a strip, nothing added and
+// nothing thrown away. The name band is lifted off and held up out of the way, a cake of tailor's chalk marks the
+// cutting lines and felt shears snip along them. Each column of pieces is then turned a quarter and shrunk, so the
+// knobs that held it together lock it again lying down; the columns are shuffled along the strip, and every piece
+// flies on its own. The band is laid back over the top of the row, the name is satin-stitched on it, the value is
+// cross-stitched across the pieces, and a felt ball on the band's end is the status colour.
+const JZ_MS=4400,JZ_CUT=.46,JZ_PERM=[0,3,1,4,2,5],JZ_ORD=[2,3,1,4,0,5],JZG={};
+// One cut edge from P to Q as points. s is the side the knob bulges to (0 for a straight edge), off moves it along,
+// kp is its depth: a neck, then a round head drawn as most of a circle.
+function jzEdge(P,Q,s,off,kp){
+ if(!s)return[P,Q];
+ const dx=Q.x-P.x,dy=Q.y-P.y,L=Math.hypot(dx,dy),u={x:dx/L,y:dy/L},n={x:u.y*s,y:-u.x*s},m=L/2+off;
+ const loc=[[0,0],[m-.46*kp,0],[m-.28*kp,.06*kp],[m-.2*kp,.3*kp]];
+ for(let i=1;i<12;i++){const t=-2.124-5.176*i/12;loc.push([m+.38*kp*Math.cos(t),kp*(.62+.38*Math.sin(t))])}
+ loc.push([m+.2*kp,.3*kp],[m+.28*kp,.06*kp],[m+.46*kp,0],[L,0]);
+ return loc.map(([a,b])=>({x:P.x+u.x*a+n.x*b,y:P.y+u.y*a+n.y*b}));
+}
+// A polyline with its running length, and the part of it up to fraction q (with the point and heading at its end).
+function jzLine(pts){const c=[0];for(let i=1;i<pts.length;i++)c.push(c[i-1]+Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y));return{pts,c,L:c[c.length-1]}}
+function jzSub(l,q){
+ if(q<=0)return null;const T=clamp(q)*l.L,o=[l.pts[0]];let i=1;
+ for(;i<l.pts.length&&l.c[i]<=T;i++)o.push(l.pts[i]);
+ if(i<l.pts.length){const a=l.pts[i-1],b=l.pts[i],k=(T-l.c[i-1])/(l.c[i]-l.c[i-1]||1);o.push({x:lerp(a.x,b.x,k),y:lerp(a.y,b.y,k)})}
+ const e=o[o.length-1],p=o[Math.max(0,o.length-3)];
+ return{d:'M'+o.map(p=>f(p.x)+' '+f(p.y)).join('L'),end:e,ang:Math.atan2(e.y-p.y,e.x-p.x)*180/Math.PI};
+}
+// The puzzle, cut per widget (its knobs follow the skin's seed): pieces with their source middle, their slot in the
+// strip, and when they leave and land. Strip pieces are ph·k wide and pw·k tall; each column lies down as pw wide.
+function jzGeo(id,small){
+ const key=id+(small?'s':'');if(JZG[key])return JZG[key];
+ const w=small?CW:W,H0=small?CH:H,R=small?2:3,C=6,pw=(w-2*EDGE)/C,ph=(H0-2*EDGE)/R,k=pw/(H0-2*EDGE),HF=small?54:60,kd=.24*Math.min(pw,ph);
+ const rowH=pw*k,rowTop=HF-EDGE-kd*k-1-rowH;
+ let sd=SKIN[id].seed*7919+13;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+ const X=i=>EDGE+i*pw,Y=j=>EDGE+j*ph,Hs=[],Vs=[];
+ for(let j=0;j<=R;j++){Hs[j]=[];for(let i=0;i<C;i++){const inn=j>0&&j<R;Hs[j][i]=jzEdge({x:X(i),y:Y(j)},{x:X(i+1),y:Y(j)},inn?(rnd()<.5?1:-1):0,inn?(rnd()-.5)*.12*pw:0,kd)}}
+ for(let j=0;j<R;j++){Vs[j]=[];for(let i=0;i<=C;i++){const inn=i>0&&i<C;Vs[j][i]=jzEdge({x:X(i),y:Y(j)},{x:X(i),y:Y(j+1)},inn?(rnd()<.5?1:-1):0,inn?(rnd()-.5)*.12*ph:0,kd)}}
+ const rs=SKIN[id].r,corners=[[X(0),Y(0),rs[0]],[X(C),Y(0),rs[1]],[X(C),Y(R),rs[2]],[X(0),Y(R),rs[3]]],rev=a=>a.slice().reverse(),pieces=[];
+ for(let j=0;j<R;j++)for(let i=0;i<C;i++){
+  const pts=[...Hs[j][i],...Vs[j][i+1].slice(1),...rev(Hs[j+1][i]).slice(1),...rev(Vs[j][i]).slice(1,-1)];
+  // The cushion's own rounded corners stay on the corner pieces.
+  for(const[cx,cy,cr]of corners){const q=pts.findIndex(p=>Math.abs(p.x-cx)<.01&&Math.abs(p.y-cy)<.01);if(q<0)continue;
+   const Pp=pts[(q-1+pts.length)%pts.length],Np=pts[(q+1)%pts.length],r=Math.min(cr,pw/2,ph/2),to=(p,s)=>{const l=Math.hypot(p.x-cx,p.y-cy);return{x:cx+(p.x-cx)/l*s,y:cy+(p.y-cy)/l*s}};
+   const A=to(Pp,r),B=to(Np,r),arc=[];for(let t=0;t<=1.001;t+=.2)arc.push({x:(1-t)*(1-t)*A.x+2*t*(1-t)*cx+t*t*B.x,y:(1-t)*(1-t)*A.y+2*t*(1-t)*cy+t*t*B.y});
+   pts.splice(q,1,...arc)}
+  const o=JZ_ORD.indexOf(i),dep=.48+j*(small?.09:.07)+o*.011;
+  pieces.push({j,i,d:'M'+pts.map(p=>f(p.x)+' '+f(p.y)).join('L')+'Z',cx:X(i)+pw/2,cy:Y(j)+ph/2,
+   sx:EDGE+JZ_PERM.indexOf(i)*pw+(R-1-j+.5)*ph*k,sy:rowTop+rowH/2,dep,land:dep+.17,rot:(i+j)%2?90:-270,arc:16+6*(o%3)})}
+ const hl=[],vl=[];
+ for(let j=1;j<R;j++){const p=[];Hs[j].forEach((e,n)=>p.push(...(n?e.slice(1):e)));hl.push(jzLine(j%2?p:rev(p)))}
+ for(let i=1;i<C;i++){const p=[];for(let j=0;j<R;j++)p.push(...(j?Vs[j][i].slice(1):Vs[j][i]));vl.push(jzLine(p))}
+ const cutD=[...hl,...vl].map(l=>'M'+l.pts.map(p=>f(p.x)+' '+f(p.y)).join('L')).join('');
+ return JZG[key]={w,H0,R,C,pw,ph,k,HF,kd,rowH,rowTop,X,pieces,hl,vl,cutD};
+}
+// Where a piece is at st: middle, turn, scale, how high it is lifted (0..1) and its landing squash.
+function jzPose(p,G,st){
+ // The rock dies away just before take-off, so the flight starts square.
+ if(st<p.dep){const r=seg(st,JZ_CUT,JZ_CUT+.02)*(1-seg(st,p.dep-.015,p.dep)),fr=Math.floor(st*JZ_MS/FRAME);return{x:p.cx,y:p.cy,th:r*Math.sin(fr*2.1+p.i*1.7+p.j*2.9)*2.4,sc:1-.025*r,lift:0,sq:0,fly:0}}
+ if(st<p.land){const q=seg(st,p.dep,p.land),e=ease(q),b=Math.sin(Math.PI*q);
+  return{x:lerp(p.cx,p.sx,e),y:lerp(p.cy,p.sy,e)-p.arc*b,th:p.rot*e,sc:lerp(.975,G.k,e)*(1+.1*b),lift:b,sq:0,fly:1}}
+ const sq=Math.sin(Math.PI*seg(st,p.land,p.land+.035))*.1;
+ return{x:p.sx,y:p.sy,th:90,sc:G.k,lift:0,sq:sq>1e-4?sq:0,hb:G.rowH/2,fly:0};
+}
+// A landing squash presses the piece down onto the strip (about its bottom edge), not in toward its middle.
+const jzTf=(O,p,dx=0,dy=0)=>`translate(${f(O.x+dx)} ${f(O.y+dy)})${O.sq?` translate(0 ${f(O.hb)}) scale(${f(1+O.sq)} ${(1-O.sq).toFixed(3)}) translate(0 ${f(-O.hb)})`:''} rotate(${f(O.th)}) scale(${O.sc.toFixed(4)}) translate(${f(-p.cx)} ${f(-p.cy)})`;
+// The box follows the lowest piece, so joins and neighbours see the strip close up as the bottom row flies.
+function jzH(st,small){
+ const G=jzGeo(small?'c':'a',small);if(st<JZ_CUT)return G.H0;let b=0;
+ for(const p of G.pieces){const O=jzPose(p,G,st),t=O.th*Math.PI/180;b=Math.max(b,O.y+((Math.abs(Math.cos(t))*G.ph+Math.abs(Math.sin(t))*G.pw)/2+G.kd)*O.sc)}
+ return Math.round(clamp(b+EDGE,G.HF,G.H0));
+}
+// Felt shears side on, points to +x, pivot at 0: silver blades opening and closing frame by frame, raspberry loops.
+function jzShears(open){
+ const a=open?13:3,bl='M0 0L15 -1.3Q16.4 -.2 15 .5L0 1.2Z';
+ return `<g transform="rotate(${-a})"><path d="${bl}" fill="url(#metal)" stroke="#4a443d" stroke-width=".5"/><path d="M0 0L-8 3.6" stroke="#c4485a" stroke-width="2.4" stroke-linecap="round"/><circle cx="-10.5" cy="4.6" r="3.2" fill="none" stroke="#c4485a" stroke-width="2.2"/></g>`+
+  `<g transform="rotate(${a})"><path d="${bl}" transform="scale(1 -1)" fill="url(#metal)" stroke="#4a443d" stroke-width=".5"/><path d="M0 0L-8 -3.6" stroke="#c4485a" stroke-width="2.4" stroke-linecap="round"/><circle cx="-10.5" cy="-4.6" r="3.2" fill="none" stroke="#c4485a" stroke-width="2.2"/></g>`+
+  `<circle r="1.3" fill="#f1e6cc" stroke="#4a443d" stroke-width=".4"/>`;
+}
+// A cake of tailor's chalk, a rounded triangle held point down on the line.
+const jzChalk=`<path d="M0 0L-5.5 -10Q0 -12.5 5.5 -10Z" fill="#000" opacity=".25" transform="translate(1 1)"/><path d="M0 0L-5.5 -10Q0 -12.5 5.5 -10Z" fill="#cfe1ee" stroke="#7d93a6" stroke-width=".6" stroke-linejoin="round"/><path d="M-3 -9.6Q0 -11 3 -9.6" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width=".8"/>`;
+function jzDraw(id,w,h,small,st){
+ const G=jzGeo(id,small),s=SKIN[id],H0=G.H0,inset=s.r.map(v=>Math.max(3,v-6)),fr=Math.floor(st*JZ_MS/FRAME),C=PLEAT_C[labelStatus(id)];
+ const bx=small?22:34,by=small?3:5,bh=small?20:22,stD=rr4(10,10,w-20,H0-20,inset),two=G.hl.length>1;
+ const stitch=`<path d="${stD}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${stD}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`;
+ let t=`<defs>${feltFilters(id,s.seed)}</defs>`;
+ if(st<JZ_CUT){
+  t+=`<path d="${rr4(2.5,6,w-5,H0-4.5,s.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/><path d="${rr4(EDGE,EDGE,w-2*EDGE,H0-2*EDGE,s.r)}" fill="${s.body}" filter="url(#f-${id})"/>`+stitch;
+  // Chalk: the long lines in one run each (the second back the other way), then the short ones top to bottom.
+  const hq=G.hl.map((l,n)=>two?seg(st,.1+n*.06,.16+n*.06):seg(st,.1,.22)),vq=G.vl.map((l,n)=>seg(st,.22+n*.016,.236+n*.016));
+  const lines=[...G.hl.map((l,n)=>jzSub(l,hq[n])),...G.vl.map((l,n)=>jzSub(l,vq[n]))].filter(Boolean);
+  if(lines.length){const d=lines.map(o=>o.d).join('');
+   t+=`<path d="${d}" fill="none" stroke="#f4f7fb" stroke-opacity=".22" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#f4f7fb" stroke-opacity=".9" stroke-width="1.2" stroke-dasharray="2.4 1.8" stroke-linecap="round"/>`}
+  // The shears follow the long lines; the short lines open as the first run passes them.
+  const cq=G.hl.map((l,n)=>two?seg(st,.3+n*.08,.38+n*.08):seg(st,.3,.46)),cuts=G.hl.map((l,n)=>jzSub(l,cq[n])).filter(Boolean);
+  const fx=cq[0]>0?jzSub(G.hl[0],cq[0]).end.x:-1;G.vl.forEach((l,n)=>{if(fx>=G.X(n+1))cuts.push(jzSub(l,1))});
+  if(cuts.length){const d=cuts.map(o=>o.d).join('');t+=`<path d="${d}" fill="none" stroke="#24160c" stroke-opacity=".78" stroke-width="1.7" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width=".7" transform="translate(.6 .7)"/>`}
+  // The tool at work: chalk while marking, shears while cutting, each at its line's end.
+  // shears is the way the cut runs (the first long line left to right, the second back), not the heading, which loops on knobs.
+  let tool=null,shears=0;
+  for(let n=0;n<G.hl.length;n++){if(hq[n]>0&&hq[n]<1)tool=jzSub(G.hl[n],hq[n]);if(cq[n]>0&&cq[n]<1){tool=jzSub(G.hl[n],cq[n]);shears=n%2?-1:1}}
+  G.vl.forEach((l,n)=>{if(vq[n]>0&&vq[n]<1)tool=jzSub(l,vq[n])});
+  if(tool){const E=tool.end;
+   if(shears){const dir=shears;
+    t+=`<g transform="translate(${f(E.x-dir*13)} ${f(E.y)}) scale(${dir} 1)"><g transform="translate(1 1.4)" opacity=".3" filter="url(#sh)">${jzShears(fr%2)}</g>${jzShears(fr%2)}</g>`+
+     `<path d="M${f(E.x-dir*16)} ${f(E.y-3)}q1.5 -2.5 3 0t3 0M${f(E.x-dir*20)} ${f(E.y+3)}q1.5 2.5 3 0" fill="none" stroke="${mixHex(s.body,'#fff8e8',.5)}" stroke-width="1" stroke-linecap="round" opacity=".8"/>`}
+   else t+=`<g transform="translate(${f(E.x)} ${f(E.y)}) rotate(${fr%2?-8:8})">${jzChalk}</g>`}
+ }else{
+  // Cut: resting pieces, then landed ones, then those in flight (the latest to leave on top).
+  const P=G.pieces.map((p,n)=>({p,n,O:jzPose(p,G,st)})),rest=P.filter(q=>st<q.p.dep),fly=P.filter(q=>q.O.fly).sort((a,b)=>a.p.dep-b.p.dep),done=P.filter(q=>st>=q.p.land);
+  t+=`<defs>${G.pieces.map((p,n)=>`<clipPath id="jzc-${id}-${n}"><path d="${p.d}"/></clipPath>`).join('')}</defs>`;
+  // Until the first piece leaves, the cushion's own shadow stays under the loose pieces, so its rim doesn't jump at the cut.
+  // Resting pieces keep their halves of the cut lines, clipped to each piece so they rock with it.
+  const cut=`<path d="${G.cutD}" fill="none" stroke="#24160c" stroke-opacity=".78" stroke-width="1.7" stroke-linejoin="round"/>`;
+  const layer=(L,air,whole)=>{if(!L.length)return'';
+   const back=air?`<g filter="url(#sh)">${L.map(({p,O})=>`<path d="${p.d}" fill="#000" opacity="${f(.3-.1*O.lift)}" transform="${jzTf(O,p,1+5*O.lift,2.5+11*O.lift)}"/>`).join('')}</g>`
+    :whole?`<path d="${rr4(2.5,6,w-5,H0-4.5,s.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/>`
+    :`<g filter="url(#g-${id})" fill="#3b291d">${L.map(({p,O})=>`<path d="${p.d}" transform="${jzTf(O,p,0,2.2)}"/>`).join('')}</g>`;
+   return back+`<g filter="url(#f-${id})" fill="${s.body}">${L.map(({p,O})=>`<path d="${p.d}" transform="${jzTf(O,p)}"/>`).join('')}</g>`+
+    L.map(({p,n,O})=>`<g transform="${jzTf(O,p)}"><g clip-path="url(#jzc-${id}-${n})">${stitch}${L===rest?cut:''}</g></g>`).join('')};
+  // Pieces in flight are drawn one at a time, so one passing over another hides its stitching.
+  t+=layer(rest,0,rest.length===P.length)+layer(done,0)+fly.map(q=>layer([q],1)).join('');
+  // Fibres knocked loose as each piece lands.
+  let fl='';for(const{p}of done){const u=seg(st,p.land,p.land+.06);if(u>=1)continue;
+   fl+=FLUFF.slice(0,4).map(([dx,dy,r],i)=>`<path d="M-3 0q1.2-2.4 2.4 0t2.4 0" transform="translate(${f(p.sx+dx*(8+10*u))} ${f(p.sy+dy*(G.rowH*.5+5*u))}) rotate(${f(r*60+u*80)})" opacity="${f(1-u)}"/>`).join('')}
+  if(fl)t+=`<g fill="none" stroke="${mixHex(s.body,'#fff8e8',.55)}" stroke-width="1.1" stroke-linecap="round">${fl}</g>`;
+ }
+ // The name band: lifted off and held up out of the way, then laid back over the row with a little squash.
+ const up=ease(seg(st,.02,.1)),dn=backOut(seg(st,.85,.9)),lf=up*(1-clamp(dn)),dy=-(small?24:27)*up*(1-dn),band=rr4(bx,by,w-2*bx,bh,[9,8,10,8]),bc=w/2;
+ let b=`<path d="${band}" fill="#000" opacity="${f(.4-.18*lf)}" filter="url(#sh)" transform="translate(${f(2*lf)} ${f(1.6+7*lf)})"/>`;
+ b+=`<g transform="translate(0 ${f(dy)}) rotate(${f(-1.2*lf)} ${f(bc)} ${f(by+bh/2)})"><path d="${band}" fill="${s.band}" filter="url(#g-${id})"/>`+
+  `<path d="${rr4(bx+3.5,by+3.5,w-2*bx-7,bh-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ // The name in cream satin stitch, sewn left to right behind a needle; the status ball pops on at the end.
+ const nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],nf=small?13:15,nx=bx+10,ny=by+bh/2+.5,nw=measure(nm,`italic 700 ${nf}px Georgia,serif`);
+ const nq=seg(st,.89,.95),sew=(x0,q,y0,y1,body,n)=>q<=0?'':`<clipPath id="jzs${n}-${id}"><rect x="${f(x0-3)}" y="${f(y0)}" width="${f(q>=1?999:(body+6)*q)}" height="${f(y1-y0)}"/></clipPath>`;
+ if(nq>0){b+=sew(nx,nq,by,by+bh,nw,'n')+`<g clip-path="url(#jzsn-${id})"><text x="${nx}" y="${f(ny+.8)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="#000" opacity=".35">${nm}</text>`+
+  `<text x="${nx}" y="${f(ny)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="#f7e8c9">${nm}</text><text x="${nx}" y="${f(ny)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="700" font-size="${nf}" fill="url(#satin)" opacity=".6">${nm}</text></g>`;
+  if(nq<1){const x=nx+(nw+6)*nq;b+=`<path d="M${f(x)} ${f(ny-6)}l4 -7" stroke="url(#metal)" stroke-width="1.3" stroke-linecap="round"/><path d="M${f(x)} ${f(ny-6)}q6 3 10 -2" fill="none" stroke="#f7e8c9" stroke-width=".8"/>`}}
+ const pop=backOut(seg(st,.95,1)),br=small?4.6:5.2,bxx=w-bx-(small?10:12),byy=by+bh/2;
+ if(pop>0)b+=`<g transform="translate(${f(bxx)} ${f(byy)}) scale(${f(pop)})"><circle r="${br+1.6}" fill="${C}" opacity=".3"/><circle r="${br}" fill="${C}" stroke="#1a0d05" stroke-opacity=".45" stroke-width=".7" filter="url(#g-${id})"/><path d="M${-br*.5} ${-br*.1}a${br*.5} ${br*.5} 0 1 1 ${br*.6} ${br*.45}" fill="none" stroke="#1a0d05" stroke-opacity=".3" stroke-width=".7"/><circle cx="${f(-br*.35)}" cy="${f(-br*.4)}" r="${f(br*.28)}" fill="#fff" opacity=".55"/></g>`;
+ b+='</g>';
+ // The value cross-stitched across the pieces under the band, dark on Jarvis's amber felt, cream on the others.
+ const vq=seg(st,.92,.98);
+ if(vq>0){const dt=pocketData(id),cs=small?1.5:1.7,xp=xpaths(dt.num,cs),wf=small?11:12.5,dk=id==='a',th1=dk?'#3a1d08':'#f7e8c9',th2=dk?'#5c3414':'#e0cba4';
+  const vc=(by+bh+G.rowTop+G.rowH-G.kd*G.k)/2,x0=bx+10,ww=measure(dt.word,`italic ${wf}px Georgia,serif`),tw=xp.w+5+ww;
+  b+=sew(x0,vq,vc-10,vc+10,tw,'v')+`<g clip-path="url(#jzsv-${id})"><g transform="translate(${f(x0)} ${f(vc-3.5*cs)})" fill="none" stroke-linecap="round" stroke-width="${f(cs*.4)}">`+
+   `<path d="${xp.d1+xp.d2}" stroke="${dk?'#fff3dc':'#000'}" stroke-opacity="${dk?.3:.35}" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="${th2}"/><path d="${xp.d2}" stroke="${th1}"/></g>`+
+   `<text x="${f(x0+xp.w+5)}" y="${f(vc+1.3)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="${dk?'#fff3dc':'#000'}" opacity=".3">${dt.word}</text>`+
+   `<text x="${f(x0+xp.w+5)}" y="${f(vc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="600" font-size="${wf}" fill="${th1}">${dt.word}</text></g>`}
+ return t+b;
+}
 // A foot-anchored shade (the sewing box) keeps each widget's foot where it stood: as the strip's height changes, the
 // widgets (and a running join path or drag origin with them) move down by d (Checks by dc), kept on the stage.
 function shiftFeet(d,dc){
@@ -5022,7 +5174,7 @@ JOINS.woolly={label:'Woolly static',kind:'Attract',gap:WS.gap,ms:5000,msDrag:460
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -5092,7 +5244,12 @@ const SHADES={
   about:'A new shade kind, Press: the cushion is pressed flat, not folded, rolled, drained or put away. From ironing day in a felt doll\'s house. The cotton display is put away and a raspberry felt toy iron (cream handle, silver soleplate, a temperature dial and a pilot light) is set down on the cushion\'s left end and presses it in. Then it glides the length of the cushion and back, three passes at 12 fps, and each pass takes a third of the puff out: the felt ahead of the toe rises in a small bow wave and the felt behind the heel lies flat with a pressed sheen and a crisp edge, while the stitching and the name band flatten with it. Felt steam puffs out at every press and turn and trails behind the heel. The iron lifts and turns round in the air while a cream iron-on name tape drops onto the flat felt under its glossy transfer film. The iron sets down on the tape and makes one last pass, and behind it the film is gone and the name (satin stitch) and value (cross-stitch) are left on the tape. The iron lifts away, and the strip keeps the cushion\'s foot where it stood. <b>The iron\'s pilot light, and the little felt iron sewn at the tape\'s end, are the status colour</b> (amber running, blue paused, red needs you, green passed). Unshading peels the tape off and a burst of steam puffs the cushion back up with a bounce. Nothing moves at rest, and joins still work.',
   sayOn:'Shaded: each cushion is ironed flat and its name and value are pressed onto an iron-on tape; the little iron on the tape shows the status.',sayOff:'Unshaded: the tapes peel off and a puff of steam fluffs the cushions back up.',
   height:(st,small)=>ironParts(st,small).h,
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:ironDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:ironDraw},
+ jigsaw:{label:'Jigsaw',kind:'Tessellate',ms:JZ_MS,ownStrip:true,
+  about:'The Tessellate kind (gothic\'s Cosmati band, elven\'s leaf tesserae, wire\'s honeycomb) done in felt, from the felt jigsaws in the toy cupboard: the cushion is cut into its own puzzle and set again as a strip, with nothing added and nothing thrown away. The cotton display is put away and the name band is lifted off and held up out of the way. A cake of tailor\'s chalk marks the cutting lines, knobs and all: the long lines in one run each, then the short ones a stroke at a time. Felt shears snip along the long lines, the short ones opening as they pass. The pieces drop loose and rock in their cuts, then leave top row first. Each lifts toward you with its shadow falling away, turns a quarter (some the long way round), shrinks as it flies and lands with a squash that knocks fibres loose. Every column of the cushion lies down whole, so the knobs that held it together lock it again along the strip, but the columns are shuffled, and each piece carries its own bit of the running stitch, so the stitching ends up in short rotated dashes. The box follows the lowest piece, so the strip closes up as the bottom row flies. Then the band is laid back across the top of the row, the name is satin-stitched on it behind a needle, the value is cross-stitched across the pieces below (dark thread on Jarvis\'s amber, cream on the others), and <b>a felt ball on the band\'s end pops on in the status colour</b> (amber running, blue paused, red to decide, green passed). Nothing moves at rest, and unshading plays it back.',
+  sayOn:'Shaded: each cushion is cut into a felt jigsaw and set again as a strip; the name is on the band and the felt ball shows the status.',sayOff:'Unshaded: the pieces fly back into place, the cuts close and the cushions are whole again.',
+  height:(st,small)=>jzH(st,small),
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:jzDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];if(s.foot)return shH(small);return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
