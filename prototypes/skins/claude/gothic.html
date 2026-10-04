@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg,.czsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg,.czsvg,.rusvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span,.w.czOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span,.w.czOn .strip span,.w.ruOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -300,7 +300,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
-$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg><svg class="ulsvg" aria-hidden="true"></svg><svg class="nssvg" aria-hidden="true"></svg><svg class="gysvg" aria-hidden="true"></svg><svg class="prsvg" aria-hidden="true"></svg><svg class="czsvg" aria-hidden="true"></svg>'));
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg><svg class="ulsvg" aria-hidden="true"></svg><svg class="nssvg" aria-hidden="true"></svg><svg class="gysvg" aria-hidden="true"></svg><svg class="prsvg" aria-hidden="true"></svg><svg class="czsvg" aria-hidden="true"></svg><svg class="rusvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -338,6 +338,8 @@ function glassBorder(x,y,w,h,b,seed){
  for(const[cx,cy]of[[x-b/2,y-b/2],[x+w+b/2,y-b/2],[x-b/2,y+h+b/2],[x+w+b/2,y+h+b/2]])o+=`<rect x="${f(cx-b/2)}" y="${f(cy-b/2)}" width="${b}" height="${b}" fill="#1f3f8a"/><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(b*.32)}" fill="url(#gild)"/>`;
  return `<g stroke="#1d1612" stroke-width=".9">${o}</g><rect x="${x-b}" y="${y-b}" width="${w+2*b}" height="${h+2*b}" fill="url(#glassHi)"/>`;
 }
+// Joins whose joining end stops square at the cornice, with no half-gable (the ruin shade reads this too).
+const SQJ=['dial','apse','fan','chevet','strap','frieze','vous','stay','roll','joggle','cwt','cast','scr','censer','lace'];
 function casing(id,w,h){
  const s=SK[id],small=id==='c',top=small?5:8,L=s.join==='l'?JP:small?16:20,Rw=s.join==='r'?JP:small?16:20,G=30,gx=32;
  // Flying buttress: the joining end is a tall pier with its own pinnacle instead of a half-gable; the corbel springs from it in the overlay.
@@ -345,7 +347,7 @@ function casing(id,w,h){
  // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
  // Frieze procession: square too, so the two friezes along the top meet as one band.
  // Joins that fix fittings to the end face (cast bronze's sockets, the censers' brackets) want it square as well.
- const dl=(model.join==='dial'||model.join==='apse'||model.join==='fan'||model.join==='chevet'||model.join==='strap'||model.join==='frieze'||model.join==='vous'||model.join==='stay'||model.join==='roll'||model.join==='joggle'||model.join==='cwt'||model.join==='cast'||model.join==='scr'||model.join==='censer'||model.join==='lace')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
+ const dl=SQJ.includes(model.join)&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
  // Winepress: once the wall starts down, its overlay has long since covered the window, so the casing drops it.
  const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2),wpNo=model.shade==='press'&&k>0;
  // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
@@ -3446,7 +3448,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress, Cosmati band) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress, Cosmati band, ruin) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -3494,7 +3496,11 @@ const SHADES={
   about:'A gothic <b>Press</b> shade. A common subject in late medieval glass and painting is the <i>Mystic Winepress</i>: a beam press treading out grapes, with the wine running into a chalice. Here the wall is the press. The display fades, the bay goes dark, and the window fills from the sill up with grapes of stained glass (purple, ruby and violet, lit from behind and leaded) with green vine leaves along the top. An oak press-board on iron straps is let down out of the frieze and lands on them with a puff of dust. A lead spout runs out through the outer pier, and a gilt chalice is set on a carved corbel under it. Then the wall comes down. <b>The shade keeps its foot where it stood, so the frieze and board come down onto the grapes:</b> they flatten, then burst one after another, spraying juice, and the wine pools on the sill and pours from the spout into the chalice, which slowly fills. The stream thins to a trickle and a last drop falls. What is left is a band of crushed skins under the board. Then the value is gilded onto a black cartouche on the board, left to right, and the glass boss at the board\'s end and the jewel in the chalice\'s knop kindle. <b>They are the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the pressed window:</b> the name in the frieze, the board with the value, the crushed grapes and the chalice at the outer end, so the joining end stays free. Nothing moves at rest. Unshading plays it back, and joins still work on the shaded pair.'},
  cosmati:{label:'Cosmati band',kind:'Tessellate',ms:4000,h:small=>small?50:62,lowAt:[.5,.82],
   on:'Shaded: the window is cut into quarries, and each one flies up into a band set out under the frieze, turning into a triangle of porphyry, serpentine, gold glass or marble; the wall lowers, a marble cartouche takes the value and two porphyry roundels light.',off:'Unshaded: the value and roundels come out, the wall rises, and the tiles fly back down into the window as glass.',
-  about:'A new shade kind, <b>Tessellate</b>: the casing comes apart into pieces that set themselves again in a new pattern, nothing added and nothing thrown away. In the twelfth and thirteenth centuries the Cosmati, families of Roman marble workers, cut the columns and slabs of ancient ruins into small triangles, squares and discs and laid them in bands and wheels of red porphyry, green serpentine, white marble and gold glass; the Great Pavement before the high altar at Westminster is theirs. They set each design out first in red chalk on the bed. Here the window is the quarry. The display fades and its glass lights as a grid of square quarries, ruby, green, gold and clear, and the glazier\'s wheel runs along the grid, leaving lead behind its spark. A bed of mortar between white marble fillets appears under the frieze, and the band is drawn on it in red chalk from the middle out. Then <b>the quarries lift out one at a time, top row first,</b> each rocking loose in its lead, and fly up in an arc, turning and trimming themselves from squares into triangles and cooling from lit glass to matt stone, and click into the chalked places from the middle outward with a flash and a little grit: two rows of red and green points against white (one row on Checks), with a gold one now and then. As the last of them land the wall lowers, grout is wiped along the band, a slab of white marble framed in porphyry is set in the middle with a puff of dust, and two porphyry roundels roll out from under it to their places. The value is inlaid in the slab, the figure in red, and the glass at the heart of each roundel kindles. <b>The roundels are the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the band:</b> the name in the frieze and the value in its cartouche between two lit roundels. Nothing moves at rest. Unshading plays it back, the tiles flying down into the window and turning back into glass. Joins still work on the shaded pair.'}
+  about:'A new shade kind, <b>Tessellate</b>: the casing comes apart into pieces that set themselves again in a new pattern, nothing added and nothing thrown away. In the twelfth and thirteenth centuries the Cosmati, families of Roman marble workers, cut the columns and slabs of ancient ruins into small triangles, squares and discs and laid them in bands and wheels of red porphyry, green serpentine, white marble and gold glass; the Great Pavement before the high altar at Westminster is theirs. They set each design out first in red chalk on the bed. Here the window is the quarry. The display fades and its glass lights as a grid of square quarries, ruby, green, gold and clear, and the glazier\'s wheel runs along the grid, leaving lead behind its spark. A bed of mortar between white marble fillets appears under the frieze, and the band is drawn on it in red chalk from the middle out. Then <b>the quarries lift out one at a time, top row first,</b> each rocking loose in its lead, and fly up in an arc, turning and trimming themselves from squares into triangles and cooling from lit glass to matt stone, and click into the chalked places from the middle outward with a flash and a little grit: two rows of red and green points against white (one row on Checks), with a gold one now and then. As the last of them land the wall lowers, grout is wiped along the band, a slab of white marble framed in porphyry is set in the middle with a puff of dust, and two porphyry roundels roll out from under it to their places. The value is inlaid in the slab, the figure in red, and the glass at the heart of each roundel kindles. <b>The roundels are the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the band:</b> the name in the frieze and the value in its cartouche between two lit roundels. Nothing moves at rest. Unshading plays it back, the tiles flying down into the window and turning back into glass. Joins still work on the shaded pair.'},
+ ruin:{label:'Ruin',kind:'Weather',ms:4800,h:small=>small?48:62,lowAt:[.42,.8],foot:true,
+  on:'Shaded: years pass over the wall. Rain stains it, lichen and ivy take hold, the glass breaks out, and the top crumbles away to a low ruin; a low sun picks out the value on a worn tablet, and one surviving pane lights.',
+  off:'Unshaded: time runs backwards. The fallen stones fly back up into place, the glass mends, and the ivy and stains withdraw as the wall rises.',
+  about:'A new shade kind, <b>Weather</b>: nothing is folded, stowed or set; time passes over the casing and the shade is what is left. Gothic ruins (Tintern, Rievaulx, Whitby) are the most painted buildings in Britain: roofless walls with empty windows, snapped pinnacles, ivy and a sapling growing out of the top. Here the facade becomes one, years at a time. The display fades into its old glass, a mosaic of ruby, blue, gold and green pieces in lead. Rain stains run down from under the frieze, lichen spreads in orange and yellow rings, moss takes the base course, and ivy climbs the outer pier, leafing as it goes. Two stones strike the glass: cracks run out from each, the pieces fall out of the lead one by one into the bay, and the night shows through the empty window. Then <b>the wall comes down from the top</b> while its foot stays where it stood: the outer pinnacle snaps and falls, turning, and lies on the ground; gaps open in the cresting, the gable\'s apex goes, and the corner of the outer pier breaks away, each piece cracking first, then falling with a puff of grit, and the big ones staying where they land. A birch sapling grows out of the broken pier. <b>A low sun rakes across the ruin</b> and, as raking light does with worn inscriptions, brings out the value cut into a weathered tablet in the face, and catches the one pane left in the stump of a lancet beside it. <b>The pane is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the ruin:</b> the name in the surviving frieze, the value on the tablet, the lit pane, ivy and rubble. Nothing moves at rest. Unshading runs time backwards: the fallen stones fly up into place, the glass mends, and the ivy, lichen and stains withdraw as the wall rises. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -4560,6 +4566,165 @@ function winepress(id,w,h,k){
  if(flare>.05&&kd<1){const bx=out==='l'?x0+(sm?17:22):x1-(sm?17:22);s+=`<circle cx="${f(bx)}" cy="${f(yB+BH/2)}" r="${sm?6:8}" fill="#fffbe8" opacity="${f(.6*flare)}" filter="url(#lglow)"/>`}
  const g2=Math.sin(Math.PI*seg(k,.95,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(xm+lw/2+6,yB+2,g2*4.5)}</g>`;
  return s+'</g>';
+}
+
+/* Ruin: a Weather shade. Years pass over the wall and the strip is what is left: stains, lichen, moss and ivy, the glass broken
+   out of the window, the top crumbled (pinnacles, cresting, the gable's apex, the outer corner), a sapling on the broken pier,
+   and a low sun that brings out the value on a worn tablet and lights the one pane left in a lancet stump. Everything is a
+   function of k, so unshading runs time backwards. The wall is foot-anchored (its top comes down), so anything that falls is
+   placed relative to the foot. What breaks off is the casing itself: the casing is clipped below a jagged cut line (ruClip), and
+   each falling piece is a copy of the casing clipped between the cut before its break and the cut after it, so nothing pops. */
+const RU_L={},RU_K={},RU_FD=.09;
+// Must match shadeH for this shade (k here is the eased st that shadeH eases internally).
+const ruH=(sm,k)=>Math.round(lerp(sm?CH:H,SHADES.ruin.h(sm),ease(seg(k,...SHADES.ruin.lowAt))));
+// The casing at full height with its ids renamed, used (by <use>) for the pieces that fall.
+// Drawn short (only the top band ever breaks off, and it matches the full casing there), so its stone filter covers little.
+function ruCasing(id,w){const ck=id+'|'+model.join;return RU_K[ck]||(RU_K[ck]=casing(id,w,id==='c'?30:40).replace(new RegExp('\\b(st|cl)-'+id+'\\b','g'),'ru$1-'+id))}
+function ruGeo(id,w){
+ const[,num,val]=tpText(id),ck=[id,val,model.join].join('|');if(RU_L[ck])return RU_L[ck];
+ const sm=id==='c',s=SK[id],top=sm?5:8,L=s.join==='l'?JP:sm?16:20,Rw=s.join==='r'?JP:sm?16:20,fx=L+5,fw=w-L-Rw-10,xm=fx+fw/2,pk=sm?.78:1;
+ const out=s.join==='l'?'r':'l',od=out==='l'?1:-1,ox=out==='l'?0:w,hS=SHADES.ruin.h(sm);
+ // The face left at strip height, between the frieze and the base course, holds the tablet and, toward the joining end, the lancet stump.
+ const fy0=top+2+(sm?14:17)+2,fy1=hS-(sm?12:12.5),fs=sm?9:10.5,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`),lw=tw+(sm?12:16),pw=sm?8:10,gp=sm?7:9;
+ const pr=s.join==='l'?-1:1,g0=xm-(lw+gp+pw)/2,tx=pr>0?g0:g0+pw+gp,px=pr>0?g0+lw+gp:g0;
+ // Breaks: each removes the casing above a jagged line over [x0,x1], sampled every 3 px as steps. cy is the piece's centre,
+ // rot and dx how it turns and drifts as it falls, rr the height of its centre above the foot once it lies there.
+ const X=[];for(let x=-9;x<=w+9;x+=3)X.push(x);
+ const B=[],add=o=>{const sd=B.length*7+3;o.ys=X.map((x,i)=>x>=o.x0&&x<=o.x1?o.d+(hash(i,sd)-.5)*2*o.amp:-1e9);B.push(o)};
+ for(const e of['l','r']){if(s.join===e)continue;const xc=e==='l'?L/2:w-Rw/2,sg=e==='l'?-1:1;
+  add({x0:xc-8.5*pk,x1:xc+8.5*pk,d:top-5*pk,amp:1.4,t:e===out?.47:.58,cx:xc,cy:top-19*pk,rot:sg*96,rr:9*pk,rest:true,dx:-sg*6*pk})}
+ // The pieces come to rest side by side on the wall's own footprint: pinnacle at the end, the corner beside it.
+ const cw=sm?11:14;
+ add({x0:out==='l'?-4:w-cw,x1:out==='l'?cw:w+4,d:top+(sm?7:10),amp:2.4,t:.64,cx:ox+od*(sm?5:6.5),cy:top+(sm?1.5:3),rot:-od*32,rr:sm?7:8.5,rest:true,dx:od*(sm?28:36)});
+ if(s.join&&!sm){const je=s.join,sg=je==='r'?1:-1,ex=je==='r'?w:0;
+  // A flying-buttress pier loses its own pinnacle; a half-gable loses its apex and finial; square ends lose only cresting.
+  if(model.join==='buttress'){const xc=ex-sg*(JP-6)/2;add({x0:xc-10,x1:xc+10,d:top-17,amp:1.4,t:.54,cx:xc,cy:top-34,rot:-sg*100,rr:10,rest:true,dx:-sg*40})}
+  // Joining-end pieces roll well in, so the seam and any join hardware at its foot stay clear.
+  else if(!SQJ.includes(model.join)&&model.join!=='pier')add({x0:je==='r'?w-21:-4,x1:je==='r'?w+4:21,d:top-9,amp:1.3,t:.54,cx:ex-sg*6,cy:top-21,rot:-sg*118,rr:8,rest:true,dx:-sg*40})}
+ const c0=L+6,cs=w-Rw-5-c0;
+ (sm?[[.22,.52],[.7,.68]]:[[.16,.5],[.5,.6],[.82,.7]]).forEach(([q,t],i)=>{const cx=c0+cs*(q+(hash(i,51)-.5)*.06),hw=(sm?6:9)+(sm?4:6)*hash(i,53);
+  add({x0:cx-hw,x1:cx+hw,d:top+.9,amp:.35,t,cx,cy:top-3,rot:(i%2?1:-1)*(50+30*hash(i,55)),rr:2.5,rest:false,dx:(hash(i,57)-.5)*10})});
+ B.sort((p,q)=>p.t-q.t);
+ // Each piece's region lies between the cut made by earlier breaks and its own; its crack is the lower edge of that region.
+ B.forEach((b,j)=>{const P=X.map(()=>-90);B.slice(0,j).forEach(q=>q.ys.forEach((y,i)=>{if(y>P[i])P[i]=y}));
+  const T=[],D=[];X.forEach((x,i)=>{const y=b.ys[i];if(y<-1e8)return;const nv=Math.max(P[i],y);T.push([x-1.5,P[i]],[x+1.5,P[i]]);D.push([x-1.5,nv],[x+1.5,nv])});
+  b.reg=poly([...T,...D.slice().reverse()]);b.crk='M'+D.map(p=>f(p[0])+' '+f(p[1])).join('L')});
+ // The window's old glass as a mosaic of triangles in lead, cracked from two strikes; pieces at the edge may stay.
+ const[wx,wy,sw,sh,bb]=SCR[id],X0=wx-bb,Y0=wy-bb,WW=sw+2*bb,HH=sh+2*bb,nC=sm?7:10,nR=sm?2:3,V=[];
+ for(let r=0;r<=nR;r++)for(let c=0;c<=nC;c++){const i=r*(nC+1)+c;V.push([X0+WW*c/nC+(c>0&&c<nC?(hash(i,61)-.5)*WW/nC*.55:0),Y0+HH*r/nR+(r>0&&r<nR?(hash(i,63)-.5)*HH/nR*.5:0)])}
+ const IM=[[X0+WW*.31,Y0+HH*.4,.12],[X0+WW*.7,Y0+HH*.64,.165]],TR=[],dg=Math.hypot(WW,HH);
+ for(let r=0;r<nR;r++)for(let c=0;c<nC;c++){const v=(a,b2)=>V[a*(nC+1)+b2],A=v(r,c),Bq=v(r,c+1),C=v(r+1,c+1),Dq=v(r+1,c);
+  for(const p of((r+c)%2?[[A,Bq,C],[A,C,Dq]]:[[A,Bq,Dq],[Bq,C,Dq]])){const i=TR.length,cx=(p[0][0]+p[1][0]+p[2][0])/3,cy=(p[0][1]+p[1][1]+p[2][1])/3;
+   const edge=p.some(q=>q[0]<=X0+.1||q[0]>=X0+WW-.1||q[1]<=Y0+.1||q[1]>=Y0+HH-.1),tc=Math.min(...IM.map(([ix,iy,ti])=>ti+Math.hypot(cx-ix,cy-iy)/dg*.09));
+   TR.push({d:poly(p),cx,cy,col:GL[(i*5+s.seed)%GL.length],stay:edge&&hash(i,67)<.34,tf:tc+.05+.13*hash(i,69),rot:(hash(i,71)-.5)*90,dx:(hash(i,73)-.5)*6})}}
+ const RY=[];IM.forEach(([ix,iy,ti],m)=>{for(let i=0;i<6;i++){const a=(i*60+40*hash(i,75+m))*Math.PI/180,len=(.35+.45*hash(i,77+m))*HH*1.2,P=[[ix,iy]];
+  for(let q=1;q<=3;q++){const j=(hash(i*3+q,79+m)-.5)*5;P.push([ix+Math.cos(a)*len*q/3-Math.sin(a)*j,iy+Math.sin(a)*len*q/3+Math.cos(a)*j])}RY.push({P,t:ti})}});
+ // Weathering: rain stains under the frieze, lichen rings, moss on the base course.
+ const nS=sm?6:10,ST=[];for(let i=0;i<nS;i++)ST.push({x:6+(w-12)*(i+.15+.7*hash(i,81))/nS,wd:3+5*hash(i,83),len:(sm?14:20)+(sm?16:32)*hash(i,85),t:.06+.18*hash(i,87)});
+ const zA=[4,tx-8],zB=[tx+lw+gp+pw+8,w-4],LI=[],LC=['#c9a83a','#c2862e','#a3ab5c','#d9c58a'];
+ for(let i=0;i<(sm?5:8);i++){const z=i%2?zB:zA,x=lerp(z[0],z[1],hash(i,89)),foot=i%3!==1,c=[];
+  for(let q=0;q<4;q++)c.push([(hash(i*4+q,91)-.5)*(sm?5:7),(hash(i*4+q,93)-.5)*(sm?3:4),(sm?.7:.9)+(sm?.8:1.2)*hash(i*4+q,95),LC[(i+q)%4]]);
+  LI.push({x,dy:foot?(sm?13:15)+3*hash(i,97):fy0+3+(sm?4:7)*hash(i,99),foot,t:.12+.3*hash(i,101),c})}
+ const MO=[];for(let i=0;i<(sm?10:16);i++)MO.push({x:3+(w-6)*hash(i,103),r:.8+.9*hash(i,105),c:i%3?'#4f6e2c':'#6b8a3a',t:.24+.26*hash(i,107)});
+ // The sapling roots in the broken corner of the outer pier, at the cut left there.
+ const bx=ox+od*(sm?5:6.5),si=Math.round((bx+9)/3),sy=Math.max(...B.map(b=>b.ys[si]));
+ return RU_L[ck]={sm,top,out,od,ox,fy0,fy1,fs,num,val,lw,tx,px,pw,X,B,TR,RY,IM,X0,Y0,WW,HH,ST,LI,MO,sap:[bx,sy],
+  stars:[[X0+WW*.22,Y0+HH*.3],[X0+WW*.58,Y0+HH*.22],[X0+WW*.83,Y0+HH*.5]]};
+}
+// The cut line (step samples) from every break that has happened by k.
+function ruCut(G,k){const v=G.X.map(()=>-90);for(const b of G.B)if(k>=b.t)b.ys.forEach((y,i)=>{if(y>v[i])v[i]=y});return v}
+function ruClip(id,w,h,k){
+ const G=ruGeo(id,w);if(!(k>=G.B[0].t))return '';
+ const v=ruCut(G,k);let p=`polygon(-60px ${h+60}px,-60px -90px`;
+ v.forEach((y,i)=>{if(y<=-90&&(v[i-1]??-90)<=-90&&(v[i+1]??-90)<=-90)return;p+=`,${f(G.X[i]-1.5)}px ${f(y)}px,${f(G.X[i]+1.5)}px ${f(y)}px`});
+ return p+`,${w+60}px -90px,${w+60}px ${h+60}px)`;
+}
+const RU_LEAF='M0 0C-1.2 -.6 -3.4 -.8 -3.8 -2.6C-3 -3.1 -2 -3 -1.4 -3.4C-1.6 -4.6 -.8 -5.6 0 -6.4C.8 -5.6 1.6 -4.6 1.4 -3.4C2 -3 3 -3.1 3.8 -2.6C3.4 -.8 1.2 -.6 0 0Z';
+const ruLeaf=(x,y,rot,sz,c)=>`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${f(sz/6.4*100)/100})"><path d="${RU_LEAF}" fill="${c}" stroke="#142710" stroke-width=".5"/><path d="M0 -.4V-4.6" stroke="#9fc07a" stroke-opacity=".55" stroke-width=".5"/></g>`;
+// A polyline drawn to fraction u of its length (by segment count, which is near enough for short cracks).
+const ruPart=(P,u)=>{const n=P.length-1,e=u*n,k=Math.floor(e),q=[...P.slice(0,k+1)];if(k<n)q.push([lerp(P[k][0],P[k+1][0],e-k),lerp(P[k][1],P[k+1][1],e-k)]);return 'M'+q.map(p=>f(p[0])+' '+f(p[1])).join('L')};
+function ruin(id,w,h,k){
+ const G=ruGeo(id,w),{sm,top,od,ox,fy0,fy1,fs,num,val,lw,tx,px,pw,B}=G,op=seg(k,0,.03);if(op<=0)return '';
+ const[gl,gb,gd]=msGlass(id),dust=JOINS.buttress.dust,hk=sm?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(hk*2.2);
+ let defs=`<linearGradient id="ruS-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2b2716" stop-opacity=".55"/><stop offset=".55" stop-color="#3a3320" stop-opacity=".26"/><stop offset="1" stop-color="#3a3320" stop-opacity="0"/></linearGradient>`+
+  `<linearGradient id="ruN-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#121024"/><stop offset="1" stop-color="#261e2e"/></linearGradient>`+
+  `<radialGradient id="ruJ-${id}" cx=".4" cy=".35" r=".75"><stop stop-color="${gl}"/><stop offset=".55" stop-color="${gb}"/><stop offset="1" stop-color="${gd}"/></radialGradient>`+
+  `<linearGradient id="ruR-${id}" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#ffe3a8" stop-opacity="0"/><stop offset=".5" stop-color="#ffe3a8" stop-opacity=".42"/><stop offset="1" stop-color="#ffe3a8" stop-opacity="0"/></linearGradient>`+
+  `<clipPath id="ruF-${id}"><rect x="0" y="${top+2}" width="${w}" height="${f(Math.max(0,h-top-2))}"/></clipPath>`+
+  `<clipPath id="ruW-${id}"><rect x="-20" y="-60" width="${w+40}" height="${f(60+h)}"/></clipPath>`+
+  `<clipPath id="ruG-${id}"><rect x="${f(G.X0)}" y="${f(G.Y0)}" width="${f(G.WW)}" height="${f(G.HH)}"/></clipPath>`;
+ let s='';
+ // Weathering on the face: rain stains run down from under the frieze, lichen spreads in rings, moss takes the base course.
+ let wx='';
+ G.ST.forEach(q=>{const a=seg(k,q.t,q.t+.22);if(a>0)wx+=`<rect x="${f(q.x)}" y="${fy0+1}" width="${f(q.wd)}" height="${f(q.len*ease(a))}" fill="url(#ruS-${id})" opacity="${f(.85*a)}"/>`});
+ G.LI.forEach(q=>{const a=ease(seg(k,q.t,q.t+.14));if(a<=0)return;const y=q.foot?h-q.dy:q.dy;
+  q.c.forEach(([dx,dy,r,col],i)=>{wx+=`<circle cx="${f(q.x+dx)}" cy="${f(y+dy)}" r="${f(r*a)}" fill="${col}" opacity=".72"/>`+(i?'':`<circle cx="${f(q.x+dx)}" cy="${f(y+dy)}" r="${f(r*a*1.7)}" fill="none" stroke="${col}" stroke-width=".5" opacity=".6"/>`)})});
+ G.MO.forEach(q=>{const a=backOut(seg(k,q.t,q.t+.08));if(a>0)wx+=`<ellipse cx="${f(q.x)}" cy="${f(h-11.4)}" rx="${f(q.r*1.4*a)}" ry="${f(q.r*.75*a)}" fill="${q.c}"/>`});
+ if(wx)s+=`<g clip-path="url(#ruF-${id})">${wx}</g>`;
+ // The window: old glass in lead, struck twice; cracks run out, the pieces fall out into the bay and the night shows through.
+ if(show>.01){const qa=seg(k,.02,.09);let gw=`<rect x="${f(G.X0)}" y="${f(G.Y0)}" width="${f(G.WW)}" height="${f(G.HH)}" fill="url(#ruN-${id})" opacity="${f(qa)}"/>`,fl='';
+  G.stars.forEach(([x,y],i)=>{const a=seg(k,.24+.04*i,.36+.04*i);if(a>0)gw+=`<circle cx="${f(x)}" cy="${f(y)}" r=".75" fill="#ece8ff" opacity="${f(.75*a)}"/>`});
+  G.TR.forEach(t=>{if(t.stay||k<t.tf){gw+=`<path d="${t.d}" fill="${t.col}" fill-opacity="${f(qa*.88)}" stroke="#1d1612" stroke-width=".9" stroke-opacity="${f(qa)}"/>`;return}
+   const u=seg(k,t.tf,t.tf+.08);if(u>=1)return;const o=1-seg(u,.55,1);
+   fl+=`<path d="${t.d}" transform="translate(${f(t.dx*u)} ${f(34*u*u)}) rotate(${f(t.rot*u)} ${f(t.cx)} ${f(t.cy)})" fill="${t.col}" fill-opacity="${f(.88*o)}" stroke="#1d1612" stroke-width=".8" stroke-opacity="${f(o)}"/>`});
+  if(qa>0)gw+=`<rect x="${f(G.X0)}" y="${f(G.Y0)}" width="${f(G.WW)}" height="${f(G.HH)}" fill="url(#glassHi)" opacity="${f(qa*(1-seg(k,.2,.42)))}"/>`;
+  const co=1-seg(k,.3,.42);
+  if(co>0)G.RY.forEach(r=>{const u=seg(k,r.t,r.t+.07);if(u>0)gw+=`<path d="${ruPart(r.P,u)}" stroke="#f6f0dc" stroke-width=".7" fill="none" opacity="${f(.85*co)}"/>`});
+  G.IM.forEach(([x,y,t])=>{const u=seg(k,t,t+.035),a=Math.sin(Math.PI*u);if(a>.02)gw+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(2+6*u)}" fill="#fffbe8" opacity="${f(.75*a)}"/>`+sparkle(x,y,4*a)});
+  s+=`<g opacity="${f(show)}" clip-path="url(#ruW-${id})"><g clip-path="url(#ruG-${id})">${gw}</g>${fl}</g>`}
+ // The tablet, exposed in the face as the wall comes down, and beside it the stump of a lancet with one pane left.
+ const ta=seg(k,.72,.8),rl=seg(k,.8,.93),kd=seg(k,.9,.94),flare=Math.sin(Math.PI*kd);
+ if(ta>0){const ty=fy0+.5,th=fy1-fy0-1,ym=ty+th/2,xc=tx+lw/2,ny=f(ym+fs*.36);
+  const txt=(fill,o,dy=0)=>`<text x="${f(xc)}" y="${f(ny+dy)}" text-anchor="middle" font-family="Georgia,serif" opacity="${f(o)}" fill="${fill}"><tspan font-weight="bold" font-size="${fs+1}">${num}</tspan><tspan font-style="italic" font-size="${fs}"> ${val}</tspan></text>`;
+  s+=`<g opacity="${f(ta)}"><rect x="${f(tx)}" y="${f(ty)}" width="${f(lw)}" height="${f(th)}" fill="#c7b893"/>`+
+   `<path d="M${f(tx)} ${f(ty+th)}V${f(ty)}H${f(tx+lw)}" fill="none" stroke="#3a2c1c" stroke-opacity=".6" stroke-width=".9"/><path d="M${f(tx+.6)} ${f(ty+th-.4)}H${f(tx+lw-.4)}V${f(ty+.6)}" fill="none" stroke="#fff6e2" stroke-opacity=".6" stroke-width=".8"/>`+
+   `<path d="M${f(tx+lw)} ${f(ty)}l-3.2 0l3.2 2.6Z" fill="#2a1f15" opacity=".55"/><path d="M${f(tx)} ${f(ty+th)}l2.6 0l-2.6 -2Z" fill="#2a1f15" opacity=".5"/>`+
+   `<circle cx="${f(tx+2.6)}" cy="${f(ty+2.4)}" r="${sm?1.1:1.5}" fill="#c9a83a" opacity=".8"/><circle cx="${f(tx+lw-3.4)}" cy="${f(ty+th-2.4)}" r="${sm?1:1.3}" fill="#c2862e" opacity=".75"/>`;
+  // Worn, the inscription barely shows; the raking light brings it out as it passes, and it stays legible.
+  s+=`<g>${txt('#3a2c1c',.22)}</g>`;
+  const rx=rl>=1?w+60:lerp(-50,w+50,rl);
+  if(rx>tx-2){defs+=`<clipPath id="ruT-${id}"><rect x="${f(tx-2)}" y="${f(ty-2)}" width="${f(Math.max(0,rx-tx+2))}" height="${f(th+4)}"/></clipPath>`;
+   s+=`<g clip-path="url(#ruT-${id})">${txt('#fff6e2',.55,.8)}<text x="${f(xc)}" y="${ny}" text-anchor="middle" font-family="Georgia,serif"><tspan font-weight="bold" font-size="${fs+1}" fill="#7a2028">${num}</tspan><tspan font-style="italic" font-size="${fs}" fill="#2a1d10"> ${val}</tspan></text></g>`}
+  // The lancet stump: a chamfered stone jamb, its head broken off, and one pane of glass left at its foot.
+  const pb=fy1-.5,yb=fy0+(sm?2.5:3.5),py0=lerp(yb,pb,.36),J=[[0,1],[.22,-1.2],[.42,1.6],[.62,-.4],[.82,1.8],[1,.4]].map(([a,d])=>[px+pw*a,yb+d]);
+  s+=`<rect x="${f(px-1.8)}" y="${f(yb-1.6)}" width="${f(pw+3.6)}" height="${f(pb-yb+2.6)}" fill="#d2c4a2" stroke="#3a2c1c" stroke-opacity=".45" stroke-width=".6"/>`+
+   `<path d="M${f(px)} ${f(pb)}L${J.map(p=>f(p[0])+' '+f(p[1])).join('L')}L${f(px+pw)} ${f(pb)}Z" fill="#140f0a"/>`+
+   `<path d="M${f(px+.8)} ${f(pb-.8)}V${f(py0+1)}L${f(px+pw*.36)} ${f(py0-1.3)}L${f(px+pw*.62)} ${f(py0+.8)}L${f(px+pw-.8)} ${f(py0-.5)}V${f(pb-.8)}Z" fill="url(#ruJ-${id})" opacity="${f(.32+.68*kd)}" stroke="#1d1612" stroke-width=".6"/>`+
+   `<path d="M${f(px+.8)} ${f((py0+pb)/2+.4)}H${f(px+pw-.8)}" stroke="#1d1612" stroke-width=".6"/><path d="M${f(px-1.8)} ${f(pb+1)}H${f(px+pw+1.8)}" stroke="#fff6e2" stroke-opacity=".6" stroke-width=".8"/></g>`;
+  if(kd>0)s+=`<g style="mix-blend-mode:screen" opacity="${f(.65*kd)}"><ellipse cx="${f(px+pw/2)}" cy="${f((py0+pb)/2)}" rx="${f(pw*1.1)}" ry="${f((pb-py0)*.9)}" fill="${gb}" filter="url(#lglow)"/></g>`;
+  if(flare>.05&&kd<1)s+=`<circle cx="${f(px+pw/2)}" cy="${f((py0+pb)/2)}" r="${f(pw*.9)}" fill="#fffbe8" opacity="${f(.6*flare)}" filter="url(#lglow)"/>`+sparkle(px+pw/2,py0-1,3.6*flare)}
+ // Ivy climbs the outer pier to its broken top, leafing as it goes, and runs along the foot.
+ const gI=seg(k,.2,.56),gR=seg(k,.3,.62);let iv='';
+ if(gI>0){const yE=top+(sm?11:15),X=u=>ox+od*((sm?4.5:5.5)+(sm?1.6:2.2)*Math.sin(u*8+1)),Y=u=>lerp(h-1,yE,u),P=[];
+  for(let u=0;u<gI;u+=.04)P.push([X(u),Y(u)]);P.push([X(gI),Y(gI)]);
+  iv+=`<path d="M${P.map(p=>f(p[0])+' '+f(p[1])).join('L')}" fill="none" stroke="#3b2c18" stroke-width="${sm?.9:1.1}" stroke-linecap="round"/>`;
+  const n=sm?8:12;for(let i=0;i<n;i++){const u=(i+.6)/n,a=backOut(seg(gI,u-.02,u+.1));if(a<=0)continue;const sd=i%2?1:-1;
+   iv+=ruLeaf(X(u)+sd*2,Y(u),sd*55+(hash(i,111)-.5)*30,(sm?3.6:4.6)*(.85+.3*hash(i,113))*a,i%3?'#2f5b2b':'#3d6e33')}}
+ if(gR>0){const xe=sm?38:58,Xr=v=>ox+od*(5+(xe-5)*v),Yr=v=>h-2.4-1.3*Math.sin(v*7),P=[];
+  for(let v=0;v<gR;v+=.05)P.push([Xr(v),Yr(v)]);P.push([Xr(gR),Yr(gR)]);
+  iv+=`<path d="M${P.map(p=>f(p[0])+' '+f(p[1])).join('L')}" fill="none" stroke="#3b2c18" stroke-width=".8"/>`;
+  const n=sm?4:6;for(let i=0;i<n;i++){const v=(i+.7)/n,a=backOut(seg(gR,v-.03,v+.12));if(a>0)iv+=ruLeaf(Xr(v),Yr(v),(i%2?1:-1)*24,(sm?3.2:4)*a,i%2?'#3d6e33':'#2f5b2b')}}
+ s+=iv;
+ // A birch sapling grows out of the broken pier.
+ const sp=seg(k,.76,.88);
+ if(sp>0){const[bx,by]=G.sap,hh=(sm?11:15)*ease(sp),ex=bx-od*2.4*ease(sp),ey=by-hh,mx=bx-od*.4,my=by-hh*.55;
+  s+=`<path d="M${f(bx)} ${f(by+.5)}Q${f(mx)} ${f(my)} ${f(ex)} ${f(ey)}" fill="none" stroke="#e2dccb" stroke-width="${sm?.9:1.1}" stroke-linecap="round"/><path d="M${f(bx)} ${f(by-hh*.25)}h${f(-od*.8)}M${f(lerp(bx,ex,.5))} ${f(by-hh*.55)}h${f(od*.8)}" stroke="#2a1d10" stroke-width=".6"/>`;
+  [[.5,1],[.72,-1],[.9,1],[1,-1],[1,1]].forEach(([u,sd],i)=>{const a=backOut(seg(sp,.3+.12*i,.5+.12*i));if(a<=0)return;const x=lerp(bx,ex,u)+sd*(u<1?2:1.4),y=by-hh*u;
+   s+=`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(1.9*a)}" ry="${f(1.2*a)}" transform="rotate(${f(sd*-30)} ${f(x)} ${f(y)})" fill="${i%2?'#86b450':'#a6c95e'}" stroke="#2e4a1a" stroke-width=".35"/>`})}
+ // The top crumbles: each break cracks first, then the piece falls (turning), lands with dust, and the big ones stay where they land.
+ let crk='',ch='',dd='';
+ B.forEach((b,j)=>{
+  if(k<b.t){const c=seg(k,b.t-.045,b.t);if(c>0)crk+=`<path d="${b.crk}" fill="none" stroke="#2a1d10" stroke-width=".9" stroke-opacity="${f(.85*c)}"/>`;return}
+  const tf=seg(k,b.t,b.t+RU_FD);if(!b.rest&&tf>=1)return;
+  const hB=ruH(sm,b.t),fall=tf<.8?Math.pow(tf/.8,2):1-.08*Math.sin(Math.PI*(tf-.8)/.2),yl=h+lerp(b.cy-hB,-b.rr,fall),xl=b.cx+b.dx*ease(tf),rot=b.rot*Math.min(1,tf/.8),o=b.rest?1:1-seg(tf,.82,1);
+  defs+=`<clipPath id="ruc${j}-${id}"><path d="${b.reg}"/></clipPath>`;
+  ch+=`<g opacity="${f(o)}" transform="translate(${f(xl)} ${f(yl)}) rotate(${f(rot)}) translate(${f(-b.cx)} ${f(-b.cy)})"><g clip-path="url(#ruc${j}-${id})"><use href="#ruK-${id}"/></g></g>`;
+  dd+=dust(b.cx,b.d,seg(k,b.t,b.t+.05),5,9,j+500)+dust(xl,h-1,seg(tf,.78,1),b.rest?7:5,b.rest?14:9,j+520)});
+ if(ch)defs+=`<g id="ruK-${id}">${ruCasing(id,w)}</g>`;
+ s+=crk+ch+dd;
+ // A low sun rakes across the ruin from the left.
+ if(rl>0&&rl<1){const bx=lerp(-50,w+50,rl);s+=`<g clip-path="url(#ruF-${id})" style="mix-blend-mode:screen" opacity="${f(Math.sin(Math.PI*rl))}"><rect x="${f(bx-45)}" y="${top}" width="90" height="${h}" fill="url(#ruR-${id})"/></g>`}
+ return `<defs>${defs}</defs><g opacity="${f(op)}">${s}</g>`;
 }
 
 /* Cosmati band: a Tessellate shade, after the inlaid marble bands of the Cosmati (the Great Pavement at Westminster, Anagni,
@@ -6449,7 +6614,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0,cz=model.shade==='cosmati'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0,cz=model.shade==='cosmati'&&model.st>0,ru=model.shade==='ruin'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -6482,7 +6647,7 @@ function render(){
   // Misericord: the display fades as the seat swings down over it. Lenten veil: it fades as the rod comes in, before the veil drops.
   // Corona: it fades as the wall starts to lower, long before the corona comes down.
   // Aumbry: the tabs and buttons fade; the display itself is drawn back into the recess and hidden once the doors are shut.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp||cz?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   const auG=au?auGeo(id,w,h,k):null;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(!au&&n.style.filter)n.style.filter='';
@@ -6492,8 +6657,12 @@ function render(){
    else if(n.style.transform){n.style.transform='';n.style.clipPath='';n.style.transformOrigin=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co||au||ul||fc||gy||wp||cz?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);el.classList.toggle('czOn',cz);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);el.classList.toggle('czOn',cz);el.classList.toggle('ruOn',ru);
+  // Ruin: the casing loses what has broken off its top, as a clip; the overlay draws everything else that weathers.
+  const rclip=ru?ruClip(id,w,h,k):'';if(svg.dataset.rclip!==rclip){svg.dataset.rclip=rclip;svg.style.clipPath=rclip}
+  const us2=el.querySelector('.rusvg'),rukey=ru?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.join}`:'';
+  if(us2.dataset.key!==rukey){us2.dataset.key=rukey;us2.setAttribute('width',w);us2.setAttribute('height',h);us2.setAttribute('viewBox',`0 0 ${w} ${h}`);us2.innerHTML=rukey?ruin(id,w,h,k):''}
   const zs=el.querySelector('.czsvg'),zkey=cz?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(zs.dataset.key!==zkey){zs.dataset.key=zkey;zs.setAttribute('width',w);zs.setAttribute('height',h);zs.setAttribute('viewBox',`0 0 ${w} ${h}`);zs.innerHTML=zkey?cosmati(id,w,h,k):''}
   const ps=el.querySelector('.prsvg'),pkey=wp?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
