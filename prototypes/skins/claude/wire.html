@@ -199,7 +199,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release; on the briolette fan, drag the fan or GitDiscuss's nameplate (or press ↑ ↓) to open or close it a stone at a time, and tap the fan to release; on the spool and claw, tap the spool, the wire or the claw to unclip it; on the wrapped-eye stay, drag the stay or GitDiscuss's nameplate (or press ↑ ↓) to swing it a step at a time, and tap the stay to release; on the tube rivets, tap the rivets to pop them out; on the cradle roll, drag the wheel round the cradle or GitDiscuss's nameplate (or press ↑ ↓) to roll it a stop at a time, and tap the wheel to release; on the keyhole loops, drag up on the keyholes to lift GitDiscuss off (past halfway it lets go), or tap them to release; on the bead scale, tap a pan (or focus it and press Enter) to move a pearl into it, drag a pan's top pearl onto the other pan, or drag GitDiscuss's nameplate (or press ↑ ↓) to tip it a mark at a time, and tap the gallows or the chain to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release; on the briolette fan, drag the fan or GitDiscuss's nameplate (or press ↑ ↓) to open or close it a stone at a time, and tap the fan to release; on the spool and claw, tap the spool, the wire or the claw to unclip it; on the wrapped-eye stay, drag the stay or GitDiscuss's nameplate (or press ↑ ↓) to swing it a step at a time, and tap the stay to release; on the tube rivets, tap the rivets to pop them out; on the cradle roll, drag the wheel round the cradle or GitDiscuss's nameplate (or press ↑ ↓) to roll it a stop at a time, and tap the wheel to release; on the keyhole loops, drag up on the keyholes to lift GitDiscuss off (past halfway it lets go), or tap them to release; on the bead scale, tap a pan (or focus it and press Enter) to move a pearl into it, drag a pan's top pearl onto the other pan, or drag GitDiscuss's nameplate (or press ↑ ↓) to tip it a mark at a time, and tap the gallows or the chain to release; on the resin bezel, tap the resin (or focus it and press Enter) to soften it with a torch and let it run out. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -271,6 +271,8 @@ const RC_X0=28,RC_R=44;
 // Bead scale: GitDiscuss hangs by a pin BS_PY above the middle of its crest. Lengths below are from that pin: the gallows post stands BS_POST to its left
 // on Jarvis's roof, the arm runs at BS_ARM, the lyre's ring hangs at BS_RING and its scale arc has radius BS_LR; the pans hang from eyes BS_EX either side.
 const BS_GAP=56,BS_PY=-10,BS_EX=160,BS_POST=-291,BS_ARM=-172,BS_RING=-64,BS_LR=42,BS_HOP=380;
+// Resin bezel: a marquise RZ_G wide between the frames; each half starts at the top RZ_T0 down its height, where it flares into a scroll round the mouth.
+const RZ_G=34,RZ_T0=.1;
 const JOINS={
  jumpring:{label:'Jump ring',kind:'Hinge',gap:56,
   about:'Each pendant ends in an eye loop on a wrapped stem. A brass jump ring swings in, threads both loops and twists shut. <b>Near:</b> the loops warm. <b>Ready:</b> a ghost ring appears between them. <b>Release:</b> click the ring, or focus it and press Enter; it twists open and lifts away. The pendants hang a ring\'s width apart, like links in a chain, which is what later lets this join pivot.',
@@ -1384,10 +1386,151 @@ const JOINS={
   end(side,lit,h){if(lit<=0)return '';const x=side>0?W+BS_GAP+W/2+BS_POST:W/2;return `<circle cx="${f(x)}" cy="6" r="13" fill="#ffb15e" opacity="${f(lit*.4)}" filter="url(#soft)"/>`},
   under(){return ''},
   over(c){return bsOver(c)}
+ },
+ resin:{label:'Resin bezel',kind:'Pour',gap:RZ_G,slow:3.2,held:0,tj:null,ld:1,
+  about:`The Pour join kind (hollow's candle wax, elven's moonwater ice) done in wire, from resin jewellery: an open-backed wire bezel is filled with clear resin, a stone is set in it while it is wet, and a UV lamp cures it glass-hard; a jeweller's torch softens it again. Each joining end carries a short wire bound to its frame's side band and coiled into a curl, copper on Jarvis and brass on GitDiscuss. <b>Near:</b> the curls open and their ends run hot. <b>Ready:</b> a dashed ghost of the marquise bezel, the tipped cup and its stream. <b>Joining:</b> as the pendants close, the curls pay out into two half-bezels, each bent out from its frame's side into half a marquise with a hot working end. At the foot the halves meet and are wrapped shut with three turns and a twisted tail; at the top they flare into scrolls round an open mouth. A small clear cup of resin comes down over the mouth and tips, a thin honey stream runs in, and the bezel fills from the foot under a wavering surface, gold flecks showing in it and bubbles rising and popping. The cup rights itself and lifts away. Tweezers bring in an amber rondelle and press it into the middle, sending a ring across the wet resin. A UV pen light sweeps down the bezel, and behind its violet line the resin cures from wet honey to clear amber with a domed shine. Last the rondelle kindles as the join light (amber while both widgets run, labradorite if either is paused), the resin glowing round it, and a glint runs down the copper. The bezel scales with any shade. Nothing moves at rest. <b>Release:</b> tap the resin, or focus it and press Enter. The light goes out, a torch flame plays up the bezel from the foot and the resin softens behind it, tweezers lift the stone out, and the soft resin runs out through the wrap at the foot in drops. The wrap unwinds and the halves draw back into their curls as the pendants part. Reversing part-way cross-fades the cup and the torch, so nothing jumps.`,
+  sayJoin:'The curls pay out into a wire bezel across the gap, a cup pours resin into it, a stone is set in the wet resin and a UV light cures it.',
+  sayJoined:'Joined by a resin bezel. Drag either nameplate to move the pair. Tap the resin to soften it and let it run out.',
+  sayRelease:'A torch softens the resin, the stone is lifted out, the resin runs out of the foot in drops, and the bezel draws back into its curls.',
+  sayReady:'Ready: release and a resin bezel will be cast between them.',sayNear:'Nearby: the wire curls open and run hot. Move closer.',
+  end(side,lit,h){return JOINS.box.end(side,lit,h)},
+  under(){return ''},
+  over(c){return rzOver.call(this,c)}
  }
 };
 // Inverse of ease (smoothstep) on 0..1.
 function unS(v){let a=0,b=1;for(let i=0;i<22;i++){const m=(a+b)/2;if(ease(m)<v)a=m;else b=m}return(a+b)/2}
+/* ---------- Resin bezel (Pour) ---------- */
+// The bezel is a marquise: a half-width rzW at height t (0 top, 1 foot). Side −1 is the copper half (Jarvis), +1 the brass (GitDiscuss).
+const rzW=(a,t)=>a*Math.pow(Math.max(0,Math.sin(Math.PI*t)),.9);
+const rzGeo=c=>{const sc=rvSc(c.h);return{sc,RY:Math.min(46*sc,c.h/2-4),a:RZ_G/2+7*sc}};
+const rzPt=(m,y,RY,a,side,t)=>[m+side*rzW(a,t),y-RY+2*RY*t];
+function rzHalf(m,y,RY,a,side,t0,t1){const n=Math.max(2,Math.ceil(Math.abs(t1-t0)*40)),p=[];for(let i=0;i<=n;i++)p.push(rzPt(m,y,RY,a,side,lerp(t0,t1,i/n)));return p}
+// The surface's height for a fraction F of the bezel filled by area (the marquise is narrow at both ends, so the level runs fast there).
+const rzLevel=F=>1-(1-RZ_T0)*Math.acos(clamp(1-2*F,-1,1))/Math.PI;
+// The scroll at the mouth: it leaves the half's top heading up and inward, then turns outward and over. fr grows it from its root.
+function rzCurl(E,side,r,fr){const a0=side<0?.6:Math.PI-.6,dn=side<0?-1:1,cx=E[0]-r*Math.cos(a0),cy=E[1]-r*Math.sin(a0),n=22;let d='';
+ for(let i=0;i<=n;i++){const t=fr*i/n,an=a0+dn*t*1.15*2*Math.PI,rr=r*(1-.62*t);d+=(i?'L':'M')+f(cx+rr*Math.cos(an))+' '+f(cy+rr*Math.sin(an))}return d}
+// Gold flecks in the resin and bubbles in the pour, as (t, across) pairs: across is a share of the half-width.
+const RZ_FL=[[.26,-.3,20],[.33,.42,75],[.41,-.55,130],[.47,.12,10],[.55,-.18,160],[.6,.6,45],[.66,-.62,95],[.71,.28,150],[.77,-.35,30],[.82,.5,115],[.86,-.08,60],[.38,.05,170],[.52,.68,85],[.9,.22,140]];
+const RZ_BU=[-.4,.3,-.12,.45,-.3,.1,.25];
+// A clear graduated cup, its spout at the origin, tipped about it; the resin inside stays level in the world (it is clipped to the cup and cut by a counter-rotated edge).
+function rzCup(P,tilt,V,sc,op,ghost){
+ const body='M-2 -1.2L1.4 1.6L1.6 15Q1.8 16 2.8 16H13.2Q14.2 16 14.4 15L16 0Z',tr=`translate(${f(P[0])} ${f(P[1])}) rotate(${f(tilt)}) scale(${f(sc*100)/100})`;
+ if(ghost)return `<path d="${body}" transform="${tr}" fill="none" stroke="#f3c96a" stroke-width="${f(1.1/sc)}" stroke-dasharray="2.2 2.2" opacity="${f(op)}"/>`;
+ const s=clamp(-tilt/100),d=lerp(15-12*V,-4*V,ease(s));
+ return `<g opacity="${f(op)}" transform="${tr}"><clipPath id="rz-cupc"><path d="${body}"/></clipPath>`+
+  `<path d="${body}" fill="#cfe3ea" fill-opacity=".1"/><g clip-path="url(#rz-cupc)"><rect x="-40" y="${f(d)}" width="80" height="80" transform="rotate(${f(-tilt)})" fill="#e9a446" opacity=".9"/><rect x="-40" y="${f(d)}" width="80" height="1.2" transform="rotate(${f(-tilt)})" fill="#fff0c4" opacity=".7"/></g>`+
+  `<path d="${body}" fill="none" stroke="#dfe9ee" stroke-width="${f(.8/sc)}" stroke-linejoin="round" opacity=".85"/><path d="M0 0H16" stroke="#f4f9fb" stroke-width="${f(1.1/sc)}"/>`+
+  `<path d="M15.2 4.5h-2.4M14.8 8h-1.6M14.4 11.5h-2.4" stroke="#dfe9ee" stroke-width=".55" opacity=".7"/><path d="M3.2 3L3.3 13" stroke="#fff" stroke-width=".7" opacity=".35"/></g>`;
+}
+// Tweezers holding a bead at B (radius rr): two steel prongs running up and to the right to a joined end; gap opens them; w draws them away.
+function rzTweezers(B,rr,sc,gap,w,op){
+ const D=[.574,-.819],N=[.819,.574],o=[B[0]+D[0]*22*sc*w,B[1]+D[1]*22*sc*w],H=[o[0]+D[0]*48*sc,o[1]+D[1]*48*sc];
+ let d='';for(const k of [-1,1]){const g=rr+.6+gap;d+=`M${f(o[0]+N[0]*k*g)} ${f(o[1]+N[1]*k*g)}L${f(o[0]+D[0]*8*sc+N[0]*k*(g+1.1*sc))} ${f(o[1]+D[1]*8*sc+N[1]*k*(g+1.1*sc))}L${f(H[0]+N[0]*k*1.4*sc)} ${f(H[1]+N[1]*k*1.4*sc)}`}
+ return `<g opacity="${f(op)}"><path d="${d}" transform="translate(2 3)" fill="none" stroke="#000" stroke-width="2" opacity=".25"/>${wire(d,'steel',1.3)}<circle cx="${f(H[0])}" cy="${f(H[1])}" r="${f(1.8*sc)}" fill="#8a969c" stroke="#0c1013" stroke-width=".6"/></g>`;
+}
+function rzOver(c){
+ const jt=c.jt,{sc,RY,a}=rzGeo(c),ya=c.a.y+c.h/2,yb=c.b.y+c.h/2,mA=c.a.x+W+RZ_G/2,mB=c.b.x-RZ_G/2;
+ // Forward the cup and the UV light act; in release the torch and the drips. A turn part-way cross-fades the two sets over a short stretch.
+ const dir=model.dir>0||jt===1?1:-1;
+ if(jt===0||jt===1||!model.busy){this.tj=null;this.ld=model.dir>0?1:-1}else if(dir!==this.ld){this.tj=jt;this.ld=dir}
+ const kx=this.tj==null?1:clamp(Math.abs(jt-this.tj)/.04),fF=dir>0?kx:1-kx,fR=dir<0?kx:1-kx;
+ // The near pose's open curls carry into the join (the engine clears the glow on drop, so the first joining frame keeps them too).
+ if(jt===0){if(model.glow>0)this.held=model.glow;else if(!model.busy)this.held=0}
+ const oe=ease(seg(jt,0,.2)),open=jt===0&&!(model.busy&&model.dir>0)?model.glow:fF*lerp(this.held,1,oe)+fR*oe,u=seg(jt,.2,.5),cool=!(model.a.run&&model.b.run);
+ const m=mA,y=ya,top=y-RY,bot=y+RY,E0=y-RY+2*RY*RZ_T0;
+ let s='';
+ // The resin: filled by area from the foot, wet honey below the cure line and clear amber above it.
+ const F=seg(jt,.635,.79),tS=rzLevel(F),ys=top+2*RY*tS,cure=seg(jt,.87,.95),yU=lerp(E0-2,bot+2,cure),warm=seg(jt,.93,.99);
+ const wv=.7*sc*(1-cure)*(dir<0?1:lerp(1,.4,seg(jt,.79,.82)));
+ if(F>0){
+  const L=rzHalf(m,y,RY,a,-1,tS,1),R=rzHalf(m,y,RY,a,1,1,tS),xl=L[0][0],xr=R[R.length-1][0],S=[];
+  for(let i=1;i<10;i++){const q=i/10;S.push([lerp(xr,xl,q),ys+wv*Math.sin(i*1.9+jt*420)-1.4*sc*Math.pow(Math.abs(2*q-1),4)])}
+  const Z=poly([...L,...R,...S])+'Z';
+  s+=`<defs><clipPath id="rz-res"><path d="${Z}"/></clipPath><clipPath id="rz-cur"><rect x="${f(m-a-4)}" y="${f(E0-8)}" width="${f(2*a+8)}" height="${f(Math.max(0,yU-E0+8))}"/></clipPath>`+
+   `<linearGradient id="rz-gw" gradientUnits="userSpaceOnUse" x1="0" y1="${f(top)}" x2="0" y2="${f(bot)}"><stop stop-color="#ffe6a8" stop-opacity=".62"/><stop offset=".4" stop-color="#e8a94e" stop-opacity=".7"/><stop offset="1" stop-color="#9a571a" stop-opacity=".82"/></linearGradient>`+
+   `<linearGradient id="rz-gs" gradientUnits="userSpaceOnUse" x1="${f(m-a)}" y1="${f(top)}" x2="${f(m+a*.6)}" y2="${f(bot)}"><stop stop-color="#ffd896" stop-opacity=".9"/><stop offset=".45" stop-color="#dc8a2c" stop-opacity=".9"/><stop offset="1" stop-color="#6a3208" stop-opacity=".95"/></linearGradient>`+
+   `<radialGradient id="rz-gl" gradientUnits="userSpaceOnUse" cx="${f(m)}" cy="${f(y)}" r="${f(RY)}"><stop stop-color="${cool?'#b9cce4':'#ffd27e'}" stop-opacity=".85"/><stop offset="1" stop-color="${cool?'#b9cce4':'#ffd27e'}" stop-opacity="0"/></radialGradient></defs>`;
+  s+=`<path d="${Z}" transform="translate(1.3 2.4)" fill="#000" opacity=".3"/><path d="${Z}" fill="url(#rz-gw)"/>`;
+  s+=`<g clip-path="url(#rz-res)"><g clip-path="url(#rz-cur)"><rect x="${f(m-a-2)}" y="${f(top-2)}" width="${f(2*a+4)}" height="${f(2*RY+4)}" fill="url(#rz-gs)"/></g>`;
+  // Gold flecks stirred through it, seen once the resin covers them.
+  for(const [t,x,r] of RZ_FL){const p=[m+x*rzW(a,t)*.85,top+2*RY*t],fo=clamp((p[1]-ys-1.5)/3);if(fo<=0)continue;
+   s+=`<path d="M-1.1 -.6L1.2 -.9L1 .7L-.9 .6Z" fill="#ffe08a" stroke="#8a5a10" stroke-width=".25" opacity="${f((.55+.35*cure)*fo)}" transform="translate(${f(p[0])} ${f(p[1])}) rotate(${r}) scale(${f(sc*100)/100})"/>`}
+  // The set ring where the stone goes in.
+  const rs=seg(jt,.845,.88);if(rs>0&&rs<1)s+=`<ellipse cx="${f(m)}" cy="${f(y)}" rx="${f((7+12*rs)*sc)}" ry="${f((5+9*rs)*sc)}" fill="none" stroke="#fff3cf" stroke-width=".8" opacity="${f(.6*(1-rs))}"/>`;
+  s+='</g>';
+ }
+ // The stone, once it sits in the resin (while carried it is drawn in front, below).
+ const bu=ease(seg(jt,.8,.85)),bop=seg(jt,.785,.8),hs=Math.max(sc,.8),Sx=m+26*sc,Sy=top-20*sc,bz=.7*(1-bu),BX=lerp(Sx,m,bu),BY=lerp(Sy,y,bu);
+ if(F>0&&warm>0)s+=`<g clip-path="url(#rz-res)"><rect x="${f(m-a)}" y="${f(top)}" width="${f(2*a)}" height="${f(2*RY)}" fill="url(#rz-gl)" opacity="${f(.75*warm)}"/></g>`;
+ if(bop>0&&bz<.02)s+=rvBead(m,y,hs,warm,cool&&warm>.5,0,bop);
+ if(F>0){
+  // Cured: a domed shine down the upper left and a point of light; wet: a bright line on the surface.
+  const gp=[];for(let i=0;i<=8;i++){const t=lerp(.2,.62,i/8);gp.push([m-.52*rzW(a,t),top+2*RY*t])}
+  if(cure>0)s+=`<g clip-path="url(#rz-cur)"><path d="${poly(gp)}" fill="none" stroke="#fff8e4" stroke-width="${f(1.9*sc)}" stroke-linecap="round" opacity="${f(.42*cure)}"/><circle cx="${f(m-.32*rzW(a,.3))}" cy="${f(top+.6*RY)}" r="${f(1.4*sc)}" fill="#fff" opacity="${f(.8*cure)}"/></g>`;
+  if(cure<1&&tS<.97){const L2=[];for(let i=1;i<10;i++){const q=i/10,x=lerp(m+rzW(a,tS),m-rzW(a,tS),q);L2.push([x,ys+1+wv*Math.sin(i*1.9+jt*420)])}
+   s+=`<path d="${poly(L2)}" fill="none" stroke="#fff3cf" stroke-width=".8" opacity="${f(.55*(1-cure))}"/>`}
+  // Bubbles carried in by the pour rise and pop.
+  if(fF>0)RZ_BU.forEach((x,i)=>{const tb=.645+.017*i,q=(jt-tb)/.08;if(q<=0||q>=1)return;const t0=.9-.06*(i%3),y0=top+2*RY*t0;if(y0<=ys+2)return;
+   const yy=lerp(y0,ys+1.2,ease(Math.min(1,q/.85))),tt=(yy-top)/(2*RY),bx=m+x*rzW(a,tt),r=(.7+.25*(i%3))*sc;
+   s+=q<.85?`<circle cx="${f(bx)}" cy="${f(yy)}" r="${f(r)}" fill="#fff6dc" fill-opacity=".25" stroke="#fff6dc" stroke-width=".5" opacity="${f(fF)}"/>`:`<circle cx="${f(bx)}" cy="${f(yy)}" r="${f(r+2*(q-.85)/.15*sc)}" fill="none" stroke="#fff6dc" stroke-width=".5" opacity="${f(fF*(1-(q-.85)/.15))}"/>`});
+  s+=`<path d="${poly([...rzHalf(m,y,RY,a,-1,tS,1),...rzHalf(m,y,RY,a,1,1,tS)])}" fill="none" stroke="#4a2306" stroke-width="2.6" opacity=".35"/>`;
+ }
+ // The pour: from the cup's spout straight down through the mouth onto the surface, the last drop falling after it.
+ const P1=[m+1.5,E0-12*sc],cin=ease(seg(jt,.55,.6)),cout=ease(seg(jt,.805,.845)),P=[m+1.5,lerp(lerp(top-56*sc,P1[1],cin),top-56*sc,cout)];
+ const tilt=jt<.6?0:jt<.635?-100*ease(seg(jt,.6,.635)):jt<.79?-100-18*seg(jt,.635,.79):-118*(1-ease(seg(jt,.79,.82)));
+ if(fF>0){
+  const on=seg(jt,.625,.635)*(1-seg(jt,.78,.79));
+  if(jt>.625&&jt<.79){const yE=Math.max(P[1]+7,lerp(P[1],ys,seg(jt,.625,.635))),ws=1.7*sc*(1-seg(jt,.77,.79)),d=`M${f(P[0]-.6)} ${f(P[1])}Q${f(m)} ${f(P[1]+3)} ${f(m)} ${f(P[1]+7)}V${f(yE)}`;
+   const so=fF*(1-seg(jt,.77,.79));
+   s+=`<path d="${d}" fill="none" stroke="#e9a446" stroke-width="${f(ws+.6)}" stroke-linecap="round" opacity="${f(.85*so)}"/><path d="${d}" fill="none" stroke="#fff0c4" stroke-width="${f(ws*.35)}" opacity="${f(.7*so)}" transform="translate(-.3 0)"/>`;
+   if(on>0)s+=`<ellipse cx="${f(m)}" cy="${f(ys)}" rx="${f((2.6+1.4*Math.abs(Math.sin(jt*300)))*sc)}" ry="${f(.8*sc)}" fill="none" stroke="#fff3cf" stroke-width=".6" opacity="${f(.55*fF*on)}"/>`}
+  const ld=seg(jt,.79,.81);if(ld>0&&ld<1)s+=`<circle cx="${f(m)}" cy="${f(lerp(P1[1]+6,ys,ld*ld))}" r="${f(1.1*sc)}" fill="#e9a446" opacity="${f(fF)}"/>`;
+ }
+ // The wire: the copper and brass halves pay out of their curls from the frames' side bands, top and foot at once, with hot working ends.
+ const halves=[[mA,ya,-1,'copper'],[mB,yb,1,'brass']];
+ for(const [mm,yy,sd,mt] of halves){
+  if(u<1){const ax=sd<0?c.a.x+W:c.b.x,cx=ax-sd*(4+1.2*open)*sc,r=(4.2+1.4*open)*sc*(1-.6*u),op=1-seg(u,.55,1),cd=spiral(cx,yy,r,1.6-.8*open,sd<0?1:-1,sd<0?Math.PI:0);
+   s+=`<g opacity="${f(op)}">${wire(`M${f(ax+sd*5)} ${f(yy)}L${f(cx+sd*r)} ${f(yy)}`+cd,mt,1.6)}${open>0?wire(cd,'hot',1.6,f(.65*open)):''}</g>`}
+  if(u>0){const tu=lerp(.5,RZ_T0,seg(u,0,.8)),tl=lerp(.5,1,seg(u,0,.85)),cf=seg(u,.8,1),E=rzPt(mm,yy,RY,a,sd,RZ_T0);
+   let d=poly(rzHalf(mm,yy,RY,a,sd,tu,tl));if(cf>0)d+=rzCurl(E,sd,3.4*sc,cf);
+   s+=`<path d="${d}" transform="translate(1.2 2.2)" fill="none" stroke="#000" stroke-width="2.4" opacity=".3"/>`+wire(d,mt,2);
+   for(const [t,g] of [[tu,seg(u,0,.8)],[tl,seg(u,0,.85)]]){if(g>=1)continue;const p=rzPt(mm,yy,RY,a,sd,t);
+    s+=`<circle cx="${f(p[0])}" cy="${f(p[1])}" r="3" fill="#ffc46a" opacity=".55" filter="url(#soft)"/><circle cx="${f(p[0])}" cy="${f(p[1])}" r="1.2" fill="#fff0c8"/>`}}
+ }
+ // At the foot the halves meet and are wrapped shut, three turns, then twisted into a short tail.
+ const wu=seg(jt,.5,.56);
+ if(wu>0){const n=Math.ceil(3*wu-.001);let d='';for(let i=0;i<n;i++)d+=band(m,bot-2*sc-i*1.7*sc,true,1,6*sc,1);
+  s+=wire(`M${f(m)} ${f(bot)}V${f(bot+5*sc*wu)}`,'copper',1.4)+wire(d,'copper',.9);
+  if(wu<1)s+=wire(band(m,bot-2*sc-(n-1)*1.7*sc,true,1,6*sc,1),'hot',.9);
+  const sp=Math.sin(Math.PI*seg(jt,.555,.58));if(sp>.03)s+=sparkle(m,bot-3*sc,sp*.45)}
+ // Tweezers bring the stone in and press it into the middle (in release they lift it out).
+ const top2=seg(jt,.785,.8)*(1-seg(jt,.865,.88));
+ if(bop>0&&bz>=.02)s+=rvBead(BX,BY,hs,0,false,bz,bop);
+ if(top2>0){const rr=5.4*hs*(1+1.3*bz);s+=rzTweezers([BX,BY],rr,sc,2.5*seg(jt,.85,.86),ease(seg(jt,.86,.88)),top2)}
+ // The cure line: forward a UV pen light sweeps down; in release a torch flame plays back up it.
+ const wo=seg(jt,.855,.87)*(1-seg(jt,.95,.965));
+ if(wo>0&&F>0){const tU=clamp((yU-top)/(2*RY)),T=[m+.15*rzW(a,tU),clamp(yU,E0,bot)];
+  if(fF>0){const o=wo*fF;s+=`<ellipse cx="${f(m)}" cy="${f(T[1])}" rx="${f(rzW(a,tU)+4)}" ry="${f(3.2*sc)}" fill="#b9a2ff" opacity="${f(.55*o)}" filter="url(#soft)"/>`+
+   `<g opacity="${f(o)}" transform="translate(${f(T[0])} ${f(T[1])}) rotate(22) scale(${f(sc*100)/100})"><path d="M-1.6 -15L1.6 -15L8 0L-8 0Z" fill="#a78bff" opacity=".22"/><rect x="-2.8" y="-42" width="5.6" height="27" rx="2" fill="#24212b" stroke="#0a090c" stroke-width=".7"/><rect x="-2.8" y="-22" width="5.6" height="3" fill="#8a969c"/><circle cx="0" cy="-15" r="1.6" fill="#d9ccff"/><circle cx="0" cy="-15" r="3.4" fill="#a78bff" opacity=".5" filter="url(#soft)"/></g>`}
+  if(fR>0){const o=wo*fR,tip=16+1.5*Math.sin(jt*900);s+=`<ellipse cx="${f(m)}" cy="${f(T[1])}" rx="${f(rzW(a,tU)+5)}" ry="${f(3.6*sc)}" fill="#ffd9a0" opacity="${f(.6*o)}" filter="url(#soft)"/>`+
+   `<g opacity="${f(o)}" transform="translate(${f(T[0])} ${f(T[1])}) rotate(35) scale(${f(sc*100)/100})"><path d="M-6 ${f(-tip)}Q-5.5 ${f(-tip*.4)} 0 0Q5.5 ${f(-tip*.4)} 6 ${f(-tip)}Z" fill="#5c9cff" opacity=".42"/><path d="M-2.8 ${f(-tip)}Q-2.5 ${f(-tip*.58)} 0 ${f(-tip*.4)}Q2.5 ${f(-tip*.58)} 2.8 ${f(-tip)}Z" fill="#d6ebff" opacity=".9"/><rect x="-3.2" y="${f(-tip-14)}" width="6.4" height="14" rx="1" fill="url(#cb-brass)" stroke="#2a1d08" stroke-width=".6"/></g>`}}
+ // The cup comes down over the mouth, tips and pours, then rights itself and lifts away.
+ if(fF>0){const co=seg(jt,.55,.565)*(1-seg(jt,.825,.845));if(co>0)s+=rzCup(P,tilt,.9-.75*seg(jt,.635,.79),sc,co*fF)}
+ // In release the soft resin runs out through the wrap at the foot, a drop at a time.
+ if(fR>0&&jt>.59&&jt<.8){const q=(.79-jt)/.16*7,D=[m,bot+5*sc];for(let k=0;k<7;k++){const v=(q-k)/1.4;if(v<=0||v>=1)continue;
+  const g=seg(v,0,.35),fl=seg(v,.35,1),r=1.7*sc*Math.max(.25,g);
+  s+=`<path d="M0 ${f(-r*1.6)}Q${f(r)} ${f(-r*.2)} ${f(r)} 0A${f(r)} ${f(r)} 0 0 1 ${f(-r)} 0Q${f(-r)} ${f(-r*.2)} 0 ${f(-r*1.6)}Z" transform="translate(${f(D[0])} ${f(D[1]+r+46*sc*fl*fl)})" fill="#e9a446" stroke="#6a3208" stroke-width=".4" opacity="${f(fR*(1-fl))}"/>`}}
+ // Kindled: a glint runs down the copper half.
+ const gl=seg(jt,.95,1);if(gl>0&&gl<1){const p=rzPt(m,y,RY,a,-1,lerp(RZ_T0,1,gl));s+=sparkle(p[0],p[1],Math.sin(Math.PI*gl)*.45*fF)}
+ // Ready: a dashed ghost of the bezel, the tipped cup and its stream.
+ if(c.ghost>0&&jt===0){const g=c.ghost*.85,L=poly(rzHalf(mA,ya,RY,a,-1,RZ_T0,1))+rzCurl(rzPt(mA,ya,RY,a,-1,RZ_T0),-1,3.4*sc,1),R=poly(rzHalf(mA,ya,RY,a,1,RZ_T0,1))+rzCurl(rzPt(mA,ya,RY,a,1,RZ_T0),1,3.4*sc,1);
+  s+=`<g fill="none" stroke="#f3c96a" stroke-width="1.1" stroke-dasharray="2.2 2.2" opacity="${f(g)}"><path d="${L+R}"/><path d="M${f(mA)} ${f(E0-10*sc)}V${f(ya+RY*.5)}" stroke-opacity=".6"/></g>`+rzCup([mA+1.5,E0-12*sc],-100,0,sc,g,true)}
+ if(jt===1){const d=poly([...rzHalf(m,y,RY,a,-1,RZ_T0,1),...rzHalf(m,y,RY,a,1,1,RZ_T0)])+'Z';
+  s+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Resin bezel: tap it, or press Enter, to soften the resin with a torch, let it run out and separate the widgets"><title>Tap the resin to soften it</title><path d="${d}" fill="transparent" stroke="transparent" stroke-width="10"/><path class="ringfocus" d="${d}" fill="none" stroke="#f0c08f" stroke-width="1.5" transform="translate(${f(m)} ${f(y)}) scale(1.18) translate(${f(-m)} ${f(-y)})"/></g>`}
+ return s;
+}
 /* ---------- Bead scale ---------- */
 // BS.n is how many of the six pearls are in the far pan (3 + angle/15); hops are pearls in the air, carry a pearl in the hand.
 const BS={n:3,hops:[],carry:null,loop:false,tm:0};
