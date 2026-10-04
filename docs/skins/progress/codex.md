@@ -58,7 +58,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 - [x] Gothic · Shade · Frieze extraction — Added selectable carved-ribbon extraction, staged masonry withdrawal, reverse expansion and independent Checks shade; retained all six joins and earlier shades; 1008 simulated state, animation, geometry, focus and touch checks plus native-font text-fit checks passed; full-page visual review blocked by denied Chrome access.
 - [x] Felt · Shade · Press flat — Added selectable dome compression, a slight sideways swell, one restrained recovery and dense layers around fixed dark labels with independent Checks shade; retained all earlier options; 621 simulated state, animation, geometry and touch checks plus native-font text-fit checks passed; full-page visual review blocked by denied Chrome access.
 - [x] Elven · Shade · Mist withdrawal — Added selectable tip-to-root silver fading, delayed body withdrawal, a dark 36 px reading rail and pale stone with reverse expansion and independent Checks shade; preserved all earlier options; 713 simulated state, animation, geometry, touch and regression checks plus native-font text-fit checks passed; full-page visual review blocked by denied Chrome access.
-- [ ] Wire · Shade · Branch fan
+- [x] Wire · Shade · Branch fan — Finished selectable sequential beaded-branch rotation, a wound pivot, copper fringe and fixed reading spine with reverse opening and independent Checks shade; retained all earlier options; 655 simulated interaction, animation, geometry and touch checks plus native-font text-fit checks passed; full-page visual review unavailable because no browser surface was exposed.
 - [ ] Hollow · Shade · Hanging banner tuck
 - [ ] Wire · Shade · Cabochon slide
 
