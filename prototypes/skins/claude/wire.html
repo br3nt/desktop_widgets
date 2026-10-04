@@ -199,7 +199,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release; on the briolette fan, drag the fan or GitDiscuss's nameplate (or press ↑ ↓) to open or close it a stone at a time, and tap the fan to release; on the spool and claw, tap the spool, the wire or the claw to unclip it; on the wrapped-eye stay, drag the stay or GitDiscuss's nameplate (or press ↑ ↓) to swing it a step at a time, and tap the stay to release; on the tube rivets, tap the rivets to pop them out; on the cradle roll, drag the wheel round the cradle or GitDiscuss's nameplate (or press ↑ ↓) to roll it a stop at a time, and tap the wheel to release; on the keyhole loops, drag up on the keyholes to lift GitDiscuss off (past halfway it lets go), or tap them to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the jump-ring pivot, drag GitDiscuss's nameplate to swing it, or focus it and press ↑ ↓. On the coil wrap, grab a band and pull to unwind it; on the twisted trunk, grab the rope and pull to untwist it; on the caged bead, tap the bead to open the cage; on the bent wire, drag GitDiscuss's nameplate to bend the rod, or focus the coil and press ↑ ↓, and tap the coil to release; on the wire nest, tap the stone to pull the nest apart; on the overlapping hoops, tap the lens lamp to unlink them; on the wire rose, tap the rose to close it; on the wire butterfly, tap the butterfly to send it home; on the weaver ants, tap the ants to send them home; on the box clasp, tap the clasp to open it; on the pearl stays, turn the stone or drag GitDiscuss's nameplate to set the angle, and tap the stone to release; on the briolette fan, drag the fan or GitDiscuss's nameplate (or press ↑ ↓) to open or close it a stone at a time, and tap the fan to release; on the spool and claw, tap the spool, the wire or the claw to unclip it; on the wrapped-eye stay, drag the stay or GitDiscuss's nameplate (or press ↑ ↓) to swing it a step at a time, and tap the stay to release; on the tube rivets, tap the rivets to pop them out; on the cradle roll, drag the wheel round the cradle or GitDiscuss's nameplate (or press ↑ ↓) to roll it a stop at a time, and tap the wheel to release; on the keyhole loops, drag up on the keyholes to lift GitDiscuss off (past halfway it lets go), or tap them to release; on the bead scale, tap a pan (or focus it and press Enter) to move a pearl into it, drag a pan's top pearl onto the other pan, or drag GitDiscuss's nameplate (or press ↑ ↓) to tip it a mark at a time, and tap the gallows or the chain to release. With the caterpillar shade on, tap a caterpillar (or press Enter on its nameplate) to pause or resume it and watch it nod. With the letter beads shade on, tap a strip (or press Enter on its nameplate) to turn its beads to the next screen. Checks has no joining sockets, as in the capsule study. Motion only runs during a drag or a transition; the resting page is still.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40;
@@ -268,6 +268,9 @@ function casing(w,h,small,noFrame,noBezel){
 // Cradle roll: the wheel's hub sits RC_X0 out from GitDiscuss's edge (28 from Jarvis's when joined). The cradle has radius RC_R and the wheel
 // half that, both scaled by rcS when shaded; the cradle's centre O is the wheel's radius past the hub, so they touch at Jarvis's side when level.
 const RC_X0=28,RC_R=44;
+// Bead scale: GitDiscuss hangs by a pin BS_PY above the middle of its crest. Lengths below are from that pin: the gallows post stands BS_POST to its left
+// on Jarvis's roof, the arm runs at BS_ARM, the lyre's ring hangs at BS_RING and its scale arc has radius BS_LR; the pans hang from eyes BS_EX either side.
+const BS_GAP=56,BS_PY=-10,BS_EX=160,BS_POST=-291,BS_ARM=-172,BS_RING=-64,BS_LR=42,BS_HOP=380;
 const JOINS={
  jumpring:{label:'Jump ring',kind:'Hinge',gap:56,
   about:'Each pendant ends in an eye loop on a wrapped stem. A brass jump ring swings in, threads both loops and twists shut. <b>Near:</b> the loops warm. <b>Ready:</b> a ghost ring appears between them. <b>Release:</b> click the ring, or focus it and press Enter; it twists open and lifts away. The pendants hang a ring\'s width apart, like links in a chain, which is what later lets this join pivot.',
@@ -1365,10 +1368,193 @@ const JOINS={
   end(){return ''},
   under(){return ''},
   over(c){return khOver.call(this,c)}
+ },
+ bscale:{label:'Bead scale',kind:'Angle · balance',gap:BS_GAP,slow:2.4,
+  // GitDiscuss turns about the pin over the middle of its crest (x0 is negative: the turning point lies inside it).
+  angle:{def:30,x0:-W/2,ring:0,max:45,snap:15,rock:true,
+   origin:c=>bsPa(c),py:()=>BS_PY,bend:jt=>bsBend(jt),span:(th,h)=>bsSpan(th,h),
+   // Counting in at 0° still rocks either way, so the pair is fitted for that swing.
+   peak:()=>model.angle?model.angle+4*Math.sign(model.angle):11,tag:c=>bsTag(c),go:to=>bsGo(to)},
+  about:'The Balance angle kind (elven\'s lantern counterpoise opened the round) done in wire, from the goldsmith\'s hand scale: a beam hung on a pin in a lyre-shaped fork, a pan on three cords under each end, and a tongue that reads against a scale. Here GitDiscuss is the beam. Elven\'s steelyard slides one weight along a rail; this is an equal-arm balance read by counting, so the angle is set by how six pearls are shared between the two pans, and each pearl moved across tips GitDiscuss one 15° mark. A twisted brass gallows stands on Jarvis\'s roof on scroll feet, with a scrolled brace and a curled end, and lets a brass chain down plumb over the middle of GitDiscuss. The chain ends in the lyre: a copper scale arc with seven gold seeds, its wires running down to the pin. GitDiscuss hangs on the pin by a brass bail on its crest and turns about it (the pair stands a gap apart wide enough for the near end to swing), and a fine tongue rises from the bail to point at the seeds. Hammered copper pans hang plumb on brass cords from eyes under its ends. <b>Near:</b> Jarvis\'s roof and GitDiscuss\'s crest warm where the post and the bail will stand. <b>Ready:</b> the gallows, chain, lyre and pans traced in lamplight. <b>Joining:</b> the post climbs hot out of Jarvis\'s roof and the arm runs out with its scrolls, the bail rises from GitDiscuss\'s crest, the chain is let down link by link, the lyre closes on the bail and the pin slides through with a glint, the eyes are drawn and the pans drop on their cords. Then the pearls are counted out into the pans one at a time, and GitDiscuss rocks half a mark toward each one as it lands until it rests at the set angle. The tongue\'s bead and the seed it points at kindle as the join light (amber while either widget runs, labradorite if both are paused) and a glint runs down the chain. <b>Set the angle:</b> −45° to +45°, one mark per 15°. Tap a pan (or focus it and press Enter) and a pearl hops into it from the other pan, then GitDiscuss tips toward it, swinging a little past and back. Or carry one across: drag a pan\'s top pearl onto the other pan (drop it anywhere else and it hops home). GitDiscuss\'s nameplate, the slider and ↑ ↓ work too, and the pearls hop across to match. A tag beside the gallows reads the angle and the pans. <b>Release:</b> tap the gallows or the chain, or press Enter: the pearls are lifted out one by one as GitDiscuss rocks back level, the pans, lyre and chain are drawn up and the gallows sinks back into Jarvis\'s roof.',
+  sayJoin:'The gallows climbs out of Jarvis\'s roof and lets its chain down to GitDiscuss\'s crest; the pans drop on their cords and the pearls are counted in until GitDiscuss rests at the set angle.',
+  sayJoined:'Hung on a bead scale. Tap a pan, or drag a pearl from pan to pan, to tip GitDiscuss a mark; drag Jarvis to move the pair. Tap the gallows or the chain to release.',
+  sayTurn:'Tipping GitDiscuss by hand: the pearls hop across to balance it.',
+  sayRelease:'The pearls are lifted out as GitDiscuss rocks level, then the pans and chain are drawn up and the gallows sinks into Jarvis\'s roof.',
+  sayReady:'Ready: release to hang GitDiscuss on a bead scale.',sayNear:'Nearby: Jarvis\'s roof and GitDiscuss\'s crest warm. Move closer.',
+  end(side,lit,h){if(lit<=0)return '';const x=side>0?W+BS_GAP+W/2+BS_POST:W/2;return `<circle cx="${f(x)}" cy="6" r="13" fill="#ffb15e" opacity="${f(lit*.4)}" filter="url(#soft)"/>`},
+  under(){return ''},
+  over(c){return bsOver(c)}
  }
 };
 // Inverse of ease (smoothstep) on 0..1.
 function unS(v){let a=0,b=1;for(let i=0;i<22;i++){const m=(a+b)/2;if(ease(m)<v)a=m;else b=m}return(a+b)/2}
+/* ---------- Bead scale ---------- */
+// BS.n is how many of the six pearls are in the far pan (3 + angle/15); hops are pearls in the air, carry a pearl in the hand.
+const BS={n:3,hops:[],carry:null,loop:false,tm:0};
+const bsS=h=>lerp(.6,1,clamp((h-HS)/(H-HS)));
+// The pin, from Jarvis (where the gallows puts it) and from GitDiscuss (where its bail is); they meet once the casings have closed.
+const bsPa=c=>({x:c.a.x+W+BS_GAP+W/2,y:c.a.y+BS_PY}),bsPb=c=>({x:c.b.x+W/2,y:c.b.y+BS_PY});
+const bsRot=(P,th,x,y)=>{const t=th*Math.PI/180,cs=Math.cos(t),sn=Math.sin(t);return{x:P.x+x*cs-y*sn,y:P.y+x*sn+y*cs}};
+const bsEll=(cx,cy,rx,ry)=>`M${f(cx-rx)} ${f(cy)}a${f(rx)} ${f(ry)} 0 1 0 ${f(2*rx)} 0a${f(rx)} ${f(ry)} 0 1 0 ${f(-2*rx)} 0`;
+// A pan (side −1 near, +1 far): its eye E turns with the beam, 2 below the casing; the dish B hangs plumb under it.
+function bsPan(P,th,h,side){const s=bsS(h),E=bsRot(P,th,side*BS_EX,h-BS_PY+2);return{E,B:{x:E.x,y:E.y+30*s},s,r:17*s,br:4.3*s}}
+// Pearls pile in a dish three, two, one.
+const BS_SLOT=[[0,0],[-1,0],[1,0],[-.5,-1],[.5,-1],[0,-2]];
+const bsSlot=(pn,i)=>{const q=BS_SLOT[clamp(i,0,5)];return{x:pn.B.x+q[0]*pn.br*1.96,y:pn.B.y-pn.br*.3+q[1]*pn.br*1.68}};
+// Eases to 1 with a swing a little past and back, as a balance settles.
+const rockE=t=>1-Math.pow(1-t,3)*Math.cos(2.4*Math.PI*t);
+// Joining counts the pearls in alternately, far pan first, until each pan has its share; pearl k lands at BS_T(k).
+function bsSeq(){let r=3+Math.round(model.angle/15),l=6-r;const q=[];while(r>0||l>0){if(r>0){q.push(1);r--}if(l>0){q.push(-1);l--}}return q}
+const BS_T=k=>.68+.04*k;
+// Each pearl that lands tips GitDiscuss half a mark toward its pan, so the six end exactly at the set angle.
+function bsBend(jt){if(jt>=1)return model.angle;let a=0;bsSeq().forEach((sd,k)=>a+=7.5*sd*rockE(seg(jt,BS_T(k),BS_T(k)+.07)));return a}
+// The pair's vertical extent from Jarvis's top edge: the gallows above, the swung casing, and the pans below.
+function bsSpan(th,h){
+ const t=th*Math.PI/180,cs=Math.cos(t),sn=Math.sin(t);let lo=BS_PY+BS_ARM-10,hi=h;
+ for(const x of [-W/2,W/2])for(const y of [-BS_PY,h-BS_PY]){const v=BS_PY+x*sn+y*cs;lo=Math.min(lo,v);hi=Math.max(hi,v)}
+ for(const sd of [-1,1]){const p=bsPan({x:0,y:BS_PY},th,h,sd);hi=Math.max(hi,p.B.y+12*p.s)}
+ return[lo,hi];
+}
+// The gallows as a centreline from the post's foot: up, round a bend, and out along the arm to just past the pin.
+const BS_ARMP=(()=>{const p=[];for(let y=15;y>BS_ARM+22;y-=5)p.push([BS_POST,y]);
+ for(let i=0;i<=8;i++){const a=Math.PI-i/16*Math.PI;p.push([BS_POST+22+22*Math.cos(a),BS_ARM+22-22*Math.sin(a)])}
+ for(let x=BS_POST+28;x<12;x+=6)p.push([x,BS_ARM]);p.push([12,BS_ARM]);return p})();
+const bsArcD=P=>{const R=BS_LR,a=50*Math.PI/180;return`M${f(P.x-R*Math.sin(a))} ${f(P.y-R*Math.cos(a))}A${R} ${R} 0 0 1 ${f(P.x+R*Math.sin(a))} ${f(P.y-R*Math.cos(a))}`};
+function bsArm(P,u,m,deco){
+ if(u<=0)return '';const n=Math.max(2,Math.ceil(u*BS_ARMP.length)),X=P.x+BS_POST,Y=P.y+BS_ARM;let o='';
+ o+=`<g opacity="${f(Math.min(1,u*6))}">${wire(spiral(X-7.5,P.y+10.5,4.4,1.2,-1,0)+spiral(X+7.5,P.y+10.5,4.4,1.2,1,Math.PI),'copper',1.3)}</g>`;
+ // The brace, the scroll in its corner and the curl at the arm's end come once the arm is out.
+ if(deco>0)o+=`<g opacity="${f(deco)}">`+wire(`M${f(X+.5)} ${f(Y+80)}C${f(X+6)} ${f(Y+38)} ${f(X+38)} ${f(Y+6)} ${f(X+80)} ${f(Y+.5)}`,'copper',1.5)+
+  wire(spiral(X+15,Y+15,7,1.5,1,Math.PI*1.25),'copper',1.2)+wire(spiral(P.x+12,Y+7,7,1.25,1,-Math.PI/2),'brass',1.9)+`</g>`;
+ o+=twisted(poly(BS_ARMP.slice(0,n).map(([x,y])=>[P.x+x,P.y+y])),m,3);
+ o+=wire(band(X,P.y+8,true,4,8,2.3),'copper',1.1);
+ if(deco>0)o+=`<g opacity="${f(deco)}">${wire(band(X,Y+32,true,3,8,2.3)+band(X+32,Y,false,3,8,2.3)+band(P.x,Y,false,3,7,2),'copper',1)+wire(circ(P.x,Y+6.5,3.4),'brass',1.2)}</g>`;
+ return o;
+}
+// The chain, let down link by link from the arm's loop to the lyre's ring (cl 0..1).
+function bsChain(P,cl){
+ const t=P.y+BS_ARM+9.5,b=P.y+BS_RING-4.8,N=Math.round((b-t)/7.4),p=(b-t)/N,k=Math.ceil(cl*N);let d1='',d2='';
+ for(let i=0;i<k;i++){const y=t+i*p;if(i%2)d2+=`M${f(P.x)} ${f(y-1.6)}V${f(y+p+1.6)}`;else d1+=bsEll(P.x,y+p/2,2.3,p/2+.6)}
+ return wire(d1,'brass',.85)+wire(d2,'brass',1.3);
+}
+// The lyre: a ring on the chain, two wires down past the scale arc to the pin's ends, seven seeds on the arc (one per 15°); lit is the seed the tongue points at.
+function bsLyre(P,k,lit){
+ const R=BS_LR,Q=a=>{const t=a*Math.PI/180;return{x:P.x+R*Math.sin(t),y:P.y-R*Math.cos(t)}},e0=Q(-50),e1=Q(50),ry=P.y+BS_RING;
+ let o=wire(`M${f(P.x-1)} ${f(ry+4.4)}Q${f(P.x-15)} ${f(ry+15)} ${f(e0.x)} ${f(e0.y)}L${f(P.x-8)} ${f(P.y)}M${f(P.x+1)} ${f(ry+4.4)}Q${f(P.x+15)} ${f(ry+15)} ${f(e1.x)} ${f(e1.y)}L${f(P.x+8)} ${f(P.y)}`,'brass',1.15);
+ o+=wire(bsArcD(P),'copper',1.5)+twisted(circ(P.x,ry,4.8),'brass',1.6);
+ for(let i=-3;i<=3;i++){const q=Q(15*i);
+  if(lit&&i===lit.i)o+=`<circle cx="${f(q.x)}" cy="${f(q.y)}" r="8" fill="${lit.on?'#ffb15e':'#9fc4e0'}" opacity="${f(lit.k*.6)}" filter="url(#soft)"/>`+strandItem({k:'bead',r:2.8,stone:lit.k>.5?(lit.on?'amber':'lab'):'gold'},q.x,q.y);
+  else o+=strandItem({k:'seed',r:1.8,stone:'gold'},q.x,q.y)}
+ return `<g opacity="${f(clamp(k*2))}" transform="translate(0 ${f(-(1-ease(k))*10)})">${o}</g>`;
+}
+// A dish on three cords from its eye; dp drops it in (0..1); n pearls sit in it.
+function bsDish(pn,dp,n){
+ const{E,s,r}=pn,B={x:pn.B.x,y:pn.B.y-(1-backOut(dp))*18*s},ry=r*.27,dep=r*.58,lw=1.1*s+.2;
+ let o=wire(`M${f(E.x)} ${f(E.y+2)}L${f(B.x-r+1)} ${f(B.y)}M${f(E.x)} ${f(E.y+2)}L${f(B.x+r-1)} ${f(B.y)}M${f(E.x)} ${f(E.y+2)}L${f(B.x)} ${f(B.y-ry)}`,'brass',.55*s+.2);
+ o+=`<ellipse cx="${f(B.x)}" cy="${f(B.y)}" rx="${f(r)}" ry="${f(ry)}" fill="#1a0d06"/>`+wire(`M${f(B.x-r)} ${f(B.y)}A${f(r)} ${f(ry)} 0 0 1 ${f(B.x+r)} ${f(B.y)}`,'copper',lw);
+ for(let i=0;i<n;i++){const q=bsSlot({B,br:pn.br},i);o+=strandItem({k:'bead',r:f(pn.br),stone:'pearl'},q.x,q.y)}
+ o+=`<path d="M${f(B.x-r)} ${f(B.y)}A${f(r)} ${f(ry)} 0 0 0 ${f(B.x+r)} ${f(B.y)}A${f(r)} ${f(dep)} 0 0 1 ${f(B.x-r)} ${f(B.y)}Z" fill="url(#ig-cu)" stroke="#2a1206" stroke-width=".7"/>`+
+  `<path d="M${f(B.x-r*.62)} ${f(B.y+dep*.42)}Q${f(B.x)} ${f(B.y+dep*.66)} ${f(B.x+r*.62)} ${f(B.y+dep*.42)}" fill="none" stroke="#fff0dc" stroke-opacity=".3" stroke-width=".8"/>`;
+ o+=wire(`M${f(B.x-r)} ${f(B.y)}A${f(r)} ${f(ry)} 0 0 0 ${f(B.x+r)} ${f(B.y)}`,'copper',lw)+strandItem({k:'seed',r:f(1.6*s),stone:'gold'},B.x,B.y+dep+.8);
+ return `<g opacity="${f(clamp(dp*3))}">${o}</g>`;
+}
+// Pearls shown in each pan: those still in the air (or waiting to leave) and the one in the hand are not in their new pan yet.
+function bsCounts(now){const c={'-1':6-BS.n,'1':BS.n};
+ for(const hp of BS.hops){if(now>=hp.t0+BS_HOP)continue;c[hp.to]--;if(!hp.pt&&now<hp.t0)c[-hp.to]++}
+ if(BS.carry)c[BS.carry.side]--;return c}
+// Joined, the pearls follow the angle GitDiscuss is headed for: each one that has to cross hops over, a little after the one before.
+function bsSync(){if(BS.carry)return;const want=clamp(3+Math.round(snapGoal()/15),0,6);if(want===BS.n)return;const now=performance.now(),d=Math.sign(want-BS.n);let k=0;
+ while(BS.n!==want){BS.n+=d;BS.hops.push({to:d,t0:now+k*110});k++}bsLoop()}
+function bsLoop(){if(BS.loop||reduce.matches){if(reduce.matches)BS.hops=[];return}BS.loop=true;
+ requestAnimationFrame(function st(now){BS.hops=BS.hops.filter(hp=>now<hp.t0+BS_HOP);render();
+  if(BS.hops.length&&model.join==='bscale'&&model.jt===1)requestAnimationFrame(st);else{BS.loop=false;BS.hops=[];render()}})}
+// The slider, the arrows and a tapped pan: the pearl hops first, then GitDiscuss tips after it.
+function bsGo(to){clearTimeout(BS.tm);if(model.jt!==1){tweenAngle(to,380);return}++settleTok;model.snapTo=to;render();
+ BS.tm=setTimeout(()=>{if(model.join==='bscale'&&model.jt===1&&model.snapTo===to)tweenAngle(to,700)},reduce.matches?0:240)}
+function bsTap(side){const cur=snapGoal(),to=clamp(cur+15*side,-45,45);
+ if(to===cur){say('The '+(side<0?'far':'near')+' pan is empty: GitDiscuss already leans all the way, at '+signed(cur)+'.');return}
+ flashTurning();goAngle(to);say('A pearl hops into the '+(side<0?'near':'far')+' pan and GitDiscuss tips to '+signed(to)+'.')}
+// A pearl carried from pan d.pan and let go at d.p: on the other pan it moves the angle a mark; anywhere else it hops home.
+function bsDrop(d){
+ BS.carry=null;if(d.empty){render();return}if(!d.moved){bsTap(d.pan);return}
+ const c=ctx(),P=bsPb(c),o=-d.pan,po=bsPan(P,model.angle,c.h,o).B,now=performance.now();
+ if(Math.hypot(d.p.x-po.x,d.p.y-po.y)<(22*bsS(c.h)+5)*1.6){const to=clamp(snapGoal()+15*o,-45,45);BS.n+=o;BS.hops.push({pt:d.p,to:o,t0:now});bsLoop();flashTurning();goAngle(to);say('Dropped in the '+(o<0?'near':'far')+' pan: GitDiscuss tips to '+signed(to)+'.')}
+ else{BS.hops.push({pt:d.p,to:d.pan,t0:now});bsLoop();render();say('The pearl hops back into its pan.')}
+}
+function bsOver(c){
+ const jt=c.jt,h=c.h,Pa=bsPa(c),Pb=bsPb(c),s=bsS(h),on=model.a.run||model.b.run,now=performance.now();let out='';
+ if(jt===0){
+  if(c.ghost>0){
+   // Ready: the gallows, chain, lyre and level pans traced where they will hang (from GitDiscuss when Jarvis is the one being moved).
+   const P=drag&&drag.id==='a'?Pb:Pa;let d=poly(BS_ARMP.map(([x,y])=>[P.x+x,P.y+y]))+`M${f(P.x)} ${f(P.y+BS_ARM+6)}V${f(P.y+BS_RING)}`+bsArcD(P)+circ(P.x,P.y,5);
+   for(const sd of [-1,1]){const pn=bsPan(P,0,h,sd);d+=`M${f(pn.E.x)} ${f(pn.E.y)}L${f(pn.B.x-pn.r)} ${f(pn.B.y)}M${f(pn.E.x)} ${f(pn.E.y)}L${f(pn.B.x+pn.r)} ${f(pn.B.y)}`+bsEll(pn.B.x,pn.B.y,pn.r,pn.r*.27)}
+   out+=`<path d="${d}" fill="none" stroke="#ffe3a8" stroke-width="1.1" stroke-dasharray="3 3" opacity="${f(c.ghost*.85)}"/>`}
+  else if(model.glow>0){const k=model.glow;for(const p of [{x:Pa.x+BS_POST,y:Pa.y+15},{x:Pb.x,y:Pb.y+15}])out+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="12" fill="#ffb15e" opacity="${f(k*.6)}" filter="url(#soft)"/>`+sparkle(p.x,p.y,k*.4)}
+  return out;
+ }
+ const th=swingAt(jt),kin=jt<1?seg(jt,.92,1):1,turn=model.turning&&pivotOn();
+ // Until the scale is whole the pearls follow the joining's count, so it is joined holding exactly the set angle's share.
+ if(jt<1)Object.assign(BS,{n:3+Math.round(model.angle/15),hops:[],carry:null});
+ // The gallows climbs out of Jarvis's roof, hot until it is out.
+ const u=ease(seg(jt,.04,.3));out+=bsArm(Pa,u,u<1?'hot':'brass',seg(jt,.26,.38));
+ const cl=seg(jt,.4,.52);if(cl>0)out+=bsChain(Pa,cl);
+ // GitDiscuss's parts turn with it about the pin: the bail rising out of its crest and the eyes under its ends.
+ const bk=seg(jt,.3,.42),ek=seg(jt,.58,.62);
+ if(bk>0){let g=`<g opacity="${f(clamp(bk*3))}" transform="translate(0 ${f((1-ease(bk))*14)})">`+wire('M-2.6 3.6L-12 15.5M2.6 3.6L12 15.5','brass',1.5)+wire(band(-12,14.5,false,3,6,2)+band(12,14.5,false,3,6,2),'copper',.8)+twisted(circ(0,0,5),'brass',1.7)+'</g>';
+  if(ek>0)for(const sd of [-1,1]){const x=sd*BS_EX,y=h-BS_PY+2;g+=`<g opacity="${f(ek)}">${wire(`M${x} ${f(y-7)}V${f(y-3.6)}`,'brass',1.4)+wire(circ(x,y,3.6*Math.max(.3,ek)),'brass',1.3)+wire(band(x,y-6,true,2,6,1.8),'copper',.7)}</g>`}
+  out+=`<g transform="translate(${f(Pb.x)} ${f(Pb.y)}) rotate(${f(th)})">${g}</g>`}
+ // The lyre closes on the bail, then the pin slides through from the far side with a glint.
+ const ly=seg(jt,.5,.56),pk=seg(jt,.54,.58);
+ if(ly>0)out+=bsLyre(Pa,ly,kin>0&&Math.abs(th-15*Math.round(th/15))<4?{i:Math.round(th/15),k:kin,on}:null);
+ if(pk>0){const dx=(1-ease(pk))*26;out+=`<g opacity="${f(clamp(pk*3))}">${wire(`M${f(Pb.x-9+dx)} ${f(Pb.y)}H${f(Pb.x+9+dx)}`,'brass',2.2)+strandItem({k:'seed',r:1.7,stone:'gold'},Pb.x-9+dx,Pb.y)+strandItem({k:'seed',r:1.7,stone:'gold'},Pb.x+9+dx,Pb.y)}</g>`;
+  const gl=Math.sin(Math.PI*seg(jt,.57,.62));if(gl>.03)out+=sparkle(Pb.x,Pb.y,gl*.6)}
+ // The tongue rises from the bail; its bead is the join light.
+ const tg=seg(jt,.56,.62);
+ if(tg>0){const L=lerp(8,32,ease(tg)),hot=kin>.5;let g=wire(`M0 -5V${f(-L)}`,'brass',1.1);
+  if(kin>0)g+=`<circle cy="${f(-L-3)}" r="${turn?10:8}" fill="${on?'#ffb15e':'#9fc4e0'}" opacity="${f(kin*(turn?.8:.6))}" filter="url(#soft)"/>`;
+  g+=strandItem({k:'bead',r:3.1,stone:hot?(on?'amber':'lab'):'gold'},0,-L-3);
+  out+=`<g transform="translate(${f(Pb.x)} ${f(Pb.y)}) rotate(${f(th)})">${g}</g>`}
+ // The pans drop on their cords; joining, the pearls are counted in one at a time, falling from above.
+ const pd=seg(jt,.6,.68);
+ if(pd>0){
+  const cnt=jt<1?{'-1':0,'1':0}:(bsSync(),bsCounts(now)),fall=[],pans={'-1':bsPan(Pb,th,h,-1),'1':bsPan(Pb,th,h,1)};
+  if(jt<1)bsSeq().forEach((sd,k)=>{const T=BS_T(k);if(jt>=T){cnt[sd]++;const lg=seg(jt,T,T+.025);if(lg>0&&lg<1)fall.push({sd,glint:Math.sin(Math.PI*lg)})}else if(jt>=T-.035)fall.push({sd,u:seg(jt,T-.035,T)})});
+  for(const sd of [-1,1])out+=bsDish(pans[sd],pd,cnt[sd]);
+  for(const fl of fall){const pn=pans[fl.sd];
+   if(fl.u!=null){const q=bsSlot(pn,cnt[fl.sd]);out+=`<g opacity="${f(clamp(fl.u*3))}">${strandItem({k:'bead',r:f(pn.br),stone:'pearl'},q.x,q.y-40*s*Math.pow(1-fl.u,2))}</g>`}
+   else{const q=bsSlot(pn,cnt[fl.sd]-1);out+=sparkle(q.x+pn.br*.4,q.y-pn.br*.4,fl.glint*.4)}}
+  if(jt===1){
+   // Pearls in the air lob from pan to pan (or from where they were let go); each lands on top of its new pile.
+   const ahead={'-1':0,'1':0};
+   for(const hp of [...BS.hops].sort((p,q)=>p.t0-q.t0)){const v=(now-hp.t0)/BS_HOP;if(v<0||v>=1)continue;
+    const A0=hp.pt||bsSlot(pans[-hp.to],cnt[-hp.to]),B0=bsSlot(pans[hp.to],cnt[hp.to]+ahead[hp.to]++),e=ease(v);
+    // A low lob, kept under the line between the eyes so it never crosses GitDiscuss's casing.
+    const ey=lerp(pans[-hp.to].E.y,pans[hp.to].E.y,e)+8*s,x=lerp(A0.x,B0.x,e),y0=lerp(A0.y,B0.y,e)-18*s*4*v*(1-v),y=hp.pt?y0:Math.max(ey,y0),br=pans[hp.to].br;
+    out+=`<circle cx="${f(x+1.5)}" cy="${f(y+3)}" r="${f(br)}" fill="#000" opacity=".3"/>`+strandItem({k:'bead',r:f(br),stone:'pearl'},x,y);
+    if(v>.82)out+=sparkle(B0.x,B0.y-br,Math.sin(Math.PI*seg(v,.82,1))*.45)}
+   if(BS.carry&&drag&&drag.pan){const br=pans[1].br*1.15;out+=`<circle cx="${f(drag.p.x+3)}" cy="${f(drag.p.y+6)}" r="${f(br)}" fill="#000" opacity=".35"/>`+strandItem({k:'bead',r:f(br),stone:'pearl'},drag.p.x,drag.p.y)}
+  }
+ }
+ // A glint runs down the chain as the light kindles.
+ const gc=seg(jt,.9,.99);if(gc>0&&gc<1)out+=sparkle(Pa.x,lerp(Pa.y+BS_ARM+10,Pa.y+BS_RING,gc),Math.sin(Math.PI*gc)*.5);
+ if(jt===1){
+  const X=Pa.x+BS_POST,Y=Pa.y+BS_ARM,c2=bsCounts(now);
+  out+=`<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Bead scale at ${signed(model.angle)}, pans ${c2[-1]} to ${c2[1]}: tap the gallows or the chain, or press Enter, to take the scale apart and separate the widgets; the arrow keys move a pearl across"><title>Tap the gallows or the chain to release</title>`+
+   `<rect x="${f(X-8)}" y="${f(Y-9)}" width="${f(Pa.x+24-X)}" height="18" fill="transparent"/><rect x="${f(X-8)}" y="${f(Y)}" width="16" height="${f(Pa.y+8-Y)}" fill="transparent"/><rect x="${f(Pa.x-9)}" y="${f(Y)}" width="18" height="${BS_RING-BS_ARM}" fill="transparent"/>`+
+   `<rect class="ringfocus" x="${f(Pa.x-11)}" y="${f(Y-8)}" width="22" height="${BS_RING-BS_ARM+14}" rx="6" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`;
+  for(const sd of [-1,1]){const B={...bsPan(Pb,th,h,sd).B},R=20*s+4;B.y+=4*s;
+   out+=`<g class="hit bsPan" data-pan="${sd}" tabindex="0" role="button" aria-label="${sd<0?'Near':'Far'} pan, ${c2[sd]} pearl${c2[sd]===1?'':'s'}: tap it or press Enter to move a pearl into it from the other pan, or drag its top pearl across" style="cursor:grab;touch-action:none"><title>Tap to move a pearl into this pan; drag its top pearl to the other pan</title>`+
+    `<circle cx="${f(B.x)}" cy="${f(B.y-4*s)}" r="${f(R)}" fill="transparent"/><circle class="ringfocus" cx="${f(B.x)}" cy="${f(B.y-4*s)}" r="${f(R)}" fill="none" stroke="#f0c08f" stroke-width="1.5"/></g>`}
+ }
+ return out;
+}
+// The angle tag hangs beside the gallows post, over Jarvis's roof.
+function bsTag(c){
+ const P=bsPa(c),moving=model.snapTo!=null||drag&&drag.mode==='angle'&&drag.moved,g=snapGoal(),r=clamp(3+Math.round(g/15),0,6);
+ const tx=clamp(P.x+BS_POST-82,90,1110),ty=clamp(P.y-40,20,585),lab=signed(moving?g:model.angle)+' · pans '+(6-r)+' : '+r;
+ return `<rect x="${f(tx-74)}" y="${f(ty-11)}" width="148" height="22" rx="6" fill="url(#st-slab)"/>`+wire(rrect(tx-74,ty-11,148,22,6),'copper',1.1)+
+  `<text x="${f(tx)}" y="${f(ty+.5)}" text-anchor="middle" dominant-baseline="central" font-family="Georgia,serif" font-size="14" fill="#f2b866">${lab}</text>`;
+}
 /* ---------- Keyhole loops ---------- */
 // Jarvis's spine is 5 in from its edge and the keyholes are centred 21 in; GitDiscuss's beads hang 23 out from its edge, so they sit in the slots when joined.
 function khOver(c){
@@ -2061,7 +2247,10 @@ function swingAt(jt){
 const pivY=(A,th,h)=>A.py?A.py(th,h):h/2;
 // GitDiscuss's vertical extent relative to Jarvis's top edge at angle th.
 function pivotSpan(th,h){
- const A=J().angle||JOINS.pivot.angle,r=th*Math.PI/180,py=pivY(A,th,h),ly=py+A.ring*Math.sin(r/2)+(A.tr?A.tr(th,h).y:0);let lo=0,hi=h;
+ const A=J().angle||JOINS.pivot.angle;
+ // The bead scale works out its own (its gallows stands above the pair and its pans hang below).
+ if(A.span)return A.span(th,h);
+ const r=th*Math.PI/180,py=pivY(A,th,h),ly=py+A.ring*Math.sin(r/2)+(A.tr?A.tr(th,h).y:0);let lo=0,hi=h;
  for(const x of [A.x0,W+A.x0])for(const y of [-py,h-py]){const v=ly+x*Math.sin(r)+y*Math.cos(r);lo=Math.min(lo,v);hi=Math.max(hi,v)}
  // A join with parts beyond the casings (the wrapped-eye stay's posts) asks for room on the side they stand.
  if(A.pad){if((Math.sign(th)||Math.sign(model.angle)||1)>0)lo-=A.pad();else hi+=A.pad()}
@@ -2090,10 +2279,13 @@ function settleAngle(){
  const d=det();if(!d)return;const from=model.angle,to=nearestDetent(from);if(from===to)return;tweenAngle(to);
 }
 // Hard steps ease in without overshoot, so a stone is never pushed out and back, and level never swaps the pivot corner.
+// A balance (`rock`) settles with a swing past and back instead, except against its stop, where it could not swing past.
 function tweenAngle(to,ms=260){
- const from=model.angle,tok=++settleTok,t0=performance.now(),sn=J().angle&&J().angle.snap;ms=reduce.matches?0:ms;model.snapTo=sn?to:null;
- (function step(now){if(tok!==settleTok)return;const t=ms?clamp((now-t0)/ms):1;if(t>=1)model.snapTo=null;setAngle(lerp(from,to,sn?1-Math.pow(1-t,3):backOut(t)));if(t<1)requestAnimationFrame(step);else setAngle(to)})(t0);
+ const from=model.angle,tok=++settleTok,t0=performance.now(),sn=J().angle&&J().angle.snap,rk=J().angle&&J().angle.rock&&Math.abs(to)<lim();ms=reduce.matches?0:ms;model.snapTo=sn?to:null;
+ (function step(now){if(tok!==settleTok)return;const t=ms?clamp((now-t0)/ms):1;if(t>=1)model.snapTo=null;setAngle(lerp(from,to,rk?rockE(t):sn?1-Math.pow(1-t,3):backOut(t)));if(t<1)requestAnimationFrame(step);else setAngle(to)})(t0);
 }
+// The slider and arrow keys on a hard-step join; a join with `go` (the bead scale) moves its weights first.
+function goAngle(to,ms){const A=J().angle;if(A&&A.go)A.go(to);else tweenAngle(to,ms)}
 // Where a hard-step join is headed: the step a running tween will land on, else the nearest step.
 const snapGoal=()=>model.snapTo??nearestDetent(model.angle);
 const signed=v=>{v=Math.round(v);return(v>0?'+':v<0?'−':'')+Math.abs(v)+'°'};
@@ -2104,7 +2296,7 @@ function startTurn(d,p){
  ++settleTok;clearTimeout(turnTimer);if(!d.tap){model.turning=true;say(J().sayTurn)}render();
 }
 function stepAngle(dir){
- if(J().angle.snap){const to=clamp(snapGoal()+dir*det(),-lim(),lim());flashTurning();tweenAngle(to,380);say('GitDiscuss at '+signed(to)+'.');return}
+ if(J().angle.snap){const to=clamp(snapGoal()+dir*det(),-lim(),lim());flashTurning();goAngle(to,380);say('GitDiscuss at '+signed(to)+'.');return}
  const st=Math.min(model.detent||5,lim());++settleTok;flashTurning();setAngle((Math.round(model.angle/st)+dir)*st);say('GitDiscuss at '+$('#angleOut').textContent+'.')}
 function flashTurning(){model.turning=true;clearTimeout(turnTimer);turnTimer=setTimeout(()=>{model.turning=false;render()},900)}
 // The dial: a copper wire just past GitDiscuss's far end, seed beads at the detents, a hot pointer and a readout tag.
@@ -4313,7 +4505,7 @@ function springRender(el,svg){
 
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:190},b:{x:700,y:190},c:{x:810,y:440}};
-const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c,page:0},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30,stays:-15,brio:30,wstay:30,roll:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0,dir:1};
+const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c,page:0},join:'jumpring',shade:'tuck',morph:'tree',size:'pendant',g:-1,jt:0,angle:15,angles:{pivot:15,ball:-30,bent:30,stays:-15,brio:30,wstay:30,roll:30,bscale:30},detent:15,turning:false,st:0,path:null,glow:0,ghost:0,busy:false,lift:0,placed:0,dir:1};
 let anim=0,shadeAnim=0,drag=null;
 const J=()=>JOINS[model.join];
 
@@ -4405,7 +4597,7 @@ function render(){
    const A=j.angle||{x0:0,ring:0},th=swingAt(model.jt),ph=th*Math.PI/360;
    // A rolling join also carries that point along as it rolls (A.tr).
    const T=A.tr&&th?A.tr(th,h):{x:0,y:0};
-   el.style.transformOrigin=`-${A.x0}px ${f(pivY(A,th,h))}px`;el.style.transform=th?`translate(${f(A.ring*Math.cos(ph)-A.ring+T.x)}px,${f(A.ring*Math.sin(ph)+T.y)}px) rotate(${f(th)}deg)`:'';
+   el.style.transformOrigin=`${f(-A.x0)}px ${f(pivY(A,th,h))}px`;el.style.transform=th?`translate(${f(A.ring*Math.cos(ph)-A.ring+T.x)}px,${f(A.ring*Math.sin(ph)+T.y)}px) rotate(${f(th)}deg)`:'';
   }
   const svg=el.querySelector('.casing');svg.setAttribute('width',w);svg.setAttribute('height',f(h));svg.setAttribute('viewBox',`0 0 ${w} ${f(h)}`);
   if(small&&model.g>-1){({bezel:bezelRender,detail:detailRender,festoon:festoonRender,loom:loomRender,vine:vineRender,fan:fanRender,spring:springRender}[model.morph]||treeRender)(el,svg);continue}
@@ -4425,14 +4617,15 @@ function render(){
  }
  $('#a .runText').innerHTML=model.a.run?'03 <em>agents running</em>':'03 <em>agents paused</em>';
  $('#under').innerHTML=j.under(c);
- const focused=document.activeElement&&document.activeElement.id==='joinHit';
+ const focused=document.activeElement&&document.activeElement.id==='joinHit',fpan=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.pan;
  $('#over').innerHTML=j.over(c);
+ if(fpan){const p=$(`#over [data-pan="${fpan}"]`);if(p)p.focus()}
  $('#dial').innerHTML=dialSvg(c);$('#dial').style.opacity=model.turning&&pivotOn()?1:0;
  $('#angleRow').style.display=j.angle?'':'none';
  if(j.angle){const ai=$('#angle'),mx=j.angle.max||40;ai.min=-mx;ai.max=mx;ai.step=j.angle.snap||1;$('#detent').style.display=j.angle.snap?'none':''}
  const ang=Math.round(model.angle);$('#angle').value=model.snapTo??ang;$('#angleOut').textContent=(ang>0?'+':ang<0?'−':'')+Math.abs(ang)+'°';
  $('#detent').textContent=model.detent?'Detents '+model.detent+'°':'Detents off';$('#detent').setAttribute('aria-pressed',String(!!model.detent));
- const hit=$('#joinHit');if(hit){hit.onclick=j.pull||j.knob?(e=>{if(e.detail===0)doSeparate()}):doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}else if(j.knob||model.join==='bent'){const k={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(k){e.preventDefault();stepAngle(k)}}};if(focused)hit.focus()}
+ const hit=$('#joinHit');if(hit){hit.onclick=j.pull||j.knob?(e=>{if(e.detail===0)doSeparate()}):doSeparate;hit.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('#a .grip').focus();doSeparate()}else if(j.knob||model.join==='bent'||model.join==='bscale'){const k={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(k){e.preventDefault();stepAngle(k)}}};if(focused)hit.focus()}
  // Controls reflect state
  const state=model.jt===0?'separate':model.jt===1?'joined':'joining';
  $$('#stateRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===state||(b.dataset.state==='shade'&&model.st>.5))));
@@ -4461,7 +4654,7 @@ function options(row,set,key,aboutEl){
 // `chosen` is a click on the option itself (not the S key cycling past it).
 function pick(key,id,chosen){
  if(drag)cancelDrag();
- if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;model.snapTo=null;model.dir=1;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);if(id==='brio')JOINS.brio.shown=brCount(model.angle);if(id==='wstay')JOINS.wstay.lt=null;model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}if(JOINS[id].phase){JOINS[id].rel=false;JOINS[id].lastJt=model.jt}if(JOINS[id].lockTo)Object.assign(JOINS[id],{lk:1,lkWant:1,lkTok:JOINS[id].lkTok+1,glint:0})}
+ if(key==='join'&&id!==model.join){const was=model.jt;++anim;++settleTok;model.busy=false;model.turning=false;model.join=id;model.snapTo=null;model.dir=1;if(JOINS[id].angle)model.angle=nearestDetent(model.angles[id]??JOINS[id].angle.def);if(id==='brio')JOINS.brio.shown=brCount(model.angle);if(id==='wstay')JOINS.wstay.lt=null;if(id==='bscale')Object.assign(BS,{n:3+Math.round(model.angle/15),hops:[],carry:null});model.path=null;model.jt=0;if(was>0){model.path={s:separatePose(),j:joinedPose('a')};setJt(was);if(was===1)model.path=null}if(JOINS[id].phase){JOINS[id].rel=false;JOINS[id].lastJt=model.jt}if(JOINS[id].lockTo)Object.assign(JOINS[id],{lk:1,lkWant:1,lkTok:JOINS[id].lkTok+1,glint:0})}
  if(key==='shade'){const was=model.shade;model.shade=id;
   // Hoop rim · tree needs a hoop: an unshaded Checks grows into a hoop tree (from the tree morph) so there is one to sink into.
   if(chosen&&id==='rimtree'&&was!==id&&model.st<.5&&!(model.morph==='tree'&&model.g>1.999)){
@@ -4493,7 +4686,7 @@ $('#grow').oninput=e=>{
  if((model.morph!=='tree'&&model.g===-1&&model.st>.5)||(rimHoop()&&model.st>0)){const v=e.target.value/100;if(v>-1||model.g>-1)morphTo(SIZES.reduce((a,b)=>Math.abs(b[2]-v)<Math.abs(a[2]-v)?b:a)[0]);return}
  ++morphAnim;model.g=e.target.value/100;const S=SIZES.find(x=>Math.abs(x[2]-model.g)<.001);model.size=S?S[0]:null;if(model.st>.5&&model.g>-1)toggleShade();render();settleLift(0)};
 $('#scrub').oninput=e=>{++anim;model.busy=false;if(model.dir<0&&J().close){model.path=null;model.jt=model.jt>=.5?1:0}model.dir=1;if(!model.path){model.path=model.jt===1?{s:separatePose(),j:{a:{...model.a},b:{...model.b}}}:{s:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}},j:joinedPose('a')}}setJt(e.target.value/100);if(model.jt===0)model.path=null;render()};
-$('#angle').oninput=e=>{++settleTok;flashTurning();if(J().angle&&J().angle.snap)tweenAngle(nearestDetent(+e.target.value),380);else setAngle(nearestDetent(+e.target.value))};
+$('#angle').oninput=e=>{++settleTok;flashTurning();if(J().angle&&J().angle.snap)goAngle(nearestDetent(+e.target.value),380);else setAngle(nearestDetent(+e.target.value))};
 $('#detent').onclick=()=>{const ds=[15,30,0];model.detent=ds[(ds.indexOf(model.detent)+1)%ds.length];flashTurning();render();settleAngle();say(model.detent?'Detents every '+model.detent+'°: the pendant clicks into the nearest seed bead.':'Detents off: any angle from −40° to +40° holds.')};
 document.addEventListener('keydown',e=>{
  if(e.target.matches('input')||e.metaKey||e.ctrlKey||e.altKey)return;
@@ -4521,6 +4714,10 @@ stage.addEventListener('pointerdown',e=>{
   model.path={s:separatePose(),j:{a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}}};if(J().lift)model.dir=1;
   drag={unwind:true,x0:p.x,y0:p.y,deg:0,moved:false};stage.setPointerCapture(e.pointerId);say(J().sayPull||(model.join==='trunk'?'Untwisting: pull further to let go.':'Unwinding: pull further to let go.'));render();return;
  }
+ // Bead scale: a pan is grabbed to carry its top pearl across; a tap moves a pearl into it from the other pan.
+ if(e.button===0&&pivotOn()&&model.join==='bscale'&&e.target.closest('.bsPan')){
+  e.preventDefault();const p=local(e);drag={pan:+e.target.closest('.bsPan').dataset.pan,start:p,p,moved:false};stage.setPointerCapture(e.pointerId);return;
+ }
  // Knob joins (caged ball joint, pearl stays): grabbing the centre turns it (and GitDiscuss); a tap without turning releases.
  if(e.button===0&&pivotOn()&&J().knob&&e.target.closest('#joinHit')){
   e.preventDefault();const p=local(e);drag={id:'b',start:p,saved:{a:{...model.a},b:{...model.b},c:{...model.c},angle:model.angle},state:'idle',tap:true,moved:false,inner:true};
@@ -4542,6 +4739,8 @@ stage.addEventListener('pointerdown',e=>{
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
+ // Carrying a pearl: it leaves its pan once the pointer has moved, if the pan has one.
+ if(drag.pan){drag.p=p;if(!drag.moved&&Math.hypot(p.x-drag.start.x,p.y-drag.start.y)>5){const n=bsCounts(performance.now())[drag.pan];if(n<=0){if(!drag.empty)say('That pan is empty: carry a pearl from the other one.');drag.empty=true;return}drag.moved=true;BS.carry={side:drag.pan};say('Carrying a pearl: drop it on the other pan to tip GitDiscuss a mark.')}if(drag.moved)render();return}
  // A join with its own lift (the keyhole loops) maps the pointer to the join itself; the rest unwind by distance.
  if(drag.unwind){if(J().lift){setJt(J().lift(drag,p));render();return}const d=Math.hypot(p.x-drag.x0,p.y-drag.y0);if(d>3)drag.moved=true;drag.deg=clamp(d/70);setJt(1-.5*drag.deg);render();return}
  if(!(drag.mode==='angle'&&drag.tap)&&Math.hypot(p.x-drag.start.x,p.y-drag.start.y)>4)drag.moved=true;
@@ -4575,6 +4774,7 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.pan){bsDrop(d);return}
  if(d.unwind){if(!d.moved||d.deg>.5){if(d.moved&&J().letGo)J().letGo();doSeparate()}else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;say(J().sayJoined)}});return}
  if(d.mode==='angle'){model.turning=false;if(d.tap&&!d.moved){++settleTok;doSeparate();return}if(!d.tap&&!d.moved&&stripOn()){stripTap(d.id);return}settleAngle();render();say(J().sayJoined);return}
  // Caterpillar shade: a tap on the nameplate pauses or resumes the widget (Checks just looks up). Letter beads: a tap turns the strip to the next screen.
@@ -4584,7 +4784,7 @@ function endDrag(){
  const ready=d.state==='ready';model.glow=0;model.ghost=0;
  if(ready){model.path=null;doJoin(d.id==='b'?'a':'b',900)}else render();
 }
-function cancelDrag(){if(!drag)return;if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;if(J().angle)model.angles[model.join]=s.angle;model.turning=false;model.glow=model.ghost=0;settleLift();render();say('Move cancelled.')}
+function cancelDrag(){if(!drag)return;if(drag.pan){drag=null;BS.carry=null;render();say('Put back.');return}if(drag.unwind){drag=null;++anim;model.busy=false;setJt(1);model.path=null;render();say(J().sayKeep||'Unwinding cancelled; the bands stay wound.');return}const s=drag.saved;drag=null;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);model.cMoved=true;model.angle=s.angle;if(J().angle)model.angles[model.join]=s.angle;model.turning=false;model.glow=model.ghost=0;settleLift();render();say('Move cancelled.')}
 stage.addEventListener('pointerup',endDrag);
 stage.addEventListener('pointercancel',cancelDrag);
 $$('[data-drag]').forEach(b=>b.addEventListener('click',e=>{if(e.detail===0&&stripOn())stripTap(b.dataset.drag)}));
@@ -4600,6 +4800,12 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  if(id==='c')settleLift(300,true);else if([model.a.x,model.a.y,model.b.x,model.b.y]+''!==was)pairPlaced();render();
 }));
 
+// Bead scale pans: Enter or Space moves a pearl into the focused pan; the arrows step the angle as on the nameplate.
+stage.addEventListener('keydown',e=>{
+ const p=e.target.closest&&e.target.closest('.bsPan');if(!p||!pivotOn()||model.join!=='bscale')return;
+ if(e.key==='Enter'||e.key===' '){e.preventDefault();bsTap(+p.dataset.pan);return}
+ const k={ArrowUp:-1,ArrowLeft:-1,ArrowDown:1,ArrowRight:1}[e.key];if(k){e.preventDefault();stepAngle(k)}
+});
 /* Bead meter columns */
 $$('.beads i').forEach(i=>{i.innerHTML='<b></b>'.repeat(+i.dataset.n)});
 function fit(){const w=$('#viewport').clientWidth,s=Math.min(1,w/1200);stage.style.transform=s<1?`scale(${s})`:'';stage.style.transformOrigin='top left';stage.style.margin=s<1?'0':'auto';$('#viewport').style.height=600*s+'px'}
