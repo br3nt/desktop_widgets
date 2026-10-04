@@ -279,6 +279,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
   <div class="tri" role="group" aria-label="The last ten runs, one painted sector per run"></div>
  </div>
  <div class="wv" id="gv1"><div class="tri" role="group" aria-label="Checks, one punched rosette per check"></div></div>
+ <div class="wv" id="xv1"><div class="tri" role="group" aria-label="Checks, one coloured quarry of light per check"></div></div>
+ <div class="wv" id="xv2"><div class="tri" role="group" aria-label="Checks, one coloured quarry of light per check, round the middle light"></div></div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
 </section>
@@ -5446,6 +5448,138 @@ MORPHS.gold={label:'Gold leaf',kind:'Stretch',sizes:[['facade','Facade',0,'a fac
  say:(d,S)=>d>0?(S[2]===1?'Checks becomes a gilt panel: a square of gold is beaten out over the red bole until it covers the panel, then brushed, burnished, punched and lettered.':'Retable: wing boards slide out from behind the panel, and the same leaf is beaten on out across them; the pass rate and the two waiting are tooled into it.'):(S[2]===0?'The lettering is rubbed out, the leaf draws back into a thick square, and the panel sinks into the facade.':'The leaf draws back off the wings, and they slide in behind the panel.'),
  about:'A <b>Stretch</b> morph (wire\'s memory wire, hollow\'s herse and elven\'s drawn glass are the others): Checks grows by one piece of gold being beaten out, and nothing is added to the gold. A goldbeater hammers a small square of gold until it is a leaf thinner than light, so thin it lets green light through, and Gothic panel painters laid it over red bole, burnished it with an agate and punched patterns into it. Here the facade stays as the plinth and keeps its nameplate and display. <b>Gilt panel</b> (252 px tall): an oak ledge is set on the cornice and a bare pointed panel, red with bole, rises out of the facade behind it, framed in oak with a gilt fillet, crockets and a trefoil finial. A thick square of gold is laid on it, and a goldbeater\'s hammer comes down on it eight times, moving round between blows. Each blow throws a spark and a ring and widens the gold by the same ratio, so its ragged edge creeps out over the bole, the gold paling and its dents smoothing out as it thins, until it runs past the panel\'s edges. Those loose skewings, pale and a little green where the light comes through, flutter until a gilder\'s mop sweeps round the panel and they fall away as flakes. An agate burnisher works down the leaf, leaving it mirror-bright, then a border is punched round it and fourteen rosettes, one per check, are punched round the panel; the last two, deploy-preview and e2e-safari, are scraped back to the red bole, since they are still waiting. Last, CHECKS, 12/14, passed · 86%, run 418 · main and 2 waiting are tooled into the gold. Hover or tap a rosette to read its check. <b>Retable</b> (484 px): the ledge lengthens, oak braces swing in under its ends, two wing boards slide out from behind the panel, and the hammer goes back to the leaf\'s edges, left and right in turn, beating the same gold on out across the wings. Their skewings are brushed off, they are burnished, bordered, and tooled: the pass rate on the left, the two waiting by name on the right. <b>Shrinking</b> runs it back: the lettering is rubbed out and the leaf draws back into its square. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest.'};
 
+/* ---------- Morph: lux nova (Checks) ---------- */
+// g runs 0 facade, 1 sunlit wall, 2 noon. A Light morph: Checks grows as an image thrown by the sun, and nothing is added but light.
+// A wall of dim ashlar rises behind the facade. A shaft of low sun comes in from high on the left and throws a window's image on it, long, leaning, blurred
+// and orange; as the sun comes round the image slides across, squares up, cools and comes into focus, the quarries kindle (one per check) and the lettering
+// painted on the clear glass resolves. For noon a cloud takes the light, the wall opens out both ways, and the higher sun throws a three-light window.
+// The wall is drawn once and moved; the light is redrawn from g, so shrinking plays it back. Image space: x about the window's middle, y up from its foot (negative).
+const LXH=260,LXW=480,LXF=LXH-CH,LXCX=240,LXFOOT=176,LXFACE=36;
+const LXA1=glArch(0,70,-66,72),LXA2=[-124,0,124].map(x=>glArch(x,54,-74,64));
+const lxBox=g=>g<1e-6?[CW,CH]:g<=1?[CW,LXH]:[lerp(CW,LXW,ease(seg(g-1,0,.12))),LXH],lxDims=k=>[[CW,CH],[CW,LXH],[LXW,LXH]][k];
+const lxR3=n=>Math.round(n*1000)/1000,LEADC='#140c06';
+const lxJw=A=>{const R=glPts(A,3.5,-3.5,false);return[...Array(14).keys()].map(m=>glAt(R,R.T*(m+.5)/14))};
+const LXJ=[null,lxJw(LXA1),lxJw(LXA2[1])];
+// One light: a blue border band, clear grisaille glass with its quarry lattice, a quatrefoil roundel in the head, and the saddle bar's shadow.
+function lxLancet(A,yr,rr,bar,j){
+ const o=glD(A,0,0),n=glD(A,7,-7),x=A.cx,hw=glHW(A,7,bar),lob=[[0,-1],[1,0],[0,1],[-1,0]].map(([a,b])=>[x+a*rr*.45,yr+b*rr*.45]);
+ const glass=`<path d="${o}" fill="${j===1?'#4a7fe0':'#5b8ee8'}"/><path d="${n}" fill="#f7ecd2"/><path d="${n}" fill="url(#lxQuar)" opacity=".55"/><circle cx="${x}" cy="${yr}" r="${rr}" fill="#dc4a56"/>`+
+  lob.map(([a,b],q)=>`<circle cx="${f(a)}" cy="${f(b)}" r="${f(rr*.46)}" fill="${q%2?'#6aa0f0':'#f2c04c'}"/>`).join('')+`<circle cx="${x}" cy="${yr}" r="${f(rr*.28)}" fill="#a676dc"/>`;
+ const lead=`<path d="${o}" fill="none" stroke="${LEADC}" stroke-width="2.6"/><path d="${n}" fill="none" stroke="${LEADC}" stroke-width="1.5"/><circle cx="${x}" cy="${yr}" r="${rr}" fill="none" stroke="${LEADC}" stroke-width="1.6"/>`+
+  lob.map(([a,b])=>`<circle cx="${f(a)}" cy="${f(b)}" r="${f(rr*.46)}" fill="none" stroke="${LEADC}" stroke-width="1"/>`).join('')+`<circle cx="${x}" cy="${yr}" r="${f(rr*.28)}" fill="none" stroke="${LEADC}" stroke-width="1"/><path d="M${f(x-hw)} ${bar}H${f(x+hw)}" stroke="${LEADC}" stroke-width="2.2"/>`;
+ return[glass,lead];
+}
+// Lettering painted on the clear glass, so it lands on the wall as shadow.
+const lxT=(x,y,t,sz,col,ex='')=>`<text x="${x}" y="${y}" text-anchor="middle" font-family="Georgia,serif" font-size="${sz}" fill="${col}" ${ex}>${t}</text>`;
+const LXI=[null,(()=>{const[g,l]=lxLancet(LXA1,-104,19,-80,0),P='#2a1a0c';
+ return{hw:70,glass:g,lead:l,out:glD(LXA1,0,0),text:lxT(0,-66,'CHECKS',7.5,'#4a2c0a','letter-spacing="2"')+lxT(0,-44,'12 / 14',22,P,'font-weight="700"')+lxT(0,-30,'passed · 86%',9.5,P,'font-style="italic"')+lxT(0,-16,'2 waiting',9.5,'#8a1a14','font-weight="700"')}})(),
+ (()=>{let g='',l='',o='';const P='#2a1a0c';
+  LXA2.forEach((A,j)=>{const[a,b]=lxLancet(A,-106,14,-86,j);g+=a;l+=b;o+=glD(A,0,0)});
+  // Two quatrefoils pierced in the spandrels, as in plate tracery.
+  for(const x of[-62,62]){const L=[[0,-1],[1,0],[0,1],[-1,0]].map(([a,b])=>[x+a*3.8,-124+b*3.8]);
+   g+=L.map(([a,b])=>`<circle cx="${f(a)}" cy="${f(b)}" r="4.2" fill="#f2c04c"/>`).join('');l+=L.map(([a,b])=>`<circle cx="${f(a)}" cy="${f(b)}" r="4.2" fill="none" stroke="${LEADC}" stroke-width="1.1"/>`).join('');o+=circ(x,-124,8)}
+  const bars=[14,14,13,14,12,14,14,13,14,12].map((v,q)=>{const x=-157+q*7,hh=5+13*(v-10)/4,t=-24-hh;return `<path d="M${x} -24V${f(t+2.5)}Q${x} ${f(t)} ${x+2.5} ${f(t-1)}Q${x+5} ${f(t)} ${x+5} ${f(t+2.5)}V-24Z" fill="${v===14?'#2f7a3c':v===13?'#a8781c':'#9a2228'}"/>`}).join('');
+  return{hw:178,glass:g,lead:l,out:o,text:lxT(0,-72,'CHECKS',7.5,'#4a2c0a','letter-spacing="2"')+lxT(0,-51,'12 / 14',21,P,'font-weight="700"')+lxT(0,-37,'passed · 86%',9.5,P,'font-style="italic"')+lxT(0,-23,'run 418 · main',9,P)+
+   lxT(-124,-72,'PASS RATE',7.5,'#4a2c0a','letter-spacing="1.6"')+lxT(-124,-51,'86%',21,'#1f5a2a','font-weight="700"')+bars+lxT(-124,-13,'last 10 runs',8.5,P,'font-style="italic"')+
+   lxT(124,-72,'WAITING · 2',7.5,'#8a1a14','letter-spacing="1.4"')+lxT(124,-53,'deploy-preview',10,P)+lxT(124,-39,'e2e-safari',10,P)+lxT(124,-23,'on Brent',9,P,'font-style="italic"')}})()];
+const LXDEFS=`<linearGradient id="lxStone" gradientUnits="userSpaceOnUse" x1="0" y1="20" x2="0" y2="${LXH}"><stop stop-color="#716654"/><stop offset=".5" stop-color="#5a5143"/><stop offset="1" stop-color="#463f35"/></linearGradient>`+
+ `<radialGradient id="lxSpill"><stop stop-color="#ffd98a" stop-opacity=".3"/><stop offset=".6" stop-color="#ffc870" stop-opacity=".1"/><stop offset="1" stop-color="#ffc870" stop-opacity="0"/></radialGradient>`+
+ `<radialGradient id="lxCloud"><stop stop-color="#0c0a14" stop-opacity=".5"/><stop offset=".6" stop-color="#0c0a14" stop-opacity=".22"/><stop offset="1" stop-color="#0c0a14" stop-opacity="0"/></radialGradient>`+
+ `<pattern id="lxQuar" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0H10M0 0V10" stroke="#9a8460" stroke-width=".7"/></pattern>`;
+// The wall, full width (it is clipped to its current ends): ashlar with toned blocks and stains, a cresting, a cornice and a corbel table of little pointed arches.
+const LXWALL=(()=>{let s=`<rect x="0" y="20" width="${LXW}" height="${LXH-20}" fill="url(#lxStone)"/>`,jd='',b='',cr='',arc='',cb='';
+ for(let y=LXFACE,r=0;y<LXH;y+=14,r++)for(let x=(r%2?17:0)+6-34;x<LXW;x+=34){if(x>0)jd+=`M${x} ${y}V${Math.min(y+14,LXH)}`;const v=tnR(r*31+x,13);b+=`<rect x="${x}" y="${y}" width="34" height="14" fill="${v>.5?'#fff':'#000'}" opacity="${f(.02+.14*Math.abs(v-.5))}"/>`}
+ for(let y=LXFACE;y<LXH;y+=14)jd+=`M0 ${y}H${LXW}`;
+ s+=b+`<path d="${jd}" fill="none" stroke="#221a12" stroke-opacity=".45" stroke-width=".8"/><path d="${jd}" fill="none" stroke="#a89a80" stroke-opacity=".18" stroke-width=".8" transform="translate(0 .9)"/>`;
+ for(let k=0;k<7;k++)s+=`<ellipse cx="${f(30+420*tnR(k,17))}" cy="${f(60+170*tnR(k,19))}" rx="${f(18+30*tnR(k,23))}" ry="${f(10+22*tnR(k,29))}" fill="#1a140c" opacity=".08"/>`;
+ for(let x=4;x<LXW;x+=9)cr+=`<path d="M${f(x-2.6)} 20.5L${x} 16L${f(x+2.6)} 20.5Z"/><circle cx="${x}" cy="15" r="1.3"/>`;
+ for(let x=0;x<LXW;x+=16){arc+=`M${x+3} ${LXFACE}V32Q${x+3} 28.6 ${x+8} 28.2Q${x+13} 28.6 ${x+13} 32V${LXFACE}Z`;cb+=`<rect x="${x-2}" y="27" width="4" height="6" fill="#8a7d66"/><circle cx="${x}" cy="33.6" r="2.2" fill="#8a7d66" stroke="#3a2c1c" stroke-width=".5"/>`}
+ return s+`<rect x="0" y="27" width="${LXW}" height="${LXFACE-27}" fill="#5c5244"/><path d="${arc}" fill="#3a3229" stroke="#2a2018" stroke-width=".5"/>${cb}<g fill="#968a72">${cr}</g><rect x="0" y="20" width="${LXW}" height="8" fill="#968a72"/>`+
+  `<path d="M0 20.6H${LXW}" stroke="#e6dcc0" stroke-opacity=".6"/><path d="M0 28H${LXW}" stroke="#1e160e" stroke-opacity=".6"/><path d="M0 ${LXFACE+.5}H${LXW}" stroke="#1e160e" stroke-opacity=".4"/>`})();
+const lxHull=Q=>{const P=Q.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]),cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]),lo=[],up=[];
+ for(const p of P){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}
+ for(const p of P.reverse()){while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}
+ return lo.slice(0,-1).concat(up.slice(0,-1))};
+// The image of window k on the wall at sun s (0 low and far round, 1 square on), at strength L: its shaft of light with motes, the warm spill,
+// the glass (screened onto the stone, blurred until it focuses), the sunset's orange, the leads' shadows and the lettering. Returns [defs, svg].
+function lxLight(k,L,s,wl,jq,tq){
+ const I=LXI[k],hw=I.hw,sx=lerp(.62,1,s),sy=lerp(1.03,1,s),kk=lerp(.95,0,s),cx=lerp(wl+14+hw*.62,LXCX,s),sd=f(.35+3.4*(1-s));
+ const mp=(x,y)=>[cx+sx*x-kk*y,LXFOOT+sy*y],M=`matrix(${lxR3(sx)} 0 ${lxR3(-kk)} ${lxR3(sy)} ${f(cx)} ${LXFOOT})`,a=(k===1?lerp(16,48,s):lerp(34,66,s))*D2R,D=[-Math.cos(a),-Math.sin(a)],N=[-D[1],D[0]];
+ const C=mp(0,-69),P=[[-hw,0],[hw,0],[-hw,-70],[hw,-70],[0,-138]].map(([x,y])=>mp(x,y)),H=lxHull([...P,...P.map(([x,y])=>[x+D[0]*700,y+D[1]*700])]),cl='clip-path="url(#lxLc)"';
+ let d=`<filter id="lxF${k}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${sd}"/></filter>`+
+  `<linearGradient id="lxBm${k}" gradientUnits="userSpaceOnUse" x1="${f(C[0])}" y1="${f(C[1])}" x2="${f(C[0]+D[0]*320)}" y2="${f(C[1]+D[1]*320)}"><stop stop-color="#fff0c0" stop-opacity=".24"/><stop offset=".55" stop-color="#ffe6a4" stop-opacity=".08"/><stop offset="1" stop-color="#ffe6a4" stop-opacity="0"/></linearGradient>`;
+ let o=`<path d="M${H.map(p=>f(p[0])+' '+f(p[1])).join('L')}Z" fill="url(#lxBm${k})" style="mix-blend-mode:screen" opacity="${f(L)}" ${cl}/>`+
+  `<ellipse cx="${f(C[0])}" cy="${f(C[1])}" rx="${f(hw*sx+50+kk*60)}" ry="100" fill="url(#lxSpill)" style="mix-blend-mode:screen" opacity="${f(L)}" ${cl}/>`;
+ let jw='';LXJ[k].forEach(([x,y],m)=>{const q=jq(m);if(q<=0)return;const c=m>11?'#ff6b6b':'#86f08e';
+  jw+=`<circle cx="${f(x)}" cy="${f(y)}" r="5.6" fill="${c}" opacity="${f(.4*q)}"/><path d="M${f(x)} ${f(y-3.7)}L${f(x+2.7)} ${f(y)}L${f(x)} ${f(y+3.7)}L${f(x-2.7)} ${f(y)}Z" fill="${c}" opacity="${f(q)}"/><circle cx="${f(x)}" cy="${f(y)}" r="1" fill="#fff" opacity="${f(.8*q)}"/>`});
+ o+=`<g style="mix-blend-mode:screen" opacity="${f(L)}" ${cl}><g transform="${M}" filter="url(#lxF${k})">${I.glass}${jw}</g></g>`;
+ const warm=.55*(1-s)*L;if(warm>.01)o+=`<g style="mix-blend-mode:multiply" opacity="${f(warm)}" ${cl}><path transform="${M}" d="${I.out}" fill="#ff8a34" filter="url(#lxF${k})"/></g>`;
+ o+=`<g ${cl}><g transform="${M}" opacity="${f(.5*L)}" filter="url(#lxF${k})">${I.lead}</g>`;
+ if(tq>0){if(tq<1)d+=`<filter id="lxG${k}"><feGaussianBlur stdDeviation="${f(1.6*(1-tq))}"/></filter>`;o+=`<g transform="${M}" opacity="${f(Math.min(1,tq*1.4)*L)}"${tq<1?` filter="url(#lxG${k})"`:''}>${I.text}</g>`}
+ // Dust motes turning in the shaft; they only drift while g changes.
+ let lo=1e9,hi=-1e9,mt='';for(const p of P){const v=(p[0]-C[0])*N[0]+(p[1]-C[1])*N[1];lo=Math.min(lo,v);hi=Math.max(hi,v)}
+ for(let m=0;m<22;m++){const al=(tnR(m,3)*240+model.g*70)%240+20,lat=lerp(lo,hi,tnR(m,5)),fd=Math.sin(Math.PI*(al-20)/240);
+  mt+=`<circle cx="${f(C[0]+D[0]*al+N[0]*lat+2.5*Math.sin(model.g*29+m))}" cy="${f(C[1]+D[1]*al+N[1]*lat+2.5*Math.cos(model.g*23+m*1.7))}" r="${f(.5+.8*tnR(m,9))}" opacity="${f(fd*(.3+.5*tnR(m,11)))}"/>`}
+ o+=`<g fill="#fff4d6" opacity="${f(L)}">${mt}</g></g>`;
+ return[d,o];
+}
+function lxRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),[w,h]=lxBox(g),cx=w/2,ox=cx-CW/2,oy=h-LXH,X0=cx-LXCX,P1=i>0;
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='lx'){ms.dataset.key='lx';ms._d='';ms._bx=null;fx._s=null;
+  ms.innerHTML=`<defs>${LXDEFS}<clipPath id="lxRise"><rect x="-1000" y="-300" width="3000" height="900"/></clipPath><clipPath id="lxWc"><rect x="0" y="12" width="${LXW}" height="${LXH-12}"/></clipPath></defs>`+
+   `<g clip-path="url(#lxRise)"><g class="owall" clip-path="url(#lxWc)">${LXWALL}</g></g><g class="odyn"></g><g class="ofac">${cas(0)}</g>`}
+ const bx=f(w)+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${f(w)} ${h}`)}}
+ ms.querySelector('.ofac').setAttribute('transform',`translate(${f(ox)} ${oy+LXF})`);
+ // The wall rises out from behind the facade and settles; for noon its ends open out both ways.
+ const rs=P1?1:seg(u,.02,.24),dy=(1-ease(rs))*(LXF+8-20)-2.4*Math.sin(Math.PI*seg(rs,.7,1)),ws=P1?ease(seg(u,.1,.36)):0,wl=lerp(102,0,ws),wr=lerp(378,LXW,ws);
+ // #lxRise is read in root space by the wall and inside translate(X0 oy) by the shafts; that agrees because oy is 0 whenever g>0.
+ ms.querySelector('#lxRise rect').setAttribute('height',rs<1?f(300+oy+LXF+8):900);
+ ms.querySelector('.owall').setAttribute('transform',`translate(${f(X0)} ${f(oy+dy)})`);
+ const wc=ms.querySelector('#lxWc rect');wc.setAttribute('x',f(wl));wc.setAttribute('width',f(wr-wl));
+ const sh=x=>`<rect x="${f(x-3.5)}" y="${LXFACE}" width="7" height="${LXH-LXFACE}" fill="#8e826c"/><path d="M${f(x+1.8)} ${LXFACE}V${LXH}" stroke="#2a2018" stroke-opacity=".5"/><path d="M${f(x-2)} ${LXFACE}V${LXH}" stroke="#e8dcc0" stroke-opacity=".4"/>`+
+  `<rect x="${f(x-5.5)}" y="${LXFACE-1}" width="11" height="5" fill="#a89a80" stroke="#3a2c1c" stroke-width=".6"/><path d="M${f(x-4.5)} ${LXFACE+6}H${f(x+4.5)}" stroke="#3a2c1c" stroke-opacity=".5"/>`;
+ let s=`<g clip-path="url(#lxRise)"><g transform="translate(0 ${f(dy)})">${sh(wl+6)+sh(wr-6)}</g></g>`,df=`<clipPath id="lxLc"><rect x="${f(wl)}" y="20" width="${f(wr-wl)}" height="${LXF+8-20}"/></clipPath>`;
+ // The light: the lancet's image on the first step (gone under a cloud on the second), the three lights' on the second.
+ const L1=P1?1-seg(u,0,.12):seg(u,.26,.38),s1=P1?1:ease(seg(u,.32,.8)),L2=P1?seg(u,.36,.48):0,s2=P1?ease(seg(u,.42,.84)):0;
+ const t1=P1?1:seg(u,.88,.99),t2=P1?seg(u,.9,.99):0;
+ for(const[k,L,sn,jq,tq]of[[1,L1,s1,m=>P1?1:seg(u,.8+.005*m,.83+.005*m),t1],[2,L2,s2,m=>P1?seg(u,.84+.003*m,.87+.003*m):0,t2]])if(L>0){const[a,b]=lxLight(k,L,sn,wl,jq,tq);df+=a;s+=b}
+ if(P1&&u>0&&u<.2){const c=seg(u,0,.2);s+=`<ellipse cx="${f(lerp(wl-170,wr+170,c))}" cy="110" rx="180" ry="150" fill="url(#lxCloud)" opacity="${f(Math.sin(Math.PI*c))}" clip-path="url(#lxLc)"/>`}
+ const d=`<defs>${df}</defs><g transform="translate(${f(X0)} ${oy})">${s}</g>`;
+ if(ms._d!==d){ms._d=d;ms.querySelector('.odyn').innerHTML=d}
+ // Effects: dust where the wall lands and where its ends open out; a glint as each quarry kindles, and one along the lettering as it focuses.
+ const dust=JOINS.buttress.dust,spk=(x,y,t,r)=>{const v=Math.sin(Math.PI*t);return v>.05?`<g opacity="${f(v)}">${sparkle(x,y,r*v)}</g>`:''};
+ let e='';
+ if(!P1){const t=seg(u,.22,.36);e+=dust(wl+14,LXF-1,t,5,9,331)+dust(wr-14,LXF-1,t,5,9,333)}
+ else{const t=seg(u,.3,.46);e+=dust(wl+5,LXH-4,t,5,9,337)+dust(wr-5,LXH-4,t,5,9,339)+dust(wl+5,24,t,4,7,341)+dust(wr-5,24,t,4,7,343)}
+ const k=P1?2:1;LXJ[k].forEach(([x,y],m)=>{e+=spk(LXCX+x,LXFOOT+y,P1?seg(u,.84+.003*m,.87+.003*m):seg(u,.8+.005*m,.83+.005*m),5)});
+ const tq=P1?t2:t1;if(tq>0&&tq<1)e+=spk(LXCX+lerp(-56,56,tq),LXFOOT-(P1?51:44)-8,tq,5);
+ const fxs=e?`<g transform="translate(${f(X0)} ${oy})">${e}</g>`:'';
+ if(fx._s!==fxs){fx._s=fxs;fx.innerHTML=fxs}
+ // Displays: the facade keeps its own; the quarries take taps once the image is still.
+ const v1=P1?u<.01:u>.99,v2=P1&&u>.99;
+ for(const[id,v]of[['#xv1',v1],['#xv2',v2]]){const n=$(id);if(!v)n.style.display='none';else Object.assign(n.style,{display:'block',left:f(X0)+'px',top:oy+'px'})}
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+oy+LXF)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+oy+LXF)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'in moving light')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function lxPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0;let t;
+ if(i===0)t=u<.24?(up?'a wall of dim ashlar rises behind the facade':'the wall sinks behind the facade'):u<.34?(up?'a shaft of low sun comes in from high on the left':'the sun goes down and the light leaves the wall'):
+  u<.8?(up?'the sun comes round: the window\'s image slides across, squares up and focuses':'the sun sinks: the image leans, blurs and slides away'):u<.9?(up?'the quarries kindle, one per check':'the quarries go dark'):(up?'the painted lettering comes into focus':'the lettering blurs');
+ else t=u<.14?(up?'a cloud passes over and takes the light':'the cloud passes and the lancet\'s light returns'):u<.36?(up?'the wall opens out both ways':'the wall closes in'):u<.44?(up?'the sun comes out, higher now':'a cloud comes over'):
+  u<.84?(up?'noon comes round: three lights slide across and square up':'the three lights lean and slide away'):u<.92?(up?'the quarries kindle round the middle light':'the quarries go dark'):(up?'the lettering in all three lights focuses':'the lettering blurs');
+ return 'Checks · '+t;
+}
+MORPHS.lux={label:'Lux nova',kind:'Light',sizes:[['facade','Facade',0,'a facade'],['sunlit','Sunlit wall',1,'a window of light on a wall'],['noon','Noon',2,'three lights at noon']],ms:[5200,3400],
+ box:lxBox,dims:lxDims,render:lxRender,phase:lxPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes a window of light: a wall rises, a shaft of low sun throws the window on it, and the image slides across, squares up and focuses as the sun comes round.':'Noon: a cloud takes the light, the wall opens out both ways, and the higher sun throws three lights across it.'):(S[2]===0?'The sun goes down: the image leans, blurs and slides off the wall, and the wall sinks behind the facade.':'A cloud comes over, the wall closes in, and the single light returns.'),
+ about:'A new morph kind, <b>Light</b>: Checks grows as an image thrown by the sun, and nothing is added to it but light. Abbot Suger rebuilt the choir of Saint-Denis so that its windows would fill it with what he called <i>lux nova</i>, the new light, and on a sunny day the glass of any great church lies across its stone in pools of colour that move with the hours. Here the facade stays at the foot and keeps its nameplate and display. <b>Sunlit wall</b> (260 px tall): a wall of dim ashlar with a cresting, a cornice and a corbel table rises out from behind the facade and settles in a little dust. A shaft of low sun comes in from high on the left, dust motes turning in it, and throws a window\'s image onto the stone: long, leaning, blurred and orange. As the sun comes round the image slides across the wall, squares up, cools and comes into focus, the stone\'s joints showing through the colour and the leads\' shadows sharpening. It is one broad light: a blue border, a quatrefoil roundel in the head, and clear grisaille glass. Then the fourteen quarries in the border kindle with a glint, one per check (green passed; the last two, deploy-preview and e2e-safari, ruby, waiting), and the lettering painted on the clear glass resolves in the light: CHECKS, 12 / 14, passed · 86%, 2 waiting. Hover or tap a quarry to read its check. <b>Noon</b> (480 px): a cloud passes over and takes the light, the wall opens out both ways, and the sun comes out higher, throwing a three-light window with two quatrefoils pierced between the heads. It slides across and squares up the same way: the count in the middle light (its border holds the fourteen quarries), the pass rate with the last ten runs as little painted lancets on the left, and the two waiting by name on the right. <b>Shrinking</b> plays it back: the sun sinks, the image leans and slides off, and the wall goes down behind the facade. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest, motes included.'};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30,roll:30,cwt:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
@@ -5687,6 +5821,8 @@ orTipBtn('#fv1 .tri','The boss · run 418 on main · 12 of 14 passed · 86%','ru
 ORUN.forEach((v,r)=>{const[x,y]=flP(FSX[0],FSY,-Math.PI+(r+.5)*Math.PI/5,27);orTipBtn('#fv2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${f(x-6)}px;top:${f(y-6)}px;width:12px;height:12px`)});
 /* Gold leaf: hover, focus or tap a punched rosette to read its check. */
 CHK.forEach((n,j)=>{const[x,y]=GLROS[j];orTipBtn('#gv1 .tri',`Rosette ${j+1} of 14 · ${n} · ${j>11?'scraped back to the red bole, waiting for your approval':'punched in the gold, passed'}`,j>11?'need':'pass',`left:${f(x-6)}px;top:${f(y-6)}px;width:12px;height:12px`)});
+/* Lux nova: hover, focus or tap a quarry of light to read its check. */
+[1,2].forEach(k=>CHK.forEach((n,j)=>{const[x,y]=LXJ[k][j];orTipBtn(`#xv${k} .tri`,`Quarry ${j+1} of 14 · ${n} · ${j>11?'ruby, waiting for your approval':'green, passed'}`,j>11?'need':'pass',`left:${f(LXCX+x-6)}px;top:${f(LXFOOT+y-6)}px;width:12px;height:12px`)}));
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
