@@ -43,7 +43,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .grip .dots{color:#fbe9cc99;letter-spacing:1px}
 .small .grip{left:24px;right:24px;top:4px;height:19px}
 /* Display: a smooth cotton patch sewn into the felt */
-.screen,.mini,.patch,.pp,.cp,.sd,.ck{position:absolute;overflow:hidden;color:#3a2a1e;border-radius:4px;
+.screen,.mini,.patch,.pp,.cp,.sd,.ck,.sb{position:absolute;overflow:hidden;color:#3a2a1e;border-radius:4px;
  background:repeating-linear-gradient(0deg,#5a40280b 0 1px,transparent 1px 2.5px),repeating-linear-gradient(90deg,#5a40280b 0 1px,transparent 1px 2.5px),linear-gradient(170deg,#f8efdb,#efe2c6);
  box-shadow:0 1px 1.5px #0006,inset 0 0 0 1px #6b4d3014;outline:1.4px dashed var(--thread);outline-offset:3px}
 .screen{left:45px;top:33px;width:300px;height:62px}
@@ -129,6 +129,18 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .mb em{font:italic 400 17px/1 Georgia,serif;color:var(--accent)}
 .mb .tiny{font-size:9.5px;color:#7a6250;letter-spacing:.2px}
 .mb2{font-size:10.5px}.mb2 i{display:inline-block;width:7px;height:7px;margin-right:4px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#ffe2a8,#e0a03a 55%,#8a5512);box-shadow:0 1px 1px #0006}
+/* Steam block morph: the cotton display pressed out at each blocked size */
+.sb{display:none;white-space:nowrap;padding:3px 11px;line-height:1.35;font-size:11px;color:#5d4838;pointer-events:none}
+.sb .tiny{display:flex;justify-content:space-between;align-items:center;font-size:10px;line-height:1.4;color:#8c725b;letter-spacing:.2px}
+.sb .kn{display:flex;gap:2.5px}
+.sb .kn i,.sb .wt i{width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#e3f7b9,#8fbf4f 50%,#3f6b1c);box-shadow:0 1px 1px #0006}
+.sb .kn i:nth-child(n+13),.sb .wt i{background:radial-gradient(circle at 36% 30%,#ffe2a8,#e0a03a 55%,#8a5512)}
+.sb .big{display:flex;align-items:flex-end;gap:8px;margin:2px 0 1px}
+.sb .big em{font:italic 400 15px/1 Georgia,serif;color:var(--accent);padding-bottom:1px}
+.sb2{padding:4px 12px}.sb2 .kn{gap:3px}.sb2 .kn i{width:8px;height:8px}.sb2 .big{margin:3px 0 2px}.sb2 .big em{font-size:16px}
+.sb .bars{position:static;margin-left:auto;padding-bottom:1px}
+.sb .wt{display:flex;align-items:center;gap:5px}.sb .wt i{display:inline-block;width:8px;height:8px;margin-left:4px}.sb .wt i:first-child{margin-left:0}.sb .wt .tiny{margin-left:auto}
+.stbtool{position:absolute;left:0;top:0;display:none;overflow:visible;pointer-events:none}
 .sdb .grip{justify-content:center;padding:0}.sdb .grip>span:first-child{font-size:0}.sdb .grip b{margin:0}.sdb .grip .dots{display:none}
 .strip{position:absolute;left:40px;right:40px;top:6px;height:21px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 8px;pointer-events:none;opacity:0}
 .strip b{font:italic 400 15px/1 Georgia,serif;color:#fff3dc;text-shadow:0 1px 0 #0007}
@@ -221,6 +233,9 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <svg class="cktool" aria-hidden="true"></svg>
  <div class="mb mb1" aria-hidden="true"><span class="tiny">main · run 418</span><span><em>86%</em> passed</span><span class="tiny">12 passed · 2 waiting</span></div>
  <div class="mb mb2" aria-hidden="true"><span class="tiny">waiting for Brent</span><span><i></i>deploy-preview</span><span><i></i>e2e-safari</span></div>
+ <div class="sb sb1" aria-hidden="true"><div class="tiny">Checks / main · run 418<span class="kn"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div><div class="big"><span class="xs" data-x="12 / 14" data-c="2.4"></span><em>passed · 86%</em></div>2 waiting for approval</div>
+ <div class="sb sb2" aria-hidden="true"><div class="tiny">Checks / main branch · run 418<span class="kn"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div><div class="big"><span class="xs" data-x="12 / 14" data-c="3"></span><em>passed · 86%</em><span class="bars"></span></div><div class="wt"><i></i>deploy-preview<i></i>e2e-safari<span class="tiny">waiting for Brent</span></div></div>
+ <svg class="stbtool" aria-hidden="true"></svg>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
 </section>
 
@@ -4276,7 +4291,13 @@ const MORPHS={
   sizes:['Pad','Swatch fan','Full deck'],noun:['a pad','a swatch fan','a full deck'],up:4200,down:3000,
   pad:()=>{const q=sfGeo(sfAt(model.gq));return[q.ox,q.oy]},padAt:i=>{if(!i)return[0,0];const q=sfGeo(sfAt(i));return[q.ox,q.oy]},
   fill:g=>g-Math.min(1,Math.floor(g)),box:i=>{if(!i)return[CW,CH];const q=sfGeo(sfAt(i));return[q.w,q.h]},dims:()=>{const q=sfGeo(sfAt(model.gq));return[q.w,q.h]},
-  sayUp:n=>'A felt swatch deck is pinned under Checks and fanned out: Checks becomes '+n+'.',sayDown:n=>'The strips are swept back together and slid away: Checks shrinks to '+n+'.'}
+  sayUp:n=>'A felt swatch deck is pinned under Checks and fanned out: Checks becomes '+n+'.',sayDown:n=>'The strips are swept back together and slid away: Checks shrinks to '+n+'.'},
+ steam:{label:'Steam block',kind:'Stretch',
+  about:'The Stretch kind (wire\'s memory wire, hollow\'s herse, elven\'s drawn glass, gothic\'s gold leaf) done in felt, from hat blocking: steamed felt goes soft enough to pull to a new size, and once it dries it keeps that size. So Checks grows by being steamed and stretched, with nothing added. The pad\'s top-left corner stays put. <b>Growing:</b> a felt iron glides across the pad, leaving it dark and wet, with puffs of steam rising behind it. Two felt mittens pinch its ends, and the raspberry one pulls it out to the right a frame at a time, a little past the mark and back, while the felt necks in and tension folds fan out from each pinch. The mittens let go and take the top and bottom edges: the navy one holds while the raspberry one pulls it down. Eight glass-headed blocking pins go in round the edge, the iron passes again to dry it, and behind the iron the cotton display is pressed out at its new size. Then the pins are pulled. Everything stretches together, the nameplate, the stitching, the knot and the fibres themselves, and the felt dries a shade paler where it has thinned. <b>Blocked</b> carries run 418, the pass rate, a French knot per check and the 2 waiting. <b>Stretched</b> adds a cross-stitched chart of recent runs and names deploy-preview and e2e-safari, waiting for Brent. Shrinking plays the same timeline backwards: the pins go back in, the iron steams it again from the right, and the mittens ease it back. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks eases it back to a pad first, and unshading stretches it again. Switching morphs takes Checks back to a pad first.',
+  sizes:['Pad','Blocked','Stretched'],noun:['a pad','a blocked pad','a stretched pad'],up:4400,down:3200,
+  pad:()=>model.gq>0?[STB.M,STB.M]:[0,0],padAt:i=>i?[STB.M,STB.M]:[0,0],
+  fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?stbBox(i-1):[CW,CH],dims:()=>model.gq>0?stbBox(model.gq>1?1:0):[CW,CH],
+  sayUp:n=>'Checks is steamed, stretched by two felt mittens and pinned to dry: it becomes '+n+'.',sayDown:n=>'Checks is steamed again and eased back: it shrinks to '+n+'.'}
 };
 const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
@@ -4364,6 +4385,7 @@ function stuffSvg(o,q,fr){
 }
 function morphRender(el){
  const svg=el.querySelector('.casing'),pa=el.querySelector('.patch'),gr=el.querySelector('.grip'),kn=el.querySelector('.knot');
+ if(model.g<=0||model.morph!=='steam')stbClear(el);
  if(model.g<=0){
   if(el.dataset.m){delete el.dataset.m;const mi=el.querySelector('.mini');el.style.width=el.style.transform=gr.style.top=gr.style.right=gr.style.left=kn.style.left=kn.style.top=mi.style.left=mi.style.top='';pa.style.display='none';el.querySelectorAll('.pp,.cp,.sd,.ck,.cktool,.mb').forEach(n=>n.style.display='none');el.classList.remove('sdb');svg.dataset.key=''}
   el.setAttribute('aria-label','Checks widget');return false;
@@ -4374,6 +4396,7 @@ function morphRender(el){
  if(model.morph==='cake')return cakeRender(el,svg,gr,kn,pa);
  if(model.morph==='mobile')return mbRender(el,svg,gr,kn,pa);
  if(model.morph==='swatch')return sfRender(el,svg,gr,kn,pa);
+ if(model.morph==='steam')return stbRender(el,svg,gr,kn,pa);
  el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
@@ -5099,6 +5122,118 @@ function sfRender(el,svg,gr,kn,pa){
  gr.style.opacity=1;gr.style.left=f(ox+24)+'px';gr.style.right=f(w-ox-CW+24)+'px';gr.style.top=f(oy+4)+'px';el.querySelector('.strip').style.opacity=0;
  const si=SIZES.findIndex(x=>x[2]===model.g);
  el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 2 failed; deploy-preview and e2e-safari waiting':''));
+ return true;
+}
+/* ---------- Morph: steam block (Checks) ---------- */
+// g runs 0 pad, 1 blocked, 2 stretched. The pad itself is stretched: its casing is drawn at pad size and scaled by (sx,sy),
+// so the nameplate, stitching, knot and fibres all stretch with it, and the cotton display, knot and nameplate (HTML) take
+// the same scale about the felt's top-left, which stays put at (M,M) in the box. Each size is the pad scaled by s.
+// Each step: the iron wets it, the mittens pull it out sideways then down, pins go in, the iron dries it and
+// the display is pressed out at the new size behind the iron, then the pins come out. All a function of g, so shrinking runs it back.
+const STB={s:[1,1.35,1.7],M:56,PIN:[[.035,.08],[.5,.05],[.965,.08],[.985,.5],[.965,.92],[.5,.95],[.035,.92],[.015,.5]]};
+$('.sb2 .bars').innerHTML=xbars([5,6,4,6,7,5,6],2.2);
+// The box covers the whole step (the pull overshoots by about 3% of the size), with room round the felt for the mittens.
+function stbBox(j){const s=STB.s[j+1];return[2*STB.M+Math.ceil(CW*s*1.05),2*STB.M+Math.ceil(CH*s*1.05)]}
+function stbAt(g){
+ const i=Math.min(1,Math.floor(g)),p=g-i,s0=STB.s[i],s1=STB.s[i+1];
+ // A pull eases out, runs a little past the mark and comes back; the other way the felt necks in while it is pulled.
+ const ux=seg(p,.24,.5),uy=seg(p,.6,.76),pe=u=>ease(seg(u,0,.75))+.12*Math.sin(Math.PI*seg(u,.6,1));
+ return{i,p,s0,s1,ux,uy,
+  sx:(s0+(s1-s0)*pe(ux))*(1-.035*Math.sin(Math.PI*uy)),sy:(s0+(s1-s0)*pe(uy))*(1-.06*Math.sin(Math.PI*ux)),
+  u1:seg(p,.02,.15),v1:seg(p,0,.03)*(1-seg(p,.15,.18)),u2:seg(p,.86,.95),v2:seg(p,.83,.86)*(1-seg(p,.95,.98)),
+  hin:seg(p,.16,.24),mv:seg(p,.5,.6),hout:seg(p,.76,.82),pin:k=>seg(p,.78+.01*k,.8+.01*k),pout:k=>seg(p,.95+.004*k,.97+.004*k)};
+}
+const stbIronX=(u,fw)=>lerp(8,fw-8,u);
+// The wet strip in felt-local px: wetted up to just ahead of the first pass, dried up to just behind the second.
+function stbWet(o,fw){const R=o.u1>=1?fw+30:o.u1>0?stbIronX(o.u1,fw)+26:-60,L=o.u2>=1?fw+30:o.u2>0?stbIronX(o.u2,fw)-4:-30;return[L,R]}
+function stbSvg(o,q,fr){
+ const keep=BO;BO=fr<0?0:(fr%3)*31;const cs=casing('c',CW,CH);BO=keep;
+ const body=rr4(EDGE,EDGE,CW-2*EDGE,CH-2*EDGE,SKIN.c.r),fw=CW*o.sx,[L,R]=stbWet(o,fw),pale=.12*clamp((Math.min(o.sx,o.sy)-1)/.7);
+ let x=`<g transform="translate(${q.ox} ${q.oy}) scale(${o.sx.toFixed(4)} ${o.sy.toFixed(4)})">${cs}`;
+ // Stretched felt has thinned, so it dries a shade paler.
+ if(pale>.004)x+=`<path d="${body}" fill="#fff1e4" opacity="${pale.toFixed(3)}"/>`;
+ if(R>L)x+=`<clipPath id="stbwc"><rect x="${f(L/o.sx)}" y="-20" width="${f((R-L)/o.sx)}" height="${CH+40}"/></clipPath><g clip-path="url(#stbwc)"><path d="${body}" fill="#2a0918" opacity=".32"/>`+
+  `<path d="M34 30Q96 22 158 28M60 58Q130 50 214 56" fill="none" stroke="#fff" stroke-opacity=".13" stroke-width="2.6" stroke-linecap="round"/></g>`;
+ return x+'</g>';
+}
+// A felt iron seen from the side, its point to the right: mustard body, blue felt handle, steel sole, a cream dial and cord.
+function stbIron(cx,sy,lift,op){
+ return `<g opacity="${f(op)}"><ellipse cx="${f(cx+2)}" cy="${f(sy+2)}" rx="${f(30-lift*.8)}" ry="3" fill="#000" opacity="${f(.3*(1-lift/16))}" filter="url(#sh)"/>`+
+  `<g transform="translate(${f(cx)} ${f(sy-lift)})"><path d="M-31 -9q-10 2 -13 9" fill="none" stroke="#efe2c4" stroke-width="2.2" stroke-linecap="round"/>`+
+  `<path d="M-22 -18Q-25 -33 -10 -33H8Q18 -33 15 -18" fill="none" stroke="#4b6f8e" stroke-width="6.5" stroke-linecap="round" filter="url(#tagfelt)"/>`+
+  `<path d="M-31 -1H22Q31 -1 33 -4Q27 -15 2 -19H-24Q-31 -19 -31 -13Z" fill="#000" opacity=".3" transform="translate(1 1.5)"/><path d="M-31 -1H22Q31 -1 33 -4Q27 -15 2 -19H-24Q-31 -19 -31 -13Z" fill="#d9a441" filter="url(#tagfelt)"/>`+
+  `<path d="M-27 -5H21Q27 -5 29 -7" fill="none" stroke="#fff3d6" stroke-opacity=".85" stroke-width="1" stroke-dasharray="2.6 2.2" stroke-linecap="round"/>`+
+  `<rect x="-32" y="-2.5" width="66" height="4" rx="2" fill="#c9ccd2" stroke="#6f727a" stroke-width=".5"/><circle cx="-12" cy="-11" r="4.2" fill="#f2e8d4" filter="url(#tagfelt)"/><path d="M-12 -11l2 -2.6" stroke="#b8476e" stroke-width="1.2" stroke-linecap="round"/></g></g>`;
+}
+// Mitten 0 (navy) holds: the left end, then the top edge. Mitten 1 (raspberry) pulls: the right end, then the bottom edge.
+function stbHand(o,ox,oy,fw,fh,which){
+ const A=which?{x:ox+fw+12,y:oy+fh/2,r:180}:{x:ox-12,y:oy+fh/2,r:0},B=which?{x:ox+fw*.5,y:oy+fh+12,r:270}:{x:ox+fw*.72,y:oy-12,r:90};
+ const m=ease(o.mv),c={x:ox+fw/2,y:oy+fh/2};let P={x:lerp(A.x,B.x,m),y:lerp(A.y,B.y,m)};const r=lerp(A.r,B.r,m);
+ // Lifted clear of the felt as it moves round to its new edge, and brought in and taken away along its own line.
+ if(o.mv>0&&o.mv<1){const d=V.sub(P,c),L=Math.hypot(d.x,d.y)||1,k=22*Math.sin(Math.PI*m);P=V.add(P,V.mul(d,k/L))}
+ const back=14*(1-ease(o.hin)+ease(o.hout)),t=r*Math.PI/180;P={x:P.x-Math.cos(t)*back,y:P.y-Math.sin(t)*back};
+ return{P,r,op:Math.min(seg(o.hin,0,.5),1-seg(o.hout,.5,1))};
+}
+// Tension folds fanning into the felt from a pinch at G, pointing along d.
+function stbFolds(G,d,t){
+ let dk='',lt='';
+ for(const a of[-34,-14,14,34]){const th=a*Math.PI/180,u={x:d.x*Math.cos(th)-d.y*Math.sin(th),y:d.x*Math.sin(th)+d.y*Math.cos(th)},Ln=16+22*t-Math.abs(a)*.18,
+  e=V.add(G,V.mul(u,Ln)),m=V.add(V.mix(G,e,.5),{x:-u.y*2.5*Math.sign(a),y:u.x*2.5*Math.sign(a)}),n={x:.8,y:-.9};
+  dk+=`M${pt(G)}Q${pt(m)} ${pt(e)}`;lt+=`M${pt(V.add(G,n))}Q${pt(V.add(m,n))} ${pt(V.add(e,n))}`}
+ return `<g fill="none" stroke-linecap="round"><path d="${dk}" stroke="#250918" stroke-opacity="${f(.42*t)}" stroke-width="2.2"/><path d="${lt}" stroke="#f3c9de" stroke-opacity="${f(.4*t)}" stroke-width="1"/></g>`;
+}
+function stbTool(o,q,fr){
+ const{ox,oy}=q,fw=CW*o.sx,fh=CH*o.sy,jig=fr<0?0:fr%2?.7:-.7;
+ let x=`<defs><radialGradient id="stbpin" cx=".35" cy=".3" r=".75"><stop stop-color="#ffd6de"/><stop offset=".4" stop-color="#d23a4e"/><stop offset="1" stop-color="#5e0f1c"/></radialGradient></defs>`;
+ if(o.ux>0&&o.ux<1){const t=Math.sin(Math.PI*o.ux);x+=stbFolds({x:ox+3,y:oy+fh/2},{x:1,y:0},t)+stbFolds({x:ox+fw-3,y:oy+fh/2},{x:-1,y:0},t)}
+ if(o.uy>0&&o.uy<1){const t=Math.sin(Math.PI*o.uy);x+=stbFolds({x:ox+fw*.72,y:oy+3},{x:0,y:1},t)+stbFolds({x:ox+fw*.5,y:oy+fh-3},{x:0,y:-1},t)}
+ // Glass-headed blocking pins, pushed in slantwise round the edge one at a time, then pulled out together.
+ STB.PIN.forEach(([fx,fy],k)=>{const e=o.pin(k),eo=o.pout(k);if(e<=0||eo>=1)return;
+  const v={x:-4.6,y:-10},P0={x:ox+fx*fw,y:oy+fy*fh},P=V.add(P0,V.mul(v,1.4*eo)),H=V.add(P,V.mul(v,1+.9*(1-ease(e)))),op=seg(e,0,.3)*(1-eo);
+  x+=`<g opacity="${f(op)}"><ellipse cx="${f(P0.x)}" cy="${f(P0.y)}" rx="2.6" ry="1.4" fill="#000" opacity="${f(.35*(1-eo))}"/><path d="M${pt(H)}L${pt(P)}" stroke="#000" stroke-opacity=".3" stroke-width="1.6" transform="translate(1.4 1.8)"/>`+
+   `<path d="M${pt(H)}L${pt(P)}" stroke="#c9ccd2" stroke-width="1.2" stroke-linecap="round"/><circle cx="${f(H.x+1)}" cy="${f(H.y+1.6)}" r="3.8" fill="#000" opacity=".3"/><circle cx="${f(H.x)}" cy="${f(H.y)}" r="3.8" fill="url(#stbpin)"/><circle cx="${f(H.x-1.3)}" cy="${f(H.y-1.4)}" r="1" fill="#fff" opacity=".85"/></g>`});
+ // The iron's two passes, each trailing puffs of steam that rise and thin out.
+ const sole=oy+fh*.8;
+ for(const[v,u,a,b,lift]of[[o.v1,o.u1,.02,.15,12*(1-seg(o.p,0,.03))+12*seg(o.p,.15,.18)],[o.v2,o.u2,.86,.95,12*(1-seg(o.p,.83,.86))+12*seg(o.p,.95,.98)]]){
+  for(let k=0;k<6;k++){const te=a+(b-a)*k/5,age=(o.p-te)/.045;if(age<=0||age>=1)continue;
+   x+=tuft(ox+stbIronX(seg(te,a,b),fw)-16+6*age,sole-12-30*age,.4+.5*age,1.15,.8*(1-age)*Math.min(1,age/.15),k*47+age*70)}
+  if(v>0)x+=stbIron(ox+stbIronX(u,fw),sole,lift,v);
+ }
+ for(const which of[0,1]){const H=stbHand(o,ox,oy,fw,fh,which);if(H.op<=0)continue;let P=H.P;
+  if(which&&o.ux>0&&o.ux<1)P={x:P.x+jig,y:P.y};if(which&&o.uy>0&&o.uy<1)P={x:P.x,y:P.y+jig};
+  const id=which?'a':'b',M=mitt({W:P,phi:H.r},1,1.5,id,0,0,1);
+  x+=`<g opacity="${f(H.op)}"><g transform="translate(${pt(P)}) rotate(${f(H.r)}) scale(1.5)"><rect x="-24" y="-6.6" width="20" height="13.2" rx="3" fill="#000" opacity=".3" transform="translate(1 2)"/><rect x="-24" y="-6.6" width="20" height="13.2" rx="3" fill="${MT.col[id]}" filter="url(#tagfelt)"/>`+
+   `<path d="M-23 -3.4h18M-23 0h18M-23 3.4h18" stroke="#000" stroke-opacity=".18" stroke-width=".8"/></g>${M.body}${M.thumb}</g>`;
+ }
+ return x;
+}
+function stbClear(el){
+ if(!el.dataset.stb)return;delete el.dataset.stb;
+ for(const n of[el.querySelector('.mini'),el.querySelector('.knot'),el.querySelector('.grip')]){n.style.transform=n.style.transformOrigin=''}
+ el.querySelectorAll('.sb,.stbtool').forEach(n=>{n.style.display='none';n.style.clipPath=''});
+}
+function stbRender(el,svg,gr,kn,pa){
+ el.dataset.m=el.dataset.stb='1';pa.style.display='none';el.querySelectorAll('.pp,.cp,.sd,.ck,.cktool,.mb').forEach(n=>n.style.display='none');el.classList.remove('sdb');
+ // Until the first drawn frame moves (gq still 0) the box is the bare pad's, as pad() and dims() say, so the pad never jumps.
+ const on=model.gq>0,o=stbAt(model.gq),[w,h]=on?stbBox(model.gq>1?1:0):[CW,CH],q={ox:on?STB.M:0,oy:on?STB.M:0},{ox,oy}=q,fw=CW*o.sx,fr=model.mFr<0?-1:model.mFr%3;
+ el.style.width=w+'px';el.style.height=h+'px';el.style.transform='';
+ const key=`stb|${model.gq}|${fr}`,tl=el.querySelector('.stbtool');tl.style.display='block';
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=stbSvg(o,q,model.mFr);
+  tl.setAttribute('width',w);tl.setAttribute('height',h);tl.setAttribute('viewBox',`0 0 ${w} ${h}`);tl.innerHTML=stbTool(o,q,model.mFr)}
+ // Each HTML part is placed at its felt-local spot and scaled about the felt's top-left with the felt.
+ const sc=(n,L,T,kx,ky)=>{n.style.left=f(ox+L)+'px';n.style.top=f(oy+T)+'px';n.style.transformOrigin=`${f(-L)}px ${f(-T)}px`;n.style.transform=Math.abs(kx-1)<1e-4&&Math.abs(ky-1)<1e-4?'':`scale(${kx.toFixed(4)},${ky.toFixed(4)})`};
+ const mini=el.querySelector('.mini'),sbs=[null,el.querySelector('.sb1'),el.querySelector('.sb2')];
+ // The display being stretched (the pad's, or the blocked one) and the one pressed out behind the drying iron.
+ const R=o.u2>=1?1e4:o.u2>0?stbIronX(o.u2,fw):-1e4,showOld=o.u2<1,showNew=o.u2>0;
+ mini.style.opacity=1;mini.style.visibility=o.i===0&&showOld?'visible':'hidden';if(o.i===0)sc(mini,17,25,o.sx,o.sy);
+ for(const j of[1,2]){const n=sbs[j],s=STB.s[j],L=17*s,isOld=j===o.i,isNew=j===o.i+1,on=isOld&&showOld||isNew&&showNew;
+  n.style.display=on?'block':'none';if(!on)continue;
+  n.style.width=f(212*s)+'px';n.style.height=f(39*s)+'px';sc(n,L,25*s,o.sx/s,o.sy/s);
+  n.style.clipPath=isNew&&o.u2<1?`inset(-6px ${f(clamp(212*s-(R-L),-6,212*s))}px -6px -6px)`:''}
+ kn.style.opacity=1;kn.style.visibility='visible';sc(kn,243,34,o.sx,o.sy);
+ gr.style.opacity=1;gr.style.right=f(w-ox-CW+24)+'px';sc(gr,24,4,o.sx,o.sy);el.querySelector('.strip').style.opacity=0;
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'being stretched')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418, 86% passed':'')+(model.g>=2?'; deploy-preview and e2e-safari waiting for Brent':''));
  return true;
 }
 const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
