@@ -5760,7 +5760,12 @@ const MORPHS={
   about:'The Gather kind (hollow\'s bivouac, gothic\'s statue-columns, elven\'s firefly lantern, wire\'s dragonfly rosette) done in felt, from the little felt people of stop-motion. In a Gather nothing is made: the larger form is built of bodies. Here they are felt folk, one per check, who build a human pyramid and hold Checks up. The pad never changes or moves. <b>Growing:</b> a raspberry gym mat unrolls under the pad. Twelve felt folk in green bobble hats and matching mittens hop in from both sides, a frame at a time. Five stand on the mat with their arms round each other\'s shoulders, four jump up onto their shoulders, and the last three jump to the top and push the pad up with their mittens, squashing as each one lands. Twelve green hats are the twelve passed checks. The mat\'s cotton label reads run 418 · main · 86% passed. Then the two waiting checks, in amber hats, hop in from the right carrying a rolled banner on two sticks. They lift it and step apart to unroll it: waiting for Brent, deploy-preview, e2e-safari. <b>Grandstand:</b> two posts and a navy felt riser come up beside them, and a cotton tape is stretched between the posts: last ten runs · 409–418. Ten more folk hop in holding cards face down over their heads, back row first, and the back row jumps up onto the riser. Then the cards flip over in a wave from left to right, one per run, each with its number and a mark: green passed, red failed (411 and 415), amber waiting (418). <b>Shrinking</b> plays it back: the cards turn over, everyone jumps down and hops off, and the mat rolls up. Every body is placed from the size alone, so nothing moves at rest. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks sends the folk home first, and unshading brings them back. Switching morphs takes Checks back to a pad first.',
   anchorTL:true,sizes:['Pad','Pyramid','Grandstand'],noun:['a pad','a pyramid','a grandstand'],up:4600,down:3200,
   fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[PY.W[i],PY.H]:[CW,CH],dims:()=>model.gq>0?[PY.W[model.gq>1?2:1],PY.H]:[CW,CH],
-  sayUp:n=>'Felt folk hop in and gather under Checks: it becomes '+n+'.',sayDown:n=>'The felt folk climb down and hop away: Checks shrinks to '+n+'.'}
+  sayUp:n=>'Felt folk hop in and gather under Checks: it becomes '+n+'.',sayDown:n=>'The felt folk climb down and hop away: Checks shrinks to '+n+'.'},
+ rug:{label:'Felt-ball rug',kind:'Ripple',
+  about:'The Ripple kind (elven\'s dewfall, gothic\'s labyrinth, wire\'s ring rosette) done in felt, from the felt-ball rug. Felt balls are rolled by hand in hot soapy water, and the round rugs are sewn from them ring by ring, so in felt a ripple leaves felt balls behind it. In a Ripple the larger form spreads out in rings from one touch. The pad never changes or moves. <b>Growing:</b> a wet plum felt ball is pushed out from under the pad\'s front edge, teeters there and drops, with two drips of soapy water trailing it. It lands in a splash of suds and is pressed flat into a felt disc, and the bubbles drift up and pop. Then four ripples run out from the disc, each a line of soapy foam carrying a ring of felt balls. Each ring runs a little past its place, comes back, and is sewn round with a running stitch. Every crest lifts the balls it passes under, so the inner rings bob as the outer ones go by. The first ring is one ball per check: twelve green, and the two waiting in amber either side of the bottom, ringed in dashed stitches. Raspberry, cream and teal rings follow. A cotton patch is sewn on the disc: run 418 · main, 12 / 14, 86% · 2 waiting. <b>Two rugs:</b> a second ball drops beside the first and splats, and its ripples lay a second rug. Their crests run on across the first rug and rock its edge. Its first ring is the last ten runs, clockwise from the top, each ball in its status colour with its run number: green passed, red failed (411 and 415), amber waiting (418). Mustard and navy rings follow, and its patch reads last ten runs, 7 / 10, 409–418. A cotton tag swings in above it and is pinned with an amber glass-headed pin: 2 waiting for Brent, deploy-preview · e2e-safari. <b>Shrinking</b> plays it back: the rings run back into the disc, which plumps back into a ball and leaps up. Every ball is placed from the size alone, so nothing moves at rest. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks rolls the rug up first, and unshading lays it out again. Switching morphs takes Checks back to a pad first.',
+  anchorTL:true,sizes:['Pad','Rug','Two rugs'],noun:['a pad','a felt-ball rug','two felt-ball rugs'],up:5000,down:3400,
+  fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[RG.W[i],RG.H]:[CW,CH],dims:()=>model.gq>0?[RG.W[model.gq>1?2:1],RG.H]:[CW,CH],
+  sayUp:n=>'A wet felt ball drops and splats, and its ripples lay felt balls in rings: Checks becomes '+n+'.',sayDown:n=>'The rings run back into the disc and it plumps back into a ball: Checks shrinks to '+n+'.'}
 };
 const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
@@ -5862,6 +5867,7 @@ function morphRender(el){
  if(model.morph==='steam')return stbRender(el,svg,gr,kn,pa);
  if(model.morph==='shadow')return lxRender(el,svg,gr,kn,pa);
  if(model.morph==='folk')return pyRender(el,svg,gr,kn,pa);
+ if(model.morph==='rug')return rgRender(el,svg,gr,kn,pa);
  el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
@@ -6946,6 +6952,125 @@ function pyRender(el,svg,gr,kn,pa){
  gr.style.opacity=1;gr.style.left='24px';gr.style.right=f(w-CW+24)+'px';gr.style.top='4px';el.querySelector('.strip').style.opacity=0;
  const si=SIZES.findIndex(x=>x[2]===model.g);
  el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'felt folk moving')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed; deploy-preview and e2e-safari waiting for Brent':'')+(model.g>=2?'; last ten runs 409 to 418, 411 and 415 failed, 418 waiting':''));
+ return true;
+}
+/* ---------- Morph: felt-ball rug (Ripple) ---------- */
+// The pad never moves (top-left anchor). g 0→1: a wet felt ball is pushed out from under the pad's front edge and drops. It lands in
+// a splash of soap suds and is pressed flat into a felt disc, and four ripples run out from it, each carrying a ring of felt balls to
+// its place; the first ring is one ball per check. g 1→2: a second ball drops beside it and rings out a rug of the last ten runs, and
+// a cotton tag is pinned up naming the two waiting. Every crest lifts the balls it runs under, so the rings bob as later ones pass.
+// Every part is a function of g, so shrinking plays it back and nothing moves at rest.
+const RG={W:[CW,276,500],H:248,K:.72,P:[[138,152],[390,152]],DISC:[[47,33],[44,31]],PATCH:[[43,30.5],[41,28.5]],
+ // Rings as [radius across, ball radius, felt colours]; null colours mark the data ring.
+ R1:[[57,8.6,null],[74,7,['#b8476e','#a03d61']],[90,7,['#efe2c4','#e0d0ac']],[106,8,['#3f807a','#336b66']]],
+ R2:[[56,11,null],[73,6.5,['#d9a441','#c99233']],[88,7,['#36557a','#2f4868']]],
+ L1:[.22,.31,.4,.49],L2:[.2,.29,.38],D:.2,
+ // Crests run on past their ring and die out at CM; the second rug's reach the first rug's edge.
+ CM:[134,180]};
+// Felt balls that fit round a ring of radius R on the (foreshortened) table, packed as tight as felt-ball rugs are sewn.
+const rgCount=(R,b)=>Math.floor(2*Math.PI*R/(2*b+.5));
+function rgWaves(P,rings,L,t,cm){
+ const w=[];
+ // The splat throws the first crest before any ball rides out.
+ [[L[0]-.07,rings[0][0]*.8],...rings.map((r,i)=>[L[i],r[0]])].forEach(([l,R])=>{const c=R*(t-l)/RG.D;if(c>0&&c<cm)w.push({x:P[0],y:P[1],c,amp:5*Math.sqrt(1-c/cm)*seg(c,0,12),op:seg(c,0,12)*(1-c/cm)})});
+ return w;
+}
+// The wet ball and what it becomes: it falls over fa (0..1) from y0 to the table at P, then splats over sp into the felt disc.
+// `held` shows it before it falls (rug one's ball is pushed out from under the pad first), tipped by rot degrees.
+function rgDrop(P,y0,fa,sp,disc,held=false,rot=0){
+ const br=11,yl=P[1]-9,[DX,DY]=disc,C='#88506f';let s='';
+ if(fa<=0&&!held)return'';
+ if(sp<=0){
+  if(fa>0)s+=`<ellipse cx="${P[0]}" cy="${P[1]+1}" rx="${f(lerp(5,13,fa))}" ry="${f(lerp(2,4.6,fa))}" fill="#000" opacity="${f(.35*fa)}" filter="url(#sh)"/>`;
+  // It stretches as it speeds up and rounds off again just before it touches.
+  const y=lerp(y0,yl,fa*fa),x=P[0],st=.16*Math.sin(Math.PI*fa*.9);
+  // Two drips of soapy water trail it as it falls.
+  if(fa>.15&&fa<1)for(const[dy,r]of[[-17,2.2],[-27,1.5]])s+=`<circle cx="${f(x+1)}" cy="${f(y+dy*(.6+fa*.6))}" r="${r}" fill="#e8f3fa" opacity=".75"/>`;
+  return s+`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(${f(1-st/2)} ${f(1+st)})"><circle r="${br}" fill="${C}" filter="url(#tagfelt)"/><circle r="${br}" fill="#000" opacity=".12"/>`+
+   `<ellipse cx="-3.6" cy="-4.4" rx="3.4" ry="2.2" fill="#fff" opacity=".55" transform="rotate(-30 -3.6 -4.4)"/><path d="M-6 3.5q4 3 9 1.2" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="1"/></g>`}
+ const k=backOut(sp),cy=lerp(yl,P[1],ease(sp)),rx=lerp(br,DX,k),ry=lerp(br,DY,k)*(1-.25*Math.sin(Math.PI*sp));
+ // Still wet as it spreads, then it dries to plain felt; the falling ball's shadow spreads into the disc's, and its gleam fades.
+ const e=ease(sp),gl=1-seg(sp,0,.3);
+ return s+`<ellipse cx="${P[0]+1}" cy="${f(lerp(P[1]+1,cy+2.5,e))}" rx="${f(lerp(13,rx,e))}" ry="${f(lerp(4.6,ry,e))}" fill="#000" opacity=".3" filter="url(#sh)"/><ellipse cx="${P[0]}" cy="${f(cy)}" rx="${f(rx)}" ry="${f(ry)}" fill="${C}" filter="url(#tagfelt)"/>`+
+  `<ellipse cx="${P[0]}" cy="${f(cy)}" rx="${f(rx)}" ry="${f(ry)}" fill="#000" opacity="${f(.14*(1-sp))}"/>`+
+  (gl>0?`<ellipse cx="${f(P[0]-rx*.33)}" cy="${f(cy-ry*.4)}" rx="${f(rx*.3)}" ry="${f(ry*.2)}" fill="#fff" opacity="${f(.55*gl)}" transform="rotate(-30 ${f(P[0]-rx*.33)} ${f(cy-ry*.4)})"/>`:'');
+}
+// Soap suds thrown up by the splat: bubbles that fly out and rise, then pop. t runs 0..1 from the splat.
+function rgSuds(P,t){
+ if(t<=0||t>=1)return'';let s='';
+ for(let k=0;k<11;k++){const u=seg(t,0,.62+.38*((k*3)%4)/3),ph=2*Math.PI*k/11+.3*(k%3),sp=.6+.4*((k*7)%5)/4,d=15+34*sp*ease(u);
+  const x=P[0]+Math.cos(ph)*d,y=P[1]+Math.sin(ph)*d*RG.K-28*ease(u)*(.5+sp/2),r=1.8+1.3*(k%3);
+  if(u<=0||u>=1)continue;
+  if(u<.84)s+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r*lerp(.4,1,seg(u,0,.2)))}" fill="#fff" fill-opacity=".2" stroke="#fff" stroke-opacity=".8" stroke-width=".7"/><circle cx="${f(x-r*.35)}" cy="${f(y-r*.35)}" r="${f(r*.25)}" fill="#fff" opacity=".9"/>`;
+  else{const p=seg(u,.84,1),q=r+3*p;s+=`<path d="M${f(x-q)} ${f(y)}h1.6M${f(x+q)} ${f(y)}h-1.6M${f(x)} ${f(y-q)}v1.6M${f(x)} ${f(y+q)}v-1.6" stroke="#fff" stroke-width=".8" stroke-linecap="round" opacity="${f(1-p)}"/>`}}
+ return s;
+}
+// One ring at progress p (0 launched from the centre, 1 settled): its shadow and running stitch go to `low`, its balls to `balls`
+// with their y for depth sorting. pick(j) gives a ball's colour and any mark over it. Each ball rides the crests passing under it.
+function rgRing(P,[R,b,cols],n,p,a0,lift,pick,low,balls){
+ if(p<=0)return;
+ const r=R*backOut(p),sc=lerp(.4,1,ease(seg(p,0,.6))),op=seg(p,0,.12),K=RG.K,th=seg(p,.85,1),own=3.5*Math.sin(Math.PI*p);
+ low.push(`<ellipse cx="${P[0]+1}" cy="${f(P[1]+2.4)}" rx="${f(r)}" ry="${f(r*K)}" fill="none" stroke="#000" stroke-opacity="${f(.3*op)}" stroke-width="${f(2*b*sc)}" filter="url(#sh)"/>`);
+ if(th>0)low.push(`<ellipse cx="${P[0]}" cy="${P[1]}" rx="${f(r)}" ry="${f(r*K)}" fill="none" stroke="#f7e8c9" stroke-opacity="${f(.85*th)}" stroke-width="1" stroke-dasharray="2.6 2.2"/>`);
+ for(let j=0;j<n;j++){const a=a0+2*Math.PI*j/n,x=P[0]+r*Math.cos(a),y0=P[1]+r*K*Math.sin(a),y=y0-lift(x,y0)-own,rb=b*sc,o=pick?pick(j,x,y,rb,op):{c:cols[j%2]};
+  balls.push({y:y0,s:`<circle cx="${f(x)}" cy="${f(y)}" r="${f(rb)}" fill="${o.c}"${op<1?` opacity="${f(op)}"`:''}/>`,m:o.m||''})}
+}
+// The cotton patch sewn on the disc, scaled in by k, with its three lines fading in by t.
+function rgPatch(P,[rx,ry],k,t,l1,l2,l3){
+ if(k<=0)return'';const T=(y,s,w,txt)=>`<text y="${y}" font-family="${PYF}" font-size="${s}" font-weight="${w}" text-anchor="middle" fill="${PY.INK}">${txt}</text>`;
+ return `<g transform="translate(${P[0]} ${P[1]}) scale(${f(k*100)/100})"><ellipse rx="${rx}" ry="${ry}" fill="#f2e9d6"/><ellipse rx="${rx}" ry="${ry}" fill="url(#woven)" opacity=".7"/>`+
+  `<ellipse rx="${rx-3.5}" ry="${ry-3.5}" fill="none" stroke="#b8476e" stroke-width=".8" stroke-dasharray="1.8 1.6"/><g opacity="${f(t)}">${T(-9,7.5,700,l1)}${T(5.5,15,800,l2)}${T(16,7,700,l3)}</g></g>`;
+}
+function rgSvg(g,fr){
+ const a=g>=1?1:g,b=g>=1?g-1:0,{K,P,R1,R2,L1,L2,D}=RG;
+ const keep=BO;BO=fr<0?0:(fr%3)*31;const pad=casing('c',CW,CH);BO=keep;
+ const WV=rgWaves(P[0],R1,L1,a,RG.CM[0]).concat(b>0?rgWaves(P[1],R2,L2,b,RG.CM[1]):[]);
+ const lift=(x,y)=>WV.reduce((s,w)=>{const d=Math.hypot(x-w.x,(y-w.y)/K)-w.c;return s+w.amp*Math.exp(-d*d/64)},0);
+ const low=[],balls=[];let x='';
+ // Rug one: the checks ring (twelve green, the two waiting in amber either side of the bottom), then raspberry, cream and teal.
+ R1.forEach((rg,i)=>{const p=seg(a,L1[i],L1[i]+D);
+  rgRing(P[0],rg,i?rgCount(rg[0],rg[1]):14,p,i?Math.PI/2:Math.PI/2+Math.PI/14,lift,i?null:(j,bx,by,rb,op)=>{const w=j===0||j===13;
+   return{c:w?PY.WAIT:PY.OK[j%4],m:w?`<circle cx="${f(bx)}" cy="${f(by)}" r="${f(rb+2)}" fill="none" stroke="${PY.WAIT}" stroke-width="1.1" stroke-dasharray="2 1.6" opacity="${f(op*seg(a,.86,.94))}"/>`:''}},low,balls)});
+ // Rug two: the last ten runs clockwise from the top, each ball in its status colour with its number, then mustard and navy.
+ if(b>0)R2.forEach((rg,i)=>{const p=seg(b,L2[i],L2[i]+D);
+  rgRing(P[1],rg,i?rgCount(rg[0],rg[1]):10,p,i?Math.PI/2:-Math.PI/2,lift,i?null:(j,bx,by,rb,op)=>{const[run,st]=PY.RUNS[j];
+   return{c:PY.C[st],m:`<text x="${f(bx)}" y="${f(by+2.9)}" font-family="${PYF}" font-size="${f(8*rb/11)}" font-weight="800" text-anchor="middle" fill="${st==='bad'?'#fff3e0':PY.INK}" opacity="${f(op*seg(p,.8,1))}">${run}</text>`}},low,balls)});
+ // The crests: a soapy line of foam with a damp shadow inside it.
+ for(const w of WV)x+=`<ellipse cx="${w.x}" cy="${f(w.y+1.5)}" rx="${f(Math.max(.1,w.c-2))}" ry="${f(Math.max(.1,(w.c-2)*K))}" fill="none" stroke="#000" stroke-opacity="${f(.12*w.op)}" stroke-width="3"/>`+
+  `<ellipse cx="${w.x}" cy="${w.y}" rx="${f(w.c)}" ry="${f(w.c*K)}" fill="none" stroke="#eef7fc" stroke-opacity="${f(.7*w.op)}" stroke-width="1.6" stroke-dasharray="7 2 3 2"/>`;
+ x+=low.join('');
+ // The dropped balls and the discs they splat into. Rug one's ball is pushed out from under the pad's front edge (the pad is drawn
+ // over it) and teeters there before it drops.
+ const e=seg(a,0,.05),tt=seg(a,.05,.08);
+ x+=rgDrop(P[0],lerp(58,86,ease(e)),seg(a,.08,.15),seg(a,.15,.23),RG.DISC[0],e>0,10*Math.sin(Math.PI*4*tt)*(1-tt));
+ if(b>0)x+=rgDrop(P[1],-14,seg(b,0,.13),seg(b,.13,.21),RG.DISC[1]);
+ balls.sort((p,q)=>p.y-q.y);
+ x+=`<g filter="url(#tagfelt)">${balls.map(o=>o.s).join('')}</g>`+balls.map(o=>o.m).join('');
+ x+=rgPatch(P[0],RG.PATCH[0],backOut(seg(a,.7,.78)),seg(a,.78,.86),'run 418 · main','12 / 14','86% · 2 waiting');
+ if(b>0)x+=rgPatch(P[1],RG.PATCH[1],backOut(seg(b,.6,.68)),seg(b,.68,.76),'last ten runs','7 / 10','409–418');
+ x+=rgSuds(P[0],seg(a,.15,.42));
+ if(b>0){x+=rgSuds(P[1],seg(b,.13,.4));
+  // A cotton tag drops in and swings level, and an amber glass-headed pin goes through its corner.
+  const tg=seg(b,.7,.84),pn=seg(b,.84,.9);
+  if(tg>0){const dy=-80*(1-backOut(tg)),rot=-2+9*(1-ease(tg))*Math.cos(Math.PI*2*tg),T=(y,s,w,t)=>`<text x="95" y="${y}" font-family="${PYF}" font-size="${s}" font-weight="${w}" text-anchor="middle" fill="${PY.INK}">${t}</text>`;
+   x+=`<g transform="translate(296 ${f(12+dy)}) rotate(${f(rot)} 8 8)" opacity="${f(seg(tg,0,.2))}"><rect width="190" height="46" rx="3" fill="#000" opacity=".3" transform="translate(1.5 2.2)" filter="url(#sh)"/><rect width="190" height="46" rx="3" fill="#f2e9d6"/><rect width="190" height="46" rx="3" fill="url(#woven)" opacity=".7"/>`+
+    `<rect x="3.5" y="3.5" width="183" height="39" rx="2" fill="none" stroke="${PY.WAIT}" stroke-width="1.1" stroke-dasharray="3 2.2"/><g opacity="${f(seg(b,.86,.94))}">${T(18,8.5,600,'2 waiting for Brent')}${T(34,10,800,'deploy-preview · e2e-safari')}</g>`;
+   if(pn>0){const py=lerp(-12,0,ease(pn));x+=`<path d="M8 ${f(8+py)}l-6 -9" stroke="#b7b2a8" stroke-width="1.1" stroke-linecap="round"/><circle cx="${f(2)}" cy="${f(-1+py)}" r="4" fill="${PY.WAIT}"/><circle cx=".8" cy="${f(-2.3+py)}" r="1.2" fill="#fff" opacity=".7"/>`}
+   x+='</g>'}}
+ // The casing doesn't clip, so the rug is kept to its box: the second rug's crests run on past it, and its ball and tag drop in from above.
+ return `<clipPath id="rgclip"><rect width="${RG.W[g>1?2:1]}" height="${RG.H}"/></clipPath><g clip-path="url(#rgclip)">${x}</g>`+pad;
+}
+function rgRender(el,svg,gr,kn,pa){
+ el.dataset.m='1';pa.style.display='none';el.querySelectorAll('.pp,.cp,.sd,.ck,.cktool,.mb').forEach(n=>n.style.display='none');el.classList.remove('sdb');
+ const on=model.gq>0,w=on?RG.W[model.gq>1?2:1]:CW,h=on?RG.H:CH,fr=model.mFr<0?-1:model.mFr%3;
+ el.style.width=w+'px';el.style.height=h+'px';el.style.transform='';
+ const key=`rg|${model.gq}|${fr}`;
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=on?rgSvg(model.gq,model.mFr):casing('c',CW,CH)}
+ const mini=el.querySelector('.mini');mini.style.left='17px';mini.style.top='25px';mini.style.opacity=1;mini.style.visibility='visible';
+ kn.style.left='243px';kn.style.top='34px';kn.style.opacity=1;kn.style.visibility='visible';
+ gr.style.opacity=1;gr.style.left='24px';gr.style.right=f(w-CW+24)+'px';gr.style.top='4px';el.querySelector('.strip').style.opacity=0;
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'felt-ball rug rippling out')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 7 passed, 411 and 415 failed, 418 waiting; deploy-preview and e2e-safari waiting for Brent':''));
  return true;
 }
 const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
