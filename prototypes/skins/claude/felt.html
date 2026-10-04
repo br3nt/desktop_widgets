@@ -1835,6 +1835,125 @@ function jzDraw(id,w,h,small,st){
    `<text x="${f(x0+xp.w+5)}" y="${f(vc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="600" font-size="${wf}" fill="${th1}">${dt.word}</text></g>`}
  return t+b;
 }
+/* ---------- Shade: left out (Weather) ---------- */
+// The Weather kind (gothic's ruin, wire's verdigris) done in felt: the cushion is left out in the rain, then the sun.
+// A grey felt cloud is lowered on threads and drifts along the cushion, dropping felt raindrops that leave wet blots
+// while the wet soaks down from the top. Wet wool shrinks (it is how felt is fulled), so the cushion shrinks to a strip
+// a frame at a time; cotton thread doesn't, so the running stitch puckers and the foot rucks. The cloud is lifted out,
+// a felt sun is lowered, the felt steams dry and its dye fades. The value was stitched tone on tone under the display
+// patch in colourfast thread, so as the felt bleaches round it the value comes out. Last a snail comes out after the
+// rain and crawls along the top, leaving a silver trail; its shell is the status colour.
+const LO_MS=5200,LOG={},LO_WET='#0b1622',LO_BLEACH='#fbf0d8';
+const loQ=st=>Math.floor(st*LO_MS/FRAME+1e-6)*FRAME/LO_MS;
+const loShrink=st=>ease(seg(loQ(st),.36,.64));
+const loH=(st,small)=>Math.round(lerp(small?CH:H,small?50:58,loShrink(st)));
+// Drops (when each leaves the cloud, its offset under it, where it lands on the full cushion, its blot) and steam, per widget.
+function loGeo(id,small){
+ const key=id+(small?'s':'');if(LOG[key])return LOG[key];
+ const w=small?CW:W,H0=small?CH:H,N=small?11:16;let sd=SKIN[id].seed*4271+7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+ const drops=[];for(let i=0;i<N;i++)drops.push({t0:.15+.25*i/N+rnd()*.012,jx:(rnd()-.5)*(small?44:60),ty:16+rnd()*(H0-34),r:(small?4:5)+rnd()*3.5});
+ const steam=[.24,.5,.76].map((u,i)=>({x:w*u+(rnd()-.5)*20,t0:.63+i*.04}));
+ return LOG[key]={w,H0,drops,steam};
+}
+// A rounded rect whose straight runs wave by a (puckered stitching), easing to nothing at the corners.
+function loRR(x,y,w,h,rs,a,ph){
+ const[r0,r1,r2,r3]=rs.map(r=>Math.max(1,Math.min(r,h/2,w/2))),wv=(u,a0,a1,o)=>a*Math.sin(u*.42+ph+o)*Math.min(1,(u-a0)/8,(a1-u)/8);
+ let d=`M${f(x+r0)} ${f(y)}`;
+ for(let u=x+r0+4;u<x+w-r1;u+=4)d+=`L${f(u)} ${f(y+wv(u,x+r0,x+w-r1,0))}`;
+ d+=`L${f(x+w-r1)} ${f(y)}Q${f(x+w)} ${f(y)} ${f(x+w)} ${f(y+r1)}`;
+ for(let v=y+r1+4;v<y+h-r2;v+=4)d+=`L${f(x+w+wv(v,y+r1,y+h-r2,1))} ${f(v)}`;
+ d+=`L${f(x+w)} ${f(y+h-r2)}Q${f(x+w)} ${f(y+h)} ${f(x+w-r2)} ${f(y+h)}`;
+ for(let u=x+w-r2-4;u>x+r3;u-=4)d+=`L${f(u)} ${f(y+h+wv(u,x+r3,x+w-r2,2))}`;
+ d+=`L${f(x+r3)} ${f(y+h)}Q${f(x)} ${f(y+h)} ${f(x)} ${f(y+h-r3)}`;
+ for(let v=y+h-r3-4;v>y+r0;v-=4)d+=`L${f(x+wv(v,y+r0,y+h-r3,3))} ${f(v)}`;
+ return d+`L${f(x)} ${f(y+r0)}Q${f(x)} ${f(y)} ${f(x+r0)} ${f(y)}Z`;
+}
+// A grey felt cloud in one piece, its puffs outlined in running stitch.
+const LO_CLOUD='M-34 6Q-41 6 -40 -1Q-39 -8 -31 -8Q-30 -18 -19 -18Q-14 -27 -3 -25Q6 -32 16 -24Q27 -25 29 -14Q40 -13 40 -3Q40 6 32 6Z';
+const loCloud=id=>`<path d="${LO_CLOUD}" fill="#000" opacity=".3" filter="url(#sh)" transform="translate(1.5 3)"/><path d="${LO_CLOUD}" fill="#9aa1ab" filter="url(#g-${id})"/>`+
+ `<path d="${LO_CLOUD}" transform="translate(0 -1) scale(.82)" fill="none" stroke="#f1ead9" stroke-opacity=".75" stroke-width="1" stroke-dasharray="2.6 2.2"/>`+
+ `<path d="M-30 1Q-22 -3 -14 1M4 -5Q12 -9 20 -4" fill="none" stroke="#6d747e" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>`;
+// A felt sun: a disc over ten felt rays, long and short, with a ring of running stitch.
+const LO_RAYS=Array.from({length:10},(_,i)=>`<path d="M-3.2 -12L0 ${i%2?-18.5:-21}L3.2 -12Z" transform="rotate(${i*36})"/>`).join('');
+const loSun=id=>`<circle r="24" fill="#ffd56a" opacity=".4" filter="url(#soft)"/><g fill="#000" opacity=".25" filter="url(#sh)" transform="translate(1.5 2.5)"><circle r="13"/>${LO_RAYS}</g>`+
+ `<g fill="#ee9d34" filter="url(#g-${id})">${LO_RAYS}</g><circle r="13" fill="#f6c443" filter="url(#g-${id})"/><circle r="9" fill="none" stroke="#fff4d6" stroke-opacity=".85" stroke-width="1" stroke-dasharray="2.4 2"/>`;
+// A felt teardrop, point up.
+const LO_DROP='M0 -5.5Q3.6 -.6 3.6 2A3.6 3.6 0 0 1 -3.6 2Q-3.6 -.6 0 -5.5Z',loDrop=(x,y,k=1)=>`<g transform="translate(${f(x)} ${f(y)}) scale(${k.toFixed(3)})"><path d="${LO_DROP}" fill="#000" opacity=".25" transform="translate(.8 1.2)"/><path d="${LO_DROP}" fill="#5f9fd6" stroke="#2f5f8e" stroke-width=".5"/><path d="M-1.6 1.2Q-1.7 -.6 -.4 -2" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width=".8" stroke-linecap="round"/></g>`;
+// The snail, facing left with its head at 0 and its foot on y=0; e runs its eye stalks out. The shell is the status colour.
+function loSnail(id,C,e,stretch){
+ const s1=`M0 0Q-1.4 -3.6 1.8 -5.4Q4.4 -6.4 6.6 -3.6L${f(21*stretch)} -2.2Q${f(25*stretch)} -1.2 ${f(24.5*stretch)} 0Z`,ey=-5-6*e;
+ return `<path d="${s1}" fill="#000" opacity=".25" transform="translate(.6 1)"/><path d="M2.4 -4.6L${f(-.6-1.4*e)} ${f(ey)}M4.6 -4.6L${f(3.6+.4*e)} ${f(ey-.6)}" stroke="#a88d68" stroke-width="1.3" stroke-linecap="round"/>`+
+  `<circle cx="${f(-.6-1.4*e)}" cy="${f(ey)}" r="1.25" fill="#3a2a1e"/><circle cx="${f(3.6+.4*e)}" cy="${f(ey-.6)}" r="1.25" fill="#3a2a1e"/><path d="${s1}" fill="#cfb48e" filter="url(#g-${id})"/>`+
+  `<circle cx="13.4" cy="-8.2" r="8.6" fill="${C}" opacity=".3"/><circle cx="13.4" cy="-8.2" r="7.2" fill="${C}" stroke="#1a0d05" stroke-opacity=".45" stroke-width=".7" filter="url(#g-${id})"/>`+
+  `<path d="M13.4 -8.2a1.8 1.8 0 0 1 2.4 1.5a3.5 3.5 0 0 1 -4.4 3a5.2 5.2 0 0 1 -4 -6a6.4 6.4 0 0 1 8 -4.4" fill="none" stroke="#1a0d05" stroke-opacity=".4" stroke-width=".9" stroke-dasharray="1.8 1.2"/>`+
+  `<circle cx="10.6" cy="-11.4" r="1.9" fill="#fff" opacity=".5"/>`;
+}
+function loDraw(id,w,h,small,st){
+ const G=loGeo(id,small),s=SKIN[id],H0=G.H0,q=loQ(st),fr=Math.floor(st*LO_MS/FRAME),sk=loShrink(st),kk=(h-2*EDGE)/(H0-2*EDGE),Yk=y=>EDGE+(y-EDGE)*kk;
+ const sc=small?.8:1,bx=small?22:34,by=small?3:5,bh=small?20:22,C=PLEAT_C[labelStatus(id)],inset=s.r.map(v=>Math.max(3,v-6));
+ // Wetness down the cushion: soaked from the top as the rain goes over, dried from the top in the sun.
+ const wetY=lerp(-12,h+24,ease(seg(q,.16,.44))),dryY=lerp(-12,h+24,ease(seg(q,.62,.84))),wet=y=>ease(clamp((wetY-y)/22))*ease(clamp((y-dryY)/22));
+ const bl=ease(seg(q,.6,.86)),warm=.12*seg(q,.58,.64)*(1-seg(q,.84,.9)),pk=1.8*sk;
+ let t=`<defs>${feltFilters(id,s.seed)}<linearGradient id="low-${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${h}">`+
+  Array.from({length:11},(_,k)=>`<stop offset="${k/10}" stop-color="${LO_WET}" stop-opacity="${(.38*wet(k*h/10)).toFixed(3)}"/>`).join('')+'</linearGradient>'+
+  `<linearGradient id="lob-${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${h}"><stop stop-color="${LO_BLEACH}" stop-opacity="${(.48*bl).toFixed(3)}"/><stop offset="1" stop-color="${LO_BLEACH}" stop-opacity="${(.34*bl).toFixed(3)}"/></linearGradient>`+
+  `<linearGradient id="lot-${id}" gradientUnits="userSpaceOnUse" x1="0" y1="-130" x2="0" y2="-30"><stop stop-color="#efe4cf" stop-opacity="0"/><stop offset="1" stop-color="#efe4cf" stop-opacity=".75"/></linearGradient>`+
+  `<clipPath id="loc-${id}"><path d="${rr4(9,9,w-18,h-18,inset)}"/></clipPath></defs>`;
+ // Where the cloud is: lowered in, drifting along with the rain, lifted out. The same for the sun later.
+ const cloudX=u=>lerp(w*.22,w*.78,ease(seg(u,.14,.46))),cy0=(small?-24:-30)-80*(1-backOut(seg(q,.04,.14)))-80*ease(seg(q,.48,.58));
+ const sunY=(small?-26:-32)-90*(1-backOut(seg(q,.54,.64)))-90*ease(seg(q,.82,.9)),sway=t0=>q>t0?2.6*Math.sin(fr*1.7)*Math.exp(-(q-t0)*28):0;
+ // The felt: the body and its wet, blots, sun warmth and bleaching all go through the felt filter together, so they read as dye.
+ const body=loRR(EDGE,EDGE,w-2*EDGE,h-2*EDGE,s.r,pk*.45,s.seed);
+ let blots='';
+ for(const d of G.drops){const land=d.t0+.035;if(q<land)continue;const x=clamp(cloudX(d.t0)+d.jx,16+d.r,w-16-d.r),y=Yk(d.ty),a=.3*(1-ease(clamp((dryY-y)/22)))*ease(seg(q,land,land+.03));
+  if(a>.005)blots+=`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(d.r*(.4+.6*seg(q,land,land+.03)))}" ry="${f(d.r*(.5+.5*kk))}" fill="${LO_WET}" opacity="${a.toFixed(3)}"/>`}
+ t+=`<path d="${rr4(2.5,6,w-5,h-4.5,s.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/>`+
+  `<g filter="url(#f-${id})"><path d="${body}" fill="${s.body}"/><path d="${body}" fill="url(#low-${id})"/>${blots?`<g clip-path="url(#loc-${id})">${blots}</g>`:''}`+
+  (warm>0?`<path d="${body}" fill="#ffcf6a" opacity="${warm.toFixed(3)}"/>`:'')+(bl>0?`<path d="${body}" fill="url(#lob-${id})"/>`:'')+'</g>';
+ // The running stitch puckers as the felt shrinks under it, and the foot rucks.
+ const stD=loRR(10,10,w-20,h-20,inset,pk,s.seed*.7);
+ t+=`<path d="${stD}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${stD}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`;
+ if(sk>.05){let rk='';for(let x=30;x<w-28;x+=small?19:23)rk+=`M${f(x+(x*7%5))} ${f(h-8.5)}q${f(1.6*sk)} 2.4 0 4.8`;
+  t+=`<path d="${rk}" fill="none" stroke="#000" stroke-opacity="${f(.28*sk)}" stroke-width="1.1" stroke-linecap="round"/><path d="${rk}" fill="none" stroke="#fff3dc" stroke-opacity="${f(.22*sk)}" stroke-width=".7" stroke-linecap="round" transform="translate(-1 0)"/>`}
+ // The value, stitched tone on tone in colourfast thread where the display was. Wet, it sinks into the felt; bleached round, it stands out.
+ const dt=pocketData(id),cs=small?1.5:1.7,xp=xpaths(dt.num,cs),wf=small?11:12.5,x0=small?32:44,vS=small?31:37,vc=lerp(H0*.56,vS,sk),wv=wet(vc)*.38;
+ const th1=mixHex(mixHex(s.body,'#160c05',.52),LO_WET,wv),th2=mixHex(mixHex(s.body,'#160c05',.36),LO_WET,wv),hi=mixHex(s.body,LO_BLEACH,.3+.4*bl);
+ t+=`<g transform="translate(${x0} ${f(vc-3.5*cs)})" fill="none" stroke-linecap="round" stroke-width="${f(cs*.4)}"><path d="${xp.d1+xp.d2}" stroke="${hi}" stroke-opacity="${f(.15+.35*bl)}" transform="translate(-.4 -.5)"/><path d="${xp.d1}" stroke="${th2}"/><path d="${xp.d2}" stroke="${th1}"/></g>`+
+  `<text x="${f(x0+xp.w+5)}" y="${f(vc-.3)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="600" font-size="${wf}" fill="${hi}" opacity="${f(.15+.35*bl)}">${dt.word}</text>`+
+  `<text x="${f(x0+xp.w+5)}" y="${f(vc+.4)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="600" font-size="${wf}" fill="${th1}">${dt.word}</text>`;
+ // The name band gets wet and fades a little too; the name stays in the satin stitch it always had.
+ const band=rr4(bx,by,w-2*bx,bh,[9,8,10,8]),bw=wet(by+bh/2)*.7;
+ t+=`<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><g filter="url(#g-${id})"><path d="${band}" fill="${s.band}"/>`+
+  (bw>.005?`<path d="${band}" fill="${LO_WET}" opacity="${(.38*bw).toFixed(3)}"/>`:'')+(bl>0?`<path d="${band}" fill="${LO_BLEACH}" opacity="${(.16*bl).toFixed(3)}"/>`:'')+'</g>'+
+  `<path d="${rr4(bx+3.5,by+3.5,w-2*bx-7,bh-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ const nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],na=seg(st,0,.08),nx=small?32:48,ny=small?13.5:16.5;
+ if(na>0)t+=`<g opacity="${f(na)}" font-family="Georgia,serif" font-style="italic" font-size="15" letter-spacing=".2"><text x="${nx}" y="${ny+1}" dominant-baseline="central" fill="#000" opacity=".45">${nm}</text><text x="${nx}" y="${ny}" dominant-baseline="central" fill="#fff3dc">${nm}</text></g>`;
+ // Drips gather on the foot and fall while it soaks and shrinks.
+ [.3,.62,.85].forEach((u,k)=>{const t0=.3+k*.07,p=seg(q,t0,t0+.07);if(p<=0||p>=1)return;const x=w*u+(k-1)*7;
+  t+=p<.6?loDrop(x,h-1.5+2.5*p/.6,.25+.6*p/.6):`<g opacity="${f(1-(p-.6)/.4*.8)}">${loDrop(x,h+1+26*(p-.6)/.4,.85)}</g>`});
+ // Raindrops falling from under the cloud to where they land, with a splash.
+ const cb=cy0+6*sc;let rain='';
+ for(const d of G.drops){const u=seg(q,d.t0,d.t0+.035);if(q<d.t0)continue;const x=clamp(cloudX(d.t0)+d.jx,16+d.r,w-16-d.r),ly=Yk(d.ty);
+  if(u<1)rain+=loDrop(x,lerp(cb,ly,u*u),.85*sc);
+  else if(q<d.t0+.05)rain+=`<path d="M${f(x-6)} ${f(ly-1)}q2 -3 3.5 -1M${f(x+6)} ${f(ly-1)}q-2 -3 -3.5 -1M${f(x-1)} ${f(ly-5)}l.5 -2.5" fill="none" stroke="#bfe0fb" stroke-width="1" stroke-linecap="round"/>`}
+ // Steam lifts off the top as the sun dries it.
+ for(const sm of G.steam){const u=seg(q,sm.t0,sm.t0+.15);if(u<=0||u>=1)continue;const y=EDGE-3-24*u,x=sm.x+2*Math.sin(fr*.9+sm.x);
+  t+=`<path d="M${f(x)} ${f(y)}q3.5 -4 0 -8t0 -8" fill="none" stroke="#fffaf0" stroke-width="${f(2.2-u)}" stroke-linecap="round" opacity="${f(.55*Math.sin(Math.PI*u))}"/>`}
+ // The cloud and the sun, each hung on cotton from above the stage like stop-motion props.
+ const hung=(x,y,top,body,threads,a)=>`<g opacity="${f(a)}"><path d="${threads.map(dx=>`M${f(x+dx)} ${f(y+top)}L${f(x+dx*.6)} -130`).join('')}" stroke="url(#lot-${id})" stroke-width=".8"/><g transform="translate(${f(x)} ${f(y)}) scale(${sc})">${body}</g></g>`;
+ if(q>=.04&&q<.58){const x=cloudX(q)+sway(.14)*sc+(q>.46?sway(.46):0);t+=rain+hung(x,cy0,-22*sc,loCloud(id),[-20*sc,20*sc],seg(q,.04,.07)*(1-seg(q,.55,.58)))}else t+=rain;
+ if(q>=.54&&q<.9)t+=hung(w*.3+sway(.64)*sc,sunY,-20*sc,loSun(id),[0],seg(q,.54,.57)*(1-seg(q,.87,.9)));
+ // The snail comes out over the far top corner and crawls in a frame at a time, its trail silver behind it.
+ // Checks' band stands proud of its top edge, so its snail rides a little higher.
+ const cp=seg(q,.84,.97);
+ if(cp>0){const rc=Math.max(1,Math.min(s.r[1],h/2)),cx0=w-EDGE-rc,top=x=>EDGE+(x>cx0?rc-Math.sqrt(Math.max(0,rc*rc-(x-cx0)*(x-cx0))):0);
+  const hx=lerp(w-EDGE+2,w-(small?50:60),ease(cp)),tail=hx+24.5*sc,str=cp<1&&fr%2?1.07:1,e=backOut(seg(q,.95,1));
+  if(tail<cx0){const L=cx0-tail,gl=[.35,.75].map(g=>tail+L*g);
+   t+=`<path d="M${f(tail)} ${EDGE+.6}H${f(cx0)}" stroke="#dfe8f2" stroke-opacity=".7" stroke-width="1.6" stroke-linecap="round"/><path d="M${f(tail)} ${EDGE+.3}H${f(cx0)}" stroke="#fff" stroke-opacity=".8" stroke-width=".5"/>`+
+    gl.map((x,k)=>`<path d="M${f(x)} ${f(EDGE-1.8-k*.3)}l.5 1.6 1.6 .5 -1.6 .5 -.5 1.6 -.5 -1.6 -1.6 -.5 1.6 -.5Z" fill="#fff"/>`).join('')}
+  t+=`<clipPath id="lon-${id}"><rect x="-20" y="-40" width="${f(w-EDGE-1+20)}" height="${f(h+40)}"/></clipPath><g clip-path="url(#lon-${id})"><g transform="translate(${f(hx)} ${f(top(hx)+(small?-1.2:.4))}) scale(${sc})">${loSnail(id,C,e,str)}</g></g>`}
+ return t;
+}
 // A foot-anchored shade (the sewing box) keeps each widget's foot where it stood: as the strip's height changes, the
 // widgets (and a running join path or drag origin with them) move down by d (Checks by dc), kept on the stage.
 function shiftFeet(d,dc){
@@ -5496,7 +5615,7 @@ JOINS.bobble={label:'Hair bobble',kind:'Crimp',gap:HB.gap,ms:4400,msDrag:4000,re
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw, left out) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -5571,7 +5690,12 @@ const SHADES={
   about:'The Tessellate kind (gothic\'s Cosmati band, elven\'s leaf tesserae, wire\'s honeycomb) done in felt, from the felt jigsaws in the toy cupboard: the cushion is cut into its own puzzle and set again as a strip, with nothing added and nothing thrown away. The cotton display is put away and the name band is lifted off and held up out of the way. A cake of tailor\'s chalk marks the cutting lines, knobs and all: the long lines in one run each, then the short ones a stroke at a time. Felt shears snip along the long lines, the short ones opening as they pass. The pieces drop loose and rock in their cuts, then leave top row first. Each lifts toward you with its shadow falling away, turns a quarter (some the long way round), shrinks as it flies and lands with a squash that knocks fibres loose. Every column of the cushion lies down whole, so the knobs that held it together lock it again along the strip, but the columns are shuffled, and each piece carries its own bit of the running stitch, so the stitching ends up in short rotated dashes. The box follows the lowest piece, so the strip closes up as the bottom row flies. Then the band is laid back across the top of the row, the name is satin-stitched on it behind a needle, the value is cross-stitched across the pieces below (dark thread on Jarvis\'s amber, cream on the others), and <b>a felt ball on the band\'s end pops on in the status colour</b> (amber running, blue paused, red to decide, green passed). Nothing moves at rest, and unshading plays it back.',
   sayOn:'Shaded: each cushion is cut into a felt jigsaw and set again as a strip; the name is on the band and the felt ball shows the status.',sayOff:'Unshaded: the pieces fly back into place, the cuts close and the cushions are whole again.',
   height:(st,small)=>jzH(st,small),
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:jzDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.1),draw:jzDraw},
+ leftout:{label:'Left out',kind:'Weather',ms:LO_MS,ownStrip:true,
+  about:'The Weather kind (gothic\'s ruin, wire\'s verdigris) done in felt: nothing is folded or put away, the cushion is just left out, and wet wool shrinks, which is how felt is fulled in the first place. The cotton display is put away. A grey felt cloud is lowered on cotton threads like a stop-motion prop and drifts along the cushion, dropping blue felt raindrops that splash and leave dark wet blots, while the wet soaks down from the top and drips gather on the foot and fall. The wet felt shrinks to a strip a frame at a time; the thread does not, so the running stitch puckers and the foot rucks. The cloud is lifted out and a felt sun is lowered in its place: the felt warms, steams dry from the top and its dye fades. The value was stitched tone on tone under the display patch in colourfast thread, so it sinks into the felt while wet and stands out as the felt bleaches round it. Last, a felt snail comes out after the rain over the far top corner and crawls in along the top, leaving a silver trail that glints; its shell is the status colour (amber running, blue paused, red to decide, green passed). Nothing moves at rest, and unshading runs the weather backwards.',
+  sayOn:'Shaded: each cushion is left out in the rain and shrinks; the sun fades the felt round its stitched value, and a snail comes out.',sayOff:'Unshaded: the weather runs backwards and the cushions grow back.',
+  height:(st,small)=>loH(st,small),
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.08),draw:loDraw}
 };
 // The drawstring's cord and toggle hang about 32px below the strip, so they count toward the bottom clamp.
 const lowH=small=>{const s=SHADES[model.shade];if(s.foot)return shH(small);return model.st>.5?(s.height?s.height(1,small):small?CHS:HS)+(model.shade==='drawstring'?32:0):small?CH:H};
