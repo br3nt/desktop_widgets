@@ -1,5 +1,6 @@
-- [ ] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/combined.html: SyntaxError: Invalid left-hand side in assignment
+- [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/combined.html: SyntaxError: Invalid left-hand side in assignment
 prototypes/skins/claude/combined.html: ["Uncaught SyntaxError: Invalid left-hand side in assignment @line 8938"]
+  - Fixed: the One frost mix's moss loop added to `(i%2?m1:m2)`, and a conditional expression can't be assigned to. It now builds the circle once and uses an if/else to add it to `m1` or `m2`, so the moss draws exactly as intended. A grep of every page finds no other conditional used as an assignment target. Not checked in a browser or parser (node needed approval this run).
 - [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/felt.html: SyntaxError: Unexpected identifier 's'
 prototypes/skins/claude/felt.html: ["Uncaught SyntaxError: Unexpected identifier 's' @line 2469"]
   - Fixed: the bees join's `about` string had two bare apostrophes ("the top chain's", "the bottom chain's") that ended the single-quoted string; both are now escaped. A grep for possessives and contractions outside comments finds no others. Not checked in a parser or browser (node and Playwright were blocked this run).
