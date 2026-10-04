@@ -5138,7 +5138,11 @@ const MORPHS={
  bivouac:{label:'Bivouac',kind:'Gather',
   about:'Checks grows with nothing made, stretched or thrown: the larger Checks is built of bodies. It comes from the army ant, which has no nest. At dusk the colony hooks itself together, leg to leg, into hanging chains and walls and bridges, a living nest called a bivouac, and takes it apart again at dawn. Here the ants are small ink beetles with pale masks, living under the shell. <b>Bivouac:</b> the box darts down in a puff of fog and the beetles crawl out from under the belly, one side then the other, each climbing down over the ones already hanging to lock on below them with a small squash, until two chains of six hang from the shell. A fog bank comes up at the foot and two late beetles push a sheet of parchment up out of it between the chains; it overshoots a touch, and the chains take its edges with a glint. The two pushers drop to the foot and turn to face each other. Then the lamps on the chain beetles\' backs kindle teal one by one: twelve, the checks that passed. The two at the foot are never let into the chain, and red rings come up round them: the two checks still waiting. The sheet gives run 418 on main, 12 / 14, the fourteen marks and 86% passed. <b>Great bivouac:</b> beetles stream out from the shell\'s far end and walk out over each other into a bridge, the way army ants span a gap; a third chain climbs out across the bridge and hangs from its end. A second sheet slides out from behind the first, along under the bridge, and the far chain takes its edge. The two waiting beetles walk across over the foot of the middle chain and climb onto the new sheet, each settling beside its name, deploy-preview and e2e-safari, waiting for Brent. <b>Shrinking</b> plays it backwards: the beetles let go and crawl back under the shell. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a bivouac sends the beetles home first, and unshading gathers them again.',
   sizes:['Shell','Bivouac','Great bivouac'],slider:'Checks size, shell to great bivouac',ms:[4600,2600],ax:0,dims:g=>bvDims(g),travel:t=>ease(seg(t,0,.2)),
-  say:(to,from,n)=>to>from?(to-from>1?'Beetles crawl out from under Checks and lock into chains holding a sheet, then build a bridge and a third chain for a second sheet: Checks is a great bivouac.':to===2?'Beetles walk out over each other into a bridge and hang a third chain from it; a second sheet slides out, and the two waiting beetles climb on beside their names.':'Beetles crawl out from under the shell and lock legs into two chains that take a sheet: twelve lamps lit, two beetles waiting at the foot in red rings.'):'The beetles let go and crawl back '+(to?'off the bridge':'under the shell')+': Checks shrinks to '+article(n)+'.'}
+  say:(to,from,n)=>to>from?(to-from>1?'Beetles crawl out from under Checks and lock into chains holding a sheet, then build a bridge and a third chain for a second sheet: Checks is a great bivouac.':to===2?'Beetles walk out over each other into a bridge and hang a third chain from it; a second sheet slides out, and the two waiting beetles climb on beside their names.':'Beetles crawl out from under the shell and lock legs into two chains that take a sheet: twelve lamps lit, two beetles waiting at the foot in red rings.'):'The beetles let go and crawl back '+(to?'off the bridge':'under the shell')+': Checks shrinks to '+article(n)+'.'},
+ rim:{label:'Rimstone pools',kind:'Ripple',
+  about:'Checks grows the way still water takes a falling drop: the larger Checks spreads out in rings from one touch. It comes from the caves under the city, where water dripping for centuries builds rimstone pools (gours): terraced basins of black water held in thin, wavy stone lips, each spilling into the one below. <b>Pool:</b> the box darts down and a rimstone basin rises out of a bank of fog under the shell, overshoots a touch and settles, its lip streaked with flowstone. Its water is black and still, and small spiral shells lie sunk on the floor, dark. A drop of fog-water gathers on the shell\'s middle belly plate, swells, lets go and falls, stretching. Where it strikes there is a flash, a crown of droplets and one that leaps back up. Five rings run out across the water, each fainter, and die at the lip. Every ring lifts the shells it passes over, and as the first reaches each shell it wakes: twelve lamps kindle teal with a flash, and the pool takes on their light. The two at the front stay dark and red rings close round them: the checks still waiting. As the water stills, a parchment that lay on the floor under the drop floats up through it, breaks the surface with a ring of its own and bobs still: run 418 on main, 12 / 14, 86% passed and 2 waiting. <b>Rimstone pools:</b> a lower terrace rises beside the first, dry. The first pool brims, a pale meniscus shows at its lip, and a thread of water spills over and runs down into the lower basin, ringing as it fills it. The overflow slows and stops, its last drop rings the full pool, and the rings find two more dark shells, which take red rings; a second parchment floats up naming deploy-preview and e2e-safari, waiting for Brent. <b>Shrinking</b> plays it backwards: the parchments sink, the water climbs back up over the lip, the rings run back into the drop and the drop rises into the shell. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a pool drains it back to a shell first, and unshading lets the drop fall again.',
+  sizes:['Shell','Pool','Rimstone pools'],slider:'Checks size, shell to rimstone pools',ms:[5200,3000],ax:0,dims:g=>rsDims(g),travel:t=>ease(seg(t,0,.2)),
+  say:(to,from,n)=>to>from?(to-from>1?'A drop falls from Checks into a still cave pool and its rings wake twelve lamp-shells; the pool brims and spills into a lower terrace: Checks is rimstone pools.':to===2?'The pool brims and spills over its lip into a lower terrace; the last drop\'s rings find the two shells waiting, and a parchment names them.':'A basin rises under Checks and a drop falls from its belly: the rings wake twelve lamp-shells teal, two stay dark in red rings, and a parchment floats up.'):'The rings run back into the drop'+(to?' and the lower terrace drains':' and it rises into the shell')+': Checks shrinks to '+article(n)+'.'}
 };
 // Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
 for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
@@ -6025,6 +6029,127 @@ function bivouac(el,w,h){
  o+='</g>'+casing('c',CW,CH,true,'body')+curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,1);
  svg.innerHTML=o;
 }
+/* ---------- Morph: rimstone pools (Checks) ---------- */
+// g runs 0 shell, 1 pool, 2 rimstone pools. A Ripple morph: the larger Checks spreads out in rings from one touch. Dripping water in a cave
+// builds rimstone pools (gours): terraced basins of still black water held in wavy stone lips. A drop of fog-water falls from the shell's belly
+// into the pool and its rings run out across the water, waking the small lamp-shells sunk on its floor. Every frame is drawn from g alone.
+const RSP=[{x:138,y:164,rx:122,ry:48,d:12},{x:376,y:200,rx:80,ry:36,d:12}],RSI={x:304,y:196};
+// The sunken shells in the first pool: six on an inner ring and eight on an outer one. The two at the front of the outer ring are the checks waiting.
+const RSL=[...[30,90,150,210,270,330].map(a=>[.7,a]),...[22.5,67.5,112.5,157.5,202.5,247.5,292.5,337.5].map(a=>[.92,a])].map(([r,a])=>({r,x:RSP[0].x+r*RSP[0].rx*Math.cos(a*Math.PI/180),y:RSP[0].y+r*RSP[0].ry*Math.sin(a*Math.PI/180),wait:a===67.5||a===112.5}));
+// The two in the lower pool, and how far each lies from where the overflow falls (in the pool's own proportions, as its rings spread).
+const RSL2=[{x:318,y:188},{x:322,y:212}].map(p=>({...p,d:Math.hypot(p.x-RSI.x,(p.y-RSI.y)*RSP[1].rx/RSP[1].ry)}));
+const RSS1=`<text class="dser" x="138" y="154.5" text-anchor="middle" font-size="9.5" font-style="italic" fill="#5c4a36" letter-spacing=".4">run 418 · main</text>`+
+ `<text class="dser" x="138" y="170.5" text-anchor="middle" font-size="15" font-weight="700" fill="#231b14">12 / 14</text>`+
+ `<text class="dser" x="138" y="181.5" text-anchor="middle" font-size="9" font-style="italic" fill="#5c4a36">86% passed · 2 waiting</text>`;
+const RSS2=`<text class="dser" x="388" y="190" text-anchor="middle" font-size="9" font-style="italic" fill="#5c4a36" letter-spacing=".4">waiting for Brent</text>`+
+ `<text class="dser" x="388" y="204.5" text-anchor="middle" font-size="11.5" fill="#231b14">deploy-preview</text><text class="dser" x="388" y="217.5" text-anchor="middle" font-size="11.5" fill="#231b14">e2e-safari</text>`;
+const rsOn=()=>model.morph==='rim'&&model.g>0;
+function rsDims(g){g=clamp(g,0,2);const a=backSoft(seg(clamp(g),0,.14)),b=backSoft(seg(clamp(g-1),0,.14));return[Math.round(CW+194*b),Math.round(lerp(CH,236,a)+26*b)]}
+// A point on a basin's wavy stone lip: rimstone grows in small rounded lobes.
+const rsLip=(P,t)=>{const k=1+.03*Math.sin(9*t+.4)+.018*Math.sin(23*t+1.3);return[P.x+(P.rx+9)*k*Math.cos(t),P.y+(P.ry+8)*k*Math.sin(t)]};
+// A basin: the lip's outer wall (flowstone, streaked), the lip, and the water (or the dry floor while it fills).
+function rsBasin(P,fill){
+ const N=72,pts=Array.from({length:N+1},(_,j)=>rsLip(P,j/N*2*Math.PI)),fr=pts.slice(0,N/2+1),pt=q=>f(q[0])+' '+f(q[1]);
+ const lip='M'+pts.map(pt).join('L')+'Z',wall='M'+fr.map(pt).join('L')+'L'+fr.slice().reverse().map(q=>f(q[0])+' '+f(q[1]+P.d)).join('L')+'Z';
+ let o=`<path d="${wall}" fill="${INK}" transform="translate(0 2.6)"/><path d="${wall}" fill="url(#rsS)"/>`;
+ for(let j=0;j<11;j++){const q=rsLip(P,(.12+j*.076)*Math.PI);o+=`<path d="M${f(q[0])} ${f(q[1]+2)}v${f(P.d-3-(j%3)*2)}" stroke="#9fb0c6" stroke-width="${j%2?.6:.9}" opacity=".2" stroke-linecap="round"/>`}
+ o+=`<path d="${wall}" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round" filter="url(#wob)"/>`+
+  `<path d="${lip}" fill="url(#rsT)"/><path d="${lip}" fill="none" stroke="${INK}" stroke-width="1.8" stroke-linejoin="round" filter="url(#wob)"/>`+
+  `<path d="M${pts.slice(N/2+4,N-3).map(pt).join('L')}" fill="none" stroke="#dbe4ee" stroke-width=".9" opacity=".4" transform="translate(0 2)" stroke-linecap="round"/>`;
+ if(fill<1)o+=`<ellipse cx="${P.x}" cy="${P.y}" rx="${P.rx}" ry="${P.ry}" fill="url(#rsD)"/>`;
+ if(fill>0)o+=`<ellipse cx="${P.x}" cy="${f(P.y+3*(1-fill))}" rx="${f(P.rx*lerp(.3,1,fill))}" ry="${f(P.ry*lerp(.3,1,fill))}" fill="url(#rsW)" opacity="${f3(Math.min(1,fill*3))}"/>`;
+ return o+`<ellipse cx="${P.x}" cy="${P.y}" rx="${P.rx}" ry="${P.ry}" fill="none" stroke="${INK}" stroke-width="1.5"/>`+
+  `<path d="M${P.x-P.rx+4} ${P.y+3}A${P.rx-4} ${P.ry-3} 0 0 0 ${P.x+P.rx-4} ${P.y+3}" fill="none" stroke="#c9d6e6" stroke-width=".8" opacity=".3"/>`}
+// A crest running out across the water: a pale line with its dark trough just inside.
+const rsCrest=(x,y,rx,ry,a)=>a<.01||rx<.5?'':`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx*.965)}" ry="${f(ry*.965)}" fill="none" stroke="#000" stroke-width="2.2" opacity="${f3(.5*a)}"/>`+
+ `<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" fill="none" stroke="#dfe9f4" stroke-width="1.2" opacity="${f3(.85*a)}"/><ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(rx*1.03)}" ry="${f(ry*1.03)}" fill="none" stroke="#9fb8d8" stroke-width=".6" opacity="${f3(.4*a)}"/>`;
+// A small spiral shell sunk on the floor, seen through the water. lit kindles its teal lamp, fl is the flash as a crest wakes it, ring the red ring of a waiting check.
+function rsShell(x,y,lit,fl,ring){
+ let o=`<g transform="translate(${f(x)} ${f(y)}) scale(1 .74)">`;
+ if(lit+fl>.01)o+=`<circle r="${f(10+6*fl)}" fill="url(#leakT)" opacity="${f3(.42*lit+.5*fl)}"/>`;
+ o+=`<circle r="4.6" fill="#1b2433" stroke="${INK}" stroke-width="1"/>`+(lit>.01?`<circle r="4.6" fill="url(#tealG)" opacity="${f3(.85*lit)}"/>`:'');
+ o+=`<path d="M.5 .3A1.1 1.1 0 1 0 -.9 -.5A2.3 2.3 0 1 1 2.6 1.6" fill="none" stroke="${lit>.5?'#1d5a52':'#7d8ca3'}" stroke-width=".8" stroke-linecap="round"/>`;
+ if(ring>.01){const r=lerp(15,9.5,ease(ring));o+=`<circle r="${f(r)}" fill="none" stroke="#3a070b" stroke-width="2.6" opacity="${f3(ring)}"/><circle r="${f(r)}" fill="none" stroke="${REDHI}" stroke-width="1.3" opacity="${f3(ring)}"/>`}
+ return o+'</g>'}
+// A parchment that was lying on the floor floats up through the water in window a..b: dark and small while sunk, a ring as it breaks the surface, then it bobs still.
+function rsSheet(x0,y0,x1,y1,txt,t,a,b){
+ const pk=seg(t,a,a+(b-a)*.6);if(pk<=0)return '';
+ const s=seg(t,a+(b-a)*.48,a+(b-a)*.75),q=seg(t,a+(b-a)*.5,b),bob=2.4*Math.sin(4*Math.PI*q)*(1-q),cx=(x0+x1)/2,cy=(y0+y1)/2,sc=lerp(.84,1,ease(pk)),r=`M${x0} ${y0}H${x1}V${y1}H${x0}Z`;
+ let o=s>0&&s<1?`<rect x="${f(x0-2-12*s)}" y="${f(y0-2-6*s)}" width="${f(x1-x0+4+24*s)}" height="${f(y1-y0+4+12*s)}" rx="${f(5+8*s)}" fill="none" stroke="#dfe9f4" stroke-width="1.1" opacity="${f3(.7*(1-s))}"/>`:'';
+ o+=`<g opacity="${f3(seg(pk,0,.3))}" transform="translate(${f(cx)} ${f(cy+bob)}) scale(${f3(sc)}) translate(${-cx} ${-cy})"><path d="${r}" fill="#000" opacity=".45" transform="translate(1.5 2.6)"/>`+
+  `<path d="${r}" fill="url(#parchG)"/><path d="${r}" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round" filter="url(#wob)"/><g opacity="${f3(seg(pk,.55,1))}">${txt}</g>`;
+ const sunk=1-seg(pk,.5,.9);if(sunk>.01)o+=`<path d="${r}" fill="#0a1220" opacity="${f3(.85*sunk)}"/>`;
+ return o+'</g>'}
+function rimstone(el,w,h){
+ const svg=el.querySelector('.casing');
+ if(!rsOn()){if(svg.dataset.rk)svg.dataset.rk='';return}
+ const g=model.g,still=g===Math.round(g);
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'rings spreading across the water')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.rk===key)return;svg.dataset.rk=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const u=clamp(g),v=clamp(g-1),[P,Q]=RSP;
+ let o=`<defs><linearGradient id="rsS" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#334055"/><stop offset="1" stop-color="#121822"/></linearGradient>`+
+  `<radialGradient id="rsT" cx=".5" cy=".42" r=".62"><stop offset=".7" stop-color="#202a3a"/><stop offset=".9" stop-color="#3d4b62"/><stop offset="1" stop-color="#2a3446"/></radialGradient>`+
+  `<radialGradient id="rsW" cx=".5" cy=".38" r=".62"><stop stop-color="#17253c"/><stop offset=".6" stop-color="#0c1424"/><stop offset="1" stop-color="#060a12"/></radialGradient>`+
+  `<radialGradient id="rsD" cx=".5" cy=".4" r=".6"><stop stop-color="#3a4558"/><stop offset="1" stop-color="#1f2735"/></radialGradient>`+
+  `<radialGradient id="rsG"><stop stop-color="#7fd6c2" stop-opacity=".3"/><stop offset="1" stop-color="#7fd6c2" stop-opacity="0"/></radialGradient>`+
+  RSP.map((p,i)=>`<clipPath id="rsC${i}"><ellipse cx="${p.x}" cy="${p.y}" rx="${p.rx-1}" ry="${p.ry-1}"/></clipPath>`).join('')+
+  `<clipPath id="rsK"><rect width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#rsK)">`;
+ // The first pool rises out of a fog bank under the shell, overshoots a touch and settles.
+ const rk=seg(u,.04,.2),dy=70*(1-backSoft(rk));
+ // Five crests leave the drop's mark one after another, each fainter, and die at the lip; each shell wakes as the first one reaches it.
+ const C=[0,1,2,3,4].map(k=>{const r=(u-.36-.045*k)/.2*1.08;return{r,a:r<=0?0:(1-.15*k)*seg(r,0,.06)*(1-seg(r,.8,1.05))}});
+ o+=`<g opacity="${f3(seg(u,.04,.09))}" transform="translate(0 ${f(dy)})">${rsBasin(P,1)}`;
+ const woke=RSL.map(L=>seg(u,.36+L.r*.2/1.08,.36+L.r*.2/1.08+.03));
+ const glow=woke.reduce((s,k,i)=>s+(RSL[i].wait?0:k),0)/12;
+ if(glow>.01)o+=`<ellipse cx="${P.x}" cy="${P.y}" rx="${P.rx}" ry="${P.ry}" fill="url(#rsG)" opacity="${f3(glow)}"/>`;
+ // The shells are drawn unclipped, so the red rings at the front can reach over the lip; only the crests and splash keep to the water.
+ RSL.forEach((L,i)=>{const bob=-2.2*C.reduce((s,c)=>s+c.a*Math.exp(-Math.pow((c.r-L.r)/.07,2)),0),k=woke[i],fl=Math.sin(Math.PI*seg(u,.36+L.r*.2/1.08,.36+L.r*.2/1.08+.06));
+  o+=rsShell(L.x,L.y+bob,L.wait?0:k,L.wait?0:fl,L.wait?k:0)});
+ o+=`<ellipse cx="${P.x}" cy="${P.y}" rx="${P.rx}" ry="${P.ry}" fill="#0c1424" opacity=".22"/><g clip-path="url(#rsC0)">`;
+ for(const c of C)o+=rsCrest(P.x,P.y,c.r*P.rx,c.r*P.ry,c.a);
+ // The splash: a crown of droplets thrown up and out, and one that leaps back up from the middle.
+ const sp=seg(u,.36,.48);
+ if(sp>0&&sp<1)for(let i=0;i<8;i++){const a=(i+.3)*Math.PI/4,hh=30*sp*(1-sp)*(.7+.3*(i%2));
+  o+=`<circle cx="${f(P.x+Math.cos(a)*(6+20*sp))}" cy="${f(P.y+Math.sin(a)*(2.4+8*sp)-hh)}" r="${f(1.5*(1-.5*sp))}" fill="#dfe9f4" stroke="${INK}" stroke-width=".5" opacity="${f3(1-seg(sp,.7,1))}"/>`}
+ o+='</g>';
+ const sb=seg(u,.38,.5);if(sb>0&&sb<1)o+=`<ellipse cx="${P.x}" cy="${f(P.y-104*sb*(1-sb))}" rx="1.6" ry="2.2" fill="#dfe9f4" stroke="${INK}" stroke-width=".5" opacity="${f3(1-seg(sb,.8,1))}"/>`;
+ // As the water stills, the sheet that lay under the drop floats up and settles on the surface.
+ o+=rsSheet(83,142,193,186,RSS1,u,.74,.96);
+ // Brimming: once the lower pool is laid, the water swells to the lip and a pale meniscus shows where it spills.
+ const mn=seg(v,.18,.26)*(1-seg(v,.58,.66));
+ if(mn>.01)o+=`<path d="M${f(P.x+P.rx*Math.cos(-.5))} ${f(P.y+P.ry*Math.sin(-.5))}A${P.rx} ${P.ry} 0 0 1 ${f(P.x+P.rx*Math.cos(.7))} ${f(P.y+P.ry*Math.sin(.7))}" fill="none" stroke="#dfe9f4" stroke-width="1.6" opacity="${f3(.8*mn)}" stroke-linecap="round"/>`;
+ o+='</g>';
+ if(v>0){
+  // The lower terrace rises out of its own fog bank, dry. The overflow runs over the first lip and down into it, filling it, and stops;
+  // its last drop rings the water, and the rings find the two shells still waiting.
+  const rk2=seg(v,.04,.2),dy2=70*(1-backSoft(rk2)),fill=ease(seg(v,.34,.62));
+  const on=seg(v,.32,.36)*(1-seg(v,.58,.62));
+  const C2=[0,1,2].map(k=>{const R=(v-.66-.045*k)/.2*200;return{R,a:R<=0?0:(1-.2*k)*seg(R,0,8)*(1-seg(R,130,190))}});
+  o+=`<g opacity="${f3(seg(v,.04,.09))}" transform="translate(0 ${f(dy2)})">${rsBasin(Q,fill)}<g clip-path="url(#rsC1)">`;
+  RSL2.forEach(L=>{const t=.66+L.d/200*.2,bob=-2*C2.reduce((s,c)=>s+c.a*Math.exp(-Math.pow((c.R-L.d)/14,2)),0);o+=rsShell(L.x,L.y+bob,0,0,seg(v,t,t+.04))});
+  o+=`<ellipse cx="${Q.x}" cy="${Q.y}" rx="${Q.rx}" ry="${Q.ry}" fill="#0c1424" opacity="${f3(.22*fill)}"/>`;
+  // While the overflow pours, small rings run from where it falls; they fade as it slows.
+  if(on>.01)for(let j=0;j<3;j++){const ph=((v-.32)*14+j/3)%1;o+=rsCrest(RSI.x,RSI.y,ph*56*fill,ph*56*fill*Q.ry/Q.rx,on*(1-ph))}
+  for(const c of C2)o+=rsCrest(RSI.x,RSI.y,c.R,c.R*Q.ry/Q.rx,c.a);
+  o+=`</g>${rsSheet(340,178,436,222,RSS2,v,.78,.96)}</g>`;
+  // The overflow: a thread of water over the lip and down the wall, drawn on from the lip; when it stops, its tail runs down after it.
+  const hd=seg(v,.26,.32),tl=seg(v,.58,.66);
+  if(hd>0&&tl<1){const d='M265 171.5C274 171 280 174 285 181C289 189 295 194 304 196';
+   o+=`<path d="${d}" pathLength="1" fill="none" stroke="${INK}" stroke-width="3.6" stroke-linecap="round" stroke-dasharray="${f3(hd-tl)} 2" stroke-dashoffset="${f3(-tl)}"/>`+
+    `<path d="${d}" pathLength="1" fill="none" stroke="#dfe9f4" stroke-width="1.7" stroke-linecap="round" stroke-dasharray="${f3(hd-tl)} 2" stroke-dashoffset="${f3(-tl)}"/>`;
+   if(on>.01)o+=`<ellipse cx="${RSI.x}" cy="${RSI.y}" rx="${f(4+1.2*Math.sin(v*90))}" ry="1.8" fill="#eef4fb" opacity="${f3(.8*on)}"/>`}
+  const fb2=Math.sin(Math.PI*seg(v,.0,.3));if(fb2>.01)o+=`<ellipse cx="${Q.x}" cy="258" rx="120" ry="30" fill="url(#fogCold)" opacity="${f3(.95*fb2)}"/>`}
+ const fb=Math.sin(Math.PI*seg(u,0,.3));if(fb>.01)o+=`<ellipse cx="${P.x}" cy="234" rx="150" ry="34" fill="url(#fogCold)" opacity="${f3(.95*fb)}"/>`;
+ o+='</g>'+casing('c',CW,CH,true,'body')+curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,1);
+ // The drop swells on the middle belly plate, lets go and falls, stretching; a flash where it strikes the water.
+ const sw=seg(u,.2,.3),fa=seg(u,.3,.36);
+ if(sw>0&&u<.36){const r=2.7*ease(sw),y=lerp(78+r*1.4,P.y+dy-2,fa*fa),st=1+.6*fa;
+  o+=`<g transform="translate(${P.x} ${f(y)}) scale(${f3(1/Math.sqrt(st))} ${f3(st)})"><path d="M0 ${f(-r*2.2)}Q${f(r*.9)} ${f(-r*.6)} ${f(r)} 0A${f(r)} ${f(r)} 0 0 1 ${f(-r)} 0Q${f(-r*.9)} ${f(-r*.6)} 0 ${f(-r*2.2)}Z" fill="#dfe9f4" stroke="${INK}" stroke-width=".8"/><circle cx="${f(-r*.35)}" cy="${f(-r*.2)}" r="${f(r*.3)}" fill="#fff"/></g>`}
+ const fx=seg(u,.36,.42);if(fx>0&&fx<1)o+=spark({x:P.x,y:P.y+dy},Math.sin(Math.PI*fx)*.9,9);
+ svg.innerHTML=o;
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -6206,8 +6331,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':small&&bvOn()?'A':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHGA'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':small&&bvOn()?'A':small&&rsOn()?'R':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHGAR'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):rn?1-seg(s,.04,.26):mr||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs||rn?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs||rn?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -6219,7 +6344,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs||((ur||ns||dr||pr||qs||rn)&&s>0)?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h);bivouac(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h);bivouac(el,w,h);rimstone(el,w,h)}
   // After the morphs, which can also move Checks' parchment, so the seal's withdraw wins.
   snailSeal(el,id,w,h,s,small?'teal':m.run?'amber':'cold');reelShell(el,id,w,h,s,small?'teal':m.run?'amber':'cold');abdomen(el,id,w,h,s,small?'teal':m.run?'amber':'cold');inkDrain(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapPress(el,id,w,h,s,small?'teal':m.run?'amber':'cold');scales(el,id,w,h,s,small?'teal':m.run?'amber':'cold');longRain(el,id,w,h,s,small?'teal':m.run?'amber':'cold',m.run);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
