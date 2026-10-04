@@ -332,7 +332,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. With the ribbon roll, drag GitDiscuss's nameplate to roll it round Jarvis's roundel (it settles on the nearest 15° star); tap the roundels to release. With the lantern counterpoise, drag the lantern along the rail under GitDiscuss and GitDiscuss tips after it (it settles on the nearest 15° mark); tap the bough or the chain to release. With moonwater ice, tap the ice to thaw it. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. With the ribbon roll, drag GitDiscuss's nameplate to roll it round Jarvis's roundel (it settles on the nearest 15° star); tap the roundels to release. With the lantern counterpoise, drag the lantern along the rail under GitDiscuss and GitDiscuss tips after it (it settles on the nearest 15° mark); tap the bough or the chain to release. With moonwater ice, tap the ice to thaw it. With the honeysuckle screw, slide the nut along the screw over Jarvis's roof (or turn the wheel on its end for fine work) and GitDiscuss tips, resting at any angle; tap the boss, the stem or the bow to release. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=38,SEP=170,NEAR=120,READY=40,TOP=70,SNAP=46;
@@ -838,6 +838,29 @@ const JOINS={
    if(jt>.37)return'Releasing · it drains out of the lower tip ';return jt>.3?'Releasing · the rim draws in ':'Releasing · the casings part '},
   about:`A new join kind, Pour, after hollow's candle wax. In a Pour the seam is cast in place: nothing is fastened, hooked or grown across the gap; a liquid is let into it and sets there, and warmth undoes it. Elven things are made by the moon and the frost, so the liquid is moonwater and it sets as ice. <b>Near:</b> frost feathers the facing rims and glints along them. <b>Ready:</b> the mould, the tipped ewer and its stream are traced in dashed moonlight. <b>Joining:</b> the casings close a span apart and a silver hairline traces a pointed lens across the gap from its top tip down both sides, lapping over each casing's rim across the middle and tapering to points in the open gap, with a leaf at each tip. A slender silver ewer (a swan-necked spout, a chased band, a leaf on its belly, a moonstone finial) drifts down out of the night over the gap and tips; a thin stream of moonwater runs from its lip into the mould, rippling where it lands, and the water rises from the lower tip, pale at the surface and deep blue below, under a wavering meniscus. The ewer rights itself and rises away. A falling star drops into the full mould with a ring of ripples and sinks to the middle as a moonstone. Then frost ferns grow in from the rim and the tips, each feathering out behind its growing tip and glinting when it stops, and the water clouds over into pale ice with a few cleavage lines. Last, the moonstone kindles as the join light (moonlight while both widgets run, a cold grey if either is paused) and a glint runs down the ice. Everything scales with any shade. Nothing moves at rest. <b>Release:</b> tap the ice, or focus it and press Enter. The moonstone dims and warms to a pale gold, the frost ferns melt back into the rim, the ice clears to water, and it drains out of the lower tip in drops, the moonstone riding down with it and dropping out last; then the rim draws in and the casings part. Reversing part-way cross-fades the ewer and the drain, so nothing jumps.`,
   over:c=>drawPour(c)
+ },
+ // part:.3 keeps the casings together on release until the screw is taken down and the straps drawn in.
+ twine:{label:'Honeysuckle screw',kind:'Angle · screw',angled:true,a0:-20,part:.3,
+  get gap(){return 2*scS(ctx().h/2)},
+  get hooks(){return SCH},
+  // Level, there is nothing to wind, so the join and release take less time.
+  get slow(){return model.angle?1.8:1.4},get msOut(){return model.angle?4400:3400},
+  bend(jt){return scBend(jt)},
+  txt:{join:'The casings close on a moonstone boss, a silver stalk grows up out of it, a stem and a small silver bow rise from Jarvis\'s roof, a night-glass rod is strung in the bow and a honeysuckle vine twines along it as its thread; a nut is set on the thread, a link pins it to the stalk, and the wheel winds GitDiscuss to its angle.',
+   joined:'Joined on a honeysuckle screw. Slide the nut along the screw (or turn the wheel on its end for fine work), drag GitDiscuss\'s nameplate, use the Angle slider, or press ↑ ↓; it rests at any angle. Tap the boss, the stem or the bow to release.',
+   release:'The boss dims, the wheel winds GitDiscuss level, the link is unpinned, the nut comes off, the wheel folds, the vine untwines, the rod is drawn out and the bow, stem and stalk sink away.',
+   stop:'The screw is taken down and the stem and stalk sink away.',
+   hold:'Held mid-join: the rod lies strung in the bow and the honeysuckle is twining along it. Use the scrubber to step through it.',
+   ready:'Ready: the stem, the bow, the screw, the link and the stalk are traced in moonlight at the set angle. Release to raise it.',near:'Nearby: Jarvis\'s roof and GitDiscuss\'s stem glimmer, and a silver bud lifts. Move closer.',
+   readyPh:'Ready · the screw is traced',nearPh:'Nearby · a bud lifts from the roof'},
+  phase:(jt,dir)=>{const r=!!model.angle,pe=scPe();
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<.44)return'Joining · the boss blooms and the stem rises ';if(jt<.52)return'Joining · the bow springs and the stalk grows ';
+    if(jt<.56)return'Joining · the rod is strung in the bow ';if(jt<.65)return'Joining · the honeysuckle twines along it ';if(jt<.71)return'Joining · the nut is set and the link pinned ';
+    if(r&&jt<.88)return'Joining · winding '+scTurnsTxt(scBend(jt))+' ';return'Joining · the boss kindles '}
+   if(jt>pe)return'Releasing · the boss dims ';if(r&&jt>.71)return'Releasing · winding level ';if(jt>.63)return'Releasing · the link is unpinned and the nut comes off ';
+   if(jt>.54)return'Releasing · the wheel folds and the honeysuckle untwines ';if(jt>.42)return'Releasing · the rod is drawn out and the bow and stalk sink ';return jt>.3?'Releasing · the stem sinks ':'Releasing · the casings part '},
+  about:'The Screw angle kind in elven, after wire\'s worm and bead wheel, gothic\'s vice, felt\'s bottlescrew and hollow\'s snail scroll. In a Screw the angle is wound in, and since a nut cannot turn its screw back, the angle holds wherever the winding stops, with no catch, stop or weight. Elves would not cut a thread into silver when a plant will grow one, so the thread here is a honeysuckle vine twined round a night-glass rod (honeysuckle twines right-handed, which is the hand of an ordinary screw). GitDiscuss turns on a moonstone boss in the middle of the gap, as on the crescent pivot, and a slender silver stalk rises from the boss, fixed to GitDiscuss and swan-necked so it never sweeps Jarvis\'s corner. Over Jarvis\'s roof a single stem holds a small silver bow, and the rod is strung in the bow like a bowstring: the far end hangs from the bow because the link passes under it. A silver nut with a moonstone face rides the vine, and a slim link with a leaf runs from the nut\'s lug to the stalk\'s tip. Wind the nut toward the gap and the link pushes the stalk over, so GitDiscuss\'s far end goes down; wind it back and it comes up. A star over the rod marks the nut\'s place at each 15°, a moonstone at level; about ten turns take GitDiscuss from level to either end (seven or eight when shaded). <b>Near:</b> Jarvis\'s roof and GitDiscuss\'s stem glimmer and a silver bud lifts from the roof. <b>Ready:</b> the stem, bow, rod, nut, link, stalk and boss are traced in dashed moonlight at the set angle. <b>Joining:</b> the casings close, the straps reach the boss and it blooms, the stem climbs out of Jarvis\'s roof and the bow springs from it over to the far bearing while the stalk grows up out of the boss; the rod is slid in from the wheel\'s end, the honeysuckle twines along it from the stem with a glint at its growing tip and curls off past the far bearing, the wheel opens on the rod\'s end, the nut blooms on the thread and the link unfurls to the stalk and pins with a click. Then the wheel turns, the vine\'s turns slide along the rod with the nut, and GitDiscuss tips smoothly to its angle, stopping dead with no overshoot; a tag over the bow counts the turns. Last, the boss kindles as the join light (warm while both widgets run, a cold grey if either is paused) and a glint runs back along the vine. <b>Angle:</b> −45° to +45°, resting at any angle. Slide the nut (or anywhere on the rod) and the screw turns under it; turn the wheel with a finger (it rolls with the finger, a fine adjustment, about a tenth as fast); drag GitDiscuss\'s nameplate round the boss; use the slider; or focus the boss and press ↑ ↓ to wind to the next 15° mark. The wheel, the vine and the nut always agree with the angle, whichever control moved it. Shading scales the whole screw with the casing. Nothing moves at rest. <b>Release:</b> tap the boss, the stem or the bow, or focus the boss and press Enter. The boss dims, the wheel winds GitDiscuss level, the link is unpinned, the nut comes off, the wheel folds, the vine untwines, the rod is drawn out, and the bow, stem and stalk sink before the casings part.',
+  over:c=>drawTwine(c)
  }
 };
 /* ---------- Lily petals: moon-white petals wedged into the opening, one per 15° (Wedge) ---------- */
@@ -1311,6 +1334,151 @@ function drawPoise(c){
  if(jt===1){o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Lantern counterpoise: GitDiscuss tipped ${signed(model.angle)}, the lantern on mark ${blN(model.angle)+4} of 7. Up and down arrows move the lantern a mark; Enter takes it down and separates the widgets"><title>Tap the bough or the chain to release; drag the lantern along its rail to tip GitDiscuss</title>`+
    `<path d="${poly(bo)}" fill="none" stroke="transparent" stroke-width="14" pointer-events="stroke"/><path d="M${f(Hk.x)} ${f(top)}V${f(Hk.y)}" stroke="transparent" stroke-width="12" pointer-events="stroke"/><path class="ringfocus" d="${poly(bo)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3" pointer-events="none"/></g>`;
   o+=`<g class="hit poise" id="poiseHit"><title>Drag the lantern along the rail to tip GitDiscuss</title><circle cx="${f(L.x)}" cy="${f(L.y+15*kl)}" r="${f(17*kl+4)}" fill="transparent"/></g>`}
+ return o}
+/* ---------- Honeysuckle screw: a nut on a silver screw over Jarvis's end draws a link that tips GitDiscuss (Screw) ---------- */
+// GitDiscuss turns about a moonstone boss mid-gap, as on the crescent pivot, and a silver stalk rises from the boss, fixed to GitDiscuss and
+// swan-necked out to xs so it never sweeps Jarvis's corner. Over Jarvis's roof a night-glass rod is strung in a small silver bow on one stem,
+// with a honeysuckle vine twined round it as its thread (honeysuckle twines right-handed). A moonstone nut rides the thread and a slim link
+// runs from the nut's lug to the stalk's tip, so winding the nut along draws the stalk round. A nut cannot turn its screw, so GitDiscuss rests
+// at any angle. Lengths are offsets from the boss K and scale with k as the casings shade; the bow hangs the rod's far end from above,
+// because the link passes under it.
+// Joining: straps .3–.4, boss .36–.44, stem .34–.44, bow .42–.52, stalk .4–.52, rod .5–.56, vine .54–.65, wheel .6–.66, nut .63–.68,
+// link .65–.71, winding .71–.88 (the nut eases along and GitDiscuss follows it), then the boss kindles.
+const SC={mode:null,x0:0,y0:0,n0:0,a0:0,moved:false};
+const scK=hh=>clamp(2*hh/H,.62,1),scS=hh=>22+hh*Math.tan(25*PI/180);
+function scDim(hh){const k=scK(hh),s=scS(hh);return{k,s,xs:.5*s,R:hh+46*k,ly:-(hh+63*k),L:200*k,p:8*k,r:2.6*k+.4,nw:7*k+1,rw:12*k}}
+// The stalk's tip at angle th, relative to K.
+function scTip(D,th){const t=th*PI/180,c=Math.cos(t),si=Math.sin(t);return{x:D.xs*c+D.R*si,y:D.xs*si-D.R*c}}
+// Where the nut's lug (on the line ly) must stand for the link to reach the tip; it moves right steadily as the angle grows.
+function scNut(D,th){const T=scTip(D,th),dy=D.ly-T.y;return T.x-Math.sqrt(D.L*D.L-dy*dy)}
+function scAng(D,x){let lo=-45,hi=45;if(x<=scNut(D,lo))return lo;if(x>=scNut(D,hi))return hi;
+ for(let i=0;i<32;i++){const m=(lo+hi)/2;if(scNut(D,m)<x)lo=m;else hi=m}return(lo+hi)/2}
+const scTurns=(D,a)=>(scNut(D,a)-scNut(D,0))/D.p;
+const scPe=()=>model.angle?.88:.72;
+function scTurnsTxt(a){const n=scTurns(scDim(ctx().h/2),a),m=Math.abs(n);return m<.05?'level':m.toFixed(1)+(m>=.95&&m<1.05?' turn ':' turns ')+(n>0?'down':'up')}
+function scBend(jt){if(jt>=1)return model.angle;if(!model.angle||jt<.71)return 0;
+ const D=scDim(ctx().h/2);return scAng(D,lerp(scNut(D,0),scNut(D,model.angle),ease(seg(jt,.71,.88))))}
+// Page coordinates for Jarvis at a: the rod's axis Y (the lug hangs 7k under it), the stem and left bearing Lb, the right bearing Rx,
+// the wheel's hub Wx and the rod's ends x0, x1.
+function scGeo(a,h){const hh=h/2,D=scDim(hh),k=D.k,K={x:a.x+W+D.s,y:a.y+hh},Y=K.y+D.ly-7*k,Lb=K.x+scNut(D,-45)-D.nw-7*k,Rx=a.x+W-11.5;
+ return{...D,hh,K,Y,Lb,Rx,Wx:Lb-11*k,x0:Lb-12*k,x1:Rx+4*k,bt:Y-26*k}}
+const scBow=G=>{const A={x:G.Lb,y:G.Y},B={x:G.Lb+4*G.k,y:G.bt},C={x:G.Rx-4*G.k,y:G.bt},E={x:G.Rx,y:G.Y},pts=[];
+ for(let i=0;i<=30;i++){const t=i/30,u=1-t;pts.push({x:u*u*u*A.x+3*u*u*t*B.x+3*u*t*t*C.x+t*t*t*E.x,y:u*u*u*A.y+3*u*u*t*B.y+3*u*t*t*C.y+t*t*t*E.y,w:(1.2+1.8*Math.sin(PI*t))*G.k+.5})}
+ return arcS(pts)};
+const scStem=(G,a)=>arcS([...Array(13)].map((_,i)=>{const t=i/12;return{x:G.Lb-3*G.k*Math.sin(PI*t),y:lerp(a.y+2,G.Y+G.r+2.4*G.k,t),w:(2.8-1.2*t)*G.k+.5}}));
+// The stalk in GitDiscuss's frame: out of the boss, swan-necked to xs above the roof line, then straight up to the tip.
+function scStalk(G,FB){const pts=[];
+ for(let i=0;i<=10;i++){const t=i/10,u=1-t;pts.push(FB(t*t*G.xs,-2*u*t*G.hh*.6-t*t*(G.hh+8)))}
+ for(let i=1;i<=6;i++)pts.push(FB(G.xs,lerp(-G.hh-8,-G.R,i/6)));
+ return arcS(widths(pts,3*G.k+.6,1.5*G.k+.4))}
+// The vine round the rod from xa to xb, one half at a time: its turns are anchored to the nut, so they travel with it as the rod turns.
+function scVine(G,xn,xa,xb,front){if(xb-xa<1)return '';const n=Math.ceil((xb-xa)/(G.p/16));let d='',pen=false;
+ for(let i=0;i<=n;i++){const x=lerp(xa,xb,i/n),al=2*PI*(x-xn)/G.p;
+  if(Math.sin(al)>0===front){d+=(pen?'L':'M')+f(x)+' '+f(G.Y-(G.r+.5)*Math.cos(al));pen=true}else pen=false}
+ return d}
+// The wheel, seen nearly edge on: five spokes with moonstone knobs, one a star, turned with the rod (ang), scaled in by sc.
+function scWheel(G,ang,sc){if(sc<=.02)return '';const {Wx,Y,rw,k}=G,ex=3.4*k,R=rw*sc;let back='',front='';
+ for(let i=0;i<5;i++){const t=ang+i*2*PI/5,z=Math.sin(t),p={x:Wx+ex*sc*z,y:Y-R*Math.cos(t)},line=`<path d="M${f(Wx)} ${f(Y)}L${P(p)}" stroke="${z>0?'#e3eaf8':'#7c88a8'}" stroke-width="${f(.9*k+.3)}"/>`;
+  const kn=i?`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((1.4+.5*z)*k*sc+.3)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".4"/>`:star(p.x,p.y,(2.6+1.2*z)*k*sc+.4,z>0?.95:.5);
+  if(z>0)front+=line+kn;else back+=line+kn}
+ return back+`<ellipse cx="${f(Wx)}" cy="${f(Y)}" rx="${f(ex*sc)}" ry="${f(R)}" fill="none" stroke="${NIGHT}" stroke-width="${f(1.9*k+.5)}" opacity=".7"/><ellipse cx="${f(Wx)}" cy="${f(Y)}" rx="${f(ex*sc)}" ry="${f(R)}" fill="none" stroke="#c9d4ee" stroke-width="${f(1.1*k+.3)}"/>`+front+
+  `<circle cx="${f(Wx)}" cy="${f(Y)}" r="${f(2*k*sc+.4)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".5"/>`}
+// The nut: a silver collar on the thread with leaf flourishes, a moonstone cabochon on its face and a lug below for the link.
+function scNutD(G,xn,sc,gl){if(sc<=.02)return '';const {Y,r,k,nw}=G,hy=r+3*k;
+ return `<g transform="translate(${f(xn)} ${f(Y)}) scale(${op(sc)})">`+leaf(nw-1,-hy+1,-38,.32*k)+leaf(-nw+1,-hy+1,-142,.32*k)+
+  `<path d="M0 ${f(hy-1)}V${f(7*k)}" stroke="${NIGHT}" stroke-width="${f(2.6*k+.6)}"/><path d="M0 ${f(hy-1)}V${f(7*k)}" stroke="url(#silverV)" stroke-width="${f(1.6*k+.4)}"/>`+
+  `<rect x="${f(-nw)}" y="${f(-hy)}" width="${f(2*nw)}" height="${f(2*hy)}" rx="${f(3*k+.5)}" fill="url(#silverV)" stroke="${NIGHT}" stroke-width=".7"/>`+
+  `<path d="M${f(-nw*.55)} ${f(-hy+1)}V${f(hy-1)}M${f(nw*.55)} ${f(-hy+1)}V${f(hy-1)}" stroke="#59627e" stroke-width=".5" opacity=".7"/>`+
+  `<circle r="${f(2.9*k+.3)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".5"/><circle r="${f(2.9*k+.3)}" fill="#f4f8ff" opacity="${op(gl*.6)}"/><circle cx="${f(-.9*k)}" cy="${f(-1*k)}" r="${f(.7*k+.1)}" fill="#fff"/></g>`}
+// While turning: a moonstone tag over the bow reads the angle and the turns the nut has been wound from level, beside a little screw.
+function scTag(x,y,a,opc){const font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;let sw='';for(let i=0;i<=16;i++){const t=i/16;sw+=(i?'L':'M')+f(-50+t*16)+' '+f(3.2*Math.sin(t*4*PI))}
+ return `<g opacity="${op(opc)}" pointer-events="none" transform="translate(${f(x)} ${f(y)})"><rect x="-62" y="-16" width="124" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-60" y="-14" width="120" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>`+
+  `<path d="M-51 0H-33" stroke="#5d6584" stroke-width="2.4" stroke-linecap="round"/><path d="${sw}" fill="none" stroke="#5f78b8" stroke-width="1.1"/>`+
+  `<text x="6" y="1" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${signed(a)}</text><text x="6" y="11" text-anchor="middle" ${font} font-size="7.5" letter-spacing="1" fill="#5d6584">${scTurnsTxt(a).toUpperCase()}</text></g>`}
+function scFit(an,hh){const D=scDim(hh),s=D.s,t=an*PI/180,ry=(u,v)=>u*Math.sin(t)+v*Math.cos(t),T=scTip(D,an);
+ const ys=[-hh-4,hh+6,ry(s,-hh),ry(s,hh),ry(s+W,-hh),ry(s+W,hh),ry(s+W/2,-hh-17),ry(s+W/2,hh+12),T.y-6,D.ly-33*D.k-40];
+ const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn-hh),hi=592-mx-hh;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+const SCH={s:(a,hh)=>scS(hh),det:[-45,-30,-15,0,15,30,45],max:45,free:true,hard:true,fit:scFit,
+ // The turn takes longer the more turns the nut is wound; the nut leads and GitDiscuss follows it.
+ angMs:(a,b)=>{const D=scDim(ctx().h/2);return clamp(300+140*Math.abs(scTurns(D,b)-scTurns(D,a)),380,2600)},
+ tw:(a,b,e)=>{const D=scDim(ctx().h/2);return scAng(D,lerp(scNut(D,a),scNut(D,b),e))},
+ hang:hh=>hh,top:hh=>{const D=scDim(hh);return hh+D.ly-33*D.k-40},
+ name:a=>({num:signed(a),cap:scTurnsTxt(a),stop:false}),
+ grip:'Turn GitDiscuss on the boss: drag round it, or use the up and down arrows to wind it to the next 15 degree mark; it rests at any angle',
+ slider:'GitDiscuss angle on the honeysuckle screw, in degrees; it rests at any angle',
+ ph:a=>signed(a)+' · '+scTurnsTxt(a),
+ say:a=>a?'GitDiscuss rests at '+signed(a)+', the nut wound '+scTurnsTxt(a)+' from level. A nut cannot turn its screw, so it stays wherever it is left.':'GitDiscuss rests level, the nut on its level mark.',
+ poise:{
+  // The nut (or the rod under it) is slid along by the finger; the wheel turns under the finger, so it is the fine adjustment.
+  grab(p,t){SC.mode=t&&t.closest&&t.closest('[data-sc="wheel"]')?'wheel':'nut';SC.x0=p.x;SC.y0=p.y;SC.a0=model.angle;SC.n0=scNut(scDim(ctx().h/2),model.angle);SC.moved=false},
+  move(p){if(!p)return;const D=scDim(ctx().h/2),n=SC.mode==='wheel'?SC.n0-(p.y-SC.y0)*D.p/(2*PI*D.rw):SC.n0+(p.x-SC.x0);
+   if(Math.abs(p.x-SC.x0)+Math.abs(p.y-SC.y0)>3)SC.moved=true;if(!SC.moved)return;
+   model.angle=Math.round(scAng(D,n)*100)/100;refitPair();render()},
+  drop(){if(!SC.moved){dialSoon(600);render();say(J().txt.joined);return}
+   model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon();settleRise(300);say(SCH.say(model.angle))},
+  cancel(){model.angle=SC.a0;refitPair();dialSoon(300);render();settleRise(300)}}};
+function drawTwine(c){
+ const a=model.a,b=model.b,h=c.h,jt=c.jt,dir=model.dir,on=a.run&&b.run,G=scGeo(a,h),{k,K,Y,r,Lb,Rx,x0,x1,Wx}=G;
+ const sv=(d,w0,w1,c1='#c9d4ee')=>d?`<path d="${d}" fill="none" stroke="${NIGHT}" stroke-width="${f(w0)}" stroke-linecap="round" opacity=".75"/><path d="${d}" fill="none" stroke="${c1}" stroke-width="${f(w1)}" stroke-linecap="round"/>`:'';
+ const stem=scStem(G,a),bow=scBow(G);
+ // Near: the roof under the stem's place and GitDiscuss's stem glimmer, and a bud lifts. Ready: the whole screw is traced at the set angle.
+ if(jt===0){const g=c.glow;if(g<=0)return '';const sB={x:b.x+11.5,y:b.y+G.hh};
+  let o=[{x:Lb,y:a.y+2},sB].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((7+9*g)*k)}" fill="url(#halo)" opacity="${op(g)}"/>`).join('');
+  if(g<1){const bd=growPts(stem,.04+.08*g,6);return o+(bd.length>1?`<path d="${ribbon(bd,1.2)}" fill="${NIGHT}"/><path d="${ribbon(bd)}" fill="url(#silver)"/>`:'')}
+  const th=model.angle,t=th*PI/180,FB=(u,v)=>({x:K.x+u*Math.cos(t)-v*Math.sin(t),y:K.y+u*Math.sin(t)+v*Math.cos(t)}),T=FB(G.xs,-G.R),xn=K.x+scNut(G,th),ds=`fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3"`;
+  o+=`<path d="${poly(stem)}" ${ds}/><path d="${poly(bow)}" ${ds}/><path d="M${f(x0)} ${f(Y)}H${f(x1)}" ${ds}/><path d="${poly(scStalk(G,FB))}" ${ds}/><path d="M${f(xn)} ${f(Y+7*k)}L${P(T)}" ${ds}/>`;
+  o+=`<rect x="${f(xn-G.nw)}" y="${f(Y-r-3*k)}" width="${f(2*G.nw)}" height="${f(2*(r+3*k))}" rx="3" ${ds}/><circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(7*k)}" ${ds}/>`;
+  return o+star(K.x,K.y,6,.95)+star(xn,Y,4,.7)}
+ const th=scBend(jt),t=th*PI/180,co=Math.cos(t),si=Math.sin(t),FB=(u,v)=>({x:K.x+u*co-v*si,y:K.y+u*si+v*co});
+ const st=seg(jt,.3,.4),pb=back(seg(jt,.36,.44),1.5),sg=ease(seg(jt,.34,.44)),bw=ease(seg(jt,.42,.52)),sk=ease(seg(jt,.4,.52)),rd=ease(seg(jt,.5,.56)),
+  gv=seg(jt,.54,.65),wh=back(seg(jt,.6,.66),1.6),nt=back(seg(jt,.63,.68),1.6),lk=ease(seg(jt,.65,.71)),pe=scPe(),lit=ease(seg(jt,pe,1))*(on?1:.45);
+ const xn=K.x+scNut(G,th),ang=-2*PI*(xn-K.x)/G.p;
+ let o='';
+ // The stem climbs out of Jarvis's roof with a leaf at its foot, and the bow springs from its top over to the rod's far end.
+ const sp=growPts(stem,sg,8);if(sp.length>1)o+=`<path d="${ribbon(sp,1.4)}" fill="${NIGHT}" opacity=".8"/><path d="${ribbon(sp)}" fill="url(#silver)"/>`+leaf(Lb+1,a.y+3,-28,.42*k*sg)+leaf(Lb-1,a.y+3,-152,.36*k*sg);
+ const bp=growPts(bow,bw,10);
+ if(bp.length>1){o+=`<path d="${ribbon(bp,1.4)}" fill="${NIGHT}" opacity=".8"/><path d="${ribbon(bp)}" fill="url(#silver)"/>`;
+  if(bw>=1){const m=bow[15];o+=leaf(m.x,m.y-1,-112,.4*k)+leaf(m.x,m.y-1,-68,.4*k)+`<circle cx="${f(m.x)}" cy="${f(m.y-1)}" r="${f(1.7*k+.3)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".4"/>`}}
+ // The rod is slid in from the wheel's end, the vine twines along it from the stem, then the wheel opens on its end.
+ if(rd>0){const xe=lerp(x0,x1,rd);o+=`<path d="M${f(x0)} ${f(Y)}H${f(xe)}" stroke="${NIGHT}" stroke-width="${f(2*r+1.6)}" stroke-linecap="round" opacity=".75"/><path d="M${f(x0)} ${f(Y)}H${f(xe)}" stroke="#1d2652" stroke-width="${f(2*r)}" stroke-linecap="round"/>`;
+  if(gv>0){const xg=lerp(Lb,Rx,gv);o+=`<path d="${scVine(G,xn,Lb,xg,false)}" fill="none" stroke="#8d9cc6" stroke-width="${f(.9*k+.3)}" opacity=".45"/>`}
+  o+=`<path d="M${f(x0)} ${f(Y-r*.45)}H${f(xe)}" stroke="#a9bbdf" stroke-width="${f(.6*k+.2)}" opacity=".55"/>`}
+ if(gv>0){const xg=lerp(Lb,Rx,gv);o+=sv(scVine(G,xn,Lb,xg,true),1.5*k+1.2,1.1*k+.4,'#e3eaf8');
+  o+=leaf(Lb+1,Y-r-1,-62,.4*k*seg(gv,0,.15))+leaf(Lb+1,Y+r+1,62,.36*k*seg(gv,0,.15));
+  if(gv<1)o+=star(xg,Y-(r+.5)*Math.cos(2*PI*(xg-xn)/G.p),2.4*k+.6,.85);
+  const ce=seg(gv,.85,1);if(ce>0){const C=widths(curlPts({x:Rx+1,y:Y-r},-.3,(11*k+2)*ce,1.7*PI,-1,16),1.2*k+.3,.3),e=C[C.length-1];
+   o+=`<path d="${ribbon(C,1)}" fill="${NIGHT}" opacity=".7"/><path d="${ribbon(C)}" fill="url(#silver)"/><circle cx="${f(e.x)}" cy="${f(e.y)}" r="${f(1.3*k*ce+.2)}" fill="url(#moonstone)"/>`}
+  // The 15° marks: a star over the rod where the nut stands at each, the level one a moonstone.
+  if(gv>=1){const mo=seg(wh,0,1);for(const d of SCH.det){const x=K.x+scNut(G,d),y=Y-r-3.6*k;o+=d?star(x,y,1.5*k+.4,.55*mo,'#dfe6f7'):`<circle cx="${f(x)}" cy="${f(y)}" r="${f(1.2*k+.2)}" fill="url(#moonstone)" opacity="${op(mo)}"/>`}}}
+ // The bearings: one on the stem, one hung from the bow's far end.
+ for(const [x,g] of[[Lb,sg>=1?1:0],[Rx,bw>=1?1:0]])if(g&&rd>0&&(x<=lerp(x0,x1,rd)+1))o+=`<ellipse cx="${f(x)}" cy="${f(Y)}" rx="${f(2.2*k+.5)}" ry="${f(r+2.4*k)}" fill="url(#silverV)" stroke="${NIGHT}" stroke-width=".6"/>`;
+ o+=scWheel(G,ang,Math.max(0,wh));
+ // GitDiscuss's strap and Jarvis's run out to the boss, and the stalk grows up out of it.
+ const sA={x:a.x+W-11.5,y:K.y};o+=moonStrap(sA,{x:K.x-6*k,y:K.y},st,k)+moonStrap(FB(G.s+11.5,0),FB(6*k,0),st,k);
+ const kp=growPts(scStalk(G,FB),sk,10);
+ if(kp.length>1){o+=`<path d="${ribbon(kp,1.4)}" fill="${NIGHT}" opacity=".8"/><path d="${ribbon(kp)}" fill="url(#silver)"/>`;
+  const q=FB(G.xs*.55,-G.hh-2);if(sk>.6)o+=leaf(q.x,q.y,th-150,.42*k*seg(sk,.6,1));
+  if(sk>=1){const T=FB(G.xs,-G.R);o+=`<circle cx="${f(T.x)}" cy="${f(T.y)}" r="${f(2.3*k+.4)}" fill="none" stroke="${NIGHT}" stroke-width="${f(1.6*k+.5)}" opacity=".7"/><circle cx="${f(T.x)}" cy="${f(T.y)}" r="${f(2.3*k+.4)}" fill="none" stroke="#dfe6f7" stroke-width="${f(.9*k+.3)}"/>`}}
+ if(lit>0)o+=`<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f((14+16*lit)*k)}" fill="url(#${on?'haloWarm':'halo'})" opacity="${op(lit)}"/>`;
+ if(pb>0){const sc=Math.max(0,pb)*k;o+=`<g transform="translate(${P(K)}) scale(${op(sc)})"><circle r="7.4" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".8"/><circle r="4.8" fill="url(#moonstone)"/><circle r="4.8" fill="${on?'#fff3cf':'#e8ebf2'}" opacity="${op(lit*.7)}"/><circle cx="-1.4" cy="-1.6" r="1" fill="#fff"/></g>`;
+  if(lit>.05)o+=star(K.x,K.y,(3+4*lit)*k,lit*(on?.9:.5))}
+ // The link unfurls from the nut's lug to the stalk's tip and pins there with a click.
+ if(lk>0){const N={x:xn,y:Y+7*k},T=FB(G.xs,-G.R),pts=arcS([...Array(17)].map((_,i)=>{const u=i/16;return{x:lerp(N.x,T.x,u),y:lerp(N.y,T.y,u),w:(1+1.6*Math.sin(PI*u))*k+.4}})),lp=growPts(pts,lk,10);
+  if(lp.length>1){o+=`<path d="${ribbon(lp,1.3)}" fill="${NIGHT}" opacity=".8"/><path d="${ribbon(lp)}" fill="url(#silver)"/>`;
+   if(lk>=1){const m=pts[8],d=Math.atan2(T.y-N.y,T.x-N.x)*180/PI;o+=leaf(m.x,m.y,d-40,.34*k)+`<circle cx="${f(T.x)}" cy="${f(T.y)}" r="${f(1.6*k+.3)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".4"/>`}}}
+ o+=scNutD(G,xn,Math.max(0,nt),lit);
+ if(dir>0&&jt<1){const cl=Math.sin(PI*seg(jt,.7,.75));if(cl>0){const T=FB(G.xs,-G.R);o+=`<circle cx="${f(T.x)}" cy="${f(T.y)}" r="${f(16*cl*k)}" fill="url(#halo)"/>`+star(T.x,T.y,8*cl*k,cl)}
+  // Kindling: a glint runs along the vine from the bow's far end to the stem.
+  const gk=seg(jt,pe,1);if(gk>0&&gk<1){const x=lerp(Rx,Lb,gk);o+=star(x,Y-(r+.5)*Math.cos(2*PI*(x-xn)/G.p),4*k+1,Math.sin(PI*gk))}}
+ // Joining, the tag comes up only when there is winding to count.
+ const dop=jt===1?model.dial:dir>0&&model.angle?seg(jt,.71,.76):0;
+ if(dop>0)o+=scTag((Lb+Rx)/2,G.bt-22,jt===1?model.angle:th,dop);
+ // The release hit is the boss, the stem and the bow; the nut, the rod and the wheel turn the screw.
+ if(jt===1){o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Honeysuckle screw: GitDiscuss at ${signed(model.angle)}, ${model.angle?'the nut wound '+scTurnsTxt(model.angle):'the nut on its level mark'}. Up and down arrows wind it to the next 15° mark; Enter takes the screw down and separates the widgets"><title>Tap the boss, the stem or the bow to release; slide the nut or turn the wheel to tip GitDiscuss</title>`+
+   `<circle cx="${f(K.x)}" cy="${f(K.y)}" r="${f(11*k+3)}" fill="transparent"/><path d="${poly(stem)}" fill="none" stroke="transparent" stroke-width="12" pointer-events="stroke"/><path d="${poly(bow)}" fill="none" stroke="transparent" stroke-width="12" pointer-events="stroke"/>`+
+   `<circle class="ringfocus" cx="${f(K.x)}" cy="${f(K.y)}" r="${f(11*k+5)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`;
+  o+=`<g class="hit poise" id="poiseHit"><title>Slide the nut along the screw, or turn the wheel, to tip GitDiscuss</title><path d="M${f(Lb+4)} ${f(Y)}H${f(Rx-4)}" stroke="transparent" stroke-width="${f(2*r+12)}" pointer-events="stroke"/>`+
+   `<rect x="${f(xn-G.nw-4)}" y="${f(Y-r-3*k-4)}" width="${f(2*G.nw+8)}" height="${f(2*(r+3*k)+8+7*k)}" fill="transparent"/><ellipse data-sc="wheel" style="cursor:ns-resize" cx="${f(Wx)}" cy="${f(Y)}" rx="${f(6*k+4)}" ry="${f(G.rw+4)}" fill="transparent"/></g>`}
  return o}
 /* ---------- Silk arrow drawing (Reel) ---------- */
 // A crescent bow stands on Jarvis's stem with a moonstone spindle of spider silk behind its grip; GitDiscuss's stem carries a lancet target
@@ -2107,7 +2275,8 @@ const signed=a=>(a>0?'+':a<0?'−':'')+Math.abs(Math.round(a*10)/10)+'°';
 function forkName(a){const d=DET.find(x=>Math.abs(a-x)<.3),F=Math.round((180-Math.abs(a))*10)/10;
  return{num:F+'°',cap:d===undefined?'fork':d===0?'straight bough':Math.abs(d)===36?'⅖ turn':'golden angle',gold:d!==undefined&&Math.abs(d)>40}}
 // Sticky near each detent, free between them.
-function magnet(r){for(const d of AH().det){const x=r-d;if(Math.abs(x)<DWIN)return d+Math.sign(x)*DWIN*(Math.abs(x)/DWIN)**2}return r}
+// A free join (the honeysuckle screw) has no detents: it rests wherever it is let go.
+function magnet(r){if(AH().free)return r;for(const d of AH().det){const x=r-d;if(Math.abs(x)<DWIN)return d+Math.sign(x)*DWIN*(Math.abs(x)/DWIN)**2}return r}
 // The range of Jarvis's y that keeps both casings, GitDiscuss's crest, the parent branch and its tag on the stage.
 function forkFit(a,hh){const s=forkS(a,hh),t=a*PI/180,ry=(u,v)=>u*Math.sin(t)+v*Math.cos(t),td=(90+a/2)*PI/180;
  const ys=[-hh-4,hh+6,ry(s,-hh),ry(s,hh),ry(s+W,-hh),ry(s+W,hh),ry(s+W/2,-hh-17),ry(s+W/2,hh+12),Math.sin(td)*(hh>40?156:118)];
@@ -4848,10 +5017,12 @@ function dialOn(){clearTimeout(dialTimer);++dialTok;model.dial=1}
 function dialOff(){clearTimeout(dialTimer);++dialTok;model.dial=0}
 function dialSoon(ms=1500){clearTimeout(dialTimer);dialTimer=setTimeout(()=>{const tok=++dialTok,t0=performance.now();
  (function st(now){if(tok!==dialTok)return;const t=reduce.matches?1:clamp((now-t0)/450);model.dial=1-t;render();if(t<1)requestAnimationFrame(st)})(t0)},ms)}
+// A hard join (the honeysuckle screw) turns with no overshoot, easing out so a dragged slider keeps up, in its own time (angMs) and along
+// its own path (tw: the nut leads and GitDiscuss follows it).
 function animateAngle(to,ms=700){
- stopRise();to=clamp(to,-amax(),amax());model.angTo=to;dialOn();const from=model.angle,tok=++angAnim,t0=performance.now();
+ stopRise();to=clamp(to,-amax(),amax());model.angTo=to;dialOn();const from=model.angle,tok=++angAnim,t0=performance.now(),A=AH();if(A.angMs)ms=A.angMs(from,to);
  (function step(now){if(tok!==angAnim)return;if(!branchOn()){model.angle=to;model.angTo=undefined;return}const t=reduce.matches?1:clamp((now-t0)/ms);
-  model.angle=t>=1?to:clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*PI*t)),-amax()-3,amax()+3);
+  model.angle=t>=1?to:A.hard?(A.tw?A.tw(from,to,1-Math.pow(1-t,3)):lerp(from,to,1-Math.pow(1-t,3))):clamp(lerp(from,to,1-Math.pow(1-t,3)*Math.cos(1.5*PI*t)),-amax()-3,amax()+3);
   // A snapping join never overshoots through level, where its pivot would change corner.
   if(AH().snap&&t<1){const sd=Math.sign(to||from);if(sd&&Math.sign(model.angle)===-sd)model.angle=0}
   refitPair();render();
@@ -4864,7 +5035,7 @@ function stepAngle(k,fine){const base=model.angTo??model.angle;let to;
  if(fine&&!AH().snap)to=clamp(Math.round(base)+k,-amax(),amax());
  else{const c=[-amax(),...AH().det,amax()];to=k>0?c.find(d=>d>base+.01):c.slice().reverse().find(d=>d<base-.01);if(to===undefined)return}
  animateAngle(to);say('GitDiscuss '+(J().hooks?'turns':'bends')+' '+(k>0?'down':'up')+' to '+signed(to)+'. '+AH().say(to))}
-function setForkAngle(v){v=clamp(v,-amax(),amax());const sn=AH().snap,d=sn?Math.round(v/sn)*sn:AH().det.find(x=>Math.abs(v-x)<DWIN);if(d!==undefined)v=d;
+function setForkAngle(v){v=clamp(v,-amax(),amax());const sn=AH().snap,d=AH().free?undefined:sn?Math.round(v/sn)*sn:AH().det.find(x=>Math.abs(v-x)<DWIN);if(d!==undefined)v=d;
  if(branchOn())animateAngle(v,520);else{stopAngle();model.angle=v;if(J().angled&&model.path&&model.jt>0&&model.dir>0)model.path.j=joinedPose('a');if(model.path&&model.jt>0)setJt(model.jt);render()}}
 const here=()=>({a:{x:model.a.x,y:model.a.y},b:{x:model.b.x,y:model.b.y}});
 function setJt(t){
@@ -5052,7 +5223,9 @@ function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
  // A balance's weight (the lantern) is dragged along its rail; the join's hooks move it and GitDiscuss follows.
- if(e.target.closest('#poiseHit')&&model.jt===1&&!model.busy&&AH().poise){e.preventDefault();stopAngle();stopRise();drag={poise:true};AH().poise.grab();dialOn();stage.setPointerCapture(e.pointerId);render();return}
+ if(e.target.closest('#poiseHit')&&model.jt===1&&!model.busy&&AH().poise){e.preventDefault();
+  // A free join (the screw) is caught where it stands mid-wind; the lantern finishes its move first.
+  if(AH().free){++angAnim;model.angTo=undefined}else stopAngle();stopRise();drag={poise:true};AH().poise.grab(local(e),e.target);dialOn();stage.setPointerCapture(e.pointerId);render();return}
  if(e.target.closest('#seamHit')&&model.jt===1&&!model.busy){e.preventDefault();$('#a .grip').focus();
   // The brooch is lifted off: it follows the pointer up, and past a short distance (or on a plain click) it lets go.
   if(J().lift||J().slide){drag={lift:true,start:local(e),moved:0};stage.setPointerCapture(e.pointerId);render();return}
@@ -5111,7 +5284,7 @@ function endDrag(){
  if(!drag)return;const d=drag;drag=null;
  if(d.poise){AH().poise.drop();return}
  if(d.bend){if(!d.moved){dialSoon(600);render();if(shTapOn())shTap('b');else if(AH().tap)AH().tap();else say(J().txt.joined);return}
-  const sn=AH().snap,dn=sn?Math.round(model.angle/sn)*sn:AH().det.find(x=>Math.abs(model.angle-x)<DWIN);
+  const sn=AH().snap,dn=AH().free?undefined:sn?Math.round(model.angle/sn)*sn:AH().det.find(x=>Math.abs(model.angle-x)<DWIN);
   if(dn!==undefined)animateAngle(dn,380);else{model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon();settleRise(300)}
   say(AH().say(dn??model.angle));return}
  if(d.lift){if(model.lift>=.5||d.moved<5){doSeparate();return}
