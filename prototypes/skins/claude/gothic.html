@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -296,7 +296,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
-$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg><svg class="ulsvg" aria-hidden="true"></svg><svg class="nssvg" aria-hidden="true"></svg><svg class="gysvg" aria-hidden="true"></svg>'));
+$$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg><svg class="ulsvg" aria-hidden="true"></svg><svg class="nssvg" aria-hidden="true"></svg><svg class="gysvg" aria-hidden="true"></svg><svg class="prsvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -341,7 +341,8 @@ function casing(id,w,h){
  // Rose dial: the joining end stops square at the cornice, so the wheel covers it at any angle and no gable tips clash.
  // Frieze procession: square too, so the two friezes along the top meet as one band.
  const dl=(model.join==='dial'||model.join==='apse'||model.join==='fan'||model.join==='chevet'||model.join==='strap'||model.join==='frieze'||model.join==='vous'||model.join==='stay'||model.join==='roll'||model.join==='joggle'||model.join==='cwt'||model.join==='cast')&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
- const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2);
+ // Winepress: once the wall starts down, its overlay has long since covered the window, so the casing drops it.
+ const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2),wpNo=model.shade==='press'&&k>0;
  // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
  const tooth=x=>{const t=[[x,top]];for(const r of JOINS.pier.rows(h))t.push([x,r.y],[x+r.e*JOINS.pier.TO,r.y],[x+r.e*JOINS.pier.TO,r.yb],[x,r.yb]);t.push([x,h]);return t};
  const pts=[];
@@ -378,7 +379,7 @@ function casing(id,w,h){
  o+=`<path d="M0 ${h-11}H${w}" stroke="#3a2c1c" stroke-opacity=".35"/>`;
  // Window: stone reveal, coloured glass border; the HTML display is the clear glass inside it
  if(show>.01){const[x,y,sw,sh,b]=SCR[id];
-  o+=`<g opacity="${f(show)}"><rect x="${x-b-3}" y="${y-b-3}" width="${sw+2*b+6}" height="${sh+2*b+6}" fill="#2a1f15" opacity=".45"/><path d="M${x-b-3} ${y+sh+b+3}H${x+sw+b+3}V${y-b-3}" fill="none" stroke="#fff6e2" stroke-opacity=".55"/>${glassBorder(x,y,sw,sh,b,s.seed)}`;
+  o+=`<g opacity="${f(show)}">`+(wpNo?'':`<rect x="${x-b-3}" y="${y-b-3}" width="${sw+2*b+6}" height="${sh+2*b+6}" fill="#2a1f15" opacity=".45"/><path d="M${x-b-3} ${y+sh+b+3}H${x+sw+b+3}V${y-b-3}" fill="none" stroke="#fff6e2" stroke-opacity=".55"/>${glassBorder(x,y,sw,sh,b,s.seed)}`);
   for(const qx of QF[id])o+=`<g transform="translate(${qx} ${h-15})"><circle r="8.2" fill="none" stroke="#2a1d10" stroke-opacity=".3"/><g fill="#24180d" opacity=".32"><circle cx="-3.3" r="3.4"/><circle cx="3.3" r="3.4"/><circle cy="-3.3" r="3.4"/><circle cy="3.3" r="3.4"/></g><circle r="1.4" fill="url(#gild)"/></g>`;
   o+='</g>'}
  return o;
@@ -2914,7 +2915,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -2956,7 +2957,10 @@ const SHADES={
   about:'A new shade kind, <b>Nest</b>: the casing collapses by sliding into itself, like a telescope. Medieval fonts were closed by carved oak covers, painted and gilded, and the tallest of them, at Ufford in Suffolk, Sudbury and Trunch, were built to telescope: their stages slide over one another, so the font can be opened without lifting the whole spire, which hangs from the roof on a chain. Here the display fades, the bay darkens into a niche, and a cover in three stages is let down out of the frieze on its chain, gathering speed until it lands on the sill and rebounds once. Each stage is narrower than the one below, a capped oak box with a row of blind arches painted red, blue and green with gilt edges and bosses, and gilt cresting along the ledge it leaves. The top stage carries a row of spirelets and a gilt finial set with a glass orb. Then the wall lowers under it: the foot rides up with the sill while the finial stays hung from the frieze, so <b>lowering the wall is what nests the stages</b>. The top stage slides down inside the middle one, dust puffs off the ledges as it seats, and then the middle one slides into the base, until only their capped rims show, stepped over the base like a closed spyglass. Last, the key value is gilded onto a black cartouche on the base, left to right, and the orb kindles with a flare. <b>The orb is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the closed cover:</b> the name in the frieze, the stepped stages, the value on the base. Nothing moves at rest. Unshading plays it back, the stages drawing out as the wall rises and the cover hauled back up into the frieze. Joins still work on the shaded pair.'},
  gargoyle:{label:'Gargoyle',kind:'Drain',ms:3800,h:small=>small?50:62,lowAt:[.56,.82],
   on:'Shaded: the window turns to glass and melts, draining into a stone gutter that throws it out through a gargoyle; the wall lowers, the melt in the gutter kindles and the value is cast in lead.',off:'Unshaded: the gutter goes dark, the lead plate is taken out, the wall rises and the melt runs back up out of the gutter into the window.',
-  about:'A new shade kind for gothic, <b>Drain</b>: the casing turns liquid and runs down into what holds it. Cathedrals are built to shed water: lead gutters behind the parapets carry the rain to stone spouts carved as beasts, the <i>gargoyles</i> (from the old French for throat), which throw it clear of the walls. There is also an old story that medieval glass is a liquid flowing very slowly, which is why old panes are thicker at the bottom. Here the story runs at speed. The display fades into a window of leaded glass lit from behind, while a stone gutter slides out along the foot of the wall and a gargoyle is carved out of the outer pier, its jaws open. Then the glass melts. The leading softens, sags and dissolves into the melt, and the level falls under a wavering meniscus, fast at first and slowing as the window empties, leaving runs, beads and tide lines on the dark bay. The melt pours over the sill into the gutter in a flickering sheet, flows along it and is thrown from the gargoyle\'s jaws in an arc that thins as the window empties. The wall lowers with the gutter riding up on its foot, the stream dwindles to a trickle, and a last drop gathers on the lower jaw and falls. Then the gutter kindles with a flare. <b>The melt in the gutter is the status:</b> honey amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. Last, the value is cast into a lead plate on the gutter\'s face, left to right behind a glowing pour front, with gilt figures. <b>The strip is the gutter:</b> the name in the frieze, the glowing melt and the value on the plate, with the gargoyle at the outer end so the joining end stays free. Nothing moves at rest. Unshading plays it back, the melt drawn up out of the gutter into the window. Joins still work on the shaded pair.'}
+  about:'A new shade kind for gothic, <b>Drain</b>: the casing turns liquid and runs down into what holds it. Cathedrals are built to shed water: lead gutters behind the parapets carry the rain to stone spouts carved as beasts, the <i>gargoyles</i> (from the old French for throat), which throw it clear of the walls. There is also an old story that medieval glass is a liquid flowing very slowly, which is why old panes are thicker at the bottom. Here the story runs at speed. The display fades into a window of leaded glass lit from behind, while a stone gutter slides out along the foot of the wall and a gargoyle is carved out of the outer pier, its jaws open. Then the glass melts. The leading softens, sags and dissolves into the melt, and the level falls under a wavering meniscus, fast at first and slowing as the window empties, leaving runs, beads and tide lines on the dark bay. The melt pours over the sill into the gutter in a flickering sheet, flows along it and is thrown from the gargoyle\'s jaws in an arc that thins as the window empties. The wall lowers with the gutter riding up on its foot, the stream dwindles to a trickle, and a last drop gathers on the lower jaw and falls. Then the gutter kindles with a flare. <b>The melt in the gutter is the status:</b> honey amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. Last, the value is cast into a lead plate on the gutter\'s face, left to right behind a glowing pour front, with gilt figures. <b>The strip is the gutter:</b> the name in the frieze, the glowing melt and the value on the plate, with the gargoyle at the outer end so the joining end stays free. Nothing moves at rest. Unshading plays it back, the melt drawn up out of the gutter into the window. Joins still work on the shaded pair.'},
+ press:{label:'Winepress',kind:'Press',ms:4200,h:small=>small?48:58,lowAt:[.26,.76],foot:true,
+  on:'Shaded: the window fills with stained-glass grapes, an oak board is let down onto them, and the wall comes down on the board; the grapes burst, the wine runs out of a spout into a gilt chalice, and the value is gilded on the board.',off:'Unshaded: the gilding wipes away, the wall rises off the board, the wine runs back and the grapes swell whole again.',
+  about:'A gothic <b>Press</b> shade. A common subject in late medieval glass and painting is the <i>Mystic Winepress</i>: a beam press treading out grapes, with the wine running into a chalice. Here the wall is the press. The display fades, the bay goes dark, and the window fills from the sill up with grapes of stained glass (purple, ruby and violet, lit from behind and leaded) with green vine leaves along the top. An oak press-board on iron straps is let down out of the frieze and lands on them with a puff of dust. A lead spout runs out through the outer pier, and a gilt chalice is set on a carved corbel under it. Then the wall comes down. <b>The shade keeps its foot where it stood, so the frieze and board come down onto the grapes:</b> they flatten, then burst one after another, spraying juice, and the wine pools on the sill and pours from the spout into the chalice, which slowly fills. The stream thins to a trickle and a last drop falls. What is left is a band of crushed skins under the board. Then the value is gilded onto a black cartouche on the board, left to right, and the glass boss at the board\'s end and the jewel in the chalice\'s knop kindle. <b>They are the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the pressed window:</b> the name in the frieze, the board with the value, the crushed grapes and the chalice at the outer end, so the joining end stays free. Nothing moves at rest. Unshading plays it back, and joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -3918,6 +3922,109 @@ function gargoyle(id,w,h,k){
  if(kd>0&&gf>0){s+=`<g style="mix-blend-mode:screen" opacity="${f(.55*kd)}"><rect x="${f(g0+4)}" y="${f(gs-1)}" width="${f(g1-g0-8)}" height="${f(yl-gs+2)}" fill="${gb}" filter="url(#lglow)"/></g>`;
   if(flare>.05&&kd<1)s+=`<rect x="${f(g0)}" y="${f(gs)}" width="${f(g1-g0)}" height="${f(yl-gs)}" fill="#fffbe8" opacity="${f(.7*flare)}"/>`}
  const g2=Math.sin(Math.PI*seg(k,.95,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(xm+lw/2+8,gs+.6,g2*4.5)}</g>`;
+ return s+'</g>';
+}
+
+/* Winepress: a Press shade, after the Mystic Winepress. The window fills with glass grapes, an oak board is let down from
+   the frieze onto them, and the wall's own lowering is the press: the shade is foot-anchored, so the frieze and board come
+   down while the sill stays, squashing the grapes until they burst. The wine runs out of a lead spout in the outer pier
+   into a gilt chalice on a corbel. yB..yb: the board; bot: the bay's floor (the sill, or the window's foot while that is higher). */
+function wpGeo(id,w,h){
+ const sm=id==='c',[x,y,sw,sh,b]=SCR[id],out=SK[id].join==='l'?'r':'l',x0=x-b-3,x1=x+sw+b+3,wy0=y-b-3,wy1=y+sh+b+3,yB=sm?22:28,BH=sm?11:14,yb=yB+BH;
+ return{sm,out,x0,x1,wy0,wy1,yB,BH,yb,bot:Math.min(wy1,h-11),B0:Math.min(wy1,(sm?CH:H)-11)-yb,dir:out==='l'?-1:1,sx:out==='l'?0:w,cx:out==='l'?-(sm?11:13):w+(sm?11:13),yM:h-(sm?7:9)};
+}
+// The grapes, laid out once per widget in the unpressed bay: a hex packing, with vine leaves along the top row.
+const WP_L={};
+function wpLayout(id,G){
+ if(WP_L[id])return WP_L[id];
+ const R=G.sm?4:5.4,px=2*R*.98,py=R*1.72,span=G.x1-G.x0-6,cols=Math.floor((span-R)/px),rows=Math.floor((G.B0-2*R)/py)+1,xs=G.x0+3+R+(span-(cols-.5)*px-R)/2,ys=(G.B0-(rows-1)*py)/2,L=[];
+ for(let r=0;r<rows;r++)for(let c=0;c<cols-(r%2);c++){const i=L.length,leaf=r===0&&c%6===2;
+  L.push({x:xs+(c+(r%2?.5:0))*px,v:(ys+r*py)/G.B0,r,c:(c*3+r*2+Math.floor(hash(i,3)*2))%4,thr:.3+.55*hash(i,7),ta:.06+.13*(rows-1-r)/Math.max(1,rows-1)+.02*hash(i,5),leaf})}
+ return WP_L[id]={R,rows,L};
+}
+const WP_C=[['#c58ae0','#5a1f6e','#2a0b36'],['#ef8fa6','#8e1f3b','#3e0818'],['#a796ee','#3f2a86','#170c3e'],['#e07aa6','#7a1f5a','#33082a']];
+function winepress(id,w,h,k){
+ const G=wpGeo(id,w,h),{sm,out,x0,x1,wy0,wy1,yB,BH,yb,bot,B0,dir,sx,cx,yM}=G,op=seg(k,0,.04);if(op<=0)return '';
+ const{R,L}=wpLayout(id,G),[gl,gb,gd]=msGlass(id),dust=JOINS.buttress.dust,wine='#6e1030',wineL='#c43a5a',xm=(x0+x1)/2;
+ const sq=clamp((bot-yb)/B0),crush=1-sq,gw=seg(k,.03,.12),sp=seg(crush,0,.1)*(1-seg(k,.78,.84)),kd=seg(k,.86,.9),flare=Math.sin(Math.PI*kd);
+ const[,num,val]=tpText(id),fs=sm?9.5:10.5,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`),lw=tw+(sm?14:18);
+ let s='<defs>'+WP_C.map(([a,b,c],i)=>`<radialGradient id="wpG${i}-${id}" cx=".38" cy=".34" r=".75"><stop stop-color="${a}"/><stop offset=".5" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></radialGradient>`).join('')+
+  `<radialGradient id="wpV-${id}" cx=".4" cy=".35" r=".8"><stop stop-color="#c9ef9a"/><stop offset=".55" stop-color="#3f8a3c"/><stop offset="1" stop-color="#173f1c"/></radialGradient>`+
+  `<linearGradient id="wpO-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#9a6a3a"/><stop offset=".45" stop-color="#7a4c26"/><stop offset="1" stop-color="#4a2c14"/></linearGradient>`+
+  `<radialGradient id="wpJ-${id}" cx=".38" cy=".34" r=".7"><stop stop-color="${gl}"/><stop offset=".55" stop-color="${gb}"/><stop offset="1" stop-color="${gd}"/></radialGradient>`+
+  `<clipPath id="wpb-${id}"><rect x="${x0+1}" y="${f(Math.min(yB,yb-1))}" width="${x1-x0-2}" height="${f(Math.max(0,bot-Math.min(yB,yb-1)))}"/></clipPath>`+
+  `<clipPath id="wpd-${id}"><rect x="${x0-20}" y="${f(yB-.5)}" width="${x1-x0+40}" height="400"/></clipPath>`+
+  `<clipPath id="wpq-${id}"><path d="M-6 0H6C6 4.6 3.6 6.8 0 7C-3.6 6.8 -6 4.6 -6 0Z"/></clipPath></defs><g opacity="${f(op)}">`;
+ // The bay goes dark over the window, then fills with glass grapes from the sill up.
+ const bt0=Math.max(wy0,yB-.5);s+=`<rect x="${x0}" y="${f(bt0)}" width="${x1-x0}" height="${f(Math.max(0,bot-bt0))}" fill="#1e150c" opacity="${f(gw)}"/>`;
+ let gr='',sk='',sy='';const span=bot-yb,ry0=R*Math.min(1,sq*1.05);
+ L.forEach((g,i)=>{const a=backOut(seg(k,g.ta,g.ta+.05));if(a<=0)return;const y=yb+g.v*span,sc=Math.max(0,a);
+  if(g.leaf){const ky=Math.max(.15,Math.min(1,sq*1.05));gr+=`<path transform="translate(${f(g.x)} ${f(y)}) scale(${f(sc*R/5)} ${f(sc*ky*R/5)})" d="M0 5C-2 4 -6 3 -6.5 -1C-5 -.5 -4 -1 -3.5 -2.5C-3.5 -5 -1.5 -6.5 0 -7C1.5 -6.5 3.5 -5 3.5 -2.5C4 -1 5 -.5 6.5 -1C6 3 2 4 0 5Z" fill="url(#wpV-${id})" stroke="#1d1612" stroke-width="${f(.8*5/R)}"/>`;return}
+  if(sq<g.thr){// Burst: a flat splat of skin, and a short spray of juice.
+   const bt=seg(g.thr-sq,0,.09),rx=R*(1.25+.4*crush),ry=Math.max(.7,ry0*.55);
+   sk+=`<ellipse cx="${f(g.x)}" cy="${f(y+ry0-ry)}" rx="${f(rx)}" ry="${f(ry)}" fill="${WP_C[g.c][2]}"/><path d="M${f(g.x-rx*.6)} ${f(y+ry0-ry*1.3)}h${f(rx*1.2)}" stroke="${WP_C[g.c][1]}" stroke-width=".7"/>`;
+   if(bt<1)for(let j=0;j<3;j++){const an=-Math.PI/2+(hash(i,j+11)-.5)*2.6,d=R*(.6+1.4*bt);sy+=`<circle cx="${f(g.x+Math.cos(an)*d)}" cy="${f(y+Math.sin(an)*d+6*bt*bt)}" r="${f(.5+.5*(1-bt))}" opacity="${f(1-bt)}"/>`}
+   return}
+  const rx=R*(1+.45*(1-ry0/R))*sc,ry=ry0*sc;
+  gr+=`<ellipse cx="${f(g.x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" fill="url(#wpG${g.c}-${id})"/><circle cx="${f(g.x-rx*.36)}" cy="${f(y-ry*.38)}" r="${f(Math.min(rx,ry)*.24)}" fill="#fff" opacity=".55"/>`;
+  sk+=`<ellipse cx="${f(g.x)}" cy="${f(y)}" rx="${f(rx)}" ry="${f(ry)}" fill="none" stroke="#1d1612" stroke-width=".85"/>`});
+ // The wine pools on the sill while the grapes give it up, and drains out through the spout.
+ const jd=(sm?2:3)*seg(crush,0,.25)*(1-seg(k,.78,.86));let pool='';
+ if(jd>.05){const ph=k*80;let sf='';for(let X=0;X<=x1-x0;X+=6)sf+=(X?'L':'M')+`${f(x0+X)} ${f(bot-jd+.4*Math.sin(X*.2+ph))}`;
+  pool=`<path d="${sf}L${x1} ${f(bot)}L${x0} ${f(bot)}Z" fill="${wine}" opacity=".9"/><path d="${sf}" fill="none" stroke="${wineL}" stroke-width=".7" opacity=".8"/>`}
+ s+=`<g clip-path="url(#wpb-${id})" opacity="${f(gw)}">${pool}${gr}<g>${sk}</g><g fill="${wineL}">${sy}</g><rect x="${x0}" y="${f(yb-1)}" width="${x1-x0}" height="4" fill="url(#tpShT)" opacity="${f(.5*seg(k,.2,.26))}"/></g>`;
+ // The sill: stone over whatever of the window is below the bay's floor, with its moulded edge.
+ // (Only while the casing still draws its window, i.e. before the wall starts down; Checks' window runs past its sill.)
+ const sb=Math.min(wy1+.5,h);if(sb>bot)s+=`<rect x="${x0-.5}" y="${f(bot)}" width="${x1-x0+1}" height="${f(sb-bot)}" fill="url(#lime)" filter="url(#st-v)"/>`;
+ s+=`<path d="M${x0} ${f(bot+.5)}H${x1}" stroke="#fff6e2" stroke-opacity="${f(.7*gw)}"/><path d="M${x0} ${f(bot+2)}H${x1}" stroke="#3a2c1c" stroke-opacity="${f(.35*gw)}"/>`;
+ // The board, let down out of the frieze on its iron straps, lands on the grapes and rebounds once.
+ const dn=seg(k,.14,.26),bo=Math.sin(Math.PI*seg(k,.26,.31))*(sm?1:1.5),by=yB-(1-dn*dn)*(BH+2)+bo;
+ if(dn>0){let gn='';for(let i=0;i<(sm?3:4);i++){const gy=by+BH*(i+.7)/(sm?3.4:4.4);gn+=`M${x0+2} ${f(gy)}C${f(xm-60)} ${f(gy+1.2*hash(i,2))} ${f(xm+40)} ${f(gy-1.1)} ${x1-2} ${f(gy+.4)}`}
+  const st=[x0+(sm?6:8),x1-(sm?10:12)];let iron='';
+  for(const ix of st)iron+=`<rect x="${ix}" y="${f(by-6)}" width="4" height="${f(BH+6)}" fill="#2e2b29" stroke="#141210" stroke-width=".5"/><circle cx="${ix+2}" cy="${f(by+2.5)}" r=".9" fill="#8a8580"/><circle cx="${ix+2}" cy="${f(by+BH-2.5)}" r=".9" fill="#8a8580"/>`;
+  s+=`<g clip-path="url(#wpd-${id})"><rect x="${x0}" y="${f(by)}" width="${x1-x0}" height="${BH}" fill="url(#wpO-${id})" stroke="#2a1608" stroke-width=".7"/>`+
+   `<path d="${gn}" fill="none" stroke="#3a2210" stroke-opacity=".45" stroke-width=".6"/><path d="M${x0+1} ${f(by+.8)}H${x1-1}" stroke="#d9aa70" stroke-opacity=".5" stroke-width=".6"/>${iron}`;
+  // A cartouche for the value, the status boss at the outer end and a carved bunch at the inner end.
+  const cy=by+BH/2,ch=BH-(sm?2:4),bx=out==='l'?x0+(sm?17:22):x1-(sm?17:22),ix=out==='l'?x1-(sm?19:24):x0+(sm?19:24),br=sm?3.4:4.4;
+  s+=`<rect x="${f(xm-lw/2)}" y="${f(cy-ch/2)}" width="${f(lw)}" height="${f(ch)}" rx="1" fill="#16100a" stroke="url(#gild)" stroke-width=".9"/>`;
+  let bn='';for(const[a,b]of[[0,-2],[-1.7,-.6],[1.7,-.6],[0,.8],[-.9,2.2],[.9,2.2],[0,3.5]])bn+=`<circle cx="${f(ix+a*(sm?1:1.25))}" cy="${f(cy-1+b*(sm?.8:1))}" r="${sm?.9:1.15}"/>`;
+  s+=`<g fill="#3a2210" opacity=".6">${bn}</g><path d="M${f(ix)} ${f(cy-3.5)}q2 -2 4 -.5" fill="none" stroke="#3a2210" stroke-opacity=".6" stroke-width=".6"/>`;
+  s+=`<circle cx="${f(bx)}" cy="${f(cy)}" r="${f(br+1)}" fill="url(#gild)" stroke="#3a2608" stroke-width=".5"/><circle cx="${f(bx)}" cy="${f(cy)}" r="${f(br)}" fill="#20150c"/>`+
+   (kd>0?`<circle cx="${f(bx)}" cy="${f(cy)}" r="${f(br)}" fill="url(#wpJ-${id})" opacity="${f(kd)}"/><circle cx="${f(bx-br*.35)}" cy="${f(cy-br*.4)}" r="${f(br*.25)}" fill="#fff" opacity="${f(.6*kd)}"/>`:'');
+  // The value is gilded in, left to right, behind a bright edge.
+  const pc=seg(k,.86,.94);
+  if(pc>0){const ty=cy+fs*.34-.8,cw=lw*pc,lx=xm-lw/2;
+   s+=`<clipPath id="wpc-${id}"><rect x="${f(lx)}" y="${f(cy-ch/2-2)}" width="${f(cw)}" height="${f(ch+4)}"/></clipPath><g clip-path="url(#wpc-${id})" font-family="Georgia,serif" font-size="${fs}">`+
+    `<text x="${f(xm-tw/2)}" y="${f(ty)}"><tspan font-weight="700" font-size="${fs+1}" fill="#f6d77e">${num}</tspan><tspan font-style="italic" fill="#f3ead6"> ${val}</tspan></text></g>`;
+   if(pc<1)s+=`<rect x="${f(lx+cw-1)}" y="${f(cy-ch/2+1)}" width="2" height="${f(ch-2)}" fill="#fff4cf" opacity=".85"/>`}
+  s+='</g>';
+  // Dust off both ends of the board as it lands.
+  const ld=seg(k,.26,.36);if(ld>0&&ld<1)s+=dust(x0+6,by+BH,ld,4,10,81,-1)+dust(x1-6,by+BH,ld,4,10,83,1)}
+ // The spout runs out through the outer pier at the bay's floor.
+ const so=ease(seg(k,.1,.2)),ly=bot-1.5,lx=sx+dir*7*so,bx0=out==='l'?x0:x1;
+ if(so>0)s+=`<g opacity="${f(so)}"><path d="M${bx0} ${f(ly)}H${f(sx)}" stroke="#20150c" stroke-width="2.4"/><path d="M${f(sx)} ${f(ly)}H${f(lx)}" stroke="#5c6166" stroke-width="3" stroke-linecap="round"/><path d="M${f(sx)} ${f(ly-.9)}H${f(lx)}" stroke="#aab0b5" stroke-width=".7"/></g>`;
+ // The chalice on its corbel, set under the spout.
+ const ca=ease(seg(k,.1,.22));
+ if(ca>0){const c=sm?.82:1,ft=yM+14.5*c,cxo=cx+dir*7;
+  // A carved bracket springing from the pier just above its foot, its top a moulded shelf.
+  s+=`<path d="M${f(sx)} ${f(h-3)}Q${f(sx+dir*3)} ${f(ft-1)} ${f(cxo)} ${f(ft)}V${f(ft+2.5)}Q${f(lerp(sx,cxo,.4))} ${f(ft+3)} ${f(sx)} ${f(ft+(sm?6:7.5))}Z" fill="url(#lime)" stroke="#3a2c1c" stroke-width=".6" opacity="${f(ca)}"/>`+
+   `<path d="M${f(sx)} ${f(ft+.5)}H${f(cxo)}" stroke="#fff6e2" stroke-opacity="${f(.7*ca)}" stroke-width=".7"/>`;
+  const fill=.85*ease(seg(crush,.03,.85)),wl=7-7*fill;
+  s+=`<g transform="translate(${f(cx)} ${f(yM-(1-ca)*8)}) scale(${c})" opacity="${f(ca)}">`+
+   `<path d="M-.9 6.5H.9V12.6H-.9Z" fill="url(#gild)"/><path d="M-4.6 14.5Q0 11.6 4.6 14.5Z" fill="url(#gild)" stroke="#4a2c06" stroke-width=".4"/>`+
+   `<circle cy="9.6" r="2" fill="url(#gild)" stroke="#4a2c06" stroke-width=".4"/><circle cy="9.6" r="1.15" fill="#3a2a1a"/>${kd>0?`<circle cy="9.6" r="1.15" fill="${gb}" opacity="${f(kd)}"/>`:''}`+
+   `<path d="M-6 0H6C6 4.6 3.6 6.8 0 7C-3.6 6.8 -6 4.6 -6 0Z" fill="url(#gild)" stroke="#4a2c06" stroke-width=".5"/>`+
+   (fill>0?`<g clip-path="url(#wpq-${id})"><rect x="-6" y="${f(wl)}" width="12" height="${f(7-wl+.5)}" fill="${wine}" opacity=".95"/><path d="M-6 ${f(wl)}H6" stroke="${wineL}" stroke-width=".6"/></g>`:'')+
+   `<ellipse cy=".2" rx="6" ry="1.1" fill="none" stroke="#fff4c4" stroke-width=".5" opacity=".8"/><path d="M-4.8 1.4Q-4.4 4.4 -2 5.6" fill="none" stroke="#fff4c4" stroke-opacity=".7" stroke-width=".6"/></g>`;
+  if(kd>0)s+=`<g style="mix-blend-mode:screen" opacity="${f(.6*kd)}"><circle cx="${f(cx)}" cy="${f(yM+9.6*c)}" r="2.6" fill="${gb}" filter="url(#lglow)"/></g>`}
+ // The stream from the spout into the chalice, thinning as the bay empties; then a last drop.
+ if(sp>0&&so>0){const d=`M${f(lx)} ${f(ly)}Q${f(cx)} ${f(ly)} ${f(cx)} ${f(yM+1.5)}`,wd=.6+1.5*sp;
+  s+=`<path d="${d}" fill="none" stroke="${wine}" stroke-width="${f(wd)}" stroke-linecap="round" opacity="${f(Math.min(1,sp*4))}"/><path d="${d}" fill="none" stroke="${wineL}" stroke-opacity="${f(.7*Math.min(1,sp*3))}" stroke-width="${f(wd*.35)}" stroke-dasharray="2 4" stroke-dashoffset="${f(dir*k*400)}"/>`}
+ const dr=seg(k,.8,.88);
+ if(dr>0&&dr<1){const t=seg(dr,.5,1),r=t>0?1:.3+.7*dr/.5;s+=`<circle cx="${f(lerp(lx,cx,Math.sqrt(t)))}" cy="${f(t>0?lerp(ly+1,yM+1,t*t):ly+r)}" r="${f(r)}" fill="${wine}" stroke="${wineL}" stroke-width=".3" opacity="${f(1-t*.5)}"/>`}
+ // The boss kindles with a flare; a glint runs off it at the end.
+ if(flare>.05&&kd<1){const bx=out==='l'?x0+(sm?17:22):x1-(sm?17:22);s+=`<circle cx="${f(bx)}" cy="${f(yB+BH/2)}" r="${sm?6:8}" fill="#fffbe8" opacity="${f(.6*flare)}" filter="url(#lglow)"/>`}
+ const g2=Math.sin(Math.PI*seg(k,.95,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(xm+lw/2+6,yB+2,g2*4.5)}</g>`;
  return s+'</g>';
 }
 
@@ -5427,7 +5534,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -5445,7 +5552,7 @@ function render(){
    // Rose dial and strap hinge: GitDiscuss pivots about the middle of the gap (the rose, or the hinge's knuckle).
    else{el.style.transformOrigin=`${-J().gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}}
   const k=ease(model.st),cnG=cn?cnGeo(id):null,Se=cn?cnSoffit(cnG,k):0;
-  const svg=el.querySelector('.casing'),key=cn?`cn|${w}x${h}|${model.join}|${f(Se)}`:cr?`cr|${w}|${model.join}|${crCold(id)}`:w+'x'+h+model.join;
+  const svg=el.querySelector('.casing'),key=cn?`cn|${w}x${h}|${model.join}|${f(Se)}`:cr?`cr|${w}|${model.join}|${crCold(id)}`:w+'x'+h+model.join+(model.shade==='press'?'|wp':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=cn?cornWall(id,w,h,k):cr?cryptWall(id,w):casing(id,w,h)}
   if(cr)cryptSet(svg,id,w,h,k);
   const rs=el.querySelector('.crsvg'),rkey=cr?`${w}x${h}|${f(k*1000)}|${model.a.run}|${f(model.jt*100)}`:'';
@@ -5458,7 +5565,7 @@ function render(){
   // Misericord: the display fades as the seat swings down over it. Lenten veil: it fades as the rod comes in, before the veil drops.
   // Corona: it fades as the wall starts to lower, long before the corona comes down.
   // Aumbry: the tabs and buttons fade; the display itself is drawn back into the recess and hidden once the doors are shut.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   const auG=au?auGeo(id,w,h,k):null;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(!au&&n.style.filter)n.style.filter='';
@@ -5468,8 +5575,10 @@ function render(){
    else if(n.style.transform){n.style.transform='';n.style.clipPath='';n.style.transformOrigin=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co||au||ul||fc||gy?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co||au||ul||fc||gy||wp?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);
+  const ps=el.querySelector('.prsvg'),pkey=wp?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
+  if(ps.dataset.key!==pkey){ps.dataset.key=pkey;ps.setAttribute('width',w);ps.setAttribute('height',h);ps.setAttribute('viewBox',`0 0 ${w} ${h}`);ps.innerHTML=pkey?winepress(id,w,h,k):''}
   const ys2=el.querySelector('.gysvg'),gykey=gy?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(ys2.dataset.key!==gykey){ys2.dataset.key=gykey;ys2.setAttribute('width',w);ys2.setAttribute('height',h);ys2.setAttribute('viewBox',`0 0 ${w} ${h}`);ys2.innerHTML=gykey?gargoyle(id,w,h,k):''}
   const ns2=el.querySelector('.nssvg'),nskey=fc?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
