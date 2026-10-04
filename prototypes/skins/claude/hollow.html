@@ -4730,7 +4730,11 @@ const MORPHS={
  magic:{label:'Magic lantern',kind:'Light',
   about:'Checks grows with nothing added: the larger Checks is only a picture thrown by its own lantern onto the fog. It comes from the magic lantern, the old projector that threw pictures painted on glass slides, and from the fog that always hangs over this city. <b>Fog show:</b> the box darts down and a bank of fog rolls in under the shell from both sides. The iron lantern on Checks\' scroll is let down on its chain, swings and hangs still beside the shell\'s foot, a little nearer to you. A brass lens runs out of its side, a glass slide in a wooden frame drops into the carrier with a click, and the shutter opens with a flash. The picture lands on the near fog as a small, faint blur by the lens, then grows as the fog draws back, dimming as it spreads, the way a picture does as the throw gets longer. The flame is turned up, and the lens hunts for focus: through sharp, a touch past and back. The ink on the slide comes up dark on the light, and the fog wavers through it until it settles: run 418 on main, 12 / 14, the route with its fourteen waymarks (twelve crosses, two open red rings), 86% passed and 2 still waiting. Motes hang in the beam. <b>Panorama:</b> a second bank of fog rolls in from the right, and a long panorama slide is pushed in from above, driving the first slide out below. As it runs down through the carrier, the round picture opens out into a long oblong, dimming and blurring, and is focused again. It leads the two open rings off the route to deploy-preview and e2e-safari, both waiting for Brent, and adds a compass rose. <b>Shrinking</b> plays it backwards: the picture blurs, closes and shrinks back into the lens, the lantern is drawn back up onto its scroll and the fog thins away. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a fog show brings the lantern back up first, and unshading lets it down again.',
   sizes:['Shell','Fog show','Panorama'],slider:'Checks size, shell to panorama',ms:[4800,2800],ax:0,dims:g=>mglDims(g),travel:t=>ease(seg(t,0,.2)),
-  say:(to,from,n)=>to>from?(to-from>1?'The lantern is let down and throws Checks onto the fog, then a panorama slide is pushed through and the picture opens out: Checks is a panorama.':to===2?'A panorama slide is pushed through the lantern and the picture on the fog opens out to name the two waiting checks.':'The lantern is let down on its chain and fitted as a magic lantern; its slide is thrown onto a bank of fog, growing as the fog draws back, then focused.'):'The picture '+(to?'closes back to a disc':'blurs and shrinks back into the lens, the lantern is drawn up and the fog thins')+': Checks shrinks to '+article(n)+'.'}
+  say:(to,from,n)=>to>from?(to-from>1?'The lantern is let down and throws Checks onto the fog, then a panorama slide is pushed through and the picture opens out: Checks is a panorama.':to===2?'A panorama slide is pushed through the lantern and the picture on the fog opens out to name the two waiting checks.':'The lantern is let down on its chain and fitted as a magic lantern; its slide is thrown onto a bank of fog, growing as the fog draws back, then focused.'):'The picture '+(to?'closes back to a disc':'blurs and shrinks back into the lens, the lantern is drawn up and the fog thins')+': Checks shrinks to '+article(n)+'.'},
+ bivouac:{label:'Bivouac',kind:'Gather',
+  about:'Checks grows with nothing made, stretched or thrown: the larger Checks is built of bodies. It comes from the army ant, which has no nest. At dusk the colony hooks itself together, leg to leg, into hanging chains and walls and bridges, a living nest called a bivouac, and takes it apart again at dawn. Here the ants are small ink beetles with pale masks, living under the shell. <b>Bivouac:</b> the box darts down in a puff of fog and the beetles crawl out from under the belly, one side then the other, each climbing down over the ones already hanging to lock on below them with a small squash, until two chains of six hang from the shell. A fog bank comes up at the foot and two late beetles push a sheet of parchment up out of it between the chains; it overshoots a touch, and the chains take its edges with a glint. The two pushers drop to the foot and turn to face each other. Then the lamps on the chain beetles\' backs kindle teal one by one: twelve, the checks that passed. The two at the foot are never let into the chain, and red rings come up round them: the two checks still waiting. The sheet gives run 418 on main, 12 / 14, the fourteen marks and 86% passed. <b>Great bivouac:</b> beetles stream out from the shell\'s far end and walk out over each other into a bridge, the way army ants span a gap; a third chain climbs out across the bridge and hangs from its end. A second sheet slides out from behind the first, along under the bridge, and the far chain takes its edge. The two waiting beetles walk across over the foot of the middle chain and climb onto the new sheet, each settling beside its name, deploy-preview and e2e-safari, waiting for Brent. <b>Shrinking</b> plays it backwards: the beetles let go and crawl back under the shell. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a bivouac sends the beetles home first, and unshading gathers them again.',
+  sizes:['Shell','Bivouac','Great bivouac'],slider:'Checks size, shell to great bivouac',ms:[4600,2600],ax:0,dims:g=>bvDims(g),travel:t=>ease(seg(t,0,.2)),
+  say:(to,from,n)=>to>from?(to-from>1?'Beetles crawl out from under Checks and lock into chains holding a sheet, then build a bridge and a third chain for a second sheet: Checks is a great bivouac.':to===2?'Beetles walk out over each other into a bridge and hang a third chain from it; a second sheet slides out, and the two waiting beetles climb on beside their names.':'Beetles crawl out from under the shell and lock legs into two chains that take a sheet: twelve lamps lit, two beetles waiting at the foot in red rings.'):'The beetles let go and crawl back '+(to?'off the bridge':'under the shell')+': Checks shrinks to '+article(n)+'.'}
 };
 // Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
 for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
@@ -5526,6 +5530,97 @@ function magic(el,w,h){
  const gl=v>0?seg(v,.88,.98):seg(u,.92,.99);if(gl>0&&gl<1)o+=spark({x:Lx,y:Ly},Math.sin(Math.PI*gl)*.8,6);
  svg.innerHTML=o;
 }
+/* ---------- Morph: bivouac (Checks) ---------- */
+// g runs 0 shell, 1 bivouac, 2 great bivouac. A Gather morph: nothing is made, stretched or thrown. The larger Checks is built of bodies, the way
+// army ants build a bivouac: small ink beetles crawl out from under the shell and lock legs into living chains, and the chains hold the parchment.
+// Each beetle walks its own path (a polyline) in its own slot of g, then locks in place, so every frame is drawn from g alone and rest sizes are still.
+// The twelve chain beetles under the shell are the checks that passed; the two that are not let into the chain are the two waiting.
+const BVL=40,BVM=236,BVR=448,BVY=[88,108,128,148,168,188];
+const BVC=Array.from({length:12},(_,j)=>{const k=j>>1,a=.12+j*.03;return{P:[[j%2?BVM:BVL,58],[j%2?BVM:BVL,BVY[k]]],a,b:a+.09,lean:(k%2?7:-7)*(j%2?-1:1)}});
+// The great bivouac: a bridge of beetles out from the shell's far end, then a chain hung from the end of it.
+const BVB=Array.from({length:9},(_,k)=>{const a=.1+k*.035;return{P:[[250,57],[280+k*19,57]],a,b:a+.07,lean:k%2?3:-3}});
+// They walk over the bridge a little above its line, so they read as crossing it rather than merging into it.
+const BVD=Array.from({length:6},(_,k)=>{const a=.43+k*.035;return{P:[[250,55],[BVR,55],[BVR,BVY[k]-6]],a,b:a+.12,lean:k%2?6:-6}});
+const BVS1=`<text class="dser" x="58" y="111" font-size="10" font-style="italic" fill="#5c4a36" letter-spacing=".4">run 418 · main</text><text class="dser" x="214" y="111" font-size="12" font-weight="700" fill="#231b14" text-anchor="end">12 / 14</text>`+
+ `<path d="M58 126H216" stroke="#5c4a36" stroke-width=".9" stroke-dasharray="2 2.2" stroke-linecap="round"/>`+
+ Array.from({length:14},(_,i)=>{const x=f(60+i*11.5);return i<12?`<path d="M${x-2.4} 123.6l4.8 4.8m0 -4.8l-4.8 4.8" stroke="#231b14" stroke-width="1.5" stroke-linecap="round"/>`:`<circle cx="${x}" cy="126" r="3.4" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.4"/>`}).join('')+
+ `<text class="dtx" x="58" y="152" style="font-size:10.5px"><tspan class="dn">86%</tspan><tspan dx="4">passed</tspan></text>`+
+ `<text class="dser" x="58" y="166" font-size="9.5" font-style="italic" fill="#5c4a36">twelve lamps lit in the chains</text>`+
+ `<circle cx="62" cy="178" r="2.7" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.3"/><text class="dser" x="69" y="181.5" font-size="9.5" font-style="italic" fill="#5c4a36">2 waiting for Brent</text>`;
+const BVS2=`<text class="dser" x="262" y="111" font-size="10" font-style="italic" fill="#5c4a36" letter-spacing=".4">awaiting approval</text>`+
+ [[140,'deploy-preview'],[172,'e2e-safari']].map(([y,nm])=>`<text class="dser" x="282" y="${y}" font-size="11.5" fill="#231b14">${nm}</text><text class="dser" x="282" y="${y+11}" font-size="9.5" font-style="italic" fill="#5c4a36">waiting for Brent</text>`).join('');
+const bvOn=()=>model.morph==='bivouac'&&model.g>0;
+function bvDims(g){g=clamp(g,0,2);return[Math.round(CW+194*backSoft(seg(clamp(g-1),0,.14))),Math.round(lerp(CH,222,backSoft(seg(clamp(g),0,.14))))]}
+// A point t of the way along a polyline, with its heading and the distance walked (which sets the legs' stride).
+// The heading eases round each corner over 7 px either side of it (every turn on these paths is a quarter turn, so a plain lerp is safe).
+function bvAlong(P,t){const S=[],A=[];let L=0;for(let i=1;i<P.length;i++){const l=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);S.push(l);A.push(Math.atan2(P[i][1]-P[i-1][1],P[i][0]-P[i-1][0])*180/Math.PI);L+=l}
+ let d=t*L;for(let i=0;i<S.length;i++){if(d<=S[i]||i===S.length-1){const k=S[i]?clamp(d/S[i]):1,a=P[i],b=P[i+1];let ang=A[i];
+   if(i<S.length-1&&d>S[i]-7)ang=lerp(A[i],A[i+1],.5*ease(clamp((d-S[i]+7)/7)));
+   if(i>0&&d<7)ang=lerp(A[i-1],A[i],.5+.5*ease(clamp(d/7)));
+   return{x:lerp(a[0],b[0],k),y:lerp(a[1],b[1],k),ang,dist:t*L}}d-=S[i]}}
+// One beetle, head toward +x before turning: navy elytra split down the back, a pale mask of a head with two eye dots, and a lamp on its back.
+// ph is the stride phase and amp its size (it eases in and out, so legs never snap); grip splays the legs to hold its neighbours; sq is the small squash as it locks on.
+function bvBug(x,y,ang,lamp,ph,grip,sq,amp=1){
+ let legs='';
+ for(const s of[-1,1])for(let i=0;i<3;i++){const sw=ph==null?0:Math.sin(ph+((i%2===0)===(s>0)?0:Math.PI))*22*amp,a=s*([128,92,54][i]+sw+[16,0,-16][i]*grip)*Math.PI/180,b=a+s*[30,14,-30][i]*Math.PI/180;
+  const rx=[-4.5,0,4.5][i],ry=s*4,kx=rx+5.5*Math.cos(a),ky=ry+5.5*Math.sin(a);legs+=`M${f(rx)} ${f(ry)}L${f(kx)} ${f(ky)}L${f(kx+5*Math.cos(b))} ${f(ky+5*Math.sin(b))}`}
+ return `<g transform="translate(${f(x+1.2)} ${f(y+2.4)}) rotate(${f(ang)})"><ellipse cx="1" rx="10.5" ry="6" fill="${INK}" opacity=".4"/></g>`+
+  `<g transform="translate(${f(x)} ${f(y)}) rotate(${f(ang)}) scale(${f3(1-.14*sq)} ${f3(1+.08*sq)})">`+
+  `<path d="${legs}" fill="none" stroke="#0b0e14" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>`+
+  `<path d="M12.8 -1.3Q15.6 -4.2 18.2 -3.4M12.8 1.3Q15.6 4.2 18.2 3.4" fill="none" stroke="#0b0e14" stroke-width=".9" stroke-linecap="round"/>`+
+  `<ellipse cx="-1.5" rx="9" ry="6.2" fill="url(#shell)" stroke="${INK}" stroke-width="1.3"/><path d="M-10.2 0H5.6" stroke="${INK}" stroke-width=".9"/>`+
+  `<path d="M-8 -3.6Q-2 -6.2 4 -4.2" fill="none" stroke="#c9d6e6" stroke-width=".9" stroke-linecap="round" opacity=".5"/>`+
+  `<ellipse cx="7.4" rx="3.2" ry="4.6" fill="#2a3548" stroke="${INK}" stroke-width="1.1"/><circle cx="11.4" r="2.7" fill="#e8edf3" stroke="${INK}" stroke-width=".9"/>`+
+  `<circle cx="12.3" cy="-1.1" r=".75" fill="${INK}"/><circle cx="12.3" cy="1.1" r=".75" fill="${INK}"/>`+
+  (lamp>.01?`<circle cx="-3.5" r="9" fill="url(#leakT)" opacity="${f3(.55*lamp)}"/>`:'')+
+  `<circle cx="-3.5" r="2.3" fill="#141a24" stroke="${INK}" stroke-width=".5"/>`+(lamp>.01?`<circle cx="-3.5" r="2.3" fill="url(#tealG)" opacity="${f3(lamp)}"/>`:'')+'</g>'}
+// A beetle on its path at g-slot x: it walks, then locks on with a squash, leans a touch and splays its legs.
+function bvWalk(B,x,lamp){if(x<=B.a)return '';const t=ease(seg(x,B.a,B.b)),p=bvAlong(B.P,t),lk=seg(x,B.b,B.b+.04);
+ return bvBug(p.x,p.y,p.ang+B.lean*ease(lk),lamp,t<1?p.dist/2.6:null,ease(lk),Math.sin(Math.PI*lk),Math.sin(Math.PI*seg(x,B.a,B.b)))}
+// A sheet of parchment with its brush-ink edge.
+const bvSheet=(x0,y0,x1,y1,txt,dx,dy,op)=>op<=.01?'':`<g opacity="${f3(op)}" transform="translate(${f(dx)} ${f(dy)})"><path d="M${x0} ${y0}H${x1}V${y1}H${x0}Z" fill="${INK}" opacity=".5" transform="translate(1.5 2.6)"/>`+
+ `<path d="M${x0} ${y0}H${x1}V${y1}H${x0}Z" fill="url(#parchG)"/><path d="M${x0} ${y0}H${x1}V${y1}H${x0}Z" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round" filter="url(#wob)"/>${txt}</g>`;
+function bivouac(el,w,h){
+ const svg=el.querySelector('.casing');
+ if(!bvOn()){if(svg.dataset.vk)svg.dataset.vk='';return}
+ const g=model.g,still=g===Math.round(g);
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'beetles moving')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.vk===key)return;svg.dataset.vk=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const u=clamp(g),v=clamp(g-1);
+ // The first sheet is pushed up out of a fog bank at the foot by the two late beetles; it overshoots a touch and the chains take its edges.
+ const rk=seg(u,.56,.72),off=78*(1-backSoft(rk)),gr1=seg(u,.72,.78);
+ // The second slides out along the bridge from behind the first, and the far chain takes its edge.
+ const sk=seg(v,.68,.8),off2=-196*(1-backSoft(sk)),gr2=seg(v,.8,.86);
+ let o=`<defs><clipPath id="bvK"><rect width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#bvK)">`;
+ const fb=Math.sin(Math.PI*seg(u,.04,.3)),ff=Math.sin(Math.PI*seg(u,.44,.86)),fr=Math.sin(Math.PI*seg(v,.04,.4));
+ if(fb>.01)o+=`<ellipse cx="138" cy="84" rx="104" ry="18" fill="url(#fogCold)" opacity="${f3(.7*fb)}"/>`;
+ if(fr>.01)o+=`<ellipse cx="360" cy="64" rx="110" ry="22" fill="url(#fogCold)" opacity="${f3(.7*fr)}"/>`;
+ o+=bvSheet(252,94,440,192,BVS2,off2,0,seg(v,.68,.71))+bvSheet(48,94,228,192,BVS1,0,off,seg(u,.56,.62));
+ for(const B of BVB)o+=bvWalk(B,v,0);
+ for(const B of BVD)o+=bvWalk(B,v,0);
+ // Chain beetles kindle one by one once the sheet is held: each lamp is a check that passed.
+ BVC.forEach((B,j)=>{const a=.78+j*.011;o+=bvWalk(B,u,seg(u,a,a+.03))});
+ // The two late beetles: they push the sheet up, then wait at the foot, facing each other, ringed in red. On the great bivouac they climb onto
+ // the second sheet and sit beside their names.
+ const rg=seg(u,.86,.96);
+ // The one ahead (on the right) climbs higher, so they never meet on the way. The left one turns round on the spot before it sets off.
+ for(const i of[0,1]){const op=seg(u,.54,.6);if(op<=.01)continue;let x,y,ang,ph=null,amp=0;
+  if(v>0){const P=i?[[156,204],[262,204],[262,136]]:[[120,204],[262,204],[262,168]],a=i?.84:.86,b=i?.94:.97,tr=seg(v,a,a+.02),t=ease(seg(v,a+.02,b)),p=bvAlong(P,t);
+   x=p.x;y=p.y;ang=t>0?p.ang:lerp(i?-180:0,0,ease(tr));
+   if(t>0&&t<1){ph=p.dist/2.6;amp=Math.sin(Math.PI*t)}else if(tr>0&&tr<1){ph=tr*8;amp=.6*Math.sin(Math.PI*tr)}}
+  else{const k=ease(seg(u,.74,.82));x=lerp(i?164:112,i?156:120,k);y=lerp(201+off,204,k);ang=lerp(-90,i?-180:0,k);
+   if(k>0&&k<1){ph=k*6;amp=Math.sin(Math.PI*k)}else if(rk>0&&rk<1){ph=off/2.6;amp=Math.sin(Math.PI*rk)}}
+  // The ring is centred on the body (the head reaches further than the tail), so it takes in the legs and head.
+  const rx=x+3*Math.cos(ang*Math.PI/180),ry=y+3*Math.sin(ang*Math.PI/180);
+  o+=`<g opacity="${f3(op)}">${bvBug(x,y,ang,0,ph,1-amp,0,amp)}`+(rg>.01?`<circle cx="${f(rx)}" cy="${f(ry)}" r="14" fill="none" stroke="#3a070b" stroke-width="2.6" opacity="${f3(rg)}"/><circle cx="${f(rx)}" cy="${f(ry)}" r="14" fill="none" stroke="${REDHI}" stroke-width="1.3" opacity="${f3(rg)}"/>`:'')+'</g>'}
+ if(ff>.01)o+=`<ellipse cx="138" cy="226" rx="140" ry="30" fill="url(#fogCold)" opacity="${f3(.95*ff)}"/>`;
+ // Glints where the chains take the sheets' edges.
+ for(const[k,xs]of[[gr1,[BVL+9,BVM-9]],[gr2,[BVR-9]]])if(k>0&&k<1)for(const x of xs)o+=spark({x,y:142},Math.sin(Math.PI*k)*.85,6);
+ o+='</g>'+casing('c',CW,CH,true,'body')+curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,1);
+ svg.innerHTML=o;
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -5707,8 +5802,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHG'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':small&&bvOn()?'A':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHGA'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):mr||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -5720,7 +5815,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs||((ur||ns||dr||pr||qs)&&s>0)?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h);bivouac(el,w,h)}
   // After the morphs, which can also move Checks' parchment, so the seal's withdraw wins.
   snailSeal(el,id,w,h,s,small?'teal':m.run?'amber':'cold');reelShell(el,id,w,h,s,small?'teal':m.run?'amber':'cold');abdomen(el,id,w,h,s,small?'teal':m.run?'amber':'cold');inkDrain(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapPress(el,id,w,h,s,small?'teal':m.run?'amber':'cold');scales(el,id,w,h,s,small?'teal':m.run?'amber':'cold');
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
