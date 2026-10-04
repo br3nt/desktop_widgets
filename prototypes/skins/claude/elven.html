@@ -207,7 +207,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit{pointer-events:all;cursor:pointer}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
-.hit.lift{cursor:grab}.hit.lift:active{cursor:grabbing}.hit.slide{cursor:ns-resize}
+.hit.poise{cursor:ew-resize}.hit.lift{cursor:grab}.hit.lift:active{cursor:grabbing}.hit.slide{cursor:ns-resize}
 .about{max-width:1200px;margin:0 auto;padding:16px 28px 26px;display:grid;grid-template-columns:1fr 1fr;gap:26px;color:#aeb6cf;font-size:13px}
 .about h2{margin:0 0 4px;font:400 21px var(--script);color:#eef1fb}.about h2 small{font:11px var(--sans);color:#7f8ab0;letter-spacing:1.4px;text-transform:uppercase;margin-left:8px}
 .about p{margin:0 0 6px}
@@ -326,7 +326,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. With the ribbon roll, drag GitDiscuss's nameplate to roll it round Jarvis's roundel (it settles on the nearest 15° star); tap the roundels to release. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. With the ribbon roll, drag GitDiscuss's nameplate to roll it round Jarvis's roundel (it settles on the nearest 15° star); tap the roundels to release. With the lantern counterpoise, drag the lantern along the rail under GitDiscuss and GitDiscuss tips after it (it settles on the nearest 15° mark); tap the bough or the chain to release. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=38,SEP=170,NEAR=120,READY=40,TOP=70,SNAP=46;
@@ -791,6 +791,29 @@ const JOINS={
    return jt>.3?'Releasing · the leaves hang clear ':'Releasing · the fittings furl and the casings part '},
   about:`A new join kind, Slide. Every other join closes the gap and then fixes the casings together; in a Slide the casings come together offset and the fixing is a slide along each other's edges, as a sliding dovetail or a French cleat is engaged, so the last move of the join is at right angles to the first. Elven fittings are not forced, they are hung. Jarvis's stem carries three silver crescent moons, horns up, on leafy brackets; GitDiscuss's stem carries three silver willow leaves hanging point down on arched stalks. <b>Near:</b> small crescents and leaves peep out of the stems. <b>Ready:</b> the crescents, the leaves seated in them and the slide down onto them are traced in dashed moonlight. <b>Joining:</b> the casings close a span apart while GitDiscuss rides up above its place, and the crescents and leaves unfurl from the stems, the leaves now hanging just over the crescents' horns. A glint marks each crescent, then GitDiscuss slides straight down along Jarvis, silver streaks trailing up the leaves, until each leaf drops into a crescent's arms with a small settle, a glint and a ring of moonlight. The horns then curl shut over the leaves like tendrils, and the moonstone in each crescent's belly kindles from the top down as the join light (moonlight while both widgets run, a cold grey if either is paused), with a glint down the seam. Pulling the casings apart does nothing: a cleat only lets go upward. Everything scales with any shade. Nothing moves at rest. <b>Release:</b> draw the cleats up (the horns uncurl as you lift; let go early and they curl shut again), tap them, or focus them and press Enter. The moonstones dim, the horns uncurl, GitDiscuss slides up off the crescents, and the leaves and crescents furl before the casings part.`,
   over:c=>drawCleat(c)
+ },
+ // GitDiscuss turns about the ring on its crest, not at the seam (s, kx and py in BLH); part:.3 keeps the casings together on release until the bough has drawn back.
+ poise:{label:'Lantern counterpoise',kind:'Angle · balance',angled:true,a0:30,part:.3,
+  get gap(){return LCB.gap},
+  get hooks(){return BLH},
+  // Level, the lantern has nowhere to slide, so the join and release take less time.
+  get slow(){return model.angle?1.75:1.35},get msOut(){return model.angle?4400:3400},
+  bend(jt){return blBend(jt)},
+  txt:{join:'The casings close, a silver bough grows up from Jarvis\'s stem and arches over GitDiscuss, a chain is let down to the ring on its crest, a rail is hung under its keel, and a lantern hung on the rail slides out until GitDiscuss tips to its angle.',
+   joined:'Joined by a lantern counterpoise, one mark per 15°. Drag the lantern along its rail and GitDiscuss tips after it, drag GitDiscuss\'s nameplate, use the Angle slider, or press ↑ ↓; tap the bough or the chain to release.',
+   release:'The lantern dims and slides back to the middle as GitDiscuss levels, it is lifted off, the rail and chain are taken up and the bough draws back into Jarvis\'s stem.',
+   stop:'The lantern is lifted off, the rail and chain are taken up and the bough draws back.',
+   hold:'Held mid-join: GitDiscuss hangs level from the chain and the lantern is being hung at the middle of its rail. Use the scrubber to step through it.',
+   ready:'Ready: the bough, the chain, the rail and the lantern\'s place are traced in moonlight. Release to hang GitDiscuss.',near:'Nearby: Jarvis\'s stem buds and GitDiscuss\'s crest glimmers. Move closer.',
+   readyPh:'Ready · the balance is traced',nearPh:'Nearby · the stem buds'},
+  phase:(jt,dir)=>{const r=!!model.angle,pe=blPe();
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<.46)return'Joining · a silver bough grows from Jarvis\'s stem ';if(jt<.52)return'Joining · the chain is let down to the crest ';
+    if(jt<.6)return'Joining · the rail is hung under the keel ';if(jt<.66)return'Joining · the lantern is hung ';
+    if(r&&jt<.86)return'Joining · the lantern slides to mark '+(blN(model.angle)+4)+' and GitDiscuss tips ';return'Joining · the lantern kindles '}
+   if(jt>pe)return'Releasing · the lantern dims ';if(r&&jt>.66)return'Releasing · the lantern slides back and GitDiscuss levels ';if(jt>.58)return'Releasing · the lantern is lifted off ';
+   if(jt>.5)return'Releasing · the rail is taken down ';if(jt>.44)return'Releasing · the chain is drawn up ';return jt>.3?'Releasing · the bough draws back ':'Releasing · the casings part '},
+  about:'A new angle kind, Balance, opening a fourth angle round. In every other angle the turn is set at the joint, by a pivot\'s friction, a stay, a wedge or a roll. In a Balance nothing at the joint holds it: the angle is wherever a weight comes to rest, the way a steelyard is read by sliding its poise along the beam. Elven lamps are hung, not stood, so the weight is a lantern. A slender silver bough grows up out of Jarvis\'s stem, tall enough to clear GitDiscuss at any tilt, and arches over to end in a curl above GitDiscuss\'s crest; a fine silver chain with moonstone beads hangs plumb from it to a ring through the crest, and GitDiscuss hangs from that ring like the beam of a scale. Under its keel, on two small drops, hangs a silver rail with curled ends and seven marks, and a lantern rides on the rail: a pointed drop of moonstone glass with silver ribs under a leaf cap. GitDiscuss tips toward the lantern until the lantern hangs straight under the chain, so the lantern\'s place along the rail is the rail\'s depth below the ring times the tangent of the angle, and the marks crowd toward the middle as on a real steelyard. <b>Near:</b> Jarvis\'s stem buds and GitDiscuss\'s crest glimmers. <b>Ready:</b> the bough, the chain, the rail and the lantern\'s place are traced in dashed moonlight. <b>Joining:</b> the casings close, the bough climbs out of the stem with leaves unfolding along it and curls over at the top; the chain is let down to the crest and the ring closes on it with a glint; the drops grow from the keel and the rail runs out both ways from the middle; the lantern is hung at the middle; then it slides out along the rail, swinging back on its ring, and GitDiscuss tips after it, a little past and back. Last, the lantern kindles as the join light (warm while both widgets run, a cold grey if either is paused) and a glint runs down the chain. <b>Angle:</b> −45° to +45°, one mark per 15°: drag the lantern along the rail (GitDiscuss follows a moment behind and settles on the nearest mark), drag GitDiscuss\'s nameplate to tip it about the ring, use the slider, or press ↑ ↓. Each mark the lantern passes glints and sets it swinging; a moonstone tag under Jarvis reads the angle and the mark, one of seven. Shading shortens the drops and the rail with the casing. Nothing moves at rest. <b>Release:</b> tap the bough or the chain, or focus them and press Enter. The lantern dims and slides back to the middle as GitDiscuss levels, it is lifted off, the rail and drops are taken up, the chain is drawn up and the bough draws back into the stem before the casings part.',
+  over:c=>drawPoise(c)
  }
 };
 /* ---------- Lily petals: moon-white petals wedged into the opening, one per 15° (Wedge) ---------- */
@@ -1123,6 +1146,147 @@ function drawRoll(c){
  // The hit area is the two roundels, so GitDiscuss's nameplate stays free to roll it.
  if(jt===1)o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Ribbon roll: GitDiscuss at ${signed(model.angle)}, star ${rlN(model.angle)+4} of 7. Up and down arrows roll GitDiscuss a star (15°); Enter unwinds the ribbons and separates the widgets"><title>Tap the roundels to release; drag GitDiscuss's nameplate to roll it</title>`+
   [C,B].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(R+3)}" fill="transparent"/>`).join('')+[C,B].map(p=>`<circle class="ringfocus" cx="${f(p.x)}" cy="${f(p.y)}" r="${f(R+3)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/>`).join('')+'</g>';
+ return o}
+/* ---------- Lantern counterpoise: GitDiscuss hangs by its crest and tips toward a lantern on a rail under its keel (Balance) ---------- */
+// A silver bough from Jarvis's stem holds a chain over GitDiscuss's crest; GitDiscuss turns about the ring there (Hk). A rail hangs under
+// its keel at depth Y below Hk, and GitDiscuss settles where the lantern hangs straight under the ring: the lantern's place is u = Y·tanθ.
+// The bough rises past the height GitDiscuss's raised end reaches at 50°, so no tilt meets it, whatever the shade.
+// Joining: bough .3–.46, chain .44–.52, drops .5–.55, rail .53–.6, lantern hung .58–.66, it slides .66–.8, GitDiscuss tips .7–.86, kindle.
+// Joined, LCB.q (the lantern's place in units of Y) leads while the lantern is dragged, and GitDiscuss follows it a moment behind.
+const LCB={gap:46,last:null,flash:-1e9,loop:false,q:null,qt:0,q0:0,moved:false,run:false};
+const lcK=h=>clamp(h/H,.34,1);
+const blPy=hh=>2-19*lcK(2*hh);
+const blN=a=>clamp(Math.round(a/15),-3,3);
+const blPe=()=>model.angle?.86:.66;
+const blQ=()=>LCB.q??Math.tan(model.angle*PI/180);
+function blBend(jt){if(jt>=1)return model.angle;if(!model.angle||jt<.7)return 0;
+ return Math.atan(back(seg(jt,.7,.86),1.2)*Math.tan(model.angle*PI/180))*180/PI}
+// The geometry for Jarvis at a, casing height h, GitDiscuss turned th degrees about the ring; turn() carries a point of GitDiscuss's into place.
+function blGeo(a,h,th){
+ const k=lcK(h),Hk={x:a.x+W+LCB.gap+W/2,y:a.y+blPy(h/2)},ry=a.y+h-5+16*k,Y=ry-Hk.y,t=th*PI/180,co=Math.cos(t),si=Math.sin(t);
+ const turn=p=>{const dx=p.x-Hk.x,dy=p.y-Hk.y;return{x:Hk.x+dx*co-dy*si,y:Hk.y+dx*si+dy*co}};
+ return{k,Hk,ry,Y,turn,rail:u=>turn({x:Hk.x+u,y:ry}),span:Y+10*k,keel:a.y+h-5}}
+// The bough: up from Jarvis's top knop, arching over to run level past the ring (where the chain hangs) and end in a curl that hangs down.
+function blBough(a,h){const k=lcK(h),x0=a.x+W-11.5,y0=a.y+10,Hx=a.x+W+LCB.gap+W/2,yT=a.y-160-10*k,c1={x:x0-4,y:y0-170-10*k},c2={x:Hx-90,y:yT},E={x:Hx+16*k+4,y:yT};
+ const pts=[];for(let i=0;i<=36;i++){const t=i/36,u=1-t,A=u*u*u,B=3*u*u*t,C=3*u*t*t,D=t*t*t;pts.push({x:A*x0+B*c1.x+C*c2.x+D*E.x,y:A*y0+B*c1.y+C*c2.y+D*E.y})}
+ const all=arcS(widths(pts.concat(curlPts(E,0,20*k+6,1.7*PI,1,14).slice(1)),3.8*k+.9,.7));all.yT=yT;return all}
+// A fine silver chain from y0 down to y1: open links and edge-on links in turn, a moonstone bead every eighth.
+function blChain(x,y0,y1,kk){if(y1-y0<1)return '';const n=Math.max(1,Math.round((y1-y0)/(4.4*kk))),d=(y1-y0)/n;
+ let o=`<path d="M${f(x)} ${f(y0)}V${f(y1)}" stroke="${NIGHT}" stroke-width="${f(2.4*kk)}" opacity=".5"/>`;
+ for(let i=0;i<n;i++){const cy=y0+d*(i+.5);
+  o+=i%2?`<path d="M${f(x)} ${f(cy-d*.55)}V${f(cy+d*.55)}" stroke="#dfe6f7" stroke-width="${f(.9*kk)}"/>`:`<ellipse cx="${f(x)}" cy="${f(cy)}" rx="${f(1.15*kk)}" ry="${f(d*.62)}" fill="none" stroke="#c9d4ee" stroke-width="${f(.6*kk+.1)}"/>`;
+  if(i%8===4)o+=`<circle cx="${f(x)}" cy="${f(cy)}" r="${f(1.5*kk)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".3"/>`}
+ return o}
+// The lantern, hung from its ring at L and swung sw degrees: a pointed drop of moonstone glass, silver ribs, a leaf cap and a moonstone drop.
+function blLantern(L,s,kl,lit,on,sw){if(s<=.02)return '';const gl='M-6.4 9C-8.6 15 -6 21.5 0 27C6 21.5 8.6 15 6.4 9Z';
+ let o=`<g transform="translate(${P(L)}) rotate(${f(sw)}) scale(${op(s*kl)})">`;
+ if(lit>0)o+=`<circle cy="17" r="${f(18+12*lit)}" fill="url(#${on?'haloWarm':'halo'})" opacity="${op(lit*(on?.9:.5))}"/>`;
+ o+=`<circle r="2.3" fill="none" stroke="#dfe6f7" stroke-width="1.1"/><path d="M0 2.3V6" stroke="#c9d4ee" stroke-width=".8"/>`;
+ o+=`<path d="${gl}" fill="#141a36" stroke="${NIGHT}" stroke-width=".6"/><path d="${gl}" fill="url(#moonstone)" opacity="${op(.28+.5*lit)}"/>`;
+ if(lit>.02)o+=`<ellipse cy="17.5" rx="${f(1.6+.8*lit)}" ry="${f(2.8+1.4*lit)}" fill="${on?'#fff3cf':'#dde0e8'}" opacity="${op(lit)}"/>`+star(0,17.5,2+3*lit,lit*(on?.9:.5));
+ o+=`<path d="M-3 9.2Q-4.4 18 0 27M3 9.2Q4.4 18 0 27M0 9V27" fill="none" stroke="#c9d4ee" stroke-width=".55" opacity=".85"/>`;
+ o+=`<path d="M-7.6 9.4Q-6 4.6 0 5.2Q6 4.6 7.6 9.4Q0 7.8 -7.6 9.4Z" fill="url(#silver)" stroke="${NIGHT}" stroke-width=".5"/><circle cy="28.4" r="1.6" fill="url(#moonstone)" stroke="#e8eef8" stroke-width=".4"/></g>`;
+ return o}
+// The drops and the rail under the keel, turned with GitDiscuss: gd grows the drops, gr runs the rail out from the middle; mark n is lit.
+function blRail(G,gd,gr,kk,n){const {Hk,ry,Y,span,turn,keel}=G;let o='';
+ for(const sg of[-1,1])if(gd>0){const x=Hk.x+sg*.78*Y,A=turn({x,y:keel}),B=turn({x,y:lerp(keel,ry,gd)});
+  o+=`<path d="M${P(A)}L${P(B)}" stroke="${NIGHT}" stroke-width="${f(1.9*kk+.4)}" opacity=".6"/><path d="M${P(A)}L${P(B)}" stroke="#c9d4ee" stroke-width="${f(1.1*kk+.3)}"/>`+leaf(A.x,A.y+1,90+sg*48,.45*kk*gd+.05)}
+ if(gr<=0)return o;const half=span*gr,pts=[];for(let i=0;i<=24;i++)pts.push(turn({x:Hk.x-half+2*half*i/24,y:ry}));
+ o+=`<path d="${poly(pts)}" fill="none" stroke="${NIGHT}" stroke-width="${f(2.6*kk+.9)}" stroke-linecap="round" opacity=".75"/><path d="${poly(pts)}" fill="none" stroke="#c9d4ee" stroke-width="${f(1.7*kk+.5)}" stroke-linecap="round"/><path d="${poly(pts)}" fill="none" stroke="#fff" stroke-width="${f(.5*kk)}" opacity=".6"/>`;
+ // The ends curl up as the rail reaches them.
+ const ce=seg(gr,.85,1);if(ce>0)for(const sg of[-1,1]){const c=widths(curlPts({x:Hk.x+sg*half,y:ry},sg>0?0:PI,(12*kk+2)*ce,1.6*PI,-sg,14),1.6*kk+.4,.3).map(p=>({...turn(p),w:p.w}));o+=`<path d="${ribbon(c)}" fill="url(#silver)" opacity="${op(ce)}"/>`}
+ // Seven marks, closer together toward the middle: a moonstone at level, a star at each 15°.
+ for(let i=-3;i<=3;i++){const u=Y*Math.tan(i*PI/12);if(Math.abs(u)>half)continue;const p=turn({x:Hk.x+u,y:ry+3.4*kk}),on=i===n;
+  o+=i?star(p.x,p.y,(on?3:1.9)*kk+.6,on?.95:.5,on?'#fff':'#c9d4ee'):`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((on?1.9:1.4)*kk)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".3"/>`}
+ return o}
+// While tipping: a moonstone tag under Jarvis reads the angle and the mark (one per 15°, the fourth level), each mark a small lantern drop.
+function blTag(x,y,a,opc){const n=blN(a)+3,hw=64,font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`;let ic='';
+ for(let i=0;i<7;i++){const on=i===n,cx=12-hw+i*6.2,r=on?2.6:1.7;ic+=`<path d="M${f(cx)} ${f(-r*1.9)}Q${f(cx+r*1.2)} ${f(-r*.1)} ${f(cx)} ${f(r*1.4)}Q${f(cx-r*1.2)} ${f(-r*.1)} ${f(cx)} ${f(-r*1.9)}Z" fill="${on?'#5f78b8':'#a3abc4'}"/>`}
+ return `<g opacity="${op(opc)}" pointer-events="none" transform="translate(${f(x)} ${f(y)})"><rect x="-${hw+2}" y="-16" width="${2*hw+4}" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-${hw}" y="-14" width="${2*hw}" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>${ic}`+
+  `<text x="22" y="1" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${signed(a)}</text><text x="22" y="11" text-anchor="middle" ${font} font-size="7.5" letter-spacing="1" fill="#5d6584">MARK ${n+1} OF 7</text></g>`}
+// Joined, each mark the lantern passes glints and sets it swinging; this keeps drawing until the swing has died.
+function blLoop(){if(LCB.loop)return;LCB.loop=true;
+ requestAnimationFrame(function st(now){if(J()!==JOINS.poise||model.jt!==1||now-LCB.flash>900){LCB.loop=false;render();return}render();requestAnimationFrame(st)})}
+// The dragged lantern slides to LCB.qt and GitDiscuss tips after it; once both have come to rest the lantern hangs under the ring again.
+function blFollow(){if(LCB.run)return;LCB.run=true;let t0=performance.now();
+ requestAnimationFrame(function st(now){
+  if(J()!==JOINS.poise||model.jt!==1||LCB.q===null||model.angTo!==undefined||(drag&&drag.bend)){LCB.run=false;LCB.q=null;
+   // Released while still settling, GitDiscuss takes its nearest mark, so the release and the next join start from one.
+   if(J()===JOINS.poise&&model.jt!==1)model.angle=blN(model.angle)*15;render();return}
+  const dt=clamp(now-t0,0,48);t0=now;
+  LCB.q=reduce.matches?LCB.qt:LCB.q+(LCB.qt-LCB.q)*(1-Math.exp(-dt/60));
+  const want=Math.atan(LCB.q)*180/PI;model.angle=reduce.matches?want:model.angle+(want-model.angle)*(1-Math.exp(-dt/170));refitPair();
+  if(!(drag&&drag.poise)&&Math.abs(LCB.qt-LCB.q)<.002&&Math.abs(want-model.angle)<.08){
+   model.angle=Math.round(Math.atan(LCB.qt)*360/PI)/2;LCB.q=null;LCB.run=false;refitPair();render();dialSoon();settleRise(300);say(BLH.say(model.angle));return}
+  render();requestAnimationFrame(st)})}
+function blFit(an,hh){const h=2*hh,o={x:0,y:0},ys=[h+44,Math.min(...blBough(o,h).map(p=>p.y))-6];
+ for(const t0 of an?[an,an+Math.sign(an)*5]:[0]){const G=blGeo(o,h,t0),bx=W+LCB.gap;
+  for(const [u,v] of[[0,0],[W,0],[0,h],[W,h]])ys.push(G.turn({x:bx+u,y:v}).y);
+  ys.push(G.rail(-G.span).y+8,G.rail(G.span).y+8,G.rail(G.Y*Math.tan(t0*PI/180)).y+30*Math.max(G.k,.55)+4)}
+ const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn),hi=592-mx;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+const BLH={s:()=>-W/2,kx:()=>LCB.gap+W/2,py:(a,hh)=>blPy(hh),det:[-45,-30,-15,0,15,30,45],max:45,snap:15,fit:blFit,
+ // The lantern hangs below the ring (the rail's depth, longer as GitDiscuss tips), so the pair's box takes it in when clearing Checks.
+ hang:hh=>{const k=lcK(2*hh),Y=2*hh-5+16*k-blPy(hh);return 1.1*(Y/Math.cos(model.angle*PI/180)+32*Math.max(k,.55))},
+ name:a=>({num:signed(a),cap:'mark '+(blN(a)+4)+' of 7',stop:true}),
+ // Turning GitDiscuss by its nameplate takes the lantern out of the dragged lead.
+ grab:()=>{LCB.q=null},
+ poise:{
+  grab(){LCB.q=blQ();LCB.qt=LCB.q0=LCB.q;LCB.moved=false},
+  move(p){const G=blGeo(model.a,ctx().h,model.angle),t=model.angle*PI/180,u=(p.x-G.Hk.x)*Math.cos(t)+(p.y-G.Hk.y)*Math.sin(t);
+   LCB.qt=clamp(u/G.Y,-1,1);if(Math.abs(LCB.qt-LCB.q0)>.02)LCB.moved=true;blFollow()},
+  // Let go, the lantern slides on to the nearest mark; a tap without a slide only says how it hangs.
+  // Grabbed while still settling, a tap lets it settle on its mark.
+  drop(){if(!LCB.moved&&!LCB.run){LCB.q=null;dialSoon(600);render();say(J().txt.joined);return}LCB.qt=Math.tan(blN(Math.atan(LCB.qt)*180/PI)*PI/12);blFollow()},
+  cancel(){LCB.qt=Math.tan(blN(Math.atan(LCB.q0)*180/PI)*PI/12);blFollow()}},
+ // The bough's top, above Jarvis's roof, so Checks never grows into it.
+ top:hh=>-166-10*lcK(2*hh),
+ grip:'Tip GitDiscuss on the ring at its crest: drag round the ring, or use the up and down arrows; each mark is 15 degrees',slider:'GitDiscuss angle on the lantern counterpoise, in degrees: one mark per 15',
+ ph:a=>signed(a)+' · mark '+(blN(a)+4)+' of 7',
+ say:a=>a?'GitDiscuss tips to '+signed(a)+', the lantern on mark '+(blN(a)+4)+' of 7, '+(a>0?'right':'left')+' of the middle: it hangs straight under the ring again.':'GitDiscuss hangs level, the lantern at the middle of the rail.'};
+function drawPoise(c){
+ const a=model.a,b=model.b,h=c.h,jt=c.jt,now=performance.now(),dir=model.dir,on=a.run&&b.run,k=lcK(h),kk=Math.max(k,.6),kl=Math.max(k,.55);
+ if(jt<1)LCB.last=null;
+ const bo=blBough(a,h);
+ // Near: Jarvis's top knop buds and GitDiscuss's crest glimmers. Ready: the bough, chain, rail and the lantern's place traced.
+ if(jt===0){const g=c.glow;if(g<=0)return '';const cr={x:b.x+W/2,y:b.y+5-12*k};
+  let o=[bo[0],cr].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((7+9*g)*kk)}" fill="url(#halo)" opacity="${op(g)}"/>`).join('');
+  if(g<1){const bud=growPts(bo,.02+.05*g,6);return o+(bud.length>1?`<path d="${ribbon(bud,1.2)}" fill="${NIGHT}"/><path d="${ribbon(bud)}" fill="url(#silver)"/>`:'')}
+  const G=blGeo(a,h,model.angle),ds=`fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3"`,L=G.rail(G.Y*Math.tan(model.angle*PI/180));
+  o+=`<path d="${poly(bo)}" ${ds}/><path d="M${f(G.Hk.x)} ${f(bo.yT+1.5)}V${f(G.Hk.y)}" ${ds}/><path d="${poly([-G.span,0,G.span].map(G.rail))}" ${ds}/>`;
+  o+=`<circle cx="${f(L.x)}" cy="${f(L.y+16*kl)}" r="${f(10*kl)}" ${ds} opacity=".8"/>`;
+  return o+star(G.Hk.x,G.Hk.y,6,.95)+star(L.x,L.y+16*kl,4,.7)}
+ const th=blBend(jt),G=blGeo(a,h,th),{Hk,turn,rail,Y}=G;
+ const gb=ease(seg(jt,.3,.46)),cg=ease(seg(jt,.44,.52)),gd=ease(seg(jt,.5,.55)),gr=ease(seg(jt,.53,.6)),hl=seg(jt,.58,.66),pe=blPe(),lit=ease(seg(jt,pe,1))*(on?1:.45);
+ const tq=Math.tan(model.angle*PI/180),ls=seg(jt,.66,.8),q=jt===1?blQ():ease(ls)*tq,L=rail(q*Y),qd=Math.atan(q)*180/PI;
+ // The bough climbs from the knop with its leaves opening behind the growing tip; a moonstone bead closes the curl.
+ const gp=growPts(bo,gb,14);let o='';
+ if(gp.length>1){o+=`<path d="${ribbon(gp,1.5)}" fill="${NIGHT}" opacity=".8"/><path d="${ribbon(gp)}" fill="url(#silver)"/>`;
+  const len=gb*bo[bo.length-1].s;
+  for(let i=5;i<34;i+=4){const p=bo[i],nx=bo[i+1],s=ease(clamp((len-p.s)/16));if(s<=0)break;const d=Math.atan2(nx.y-p.y,nx.x-p.x)*180/PI;o+=leaf(p.x,p.y,d+(i%8===1?-58:58),(.5*kk+.12)*s,.95)}
+  if(gb>=1){const e=bo[bo.length-1];o+=`<circle cx="${f(e.x)}" cy="${f(e.y)}" r="${f(1.6*kk+.3)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".4"/>`}}
+ // The chain is let down from the bough to the ring, which closes on the crest; the ring and its stalk turn with GitDiscuss.
+ const top=bo.yT+1.3,rr=3.2*k+.6,bot=lerp(top,Hk.y-rr,cg);
+ if(cg>0){o+=blChain(Hk.x,top,bot,kk);
+  const R=cg<1?{x:Hk.x,y:bot+rr}:Hk,S0=turn({x:Hk.x,y:Hk.y+rr}),S1=turn({x:Hk.x,y:a.y+5-17.5*k});
+  if(cg>=1&&S1.y>S0.y-.01)o+=`<path d="M${P(S0)}L${P(S1)}" stroke="#c9d4ee" stroke-width="${f(1.1*k+.3)}"/>`;
+  o+=`<circle cx="${f(R.x)}" cy="${f(R.y)}" r="${f(rr)}" fill="none" stroke="${NIGHT}" stroke-width="${f(1.9*k+.6)}" opacity=".6"/><circle cx="${f(R.x)}" cy="${f(R.y)}" r="${f(rr)}" fill="none" stroke="#dfe6f7" stroke-width="${f(1.1*k+.3)}"/>`;
+  const gk=seg(jt,.52,.56);if(dir>0&&gk>0&&gk<1)o+=star(Hk.x,Hk.y,(4+5*gk)*kk+1,Math.sin(PI*gk))}
+ // The drops, the rail and its marks; the lit mark is the one the lantern is nearest.
+ o+=blRail(G,gd,gr,kk,hl>0?blN(qd):99);
+ // The lantern: hung at the middle with a small bounce, it swings back on its ring as it slides, and after each mark passed joined.
+ let sw=dir>0?9*Math.sin(PI*ls)*Math.sign(tq):0;
+ if(jt===1){const n=Math.floor(qd/15+1e-6);if(LCB.last!==null&&n!==LCB.last&&!reduce.matches){LCB.flash=now;LCB.fdir=Math.sign(n-LCB.last);setTimeout(blLoop,0)}LCB.last=n;
+  const e=(now-LCB.flash)/860;if(e>=0&&e<1){sw=7*LCB.fdir*Math.sin(e*3*PI)*(1-e);const p=turn({x:Hk.x+Math.tan(Math.round(qd/15)*PI/12)*Y,y:G.ry});
+   o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((3+10*e)*kk)}" fill="none" stroke="#e6edff" stroke-width="${f(1.1*(1-e)+.2)}" opacity="${op(1-e)}"/>`}}
+ if(hl>0)o+=blLantern({x:L.x,y:L.y-6*(1-ease(hl))*kl},back(hl,1.4),kl,lit,on,sw);
+ // Kindling: a glint runs down the chain to the lantern.
+ if(dir>0&&jt<1){const gk=seg(jt,pe,1);if(gk>0&&gk<1){const y=lerp(top,Hk.y,gk);o+=star(Hk.x,y,4.2*kk+1,Math.sin(PI*gk))}}
+ const dop=jt===1?model.dial:dir>0?seg(jt,pe,Math.min(1,pe+.05)):0;
+ if(dop>0)o+=blTag(a.x+W-100,a.y+h+26,jt===1?model.angle:th,dop);
+ // The release hit is the bough and the chain (stroke only, so GitDiscuss's raised end stays free under the arch); the lantern has its own.
+ if(jt===1){o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Lantern counterpoise: GitDiscuss tipped ${signed(model.angle)}, the lantern on mark ${blN(model.angle)+4} of 7. Up and down arrows move the lantern a mark; Enter takes it down and separates the widgets"><title>Tap the bough or the chain to release; drag the lantern along its rail to tip GitDiscuss</title>`+
+   `<path d="${poly(bo)}" fill="none" stroke="transparent" stroke-width="14" pointer-events="stroke"/><path d="M${f(Hk.x)} ${f(top)}V${f(Hk.y)}" stroke="transparent" stroke-width="12" pointer-events="stroke"/><path class="ringfocus" d="${poly(bo)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3" pointer-events="none"/></g>`;
+  o+=`<g class="hit poise" id="poiseHit"><title>Drag the lantern along the rail to tip GitDiscuss</title><circle cx="${f(L.x)}" cy="${f(L.y+15*kl)}" r="${f(17*kl+4)}" fill="transparent"/></g>`}
  return o}
 /* ---------- Silk arrow drawing (Reel) ---------- */
 // A crescent bow stands on Jarvis's stem with a moonstone spindle of spider silk behind its grip; GitDiscuss's stem carries a lancet target
@@ -4192,8 +4356,10 @@ function pairBox(){
  if(bd){const ox=model.b.x-AH().s(model.angle,h/2),oy=model.b.y+pivOY(j.bend(model.jt),h/2),co=Math.cos(bd),si=Math.sin(bd);
   for(const u of[0,W])for(const v of[0,h]){const dx=model.b.x+u-ox,dy=model.b.y+v-oy,x=ox+dx*co-dy*si,y=oy+dx*si+dy*co;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}}
  // The fork's parent branch hangs from the knot below the casings, with its leaves and curl.
- if(j.angled&&model.jt>0){const L=AH().hang(h/2),td=(90+j.bend(model.jt)/2)*PI/180,kx=model.a.x+W+AH().s(model.angle,h/2),ky=model.a.y+pivY(h/2),tx=kx+Math.cos(td)*L;
+ if(j.angled&&model.jt>0){const L=AH().hang(h/2),td=(90+j.bend(model.jt)/2)*PI/180,kx=model.a.x+W+knotX(h/2),ky=model.a.y+pivY(h/2),tx=kx+Math.cos(td)*L;
   x0=Math.min(x0,tx-20);x1=Math.max(x1,tx+20);y1=Math.max(y1,ky+Math.sin(td)*L)}
+ // A join with ornament standing high over the casings (the counterpoise's bough) gives its top.
+ if(j.angled&&model.jt>0&&AH().top)y0=Math.min(y0,model.a.y+AH().top(h/2));
  return{x0:x0-8,x1:x1+8,y0:y0+R-22,y1:y1+R+16};
 }
 // How far the pair has to rise (from where it stood) to clear a w×h Checks at x,y that reaches below it; never past the top of its range.
@@ -4309,7 +4475,7 @@ function settleRise(ms=450,keep=false,delay=0){
 }
 // The pair was moved by hand: it stays where it was put, and any rise is forgotten.
 function pairPlaced(){stopRise();model.rise=0;model.placed++}
-const pairHeld=()=>!!(drag&&(drag.id&&drag.id!=='c'||drag.bend));
+const pairHeld=()=>!!(drag&&(drag.id&&drag.id!=='c'||drag.bend||drag.poise));
 let morphAnim=0;
 function morphTo(id){
  if(drag)cancelDrag();
@@ -4354,7 +4520,9 @@ function joinedPose(fixed='a'){
 /* ---------- Bending the fork ---------- */
 let angAnim=0,dialTok=0,dialTimer=0;
 const branchOn=()=>!!J().angled&&model.jt===1;
-const forkKnot=()=>{const hh=ctx().h/2;return{x:model.a.x+W+AH().s(model.angle,hh),y:model.a.y+pivY(hh)}};
+// kx: a pivot away from the seam (the lantern counterpoise turns GitDiscuss about its crest) gives its place from Jarvis's end directly.
+const knotX=hh=>AH().kx?AH().kx(hh):AH().s(model.angle,hh);
+const forkKnot=()=>{const hh=ctx().h/2;return{x:model.a.x+W+knotX(hh),y:model.a.y+pivY(hh)}};
 // A raised pair pushed down by the fit gives up that much of its rise, so it settles back to where it stood.
 function refitPair(){if(!branchOn())return;const[lo,hi]=AH().fit(model.angle,ctx().h/2),ny=clamp(model.a.y,lo,hi),d=ny-model.a.y;if(d>0)model.rise=Math.max(0,model.rise-d);model.a.y=model.b.y=ny}
 function pairY(){return branchOn()?AH().fit(model.angle,ctx().h/2):[TOP,600-(model.st>.5?HS:H)-14]}
@@ -4496,7 +4664,7 @@ function render(){
  $('#scrub').value=Math.round(model.jt*100);$('#scrubOut').textContent=Math.round(model.jt*100)+'%';
  const p=Math.round(model.jt*100),jt=model.jt;
  const ph={separate:'Separate · two leaves',joining:j.phase(jt,model.dir)+p+'%',joined:'Joined · '+j.label.toLowerCase()+(j.angled?' · '+AH().ph(model.angle):'')};
- $('#phase').textContent=(drag&&drag.bend?(j.hooks?'Turning · ':'Bending · ')+AH().ph(model.angle):drag&&drag.strain>0?(j.txt.strainPh||'Pulling · the braid strains'):drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?MORPHS[model.morph].ph[model.mdir>0?0:1]:'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
+ $('#phase').textContent=(drag&&(drag.bend||drag.poise)?(j.hooks?'Turning · ':'Bending · ')+AH().ph(model.angle):drag&&drag.strain>0?(j.txt.strainPh||'Pulling · the braid strains'):drag&&drag.lift&&model.lift>0?(j.txt.liftPh||'Lifting · the brooch rises'):drag&&drag.state==='ready'?j.txt.readyPh:drag&&drag.state==='near'?j.txt.nearPh:ph[state])+(model.st>.5?' · shaded':'')+(model.g%1?MORPHS[model.morph].ph[model.mdir>0?0:1]:'')+(model.shade==='lantern'&&model.st>=1&&['a','b','c'].some(id=>WK[id]>.5)?' · '+['a','b','c'].filter(id=>WK[id]>.5).map(id=>({a:'Jarvis',b:'GitDiscuss',c:'Checks'})[id]).join(', ')+' awake':'');
  wakeKick();rsKick();
 }
 
@@ -4554,6 +4722,8 @@ function local(e){const r=stage.getBoundingClientRect(),s=r.width/1200;return{x:
 function targetFor(id){const g=J().gap;return id==='b'?{x:model.a.x+W+g,y:model.a.y}:{x:model.b.x-W-g,y:model.b.y}}
 stage.addEventListener('pointerdown',e=>{
  if(e.button!==0)return;
+ // A balance's weight (the lantern) is dragged along its rail; the join's hooks move it and GitDiscuss follows.
+ if(e.target.closest('#poiseHit')&&model.jt===1&&!model.busy&&AH().poise){e.preventDefault();stopAngle();stopRise();drag={poise:true};AH().poise.grab();dialOn();stage.setPointerCapture(e.pointerId);render();return}
  if(e.target.closest('#seamHit')&&model.jt===1&&!model.busy){e.preventDefault();$('#a .grip').focus();
   // The brooch is lifted off: it follows the pointer up, and past a short distance (or on a plain click) it lets go.
   if(J().lift||J().slide){drag={lift:true,start:local(e),moved:0};stage.setPointerCapture(e.pointerId);render();return}
@@ -4574,6 +4744,7 @@ stage.addEventListener('pointerdown',e=>{
 });
 stage.addEventListener('pointermove',e=>{
  if(!drag)return;const p=local(e);
+ if(drag.poise){AH().poise.move(p);return}
  // Judged in screen pixels, so a tap on a phone (where the stage is scaled down) isn't taken for a drag.
  if(drag.cx!==undefined)drag.far=Math.max(drag.far,Math.hypot(e.clientX-drag.cx,e.clientY-drag.cy));
  if(drag.bend){const K=forkKnot(),a=Math.atan2(p.y-K.y,p.x-K.x);let dd=(a-drag.prev)*180/PI;dd=((dd+540)%360)-180;drag.prev=a;
@@ -4609,6 +4780,7 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.poise){AH().poise.drop();return}
  if(d.bend){if(!d.moved){dialSoon(600);render();if(shTapOn())shTap('b');else if(AH().tap)AH().tap();else say(J().txt.joined);return}
   const sn=AH().snap,dn=sn?Math.round(model.angle/sn)*sn:AH().det.find(x=>Math.abs(model.angle-x)<DWIN);
   if(dn!==undefined)animateAngle(dn,380);else{model.angle=Math.round(model.angle*2)/2;refitPair();render();dialSoon();settleRise(300)}
@@ -4622,6 +4794,7 @@ function endDrag(){
 }
 function cancelDrag(){
  if(!drag)return;const d=drag;drag=null;
+ if(d.poise){AH().poise.cancel();return}
  if(d.bend){model.angle=d.th0;refitPair();dialSoon(300);render();settleRise(300);return}
  if(d.lift){model.lift=0;render();return}
  const s=d.saved;for(const id of ['a','b','c'])Object.assign(model[id],s[id]);stopRise();model.rise=s.rise;
