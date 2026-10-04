@@ -278,6 +278,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
   <div class="mw lst" aria-hidden="true" style="left:390px;top:128px;width:88px;height:62px"><div class="tiny">Waiting · 2</div><ul><li>deploy-preview</li><li>e2e-safari</li></ul></div>
   <div class="tri" role="group" aria-label="The last ten runs, one painted sector per run"></div>
  </div>
+ <div class="wv" id="gv1"><div class="tri" role="group" aria-label="Checks, one punched rosette per check"></div></div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
 </section>
@@ -4844,6 +4845,201 @@ MORPHS.flabellum={label:'Flabellum',kind:'Fan',sizes:[['facade','Facade',0,'a fa
  say:(d,S)=>d>0?(S[2]===1?'Checks becomes a flabellum: it rises out of the facade shut in its ivory case, and the boards swing round until the painted vellum is a full disc.':'Procession: two processional flabella rise on staffs beside it and open, the last ten runs painted round one, the two waiting on the other.'):(S[2]===0?'The boards swing back, the vellum folds into the case, and the flabellum sinks into the facade.':'The flabella fold shut and sink into the floor.'),
  about:'A new morph kind for gothic, <b>Fan</b>: Checks grows by turning about one pivot. A <i>flabellum</i> is a liturgical fan, carried beside the altar and in processions. The ninth-century one from the abbey of Tournus is a long strip of pleated vellum, painted in bands, that folds into a carved ivory case on a handle; to open it, the case\'s two boards are swung round about the pivot until they meet, and the vellum stands as a full disc. Here the facade stays as the plinth and keeps its nameplate and display. <b>Flabellum</b> (252 px tall): an ivory collar is set on the cornice, and the handle rises out of the facade through it with the case shut, its boards carved with lancets and capped in gilt. A gilt clasp is unhooked, and the boards swing apart, each through half a turn, until they meet under the pivot with a click. The vellum unfolds between them, its pleats easing from tight shadowed folds to a gentle zigzag edge, and what is painted on it unfolds too: a lapis band with a gilt vine weaving through fourteen medallions, one per check, spaced to leave the foot clear where the boards meet; and, once the pleats lie nearly flat, an inscription band, <i>Run 418 · main</i> across the top, <i>86% passed</i> and <i>2 waiting</i> below. The medallions kindle one by one round the disc, twelve green and the last two, deploy-preview and e2e-safari, red, and a gilt boss is set over the pivot with the count, 12/14. Hover or tap a medallion to read its check, or the boss for the run. <b>Procession</b> (484 px): flabella were carried in pairs, so two smaller ones rise out of the floor on staffs, crimson banners unroll from their crossbars, and they open the same way. The left one has the last ten runs painted round it, 409 from the foot round to 418, green, amber or red, and its banner gives the pass rate; the right one carries the two waiting checks as red medallions, and its banner names them. Hover or tap a painted run to read it. <b>Shrinking</b> folds the vellum back into the cases and lowers them. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading folds it and lowers it first, and unshading raises it again. Nothing moves at rest.'};
 
+/* ---------- Morph: gold leaf (Checks) ---------- */
+// g runs 0 facade, 1 gilt panel, 2 retable. A Stretch: Checks grows by one square of gold being beaten out, the goldbeater's craft, and nothing is added to
+// the gold. A bare oak panel, red with bole, rises out of the facade; a thick square of gold is laid on it and a goldbeater's hammer spreads it in eight blows,
+// its ragged edge creeping over the bole until it overruns the panel; the loose skewings are brushed off, the leaf is burnished with an agate, the border and a
+// rosette per check are punched into it (the two waiting are scraped back to the bole), and the count is tooled in. For the retable, wing boards slide out
+// from behind the panel and the same leaf is beaten on out across them. Everything is drawn in one 484-wide frame (X0 shifts it into the box) and is a function of g.
+const GLH=252,GLW=484,GLF=GLH-CH,GLT=GLF-5,GLCX=242,GLCY=92,GLR0=9,GLR1=118,GLRX0=80,GLRX=240,GLN=8;
+const glArch=(cx,hs,spring,rise)=>{const c=(rise*rise-hs*hs)/(2*hs);return{cx,hs,spring,c,r:hs+c}};
+const GLA=glArch(GLCX,75,98,88),GLWX=[111,373],glWA=x=>glArch(x,59,110,66);
+const glBox=g=>g<1e-6?[CW,CH]:g<=1?[CW,GLH]:[lerp(CW,GLW,ease(seg(g-1,0,.12))),GLH],glDims=k=>[[CW,CH],[CW,GLH],[GLW,GLH]][k];
+// A pointed panel inset by i, its foot at bot: straight sides to the springing, then two arcs struck from centres c either side of the middle.
+function glD(A,i,bot){const r=A.r-i,ay=A.spring-Math.sqrt(r*r-A.c*A.c);return `M${f(A.cx-A.hs+i)} ${f(bot)}V${A.spring}A${f(r)} ${f(r)} 0 0 1 ${f(A.cx)} ${f(ay)}A${f(r)} ${f(r)} 0 0 1 ${f(A.cx+A.hs-i)} ${A.spring}V${f(bot)}Z`}
+// The same outline as points about 2 px apart, from the foot on the left, over the apex, down the right (and along the foot if closed), with lengths.
+function glPts(A,i,bot,closed){
+ const r=A.r-i,x0=A.cx-A.hs+i,x1=A.cx+A.hs-i,dy=-Math.sqrt(r*r-A.c*A.c),pa=Math.atan2(dy,-A.c),pb=Math.atan2(dy,A.c),P=[];
+ for(let y=bot;y>A.spring;y-=2)P.push([x0,y]);
+ const n1=Math.max(8,Math.ceil(r*(pa+Math.PI)/2));for(let k=0;k<=n1;k++){const p=-Math.PI+(pa+Math.PI)*k/n1;P.push([A.cx+A.c+r*Math.cos(p),A.spring+r*Math.sin(p)])}
+ const n2=Math.max(8,Math.ceil(-r*pb/2));for(let k=1;k<=n2;k++){const p=pb*(1-k/n2);P.push([A.cx-A.c+r*Math.cos(p),A.spring+r*Math.sin(p)])}
+ for(let y=A.spring+2;y<=bot;y+=2)P.push([x1,y]);
+ if(closed)for(let x=x1-2;x>x0;x-=2)P.push([x,bot]);
+ const L=[0];for(let k=1;k<P.length;k++)L.push(L[k-1]+Math.hypot(P[k][0]-P[k-1][0],P[k][1]-P[k-1][1]));return{P,L,T:L[L.length-1]};
+}
+const glAt=(R,s)=>{s=clamp(s,0,R.T);let k=1;while(k<R.L.length-1&&R.L[k]<s)k++;const t=(s-R.L[k-1])/((R.L[k]-R.L[k-1])||1),a=R.P[k-1],b=R.P[k];return[lerp(a[0],b[0],t),lerp(a[1],b[1],t)]};
+const glEven=(R,gap)=>{const n=Math.floor(R.T/gap);return[...Array(n).keys()].map(k=>glAt(R,R.T*k/n))};
+// Inside a panel's outline (above the ledge)? Its half-width at height y, inset by i.
+const glIn=(A,x,y)=>{if(y>GLT||y<0)return false;const dx=Math.abs(x-A.cx);if(dx>A.hs)return false;if(y>=A.spring)return true;const q=A.r*A.r-(dx+A.c)**2;return q>0&&y>=A.spring-Math.sqrt(q)};
+const glHW=(A,i,y)=>{if(y>=A.spring)return A.hs-i;const r=A.r-i,q=r*r-(A.spring-y)**2;return q>0?Math.max(0,Math.sqrt(q)-A.c):0};
+// Fixed layout: the rosettes (one per check) and the punched border on the panel, the border on a wing (about its own middle, x 0).
+const GLROS=(()=>{const R=glPts(GLA,18,GLT-13,false);return[...Array(14).keys()].map(m=>glAt(R,R.T*(m+.5)/14))})();
+const GLDOT=glEven(glPts(GLA,11,GLT-11,true),4.2),GLWDOT=glEven(glPts(glWA(0),10,GLT-10,true),4.2);
+const GLCROC=(()=>{const R=glPts(GLA,0,GLT,false);return[.27,.35,.43,.57,.65,.73].map(q=>{const[x,y]=glAt(R,R.T*q),cx=x<GLCX?GLA.cx+GLA.c:GLA.cx-GLA.c,l=Math.hypot(x-cx,y-GLA.spring);return[x,y,(x-cx)/l,(y-GLA.spring)/l]})})();
+// Hammer dents in the thick gold, fixed; they go as it thins.
+const GLDENT=(()=>{let s='';for(let k=0;k<34;k++){const x=180+124*tnR(k,31),y=24+134*tnR(k,37),r=1.6+2.2*tnR(k,41);s+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="#6e4a12" opacity=".55"/><circle cx="${f(x-r*.3)}" cy="${f(y-r*.3)}" r="${f(r*.55)}" fill="#fff0b8" opacity=".5"/>`}return s})();
+// The leaf's torn edge: a fixed ragged radius, so the edge creeps rather than flickers. sup squares the outline off (a superellipse) to reach the wings' corners.
+const glJ=t=>1+.06*Math.sin(5*t+1.3)+.045*Math.sin(11*t+.4)+.03*Math.sin(23*t+2.1)+.02*Math.sin(41*t+.7);
+const glBP=(Rx,Ry,sup,t)=>{const c=Math.cos(t),s=Math.sin(t),j=glJ(t),x=sup?Math.sign(c)*Math.sqrt(Math.abs(c)):c,y=sup?Math.sign(s)*Math.sqrt(Math.abs(s)):s;return[GLCX+Rx*x*j,GLCY+Ry*y*j]};
+const glBlob=(Rx,Ry,sup)=>{let d='';for(let k=0;k<144;k++){const[x,y]=glBP(Rx,Ry,sup,k/144*2*Math.PI);d+=(k?'L':'M')+f(x)+' '+f(y)}return d+'Z'};
+// Eight blows a step; n counts them as they land, and each one widens the leaf by the same ratio.
+const GLBT=k=>.38+.034*k,glN=u=>{let n=0;for(let k=0;k<GLN;k++)n+=ease(seg(u,GLBT(k),GLBT(k)+.012));return n};
+const GLK1=[...Array(GLN).keys()].map(k=>{const d=Math.min(34,.42*GLR0*Math.pow(GLR1/GLR0,k/GLN)),a=k*2.4;return[GLCX+d*Math.cos(a),GLCY+d*Math.sin(a)]});
+// On the retable each blow lands just inside the leaf's edge, left and right in turn.
+const GLK2=[...Array(GLN).keys()].map(k=>[GLCX+(k%2?1:-1)*Math.max(76,.85*GLRX0*Math.pow(GLRX/GLRX0,k/GLN)),GLCY+(k%4<2?-12:20)]);
+// The goldbeater's hammer between blows: raised (h 1, nearer you, its shadow further off) as it moves to the next spot, then brought down; it rests a moment on each blow.
+function glHam(u,T){
+ if(u<=.34||u>=.68)return null;
+ const o=seg(u,.34,.37)*(1-seg(u,.65,.68)),ent=[T[0][0]+46,T[0][1]+58],ext=[T[GLN-1][0]+46,T[GLN-1][1]+58];
+ let m=0;while(m<GLN&&u>=GLBT(m)+.01)m++;
+ if(m<GLN&&u>=GLBT(m))return{x:T[m][0],y:T[m][1],h:0,o};
+ const a=m?GLBT(m-1)+.01:.34,b=m<GLN?GLBT(m):.68,P=m?T[m-1]:ent,N=m<GLN?T[m]:ext,q=seg(u,a,b),e=ease(seg(q,0,.65));
+ const h=m===GLN?ease(seg(q,0,.5)):q<.7?(m?ease(seg(q,0,.55)):1):1-Math.pow(seg(q,.7,1),2);
+ return{x:lerp(P[0],N[0],e),y:lerp(P[1],N[1],e),h,o};
+}
+const glHamSvg=(x,y,hh,o)=>{const s=1+.5*hh;return `<g opacity="${f(o)}"><ellipse cx="${f(x+3+13*hh)}" cy="${f(y+4+15*hh)}" rx="${f(10*s)}" ry="${f(9*s)}" fill="#1a0e04" opacity="${f(.32-.14*hh)}"/><g transform="translate(${f(x)} ${f(y)}) scale(${f(s)})">`+
+ `<path d="M5 5L31 41" stroke="#4a2a12" stroke-width="6" stroke-linecap="round"/><path d="M4.6 5.4L30.6 41.4" stroke="#b07a42" stroke-width="1.8" stroke-linecap="round" opacity=".8"/><circle r="9.5" fill="url(#glIron)" stroke="#0e0c0a" stroke-width=".8"/>`+
+ `<circle r="6.6" fill="none" stroke="#2a2622" stroke-width="1"/><path d="M-6.5 -3.5A7.5 7.5 0 0 1 -1 -7.2" fill="none" stroke="#e6ded0" stroke-width="1.1" stroke-linecap="round" opacity=".75"/></g></g>`};
+// A gilder's mop (a round squirrel-hair brush on a quill), and an agate burnisher.
+const glMop=(x,y,nx,ny,o)=>{y=Math.max(8,y);let hr='';for(let k=0;k<9;k++){const a=k*.7+.3;hr+=`M${f(x)} ${f(y)}L${f(x+7.8*Math.cos(a))} ${f(y+7.8*Math.sin(a))}`}
+ let tx=-ny,ty=nx;if(ty<0){tx=-tx;ty=-ty}const hx=x+tx*24+nx*8,hy=y+ty*24+4;return `<g opacity="${f(o)}"><path d="M${f(x)} ${f(y)}L${f(hx)} ${f(hy)}" stroke="#d8c8a2" stroke-width="2.4" stroke-linecap="round"/><path d="M${f(x)} ${f(y)}L${f(hx)} ${f(hy)}" stroke="#8a7650" stroke-width=".6"/>`+
+ `<circle cx="${f(x)}" cy="${f(y)}" r="7" fill="#6e4e30"/><path d="${hr}" stroke="#b0906a" stroke-width=".55"/><circle cx="${f(x-2)}" cy="${f(y-2)}" r="3" fill="#c8a882" opacity=".4"/></g>`};
+const glBurn=(x,y,o)=>`<g opacity="${f(o)}" transform="translate(${f(x)} ${f(y)})"><path d="M20 24L40 48" stroke="#3a2412" stroke-width="5" stroke-linecap="round"/><path d="M20 24L40 48" stroke="#7a5230" stroke-width="1.4" stroke-linecap="round"/>`+
+ `<rect x="15" y="19" width="8" height="6" rx="1" transform="rotate(48 19 22)" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/><path d="M0 0C1 -4 6 -6 11 -2C15 2 19 10 21 19L16 23C14 15 9 7 3 4C1 3 0 2 0 0Z" fill="url(#glAg)" stroke="#5a3a1a" stroke-width=".5"/>`+
+ `<path d="M3 -.6C6 -3 9 -2 12 1" fill="none" stroke="#fff" stroke-width=".7" opacity=".6"/></g>`;
+// The oak frame round a panel (outline less its inset), with a gilt fillet on the inside edge.
+const glFrame=(A,i)=>{const o=glD(A,0,GLT),n=glD(A,i,GLT-i);return `<path d="${o}${n}" fill-rule="evenodd" fill="url(#glOak)" stroke="#1e1208" stroke-width=".8"/><path d="${n}" fill="none" stroke="url(#gild)" stroke-width="1.3"/><path d="${glD(A,1.4,GLT)}" fill="none" stroke="#a07448" stroke-width=".5" opacity=".5"/>`};
+// Tooled lettering: dark, with a light line under each stroke where the tool has turned the gold up.
+const glTx=(x,y,t,a)=>`<text x="${x}" y="${f(y+.7)}" fill="#fff4c8" opacity=".6" ${a.replace(/ fill="[^"]*"/,'')}>${t}</text><text x="${x}" y="${y}" ${a}>${t}</text>`;
+const glRos=(x,y,m,q)=>{const s=Math.max(.05,ease(q));let o=`<g opacity="${f(Math.min(1,q*3))}" transform="translate(${f(x)} ${f(y)}) scale(${f(s)})">`;
+ if(m>11)return o+`<circle r="4.3" fill="url(#glBole)" stroke="#6e4a12" stroke-width=".6"/><circle r="5.4" fill="none" stroke="#8e1f2b" stroke-width=".7" stroke-dasharray="1.2 1"/></g>`;
+ for(let k=0;k<6;k++)o+=`<circle cx="${f(3.1*Math.cos(k*Math.PI/3))}" cy="${f(3.1*Math.sin(k*Math.PI/3))}" r=".85" fill="#6e4a12"/>`;
+ return o+`<circle r="1.3" fill="#7a5214"/><circle r="4.6" fill="none" stroke="#fff4c4" stroke-width=".45" opacity=".7"/></g>`};
+// One wing board at its middle x (sliding in from behind the panel): bole, the leaf where it has reached, burnish, frame, border and lettering.
+function glWing(k,x,blob2,yb,dq,tq){
+ const A=glWA(x);let s=`<path d="${glD(A,0,GLT)}" fill="url(#glBole)"/><g clip-path="url(#glWi${k})">`;
+ if(blob2)s+=`<path d="${blob2}" fill="url(#glLeaf)"/><path d="${blob2}" fill="none" stroke="#7a4e10" stroke-width=".7" opacity=".5"/>`+(yb>0?`<g clip-path="url(#glB2)"><rect x="${f(x-59)}" y="0" width="118" height="${f(yb)}" fill="url(#glSh${k})"/></g>`:'');
+ s+=`</g>`+glFrame(A,6)+`<circle cx="${f(x)}" cy="${f(A.spring-Math.sqrt(A.r*A.r-A.c*A.c)-2.6)}" r="2.6" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/>`;
+ const nd=Math.floor(GLWDOT.length*dq);if(nd>0)s+=`<g fill="#6e4a12" opacity=".7">${GLWDOT.slice(0,nd).map(([px,py])=>`<circle cx="${f(px+x)}" cy="${f(py)}" r=".8"/>`).join('')}</g>`;
+ if(tq>0){const a=`text-anchor="middle" font-family="Georgia,serif"`,t=k?glTx(x,84,'WAITING · 2',`${a} font-size="7.5" letter-spacing="1.4" fill="#7a1a14"`)+glTx(x,108,'deploy-preview',`${a} font-size="10.5" fill="#2a1704"`)+glTx(x,125,'e2e-safari',`${a} font-size="10.5" fill="#2a1704"`)+glTx(x,145,'on Brent',`${a} font-size="8.5" font-style="italic" fill="#3a2408"`)
+   :glTx(x,84,'PASS RATE',`${a} font-size="7.5" letter-spacing="1.6" fill="#4a2c0a"`)+glTx(x,113,'86%',`${a} font-size="22" font-weight="700" fill="#2a1704"`)+glTx(x,130,'run 418 · main',`${a} font-size="9" fill="#3a2408"`)+glTx(x,146,'12 of 14 passed',`${a} font-size="8.5" font-style="italic" fill="#3a2408"`);
+  s+=tq<1?`<clipPath id="glTw${k}"><rect x="${f(x-56)}" y="60" width="${f(112*tq)}" height="100"/></clipPath><g clip-path="url(#glTw${k})">${t}</g>`:t}
+ return s;
+}
+// The leaf's loose edges past the panels, fluttering until the mop passes: a wedge from the mop's angle (ψ, 0 at the top, clockwise) round to the foot.
+const glWedge=pm=>{let d=`M${GLCX} ${GLCY}`;for(let a=pm;a<Math.PI;a+=.12)d+=`L${f(GLCX+700*Math.sin(a))} ${f(GLCY-700*Math.cos(a))}`;return d+`L${GLCX} ${GLCY+700}Z`};
+const glEdge=(pm,inside)=>{const sx=Math.sin(pm),sy=-Math.cos(pm);for(let r=8;r<330;r+=2){const x=GLCX+sx*r,y=GLCY+sy*r;if(!inside(x,y))return[x,y,sx,sy]}return null};
+function glRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),[w,h]=glBox(g),cx=w/2,ox=cx-CW/2,oy=h-GLH,X0=cx-GLCX,P1=i>0;
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='gl'){ms.dataset.key='gl';ms._d='';ms._bx=null;fx._s=null;
+  const sh=(id,x0)=>`<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${x0}" y1="10" x2="${x0+150}" y2="${GLT}"><stop stop-color="#fff" stop-opacity="0"/><stop offset=".3" stop-color="#fff" stop-opacity=".06"/><stop offset=".42" stop-color="#fffbe6" stop-opacity=".55"/><stop offset=".48" stop-color="#fff" stop-opacity=".75"/><stop offset=".56" stop-color="#fffbe6" stop-opacity=".3"/><stop offset=".74" stop-color="#fff" stop-opacity=".04"/><stop offset=".86" stop-color="#fff" stop-opacity=".3"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>`;
+  ms.innerHTML=`<defs><radialGradient id="glBole" cx=".5" cy=".45" r=".7"><stop stop-color="#b85a3c"/><stop offset=".6" stop-color="#93361f"/><stop offset="1" stop-color="#5e1e12"/></radialGradient>`+
+   `<linearGradient id="glLeaf" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6dc8a"/><stop offset=".35" stop-color="#e0b14c"/><stop offset=".6" stop-color="#f1d27a"/><stop offset=".82" stop-color="#d9a842"/><stop offset="1" stop-color="#c2902c"/></linearGradient>`+
+   `<radialGradient id="glThick" cx=".4" cy=".35" r=".75"><stop stop-color="#ffe9a8"/><stop offset=".35" stop-color="#d49a2c"/><stop offset="1" stop-color="#7a4e0e"/></radialGradient>`+
+   `<linearGradient id="glSkew" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6e6a6"/><stop offset=".5" stop-color="#e2cd7a"/><stop offset="1" stop-color="#b6cc7e"/></linearGradient>`+
+   `<linearGradient id="glOak" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#2c1a0c"/><stop offset=".3" stop-color="#6a4424"/><stop offset=".6" stop-color="#553820"/><stop offset="1" stop-color="#2a180a"/></linearGradient>`+
+   `<radialGradient id="glIron" cx=".38" cy=".34" r=".75"><stop stop-color="#9a928a"/><stop offset=".45" stop-color="#4a4540"/><stop offset="1" stop-color="#151311"/></radialGradient>`+
+   `<linearGradient id="glAg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4e2c4"/><stop offset=".5" stop-color="#c89a64"/><stop offset="1" stop-color="#8a5a2e"/></linearGradient>`+
+   sh('glSh',167)+sh('glSh0',52)+sh('glSh1',314)+
+   `<linearGradient id="glMkG" gradientUnits="userSpaceOnUse" x1="110" y1="0" x2="374" y2="0"><stop stop-opacity="0"/><stop offset=".22" stop-opacity="1"/><stop offset=".78" stop-opacity="1"/><stop offset="1" stop-opacity="0"/></linearGradient>`+
+   `<clipPath id="glRise"><rect x="-60" y="-100" width="604" height="${GLT+100}"/></clipPath><clipPath id="glCi"><path d="${glD(GLA,7,GLT-7)}"/></clipPath></defs><g class="ofac">${cas(0)}</g><g class="odyn"></g>`}
+ const bx=f(w)+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${f(w)} ${h}`)}}
+ ms.querySelector('.ofac').setAttribute('transform',`translate(${f(ox)} ${oy+GLF})`);
+ // The panel's step (full once on the second), then the retable's.
+ const tb=P1?1:seg(u,.02,.1),rs=P1?1:seg(u,.08,.28),ig=P1?1:seg(u,.3,.36),n1=P1?GLN:glN(u),b1=P1?1:seg(u,.66,.74),p1=P1?1:seg(u,.74,.84),d1=P1?1:seg(u,.84,.9),t1=P1?1:seg(u,.9,.99);
+ const se=P1?seg(u,.08,.2):0,ws=P1?seg(u,.16,.34):0,n2=P1?glN(u):0,b2=P1?seg(u,.66,.74):0,p2=P1?seg(u,.74,.84):0,d2=P1?seg(u,.84,.9):0;
+ const R1=GLR0*Math.pow(GLR1/GLR0,n1/GLN),Rx2=GLRX0*Math.pow(GLRX/GLRX0,n2/GLN),blob1=n1>0?glBlob(R1,R1,false):'',blob2=n2>0?glBlob(Rx2,GLR1,true):'';
+ const we=ease(ws)+.025*Math.sin(Math.PI*seg(ws,.7,1)),WX=GLWX.map(x=>lerp(GLCX,x,we)),bl=-X0,br=w-X0;
+ let df=`<clipPath id="glBx"><rect x="${f(bl)}" y="0" width="${f(w)}" height="${GLT}"/></clipPath>`+(blob1?`<clipPath id="glB1"><path d="${blob1}"/></clipPath>`:'')+(blob2?`<clipPath id="glB2"><path d="${blob2}"/></clipPath>`:'');
+ let s='';
+ // Skewings: the leaf beaten past the panel, pale and greenish where the light comes through, fluttering until the mop sweeps them off.
+ // On the retable, the middle (swept on the panel's step) is faded out of the mask softly, so only the new skewings past the wings show.
+ const skw=(blob,b,outs,thr,extra='')=>{if(!blob||b>=1||thr<=0)return '';const pm=-2.45+4.9*b;
+  df+=`<mask id="glMk" maskUnits="userSpaceOnUse" x="-400" y="-400" width="1300" height="1100"><path d="${glWedge(pm)}" fill="#fff"/>${extra}<path d="${outs}" fill="#000"/></mask>`;
+  return `<g clip-path="url(#glBx)"><g mask="url(#glMk)" opacity="${f(.85*thr*(1-seg(b,.94,1)))}"><g transform="translate(0 ${f(.9*Math.sin(u*260))})"><path d="${blob}" fill="url(#glSkew)"/><path d="${blob}" fill="none" stroke="#a8862c" stroke-width=".6"/></g></g></g>`};
+ const cO=glD(GLA,0,GLT);
+ if(!P1)s+=skw(blob1,b1,cO,seg(n1,4.5,5.5));
+ else s+=skw(blob2,b2,cO+WX.map(x=>glD(glWA(x),0,GLT)).join(''),seg(n2,3,4),`<rect x="110" y="-400" width="264" height="900" fill="url(#glMkG)"/>`);
+ // The wing boards, behind the panel until they slide out.
+ if(ws>0){WX.forEach((x,k)=>df+=`<clipPath id="glWi${k}"><path d="${glD(glWA(x),6,GLT-6)}"/></clipPath>`);
+  const yq=k=>p2>0?lerp(48,GLT-6,k?seg(p2,.5,1):seg(p2,0,.5)):0;
+  s+=WX.map((x,k)=>glWing(k,x,blob2,yq(k),d2,k?seg(u,.935,.99):seg(u,.88,.935))).join('')}
+ // The panel: bole, the leaf, dents, burnish, frame, crockets and finial, border, rosettes, lettering, and the thick square before the first blow.
+ if(rs>0){const dy=(1-ease(rs))*(GLT-4)-2.2*Math.sin(Math.PI*seg(rs,.72,1)),thin=n1/GLN;
+  let c=`<path d="${cO}" fill="url(#glBole)"/>`;
+  if(blob1){const op=seg(n1,0,.4);c+=`<g clip-path="url(#glCi)"><path d="${blob1}" fill="url(#glLeaf)" opacity="${f(op)}"/>`+(thin<1?`<path d="${blob1}" fill="url(#glThick)" opacity="${f(op*(1-thin))}"/>`:'');
+   const dn=.9*seg(n1,0,1)*(1-seg(n1,4,7.5));if(dn>0)c+=`<g clip-path="url(#glB1)" opacity="${f(dn)}">${GLDENT}</g>`;
+   if(p1>0)c+=`<g clip-path="url(#glB1)"><rect x="167" y="0" width="150" height="${f(lerp(12,GLT-7,p1))}" fill="url(#glSh)"/><rect x="167" y="0" width="150" height="${f(lerp(12,GLT-7,p1))}" fill="#fff6d0" opacity=".12"/></g>`;
+   c+=`<path d="${blob1}" fill="none" stroke="#7a4e10" stroke-width=".7" opacity="${f(.55*op)}"/></g>`}
+  c+=glFrame(GLA,7)+GLCROC.map(([x,y,nx,ny])=>`<path d="M${f(x+nx)} ${f(y+ny)}q${f(nx*5-ny*2)} ${f(ny*5+nx*2)} ${f(nx*3-ny*5)} ${f(ny*3+nx*5)}" fill="none" stroke="url(#gild)" stroke-width="1.6" stroke-linecap="round"/><circle cx="${f(x+nx*2.6)}" cy="${f(y+ny*2.6)}" r="2.1" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/>`).join('')+
+   `<g fill="url(#gild)" stroke="#3a2608" stroke-width=".4"><rect x="${GLCX-1.2}" y="6" width="2.4" height="6"/><circle cx="${GLCX}" cy="4.6" r="2.3"/><circle cx="${GLCX-3.4}" cy="8" r="2"/><circle cx="${GLCX+3.4}" cy="8" r="2"/></g>`;
+  const nd=Math.floor(GLDOT.length*d1);if(nd>0)c+=`<g fill="#6e4a12" opacity=".7">${GLDOT.slice(0,nd).map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r=".8"/>`).join('')}</g>`;
+  GLROS.forEach(([x,y],m)=>{const q=P1?1:seg(u,.88+.006*m,.895+.006*m);if(q>0)c+=glRos(x,y,m,q)});
+  if(t1>0){const a=`text-anchor="middle" font-family="Georgia,serif"`,t=glTx(GLCX,62,'CHECKS',`${a} font-size="8" letter-spacing="2.2" fill="#4a2c0a"`)+glTx(GLCX,94,'12/14',`${a} font-size="25" font-weight="700" fill="#2a1704"`)+
+    glTx(GLCX,111,'passed · 86%',`${a} font-size="10" font-style="italic" fill="#3a2408"`)+glTx(GLCX,127,'run 418 · main',`${a} font-size="9.5" fill="#3a2408"`)+glTx(GLCX,145,'2 waiting',`${a} font-size="10" font-weight="700" fill="#7a1a14"`);
+   c+=t1<1?`<clipPath id="glTc"><rect x="186" y="40" width="${f(116*t1)}" height="120"/></clipPath><g clip-path="url(#glTc)">${t}</g>`:t}
+  if(ig>0&&n1<.5){const q=ease(ig),k=1-q,sc=1+.7*k;c+=`<g opacity="${f(seg(ig,0,.4)*(1-seg(n1,0,.5)))}"><rect x="${f(GLCX-9+2+12*k)}" y="${f(GLCY-7+3+14*k)}" width="18" height="14" rx="1.5" fill="#1a0e04" opacity="${f(.35-.2*k)}"/>`+
+   `<g transform="translate(${GLCX} ${GLCY}) scale(${f(sc)}) rotate(-8)"><rect x="-9" y="-7" width="18" height="14" rx="1.5" fill="url(#glThick)" stroke="#6e4a12" stroke-width=".6"/><path d="M-8 -6H8L6 -4H-6Z" fill="#fff0b8" opacity=".6"/><path d="M-6 -4V5" stroke="#fff4c4" stroke-width=".6" opacity=".5"/></g></g>`}
+  s+=`<g clip-path="url(#glRise)"><g transform="translate(0 ${f(dy)})">${c}</g></g>`}
+ // The oak ledge on the cornice, lengthened for the wings; once it overhangs the facade, oak braces swing in from its ends to the facade's sides.
+ const sw=P1?lerp(164,392,ease(se)):164*Math.max(.02,ease(tb)),bq=P1?seg(u,.18,.3):0;
+ if(bq>0)s+=[-1,1].map(k=>{const x0=GLCX+k*188,x1=GLCX+k*138,a=(1-ease(bq))*k*-70;return `<g transform="rotate(${f(a)} ${x0} ${GLT+8})"><path d="M${x0} ${GLT+8}L${x1} ${GLT+44}" stroke="#2a180a" stroke-width="5" stroke-linecap="round"/><path d="M${x0} ${GLT+8}L${x1} ${GLT+44}" stroke="#7a5230" stroke-width="1.6" stroke-linecap="round"/><circle cx="${x1}" cy="${GLT+44}" r="2" fill="url(#gild)" stroke="#3a2608" stroke-width=".4"/></g>`}).join('');
+ if(tb>0)s+=`<g><rect x="${f(GLCX-sw/2)}" y="${GLT}" width="${f(sw)}" height="8" fill="#4a2e16" stroke="#1e1208" stroke-width=".7"/><path d="M${f(GLCX-sw/2)} ${GLT+.8}H${f(GLCX+sw/2)}" stroke="#a07448" stroke-opacity=".7" stroke-width=".8"/>`+
+  `<path d="M${f(GLCX-sw/2)} ${GLT+5}H${f(GLCX+sw/2)}" stroke="url(#gild)" stroke-width=".9"/><path d="M${f(GLCX-sw/2+2)} ${GLT+9}H${f(GLCX+sw/2-2)}" stroke="#000" stroke-opacity=".3" stroke-width="2"/></g>`;
+ const d=`<defs>${df}</defs><g transform="translate(${f(X0)} ${oy})">${s}</g>`;
+ if(ms._d!==d){ms._d=d;ms.querySelector('.odyn').innerHTML=d}
+ // Effects: dust where the ledge, the panel and the wings land; the hammer, its sparks and rings; the mop and the flakes it sweeps off; the burnisher; punch glints.
+ const dust=JOINS.buttress.dust,spk=(x,y,t,r)=>{const v=Math.sin(Math.PI*t);return v>.05?`<g opacity="${f(v)}">${sparkle(x,y,r*v)}</g>`:''};
+ let e='';
+ if(!P1){const t=seg(u,.06,.16),t2=seg(u,.22,.34);e+=dust(160,GLT+8,t,4,7,311)+dust(324,GLT+8,t,4,7,313)+dust(167,GLT,t2,5,9,317)+dust(317,GLT,t2,5,9,319)}
+ else{const t=seg(u,.14,.24),t2=seg(u,.3,.42);e+=dust(46,GLT+8,t,4,8,321)+dust(438,GLT+8,t,4,8,323)+dust(52,GLT,t2,5,9,327)+dust(432,GLT,t2,5,9,329)}
+ const T=P1?GLK2:GLK1;
+ for(let k=0;k<GLN;k++){const t=seg(u,GLBT(k),GLBT(k)+.03);if(t>0&&t<1){const[x,y]=T[k];e+=spk(x,y,t,7)+`<circle cx="${f(x)}" cy="${f(y)}" r="${f(5+20*t)}" fill="none" stroke="#fff4c4" stroke-width="${f(1.4*(1-t))}" opacity="${f(.85*(1-t))}"/>`}}
+ const hm=glHam(u,T);if(hm)e+=glHamSvg(hm.x,hm.y,hm.h,hm.o);
+ const b=P1?b2:b1;
+ if(b>0&&b<1){const ins=P1?(x,y)=>glIn(GLA,x,y)||glIn(glWA(GLWX[0]),x,y)||glIn(glWA(GLWX[1]),x,y):(x,y)=>glIn(GLA,x,y),pm=-2.45+4.9*b,E=glEdge(pm,ins);
+  // Flakes: points on the leaf's edge past the panels, let go as the mop reaches them.
+  const Rx=P1?GLRX:GLR1;for(let k=0;k<26;k++){const[x,y]=glBP(Rx,GLR1,P1,2*Math.PI*k/26+.13);if(ins(x,y)||y>GLT-3||y<3||x<bl+3||x>br-3||(P1&&Math.abs(x-GLCX)<130))continue;
+   const r0=.8*(Math.atan2(x-GLCX,GLCY-y)+2.45)/4.9,t=seg(b,r0,r0+.2);if(t<=0||t>=1)continue;
+   e+=`<path d="M0 -2.4L2 0L0 2.4L-2 0Z" fill="#f2df98" stroke="#a8862c" stroke-width=".3" opacity="${f(.9*(1-t))}" transform="translate(${f(x+(x<GLCX?-8:8)*t)} ${f(y+30*t*t)}) rotate(${f(220*t)})"/>`}
+  if(E)e+=glMop(E[0]+E[2]*7,E[1]+E[3]*7,E[2],E[3],seg(b,0,.08)*(1-seg(b,.92,1)))}
+ const p=P1?p2:p1;
+ if(p>0&&p<1){let A,q,y0;if(P1){const k=p<.5?0:1;A=glWA(GLWX[k]);q=k?seg(p,.5,1):seg(p,0,.5);y0=48}else{A=GLA;q=p;y0=12}
+  const yb=lerp(y0,GLT-8,q),hw=Math.max(0,glHW(A,7,yb)-9);e+=glBurn(A.cx+hw*Math.sin(q*Math.PI*(P1?8:11)),yb,seg(p,0,.05)*(1-seg(p,.95,1))*(P1?Math.min(1,Math.abs(p-.5)*20):1))}
+ if(!P1)GLROS.forEach(([x,y],m)=>{e+=spk(x,y,seg(u,.88+.006*m,.9+.006*m),5)});
+ const tg=(x,t)=>t>0&&t<1?spk(x,100,seg(t,0,1),4):'';
+ if(!P1)e+=tg(186+116*t1,t1);else e+=tg(GLWX[0]-56+112*seg(u,.88,.935),seg(u,.88,.935))+tg(GLWX[1]-56+112*seg(u,.935,.99),seg(u,.935,.99));
+ const fxs=e?`<g transform="translate(${f(X0)} ${oy})">${e}</g>`:'';
+ if(fx._s!==fxs){fx._s=fxs;fx.innerHTML=fxs}
+ // Displays: the facade keeps its own; the rosettes take taps once punched.
+ const lit=P1?1:seg(u,.97,1),o1=$('#gv1');
+ if(lit<.01)o1.style.display='none';else Object.assign(o1.style,{display:'block',left:f(X0)+'px',top:oy+'px'});
+ $('#gv1 .tri').style.visibility=lit<1?'hidden':'';
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+oy+GLF)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+oy+GLF)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'being gilded')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function glPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0,k=[...Array(GLN).keys()].filter(m=>u>=GLBT(m)+.006).length;let t;
+ if(i===0)t=u<.1?(up?'setting an oak ledge on the cornice':'lifting the ledge away'):u<.3?(up?'a bare panel, red with bole, rises out of the facade':'the bare panel sinks into the facade'):
+  u<.37?(up?'a square of gold is laid on the bole':'the gold is a thick square again'):u<.66?(up?'beating the gold out, blow '+Math.min(GLN,k+1)+' of '+GLN:'the leaf draws back in, '+k+' blows to undo'):
+  u<.74?(up?'brushing off the ragged edges':'the ragged edges come back'):u<.84?(up?'burnishing the leaf with an agate':'the shine goes off the gold'):u<.88?(up?'punching the border':'the border is smoothed out'):
+  u<.9?(up?'punching the rosettes, one per check':'the rosettes are smoothed out'):(up?'tooling in the count':'the lettering is rubbed out');
+ else t=u<.08?(up?'clearing room beside the panel':'the panel stands alone'):u<.2?(up?'lengthening the ledge':'shortening the ledge'):u<.36?(up?'two wing boards slide out from behind the panel':'the wings slide in behind the panel'):
+  u<.66?(up?'beating the leaf on across the wings, blow '+Math.min(GLN,k+1)+' of '+GLN:'the leaf draws back off the wings, '+k+' blows to undo'):u<.74?(up?'brushing off the ragged edges':'the ragged edges come back'):
+  u<.84?(up?'burnishing the wings':'the shine goes off the wings'):u<.88?(up?'punching the wings\' borders':'the wings\' borders are smoothed out'):(up?'tooling in the pass rate and the waiting':'the wings\' lettering is rubbed out');
+ return 'Checks · '+t;
+}
+MORPHS.gold={label:'Gold leaf',kind:'Stretch',sizes:[['facade','Facade',0,'a facade'],['panel','Gilt panel',1,'a gilt panel'],['retable','Retable',2,'a gilt retable']],ms:[5200,3400],
+ box:glBox,dims:glDims,render:glRender,phase:glPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes a gilt panel: a square of gold is beaten out over the red bole until it covers the panel, then brushed, burnished, punched and lettered.':'Retable: wing boards slide out from behind the panel, and the same leaf is beaten on out across them; the pass rate and the two waiting are tooled into it.'):(S[2]===0?'The lettering is rubbed out, the leaf draws back into a thick square, and the panel sinks into the facade.':'The leaf draws back off the wings, and they slide in behind the panel.'),
+ about:'A <b>Stretch</b> morph (wire\'s memory wire, hollow\'s herse and elven\'s drawn glass are the others): Checks grows by one piece of gold being beaten out, and nothing is added to the gold. A goldbeater hammers a small square of gold until it is a leaf thinner than light, so thin it lets green light through, and Gothic panel painters laid it over red bole, burnished it with an agate and punched patterns into it. Here the facade stays as the plinth and keeps its nameplate and display. <b>Gilt panel</b> (252 px tall): an oak ledge is set on the cornice and a bare pointed panel, red with bole, rises out of the facade behind it, framed in oak with a gilt fillet, crockets and a trefoil finial. A thick square of gold is laid on it, and a goldbeater\'s hammer comes down on it eight times, moving round between blows. Each blow throws a spark and a ring and widens the gold by the same ratio, so its ragged edge creeps out over the bole, the gold paling and its dents smoothing out as it thins, until it runs past the panel\'s edges. Those loose skewings, pale and a little green where the light comes through, flutter until a gilder\'s mop sweeps round the panel and they fall away as flakes. An agate burnisher works down the leaf, leaving it mirror-bright, then a border is punched round it and fourteen rosettes, one per check, are punched round the panel; the last two, deploy-preview and e2e-safari, are scraped back to the red bole, since they are still waiting. Last, CHECKS, 12/14, passed · 86%, run 418 · main and 2 waiting are tooled into the gold. Hover or tap a rosette to read its check. <b>Retable</b> (484 px): the ledge lengthens, oak braces swing in under its ends, two wing boards slide out from behind the panel, and the hammer goes back to the leaf\'s edges, left and right in turn, beating the same gold on out across the wings. Their skewings are brushed off, they are burnished, bordered, and tooled: the pass rate on the left, the two waiting by name on the right. <b>Shrinking</b> runs it back: the lettering is rubbed out and the leaf draws back into its square. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest.'};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30,roll:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
@@ -5081,6 +5277,8 @@ ORUN.forEach((v,r)=>orTipBtn('#hv2 .tri',`Run ${409+r} · ${v} of 14 checks pass
 CHK.forEach((n,j)=>{const[x,y]=flP(FLX,FLY,flMed(j),50.5);orTipBtn('#fv1 .tri',`Medallion ${j+1} of 14 · ${n} · ${j>11?'red, waiting for your approval':'passed'}`,j>11?'need':'pass',`left:${f(x-7)}px;top:${f(y-7)}px;width:14px;height:14px`)});
 orTipBtn('#fv1 .tri','The boss · run 418 on main · 12 of 14 passed · 86%','run',`left:${FLX-22}px;top:${FLY-22}px;width:44px;height:44px`);
 ORUN.forEach((v,r)=>{const[x,y]=flP(FSX[0],FSY,-Math.PI+(r+.5)*Math.PI/5,27);orTipBtn('#fv2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${f(x-6)}px;top:${f(y-6)}px;width:12px;height:12px`)});
+/* Gold leaf: hover, focus or tap a punched rosette to read its check. */
+CHK.forEach((n,j)=>{const[x,y]=GLROS[j];orTipBtn('#gv1 .tri',`Rosette ${j+1} of 14 · ${n} · ${j>11?'scraped back to the red bole, waiting for your approval':'punched in the gold, passed'}`,j>11?'need':'pass',`left:${f(x-6)}px;top:${f(y-6)}px;width:12px;height:12px`)});
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
