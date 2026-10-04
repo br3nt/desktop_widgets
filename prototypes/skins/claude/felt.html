@@ -5309,7 +5309,12 @@ const MORPHS={
   sizes:['Pad','Lit sheet','Full show'],noun:['a pad','a lit sheet','a full show'],up:5000,down:3400,
   pad:()=>model.gq>0?[LX.OX[model.gq>1?2:1],LX.OY]:[0,0],padAt:i=>i?[LX.OX[i],LX.OY]:[0,0],
   fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[LX.W[i],LX.H]:[CW,CH],dims:()=>model.gq>0?[LX.W[model.gq>1?2:1],LX.H]:[CW,CH],
-  sayUp:n=>'A sheet goes up behind Checks, a torch is lit behind it and felt shadows come up to the cloth: Checks becomes '+n+'.',sayDown:n=>'The shadows swell and blur back toward the torch: Checks shrinks to '+n+'.'}
+  sayUp:n=>'A sheet goes up behind Checks, a torch is lit behind it and felt shadows come up to the cloth: Checks becomes '+n+'.',sayDown:n=>'The shadows swell and blur back toward the torch: Checks shrinks to '+n+'.'},
+ folk:{label:'Felt folk',kind:'Gather',
+  about:'The Gather kind (hollow\'s bivouac, gothic\'s statue-columns, elven\'s firefly lantern, wire\'s dragonfly rosette) done in felt, from the little felt people of stop-motion. In a Gather nothing is made: the larger form is built of bodies. Here they are felt folk, one per check, who build a human pyramid and hold Checks up. The pad never changes or moves. <b>Growing:</b> a raspberry gym mat unrolls under the pad. Twelve felt folk in green bobble hats and matching mittens hop in from both sides, a frame at a time. Five stand on the mat with their arms round each other\'s shoulders, four jump up onto their shoulders, and the last three jump to the top and push the pad up with their mittens, squashing as each one lands. Twelve green hats are the twelve passed checks. The mat\'s cotton label reads run 418 · main · 86% passed. Then the two waiting checks, in amber hats, hop in from the right carrying a rolled banner on two sticks. They lift it and step apart to unroll it: waiting for Brent, deploy-preview, e2e-safari. <b>Grandstand:</b> two posts and a navy felt riser come up beside them, and a cotton tape is stretched between the posts: last ten runs · 409–418. Ten more folk hop in holding cards face down over their heads, back row first, and the back row jumps up onto the riser. Then the cards flip over in a wave from left to right, one per run, each with its number and a mark: green passed, red failed (411 and 415), amber waiting (418). <b>Shrinking</b> plays it back: the cards turn over, everyone jumps down and hops off, and the mat rolls up. Every body is placed from the size alone, so nothing moves at rest. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks sends the folk home first, and unshading brings them back. Switching morphs takes Checks back to a pad first.',
+  anchorTL:true,sizes:['Pad','Pyramid','Grandstand'],noun:['a pad','a pyramid','a grandstand'],up:4600,down:3200,
+  fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[PY.W[i],PY.H]:[CW,CH],dims:()=>model.gq>0?[PY.W[model.gq>1?2:1],PY.H]:[CW,CH],
+  sayUp:n=>'Felt folk hop in and gather under Checks: it becomes '+n+'.',sayDown:n=>'The felt folk climb down and hop away: Checks shrinks to '+n+'.'}
 };
 const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
@@ -5410,6 +5415,7 @@ function morphRender(el){
  if(model.morph==='swatch')return sfRender(el,svg,gr,kn,pa);
  if(model.morph==='steam')return stbRender(el,svg,gr,kn,pa);
  if(model.morph==='shadow')return lxRender(el,svg,gr,kn,pa);
+ if(model.morph==='folk')return pyRender(el,svg,gr,kn,pa);
  el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
@@ -6359,6 +6365,141 @@ function lxRender(el,svg,gr,kn,pa){
  gr.style.opacity=1;gr.style.left=f(ox+24)+'px';gr.style.right=f(w-ox-CW+24)+'px';gr.style.top=f(oy+4)+'px';el.querySelector('.strip').style.opacity=0;
  const si=SIZES.findIndex(x=>x[2]===model.g);
  el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 2 failed; deploy-preview and e2e-safari waiting for Brent':''));
+ return true;
+}
+/* ---------- Morph: felt folk (Gather) ---------- */
+// The pad never moves (top-left anchor). g 0→1: a felt mat unrolls under it, and twelve felt folk (one per passed check, in green
+// bobble hats) hop in and climb into a human pyramid, 5 + 4 + 3, whose top row holds the pad up; the two waiting checks, in amber
+// hats, carry in a banner. g 1→2: a felt grandstand fills with ten folk holding a card per recent run, and the cards flip in a wave.
+// Every part is a function of g, so shrinking plays it back and nothing moves at rest.
+const PY={W:[CW,410,618],H:214,CX:138,FL:192,
+ BODY:['#d0912f','#3f807a','#88506f','#b8476e','#36557a','#b5582f','#d9a441','#6d4a8a'],SKIN:['#f3cfa6','#e2b088','#c98f62','#f6d9b8','#a8724a'],
+ OK:['#8fbf4f','#76a83c','#a6cf5e','#6b9a35'],WAIT:'#e0a03a',C:{ok:'#8fbf4f',bad:'#d9533f',wait:'#e0a03a'},INK:'#3b291d',
+ // Pyramid entrances as [row, slot, side]: side 1 comes in from the left. Each row is filled from the middle out, so nobody passes anybody.
+ ORD:[[0,2,1],[0,3,-1],[0,1,1],[0,4,-1],[0,0,1],[1,0,1],[1,3,-1],[1,1,1],[1,2,-1],[2,0,1],[2,2,-1],[2,1,1]],
+ RUNS:[[409,'ok'],[410,'ok'],[411,'bad'],[412,'ok'],[413,'ok'],[414,'ok'],[415,'bad'],[416,'ok'],[417,'ok'],[418,'wait']]};
+const PYF="'Avenir Next',Avenir,'Segoe UI',Helvetica,sans-serif";
+// The top row stands 5 px lower, so its raised mittens show pressed against the pad's bottom edge.
+const pySlot=(r,k)=>({x:PY.CX+(k-([5,4,3][r]-1)/2)*32,y:PY.FL-32*r+(r===2?5:0)});
+// An arm from the shoulder: ar 0 hangs down, .5 is out level (round a neighbour's shoulder), 1 is straight up.
+function pyTip(sd,ar){const th=(20+150*ar)*Math.PI/180,L=14+11*ar;return{x:sd*(9+L*Math.sin(th)),y:-30+L*Math.cos(th)}}
+// Where a body is at local time t of its entrance: hops along the floor from x0 to the take-off point xa, then, if its spot is higher,
+// one big jump up to (x1,y1), then a squash as it lands.
+function pyGo(t,x0,xa,x1,y1){
+ const s=x1>=x0?1:-1,up=y1<PY.FL-1,he=up?.62:.9,n=Math.max(1,Math.round(Math.abs(xa-x0)/30));
+ if(t>=1)return{x:x1,y:y1,sq:0,air:0,s,end:1};
+ if(t<he){const h=t/he*n,k=Math.min(n-1,Math.floor(h)),tt=h-k,air=Math.sin(Math.PI*tt);
+  return{x:lerp(x0,xa,(k+ease(tt))/n),y:PY.FL-9*air,sq:-.1*air+(k?.14*Math.sin(Math.PI*seg(tt,0,.15)):0),air,s,end:0}}
+ if(up&&t<.9){const u=(t-he)/(.9-he),H=22+(PY.FL-y1)*.3+Math.abs(x1-xa)*.08;
+  return{x:lerp(xa,x1,u),y:lerp(PY.FL,y1,u)-H*4*u*(1-u),sq:-.14*Math.sin(Math.PI*u),air:1,s,end:0}}
+ const v=seg(t,.9,1);return{x:x1,y:y1,sq:.3*Math.sin(Math.PI*v),air:0,s,end:v};
+}
+// A felt person: stubby legs, a round body with a buttoned placket, a round head, and a bobble hat with mittens to match.
+// gy is the ground under it for a shadow; arms are [left, right] in the 0..1 scale above.
+function pyFolk(o){
+ if(!o||o.op<=0)return'';
+ const{x,y,sq=0,arms,ex=0,body,skin,hat}=o,sx=1+sq*.3,sy=1-sq*.3,dk='#000';
+ let s='';
+ if(o.gy!=null)s+=`<ellipse cx="${f(x+1)}" cy="${f(o.gy+1)}" rx="${f(11-3*clamp((o.gy-y)/30))}" ry="2.6" fill="#000" opacity="${f(.3*o.op*(o.ga??1))}" filter="url(#sh)"/>`;
+ s+=`<g transform="translate(${f(x)} ${f(y)}) scale(${sx.toFixed(3)} ${sy.toFixed(3)})" opacity="${f(o.op)}"><g filter="url(#tagfelt)">`;
+ [-1,1].forEach((sd,i)=>{const t=pyTip(sd,arms[i]);s+=`<path d="M${sd*8} -30L${f(t.x)} ${f(t.y)}" stroke="${body}" stroke-width="5.4" stroke-linecap="round"/><path d="M${sd*8} -30L${f(t.x)} ${f(t.y)}" stroke="${dk}" stroke-opacity=".18" stroke-width="5.4" stroke-linecap="round"/><circle cx="${f(t.x)}" cy="${f(t.y)}" r="3.5" fill="${hat}"/>`});
+ s+=`<rect x="-7" y="-13" width="5" height="12" rx="2.4" fill="#4b3628"/><rect x="2" y="-13" width="5" height="12" rx="2.4" fill="#4b3628"/><ellipse cx="-5.2" cy="-1.6" rx="4.6" ry="2.6" fill="#2e1f15"/><ellipse cx="5.2" cy="-1.6" rx="4.6" ry="2.6" fill="#2e1f15"/>`+
+  `<ellipse cy="-23" rx="12" ry="12.5" fill="${body}"/><circle cy="-43" r="9" fill="${skin}"/>`+
+  `<path d="M-9.6 -44.5C-9.6 -57 9.6 -57 9.6 -44.5Z" fill="${hat}"/><rect x="-10.2" y="-47" width="20.4" height="4.4" rx="2.2" fill="${hat}"/><circle cy="-55" r="3.7" fill="${hat}"/></g>`;
+ // Stitched details sit outside the felt filter so they stay crisp: placket and buttons, hat ribbing, face.
+ s+=`<path d="M0 -34V-13" stroke="#f7e8c9" stroke-opacity=".7" stroke-width=".9" stroke-dasharray="2 1.8"/><circle cx="2.6" cy="-27" r="1.2" fill="#f7e8c9"/><circle cx="2.6" cy="-20" r="1.2" fill="#f7e8c9"/>`+
+  `<path d="M-7 -46.6v3.6M-3.5 -46.8v3.8M0 -46.8v3.8M3.5 -46.8v3.8M7 -46.6v3.6" stroke="#000" stroke-opacity=".2" stroke-width=".8"/><circle cx="-1.2" cy="-56.2" r="1.3" fill="#fff" opacity=".45"/>`+
+  `<circle cx="${f(-5+ex*.6)}" cy="-40" r="2" fill="#e98a8a" opacity=".55"/><circle cx="${f(5+ex*.6)}" cy="-40" r="2" fill="#e98a8a" opacity=".55"/>`+
+  `<circle cx="${f(-3.1+ex)}" cy="-43.2" r="1.2" fill="#2a1a12"/><circle cx="${f(3.1+ex)}" cy="-43.2" r="1.2" fill="#2a1a12"/></g>`;
+ return s;
+}
+// One entrance: a body's pose from its local time t, settling its arms to `rest` once it lands.
+function pyWalk(t,x0,xa,x1,y1,c,rest,gy){
+ if(t<=0)return null;const p=pyGo(t,x0,xa,x1,y1),up=y1<PY.FL-1;
+ // Arms bob with each hop, fling up for a big jump, then settle to their rest.
+ const arms=rest.map(r=>p.end?lerp(up?.85:.2,r,ease(p.end)):up&&t>=.62?lerp(.2,.85,ease(seg(t,.62,.7))):.2+.3*p.air);
+ // A shadow on the floor while it hops there, fading as it jumps up onto someone's shoulders.
+ return{...c,x:p.x,y:p.y,sq:p.sq,arms,ex:p.s*1.6*(1-p.end),op:seg(t,0,.08),gy:gy!=null?gy:!up||t<.7?PY.FL:null,ga:gy!=null||!up?1:1-seg(t,.62,.7)};
+}
+// A card held over the head by both mittens: cream back, or its run in its status colour; flipped by w (0 back, 1 front).
+function pyCard(x,y,run,st,w){
+ const sc=Math.abs(Math.cos(Math.PI*w)),front=w>.5,c=PY.C[st],ink=st==='bad'?'#fff3e0':PY.INK;
+ let s=`<g transform="translate(${f(x)} ${f(y-66)}) scale(1 ${Math.max(.04,sc).toFixed(3)})"><rect x="-14" y="-11" width="28" height="22" rx="3" fill="#000" opacity=".3" transform="translate(1 1.5)"/>`;
+ if(!front)return s+`<rect x="-14" y="-11" width="28" height="22" rx="3" fill="#e9dcc0" filter="url(#tagfelt)"/><rect x="-10.5" y="-7.5" width="21" height="15" rx="2" fill="none" stroke="#8c7d64" stroke-width=".8" stroke-dasharray="2 1.6"/></g>`;
+ const mk=st==='ok'?`<path d="M-3.4 5.4l2.2 2.2l4.6-4.6" fill="none" stroke="${ink}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`:
+  st==='bad'?`<path d="M-2.6 3.2l5.2 5.2M2.6 3.2l-5.2 5.2" stroke="${ink}" stroke-width="1.6" stroke-linecap="round"/>`:`<path d="M-4 5.8h.1M0 5.8h.1M4 5.8h.1" stroke="${ink}" stroke-width="2" stroke-linecap="round"/>`;
+ return s+`<rect x="-14" y="-11" width="28" height="22" rx="3" fill="${c}" filter="url(#tagfelt)"/><text y="1" font-family="${PYF}" font-size="9.5" font-weight="800" text-anchor="middle" fill="${ink}">${run}</text>${mk}</g>`;
+}
+// A wooden post on a felt foot with a raspberry knob, grown up from y0 to height k.
+function pyPost(x,y0,top,k){
+ if(k<=0)return'';const t=y0-(y0-top)*k;
+ return `<rect x="${f(x-2.7)}" y="${f(t)}" width="5.4" height="${f(y0-t)}" rx="2.7" fill="#b98b5a"/><path d="M${f(x-1)} ${f(t+4)}V${y0-3}" stroke="#f1d6ad" stroke-opacity=".6" stroke-width="1"/><circle cx="${f(x)}" cy="${f(t)}" r="5.6" fill="#b8476e" filter="url(#tagfelt)"/>`;
+}
+function pySvg(g,fr){
+ const a=g>=1?1:g,b=g>=1?g-1:0,{FL,CX,INK}=PY,T=(x,y,s,t,w=700,ex='')=>`<text x="${x}" y="${y}" font-family="${PYF}" font-size="${s}" font-weight="${w}" text-anchor="middle" fill="${INK}"${ex}>${t}</text>`;
+ const keep=BO;BO=fr<0?0:(fr%3)*31;const pad=casing('c',CW,CH);BO=keep;
+ let x='';
+ // The mat unrolls left to right: a raspberry felt gym mat with a cream running stitch, and the run sewn on its front.
+ const m=ease(seg(a,0,.08));
+ if(m>0){const x0=40,x1=lerp(46,236,m),mw=x1-x0;
+  x+=`<rect x="${x0}" y="${FL+4}" width="${f(mw)}" height="16" rx="5" fill="#000" opacity=".35" filter="url(#sh)"/><path d="${rr4(x0,FL-4,mw,22,[5,5,6,6])}" fill="#b8476e" filter="url(#tagfelt)"/><path d="M${x0+2} ${FL}H${f(x1-2)}" stroke="#000" stroke-opacity=".18" stroke-width="1"/>`+
+   `<path d="M${x0+5} ${FL+15}H${f(x1-5)}" stroke="#f7e8c9" stroke-opacity=".85" stroke-width="1.1" stroke-dasharray="3 2.4" stroke-linecap="round"/>`;
+  if(m<1)x+=`<rect x="${f(x1-5)}" y="${FL-6}" width="10" height="26" rx="5" fill="#a03d61" filter="url(#tagfelt)"/>`;
+  const l=backOut(seg(a,.74,.84));
+  if(l>0)x+=`<g transform="translate(${CX} ${FL+7.5}) scale(${f(Math.max(.01,l)*100)/100})"><rect x="-74" y="-6.5" width="148" height="13" rx="2" fill="#f2e9d6"/><rect x="-74" y="-6.5" width="148" height="13" rx="2" fill="url(#woven)" opacity=".7"/>`+
+   `<rect x="-71.5" y="-4.5" width="143" height="9" rx="1.5" fill="none" stroke="#b8476e" stroke-width=".7" stroke-dasharray="1.8 1.6"/>${T(0,3.6,9.5,'run 418 · main · 86% passed',700,` opacity="${f(seg(a,.8,.86))}"`)}</g>`}
+ // The pyramid, back row first so the lower rows' heads sit in front of the legs above them.
+ const L=[[],[],[]];
+ PY.ORD.forEach(([r,k,sd],i)=>{const t=seg(a,.06+i*.042,.26+i*.042),sp=pySlot(r,k),x0=sd>0?34:PY.W[1]-34,xa=r?(sd>0?40:236):sp.x;
+  L[r][k]=pyWalk(t,x0,xa,sp.x,sp.y,{body:PY.BODY[i%8],skin:PY.SKIN[i%5],hat:PY.OK[i%4]},r===2?[1,1]:[.42,.42])});
+ for(const r of [2,1,0])for(const o of L[r])x+=pyFolk(o);
+ // The two waiting checks come in from the right with a rolled banner on two sticks, then step apart to unroll it.
+ const wt=seg(a,.72,.86),u=ease(seg(a,.86,.96));
+ if(wt>0){const hl=pyWalk(wt,320,244,244,FL,{body:'#36557a',skin:PY.SKIN[3],hat:PY.WAIT},[.15,.8],FL),hr=pyWalk(wt,371,295,295,FL,{body:'#88506f',skin:PY.SKIN[1],hat:PY.WAIT},[.8,.15],FL);
+  if(u>0){const st=seg(a,.86,.96),hop=Math.abs(Math.sin(Math.PI*3*st))*(st<1?6:0);hr.x=lerp(295,384,u);hr.y=FL-hop;hr.ex=1.6*Math.sin(Math.PI*st)}
+  hl.arms=[.15,wt<1?lerp(.3,.8,seg(wt,.9,1)):.8];hr.arms=[wt<1?lerp(.3,.8,seg(wt,.9,1)):.8,.15];
+  const sl=hl.x+pyTip(1,hl.arms[1]).x,sr=hr.x+pyTip(-1,hr.arms[0]).x,sy=hl.y+pyTip(1,hl.arms[1]).y,syr=hr.y+pyTip(-1,hr.arms[0]).y,op=hl.op;
+  const stick=(sx,yy)=>`<g opacity="${f(op)}"><rect x="${f(sx-1.6)}" y="${f(yy-62)}" width="3.2" height="${f(Math.min(yy+36,FL-2)-yy+62)}" rx="1.6" fill="#b98b5a"/><circle cx="${f(sx)}" cy="${f(yy-63)}" r="3.4" fill="#d9a441" filter="url(#tagfelt)"/></g>`;
+  x+=stick(sl,sy)+stick(sr,syr);
+  const bw=sr-sl;
+  x+=`<g opacity="${f(op)}"><path d="M${f(sl)} ${f(sy-58)}L${f(sr)} ${f(syr-58)}V${f(syr-6)}L${f(sl)} ${f(sy-6)}Z" fill="#000" opacity=".25" transform="translate(1.5 2)" filter="url(#sh)"/>`+
+   `<path d="M${f(sl)} ${f(sy-58)}L${f(sr)} ${f(syr-58)}V${f(syr-6)}L${f(sl)} ${f(sy-6)}Z" fill="#efe6d2"/><path d="M${f(sl)} ${f(sy-58)}L${f(sr)} ${f(syr-58)}V${f(syr-6)}L${f(sl)} ${f(sy-6)}Z" fill="url(#woven)" opacity=".6"/>`;
+  if(bw>12)x+=`<path d="M${f(sl+3)} ${f(sy-54)}L${f(sr-3)} ${f(syr-54)}M${f(sl+3)} ${f(sy-10)}L${f(sr-3)} ${f(syr-10)}" stroke="${PY.WAIT}" stroke-width="1.2" stroke-dasharray="3 2.2" stroke-linecap="round"/>`;
+  if(u<1)x+=`<rect x="${f(sr-4-4*(1-u))}" y="${f(syr-60)}" width="${f(8+8*(1-u))}" height="56" rx="${f(4+4*(1-u))}" fill="#e3d8c0" stroke="#8c7d64" stroke-width=".6"/>`;
+  const to=seg(a,.95,1);
+  if(to>0){const cx=(sl+sr)/2,cy=(sy+syr)/2-58;x+=`<g opacity="${f(to)}">`+T(cx,cy+13,9,'waiting for Brent',600)+T(cx,cy+29,10,'deploy-preview',800)+T(cx,cy+44,10,'e2e-safari',800)+'</g>'}
+  x+='</g>'+pyFolk(hl)+pyFolk(hr)}
+ // The grandstand: a felt riser and two posts come up, a cotton tape is stretched between them,
+ // then ten folk hop in holding cards face down, back row first, and the cards flip over in a wave.
+ if(b>0){const X0=420,X1=612,RT=FL-46,rk=backOut(seg(b,0,.14)),pk=ease(seg(b,.08,.18)),tu=ease(seg(b,.16,.28));
+  x+=pyPost(426,FL,40,pk)+pyPost(606,FL,40,pk);
+  if(tu>0){const tx=lerp(430,602,tu);x+=`<rect x="428" y="44" width="${f(tx-428)}" height="15" rx="2" fill="#000" opacity=".25" transform="translate(1 1.5)" filter="url(#sh)"/><rect x="428" y="44" width="${f(tx-428)}" height="15" rx="2" fill="#f2e9d6"/><rect x="428" y="44" width="${f(tx-428)}" height="15" rx="2" fill="url(#woven)" opacity=".7"/>`;
+   if(tu<1)x+=`<rect x="${f(tx-4)}" y="42" width="8" height="19" rx="4" fill="#e3d8c0" stroke="#8c7d64" stroke-width=".6"/>`;
+   else x+=`<path d="M432 47H598M432 56H598" stroke="#36557a" stroke-width=".8" stroke-dasharray="2 1.8"/>`+T(516,55.2,10,'last ten runs · 409–418',700,` opacity="${f(seg(b,.28,.34))}"`)}
+  if(rk>0){const ht=46*rk,top=FL-ht;x+=`<rect x="${X0+2}" y="${f(top+4)}" width="${X1-X0}" height="${f(ht)}" rx="6" fill="#000" opacity=".3" filter="url(#sh)"/><path d="${rr4(X0,top,X1-X0,ht,[6,6,3,3])}" fill="#36557a" filter="url(#tagfelt)"/>`+
+   `<path d="${rr4(X0+1,top,X1-X0-2,Math.min(ht,8),[6,6,2,2])}" fill="#5b7aa0" filter="url(#tagfelt)"/>`+(ht>14?`<path d="M${X0+6} ${f(top+12)}H${X1-6}" stroke="#f7e8c9" stroke-opacity=".75" stroke-width="1" stroke-dasharray="3 2.4"/>`:'')}
+  const back=[],front=[];
+  for(let i=0;i<10;i++){const row=i<5?0:1,k=i%5,x1=row?438+36*k:456+36*k,y1=row?FL:RT,t=seg(b,.2+i*.05,.4+i*.05);
+   const o=pyWalk(t,600,x1,x1,y1,{body:PY.BODY[(i*3+1)%8],skin:PY.SKIN[(i+2)%5],hat:i%2?'#efe2c4':'#2f4868'},[1,1],null);
+   // Shadows fall on the floor, or on the riser once a back-row body has landed on it; none mid-jump.
+   if(o){o.arms=[1,1];o.gy=row||t<.7?FL:t>=.9?RT:null;o.ga=row?1:t<.7?1-seg(t,.62,.7):seg(t,.9,.95);
+    const[run,st]=PY.RUNS[i];o.card=pyCard(o.x,o.y+19.8*o.sq,run,st,seg(b,.86+.01*i,.91+.01*i));(row?front:back).push(o)}}
+  for(const o of back)x+=pyFolk(o)+(o.op>0?`<g opacity="${f(o.op)}">${o.card}</g>`:'');
+  for(const o of front)x+=pyFolk(o)+(o.op>0?`<g opacity="${f(o.op)}">${o.card}</g>`:'')}
+ return x+pad;
+}
+function pyRender(el,svg,gr,kn,pa){
+ el.dataset.m='1';pa.style.display='none';el.querySelectorAll('.pp,.cp,.sd,.ck,.cktool,.mb').forEach(n=>n.style.display='none');el.classList.remove('sdb');
+ // Until the first drawn frame moves (gq still 0) the box is the bare pad's, so nothing jumps; the pad sits at the box's top-left at every size.
+ const on=model.gq>0,w=on?PY.W[model.gq>1?2:1]:CW,h=on?PY.H:CH,fr=model.mFr<0?-1:model.mFr%3;
+ el.style.width=w+'px';el.style.height=h+'px';el.style.transform='';
+ const key=`py|${model.gq}|${fr}`;
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=on?pySvg(model.gq,model.mFr):casing('c',CW,CH)}
+ const mini=el.querySelector('.mini');mini.style.left='17px';mini.style.top='25px';mini.style.opacity=1;mini.style.visibility='visible';
+ kn.style.left='243px';kn.style.top='34px';kn.style.opacity=1;kn.style.visibility='visible';
+ gr.style.opacity=1;gr.style.left='24px';gr.style.right=f(w-CW+24)+'px';gr.style.top='4px';el.querySelector('.strip').style.opacity=0;
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'felt folk moving')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed; deploy-preview and e2e-safari waiting for Brent':'')+(model.g>=2?'; last ten runs 409 to 418, 411 and 415 failed, 418 waiting':''));
  return true;
 }
 const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
