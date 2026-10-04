@@ -337,7 +337,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. With the ribbon roll, drag GitDiscuss's nameplate to roll it round Jarvis's roundel (it settles on the nearest 15° star); tap the roundels to release. With the lantern counterpoise, drag the lantern along the rail under GitDiscuss and GitDiscuss tips after it (it settles on the nearest 15° mark); tap the bough or the chain to release. With moonwater ice, tap the ice to thaw it. With the honeysuckle screw, slide the nut along the screw over Jarvis's roof (or turn the wheel on its end for fine work) and GitDiscuss tips, resting at any angle; tap the boss, the stem or the bow to release. With the lodestones, tap the lodestar to turn it over and push the casings apart, or pull a casing away (let go early and the stones draw it back). Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
+<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M grows Checks to its next size (and from the largest back to the smallest) · Esc cancels a drag. A lantern-sleeping leaf wakes on hover, a tap, or keyboard focus on its nameplate. With the aspen leaf shade on, tap a strip (or press Enter on its nameplate) to turn its leaf to the next screen. With the leaf-eye stay, drag GitDiscuss's nameplate to swing it (the stay lifts and drops onto the nearest eye); tap the stay or its pin to release. With the ribbon roll, drag GitDiscuss's nameplate to roll it round Jarvis's roundel (it settles on the nearest 15° star); tap the roundels to release. With the lantern counterpoise, drag the lantern along the rail under GitDiscuss and GitDiscuss tips after it (it settles on the nearest 15° mark); tap the bough or the chain to release. With moonwater ice, tap the ice to thaw it. With the honeysuckle screw, slide the nut along the screw over Jarvis's roof (or turn the wheel on its end for fine work) and GitDiscuss tips, resting at any angle; tap the boss, the stem or the bow to release. With the lodestones, tap the lodestar to turn it over and push the casings apart, or pull a casing away (let go early and the stones draw it back). With the tendril lacing, drag the moonstone bead out of the mouth to draw the lace in and close GitDiscuss (its tendrils grow), or push it in to open it, resting at any angle; tap the lacing to release. Checks has no joining edges, as in the capsule study. Motion is slow and unfurling: things grow rather than slide. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=44,CW=276,CH=78,CHS=38,SEP=170,NEAR=120,READY=40,TOP=70,SNAP=46;
@@ -890,6 +890,29 @@ const JOINS={
    if(jt>.5)return'Releasing · the field lines break and curl away ';return LDS.pulled?'Releasing · the casings part ':'Releasing · like faces push the casings apart '},
   about:'A new join kind, Attract. In every other join something is fastened, wound, grown or poured across the seam; in an Attract nothing crosses it, and the casings hold each other across an open gap by a pull you can only see through what it arranges. Elves would not bolt a leaf to a leaf, so each joining stem carries a lodestone, a dark polished stone of magnetite with a blue sheen, set in a silver collet: Jarvis\'s is inlaid with a star and GitDiscuss\'s with a crescent, and the star draws the moon. <b>Near:</b> the stones glimmer and the field reaches out from their faces in faint stubs. <b>Ready:</b> the whole field and the lodestar are traced in dashed moonlight. <b>Joining:</b> the casings drift together, hang a moment, then leap the last of the way, and stop dead a gap apart with a ring of light; star dust that drifted in as they closed flies into the field, each mote turning to lie along its line, as iron filings do round a magnet; seven silver hairlines are drawn out of the two stone faces, bowing up and down, and meet in the middle with a glint. A lodestar, a small silver compass rose with a needle, rises spinning on the middle line and settles pointing from star to moon. Last, the stones and the lodestar\'s hub kindle as the join light (moonlight while both widgets run, a cold grey if either is paused) and a glint runs along the middle line. The field stays in the gap, clear of both displays, and scales with any shade. Nothing moves at rest. <b>Release:</b> tap the lodestar or anywhere on the field, or focus it and press Enter. The stones dim, the lodestar turns over, and GitDiscuss\'s crescent turns to a star, so star faces star; the field lines break in the middle and curl away from each other, the dust scatters, and like faces push the casings apart. Or pull a casing away: the field stretches thin and the dust trembles, and if you let go the stones draw it back; past a hand-width the field tears, the lodestar spins loose, and the casings part. Drag a nameplate to move the pair.',
   over:c=>drawLode(c)
+ },
+ // part:.3 keeps the casings together on release until the eyelets have folded: one timeline both ways, so a reversal never jumps.
+ tendril:{label:'Tendril lacing',kind:'Angle · lace',angled:true,a0:30,part:.3,
+  get gap(){return TL.gap},
+  get hooks(){return TLH},
+  // Level, there is no swing, so the join and release take a little less time.
+  get slow(){return model.angle?1.85:1.55},get msOut(){return model.angle?4200:3500},
+  bend(jt){return tlBend(jt)},
+  txt:{join:'The casings close on a corner, silver eyelets bloom on both ends, a lace of silver silk laces itself up through them and both ends pass through a moonstone bead; the silk left over curls up as two tendrils, and GitDiscuss swings open while the crossings take some of it back.',
+   joined:'Joined by tendril lacing: the tendrils\' curls are the silk the crossings leave over. Drag the bead out of the mouth to draw the lace in and close GitDiscuss, or push it in to open it; drag GitDiscuss\'s nameplate, use the Angle slider, or press ↑ ↓. It rests at any angle. Tap the lacing to release.',
+   release:'The bead dims, GitDiscuss swings closed as the tendrils unwind, the ends slip back out of the bead, the silk unlaces and the eyelets fold before the casings part.',
+   stop:'The silk unlaces and the eyelets fold.',
+   hold:'Held mid-join: the eyelets have bloomed and the silk is lacing itself up, its first crossing made. Use the scrubber to step through it.',
+   ready:'Ready: the eyelets, the lacing, the bead and its tendrils are traced in moonlight at the set angle. Release to lace it.',near:'Nearby: the facing ends glimmer and a silk tendril uncurls from Jarvis\'s end. Move closer.',
+   readyPh:'Ready · the lacing is traced',nearPh:'Nearby · a tendril uncurls'},
+  phase:(jt,dir)=>{const r=!!model.angle;
+   if(dir>0){if(jt<.3)return'Joining · closing in ';if(jt<.42)return'Joining · silver eyelets bloom on both ends ';if(jt<.48)return'Joining · the silk is laid across the narrow end ';
+    if(jt<.64)return'Joining · the silk laces itself up, crossing '+(jt<.56?'once ':'twice ');if(jt<.7)return'Joining · a moonstone bead drops in and both ends pass through it ';
+    if(jt<.78)return'Joining · the spare silk curls into tendrils ';if(r&&jt<.9)return'Joining · GitDiscuss swings open and the tendrils wind in ';return'Joining · the bead kindles '}
+   if(jt>.9)return'Releasing · the bead dims ';if(r&&jt>.78)return'Releasing · GitDiscuss swings closed and the tendrils unwind ';if(jt>.7)return'Releasing · the tendrils wind back into the bead ';
+   if(jt>.64)return'Releasing · the ends slip out of the bead ';if(jt>.6)return'Releasing · the bead is lifted away ';if(jt>.48)return'Releasing · the silk unlaces ';if(jt>.42)return'Releasing · the last bar is drawn in ';return jt>.3?'Releasing · the eyelets fold ':'Releasing · the casings part '},
+  about:'The Lace angle kind in elven, after felt\'s lacing card, hollow\'s thorn lacing and gothic\'s bell-rope lacing: the angle is held by how much of one lace the crossings take. Felt ties the spare lace in a bow, hollow winds it on a bobbin and gothic hangs a bell on it; elven lets it grow, so the spare silk curls up as tendrils, the way a vine\'s tendrils coil when they find nothing to hold. The casings close on a 22 px gap and GitDiscuss turns on the inside corner of it: the bottom corner when it is lowered (the lacing opens upward) and the top corner when it is raised (it hangs down). Three pairs of silver eyelets stand off the two facing ends, each a small ring on a shank (the outer pairs spring from the rims of the stems\' moonstone knops, the middle pair from a two-leaf mount), at the same heights from either corner. One lace of silver silk runs through them: a bar across the narrow end, then two crossings (Jarvis\'s strand over at the first, GitDiscuss\'s at the second), then both ends pass through a moonstone bead in the mouth, crossing as they go, and curl away from each other as two tendrils. Each tendril is half of what the crossings leave over, so level they are long and coiled about three turns, and at 45° they are short hooks: the tendrils\' turns read the angle. <b>Near:</b> the facing ends glimmer and a silk tendril uncurls from Jarvis\'s end. <b>Ready:</b> the eyelets, the lacing, the bead and the tendrils at the set angle are traced in dashed moonlight. Joining: the casings close and the eyelets bloom out of both ends from the corner out. The silk is laid across the narrow end, and its two glinting tips lace themselves up, crossing twice, and pass through the bead as it drops into the mouth. The spare silk curls out as two tendrils with a pair of leaves at the bead. Then GitDiscuss swings open a little past its angle and back, and the tendrils wind in as the crossings take their silk. Last, the bead kindles as the join light (moonlight while both widgets run, a cold grey if either is paused) and a glint runs up the lace. <b>Angle:</b> −45° to +45°, resting at any angle. Drag the bead out of the mouth to draw the lace in (GitDiscuss closes toward level, 0.8° a pixel, and the tendrils grow), or push it back in to give the crossings slack (it opens); drag GitDiscuss\'s nameplate round the corner; use the slider; or focus the lacing and press ↑ ↓ to go to the next 15° mark. Crossing level, the lace and its tendrils move over to the other corner in a short crossfade while the eyelets stay. A moonstone tag reads the angle and the tendrils\' turns while it moves. Shading scales the lacing with the casings. Nothing moves at rest. <b>Release:</b> tap the lacing, or focus it and press Enter. The bead dims, GitDiscuss swings closed as the tendrils unwind, the ends slip back out of the bead, the silk unlaces and the eyelets fold before the casings part.',
+  over:c=>drawTendril(c)
  }
 };
 /* ---------- Lily petals: moon-white petals wedged into the opening, one per 15° (Wedge) ---------- */
@@ -1109,6 +1132,142 @@ function drawStay(c){
  // The hit area is the stay and the pin, so GitDiscuss's nameplate stays free to turn it.
  if(jt===1){const r=deg*PI/180,E={x:Pv.x+Math.cos(r)*G.L,y:Pv.y+Math.sin(r)*G.L};
   o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Leaf-eye stay: GitDiscuss at ${signed(model.angle)}, the stay on eye ${lyN(model.angle)+1} of 4. Up and down arrows swing GitDiscuss an eye; Enter lifts the stay off and separates the widgets"><title>Tap the stay or its pin to release; drag GitDiscuss's nameplate to swing it</title><path d="M${P(Pv)}L${P(E)}" stroke="transparent" stroke-width="16" stroke-linecap="round"/><circle cx="${f(Pn.x)}" cy="${f(Pn.y)}" r="${f(10*kk+3)}" fill="transparent"/><path class="ringfocus" d="M${P(Pv)}L${P(E)}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3"/></g>`}
+ return o}
+/* ---------- Tendril lacing: one silk lace criss-crossed through leaf eyelets, its spare curled up as tendrils (Lace) ---------- */
+// The Lace angle kind in elven. GitDiscuss turns on the inside corner of a 22 px gap (the bottom one when lowered, the top one when raised).
+// Three pairs of silver eyelets stand off the facing ends, at the same heights from either corner, and carry one lace of silver silk: a bar
+// across the narrow end, two crossings, then both ends through a moonstone bead at the mouth. What the crossings leave over curls up past
+// the bead as two tendrils, so their turns read the slack: about three turns level, a short hook at 45°.
+// Joining: eyelets bloom .3–.43, bar .42–.48, lacing .48–.64, the bead drops .6–.68 and the ends pass through it .64–.7, tendrils curl
+// .68–.78, GitDiscuss swings open .78–.9 (the tendrils winding in as the crossings take their silk), then the bead kindles.
+const TL={gap:22,side:1,old:1,ft:-1e9,loop:false,mv:null};
+const tlKK=h=>Math.max(clamp(h/H,.34,1),.6);
+// Level, the lacing stays on the corner it was last on.
+const tlSg=a=>a<0?-1:a>0?1:TL.side;
+// Page geometry for Jarvis at (ax, ay), casing height h, GitDiscuss turned th about the corner Q; sg picks the corner.
+function tlGeo(ax,ay,h,th,sg){
+ const kk=tlKK(h),ex=18-4*kk,Q={x:ax+W+TL.gap/2,y:ay+(sg>0?h-5:5)},t=th*PI/180,co=Math.cos(t),si=Math.sin(t);
+ const U=(x,d)=>({x:Q.x+x,y:Q.y-sg*d}),rot=p=>({x:Q.x+(p.x-Q.x)*co-(p.y-Q.y)*si,y:Q.y+(p.x-Q.x)*si+(p.y-Q.y)*co});
+ // The outer pairs stand level with the stems' moonstone knops and spring from their rims; the middle pair has its own leaf mount.
+ const ds=[11,(h-10)/2,h-21];
+ const J=ds.map(d=>U(-ex,d)),G=ds.map(d=>rot(U(ex,d))),Jf=ds.map(d=>U(-18,d)),Gf=ds.map(d=>rot(U(18,d)));
+ // The mouth's bisector, pointing out of the wedge; the bead sits on it just past the top pair.
+ const n={x:sg*Math.sin(t/2),y:-sg*Math.cos(t/2)},m={x:(J[2].x+G[2].x)/2,y:(J[2].y+G[2].y)/2},Bd={x:m.x+n.x*(7*kk+3),y:m.y+n.y*(7*kk+3)};
+ return{kk,Q,J,G,Jf,Gf,n,Bd,th,sg}}
+const tlLen=(p,q)=>Math.hypot(p.x-q.x,p.y-q.y);
+function tlTaken(g){const {J,G,Bd}=g;return tlLen(J[0],G[0])+tlLen(J[0],G[1])+tlLen(G[1],J[2])+tlLen(G[0],J[1])+tlLen(J[1],G[2])+tlLen(J[2],Bd)+tlLen(G[2],Bd)}
+// One length of lace: each tendril is half of what the crossings leave over, a short hook at 45° and longest level.
+function tlCurlL(h,th){const kk=tlKK(h),T=a=>tlTaken(tlGeo(0,0,h,Math.abs(a),1));return 10*kk+(T(45)-T(th))/2}
+const tlTurns=(h,th)=>tlCurlL(h,th)/(6*tlKK(h))/(2*PI);
+function tlTurnsTxt(a){const n=Math.round(tlTurns(ctx().h,a)*10)/10;return n+(n===1?' turn':' turns')}
+function tlBend(jt){if(jt>=1)return model.angle;if(!model.angle||jt<.78)return 0;if(jt>=.9)return model.angle;
+ const u=seg(jt,.78,.9),A=model.angle;return u<.7?A*1.03*ease(u/.7):lerp(A*1.03,A,ease(seg(u,.7,1)))}
+// An eyelet: a ring R on a shank from the end at F, with a leaf up and down the end (deg turns them with GitDiscuss), grown g.
+function tlEye(R,F,kk,g,deg,lv){if(g<=.01)return '';const r=(2.7*kk+.3)*g;
+ return `<path d="M${P(F)}L${P(R)}" stroke="${NIGHT}" stroke-width="${f(2.3*kk+.6)}" stroke-linecap="round" opacity=".7"/><path d="M${P(F)}L${P(R)}" stroke="#d6def2" stroke-width="${f(1.2*kk+.3)}" stroke-linecap="round"/>`+
+  (lv?leaf(F.x,F.y,deg-90,.3*kk*g)+leaf(F.x,F.y,deg+90,.3*kk*g):'')+
+  `<circle cx="${f(R.x)}" cy="${f(R.y)}" r="${f(r)}" fill="#141a33" stroke="${NIGHT}" stroke-width="${f(2.4*kk*g+.4)}" opacity=".85"/><circle cx="${f(R.x)}" cy="${f(R.y)}" r="${f(r)}" fill="none" stroke="#dfe6f7" stroke-width="${f(1.2*kk*g+.2)}"/>`}
+// The ring's far half drawn again over the silk, so the lace reads as threaded through it.
+function tlEyeFront(R,F,kk,g){if(g<.6)return '';const r=(2.7*kk+.3)*g,l=tlLen(R,F)||1,v={x:(R.x-F.x)/l,y:(R.y-F.y)/l};
+ return `<path d="M${f(R.x-v.y*r)} ${f(R.y+v.x*r)}Q${f(R.x+v.x*r*2)} ${f(R.y+v.y*r*2)} ${f(R.x+v.y*r)} ${f(R.y-v.x*r)}" fill="none" stroke="#dfe6f7" stroke-width="${f(1.2*kk+.3)}" stroke-linecap="round"/>`}
+function tlSilk(pts,kk,lit,on){if(pts.length<2)return '';const d=poly(pts),w=1.8*kk+.4,j='fill="none" stroke-linecap="round" stroke-linejoin="round"';
+ return `<path d="${d}" ${j} stroke="${NIGHT}" stroke-width="${f(w+1.3)}" opacity=".75"/><path d="${d}" ${j} stroke="#d4dcf1" stroke-width="${f(w)}"/><path d="${d}" ${j} stroke="#fff" stroke-width="${f(w*.36)}" opacity=".8"/>`+
+  (lit>0?`<path d="${d}" ${j} stroke="${on?'#fff3cf':'#e2e4ea'}" stroke-width="${f(w*.7)}" opacity="${op(lit*.55)}"/>`:'')}
+// A tendril from the bead: side +1 is Jarvis's strand (it curls out over GitDiscuss), −1 GitDiscuss's; grown cg of the way.
+function tlCurl(G,h,side){const kk=G.kk,L=tlCurlL(h,G.th),bis=Math.atan2(G.n.y,G.n.x);
+ return arcS(widths(curlPts(G.Bd,bis+side*G.sg*PI/6,L,L/(6*kk),side*G.sg,32),1.9*kk+.4,.45))}
+function tlTendril(G,h,side,cg,lit,on){if(cg<=.01)return '';const kk=G.kk,g=growPts(tlCurl(G,h,side),cg,8);if(g.length<2)return '';const e=g[g.length-1];
+ let o=`<path d="${ribbon(g,1.3)}" fill="${NIGHT}" opacity=".75"/><path d="${ribbon(g)}" fill="#d4dcf1"/>`;
+ if(lit>0)o+=`<path d="${ribbon(g)}" fill="${on?'#fff3cf':'#e2e4ea'}" opacity="${op(lit*.45)}"/>`;
+ if(cg>=1)o+=`<circle cx="${f(e.x)}" cy="${f(e.y)}" r="${f(1.3*kk+.2)}" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".35"/>`;
+ return o}
+function tlBead(p,kk,lit,on,o1){const r=3.9*kk+.4;let o='';
+ if(lit>0)o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((11+11*lit)*kk)}" fill="url(#halo)" opacity="${op(lit*(on?1:.55))}"/>`;
+ o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r)}" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".7"/><circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r*.64)}" fill="url(#moonstone)"/>`;
+ if(lit>.05)o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(r*.64)}" fill="${on?'#fff8e0':'#d8dbe2'}" opacity="${op(lit*.75)}"/>`+star(p.x,p.y,(2.6+3.2*lit)*kk+1,lit*(on?.95:.5),on?'#fff':'#d8dbe2');
+ return `<g opacity="${op(o1)}">${o}</g>`}
+// The lace: the bar grows out from its middle, then both tips lace up a segment at a time. Jarvis's strand is over at the first
+// crossing and GitDiscuss's at the second; the last segments run into the bead.
+function tlStrands(G,jt,lit,on){const {J,G:R,Bd,kk}=G,gb=ease(seg(jt,.42,.48));if(gb<=0)return '';
+ const L=(p,q,u)=>({x:lerp(p.x,q.x,u),y:lerp(p.y,q.y,u)}),M=L(J[0],R[0],.5),A=[J[0],R[1],J[2],Bd],B=[R[0],J[1],R[2],Bd],w=[[.48,.56],[.56,.64],[.64,.7]];
+ let o=tlSilk([L(M,J[0],gb),L(M,R[0],gb)],kk,lit,on),tips='';
+ for(const [S,i] of[[B,0],[A,0],[A,1],[B,1],[A,2],[B,2]]){const u=ease(seg(jt,...w[i]));if(u<=0)continue;const e=L(S[i],S[i+1],u);
+  o+=tlSilk([S[i],e],kk,lit,on);if(u<1&&model.dir>0)tips+=star(e.x,e.y,(2.2+2*Math.sin(PI*u))*kk+.5,.9)}
+ return o+tips}
+function tlTop(G,h,jt,lit,on){const {Bd,n,kk}=G,bd=back(seg(jt,.6,.68),1.4),bo=seg(jt,.6,.63),cg=seg(jt,.7,.78),bis=Math.atan2(n.y,n.x)*180/PI,lv=.42*kk*back(seg(cg,.3,1),1.4);
+ let o=tlTendril(G,h,1,cg,lit,on)+tlTendril(G,h,-1,cg,lit,on);
+ if(lv>.01)o+=leaf(Bd.x,Bd.y,bis+42,lv)+leaf(Bd.x,Bd.y,bis-42,lv);
+ if(bo>0){const off=(1-bd)*30*kk;o+=tlBead({x:Bd.x+n.x*off,y:Bd.y+n.y*off},kk,lit,on,bo)}
+ return o}
+// While moving: a moonstone tag on the far side of Jarvis reads the angle and the tendrils' turns, beside a little curl.
+function tlTag(x,y,a,opc){const font=`font-family="Optima,Candara,'Segoe UI',sans-serif"`,n=tlTurns(ctx().h,a);let sp='';
+ for(let i=0;i<=28;i++){const t=i/28,r=6.5*(1-.78*t),an=-PI/2+t*2*PI*clamp(n*.45,.3,1.4);sp+=(i?'L':'M')+f(-46+r*Math.cos(an))+' '+f(r*Math.sin(an))}
+ return `<g opacity="${op(opc)}" pointer-events="none" transform="translate(${f(x)} ${f(y)})"><rect x="-62" y="-16" width="124" height="32" rx="14" fill="${NIGHT}" opacity=".75"/><rect x="-60" y="-14" width="120" height="28" rx="12" fill="#e9edf7" stroke="#f6f8ff" stroke-width="1"/>`+
+  `<path d="${sp}" fill="none" stroke="#5f78b8" stroke-width="1.2" stroke-linecap="round"/><text x="10" y="1" text-anchor="middle" ${font} font-size="13" font-weight="700" fill="#2f4f86">${signed(a)}</text><text x="10" y="11" text-anchor="middle" ${font} font-size="7.5" letter-spacing="1" fill="#5d6584">${(Math.round(n*10)/10).toFixed(1)} TURNS CURLED</text></g>`}
+// Crossing level, the old side's lace fades out (drawn level) while the new side's fades in.
+function tlLoop(){if(TL.loop||reduce.matches)return;TL.loop=true;
+ requestAnimationFrame(function st(now){if(J()!==JOINS.tendril||model.jt!==1||now-TL.ft>=400){TL.loop=false;render();return}render();requestAnimationFrame(st)})}
+function tlFit(a,hh){const h=2*hh,kk=tlKK(h),sg=tlSg(a),py=sg<0?5:h-5,s=TL.gap/2,ys=[-4,h+6,sg>0?-28*kk-4:h+28*kk+4,sg>0?h+42:-42];
+ for(const t0 of a?[a,a*1.03]:[0]){const t=t0*PI/180,ry=(u,v)=>py+u*Math.sin(t)+(v-py)*Math.cos(t);
+  ys.push(ry(s,0),ry(s,h),ry(s+W,0),ry(s+W,h),ry(s+W/2,-17),ry(s+W/2,h+12))}
+ const mn=Math.min(...ys),mx=Math.max(...ys);let lo=Math.max(TOP,34-mn),hi=592-mx;if(lo>hi)lo=hi=(lo+hi)/2;return[lo,hi]}
+const TLH={s:()=>TL.gap/2,py:(a,hh)=>a<0?5:2*hh-5,det:[-45,-30,-15,0,15,30,45],max:45,free:true,hard:true,fit:tlFit,
+ angMs:(a,b)=>clamp(260+12*Math.abs(b-a),320,1300),
+ // The tendrils stand over the roofs when GitDiscuss is lowered and hang under the keels when it is raised.
+ hang:hh=>tlSg(model.angle)<0?2*hh-5+28*tlKK(2*hh)+4:0,top:hh=>tlSg(model.angle)>0?-28*tlKK(2*hh)-4:0,
+ name:a=>({num:signed(a),cap:tlTurnsTxt(a),stop:false}),
+ grip:'Turn GitDiscuss on the tendril lacing: drag round the corner, or use the up and down arrows to go to the next 15 degree mark; it rests at any angle',
+ slider:'GitDiscuss angle on the tendril lacing, in degrees; it rests at any angle',
+ ph:a=>signed(a)+' · tendrils '+tlTurnsTxt(a),
+ say:a=>a?'GitDiscuss rests at '+signed(a)+': the crossings take more silk across the wider mouth, so the tendrils curl only '+tlTurnsTxt(a)+'.':'GitDiscuss rests level: the crossings take the least silk, so the tendrils curl '+tlTurnsTxt(0)+'.',
+ poise:{
+  // Drawn out of the mouth, the bead pulls lace through the crossings and GitDiscuss closes; pushed in, it opens. The bead stays under
+  // the finger: the angle (on the side it was grabbed, never past level) is the one whose bead lies nearest the pointer.
+  grab(p){const sg=tlSg(model.angle),B=tlGeo(model.a.x,model.a.y,ctx().h,model.angle,sg).Bd;TL.mv={p,a0:model.angle,sg,off:{x:p.x-B.x,y:p.y-B.y},moved:false}},
+  move(p){const m=TL.mv;if(!m||!p)return;if(Math.abs(p.x-m.p.x)+Math.abs(p.y-m.p.y)>3)m.moved=true;if(!m.moved)return;
+   const h=ctx().h,tx=p.x-m.off.x,ty=p.y-m.off.y,dd=A=>{const B=tlGeo(model.a.x,model.a.y,h,m.sg*A,m.sg).Bd;return Math.hypot(B.x-tx,B.y-ty)};
+   let best=0,bd=1e9;for(let A=0;A<=45;A+=1){const d=dd(A);if(d<bd){bd=d;best=A}}
+   for(const s of[.5,.25,.125])for(const A of[best-s,best+s])if(A>=0&&A<=45&&dd(A)<bd){bd=dd(A);best=A}
+   model.angle=m.sg*Math.round(best*100)/100||0;refitPair();render()},
+  drop(){const m=TL.mv;TL.mv=null;if(!m||!m.moved){dialSoon(600);render();say(J().txt.joined);return}
+   model.angle=Math.round(model.angle*2)/2||0;refitPair();render();dialSoon();settleRise(300);say(TLH.say(model.angle))},
+  cancel(){const m=TL.mv;TL.mv=null;if(m)model.angle=m.a0;refitPair();dialSoon(300);render();settleRise(300)}}};
+function drawTendril(c){
+ const a=model.a,h=c.h,jt=c.jt,dir=model.dir,on=a.run&&model.b.run,now=performance.now(),kk=tlKK(h);
+ if(jt<1){if(model.angle)TL.side=model.angle<0?-1:1;TL.old=TL.side;TL.ft=-1e9}
+ const sg=tlSg(model.angle);
+ // Near: the facing ends glimmer and a tendril uncurls from Jarvis's end at the corner. Ready: the whole lacing traced at the set angle.
+ if(jt===0){const g=c.glow;if(g<=0)return '';const b=model.b;
+  let o=[{x:a.x+W-7,y:a.y+h/2},{x:b.x+7,y:b.y+h/2}].map(p=>`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f((7+9*g)*kk)}" fill="url(#halo)" opacity="${op(g)}"/>`).join('');
+  if(g<1){const K={x:a.x+W-6,y:a.y+(sg>0?h-17*kk:17*kk)},cp=widths(curlPts(K,-sg*PI/3,(5+12*g)*kk,3.4-2*g,sg,20),1.6*kk+.4,.4);
+   return o+`<path d="${ribbon(cp,1.2)}" fill="${NIGHT}" opacity=".75"/><path d="${ribbon(cp)}" fill="#d4dcf1"/>`}
+  const G=tlGeo(a.x,a.y,h,model.angle,sg),{J,G:R,Bd}=G,ds=`fill="none" stroke="#dfe8ff" stroke-width="1" stroke-dasharray="3 3"`;
+  o+=`<path d="M${P(J[0])}L${P(R[0])}M${P(J[0])}L${P(R[1])}L${P(J[2])}L${P(Bd)}M${P(R[0])}L${P(J[1])}L${P(R[2])}L${P(Bd)}" ${ds}/>`;
+  for(const p of[...J,...R])o+=`<circle cx="${f(p.x)}" cy="${f(p.y)}" r="${f(2.7*kk+.3)}" ${ds}/>`;
+  for(const s of[1,-1])o+=`<path d="${poly(tlCurl(G,h,s))}" ${ds} opacity=".8"/>`;
+  return o+`<circle cx="${f(Bd.x)}" cy="${f(Bd.y)}" r="${f(3.9*kk+.4)}" ${ds}/>`+star(Bd.x,Bd.y,6,.95)}
+ const th=jt===1?model.angle:tlBend(jt);
+ // Joined, crossing level moves the lace to the other corner: the side flips and the old side fades out, drawn level.
+ // Crossing back while the fade is still running picks it up where it was, so neither side pops.
+ if(jt===1){const s2=th>0?1:th<0?-1:TL.side;if(s2!==TL.side){const f0=clamp((now-TL.ft)/380);TL.old=TL.side;TL.side=s2;TL.ft=f0<1?now-(1-f0)*380:now;setTimeout(tlLoop,0)}}
+ const G=tlGeo(a.x,a.y,h,th,jt===1?TL.side:sg),fe=jt===1&&!reduce.matches?clamp((now-TL.ft)/380):1,G0=fe<1?tlGeo(a.x,a.y,h,0,TL.old):null;
+ const eg=[0,1,2].map(i=>back(seg(jt,.3+.035*i,.36+.035*i),1.5)),kd=ease(seg(jt,.9,1)),lit=kd*(on?1:.45);
+ let o='';
+ for(let i=0;i<3;i++)o+=tlEye(G.J[i],G.Jf[i],kk,eg[i],0,i===1)+tlEye(G.G[i],G.Gf[i],kk,eg[i],th,i===1);
+ if(G0)o+=`<g opacity="${op(1-fe)}">${tlStrands(G0,jt,lit,on)}</g>`;
+ o+=`<g opacity="${op(fe)}">${tlStrands(G,jt,lit,on)}</g>`;
+ for(let i=0;i<3;i++)o+=tlEyeFront(G.J[i],G.Jf[i],kk,eg[i])+tlEyeFront(G.G[i],G.Gf[i],kk,eg[i]);
+ if(G0)o+=`<g opacity="${op(1-fe)}">${tlTop(G0,h,jt,lit,on)}</g>`;
+ o+=`<g opacity="${op(fe)}">${tlTop(G,h,jt,lit,on)}</g>`;
+ // Glints: as the ends pass through the bead, then up the lace to the bead as it kindles.
+ if(dir>0&&jt<1){const gk=seg(jt,.68,.74);if(gk>0&&gk<1)o+=star(G.Bd.x,G.Bd.y,(5+4*gk)*kk+1,Math.sin(PI*gk));
+  const gl=seg(jt,.9,1);if(gl>0&&gl<1){const p=rlAt([G.J[0],G.G[1],G.J[2],G.Bd],gl);o+=star(p.x,p.y,4.5*kk+1,Math.sin(PI*gl))}}
+ const dop=jt===1?model.dial:dir>0?seg(jt,.9,.95):0;
+ if(dop>0)o+=tlTag(G.Q.x-100,G.sg>0?a.y+h+24:a.y-24,jt===1?model.angle:th,dop);
+ // The hit area is the lacing (tap to release); the bead is the grip that draws the lace in or lets it out.
+ if(jt===1){const {J,G:R,Bd}=G,hd=`M${P(J[0])}L${P(J[1])}L${P(J[2])}L${P(Bd)}L${P(R[2])}L${P(R[1])}L${P(R[0])}Z`;
+  o+=`<g class="hit" id="seamHit" tabindex="0" role="button" aria-label="Tendril lacing: GitDiscuss at ${signed(model.angle)}, the tendrils curled ${tlTurnsTxt(model.angle)}. Up and down arrows turn GitDiscuss to the next 15 degree mark; Enter unlaces it and separates the widgets"><title>Tap the lacing to release; drag the bead out or in to close or open it</title><path d="${hd}" fill="transparent" stroke="transparent" stroke-width="12" stroke-linejoin="round"/><path class="ringfocus" d="${hd}" fill="none" stroke="#dfe8ff" stroke-width="1.3" stroke-dasharray="3 3" stroke-linejoin="round"/></g>`;
+  o+=`<g class="hit poise" id="poiseHit" style="cursor:grab"><title>Drag the bead out of the mouth to draw the lace in and close GitDiscuss, or push it in to open it</title><circle cx="${f(Bd.x+G.n.x*6*kk)}" cy="${f(Bd.y+G.n.y*6*kk)}" r="${f(14*kk+4)}" fill="transparent"/></g>`}
  return o}
 /* ---------- Ribbon roll: GitDiscuss's silver roundel rolls round Jarvis's, bound by two crossed silk ribbons (Roll) ---------- */
 // The Roll angle kind in elven, after hollow's cog roll. Two equal roundels of radius R stand in the gap on arms from the stems: Jarvis's
