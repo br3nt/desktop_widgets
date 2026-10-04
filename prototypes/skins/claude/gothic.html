@@ -105,7 +105,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .av .mw{background:radial-gradient(ellipse 90% 120% at 50% 0%,#fffaf0,#f4e6c6 62%,#e6d1a4);outline-color:#4a2c06;box-shadow:inset 0 0 10px #b8862a40}
 .av .mw.lst{padding:4px 3px 0 5px}.av .mw ul{font:10px/1.5 Georgia,serif;margin-top:1px}.av .mw li:before{margin-right:4px}
 #av2 .rb{position:static;display:block;margin:3px 0 0}
-.wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}#ov1 .tri button,#ov2 .tri button,#hv1 .tri button,#hv2 .tri button{border-radius:3px}
+.wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}#ov1 .tri button,#ov2 .tri button,#hv1 .tri button,#hv2 .tri button,#sv1 .tri button,#sv2 .tri button{border-radius:3px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -281,6 +281,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="wv" id="gv1"><div class="tri" role="group" aria-label="Checks, one punched rosette per check"></div></div>
  <div class="wv" id="xv1"><div class="tri" role="group" aria-label="Checks, one coloured quarry of light per check"></div></div>
  <div class="wv" id="xv2"><div class="tri" role="group" aria-label="Checks, one coloured quarry of light per check, round the middle light"></div></div>
+ <div class="wv" id="sv1"><div class="tri" role="group" aria-label="Checks, one stone figure per check"></div></div>
+ <div class="wv" id="sv2"><div class="tri" role="group" aria-label="The last ten runs, one stone figure per run"></div></div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
 </section>
@@ -5945,6 +5947,148 @@ MORPHS.lux={label:'Lux nova',kind:'Light',sizes:[['facade','Facade',0,'a facade'
  say:(d,S)=>d>0?(S[2]===1?'Checks becomes a window of light: a wall rises, a shaft of low sun throws the window on it, and the image slides across, squares up and focuses as the sun comes round.':'Noon: a cloud takes the light, the wall opens out both ways, and the higher sun throws three lights across it.'):(S[2]===0?'The sun goes down: the image leans, blurs and slides off the wall, and the wall sinks behind the facade.':'A cloud comes over, the wall closes in, and the single light returns.'),
  about:'A new morph kind, <b>Light</b>: Checks grows as an image thrown by the sun, and nothing is added to it but light. Abbot Suger rebuilt the choir of Saint-Denis so that its windows would fill it with what he called <i>lux nova</i>, the new light, and on a sunny day the glass of any great church lies across its stone in pools of colour that move with the hours. Here the facade stays at the foot and keeps its nameplate and display. <b>Sunlit wall</b> (260 px tall): a wall of dim ashlar with a cresting, a cornice and a corbel table rises out from behind the facade and settles in a little dust. A shaft of low sun comes in from high on the left, dust motes turning in it, and throws a window\'s image onto the stone: long, leaning, blurred and orange. As the sun comes round the image slides across the wall, squares up, cools and comes into focus, the stone\'s joints showing through the colour and the leads\' shadows sharpening. It is one broad light: a blue border, a quatrefoil roundel in the head, and clear grisaille glass. Then the fourteen quarries in the border kindle with a glint, one per check (green passed; the last two, deploy-preview and e2e-safari, ruby, waiting), and the lettering painted on the clear glass resolves in the light: CHECKS, 12 / 14, passed · 86%, 2 waiting. Hover or tap a quarry to read its check. <b>Noon</b> (480 px): a cloud passes over and takes the light, the wall opens out both ways, and the sun comes out higher, throwing a three-light window with two quatrefoils pierced between the heads. It slides across and squares up the same way: the count in the middle light (its border holds the fourteen quarries), the pass rate with the last ten runs as little painted lancets on the left, and the two waiting by name on the right. <b>Shrinking</b> plays it back: the sun sinks, the image leans and slides off, and the wall goes down behind the facade. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest, motes included.'};
 
+/* ---------- Morph: statue-columns (Checks) ---------- */
+// g runs 0 facade, 1 portal, 2 royal portal. A Gather morph: nothing new is carved, and the larger form is built of bodies.
+// On the portals of Chartres the column shafts are people: tall, narrow kings, queens and prophets stand where the shafts should be, and the lintel rests on their canopies.
+// Here a portal head (archivolt, tympanum, lintel and the dark embrasure behind) rises from behind the facade and waits; small stone figures climb up over the cornice
+// and waddle along the ledge to their places, and only when all twelve stand does the head come down onto them. The two waiting are not let in under it.
+// Everything is a function of g. Frames: the portal's own is CW wide with x from its left edge; the royal portal's is SVW wide; y runs down from the top of the box.
+const SVH=260,SVW=480,SVF=SVH-CH,SVB=181,SVJ=[50,66,82,98,114,130,146,162,178,194,210,226],SVWT=[28,248],SVO=[5,6,4,7,3,8,2,9,1,10,0,11],SVS=[[1,4],[0,0],[1,3],[0,1],[1,2],[0,2],[1,1],[0,3],[1,0],[0,4]];
+const svSX=(sd,j)=>sd?18+16*j:398+16*j;
+const svBox=g=>g<1e-6?[CW,CH]:g<=1?[CW,SVH]:[lerp(CW,SVW,ease(seg(g-1,0,.12))),SVH],svDims=k=>[[CW,CH],[CW,SVH],[SVW,SVH]][k];
+// A pointed head over a lintel: two cubic arcs from the springing line (ys) to the apex, half-span hw and rise r about xm.
+const svHead=(xm,ys,hw,r)=>`M${f(xm-hw)} ${ys}C${f(xm-hw)} ${f(ys-.49*r)} ${f(xm-.39*hw)} ${f(ys-.86*r)} ${xm} ${f(ys-r)}C${f(xm+.39*hw)} ${f(ys-.86*r)} ${f(xm+hw)} ${f(ys-.49*r)} ${f(xm+hw)} ${ys}`;
+const svBez=(xm,ys,hw,r,t)=>{const s=t<.5?-1:1,q=t<.5?t*2:2-t*2,P=[[xm+s*hw,ys],[xm+s*hw,ys-.49*r],[xm+s*.39*hw,ys-.86*r],[xm,ys-r]],m=1-q;
+ return[0,1].map(k=>m*m*m*P[0][k]+3*m*m*q*P[1][k]+3*m*q*q*P[2][k]+q*q*q*P[3][k])};
+const svT=(x,y,t,sz,col,ex='')=>`<text x="${x}" y="${y}" text-anchor="middle" font-family="Georgia,serif" font-size="${sz}" fill="${col}" ${ex}>${t}</text>`;
+// One portal head: the embrasure with a colonnette behind each figure, the archivolt with gilt studs, the painted tympanum with its lettering (tq), the lintel and a finial.
+function svPortal(xm,hw,r,lx,cols,txt,lin,tq){
+ const ys=101,o=hw<60?7:9,ro=r*(hw+o)/hw,st=[...Array(hw<60?9:17).keys()].map(n=>svBez(xm,ys,hw+o/2,(r+ro)/2,(n+.5)/(hw<60?9:17)));
+ let s=`<rect x="${lx[0]+2}" y="${ys+10}" width="${lx[1]-lx[0]-4}" height="96" fill="#2a2119"/><rect x="${lx[0]+2}" y="${ys+10}" width="${lx[1]-lx[0]-4}" height="96" fill="url(#quarry)" opacity=".18"/>`+
+  cols.map(x=>`<rect x="${x-1.6}" y="${ys+12}" width="3.2" height="90" fill="#8e826c"/><path d="M${x+.9} ${ys+12}V${ys+102}" stroke="#2a2018" stroke-opacity=".5"/>`).join('');
+ s+=`<path d="${svHead(xm,ys,hw+o,ro)}Z" fill="url(#lime)" filter="url(#st-m0)"/><path d="${svHead(xm,ys,hw+o,ro)}" fill="none" stroke="#fff6e2" stroke-opacity=".5" transform="translate(0 1)"/>`+
+  `<g fill="url(#gild)" stroke="#3a2608" stroke-width=".4">${st.map(([x,y])=>`<circle cx="${f(x)}" cy="${f(y)}" r="1.5"/>`).join('')}</g>`+
+  `<path d="${svHead(xm,ys,hw,r)}Z" fill="url(#svTy)" stroke="#d9b45e" stroke-width="1.2"/><path d="${svHead(xm,ys,hw-3,r-3)}" fill="none" stroke="#e6c46a" stroke-opacity=".35" stroke-width=".6"/>`;
+ // Gilt stars in the blue, kept to the edges so the lettering stands clear.
+ const sa=[];for(let n=0;n<(hw<60?8:16);n++){const t=(n+.5)/(hw<60?8:16),[x,y]=svBez(xm,ys,hw-7,r-7,t);if(y<ys-10)sa.push(`<circle cx="${f(x)}" cy="${f(y)}" r=".9"/>`)}
+ s+=`<g fill="#f2cf74" opacity=".8">${sa.join('')}</g>`;
+ if(tq>0)s+=`<g opacity="${f(tq)}">${txt}</g>`;
+ s+=`<rect x="${lx[0]}" y="${ys}" width="${lx[1]-lx[0]}" height="12" fill="url(#lime)" filter="url(#st-m0)"/><path d="M${lx[0]} ${ys+.6}H${lx[1]}" stroke="#fff6e2" stroke-opacity=".6"/><path d="M${lx[0]} ${ys+11.6}H${lx[1]}" stroke="#2a1d10" stroke-opacity=".55"/>`;
+ if(tq>0)s+=`<g opacity="${f(tq)}">${lin}</g>`;
+ const ap=ys-ro;
+ return s+`<g fill="url(#gild)" stroke="#3a2608" stroke-width=".4"><rect x="${xm-1}" y="${f(ap-8)}" width="2" height="8"/><circle cx="${xm}" cy="${f(ap-9)}" r="1.9"/><circle cx="${xm-3}" cy="${f(ap-5.5)}" r="1.4"/><circle cx="${xm+3}" cy="${f(ap-5.5)}" r="1.4"/></g>`;
+}
+const SVP=[
+ {xm:138,hw:98,r:83,lx:[42,234],cols:SVJ,txt:svT(138,48,'CHECKS',7.5,'#e6c46a','letter-spacing="2.4"')+svT(138,74,'12 / 14',22,'#f6ecd2','font-weight="700"')+svT(138,90,'passed · 86%',10,'#f6ecd2','font-style="italic"'),
+  lin:svT(138,110,'RUN 418 · MAIN · 2 WAITING',7.2,'#3b2c1f','letter-spacing="1.2" font-weight="700"')},
+ {xm:50,hw:38,r:50,lx:[10,90],cols:[0,1,2,3,4].map(j=>svSX(1,j)),txt:svT(50,76,'PASS RATE',6.4,'#e6c46a','letter-spacing=".8"')+svT(50,96,'86%',19,'#f6ecd2','font-weight="700"'),
+  lin:svT(50,110,'RUNS 409–413',7,'#3b2c1f','letter-spacing=".8" font-weight="700"')},
+ {xm:430,hw:38,r:50,lx:[390,470],cols:[0,1,2,3,4].map(j=>svSX(0,j)),txt:svT(430,77,'WAITING · 2',6,'#ff9a8e','letter-spacing=".5"')+svT(430,88,'deploy-preview',8.2,'#f6ecd2')+svT(430,98.5,'e2e-safari',8.2,'#f6ecd2'),
+  lin:svT(430,110,'RUNS 414–418',7,'#3b2c1f','letter-spacing=".8" font-weight="700"')}];
+// One statue-column, drawn about its foot at (x,y) at 1.25 scale: a socle, a long robe in straight folds, an attribute held to the chest, a nimbus and a canopy.
+// Kinds turn on n: a king (crown, sceptre), a queen (crown, long braids, book), a prophet (beard, scroll) and a saint (book). nb is [colour, kindle 0..1].
+function svFig(x,y,n,rot,sq,nb){
+ const k=n%4,[col,q]=nb;let s=`<g transform="translate(${f(x)} ${f(y)}) rotate(${f(rot)}) scale(1.25 ${f(1.25*sq*1000)/1000})">`;
+ if(q>0)s+=`<circle cy="-38.4" r="7.4" fill="${col}" opacity="${f(.85*q)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`;
+ s+=`<circle cy="-38.4" r="4.8" fill="#cfc2a4" stroke="#8e826c" stroke-width=".4"/>`;
+ if(q>0)s+=`<circle cy="-38.4" r="4.8" fill="url(#gild)" opacity="${f(q)}"/><circle cy="-38.4" r="4.4" fill="none" stroke="${col}" stroke-width=".9" opacity="${f(q)}"/>`;
+ s+=`<path d="M-5.6 0V-3.6H5.6V0Z" fill="#b9ab8c"/><path d="M-4.8 -3.6V-5.2H4.8V-3.6Z" fill="#d6cab0"/><path d="M-5.6 -3.4H5.6" stroke="#fff6e2" stroke-opacity=".6" stroke-width=".4"/>`+
+  `<path d="M-4.8 -5.2L-3.6 -33Q0 -35.6 3.6 -33L4.8 -5.2Q0 -4 -4.8 -5.2Z" fill="url(#lime)" stroke="#6d5d46" stroke-width=".4"/><path d="M1.2 -5L1.6 -33.8Q3 -33.6 3.6 -33L4.8 -5.2Z" fill="#4a3b2a" opacity=".22"/>`+
+  `<path d="M-3 -5.4L-2.4 -26M-1.2 -5L-.9 -24M.6 -5V-25M2.4 -5.4L2.2 -26" stroke="#5a4a34" stroke-width=".45" opacity=".6"/><path d="M-2.6 -5.4L-2 -26M1 -5V-25" stroke="#fff6e2" stroke-width=".35" opacity=".5"/>`+
+  `<path d="M-3.8 -27Q0 -21 3.8 -29" fill="none" stroke="#6d5d46" stroke-width=".6"/><rect x="-1" y="-35" width="2" height="2" fill="#d6cab0"/>`;
+ if(k===1)s+=`<path d="M-2.6 -39Q-3.4 -30 -3 -17M2.6 -39Q3.4 -30 3 -17" fill="none" stroke="#a99a7c" stroke-width="1.1" stroke-dasharray="1.2 .5"/>`;
+ if(k===2)s+=`<path d="M-.9 -29.4V-10.5" stroke="#efe6d0" stroke-width="2"/><path d="M-1.9 -10.6H.1" stroke="#8e826c" stroke-width=".6"/>`;
+ else if(k===0)s+=`<path d="M2.4 -24V-41" stroke="#6e4a12" stroke-width=".8"/><circle cx="2.4" cy="-41.6" r="1.1" fill="url(#gild)"/>`;
+ else s+=`<rect x="-2.3" y="-30" width="4.6" height="3.6" rx=".4" fill="#6d5d46" stroke="#3a2c1c" stroke-width=".3"/><circle cy="-28.2" r=".55" fill="url(#gild)"/>`;
+ s+=`<circle cx="-1.7" cy="-27.4" r=".9" fill="#ddd2b8"/><circle cx="1.7" cy="-27.4" r=".9" fill="#ddd2b8"/>`+
+  `<ellipse cy="-38.4" rx="2.5" ry="3" fill="#e6dcc6" stroke="#8e826c" stroke-width=".3"/><path d="M-.9 -38.8H-.3M.3 -38.8H.9" stroke="#5a4a34" stroke-width=".35"/>`;
+ if(k===0||k===2)s+=`<path d="M-2 -37.6Q0 -32.4 2 -37.6Z" fill="#b9aa8a"/>`;
+ if(k<2)s+=`<path d="M-2.6 -40.6V-43.4L-1.3 -42L0 -43.8L1.3 -42L2.6 -43.4V-40.6Z" fill="url(#gild)" stroke="#3a2608" stroke-width=".25"/>`;
+ else s+=`<path d="M-2.6 -39.2Q0 -42.8 2.6 -39.2" fill="#b9aa8a"/>`;
+ return s+`<path d="M-5.6 -44.4H5.6L4.6 -46.6H-4.6Z" fill="#cbbd9f" stroke="#6d5d46" stroke-width=".3"/><rect x="-4.6" y="-52.6" width="9.2" height="6" fill="url(#lime)" stroke="#6d5d46" stroke-width=".3"/>`+
+  `<path d="M-2.6 -46.6V-49Q-1.8 -50.4 -1 -49V-46.6ZM1 -46.6V-49Q1.8 -50.4 2.6 -49V-46.6Z" fill="#3a2c1c" opacity=".55"/><path d="M-4.6 -52.6V-54.4H-3V-53.4H-.8V-54.4H.8V-53.4H3V-54.4H4.6V-52.6Z" fill="#cbbd9f"/></g>`;
+}
+// A figure on its way: it climbs up from behind the ledge at x0 (c), then waddles along it to x1 (w), rocking from corner to corner of its socle.
+function svWalk(x0,x1,c,w){
+ const dy=72*Math.pow(1-c,3)-2.4*Math.sin(Math.PI*seg(c,.6,1)),st=Math.max(2,Math.round(Math.abs(x1-x0)/8)),p=w*st,mv=w>0&&w<1;
+ return{x:lerp(x0,x1,w),y:SVB+dy-(mv?1.3*Math.abs(Math.sin(Math.PI*p)):0),rot:mv?5*Math.sin(Math.PI*p):0};
+}
+// The portal's timeline on the first step, the royal portal's on the second.
+const svN1=n=>.16+.04*n,svN2=n=>.32+.04*n;
+// The head waits 6 px up, drops onto the canopies, and rides down with them as they give under it.
+const svLand=(u,a)=>(u<a?-6:-6*(1-Math.pow(seg(u,a,a+.045),2)))+3.4*Math.sin(Math.PI*seg(u,a+.045,a+.1));
+function svRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),[w,h]=svBox(g),cx=w/2,ox=cx-CW/2,oy=h-SVH,X0=cx-SVW/2,P1=i>0;
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=h+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='sv'){ms.dataset.key='sv';ms._d='';ms._bx=null;fx._s=null;
+  ms.innerHTML=`<defs><linearGradient id="svTy" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2c3f7e"/><stop offset=".7" stop-color="#1c2a5c"/><stop offset="1" stop-color="#141d42"/></linearGradient>`+
+   `<clipPath id="svC"><rect x="-700" y="-300" width="1900" height="${SVB+300}"/></clipPath><clipPath id="svFl"><rect x="-700" y="-300" width="1900" height="${SVH+300}"/></clipPath></defs><g class="ofac">${cas(0)}</g><g class="odyn"></g>`}
+ const bx=f(w)+'x'+h;if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',h);n.setAttribute('viewBox',`0 0 ${f(w)} ${h}`)}}
+ ms.querySelector('.ofac').setAttribute('transform',`translate(${f(ox)} ${oy+SVF})`);
+ const dust=JOINS.buttress.dust,spk=(x,y,t,r)=>{const v=Math.sin(Math.PI*t);return v>.05?`<g opacity="${f(v)}">${sparkle(x,y,r*v)}</g>`:''};
+ let e='',d='';
+ // The portal: the ledge is laid, the head rises from behind the facade and waits, the twelve climb up and take their places (the middle ones first),
+ // the two waiting climb up at the ends, the head comes down onto the canopies, the nimbi kindle and the lettering is gilded.
+ {const lg=P1?1:ease(seg(u,0,.06)),hr=P1?1:ease(seg(u,.02,.16)),land=P1?1:u,off=hr<1?lerp(190,-6,hr):svLand(land,.8),hit=P1?1:seg(u,.845,.9),tq=P1?1:seg(u,.93,1);
+  let s='';
+  if(hr>0){const p=SVP[0];s+=`<g clip-path="url(#svC)"><g transform="translate(0 ${f(off)})">${svPortal(p.xm,p.hw,p.r,p.lx,p.cols,p.txt,p.lin,tq)}</g></g>`}
+  let figs='';const sq=1-.05*Math.sin(Math.PI*hit);
+  SVJ.forEach((x,j)=>{const n=SVO.indexOf(j),a=svN1(n),c=P1?1:seg(u,a,a+.04),wk=P1?1:seg(u,a+.04,a+.17);if(c<=0)return;
+   const q=svWalk(j<6?SVWT[0]:SVWT[1],x,c,wk),kq=P1?1:seg(u,.86+.005*j,.89+.005*j);
+   figs+=svFig(q.x,q.y,j,q.rot,wk>=1?sq:1,[LCOL.pass,kq]);
+   if(!P1){const ld=seg(u,a+.034,a+.07);if(ld>0&&ld<1)e+=dust(ox+(j<6?SVWT[0]:SVWT[1]),SVB,ld,3,6,600+j);e+=spk(ox+x,SVB-48,seg(u,.86+.005*j,.9+.005*j),4)}});
+  SVWT.forEach((x,m)=>{const a=.72+.02*m,c=P1?1:seg(u,a,a+.05);if(c<=0)return;const q=svWalk(x,x,c,0),kq=P1?1:seg(u,.925+.01*m,.955+.01*m);
+   figs+=svFig(q.x,q.y,12+m,0,1,[LCOL.need,kq]);if(!P1)e+=spk(ox+x,SVB-48,seg(u,.925+.01*m,.965+.01*m),4)});
+  if(figs)s+=`<g clip-path="url(#svC)">${figs}</g>`;
+  if(lg>0)s+=`<g transform="translate(138 0) scale(${f(Math.max(.02,lg)*1000)/1000} 1) translate(-138 0)"><rect x="18" y="${SVB-.5}" width="240" height="7" fill="url(#lime)"/><path d="M18 ${SVB}H258" stroke="#fff6e2" stroke-opacity=".7"/><path d="M18 ${SVB+6.5}H258" stroke="#2a1d10" stroke-opacity=".55"/></g>`;
+  d+=`<g transform="translate(${f(ox)} ${oy})">${s}</g>`;
+  if(!P1&&hit>0&&hit<1)e+=dust(ox+44,101,hit,5,10,611,-1)+dust(ox+232,101,hit,5,10,613,1)+dust(ox+138,SVB,hit,6,16,615);
+  if(!P1)e+=spk(ox+138,40,seg(u,.93,1),6)}
+ // The royal portal: two plinths rise out of the floor beside it, their heads rise and wait, five figures climb onto each (a run apiece), the heads come down,
+ // the nimbi kindle in their runs' colours and the side tympana are gilded.
+ if(P1&&u>.1){const pl=ease(seg(u,.12,.26)),hr=ease(seg(u,.2,.32)),off=hr<1?lerp(190,-6,hr):svLand(u,.85),hit=seg(u,.895,.95),tq=seg(u,.94,1),sq=1-.05*Math.sin(Math.PI*hit);
+  let s='';
+  if(pl>0){let jd='';for(const[a,b]of[[4,98],[382,476]]){for(let y=SVB+20;y<SVH;y+=14)jd+=`M${a} ${y}H${b}`;for(let y=SVB+6,r=0;y<SVH;y+=14,r++)for(let x=a+(r%2?17:6);x<b;x+=34)jd+=`M${x} ${y}V${Math.min(y+14,SVH)}`}
+   s+=`<g clip-path="url(#svFl)"><g transform="translate(0 ${f(80*(1-pl))})"><g fill="url(#lime)" filter="url(#st-m0)"><rect x="4" y="${SVB-.5}" width="94" height="${SVH-SVB+1}"/><rect x="382" y="${SVB-.5}" width="94" height="${SVH-SVB+1}"/></g>`+
+    `<path d="${jd}" fill="none" stroke="#4a3b2a" stroke-opacity=".3" stroke-width=".8"/><path d="M4 ${SVB}H98M382 ${SVB}H476" stroke="#fff6e2" stroke-opacity=".7"/><path d="M4 ${SVB+6.5}H98M382 ${SVB+6.5}H476" stroke="#2a1d10" stroke-opacity=".5"/></g></g>`}
+  if(hr>0)s+=`<g clip-path="url(#svC)"><g transform="translate(0 ${f(off)})">${[1,2].map(k=>{const p=SVP[k];return svPortal(p.xm,p.hw,p.r,p.lx,p.cols,p.txt,p.lin,tq)}).join('')}</g></g>`;
+  let figs='';
+  SVS.forEach(([sd,j],n)=>{const a=svN2(n),c=seg(u,a,a+.04),wk=seg(u,a+.04,a+.16);if(c<=0)return;
+   const x0=sd?12:468,x=svSX(sd,j),q=svWalk(x0,x,c,wk),r=sd?j:5+j,kq=seg(u,.9+.005*n,.93+.005*n);
+   figs+=svFig(q.x,q.y,r+1,q.rot,wk>=1?sq:1,[LCOL[orSt(ORUN[r])],kq]);
+   const ld=seg(u,a+.034,a+.07);if(ld>0&&ld<1)e+=dust(X0+x0,SVB,ld,3,6,630+n);e+=spk(X0+x,SVB-48,seg(u,.9+.005*n,.94+.005*n),4)});
+  if(figs)s+=`<g clip-path="url(#svC)">${figs}</g>`;
+  d=`<g transform="translate(${f(X0)} ${oy})">${s}</g>`+d;
+  if(pl>0&&pl<1)for(const x of[10,92,388,470])e+=dust(X0+x,SVH-2,seg(u,.12,.26),4,10,650+x);
+  if(hit>0&&hit<1)for(const x of[12,88,392,468])e+=dust(X0+x,101,hit,4,9,660+x)}
+ if(ms._d!==d){ms._d=d;ms.querySelector('.odyn').innerHTML=d}
+ if(fx._s!==e){fx._s=e;fx.innerHTML=e}
+ // Displays: the facade keeps its own; the figures take taps once they stand lit.
+ const v1=P1||u>.99,v2=P1&&u>.99;
+ for(const[id,v,x]of[['#sv1',v1,ox],['#sv2',v2,X0]]){const n=$(id);if(!v)n.style.display='none';else Object.assign(n.style,{display:'block',left:f(x)+'px',top:oy+'px'})}
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+oy+SVF)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+oy+SVF)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'figures gathering')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function svPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0;let t;
+ if(i===0){const n=SVO.filter((_,m)=>u>=svN1(m)+.17).length;
+  t=u<.16?(up?'a portal head rises from behind the facade and waits':'the portal head sinks behind the facade'):u<.77?(up?'figures climb over the cornice to take their places, '+n+' of 12 standing':'the figures step down from the ledge, '+n+' still standing'):
+   u<.79?(up?'the two waiting climb up at the ends, outside the portal':'the two waiting step down'):u<.86?(up?'the head comes down onto their canopies':'the head lifts off the figures'):u<.965?(up?'the nimbi kindle, one per check':'the nimbi go dark'):(up?'the tympanum is gilded':'the gilding fades')}
+ else{const n=SVS.filter((_,m)=>u>=svN2(m)+.16).length;
+  t=u<.12?(up?'clearing the floor beside the portal':'the portal stands alone'):u<.32?(up?'two plinths rise out of the floor, and their heads rise and wait':'the side heads sink and the plinths go down into the floor'):
+   u<.85?(up?'a figure for each of the last ten runs climbs up, '+n+' of 10 standing':'the figures for the runs step down, '+n+' still standing'):u<.9?(up?'the side heads come down onto them':'the side heads lift off'):u<.975?(up?'their nimbi kindle in their runs\' colours':'their nimbi go dark'):(up?'the side tympana are gilded':'the gilding fades')}
+ return 'Checks · '+t;
+}
+MORPHS.statues={label:'Statue-columns',kind:'Gather',sizes:[['facade','Facade',0,'a facade'],['portal','Portal',1,'a portal on twelve figures'],['royal','Royal portal',2,'a royal portal of three doors']],ms:[6400,4000],
+ box:svBox,dims:svDims,render:svRender,phase:svPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes a portal: twelve stone figures climb over the cornice and stand shoulder to shoulder, and the portal head comes down onto them. The two waiting stand outside it.':'The royal portal: two plinths rise beside it and ten more figures, one per run, climb up and carry two side doors.'):(S[2]===0?'The portal head lifts off, and the figures step down behind the facade.':'The side heads lift off, the figures for the runs step down, and the plinths sink into the floor.'),
+ about:'A morph of the <b>Gather</b> kind, which hollow\'s bivouac opened: nothing new is carved, and the larger form is built of bodies. On the Royal Portal at Chartres (about 1145) the column shafts of the doorways are people: tall, narrow kings, queens and prophets stand where the shafts should be, each on a socle and under a little canopy, and the lintels and arches rest on them. Here the facade stays at the foot and keeps its nameplate and display. <b>Portal</b> (260 px tall): a ledge is laid along the cornice, and a portal head (an archivolt with gilt studs, a tympanum painted blue with gilt stars, a lintel and a dark embrasure) rises from behind the facade and waits in the air. Small stone figures climb up over the cornice at both ends and waddle along the ledge, rocking from corner to corner of their socles, to stand shoulder to shoulder in front of the colonnettes, the middle places filled first. Only when all twelve stand does the head come down onto their canopies, with a thud that makes them all give a little. Their nimbi kindle gold, ringed green, one per passed check. The two waiting (deploy-preview and e2e-safari) climb up at the ends of the ledge, outside the portal, with red rings: they are not let in under it. The tympanum is gilded: CHECKS, 12 / 14, passed · 86%, and on the lintel RUN 418 · MAIN · 2 WAITING. <b>Royal portal</b> (480 px): like Chartres, three doors. Two plinths rise out of the floor beside the portal and their heads rise and wait; five figures climb onto each, one for each of the last ten runs, and the heads come down onto them. Their nimbi are ringed in their runs\' colours (green all passed, amber 13, red 12). The left tympanum gives the pass rate, the right the two waiting by name. Hover or tap a figure to read its check or run. <b>Shrinking</b> plays it back: the heads lift off and the figures walk back and climb down behind the wall. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest.'};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30,roll:30,cwt:30,scr:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
@@ -6190,6 +6334,9 @@ ORUN.forEach((v,r)=>{const[x,y]=flP(FSX[0],FSY,-Math.PI+(r+.5)*Math.PI/5,27);orT
 CHK.forEach((n,j)=>{const[x,y]=GLROS[j];orTipBtn('#gv1 .tri',`Rosette ${j+1} of 14 · ${n} · ${j>11?'scraped back to the red bole, waiting for your approval':'punched in the gold, passed'}`,j>11?'need':'pass',`left:${f(x-6)}px;top:${f(y-6)}px;width:12px;height:12px`)});
 /* Lux nova: hover, focus or tap a quarry of light to read its check. */
 [1,2].forEach(k=>CHK.forEach((n,j)=>{const[x,y]=LXJ[k][j];orTipBtn(`#xv${k} .tri`,`Quarry ${j+1} of 14 · ${n} · ${j>11?'ruby, waiting for your approval':'green, passed'}`,j>11?'need':'pass',`left:${f(LXCX+x-6)}px;top:${f(LXFOOT+y-6)}px;width:12px;height:12px`)}));
+/* Statue-columns: hover, focus or tap a figure to read its check, or at the side doors its run. */
+CHK.forEach((n,j)=>{const x=j<12?SVJ[j]:SVWT[j-12];orTipBtn('#sv1 .tri',`Figure ${j+1} of 14 · ${n} · ${j>11?'outside the portal, waiting for your approval':'under the lintel, passed'}`,j>11?'need':'pass',`left:${x-8}px;top:${SVB-68}px;width:16px;height:68px`)});
+ORUN.forEach((v,r)=>orTipBtn('#sv2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${svSX(r<5?1:0,r%5)-8}px;top:${SVB-68}px;width:16px;height:68px`));
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
