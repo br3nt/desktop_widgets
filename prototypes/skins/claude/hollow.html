@@ -3854,7 +3854,11 @@ const MORPHS={
  earwig:{label:'Earwig wing',kind:'Fan',
   about:'Checks grows the way an earwig opens its hind wing, the most tightly folded wing of any insect: a fan of veins and clear membrane, folded like a paper fan, then folded in half again and tucked under a short wing case. <b>Wing:</b> the box darts down and, in a puff of fog, the folded bundle slides out from under the shell\'s belly, pleats dark and light. The folded half flips over at the knee and straightens with a glint, then the whole fan springs open from its pale base, swings a touch past its rest and locks with a second glint, the pleats flattening into one pale membrane. Its veins run out from the base, a fine vein between each pair, and a ring vein ties them together near the edge, as on the real wing. A smoky band comes up across the membrane with run 418 written on arcs: <i>12 / 14 passed · 2 waiting</i> and <i>run 418 · main · 86%</i>. The fourteen panel tips are the checks: twelve light teal one by one, left to right, and the last two show red rings. <b>Both wings:</b> a second short wing case darts out from behind Checks\' right end, and the second wing slides out from under it and opens the same way. Its band names deploy-preview and e2e-safari, waiting for Brent, and only its two middle tips are marked, in red. <b>Shrinking</b> plays it backwards: the fan folds, the knee folds over and the wing slides back under its case. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a winged Checks folds it back to a shell first, and unshading opens it again.',
   sizes:['Shell','Wing','Both wings'],slider:'Checks size, shell to both wings',ms:[3400,2200],ax:0,dims:g=>ewDims(g),travel:t=>ease(seg(t,0,.2)),
-  say:(to,from,n)=>to>from?(to-from>1?'A folded wing slides out from under Checks, flips open at the knee and springs into a fan; a second wing case darts out and its wing opens too: Checks has both wings.':to===2?'A second wing case darts out from behind Checks, and its wing slides out, flips open at the knee and springs into a fan naming the two waiting checks.':'A folded wing slides out from under Checks, flips open at the knee and springs into a fan: twelve tips lit, two in red rings.'):'The fan folds, the knee folds over and the wing slides back under its case: Checks shrinks to '+article(n)+'.'}
+  say:(to,from,n)=>to>from?(to-from>1?'A folded wing slides out from under Checks, flips open at the knee and springs into a fan; a second wing case darts out and its wing opens too: Checks has both wings.':to===2?'A second wing case darts out from behind Checks, and its wing slides out, flips open at the knee and springs into a fan naming the two waiting checks.':'A folded wing slides out from under Checks, flips open at the knee and springs into a fan: twelve tips lit, two in red rings.'):'The fan folds, the knee folds over and the wing slides back under its case: Checks shrinks to '+article(n)+'.'},
+ herse:{label:'Herse',kind:'Stretch',
+  about:'Checks grows by being stretched, with nothing added. It comes from parchment-making: a wet hide is laced into a frame called a herse, by cords tied round pebbles folded into its rim, and the maker turns the pegs a little at a time, opposite sides in turn, until it dries drum-tight, then scrapes it with a crescent knife. That is why old parchment has a scalloped edge, pointed at every cord. <b>Herse:</b> the box darts down and an iron frame is let down on two chains from behind the belly, in a puff of fog, with the hide laced in: small, dark with damp and cockled, its red cords hanging slack. The writing is already on it, cramped and buckled too small to read. Then the pegs are turned one at a time, top and bottom and side to side, each a quick quarter turn and a pause. Each cord snaps taut and pulls its pebble out, and the hide stretches in steps, its creases flattening and its writing opening out to full size. Each peg is a check: as it locks, its bone head lights teal. Twelve are turned. The two on the right stay slack, ringed in red, and leave a small dent in the edge: those checks are waiting on Brent, and the hide cannot be pulled fully tight until they pass. Last, the crescent knife scrapes across once, and the hide behind it comes up clean: run 418 on main, 12 / 14, the fourteen marks and 86% passed. <b>Double herse:</b> a second frame darts out from behind the first and is clasped to it with a glint, and its hide is stretched the same way, peg by peg. All ten of its pegs light, and it names deploy-preview and e2e-safari, waiting for Brent. <b>Shrinking</b> plays it backwards: the pegs are let off, the hide shrinks and cockles, and the frame is drawn back up behind the shell. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a stretched Checks lets the hide off first, and unshading stretches it again.',
+  sizes:['Shell','Herse','Double herse'],slider:'Checks size, shell to double herse',ms:[4200,2400],ax:0,dims:g=>hrDims(g),travel:t=>ease(seg(t,0,.2)),
+  say:(to,from,n)=>to>from?(to-from>1?'A herse drops under Checks and its hide is stretched peg by peg; a second herse is clasped beside it and stretched too: Checks is a double herse.':to===2?'A second herse darts out and is clasped to the first, and its hide is stretched peg by peg until it names the two waiting checks.':'A herse drops under the shell and the pegs are turned one by one: the hide stretches until its writing can be read. Twelve pegs are tight; two stay slack, waiting on Brent.'):'The pegs are let off and the hide shrinks and cockles'+(to?'':', and the herse is drawn back up behind the shell')+': Checks shrinks to '+article(n)+'.'}
 };
 // Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
 for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
@@ -4454,6 +4458,112 @@ function earwig(el,w,h){
  o+=casing('c',CW,CH,true,'body')+curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,1);
  svg.innerHTML=o;
 }
+/* ---------- Morph: herse (Checks) ---------- */
+// g runs 0 shell, 1 herse, 2 double herse. Checks grows by being stretched, with nothing added: a wet, shrunken hide is laced into a frame (a herse)
+// by cords tied round pebbles in its rim, and the pegs are turned a little at a time, opposite sides in turn, until it is drum-tight; then it is scraped.
+// The writing is on the hide from the start, cramped and cockled, and the stretch makes it legible. Each peg is a check: bay 0's two right pegs stay slack.
+// Peg ids: T top, B bottom, L left, R right. Rest sizes leave every phase finished, so nothing moves at rest.
+const HRB=[{x0:13,y0:87,x1:263,y1:207,s:[40,108,236,186],tx:[60,99,138,177,216],ly:[130,164],ry:[130,164],slack:['R0','R1'],ord:['T2','B2','L0','T4','B0','L1','T0','B4','T1','B3','T3','B1']},
+ {x0:263,y0:87,x1:463,y1:207,s:[288,108,440,186],tx:[306,344,382,420],ly:[],ry:[130,164],slack:[],ord:['T1','B2','R0','T3','B0','R1','T0','B3','T2','B1']}];
+// Each peg's place on the frame, its pebble's place on the stretched hide (r) and on the shrunken hide (q, a little uneven, as a hide is).
+for(const b of HRB){const[sx0,sy0,sx1,sy1]=b.s,cx=(sx0+sx1)/2,cy=(sy0+sy1)/2;let n=0;b.P={};
+ const add=(id,px,py,rx,ry)=>{const j=n++;b.P[id]={px,py,rx,ry,qx:cx+(rx-cx)*.46+((j*37)%7-3)*1.3,qy:cy+(ry-cy)*.46+((j*53)%5-2)*1.3}};
+ b.tx.forEach((x,i)=>{add('T'+i,x,b.y0+3.5,x,sy0);add('B'+i,x,b.y1-3.5,x,sy1)});
+ b.ly.forEach((y,i)=>add('L'+i,b.x0+3.5,y,sx0,y));b.ry.forEach((y,i)=>add('R'+i,b.x1-3.5,y,sx1,y));
+ // The rim, clockwise from the top left.
+ b.top=b.tx.map((_,i)=>'T'+i);b.bot=b.tx.map((_,i)=>'B'+i).reverse();b.lef=b.ly.map((_,i)=>'L'+i).reverse();b.rig=b.ry.map((_,i)=>'R'+i)}
+// The writing on each hide, drawn at its stretched size.
+const HRT=[`<text class="dser" x="50" y="123" font-size="10" font-style="italic" fill="#5c4a36" letter-spacing=".4">run 418 · main</text><text class="dser" x="222" y="123" font-size="12" font-weight="700" fill="#231b14" text-anchor="end">12 / 14</text>`+
+ `<path d="M50 138H214" stroke="#5c4a36" stroke-width=".9" stroke-dasharray="2 2.2" stroke-linecap="round"/>`+
+ Array.from({length:14},(_,i)=>{const x=f(52+i*12.2);return i<12?`<path d="M${f(x-2.4)} 135.6l4.8 4.8m0 -4.8l-4.8 4.8" stroke="#231b14" stroke-width="1.5" stroke-linecap="round"/>`:`<circle cx="${x}" cy="138" r="3.4" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.4"/>`}).join('')+
+ `<text class="dtx" x="50" y="161" style="font-size:10.5px"><tspan class="dn">86%</tspan><tspan dx="4">passed</tspan></text>`+
+ `<circle cx="54" cy="173.5" r="2.7" fill="#1a0d10" stroke="${REDHI}" stroke-width="1.2"/><text class="dser" x="61" y="177" font-size="9.5" font-style="italic" fill="#5c4a36">2 cords slack · waiting on Brent</text>`,
+ `<text class="dser" x="298" y="123" font-size="10" font-style="italic" fill="#5c4a36" letter-spacing=".4">awaiting approval</text>`+
+ [[138,'deploy-preview'],[164,'e2e-safari']].map(([y,nm])=>`<circle cx="302" cy="${y-4}" r="3" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.3"/><text class="dser" x="310" y="${y}" font-size="11.5" fill="#231b14">${nm}</text><text class="dser" x="310" y="${y+11}" font-size="9.5" font-style="italic" fill="#5c4a36">waiting for Brent</text>`).join('')];
+// Cockles: the creases a damp hide dries into, light on one side and shadowed on the other. They flatten as it is stretched.
+function hrCockles(b,c){if(c<.03)return '';const[x0,y0,x1,y1]=b.s,w=x1-x0,hh=y1-y0;
+ const D=[`M${x0+8} ${f(y0+hh*.3)}Q${f(x0+w*.3)} ${f(y0+hh*.48)} ${f(x0+w*.55)} ${f(y0+hh*.28)}T${x1-8} ${f(y0+hh*.34)}`,`M${x0+10} ${f(y0+hh*.74)}Q${f(x0+w*.35)} ${f(y0+hh*.6)} ${f(x0+w*.6)} ${f(y0+hh*.8)}T${x1-6} ${f(y0+hh*.7)}`,
+  `M${f(x0+w*.22)} ${y0+6}Q${f(x0+w*.28)} ${f(y0+hh*.5)} ${f(x0+w*.18)} ${y1-6}`,`M${f(x0+w*.8)} ${y0+6}Q${f(x0+w*.74)} ${f(y0+hh*.55)} ${f(x0+w*.84)} ${y1-6}`];
+ return `<g fill="none" stroke-linecap="round">`+D.map(d=>`<path d="${d}" stroke="#5c4a36" stroke-width="1.2" opacity="${f3(.5*c)}" transform="translate(0 1.6)"/><path d="${d}" stroke="#fffaf0" stroke-width="2" opacity="${f3(.6*c)}"/>`).join('')+'</g>'}
+// The iron frame: a flat bar with a brush-ink edge, brass rivets at the corners and curled feet; the first hangs from the shell on two chains.
+function hrFrame(b,first){const{x0,y0,x1,y1}=b,d=`M${x0} ${y0}H${x1}V${y1}H${x0}ZM${x0+7} ${y0+7}V${y1-7}H${x1-7}V${y0+7}Z`;let o='';
+ if(first)for(const x of[x0+30,x1-30])o+=`<path d="M${x} 50V${y0+1}" stroke="#0a0e16" stroke-width="1.4" stroke-dasharray="3 1.5"/>`;
+ for(const x of[x0+3.5,x1-3.5])o+=`<path d="M${f(x-3.4)} ${y1-1}Q${f(x-1)} ${y1+10} ${f(x+4)} ${y1+7}Q${f(x+1.2)} ${y1+5} ${f(x+3.4)} ${y1-1}Z" fill="#0b0e14"/>`;
+ o+=`<path d="${d}" fill="${INK}" fill-rule="evenodd" opacity=".55" transform="translate(1.5 2.6)"/><path d="${d}" fill="#262d39" fill-rule="evenodd" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round" filter="url(#wob)"/>`+
+  `<path d="M${x0+3} ${y0+1.8}H${x1-3}M${x0+1.8} ${y0+3}V${y1-3}M${x0+9} ${y1-5.4}H${x1-9}" stroke="#7d8ca3" stroke-width=".8" opacity=".45" fill="none"/>`;
+ for(const[x,y]of[[x0+3.5,y0+3.5],[x1-3.5,y0+3.5],[x0+3.5,y1-3.5],[x1-3.5,y1-3.5]])o+=`<circle cx="${f(x)}" cy="${f(y)}" r="1.9" fill="url(#brass)" stroke="${INK}" stroke-width=".6"/>`;
+ return o}
+// One herse at progress u: fk drops (or darts) the frame in, each peg turns in its slot, then the knife scrapes (sc).
+function hrBay(i,u,w,h){
+ if(u<=0)return '';
+ const b=HRB[i],[sx0,sy0,sx1,sy1]=b.s,cx=(sx0+sx1)/2,cy=(sy0+sy1)/2,n=b.ord.length,fk=seg(u,.04,.2),sc=seg(u,.8,.95),K={};
+ // A peg turns in the first 60% of its slot and the rest is the pause: a dart, a pause.
+ b.ord.forEach((id,j)=>{const a=.24+j*.54/n;K[id]=seg(u,a,a+.6*.54/n)});
+ const avg=b.ord.reduce((s,id)=>s+ease(K[id]),0)/n;
+ // A slack cord is tied but never turned: its pebble only goes as far as the rest of the hide drags it.
+ const T=id=>b.slack.includes(id)?.86*avg:ease(K[id]),pos=id=>{const p=b.P[id],t=T(id);return[lerp(p.qx,p.rx,t),lerp(p.qy,p.ry,t),t]};
+ // The writing is carried by the pebbles at the ends of the top and bottom rows (all turned), so it stretches as the hide does.
+ const m=b.tx.length-1,a0=pos('T0'),a1=pos('T'+m),c0=pos('B0'),c1=pos('B'+m);
+ const sxS=(a1[0]+c1[0]-a0[0]-c0[0])/2/(b.tx[m]-b.tx[0]),ox=(a0[0]+c0[0])/2-b.tx[0]*sxS;
+ let yT=0,yB=0;for(let k=0;k<=m;k++){yT+=pos('T'+k)[1];yB+=pos('B'+k)[1]}yT/=m+1;yB/=m+1;
+ const syS=(yB-yT)/(sy1-sy0),oy=yT-sy0*syS,X=x=>ox+x*sxS,Y=y=>oy+y*syS,CX=X(cx),CY=Y(cy);
+ // The edge runs through every pebble and bows in between them: points at the cords, scallops between, deeper where the hide is still loose.
+ const rim=[[X(sx0)+1.5,Y(sy0)+1.5,avg],...b.top.map(pos),[X(sx1)-1.5,Y(sy0)+1.5,avg],...b.rig.map(pos),[X(sx1)-1.5,Y(sy1)-1.5,avg],...b.bot.map(pos),[X(sx0)+1.5,Y(sy1)-1.5,avg],...b.lef.map(pos)];
+ let d='M'+f(rim[0][0])+' '+f(rim[0][1]);
+ for(let k=0;k<rim.length;k++){const p=rim[k],q=rim[(k+1)%rim.length],mx=(p[0]+q[0])/2,my=(p[1]+q[1])/2,dx=CX-mx,dy=CY-my,l=Math.hypot(dx,dy)||1,bu=2.2+7*(1-Math.min(p[2],q[2]));
+  d+=`Q${f(mx+dx/l*bu)} ${f(my+dy/l*bu)} ${f(q[0])} ${f(q[1])}`}
+ d+='Z';
+ // Damp darkens the hide until it is stretched; the knife leaves it clean behind it.
+ const ck=1-avg,bx=lerp(X(sx0)-10,X(sx1)+10,ease(sc));
+ let o=hrFrame(b,!i)+`<path d="${d}" fill="${INK}" opacity=".5" transform="translate(1.5 2.6)"/><path d="${d}" fill="url(#parchG)"/>`;
+ if(ck>.01)o+=`<path d="${d}" fill="#5f5444" opacity="${f3(.5*ck)}"/>`;
+ if(sc<1)o+=`<clipPath id="hrS${i}"><rect x="${f(bx)}" y="0" width="600" height="300"/></clipPath><path d="${d}" fill="#9c875f" opacity=".3" clip-path="url(#hrS${i})"/>`;
+ o+=`<path d="${d}" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round" filter="url(#wob)"/>`;
+ // The writing, cramped and buckled while the hide is loose.
+ if(ck>.02)o+=`<filter id="hrW${i}" x="-10%" y="-20%" width="120%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="2" seed="${7+i}"/><feDisplacementMap in="SourceGraphic" scale="${f(10*ck)}" xChannelSelector="R" yChannelSelector="G"/></filter>`;
+ // Clipped to the hide, so the cramped writing never spills past its edge.
+ o+=`<clipPath id="hrH${i}"><path d="${d}"/></clipPath><g clip-path="url(#hrH${i})"><g transform="matrix(${f3(sxS)} 0 0 ${f3(syS)} ${f(ox)} ${f(oy)})"${ck>.02?` filter="url(#hrW${i})"`:''} opacity="${f3(lerp(.55,1,avg))}">${hrCockles(b,ck)}${HRT[i]}</g></g>`;
+ // Cords of red thread from each peg to its pebble, sagging until the peg takes them up. Then the pebbles, then the pegs.
+ let cords='',pips='',pegs='';
+ for(const id in b.P){const p=b.P[id],[x,y]=pos(id),sl=b.slack.includes(id),k=sl?0:K[id],sag=sl?5+3*(1-avg):9*(1-seg(k,0,.45)),hor=id[0]==='L'||id[0]==='R';
+  const cd=`M${f(p.px)} ${f(p.py)}Q${f((x+p.px)/2+(hor?0:sag*.7))} ${f((y+p.py)/2+(hor?sag:0))} ${f(x)} ${f(y)}`;
+  cords+=`<path d="${cd}" stroke="#3a070b" stroke-width="2.1"/><path d="${cd}" stroke="${RED}" stroke-width="1.2"/>`;
+  pips+=`<circle cx="${f(x)}" cy="${f(y)}" r="2.6" fill="#d8caa6" stroke="${INK}" stroke-width=".9"/>`;
+  const lt=sl?0:seg(k,.55,1),gl=seg(k,.6,1);
+  pegs+=`<g transform="translate(${f(p.px)} ${f(p.py)})">`+(lt>0?`<circle r="9" fill="url(#leakT)" opacity="${f3(.5*lt)}"/>`:'')+
+   `<g transform="rotate(${f(sl?20:20+90*dart(k))})"><path d="M-7 -1.5H7V1.5H-7Z" fill="#0b0e14"/><circle cx="-7" r="1.9" fill="#0b0e14"/><circle cx="7" r="1.9" fill="#0b0e14"/></g>`+
+   `<circle r="3.4" fill="#cfc4a8" stroke="${INK}" stroke-width="1"/>`+
+   (sl?`<circle r="1.4" fill="#1a0d10"/><circle r="6" fill="none" stroke="${REDHI}" stroke-width="1.3" opacity="${f3(seg(u,.78,.9))}"/>`:lt>0?`<circle r="2" fill="url(#tealG)" stroke="${INK}" stroke-width=".5" opacity="${f3(lt)}"/>`:'')+'</g>';
+  if(gl>0&&gl<1)pegs+=spark({x:p.px,y:p.py},Math.sin(Math.PI*gl)*.7,5)}
+ o+=`<g fill="none" stroke-linecap="round">${cords}</g>${pips}${pegs}`;
+ // The crescent knife (a lunellum), one pass across, throwing off a few pale shavings.
+ if(sc>0&&sc<1){const y=CY+4-10*Math.sin(Math.PI*sc),op=Math.min(1,Math.sin(Math.PI*sc)*3);
+  for(let j=0;j<5;j++)o+=`<circle cx="${f(bx-8-j*7)}" cy="${f(y+3+((j*5)%3-1)*2.5+j*.8)}" r="${f(1.3-j*.15)}" fill="#f5eedb" opacity="${f3((1-j/5)*.75*op)}"/>`;
+  o+=`<g opacity="${f3(op)}" transform="translate(${f(bx)} ${f(y)}) rotate(${f(-18+30*sc)})"><path d="M0 0V-18" stroke="#3b2c1c" stroke-width="3.4" stroke-linecap="round"/><path d="M-.4 -1V-17" stroke="#7a5c3a" stroke-width="1.1" stroke-linecap="round"/>`+
+   `<path d="M-11 -2A12 12 0 0 0 11 -2A14 9 0 0 1 -11 -2Z" fill="#dfe6ee" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/></g>`}
+ // The first herse drops from behind the shell; the second darts out from behind the first.
+ // Waiting, the first is wholly hidden behind the shell; the arrival is capped so it never runs past the widget's box.
+ const dy=i?0:-(1-Math.min(1,backSoft(fk)))*150,dx=i?-(1-Math.min(1,backSoft(fk)))*210:0;
+ return `<defs><clipPath id="hrC${i}"><rect x="${i?259:0}" y="${i?0:40}" width="${w}" height="${h}"/></clipPath></defs><g clip-path="url(#hrC${i})"><g transform="translate(${f(dx)} ${f(dy)})">${o}</g></g>`}
+const hrOn=()=>model.morph==='herse'&&model.g>0;
+function hrDims(g){g=clamp(g,0,2);return[Math.round(CW+194*backSoft(seg(clamp(g-1),0,.14))),Math.round(lerp(CH,218,backSoft(seg(clamp(g),0,.14))))]}
+function herse(el,w,h){
+ const svg=el.querySelector('.casing');
+ if(!hrOn()){if(svg.dataset.hk)svg.dataset.hk='';return}
+ const g=model.g,still=g===Math.round(g);
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'being stretched')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.hk===key)return;svg.dataset.hk=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const u0=clamp(g),u1=clamp(g-1),fog=Math.sin(Math.PI*seg(u0,.02,.26)),k1=seg(u1,.04,.2);
+ let o=hrBay(1,u1,w,h)+hrBay(0,u0,w,h);
+ // Two brass clasps hold the second herse to the first, with a glint as they close.
+ if(k1>.7){const c=seg(k1,.7,.95);for(const y of[90.5,203.5])o+=`<rect x="258" y="${f(y-3)}" width="10" height="6" rx="1.5" fill="url(#brass)" stroke="${INK}" stroke-width=".8" opacity="${f3(c)}"/>`;
+  if(c<1)o+=spark({x:263,y:90.5},Math.sin(Math.PI*c)*.85,7)}
+ if(fog>.01)o+=`<ellipse cx="138" cy="92" rx="84" ry="22" fill="url(#fogCold)" opacity="${f3(.7*fog)}"/>`;
+ o+=casing('c',CW,CH,true,'body')+curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,1);
+ svg.innerHTML=o;
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -4633,8 +4743,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNE'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEH'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):mr||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -4646,7 +4756,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs||((ur||ns||dr)&&s>0)?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h)}
   // After the morphs, which can also move Checks' parchment, so the seal's withdraw wins.
   snailSeal(el,id,w,h,s,small?'teal':m.run?'amber':'cold');reelShell(el,id,w,h,s,small?'teal':m.run?'amber':'cold');abdomen(el,id,w,h,s,small?'teal':m.run?'amber':'cold');inkDrain(el,id,w,h,s,small?'teal':m.run?'amber':'cold');
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
