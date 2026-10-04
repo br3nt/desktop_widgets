@@ -4276,7 +4276,11 @@ const MORPHS={
  herse:{label:'Herse',kind:'Stretch',
   about:'Checks grows by being stretched, with nothing added. It comes from parchment-making: a wet hide is laced into a frame called a herse, by cords tied round pebbles folded into its rim, and the maker turns the pegs a little at a time, opposite sides in turn, until it dries drum-tight, then scrapes it with a crescent knife. That is why old parchment has a scalloped edge, pointed at every cord. <b>Herse:</b> the box darts down and an iron frame is let down on two chains from behind the belly, in a puff of fog, with the hide laced in: small, dark with damp and cockled, its red cords hanging slack. The writing is already on it, cramped and buckled too small to read. Then the pegs are turned one at a time, top and bottom and side to side, each a quick quarter turn and a pause. Each cord snaps taut and pulls its pebble out, and the hide stretches in steps, its creases flattening and its writing opening out to full size. Each peg is a check: as it locks, its bone head lights teal. Twelve are turned. The two on the right stay slack, ringed in red, and leave a small dent in the edge: those checks are waiting on Brent, and the hide cannot be pulled fully tight until they pass. Last, the crescent knife scrapes across once, and the hide behind it comes up clean: run 418 on main, 12 / 14, the fourteen marks and 86% passed. <b>Double herse:</b> a second frame darts out from behind the first and is clasped to it with a glint, and its hide is stretched the same way, peg by peg. All ten of its pegs light, and it names deploy-preview and e2e-safari, waiting for Brent. <b>Shrinking</b> plays it backwards: the pegs are let off, the hide shrinks and cockles, and the frame is drawn back up behind the shell. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a stretched Checks lets the hide off first, and unshading stretches it again.',
   sizes:['Shell','Herse','Double herse'],slider:'Checks size, shell to double herse',ms:[4200,2400],ax:0,dims:g=>hrDims(g),travel:t=>ease(seg(t,0,.2)),
-  say:(to,from,n)=>to>from?(to-from>1?'A herse drops under Checks and its hide is stretched peg by peg; a second herse is clasped beside it and stretched too: Checks is a double herse.':to===2?'A second herse darts out and is clasped to the first, and its hide is stretched peg by peg until it names the two waiting checks.':'A herse drops under the shell and the pegs are turned one by one: the hide stretches until its writing can be read. Twelve pegs are tight; two stay slack, waiting on Brent.'):'The pegs are let off and the hide shrinks and cockles'+(to?'':', and the herse is drawn back up behind the shell')+': Checks shrinks to '+article(n)+'.'}
+  say:(to,from,n)=>to>from?(to-from>1?'A herse drops under Checks and its hide is stretched peg by peg; a second herse is clasped beside it and stretched too: Checks is a double herse.':to===2?'A second herse darts out and is clasped to the first, and its hide is stretched peg by peg until it names the two waiting checks.':'A herse drops under the shell and the pegs are turned one by one: the hide stretches until its writing can be read. Twelve pegs are tight; two stay slack, waiting on Brent.'):'The pegs are let off and the hide shrinks and cockles'+(to?'':', and the herse is drawn back up behind the shell')+': Checks shrinks to '+article(n)+'.'},
+ magic:{label:'Magic lantern',kind:'Light',
+  about:'Checks grows with nothing added: the larger Checks is only a picture thrown by its own lantern onto the fog. It comes from the magic lantern, the old projector that threw pictures painted on glass slides, and from the fog that always hangs over this city. <b>Fog show:</b> the box darts down and a bank of fog rolls in under the shell from both sides. The iron lantern on Checks\' scroll is let down on its chain, swings and hangs still beside the shell\'s foot, a little nearer to you. A brass lens runs out of its side, a glass slide in a wooden frame drops into the carrier with a click, and the shutter opens with a flash. The picture lands on the near fog as a small, faint blur by the lens, then grows as the fog draws back, dimming as it spreads, the way a picture does as the throw gets longer. The flame is turned up, and the lens hunts for focus: through sharp, a touch past and back. The ink on the slide comes up dark on the light, and the fog wavers through it until it settles: run 418 on main, 12 / 14, the route with its fourteen waymarks (twelve crosses, two open red rings), 86% passed and 2 still waiting. Motes hang in the beam. <b>Panorama:</b> a second bank of fog rolls in from the right, and a long panorama slide is pushed in from above, driving the first slide out below. As it runs down through the carrier, the round picture opens out into a long oblong, dimming and blurring, and is focused again. It leads the two open rings off the route to deploy-preview and e2e-safari, both waiting for Brent, and adds a compass rose. <b>Shrinking</b> plays it backwards: the picture blurs, closes and shrinks back into the lens, the lantern is drawn back up onto its scroll and the fog thins away. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a fog show brings the lantern back up first, and unshading lets it down again.',
+  sizes:['Shell','Fog show','Panorama'],slider:'Checks size, shell to panorama',ms:[4800,2800],ax:0,dims:g=>mglDims(g),travel:t=>ease(seg(t,0,.2)),
+  say:(to,from,n)=>to>from?(to-from>1?'The lantern is let down and throws Checks onto the fog, then a panorama slide is pushed through and the picture opens out: Checks is a panorama.':to===2?'A panorama slide is pushed through the lantern and the picture on the fog opens out to name the two waiting checks.':'The lantern is let down on its chain and fitted as a magic lantern; its slide is thrown onto a bank of fog, growing as the fog draws back, then focused.'):'The picture '+(to?'closes back to a disc':'blurs and shrinks back into the lens, the lantern is drawn up and the fog thins')+': Checks shrinks to '+article(n)+'.'}
 };
 // Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
 for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
@@ -4982,6 +4986,96 @@ function herse(el,w,h){
  o+=casing('c',CW,CH,true,'body')+curlIn(IRON||(IRON=casing('c',CW,CH,true,'iron')),26,14,1);
  svg.innerHTML=o;
 }
+/* ---------- Morph: magic lantern (Checks) ---------- */
+// g runs 0 shell, 1 fog show, 2 panorama. A Light morph: nothing is added to Checks. Its own iron lantern is let down on its chain and fitted as a magic lantern,
+// and the larger Checks is only the picture it throws on a bank of fog: small, faint and blurred near the lens, growing as the fog draws back, then focused.
+// The picture is laid out at its full size (a disc round MGC, then an oblong out to MGR) and scaled with the throw. Rest sizes leave every phase finished.
+const MGX=f(HANG[0]),MGY=f(HANG[1]+2),MGT0=MGY+10.5,MGT1=140,MGS=1.25,MGC={x:166,y:159,r:66},MGR=466;
+// The fog bank: [x, y, rx, ry, side it rolls in from]. The second bank comes in for the panorama.
+const MGF=[[[166,160,92,60,0],[96,120,58,34,-1],[60,182,44,30,-1],[150,206,70,30,-1],[208,112,64,32,1],[250,190,48,40,1]],
+ [[350,160,96,62,0],[318,118,60,32,1],[372,202,70,32,1],[428,128,46,34,1],[446,194,30,28,1]]];
+// The slide, drawn in ink on glass: thrown dark on the light. The route of run 418, its fourteen waymarks, the count and the pass rate.
+const MGP1=(()=>{const y=x=>158+3.5*Math.sin((x-116)*.075);let d='M112 '+f(y(112));for(let x=116;x<=220;x+=4)d+=`L${x} ${f(y(x))}`;
+ let o=`<text class="dser" x="166" y="119" text-anchor="middle" font-size="10" font-style="italic" fill="#4a3826" letter-spacing=".4">run 418 · main</text>`+
+  `<text class="dser" x="166" y="141" text-anchor="middle" font-size="17" font-weight="700" fill="#231b14">12 / 14</text>`+
+  `<path d="${d}" fill="none" stroke="#5c4a36" stroke-width=".9" stroke-dasharray="2 2.2" stroke-linecap="round"/>`;
+ for(let i=0;i<14;i++){const x=117+i*7.3,yy=y(x);o+=i<12?`<path d="M${f(x-2)} ${f(yy-2)}l4 4m0 -4l-4 4" stroke="#231b14" stroke-width="1.4" stroke-linecap="round"/>`:`<circle cx="${f(x)}" cy="${f(yy)}" r="2.6" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.3"/>`}
+ return o+`<text class="dtx" x="166" y="183" text-anchor="middle" style="font-size:10.5px"><tspan class="dn">86%</tspan><tspan dx="4">passed</tspan></text>`+
+  `<circle cx="134" cy="196" r="2.7" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.3"/><text class="dser" x="141" y="199.5" font-size="10" font-style="italic" fill="#4a3826">2 still waiting</text>`})();
+// The rest of the panorama slide: the two waiting checks by name, led off the route's two open rings, and a compass rose.
+const MGP2=`<text class="dser" x="258" y="119" font-size="10" font-style="italic" fill="#4a3826" letter-spacing=".4">awaiting approval</text>`+
+ [[139,'deploy-preview'],[175,'e2e-safari']].map(([y,nm])=>`<circle cx="258" cy="${y}" r="3" fill="#f5eedb" stroke="#8f1c22" stroke-width="1.3"/><text class="dser" x="266" y="${y+4}" font-size="11.5" fill="#231b14">${nm}</text><text class="dser" x="266" y="${y+16}" font-size="9.5" font-style="italic" fill="#4a3826">waiting for Brent</text>`).join('');
+const MGP3=`<path d="M204.6 156.2Q228 144 254 140.5M214.5 161.8Q236 170 254 173.5" fill="none" stroke="#5c4a36" stroke-width=".9" stroke-dasharray="2 2.2" stroke-linecap="round"/>`+
+ `<g transform="translate(420 168)"><circle r="12.5" fill="none" stroke="#5c4a36" stroke-width=".8"/><path d="M0 -15L2.6 -2.6L15 0L2.6 2.6L0 15L-2.6 2.6L-15 0L-2.6 -2.6Z" fill="#4a3826"/><path d="M0 -15L2.6 -2.6L0 0Z M15 0L2.6 2.6L0 0Z M0 15L-2.6 2.6L0 0Z M-15 0L-2.6 -2.6L0 0Z" fill="#e8d6a6"/><text class="dser" y="-18" text-anchor="middle" font-size="8" fill="#4a3826">N</text></g>`;
+const mglOn=()=>model.morph==='magic'&&model.g>0;
+function mglDims(g){g=clamp(g,0,2);const a=backSoft(seg(clamp(g),0,.14)),b=backSoft(seg(clamp(g-1),0,.12));return[Math.round(lerp(CW,300,a)+180*b),Math.round(lerp(CH,238,a))]}
+// The lantern, hung from its chain at x,top and swung rot degrees: the casing's own lantern at scale 1 with no lens, so the first frame matches it.
+// lens: the brass draw tube run out toward the fog. sl: the slides in the carrier, each [length, drop, opacity]. on: the shutter opened, the flame turned up.
+function mglLamp(x,top,sc,rot,lens,sl,on){
+ // The glow goes under the chain, as in the casing; the chain hangs from the scroll to the lantern's ring.
+ // rot swings the chain end to the right for a positive angle, so the lantern turns the other way in SVG to stay in line with it.
+ let o=`<circle cx="${f(x)}" cy="${f(top+8.5*sc)}" r="${f((22+8*on)*sc)}" fill="url(#lamp)"/><path d="M${MGX} ${MGY}L${f(x)} ${f(top+.5)}" stroke="#0b0e14" stroke-width="1.3" stroke-dasharray="2.2 1.1"/><g transform="translate(${f(x)} ${f(top)}) rotate(${f(-rot)}) scale(${f3(sc)})">`;
+ if(lens>.01){const e=3.7+8*lens;o+=`<path d="M3.7 6.4H${f(e)}V11.6H3.7Z" fill="url(#brass)" stroke="${INK}" stroke-width=".7"/><path d="M${f(e-2)} 6.4V11.6" stroke="${INK}" stroke-width=".5" opacity=".7"/>`+
+  `<ellipse cx="${f(e)}" cy="9" rx="1.1" ry="2.6" fill="#9fb8d8" stroke="${INK}" stroke-width=".6"/>`+(on>.01?`<ellipse cx="${f(e)}" cy="9" rx="1.1" ry="2.6" fill="#fff6d6" opacity="${f3(on)}"/>`:'')}
+ for(const[L,dy,op]of sl)if(op>.01)o+=`<g opacity="${f3(op)}"><rect x="5.1" y="${f(9-L/2+dy)}" width="2.8" height="${L}" rx=".5" fill="#5a3d22" stroke="${INK}" stroke-width=".6"/><rect x="5.8" y="${f(9-L/2+dy+3)}" width="1.4" height="${f(L-6)}" fill="#d9c79a" opacity=".85"/></g>`;
+ o+=`<path d="M-4.8 4.5L0 0L4.8 4.5Z" fill="#0b0e14"/><rect x="-3.7" y="4.5" width="7.4" height="9" rx="1.2" fill="#ffd581" stroke="${INK}"/>`+
+  (on>.01?`<rect x="-3.7" y="4.5" width="7.4" height="9" rx="1.2" fill="#fffbe8" opacity="${f3(.6*on)}"/>`:'')+
+  `<path d="M0 4.5V13.5" stroke="${INK}" stroke-width=".8"/><path d="M-4.4 13.5H4.4L1.6 16.5H-1.6Z" fill="#0b0e14"/></g>`;
+ return o}
+function magic(el,w,h){
+ const svg=el.querySelector('.casing');
+ if(!mglOn()){if(svg.dataset.mk)svg.dataset.mk='';return}
+ const g=model.g,still=g===Math.round(g);
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'its lantern throwing a picture on the fog')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.mk===key)return;svg.dataset.mk=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const u=clamp(g),v=clamp(g-1);
+ // The lantern is let down on its chain, swings and hangs still, runs out its lens, takes a slide and opens its shutter.
+ const drop=backSoft(seg(u,.12,.3)),top=lerp(MGT0,MGT1,drop),sc=lerp(1,MGS,clamp(drop)),sw=seg(u,.24,.44),rot=10*Math.sin(3*Math.PI*sw)*(1-sw);
+ const len=top-MGY,lx=MGX+len*Math.sin(rot*Math.PI/180),ly=MGY+len*Math.cos(rot*Math.PI/180);
+ const lens=ease(seg(u,.32,.4)),s1=seg(u,.38,.48),on=seg(u,.46,.52);
+ // A panorama slide is pushed in from above and drives the first one out below; then it runs down through the carrier as the picture opens out.
+ const pa=seg(v,.16,.3),wid=ease(seg(v,.3,.72));
+ const sl=v>0?[[20,22*ease(pa),1-pa],[34,lerp(-40,-10,ease(pa))+12*wid,Math.min(1,pa*3)]]:[[20,-18*(1-dart(s1)),seg(s1,0,.3)]];
+ const Lx=MGX+(3.7+8*lens+.6)*MGS,Ly=MGT1+9*MGS;
+ // The picture: it grows with the throw (the fog draws back), dims as it spreads, then the flame is turned up. Focus hunts: through sharp, a touch past, back.
+ const p=ease(seg(u,.5,.78)),cx=lerp(Lx+14,MGC.x,p),cy=lerp(Ly,MGC.y,p),r=lerp(8,MGC.r,p),R=lerp(MGC.x+MGC.r,MGR,wid);
+ const hunt=k=>(1-k)*Math.cos(1.5*Math.PI*k);
+ const e=v>0?(v<.72?seg(v,.3,.4):hunt(seg(v,.72,.88))):(u<.8?1:hunt(seg(u,.8,.94)));
+ const I=on*(lerp(1,.6,p)+.4*seg(u,.78,.86))*(1-.35*Math.sin(Math.PI*wid)),ae=Math.abs(e),sd=3*ae,disp=5*ae;
+ const x0=cx-r,x1=cx+r+(R-MGC.x-MGC.r),y0=cy-r,y1=cy+r;
+ let o=`<defs><radialGradient id="mglL" cx=".5" cy=".5" r=".5"><stop stop-color="#fff6d8"/><stop offset=".55" stop-color="#f6e2ae"/><stop offset=".86" stop-color="#e7c88a"/><stop offset="1" stop-color="#cfa868"/></radialGradient>`+
+  `<linearGradient id="mglB"><stop stop-color="#ffe7b0" stop-opacity=".34"/><stop offset=".5" stop-color="#ffe7b0" stop-opacity=".13"/><stop offset="1" stop-color="#ffe7b0" stop-opacity=".04"/></linearGradient>`+
+  `<filter id="mglE" filterUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><feGaussianBlur stdDeviation="${f3(1.4+3*ae)}"/></filter>`+
+  `<filter id="mglV" filterUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><feGaussianBlur stdDeviation="2.6"/></filter>`+
+  (ae>.02?`<filter id="mglW" filterUnits="userSpaceOnUse" x="0" y="0" width="${w}" height="${h}"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="${f3(disp)}" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="${f3(sd)}"/></filter>`:'')+
+  `<clipPath id="mglK"><rect x="${f(x0+1)}" y="${f(y0+1)}" width="${f(x1-x0-2)}" height="${f(2*r-2)}" rx="${f(r-1)}"/></clipPath></defs>`;
+ // The fog bank rolls in from both sides; the second bank comes in from the right for the panorama.
+ MGF.forEach((B,i)=>{const t=i?seg(v,.1,.32):seg(u,.08,.3),k=ease(i?seg(v,.02,.34):seg(u,.02,.34));if(t>.01)for(const[fx,fy,rx,ry,from]of B)o+=`<ellipse cx="${f(fx+from*40*(1-k))}" cy="${fy}" rx="${rx}" ry="${ry}" fill="url(#fogCold)" opacity="${f3(.95*t)}"/>`});
+ if(I>.01){
+  // The beam through the mist, the warm spill round the picture, then the picture itself with a few darker wisps of fog across it.
+  o+=`<path d="M${f(Lx)} ${f(Ly-2)}L${f(x0+.55*r)} ${f(y0)}L${f(x0+.55*r)} ${f(y1)}L${f(Lx)} ${f(Ly+2)}Z" fill="url(#mglB)" opacity="${f3(I)}" filter="url(#mglV)"/>`+
+   `<ellipse cx="${f((x0+x1)/2)}" cy="${f(cy)}" rx="${f((x1-x0)/2*1.1)}" ry="${f(r*1.18)}" fill="url(#fogLamp)" opacity="${f3(.4*I)}"/>`+
+   `<rect x="${f(x0)}" y="${f(y0)}" width="${f(x1-x0)}" height="${f(2*r)}" rx="${f(r)}" fill="url(#mglL)" opacity="${f3(.95*I)}" filter="url(#mglE)"/>`+
+   `<g clip-path="url(#mglK)" fill="none" stroke="#8d7a58" stroke-linecap="round" opacity="${f3(.12*I)}" stroke-width="6"><path d="M${f(x0)} ${f(cy-r*.5)}Q${f(cx)} ${f(cy-r*.75)} ${f(x1)} ${f(cy-r*.35)}"/><path d="M${f(x0)} ${f(cy+r*.62)}Q${f(cx+r*.3)} ${f(cy+r*.3)} ${f(x1)} ${f(cy+r*.7)}"/></g>`;
+  // The slide's ink, scaled with the throw. The panorama's half shows only where the picture has opened out.
+  const t1=seg(u,.58,.8),t2=seg(v,.5,.76),t3=seg(v,.84,.96);
+  if(t1>.01){const k=r/MGC.r;
+   o+=`<g clip-path="url(#mglK)"><g${ae>.02?' filter="url(#mglW)"':''} opacity="${f3(t1*Math.min(1,I/.6))}"><g transform="translate(${f(cx)} ${f(cy)}) scale(${f3(k)}) translate(${-MGC.x} ${-MGC.y})">${MGP1}`+
+    (t2>.01?`<g opacity="${f3(t2)}">${MGP2}</g>`:'')+(t3>.01?`<g opacity="${f3(t3)}">${MGP3}</g>`:'')+`</g></g></g>`}
+  // Motes in the beam, placed by g alone, so they hang still at rest.
+  const mo=seg(u,.5,.6);for(let i=0;i<9;i++){const s=(i*.137+.08)%1,tt=((i*.61)%1)*2-1,hh=lerp(2,r,s);
+   o+=`<circle cx="${f(lerp(Lx,x0+.55*r,s))}" cy="${f(lerp(Ly,cy,s)+tt*hh*.8+3*Math.sin(i*1.7+u*9+v*5))}" r="${f(.6+(i%3)*.3)}" fill="#fff4d6" opacity="${f3(.55*I*mo)}"/>`}}
+ // The shell and its scroll; the lantern is drawn on its own, on the end of its chain.
+ o+=casing('c',CW,CH,true,'body')+`<g class="scr"><g filter="url(#wob)"><path d="${taper(SCROLL,6,1.4)}" fill="#0b0e14"/><circle cx="${f(SCROLL[44][0])}" cy="${f(SCROLL[44][1])}" r="1.5" fill="#0b0e14"/></g><path d="${taper(SCROLL.slice(0,20),1.4,.3)}" fill="#7d8ca3" opacity=".55" transform="translate(-.6 -.8)"/></g>`;
+ o+=mglLamp(lx,ly,sc,rot,lens,sl,on);
+ // A click as the slide seats, a flash as the shutter opens, and a glint on the lens once the picture is sharp.
+ if(s1>.85&&s1<1&&v===0)o+=spark({x:lx+6.5*sc,y:ly-1*sc},Math.sin(Math.PI*seg(s1,.85,1))*.85,6);
+ if(on>0&&on<1&&v===0)o+=spark({x:Lx,y:Ly},Math.sin(Math.PI*on)*.9,8);
+ const gl=v>0?seg(v,.88,.98):seg(u,.92,.99);if(gl>0&&gl<1)o+=spark({x:Lx,y:Ly},Math.sin(Math.PI*gl)*.8,6);
+ svg.innerHTML=o;
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -5163,8 +5257,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEH'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHG'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):mr||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -5176,7 +5270,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs||((ur||ns||dr||pr)&&s>0)?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h)}
   // After the morphs, which can also move Checks' parchment, so the seal's withdraw wins.
   snailSeal(el,id,w,h,s,small?'teal':m.run?'amber':'cold');reelShell(el,id,w,h,s,small?'teal':m.run?'amber':'cold');abdomen(el,id,w,h,s,small?'teal':m.run?'amber':'cold');inkDrain(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapPress(el,id,w,h,s,small?'teal':m.run?'amber':'cold');
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
