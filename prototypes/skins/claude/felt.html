@@ -4807,7 +4807,13 @@ const MORPHS={
   sizes:['Pad','Blocked','Stretched'],noun:['a pad','a blocked pad','a stretched pad'],up:4400,down:3200,
   pad:()=>model.gq>0?[STB.M,STB.M]:[0,0],padAt:i=>i?[STB.M,STB.M]:[0,0],
   fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?stbBox(i-1):[CW,CH],dims:()=>model.gq>0?stbBox(model.gq>1?1:0):[CW,CH],
-  sayUp:n=>'Checks is steamed, stretched by two felt mittens and pinned to dry: it becomes '+n+'.',sayDown:n=>'Checks is steamed again and eased back: it shrinks to '+n+'.'}
+  sayUp:n=>'Checks is steamed, stretched by two felt mittens and pinned to dry: it becomes '+n+'.',sayDown:n=>'Checks is steamed again and eased back: it shrinks to '+n+'.'},
+ shadow:{label:'Shadow play',kind:'Light',
+  about:'The Light kind (gothic\'s lux nova) done in felt, from the bedtime shadow theatre: a sheet, a torch behind it and cut-out puppets on rods. Felt is the perfect shadow-puppet stuff, because it stops light dead and cuts clean. Nothing is added to Checks: the bigger form is shadows thrown by the torch, and the pad itself becomes the playboard at the front of the stage, keeping its nameplate, display and knot. <b>Growing:</b> two wooden props with raspberry felt knobs pop up from the table either side of the pad, and a cotton line is tied across between them. Three felt clothes pegs clip a rolled cotton sheet to the line, and it unrolls down behind the pad and sways still. Then the torch behind it clicks on, flickers and holds, and the sheet glows warm from behind. The puppets come in from the torch: each shadow starts huge, faint and blurred, filling the sheet, and shrinks, darkens and sharpens as the puppet is brought up to the cloth, until it reads at its true size, with its rod running off the sheet\'s edge. The count (12 / 14) comes first, then checks passed · 86%, then a felt strip with fourteen holes covered in sweet-wrapper cellophane, which throws fourteen spots of coloured light, one per check (twelve green passed, two amber waiting), and last run 418 · main branch. A hand-shadow bird, two mittens with their thumbs hooked together, flaps across the top and away. <b>Full show:</b> the props waddle outward and the line lengthens, two more sheets are pegged on and unroll either side, and the torch is drawn back so its light spreads over all three. On the left comes the pass rate, 86% passed, over a row of ten felt bars on a rod for the recent runs, each with a cellophane window (green passed, red failed, amber for the one waiting). On the right come the two checks waiting for Brent by name, each beside an amber spot. Then the bird flies back across. <b>Shrinking</b> plays the same timeline backwards: the shadows swell and blur back toward the torch, the light goes out and the sheet rolls back up. The light is drawn from the size alone, so nothing moves at rest. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks takes the show down first, and unshading puts it back up. Switching morphs takes Checks back to a pad first.',
+  sizes:['Pad','Lit sheet','Full show'],noun:['a pad','a lit sheet','a full show'],up:5000,down:3400,
+  pad:()=>model.gq>0?[LX.OX[model.gq>1?2:1],LX.OY]:[0,0],padAt:i=>i?[LX.OX[i],LX.OY]:[0,0],
+  fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[LX.W[i],LX.H]:[CW,CH],dims:()=>model.gq>0?[LX.W[model.gq>1?2:1],LX.H]:[CW,CH],
+  sayUp:n=>'A sheet goes up behind Checks, a torch is lit behind it and felt shadows come up to the cloth: Checks becomes '+n+'.',sayDown:n=>'The shadows swell and blur back toward the torch: Checks shrinks to '+n+'.'}
 };
 const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
@@ -4907,6 +4913,7 @@ function morphRender(el){
  if(model.morph==='mobile')return mbRender(el,svg,gr,kn,pa);
  if(model.morph==='swatch')return sfRender(el,svg,gr,kn,pa);
  if(model.morph==='steam')return stbRender(el,svg,gr,kn,pa);
+ if(model.morph==='shadow')return lxRender(el,svg,gr,kn,pa);
  el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
@@ -5744,6 +5751,118 @@ function stbRender(el,svg,gr,kn,pa){
  gr.style.opacity=1;gr.style.right=f(w-ox-CW+24)+'px';sc(gr,24,4,o.sx,o.sy);el.querySelector('.strip').style.opacity=0;
  const si=SIZES.findIndex(x=>x[2]===model.g);
  el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'being stretched')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418, 86% passed':'')+(model.g>=2?'; deploy-preview and e2e-safari waiting for Brent':''));
+ return true;
+}
+/* ---------- Morph: shadow play (Checks) ---------- */
+// g runs 0 pad, 1 lit sheet, 2 full show. Nothing is added to Checks: the pad is the playboard at the front, a sheet hangs behind it
+// and felt puppets throw shadows from a torch behind the sheet. Everything is drawn in pad-local units (the pad's top-left at 0,0;
+// the box puts it at OX[i],OY), and every part is a function of g, so shrinking runs it back and nothing moves at rest.
+// A shadow is the puppet projected from the torch at L: scale s about L, s→1 as the puppet comes up to the cloth, blur growing with s.
+const LX={W:[CW,328,554],OX:[0,26,138],OY:176,H:254,SC:'#3a2216',L:{x:138,y:-80},TOP:-164,FOOT:74,LINE:-160,SH:-158,HEM:24};
+const LXC={ok:'#b8f27c',wait:'#ffc54a',bad:'#ff7a6e'};
+const LXF="'Avenir Next',Avenir,'Segoe UI',Helvetica,sans-serif";
+// The torch clicks on: a few stop-motion frames of flicker, then it holds.
+const lxOn=k=>k<=0?0:k>=1?1:[.55,.08,.9,.45,1][Math.min(4,Math.floor(k*5))];
+const lxT=(x,y,s,t,w=700,a='middle',ex='')=>`<text x="${x}" y="${y}" font-family="${LXF}" font-size="${s}" font-weight="${w}" text-anchor="${a}" fill="${LX.SC}"${ex}>${t}</text>`;
+// A cellophane window: coloured light through a hole in the felt, with a little bloom round it.
+const lxHole=(x,y,r,c)=>`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r+2.2)}" fill="${c}" opacity=".4"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="${c}"/><circle cx="${f(x-r*.3)}" cy="${f(y-r*.3)}" r="${f(r*.42)}" fill="#fffbe6" opacity=".7"/>`;
+// Rods run off the sheet's edge, held by someone out of sight; they are routed clear of the lettering.
+const lxRod=(x0,y0,x1,y1)=>`<path d="M${x0} ${y0}L${x1} ${y1}" stroke="${LX.SC}" stroke-width="1.5" stroke-linecap="round"/>`;
+const LXRUN=[[22,'ok'],[18,'ok'],[25,'bad'],[21,'ok'],[24,'ok'],[19,'ok'],[26,'bad'],[23,'ok'],[20,'ok'],[27,'wait']];
+const LXP={
+ A:()=>lxT(138,-98,38,'12 / 14',800,'middle',' letter-spacing="1"')+lxRod(78,-112,10,40),
+ B:()=>lxT(138,-78,13,'checks passed · 86%')+lxRod(212,-86,300,40),
+ C:()=>`<path d="${rr4(46,-66,184,16,[6,5,7,5])}" fill="${LX.SC}"/>`+Array.from({length:14},(_,k)=>lxHole(54+k*12.92,-58,3.5,k<12?LXC.ok:LXC.wait)).join('')+lxRod(228,-56,256,40),
+ D:()=>lxT(138,-32,11,'run 418 · main branch',600)+lxRod(203,-34,240,40),
+ E:()=>lxT(-60,-124,11,'pass rate',600)+lxT(-60,-96,30,'86%',800)+lxT(-60,-82,11,'passed',600)+lxRod(-94,-104,-122,-50),
+ F:()=>{let s=`<rect x="-114" y="-37" width="108" height="3.4" rx="1.7" fill="${LX.SC}"/>`;
+  LXRUN.forEach(([h,r],j)=>{const x=-112+j*10.6;s+=`<path d="${rr4(x,-36-h,7,h,[2.5,2.5,1,1])}" fill="${LX.SC}"/>`+lxHole(x+3.5,-36-h+5,2.2,LXC[r])});
+  return s+lxT(-60,-20,9.5,'last ten runs · 409–418',600)+lxRod(-114,-35,-122,24)},
+ G:()=>lxT(336,-122,10.5,'waiting for Brent',600)+lxRod(386,-125,400,-110),
+ H:()=>lxHole(287,-101.5,3.6,LXC.wait)+lxT(295,-97,12,'deploy-preview',700,'start')+lxHole(287,-77.5,3.6,LXC.wait)+lxT(295,-73,12,'e2e-safari',700,'start')+
+  lxT(336,-50,10,'2 of 14 checks',600)+lxRod(380,-55,398,-30)};
+function lxPup(d,id,body){
+ if(d<=0)return'';const e=ease(d),s=1+1.7*(1-e),bl=.45+4.4*(s-1),op=seg(d,0,.22)*(.9-.24*(s-1)/1.7),{x,y}=LX.L;
+ return `<filter id="lxb${id}" x="-40%" y="-60%" width="180%" height="220%"><feGaussianBlur stdDeviation="${f(bl)}"/></filter>`+
+  `<g opacity="${f(op)}" filter="url(#lxb${id})"><g transform="translate(${x} ${y}) scale(${s.toFixed(3)}) translate(${-x} ${-y})">${body}</g></g>`;
+}
+// The hand-shadow bird: two mittens hooked at the thumbs, the fingers its wings, flapping on alternate frames.
+function lxBird(t,x0,x1,flip){
+ if(t<=0||t>=1)return'';const x=lerp(x0,x1,t),y=-146+4*Math.sin(t*9),up=Math.floor(t*16)%2,SC=LX.SC;
+ const tips=up?[[-16,-14],[-10,-18],[-4,-19],[2,-16]]:[[-16,10],[-10,13],[-4,14],[2,11]];
+ return `<filter id="lxbird" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.3"/></filter><g opacity="${f(.85*seg(t,0,.08)*(1-seg(t,.92,1)))}" filter="url(#lxbird)"><g transform="translate(${f(x)} ${f(y)}) scale(${flip*1.2} 1.2)">`+
+  `<ellipse rx="10" ry="4.3" fill="${SC}"/><circle cx="11" cy="-2.6" r="3.9" fill="${SC}"/><path d="M14 -4l5.5 1.8l-5.5 1.4zM-8 -1l-9 -4.5l1.2 4.5l-1.2 4.5l9 -3z" fill="${SC}"/>`+
+  `<path d="${tips.map(([a,b])=>`M-2 -1L${a} ${b}`).join('')}" stroke="${SC}" stroke-width="3.6" stroke-linecap="round"/></g></g>`;
+}
+// A hanging cotton panel from the line down to its hem, the hem swaying as it settles; a roll while it is still unrolling.
+function lxSheet(x0,x1,u,amp,ph,tone){
+ if(u<=0)return{d:'',s:''};const hem=LX.SH+(LX.HEM-LX.SH)*(1-(1-u)*(1-u)),m=(x0+x1)/2;
+ const d=`M${x0} ${LX.SH}H${x1}V${f(hem+amp*Math.sin(ph))}Q${f(m)} ${f(hem+1.6*amp*Math.sin(ph+2))} ${x0} ${f(hem+amp*Math.sin(ph+4))}Z`;
+ let s=`<path d="${d}" fill="#000" opacity=".22" transform="translate(1.5 2)" filter="url(#sh)"/><path d="${d}" fill="${tone}"/><path d="${d}" fill="url(#woven)" opacity=".6"/>`;
+ // Soft hanging folds, and a raspberry running stitch along the hem.
+ for(let k=1;k<5;k++){const fx=lerp(x0,x1,k/5)+(k%2?3:-3);s+=`<path d="M${f(fx)} ${LX.SH+4}V${f(Math.max(LX.SH+4,hem-3))}" stroke="#6b5a40" stroke-opacity=".1" stroke-width="5"/>`}
+ if(u>=1)s+=`<path d="M${x0+4} ${f(hem-5+amp*Math.sin(ph+4))}Q${f(m)} ${f(hem-5+1.6*amp*Math.sin(ph+2))} ${x1-4} ${f(hem-5+amp*Math.sin(ph))}" fill="none" stroke="#b8476e" stroke-width="1.2" stroke-dasharray="3 2.4" stroke-linecap="round"/>`;
+ else{const r=2+5*(1-u);s+=`<rect x="${x0-1}" y="${f(hem-r)}" width="${x1-x0+2}" height="${f(2*r)}" rx="${f(r)}" fill="#cbc0ab" stroke="#8c7d64" stroke-width=".6"/><path d="M${x0+2} ${f(hem-r*.4)}H${x1-2}" stroke="#fff" stroke-opacity=".5" stroke-width=".8"/>`}
+ return{d,s};
+}
+// A felt clothes peg on the line, popping on.
+function lxPeg(x,e,c){
+ if(e<=0)return'';const sc=Math.max(.01,e);
+ return `<g transform="translate(${x} ${LX.LINE}) scale(${f(sc*100)/100})"><rect x="-2.6" y="-3" width="5.2" height="13" rx="2" fill="#000" opacity=".3" transform="translate(1 1.5)"/><rect x="-2.6" y="-3" width="5.2" height="13" rx="2" fill="${c}" filter="url(#tagfelt)"/>`+
+  `<path d="M0 -2.4V9.4" stroke="#000" stroke-opacity=".35" stroke-width=".8"/><rect x="-3.3" y="1.6" width="6.6" height="2.1" rx="1" fill="#c9ccd2" stroke="#6f727a" stroke-width=".4"/></g>`;
+}
+// A wooden prop on a felt foot with a raspberry felt knob, popped up from the table to height k and leaning by rot degrees.
+function lxPost(x,k,rot){
+ if(k<=0)return'';const{TOP,FOOT}=LX,top=FOOT-(FOOT-TOP)*k;
+ return `<ellipse cx="${f(x+2)}" cy="${FOOT+1.5}" rx="12" ry="3.2" fill="#000" opacity=".3" filter="url(#sh)"/><g transform="rotate(${f(rot)} ${f(x)} ${FOOT})">`+
+  `<rect x="${f(x-2.7)}" y="${f(top)}" width="5.4" height="${f(FOOT-top)}" rx="2.7" fill="#b98b5a"/><path d="M${f(x-1)} ${f(top+4)}V${FOOT-4}" stroke="#f1d6ad" stroke-opacity=".6" stroke-width="1"/><path d="M${f(x+1.8)} ${f(top+4)}V${FOOT-4}" stroke="#5e3d1d" stroke-opacity=".35" stroke-width="1"/>`+
+  `<ellipse cx="${f(x)}" cy="${FOOT}" rx="10" ry="3.6" fill="#d9a441" filter="url(#tagfelt)"/><circle cx="${f(x)}" cy="${f(top)}" r="6.6" fill="#b8476e" filter="url(#tagfelt)"/></g>`;
+}
+function lxSvg(g,q,fr){
+ const{ox,oy}=q,a=g>=1?1:g,b=g>=1?g-1:0,{FOOT,LINE}=LX;
+ const keep=BO;BO=fr<0?0:(fr%3)*31;const pad=casing('c',CW,CH);BO=keep;
+ // The props waddle outward in three steps for the full show, rocking as they go.
+ const hx=seg(b,0,.21)*3,hk=Math.min(2,Math.floor(hx)),ht=hx>=3?0:hx-hk,out=hx>=3?1:(hk+ease(ht))/3,rot=hx>0&&hx<3?(hk%2?3:-3)*Math.sin(Math.PI*ht):0;
+ const xL=lerp(-12,-124,out),xR=lerp(288,400,out),pop=t=>ease(t)+.02*Math.sin(Math.PI*seg(t,.55,1)),kL=pop(seg(a,0,.12)),kR=pop(seg(a,.05,.17));
+ const tip=(x,k,r)=>({x:x+(FOOT-LINE)*Math.sin(r*Math.PI/180)*k,y:FOOT-(FOOT-LINE)*k}),PL=tip(xL,kL,-rot),PR=tip(xR,kR,rot);
+ // Sheets: the middle one in the first step, the side ones in the second; each sways still after it unrolls.
+ const sway=(t,a0)=>6*Math.sin(Math.PI*seg(t,a0,a0+.16)),u0=seg(a,.26,.42),uL=seg(b,.24,.4),uR=seg(b,.28,.44);
+ const SM=lxSheet(-6,282,u0,sway(a,.36),a*70,'#ddd4c3'),SL=lxSheet(-118,-2,uL,sway(b,.34),b*64,'#d6cdbb'),SR=lxSheet(278,394,uR,sway(b,.38),b*64+1,'#d6cdbb');
+ const lo=lxOn(seg(a,.44,.52)),wd=ease(seg(b,.44,.54)),{x:Lx,y:Ly}=LX.L;
+ let x=`<defs><radialGradient id="lxg"><stop stop-color="#fffbea"/><stop offset=".35" stop-color="#ffeab4" stop-opacity=".95"/><stop offset=".75" stop-color="#ffd385" stop-opacity=".5"/><stop offset="1" stop-color="#ffc867" stop-opacity="0"/></radialGradient>`+
+  `<clipPath id="lxclip"><path d="${SL.d}"/><path d="${SR.d}"/><path d="${SM.d}"/></clipPath></defs><g transform="translate(${ox} ${oy})">`;
+ x+=SL.s+SR.s+SM.s;
+ // The torch behind the cloth: a warm wash over every sheet and a bright pool, which spreads when the torch is drawn back.
+ if(lo>0){const rx=lerp(178,312,wd),ry=lerp(124,136,wd);
+  x+=`<g clip-path="url(#lxclip)"><rect x="-130" y="${LX.SH}" width="545" height="200" fill="#efc07a" opacity="${f(.5*lo)}"/><ellipse cx="${Lx}" cy="${Ly}" rx="${f(rx)}" ry="${f(ry)}" fill="url(#lxg)" opacity="${f(lo*(1-.15*wd))}"/>`+
+   `<ellipse cx="${Lx}" cy="${Ly+4}" rx="${f(lerp(30,44,wd))}" ry="22" fill="#fffef6" opacity="${f(.55*lo)}" filter="url(#soft)"/>`;
+  // Shadows only fall where there is light, so they come after the light and inside the sheets.
+  const P=[['A',seg(a,.5,.66)],['B',seg(a,.57,.71)],['C',seg(a,.63,.77)],['D',seg(a,.69,.83)],['E',seg(b,.52,.68)],['F',seg(b,.58,.74)],['G',seg(b,.62,.76)],['H',seg(b,.68,.84)]];
+  for(const[id,d]of P)x+=lxPup(d,id,LXP[id]());
+  x+=lxBird(seg(a,.83,.99),-30,300,1)+lxBird(seg(b,.85,.99),420,-140,-1)+'</g>'}
+ // The line is tied across from the left prop, then the pegs clip on.
+ const l=seg(a,.16,.25);
+ if(l>0){const e={x:lerp(PL.x,PR.x,l),y:lerp(PL.y,PR.y,l)},c=`${f((PL.x+e.x)/2)} ${f((PL.y+e.y)/2+3*l)}`;
+  x+=`<path d="M${f(PL.x)} ${f(PL.y)}Q${c} ${f(e.x)} ${f(e.y)}" fill="none" stroke="#3b291d" stroke-opacity=".5" stroke-width="2.2" transform="translate(.6 1)"/><path d="M${f(PL.x)} ${f(PL.y)}Q${c} ${f(e.x)} ${f(e.y)}" fill="none" stroke="#efe2c4" stroke-width="1.5"/>`+
+   `<path d="M${f(PL.x)} ${f(PL.y)}Q${c} ${f(e.x)} ${f(e.y)}" fill="none" stroke="#a89878" stroke-width=".6" stroke-dasharray="1.4 1.6"/>`}
+ [[6,'#3f807a'],[138,'#d9a441'],[270,'#3f807a']].forEach(([px,c],k)=>x+=lxPeg(px,backOut(seg(a,.2+.025*k,.26+.025*k)),c));
+ [[-112,'#d9a441'],[-9,'#b8476e'],[285,'#b8476e'],[388,'#d9a441']].forEach(([px,c],k)=>x+=lxPeg(px,backOut(seg(b,.18+.02*k,.24+.02*k)),c));
+ x+=lxPost(xL,kL,-rot)+lxPost(xR,kR,rot);
+ return x+`</g><g transform="translate(${ox} ${oy})">${pad}</g>`;
+}
+function lxRender(el,svg,gr,kn,pa){
+ el.dataset.m='1';pa.style.display='none';el.querySelectorAll('.pp,.cp,.sd,.ck,.cktool,.mb').forEach(n=>n.style.display='none');el.classList.remove('sdb');
+ // Until the first drawn frame moves (gq still 0) the box is the bare pad's, as pad() and dims() say, so the pad never jumps.
+ const on=model.gq>0,j=model.gq>1?2:1,w=on?LX.W[j]:CW,h=on?LX.H:CH,ox=on?LX.OX[j]:0,oy=on?LX.OY:0,fr=model.mFr<0?-1:model.mFr%3;
+ el.style.width=w+'px';el.style.height=h+'px';el.style.transform='';
+ const key=`lx|${model.gq}|${fr}`;
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=on?lxSvg(model.gq,{ox,oy},model.mFr):casing('c',CW,CH)}
+ // The pad is the playboard: its nameplate, display and knot stay where they always are.
+ const mini=el.querySelector('.mini');mini.style.left=f(ox+17)+'px';mini.style.top=f(oy+25)+'px';mini.style.opacity=1;mini.style.visibility='visible';
+ kn.style.left=f(ox+243)+'px';kn.style.top=f(oy+34)+'px';kn.style.opacity=1;kn.style.visibility='visible';
+ gr.style.opacity=1;gr.style.left=f(ox+24)+'px';gr.style.right=f(w-ox-CW+24)+'px';gr.style.top=f(oy+4)+'px';el.querySelector('.strip').style.opacity=0;
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'changing size')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 2 failed; deploy-preview and e2e-safari waiting for Brent':''));
  return true;
 }
 const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
