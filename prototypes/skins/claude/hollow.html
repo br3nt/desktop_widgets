@@ -6355,7 +6355,11 @@ const MORPHS={
  mring:{label:'Moth ring',kind:'Orbit',
   about:'Checks grows by being circled: the larger Checks is whatever goes round the shell once it comes to rest. It comes from moths at a lamp, which fly round and round a light they cannot reach, and from the iron hoops that lamps hang in here. <b>Moth ring:</b> the box opens out evenly both sides, so the shell stays where it is. An iron hoop rises out of a bank of fog under the shell, seen from a little above, overshoots a touch, and two iron stays swing down from the shell\'s foot and catch it with a glint. Its far half runs behind the shell, its near half in front of its foot. The lantern on Checks\' scroll swells, and fourteen pale moths come out of the fog at the left end one after another and circle the shell as one train, wings beating, the far ones smaller and passing behind it. They go round once and on, slow together, and each settles on the hoop in its place, seven a side where you can see them, and closes its beating wings down to spread flat, as a moth rests. Twelve eyespots kindle teal one by one: the checks that passed. The two moths either side of the front take red rings: the two still waiting. A parchment tag drops on red thread from the front of the hoop: run 418 on main, 86% passed and 2 waiting. <b>Two rings:</b> the box widens again and a wider hoop rises out of the fog and is hung from the first by two more stays. The two waiting moths lift off, fly out to it and once round it the other way, and settle at its front, where two tags drop under them naming deploy-preview and e2e-safari, waiting for Brent. <b>Shrinking</b> plays it backwards: the moths take off, circle back into the fog and the hoops sink away. Pick a size, press M or scrub the slider. When Checks would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a moth ring sends the moths away first, and unshading calls them back.',
   sizes:['Shell','Moth ring','Two rings'],slider:'Checks size, shell to two rings',ms:[5800,3200],ax:.5,dims:g=>mrDims(g),travel:t=>ease(seg(t,0,.2)),
-  say:(to,from,n)=>to>from?(to-from>1?'Moths come out of the fog to Checks\' lamp, circle the shell and settle on an iron hoop; a second hoop is hung and the two waiting moths fly out to it: Checks is two rings.':to===2?'A wider hoop is hung from the first, and the two waiting moths fly out and once round it to settle over their names.':'An iron hoop is hung round Checks and fourteen moths circle the shell and settle on it: twelve eyespots kindle teal, two moths wait in red rings.'):(to?'The two waiting moths fly back to the inner hoop and the outer hoop sinks':'The moths take off and circle back into the fog, and the hoop sinks away')+': Checks shrinks to '+article(n)+'.'}
+  say:(to,from,n)=>to>from?(to-from>1?'Moths come out of the fog to Checks\' lamp, circle the shell and settle on an iron hoop; a second hoop is hung and the two waiting moths fly out to it: Checks is two rings.':to===2?'A wider hoop is hung from the first, and the two waiting moths fly out and once round it to settle over their names.':'An iron hoop is hung round Checks and fourteen moths circle the shell and settle on it: twelve eyespots kindle teal, two moths wait in red rings.'):(to?'The two waiting moths fly back to the inner hoop and the outer hoop sinks':'The moths take off and circle back into the fog, and the hoop sinks away')+': Checks shrinks to '+article(n)+'.'},
+ popup:{label:'Pop-up city',kind:'Let out',
+  about:'Checks grows with nothing made, stretched or brought in: the larger Checks was folded up inside the shell all along, and is let out. Here it is a pop-up book of the rain city, kept shut in the shell\'s belly. <b>Pop-up:</b> the box darts down and light shows along the seam of the belly plates. A closed book bound in chitin is let down out of the seam on two red threads and bobs still. Its front cover falls open toward you like a drawbridge, hinged at the foot and gathering speed, while two red threads pay out from the corners of the back cover; they catch it level with a jolt and a spark at each corner. Then the city stands up off the open page in three layers of cut paper, back to front, each springing a touch past upright and settling: a far skyline of spires and domes, seven towers in front of it, and a bridge with a lamp at each end over a canal printed on the open cover. In the rain-washed sky behind them is run 418 on main, 12 / 14 and 86% passed · 2 waiting. The towers\' windows light teal one by one: twelve, the checks that passed, each reflected in the canal. The two windows of the last tower stay dark and red rings close round them: the two checks still waiting. The bridge lamps are lit last. <b>Gatefold:</b> the box widens and the book\'s right-hand flaps, folded in against the scene like the side walls of a toy theatre, swing out one after the other, the back page first, and slap flat with a puff of paper dust, a third red thread drawing out between their corners. A bench and a lamp spring up on them with a small cloaked bug waiting on the bench, and the page behind names deploy-preview and e2e-safari, waiting for Brent, as red rings close beside them. <b>Shrinking</b> plays it backwards: the city folds flat, the cover is drawn shut on its threads and the book is drawn back up into the shell. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a pop-up folds it away first, and unshading opens it again.',
+  sizes:['Shell','Pop-up','Gatefold'],slider:'Checks size, shell to gatefold',ms:[5600,3200],ax:0,dims:g=>poDims(g),travel:t=>ease(seg(t,0,.2)),
+  say:(to,from,n)=>to>from?(to-from>1?'A book is let down out of Checks\' belly and its cover falls open like a drawbridge: the rain city pops up and twelve windows light. Then its side flaps swing out to a bench where two checks wait: Checks is a gatefold.':to===2?'The book\'s side flaps swing out flat, and a bench and a lamp pop up beside deploy-preview and e2e-safari, waiting for Brent.':'A book is let down out of Checks\' belly on red threads, and its cover falls open like a drawbridge: the rain city pops up, twelve windows lit, two dark in red rings.'):(to?'The side flaps fold back in against the scene':'The city folds flat, the cover is drawn shut and the book goes back up into the shell')+': Checks shrinks to '+article(n)+'.'}
 };
 // Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
 for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
@@ -7577,6 +7581,156 @@ function mothRing(el,w,h){
  o+=lay(front);
  svg.innerHTML=o+'</g>';
 }
+/* ---------- Morph: pop-up city (Checks) ---------- */
+// g runs 0 shell, 1 pop-up, 2 gatefold. A Let out morph: the larger Checks was folded up inside the shell all along. A pop-up book of the
+// rain city is let down out of the belly; its front cover falls open like a drawbridge and the city stands up off the page in layers.
+// The book is seen from the front and a little above: a page lying flat shows at PO.k of its depth, and the cover's face scales by
+// c = cos φ − k sin φ about the spine (positive while its outside faces you, negative once it shows the open page). Every frame is drawn from g alone.
+const PO={L:28,R:248,T:92,S:212,D:120,k:.3,F:120};
+const poOn=()=>model.morph==='popup'&&model.g>0;
+function poDims(g){g=clamp(g,0,2);const a=backSoft(seg(clamp(g),0,.12)),b=backSoft(seg(clamp(g-1),0,.12));return[Math.round(CW+104*b),Math.round(lerp(CH,266,a))]}
+// Rain printed on a page: short slanting ink strokes, missing wherever skip says (round the writing).
+function poRain(x0,x1,y0,y1,n,skip){let d='';for(let i=0;i<n;i++){const x=x0+(i*37.7)%(x1-x0),y=y0+(i*19.3)%(y1-y0);if(skip&&skip(x,y))continue;d+=`M${f(x)} ${f(y)}l-2.2 6`}
+ return d?`<path d="${d}" stroke="#5c6b82" stroke-width=".8" opacity=".35" stroke-linecap="round"/>`:''}
+// The cut-paper city. The far skyline is one piece; the seven towers in front each carry two windows; the bridge is nearest, with a lamp at each end.
+const PO_A=[[32,48,24,'f'],[48,62,42,'s'],[62,80,30,'d'],[80,92,48,'s'],[92,116,32,'f'],[116,126,46,'s'],[126,150,36,'d'],[150,162,50,'s'],[162,186,30,'f'],[186,198,44,'s'],[198,218,28,'d'],[218,230,40,'s'],[230,244,22,'f']];
+const PO_AP=(()=>{let d='M32 0';for(const[x0,x1,h,r]of PO_A){d+=`L${x0} ${-h}`;
+ if(r==='s')d+=`L${f((x0+x1)/2)} ${-h-12}L${x1} ${-h}`;else if(r==='d'){const rr=(x1-x0)/2;d+=`A${f(rr)} ${f(rr*.9)} 0 0 1 ${x1} ${-h}`}
+ else d+=`L${x0+2} ${-h}V${-h-3}H${x0+5}V${-h}H${x1-5}V${-h-3}H${x1-2}V${-h}L${x1} ${-h}`}return d+'L244 0Z'})();
+const PO_AW=PO_A.filter((q,i)=>i%2===0).map(([x0,x1,h],i)=>`M${f((x0+x1)/2-1)} ${-h+8+(i%2)*6}v3`).join('');
+const PO_B=[40,50,44,50,46,50,42].map((h,i)=>{const x0=40+i*28,x1=x0+22,cx=x0+11,r='sdsosds'[i];
+ const top=r==='s'?`L${cx} ${-h-12}`:r==='d'?`A11 9.9 0 0 1 ${x1} ${-h}`:`Q${x0-3} ${-h-7} ${cx} ${-h-15}Q${x1+3} ${-h-7} ${x1} ${-h}`;
+ const tip=r==='s'?-h-12:r==='o'?-h-15:-h-9.9;
+ return{cx,h,d:`M${x0} 0V${-h}${top}${r==='s'?`L${x1} ${-h}`:''}V0Z`,fin:r==='d'?'':`M${cx} ${tip}v-4`,ws:[-(h-11),-(h-25)]}});
+const PO_C=(()=>{let d='M34 0V-16H242V0Z',arch='',bal='';for(const cx of[80,138,196])arch+=`M${cx-15} 0A15 12 0 0 1 ${cx+15} 0Z`;
+ for(let x=40;x<238;x+=6)if(Math.min(...[80,138,196].map(c=>Math.abs(x-c)))>18)bal+=`M${x} -13v7`;return{d,arch,bal}})();
+const POT1=`<text class="dser" x="138" y="110" text-anchor="middle" font-size="9.5" font-style="italic" fill="#5c4a36" letter-spacing=".4">run 418 · main</text>`+
+ `<text class="dser" x="138" y="131" text-anchor="middle" font-size="17" font-weight="700" fill="#231b14">12 / 14</text>`+
+ `<text class="dser" x="138" y="145" text-anchor="middle" font-size="9.5" font-style="italic" fill="#5c4a36">86% passed · 2 waiting</text>`;
+const POT2=`<text class="dser" x="60" y="17" text-anchor="middle" font-size="9.5" font-style="italic" fill="#5c4a36" letter-spacing=".4">awaiting approval</text>`+
+ `<text class="dser" x="25" y="40" font-size="11.5" fill="#231b14">deploy-preview</text><text class="dser" x="25" y="51" font-size="8.5" font-style="italic" fill="#5c4a36">waiting for Brent</text>`+
+ `<text class="dser" x="25" y="70" font-size="11.5" fill="#231b14">e2e-safari</text><text class="dser" x="25" y="81" font-size="8.5" font-style="italic" fill="#5c4a36">waiting for Brent</text>`;
+// The back board and its page: a rain-washed sky over the city, with the writing in the sky and brass eyelets for the hanging threads.
+const POBACK=(()=>{const{L,R,T,S}=PO,bd=`M${L-3} ${S}V${T-1}Q${L-3} ${T-3} ${L-1} ${T-3}H${R+1}Q${R+3} ${T-3} ${R+3} ${T-1}V${S}Z`;
+ return `<path d="${bd}" fill="url(#shell)"/><path d="${bd}" fill="url(#sheen)"/><rect x="${L}" y="${T}" width="${R-L}" height="${S-T}" fill="url(#parchG)"/><rect x="${L}" y="${T}" width="${R-L}" height="${S-T}" fill="url(#poSky)"/>`+
+  poRain(L+4,R-4,T+4,S-10,70,(x,y)=>x>70&&x<206&&y>98&&y<152)+`<rect x="${L+4}" y="${T+4}" width="${R-L-8}" height="${S-T-4}" fill="none" stroke="#5c4a36" stroke-width=".6" opacity=".45"/>`+POT1+
+  `<path d="${bd}" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round" filter="url(#wob)"/>`+[60,216].map(x=>`<circle cx="${x}" cy="${T-1.5}" r="2.2" fill="url(#brass)" stroke="${INK}" stroke-width=".7"/>`).join('')})();
+// The front cover's outside, drawn upright (y up the board from the spine) and scaled by c: chitin with a chalk border, a chalk emblem of the city and brass corners.
+const POCOVER=(()=>{const{L,R,D}=PO,bd=`M${L-3} 0V${-D-1}Q${L-3} ${-D-3} ${L-1} ${-D-3}H${R+1}Q${R+3} ${-D-3} ${R+3} ${-D-1}V0Z`;
+ return{bd,s:`<path d="${bd}" fill="url(#shell)"/><path d="${bd}" fill="url(#sheen)"/><rect x="${L+6}" y="${-D+3}" width="${R-L-12}" height="${D-9}" fill="none" stroke="#c9d6e6" stroke-width=".8" stroke-dasharray="3 2" opacity=".3"/>`+
+  `<circle cx="138" cy="-66" r="27" fill="none" stroke="#c9d6e6" stroke-width=".9" opacity=".45"/><g fill="none" stroke="#c9d6e6" stroke-width=".9" opacity=".55" stroke-linejoin="round">`+
+  `<path d="M116 -52V-62L119 -70L122 -62V-52M125 -52V-66Q129 -74 133 -66V-52M136 -52V-72L139 -81L142 -72V-52M145 -52V-64Q149 -70 153 -64V-52M156 -52V-60L159 -67L162 -60V-52M112 -52H166"/>`+
+  `<path d="M121 -88l-2 5M131 -91l-2 5M147 -90l-2 5M157 -85l-2 5" stroke-linecap="round"/></g>`+
+  `<text class="dser" x="138" y="-24" text-anchor="middle" font-size="9" font-style="italic" fill="#c9d6e6" opacity=".55" letter-spacing="1">the rain city</text>`+
+  `<path d="M${L-3} ${-D+9}V${-D-3}H${L+9}Z" fill="url(#brass)" stroke="${INK}" stroke-width=".8"/><path d="M${R+3} ${-D+9}V${-D-3}H${R-9}Z" fill="url(#brass)" stroke="${INK}" stroke-width=".8"/>`+
+  `<path d="${bd}" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round" filter="url(#wob)"/>`}})();
+// A page lying open (the front cover's inside, or the floor flap): parchment, faint paving and a canal across the front. y runs into the page.
+const poFloor=(x0,x1,bd)=>`<path d="${bd}" fill="url(#shell)"/><rect x="${x0}" y="0" width="${x1-x0}" height="${PO.D}" fill="url(#parchG)"/>`+
+ `<path d="${[12,26,44,62].map(v=>`M${x0+4} ${v}H${x1-4}`).join('')}" stroke="#8f7a5c" stroke-width=".6" opacity=".45" vector-effect="non-scaling-stroke"/>`+
+ `<rect x="${x0}" y="84" width="${x1-x0}" height="${PO.D-84}" fill="url(#poCan)"/><path d="M${x0} 84H${x1}" stroke="${INK}" stroke-width="1" vector-effect="non-scaling-stroke"/>`+
+ `<path d="M${x0} 85.5H${x1}" stroke="#c9d6e6" stroke-width=".6" opacity=".35" vector-effect="non-scaling-stroke"/>`;
+const POFL=`M${PO.L-3} 0V${PO.D+1}Q${PO.L-3} ${PO.D+3} ${PO.L-1} ${PO.D+3}H${PO.R+1}Q${PO.R+3} ${PO.D+3} ${PO.R+3} ${PO.D+1}V0Z`,POFF=`M0 0V${PO.D+3}H${PO.F+1}Q${PO.F+3} ${PO.D+3} ${PO.F+3} ${PO.D+1}V0Z`;
+const POBF=`M0 ${PO.D}V-3H${PO.F+1}Q${PO.F+3} -3 ${PO.F+3} -1V${PO.D}Z`;
+// The backdrop flap's page (y down from the top of the page): the two waiting checks by name, with dark sockets for their red rings.
+const POFLAP=`<path d="${POBF}" fill="url(#shell)"/><rect width="${PO.F}" height="${PO.D}" fill="url(#parchG)"/><rect width="${PO.F}" height="${PO.D}" fill="url(#poSky)"/>`+
+ poRain(4,116,88,112,16)+`<rect x="4" y="4" width="${PO.F-8}" height="${PO.D-4}" fill="none" stroke="#5c4a36" stroke-width=".6" opacity=".45"/>`+POT2+
+ `<circle cx="15" cy="36.5" r="3.4" fill="#141a24"/><circle cx="15" cy="66.5" r="3.4" fill="#141a24"/><path d="${POBF}" fill="none" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round" filter="url(#wob)"/>`;
+// A layer of the city standing up off the page at depth d: base on the page, its height scaled by how far it stands (th, which springs a touch past 90°).
+function poPiece(d,fill,base,th,inner='',top=''){const s=Math.sin(th*Math.PI/180);if(th<=.5||s<.02)return '';
+ return `<g transform="translate(0 ${f(base)}) scale(1 ${f3(s)})"><path d="${d}" fill="${INK}" opacity=".6" transform="translate(1.2 1.6)"/><path d="${d}" fill="${fill}"/>${inner}<path d="${d}" fill="${INK}" opacity="${f3(.5*(1-s))}"/>`+
+  `<path d="${d}" fill="none" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round" vector-effect="non-scaling-stroke" filter="url(#wob)"/>${top}</g>`}
+const poThread=(a,b,op=1)=>op<=.01?'':`<g opacity="${f3(op)}" fill="none" stroke-linecap="round"><path d="M${f(a.x)} ${f(a.y)}L${f(b.x)} ${f(b.y)}" stroke="#3a070b" stroke-width="2"/><path d="M${f(a.x)} ${f(a.y)}L${f(b.x)} ${f(b.y)}" stroke="${RED}" stroke-width="1.1"/></g>`;
+const POSEAM='M252 74'+belly(252,24,78).s;
+function popup(el,w,h){
+ const svg=el.querySelector('.casing');
+ if(!poOn()){if(svg.dataset.pk)svg.dataset.pk='';return}
+ const g=model.g,still=g===Math.round(g);
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'a pop-up book of the city')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.pk===key)return;svg.dataset.pk=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const u=clamp(g),v=clamp(g-1),{L,R,T,S,D,k,F}=PO;
+ // Let down out of the belly on two threads, bobbing to a stop.
+ const dk=seg(u,.1,.34),dy=-146*(1-backSoft(dk));
+ // The cover falls open, gathering speed, and the threads catch it level with a small rebound.
+ const ck=seg(u,.38,.58),bk=seg(u,.58,.72),phi=90*ck*ck+6*Math.sin(2*Math.PI*bk)*(1-bk)*(1-bk),pr=phi*Math.PI/180,c=Math.cos(pr)-k*Math.sin(pr),open=clamp(-c/k);
+ // The three layers stand up back to front; on the gatefold the side flaps swing out and slap flat, and the bench and lamp stand up on them.
+ const thA=90*backOut(seg(u,.56,.7)),thB=90*backOut(seg(u,.62,.76)),thC=90*backOut(seg(u,.68,.82));
+ // The backdrop flap leads and the floor flap follows it down, so the two never pass through each other (sbB, cbB: backdrop; sb, cb: floor).
+ const fkB=seg(v,.14,.42),fkF=seg(v,.22,.48),beB=Math.PI/2*fkB*fkB,beF=Math.PI/2*fkF*fkF,sbB=Math.sin(beB),cbB=Math.cos(beB),sb=Math.sin(beF),cb=Math.cos(beF),thF=90*backOut(seg(v,.52,.66)),flB=sbB>.01,fl=sb>.01;
+ // Lights: twelve windows one by one, red rings round the last tower's two, then the bridge lamps; on the gatefold the bench lamp and two more rings.
+ const lt=j=>j>11?0:seg(u,.8+j*.009,.83+j*.009),fx=j=>j>11?0:Math.sin(Math.PI*seg(u,.8+j*.009,.85+j*.009)),rg=seg(u,.92,.98),lk=seg(u,.9,.96),lk2=seg(v,.72,.8),rg2=seg(v,.8,.92);
+ let o=`<defs><linearGradient id="poSky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5d6c85" stop-opacity=".55"/><stop offset=".5" stop-color="#8a98ad" stop-opacity=".2"/><stop offset=".85" stop-color="#8a98ad" stop-opacity="0"/></linearGradient>`+
+  `<linearGradient id="poCan" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#2f3d54"/><stop offset="1" stop-color="#121822"/></linearGradient>`+
+  `<clipPath id="poK"><rect y="40" width="${w}" height="${h}"/></clipPath></defs>`;
+ const fb=Math.sin(Math.PI*seg(u,.04,.5)),fb2=Math.sin(Math.PI*seg(v,.04,.5));
+ if(fb>.01)o+=`<ellipse cx="138" cy="236" rx="150" ry="34" fill="url(#fogCold)" opacity="${f3(.85*fb)}"/>`;
+ if(fb2>.01)o+=`<ellipse cx="318" cy="226" rx="84" ry="36" fill="url(#fogCold)" opacity="${f3(.85*fb2)}"/>`;
+ // The hanging threads, from the seam down to the back board's eyelets.
+ for(const x of[60,216]){const y1=T-1.5+dy;if(y1>76)o+=poThread({x,y:74},{x,y:y1})}
+ o+=`<g clip-path="url(#poK)"><g transform="translate(0 ${f(dy)})">`;
+ // Its shadow on the fog below, once it lies open.
+ if(open>.01){const ex=fl?60*sb:0;o+=`<ellipse cx="${f((L+R)/2+ex)}" cy="${f(S-c*(D+3)+6)}" rx="${f(114+ex)}" ry="5" fill="${INK}" opacity="${f3(.45*open)}" filter="url(#blur3)"/>`}
+ // Shut, the book shows the top edge of its pages above the boards, as seen from a little above; it goes once the cover tips.
+ const pe=seg(c,.85,1);
+ if(pe>.01)o+=`<g opacity="${f3(pe)}"><path d="M${L-1} ${T-3}L${L+2} ${T-7}H${R-2}L${R+1} ${T-3}Z" fill="#e8dbbb" stroke="${INK}" stroke-width="1" stroke-linejoin="round"/>`+
+  `<path d="M${L+3} ${T-5.6}H${R-3}M${L+1} ${T-4.2}H${R-1}" stroke="#b3966a" stroke-width=".5"/></g>`;
+ o+=POBACK;
+ // Gatefold, backdrop flap: hinged on the page's right edge, folded forward against the scene; it swings out about the hinge until it lies flat.
+ if(flB)o+=`<g transform="matrix(${f3(sbB)} ${f3(k*cbB)} 0 1 ${R} ${T})">${POFLAP}`+
+  (rg2>.01?[36.5,66.5].map(y=>(r=>`<circle cx="15" cy="${y}" r="${f(r)}" fill="none" stroke="#3a070b" stroke-width="2.4" opacity="${f3(rg2)}"/><circle cx="15" cy="${y}" r="${f(r)}" fill="none" stroke="${REDHI}" stroke-width="1.2" opacity="${f3(rg2)}"/>`)(lerp(11,6.5,ease(rg2)))).join(''):'')+
+  `<path d="${POBF}" fill="${INK}" opacity="${f3(.55*cbB)}"/></g>`;
+ if(c>0){
+  // Shut, or still falling: the cover's outside, foreshortening and darkening as it tips toward you.
+  o+=`<g transform="translate(0 ${S}) scale(1 ${f3(c)})">${POCOVER.s}<path d="${POCOVER.bd}" fill="${INK}" opacity="${f3(.6*(1-c))}"/></g>`;
+ }else{
+  // Open: the inside of the cover, with the canal; lit windows and lamps are reflected in it.
+  let rf='';
+  PO_B.forEach((B,i)=>{const a=Math.max(lt(2*i),lt(2*i+1));if(a>.01)rf+=`<path d="M${B.cx} 92v8m0 4v6" stroke="#8fe0cf" stroke-width="2" stroke-linecap="round" opacity="${f3(.55*a)}"/>`});
+  if(lk>.01)for(const x of[36,240])rf+=`<path d="M${x} 90v10m0 4v8" stroke="#ffd581" stroke-width="2.4" stroke-linecap="round" opacity="${f3(.6*lk)}"/>`;
+  o+=`<g transform="translate(0 ${S}) scale(1 ${f3(-c)})">${poFloor(L,R,POFL)}${rf}<path d="${POFL}" fill="none" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`+
+   `<path d="${POFL}" fill="${INK}" opacity="${f3(.5*(1-open))}"/></g>`;
+ }
+ // Gatefold, floor flap: hinged on the open page's right edge, folded up against the scene; it comes down about that edge until it lies flat.
+ if(fl)o+=`<g transform="matrix(${f3(sb)} ${f3(-cb)} 0 ${k} ${R} ${S})">${poFloor(0,F,POFF)}<path d="${POFF}" fill="none" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><path d="${POFF}" fill="${INK}" opacity="${f3(.55*cb)}"/></g>`;
+ if(c<0){
+  // The far skyline, hazy with distance, with a few dim windows.
+  o+=poPiece(PO_AP,'#4f5f78',S-c*8,thA,`<path d="${PO_AW}" stroke="#8fa0b8" stroke-width="1.6" opacity=".5"/>`,`<path d="${PO_AP}" fill="#9fb8d8" opacity=".12"/>`);
+  // Seven towers, two windows each: the checks. Twelve light; the last tower's two stay dark and take red rings.
+  PO_B.forEach((B,i)=>{let win='',top='';
+   B.ws.forEach((wy,q)=>{const j=2*i+q,a=lt(j),x=fx(j),wd=`M${B.cx-3} ${wy+4.5}V${wy-1.5}A3 3 0 0 1 ${B.cx+3} ${wy-1.5}V${wy+4.5}Z`;
+    win+=`<path d="${wd}" fill="#141a24"/>`+(a>.01?`<path d="${wd}" fill="url(#tealG)" opacity="${f3(a)}"/>`:'');
+    if(a+x>.01)top+=`<circle cx="${B.cx}" cy="${wy+1.5}" r="${f(9+5*x)}" fill="url(#leakT)" opacity="${f3(.4*a+.5*x)}"/>`;
+    if(i===6&&rg>.01){const r=lerp(12,7.5,ease(rg));top+=`<circle cx="${B.cx}" cy="${wy+1.5}" r="${f(r)}" fill="none" stroke="#3a070b" stroke-width="2.4" opacity="${f3(rg)}"/><circle cx="${B.cx}" cy="${wy+1.5}" r="${f(r)}" fill="none" stroke="${REDHI}" stroke-width="1.2" opacity="${f3(rg)}"/>`}});
+   o+=poPiece(B.d,'url(#shell)',S-c*36,thB,win,(B.fin?`<path d="${B.fin}" stroke="${INK}" stroke-width="1.2" vector-effect="non-scaling-stroke"/>`:'')+top)});
+  // The bridge, nearest: a parapet with three arches over the canal and a lamp on each end.
+  let lamps='';for(const x of[36,240])lamps+=`<path d="M${x} -16V-30" stroke="${INK}" stroke-width="2.2"/><path d="M${x-4.6} -33L${x} -37.5L${x+4.6} -33Z" fill="${INK}"/>`+
+   `<rect x="${x-3.6}" y="-33" width="7.2" height="8" rx="1.1" fill="#3c3022" stroke="${INK}"/>`+(lk>.01?`<circle cx="${x}" cy="-29" r="16" fill="url(#lamp)" opacity="${f3(lk)}"/><rect x="${x-3.6}" y="-33" width="7.2" height="8" rx="1.1" fill="#ffd581" opacity="${f3(lk)}"/>`:'');
+  o+=poPiece(PO_C.d,'url(#shell)',S-c*80,thC,`<path d="${PO_C.arch}" fill="#0c1424"/><path d="${PO_C.bal}" stroke="${INK}" stroke-width="1.6" opacity=".8"/><path d="M36 -14.6H240" stroke="#c9d6e6" stroke-width=".8" opacity=".35"/>`,lamps);
+ }
+ // The bench and lamp on the gatefold, with a small cloaked bug waiting on the bench.
+ if(fl&&thF>.5){const s=Math.sin(thF*Math.PI/180);
+  o+=`<g transform="matrix(${f3(sb)} ${f3(-cb)} 0 ${f3(s)} ${R} ${f(S+k*40)})"><g fill="none" stroke="${INK}" stroke-linecap="round" stroke-linejoin="round">`+
+   `<path d="M26 0V-8M58 0V-8M24 1Q26 -1 28 1M56 1Q58 -1 60 1" stroke-width="2.2"/><path d="M22 -9.5H62" stroke-width="3.4"/><path d="M22 -9.5H62" stroke="#454e5c" stroke-width="1.4"/>`+
+   `<path d="M24 -11Q26 -21 42 -21Q58 -21 60 -11M30 -11Q31 -17 36 -18M54 -11Q53 -17 48 -18" stroke-width="2"/><path d="M42 -21v-3" stroke-width="1.6"/></g>`+
+   `<path d="M37 -11Q36 -21 42 -23Q48 -21 47 -11Z" fill="#1c2535" stroke="${INK}" stroke-width="1.1" vector-effect="non-scaling-stroke"/><circle cx="42" cy="-26.5" r="4" fill="#e8edf3" stroke="${INK}" stroke-width=".9" vector-effect="non-scaling-stroke"/>`+
+   `<circle cx="40.6" cy="-26.2" r=".75" fill="${INK}"/><circle cx="43.4" cy="-26.2" r=".75" fill="${INK}"/>`+
+   `<path d="M88 0V-26" stroke="${INK}" stroke-width="2.2"/><path d="M83.4 -29L88 -33.5L92.6 -29Z" fill="${INK}"/><rect x="84.4" y="-29" width="7.2" height="8" rx="1.1" fill="#3c3022" stroke="${INK}" vector-effect="non-scaling-stroke"/>`+
+   (lk2>.01?`<circle cx="88" cy="-25" r="16" fill="url(#lamp)" opacity="${f3(lk2)}"/><rect x="84.4" y="-29" width="7.2" height="8" rx="1.1" fill="#ffd581" opacity="${f3(lk2)}"/>`:'')+
+   `<path d="M20 0H96" stroke="#e8dbbb" stroke-width="1" opacity=".5"/><g fill="${INK}" opacity="${f3(.5*(1-s))}"><rect x="20" y="-34" width="76" height="34"/></g></g>`}
+ // The drawbridge threads, from the back board's top corners to the cover's free corners; and on the gatefold a third, between the flaps' corners.
+ if(phi>0){const yT=S-c*D,op=clamp(phi/8);o+=poThread({x:L+2,y:T+1},{x:L,y:yT},op)+poThread({x:R-2,y:T+1},{x:R,y:yT},op);
+  if(bk>0&&bk<.4){const a=Math.sin(Math.PI*seg(bk,0,.4))*.85;o+=spark({x:L,y:yT},a,6)+spark({x:R,y:yT},a,6)}}
+ if(flB||fl)o+=poThread({x:R+F*sbB,y:T+k*F*cbB},{x:R+F*sb,y:S+k*D-F*cb});
+ // Paper dust off the flaps' free edges as they slap flat.
+ const dt=seg(v,.48,.64);if(dt>0&&dt<1)for(const[x,y,dx,dy2]of[[R+F,T+8,1,-.6],[R+F,T+60,1,0],[R+F,S-6,1,.3],[R+F,S+30,.8,1],[R+64,T-2,.2,-1]])
+  o+=`<circle cx="${f(x+dx*9*dart(dt))}" cy="${f(y+dy2*12*dart(dt))}" r="${f(1.7-dt)}" fill="#efe5cc" opacity="${f3((1-dt)*.85*seg(dt,0,.1))}"/>`;
+ o+='</g></g>'+casing('c',CW,CH,true,'body')+(IRON||(IRON=casing('c',CW,CH,true,'iron')));
+ // Light along the belly seam while the book is let out.
+ const sl=Math.sin(Math.PI*seg(u,.06,.36));
+ if(sl>.01)o+=`<path d="${POSEAM}" fill="none" stroke="#ffe7b0" stroke-width="3" opacity="${f3(.35*sl)}" filter="url(#blur3)"/><path d="${POSEAM}" fill="none" stroke="#fff6d8" stroke-width="1.1" opacity="${f3(.8*sl)}"/>`;
+ svg.innerHTML=o;
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -7760,8 +7914,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':small&&bvOn()?'A':small&&rsOn()?'R':small&&lfOn()?'F':small&&mrOn()?'O':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHGARFO'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':small&&bvOn()?'A':small&&rsOn()?'R':small&&lfOn()?'F':small&&mrOn()?'O':small&&poOn()?'P':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHGARFOP'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):rn?1-seg(s,.04,.26):mr||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs||sl||pn||wn?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs||rn||sl||pn||wn?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs||rn||sl||pn||wn?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -7773,7 +7927,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs||((ur||ns||dr||pr||qs||rn||sl||pn||wn)&&s>0)?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h);bivouac(el,w,h);rimstone(el,w,h);glowFly(el,w,h);mothRing(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h);bivouac(el,w,h);rimstone(el,w,h);glowFly(el,w,h);mothRing(el,w,h);popup(el,w,h)}
   // After the morphs, which can also move Checks' parchment, so the seal's withdraw wins.
   snailSeal(el,id,w,h,s,small?'teal':m.run?'amber':'cold');reelShell(el,id,w,h,s,small?'teal':m.run?'amber':'cold');abdomen(el,id,w,h,s,small?'teal':m.run?'amber':'cold');inkDrain(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapPress(el,id,w,h,s,small?'teal':m.run?'amber':'cold');scales(el,id,w,h,s,small?'teal':m.run?'amber':'cold');longRain(el,id,w,h,s,small?'teal':m.run?'amber':'cold',m.run);needleSlash(el,id,w,h,s,small?'teal':m.run?'amber':'cold',m.run);pinned(el,id,w,h,s,small?'teal':m.run?'amber':'cold',m.run);darkLantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold',m.run);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
