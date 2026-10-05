@@ -5931,9 +5931,100 @@ JOINS.hen={label:'Wind-up hen',kind:'Angle · ratchet',gap:HN.gap,ms:5000,msDrag
  }
 };
 
+/* ---------- Shade: fulled (Shrink) ---------- */
+// A new shade kind, Shrink: nothing is folded, cut, pressed or put away; the material itself gets smaller. Felt is the one
+// material that does this on purpose: fulling is wool worked in hot soapy water until its fibres lock tighter and the
+// piece shrinks, thicker and denser (the shrunken jumper is the accident version). Hot water rises through the cushion,
+// a felt soap bar scrubs it in four passes, and after each pass the felt gives a step, less each time, as fulling slows:
+// much more in height than in width, as knitted wool shrinks. The running stitch crowds up as the felt draws in under it.
+// Then the water drains with the suds, the felt dries a shade deeper than it went in, and a care label drops out of the
+// top seam, its tumble-dry dot in the status colour. The value is cross-stitched on the strip.
+const FU_MS=5500,FUG={},FU_P=[[.22,.33],[.34,.45],[.46,.57],[.58,.69]],FU_A=[.38,.28,.2,.14],FU_V=[.62,.3,.7,.42];
+const fuQ=st=>Math.floor(st*FU_MS/FRAME+1e-6)*FRAME/FU_MS;
+const fuD=small=>small?30:74;
+// How far it has shrunk: a step at the end of each pass, overshooting a little as the felt gives.
+const fuK=q=>FU_P.reduce((k,[a,b],i)=>k+FU_A[i]*backOut(seg(q,b-.06,b)),0);
+const fuH=(st,small)=>Math.round((small?CH:H)-fuD(small)*fuK(fuQ(st)));
+// The suds each pass leaves behind the soap, in cushion-relative positions so they ride the shrinking felt.
+function fuGeo(id,small){
+ const key=id+(small?'s':'');if(FUG[key])return FUG[key];
+ let sd=SKIN[id].seed*2203+7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647,bub=[];
+ FU_P.forEach(([a,b],i)=>{for(let n=0;n<10;n++){const u=.06+.88*rnd();
+  bub.push({u,v:clamp(FU_V[i]+(rnd()-.5)*.5,.08,.92),r:(1.3+rnd()*2.3)*(small?.85:1),t:a+(b-.05-a)*(i%2?1-u:u),ph:rnd()})}});
+ return FUG[key]={bub};
+}
+// A felt soap bar, as in the wet-felt join, squashing as it scrubs.
+function fuSoap(id,x,y,k,sq,op){
+ const sx=1+.12*sq,sy=1-.14*sq,cake='<rect x="-11" y="-6.5" width="22" height="13" rx="5.5"';
+ return `<g opacity="${f(op)}" transform="translate(${f(x)} ${f(y)}) rotate(-12) scale(${Math.round(k*sx*1000)/1000} ${Math.round(k*sy*1000)/1000})">${cake} fill="#000" opacity=".35" filter="url(#sh)" transform="translate(1 2)"/>`+
+  `${cake} fill="#f2b8c6" filter="url(#tagfelt)"/>${cake} fill="url(#fuP-${id})"/><rect x="-8.6" y="-4.2" width="17.2" height="8.4" rx="3.8" fill="none" stroke="#a2405e" stroke-opacity=".7" stroke-width=".7" stroke-dasharray="1.5 1.2"/>`+
+  `<circle cx="-3" cy="0" r="2.2" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width=".8"/><circle cx="2.4" cy="-1" r="1.3" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width=".7"/><circle cx="4.6" cy="1.6" r=".8" fill="#fff" opacity=".85"/></g>`}
+function fuDraw(id,w,h,small,st){
+ const s=SKIN[id],G=fuGeo(id,small),q=fuQ(st),fr=Math.floor(st*FU_MS/FRAME),k=fuK(q),kc=Math.min(1,k),C=PLEAT_C[labelStatus(id)];
+ const dx=(small?4:7)*kc,x0=EDGE+dx,x1=w-EDGE-dx,cw=x1-x0,scrub=q>=.22&&q<.69,jx=scrub?(fr%2?.9:-.9):0;
+ const bx=small?22:34,by=small?3:5,bh=small?20:22,yb=by+bh+3,ye=h-EDGE-5,vy=v=>yb+v*Math.max(2,ye-yb);
+ const inset=s.r.map(v=>Math.max(3,v-6)),cushion=rr4(x0,EDGE,cw,h-2*EDGE,s.r),ks=1-.38*kc;
+ const body=mixHex(s.body,'#24130a',.14*kc),stD=rr4(x0+6,10,cw-12,h-20,inset),band=rr4(bx+dx*.6,by,w-2*bx-1.2*dx,bh,[9,8,10,8]);
+ const rise=ease(seg(q,.08,.2)),drain=ease(seg(q,.72,.84)),dry=seg(q,.86,.96);
+ let t=`<defs>${feltFilters(id,s.seed)}<clipPath id="fuc-${id}"><path d="${cushion}"/></clipPath>`+
+  `<radialGradient id="fuP-${id}" cx=".38" cy=".3" r=".8"><stop stop-color="#fff" stop-opacity=".26"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#1a0a05" stop-opacity=".38"/></radialGradient></defs>`;
+ t+=`<g transform="translate(${jx} 0)"><path d="${rr4(x0-1.5,6,cw+3,h-4.5,s.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/><path d="${cushion}" fill="${body}" filter="url(#f-${id})"/>`+
+  `<path d="${stD}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="${f(4.4*ks)} ${f(3.2*ks)}" transform="translate(.5 .8)"/><path d="${stD}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="${f(4.4*ks)} ${f(3.2*ks)}" stroke-linecap="round"/>`+
+  `<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band}" fill="${mixHex(s.band,'#1c0e06',.12*kc)}" filter="url(#g-${id})"/>`+
+  `<path d="${rr4(bx+dx*.6+3.5,by+3.5,w-2*bx-1.2*dx-7,bh-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="${f(2.6*ks)} ${f(2.4*ks)}"/>`;
+ // Hot water: it rises from the foot, darkening the wool it soaks, stays while it is scrubbed, then drains; the felt stays damp until it dries.
+ if(rise>0&&dry<1){const wl=drain>0?lerp(EDGE-2,h+2,drain):lerp(h+2,EDGE-2,rise),damp=drain>0?.24*(1-dry):.24;
+  t+=`<g clip-path="url(#fuc-${id})"><rect x="0" y="${f(drain>0?0:wl)}" width="${w}" height="${h+4}" fill="#0e1c26" opacity="${f(damp)}"/>`;
+  if(wl<h){let d=`M${f(x0-6)} ${f(wl)}`;for(let x=x0-6,i=0;x<x1+6;x+=12,i++)d+=`q6 ${(i+fr)%2?-1.6:1.6} 12 0`;
+   t+=`<rect x="0" y="${f(wl)}" width="${w}" height="${h+4}" fill="#cfeaf5" opacity=".16"/><path d="${d}" fill="none" stroke="#f2fbff" stroke-opacity=".85" stroke-width="1.1"/><path d="${d}" fill="none" stroke="#f2fbff" stroke-opacity=".3" stroke-width=".8" transform="translate(-5 3.2)"/>`}
+  t+='</g>'}
+ // Suds left behind the soap; they slide down with the draining water and pop, kept on the felt.
+ t+=`<g clip-path="url(#fuc-${id})">`;
+ for(const b of G.bub){if(q<b.t)continue;const a=1-seg(q,.72+.07*b.ph,.76+.07*b.ph);if(a<=0)continue;
+  const r=b.r*backOut(seg(q,b.t,b.t+.025)),x=x0+b.u*cw,y=vy(b.v)+12*seg(q,.72,.82);
+  t+=`<g opacity="${f(a)}"><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="#fffdf6" fill-opacity=".8" stroke="#8fa9b3" stroke-opacity=".7" stroke-width=".5"/><circle cx="${f(x-r*.35)}" cy="${f(y-r*.38)}" r="${f(r*.3)}" fill="#fff"/></g>`}
+ t+='</g>';
+ // Fibres knocked loose from the corners as the felt gives at the end of each pass.
+ for(const[a,b]of FU_P){const u=seg(q,b-.04,b+.02);if(u<=0||u>=1)continue;
+  t+=`<g fill="none" stroke="${mixHex(s.body,'#fff8e8',.45)}" stroke-width="1.1" stroke-linecap="round" opacity="${f(1-u)}">${[[x0+6,h-6,-1],[x1-6,h-6,1],[x0+4,12,-1],[x1-4,12,1]].map(([x,y,sx],i)=>{const[fx,fy,r]=FLUFF[i];return`<path d="M-3 0q1.2-2.4 2.4 0t2.4 0" transform="translate(${f(x+sx*(3+10*u)+fx*3)} ${f(y+fy*6*u)}) rotate(${f(r*60+u*90)})"/>`}).join('')}</g>`}
+ t+='</g>';
+ // The name stays in its band, held still while the felt jiggles; it fades in as the cotton nameplate goes.
+ const nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],na=seg(st,0,.08),tx=(small?32:48)+dx*.6,ty=small?13.5:16.5;
+ if(na>0)t+=`<g opacity="${f(na)}" font-family="Georgia,serif" font-style="italic" font-size="15" letter-spacing=".2"><text x="${f(tx)}" y="${ty+1}" dominant-baseline="central" fill="#000" opacity=".45">${nm}</text><text x="${f(tx)}" y="${ty}" dominant-baseline="central" fill="#fff3dc">${nm}</text></g>`;
+ // Steam off the hot water.
+ const sa=seg(q,.12,.2)*(1-seg(q,.84,.92));
+ if(sa>0)[.2,.5,.8].forEach((g,i)=>{const p=(fr/10+i*.37)%1;
+  t+=`<path d="M${f(x0+cw*g)} ${f(EDGE+1)}c-3 -3 3 -5 0 -8s3 -5 0 -8" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity="${f(.55*sa*Math.sin(Math.PI*p))}" transform="translate(${f(2*Math.sin(p*6))} ${f(-9*p)})"/>`});
+ // The soap: dropped in, scrubbed back and forth a pass at a time (it rests at each end while the felt gives), then lifted away.
+ if(q>=.2&&q<.72){const n=FU_P.findIndex(([a,b])=>q<b+.01),i=n<0?3:n,[a,b]=FU_P[i],m=seg(q,a,b-.06),dir=i%2?-1:1,L=x0+(small?16:20),R=x1-(small?16:20);
+  // Its line moves to the next pass's height while it rests at the end, not at once.
+  const v=FU_V.reduce((v,vj,j)=>j?v+(vj-FU_V[j-1])*ease(seg(q,FU_P[j-1][1]-.03,FU_P[j][0])):v,FU_V[0]);
+  const x=dir>0?lerp(L,R,m):lerp(R,L,m),y=vy(v)-26*(1-ease(seg(q,.2,.22)))-24*ease(seg(q,.69,.72)),op=seg(q,.2,.21)*(1-seg(q,.705,.72));
+  t+=fuSoap(id,x,y,small?.8:.95,scrub&&m>0&&m<1?fr%2:0,op)}
+ // Drips off the foot as it drains.
+ [.3,.56,.8].forEach((g,j)=>{const u=seg(q,.75+j*.03,.81+j*.03);if(u<=0||u>=1)return;
+  t+=`<ellipse cx="${f(x0+cw*g)}" cy="${f(h-2+26*u*u)}" rx="1.4" ry="${f(1.6+.8*u)}" fill="#d8f0fa" stroke="#7fa6b5" stroke-width=".5" opacity="${f(1-seg(u,.7,1))}"/>`});
+ // The care label drops out of the top seam at the right end: a wash tub and the tumble-dry symbol, its dot the status colour.
+ const lq=seg(q,.9,.96);
+ if(lq>0){const lw=small?13:16,lh=small?19:25,lx=x1-(small?20:28),sy=backOut(lq),sq=small?7:8,cy=lh-sq/2-3.5;
+  t+=`<g transform="translate(${f(lx)} ${EDGE-1}) scale(1 ${f(sy)})"><rect x="1" y="1.4" width="${lw}" height="${lh}" rx="1.4" fill="#000" opacity=".35" filter="url(#sh)"/><rect width="${lw}" height="${lh}" rx="1.4" fill="#f6f2ea" stroke="#b7ab98" stroke-width=".5"/>`+
+   `<rect width="${lw}" height="3" fill="#ddd3c3"/><path d="M1.5 1.6H${lw-1.5}" stroke="#7c6e5c" stroke-width=".5" stroke-dasharray="1 .9"/>`+
+   (small?'':`<path d="M3.6 6.6L4.8 11.4H11.2L12.4 6.6M4.2 8.4q1.6 -1.2 3.2 0t3.2 0t1.6 0" fill="none" stroke="#5b5348" stroke-width=".8" stroke-linejoin="round"/>`)+
+   `<rect x="${f((lw-sq)/2)}" y="${f(cy-sq/2)}" width="${sq}" height="${sq}" fill="none" stroke="#5b5348" stroke-width=".8"/><circle cx="${f(lw/2)}" cy="${f(cy)}" r="${f(sq*.32)}" fill="${C}" stroke="#2a1d10" stroke-opacity=".4" stroke-width=".4"/></g>`}
+ // The value cross-stitched on the strip under the band, left to right; dark on Jarvis's amber, cream on the others.
+ const vq=seg(q,.94,1);
+ if(vq>0){const dt=pocketData(id),cs=small?1.4:1.6,xp=xpaths(dt.num,cs),wf=small?10.5:12,dkT=id==='a',th1=dkT?'#3a1d08':'#f7e8c9',th2=dkT?'#5c3414':'#e0cba4';
+  const vc=(by+bh+h-10)/2,vx=(small?22:34)+dx,ww=measure(dt.word,`italic 600 ${wf}px Georgia,serif`),tw=xp.w+5+ww;
+  t+=`<clipPath id="fuv-${id}"><rect x="${f(vx-3)}" y="${f(vc-10)}" width="${f(vq>=1?999:(tw+6)*vq)}" height="20"/></clipPath><g clip-path="url(#fuv-${id})"><g transform="translate(${f(vx)} ${f(vc-3.5*cs)})" fill="none" stroke-linecap="round" stroke-width="${f(cs*.4)}">`+
+   `<path d="${xp.d1+xp.d2}" stroke="${dkT?'#fff3dc':'#000'}" stroke-opacity="${dkT?.3:.35}" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="${th2}"/><path d="${xp.d2}" stroke="${th1}"/></g>`+
+   `<text x="${f(vx+xp.w+5)}" y="${f(vc+1.3)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="${dkT?'#fff3dc':'#000'}" opacity=".3">${dt.word}</text>`+
+   `<text x="${f(vx+xp.w+5)}" y="${f(vc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="600" font-size="${wf}" fill="${th1}">${dt.word}</text></g>`}
+ return t;
+}
+
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw, left out, pinked seam) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw, left out, pinked seam, fulled) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -6018,7 +6109,12 @@ const SHADES={
   about:'The Cut kind (wire\'s saw cut) done in felt: nothing is folded, flattened or put away; what isn\'t needed is cut out. Felt doesn\'t fray, so it is cut and never hemmed. The cotton display is put away and a pair of pinking shears with chunky orange handles drops onto the cushion under its name band and snips straight across it, a bite a frame, leaving a zigzag kerf with fibres falling from the blades. The shears are turned round and cut back across just above the foot, then lifted away. The band between the cuts drops out, tipping toward you as it falls, and the stage shows through the gap. Both cuts were made with the same blades, so the two pinked edges are the same zigzag: the foot is pushed up and its teeth sit in the top\'s notches with a little bump that knocks fibres loose. A felting needle in a turned wooden holder then stabs along the seam a frame at a time, its barbs dragging fibres from each side into the other until the crevice is gone and the two are one piece. At the seam\'s end it dabs on a wisp of roving in the status colour and felts it down into a firm dot (amber running, blue paused, red needs you, green passed), and the value is cross-stitched on the foot. Unshading puts the band back.',
   sayOn:'Shaded: each cushion has a band cut out with pinking shears and its pinked edges are needle-felted together; the dot on the seam shows the status.',sayOff:'Unshaded: the seam is unpicked, the band comes back up and the cuts close.',
   height:(st,small)=>pkH(st,small),
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.08),draw:pkDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.08),draw:pkDraw},
+ fulled:{label:'Fulled',kind:'Shrink',ms:FU_MS,ownStrip:true,
+  about:'A new shade kind, Shrink: nothing is folded, cut, pressed or put away; the material itself gets smaller. Felt is the one material that does this on purpose. Fulling works wool in hot soapy water until its fibres lock tighter and the piece shrinks, thicker and denser (a jumper shrunk in the wash is the accident version). Left out shrinks a cushion too, by weather; here it is done on purpose, by hand. The cotton display is put away and hot water rises through the cushion from its foot, darkening the wool as it soaks, with steam curling off the top. A pink felt soap bar drops in and scrubs across the cushion in four passes, back and forth, a frame at a time, leaving suds behind it while the cushion jiggles. At the end of each pass the felt gives a step, less each time as fulling slows, with fibres knocked off its corners. It shrinks much more in height than in width, the way knitted wool does, and the running stitch crowds up as the felt draws in under it. The water then drains down with the suds and drips off the foot, the steam dies away and the felt dries a shade deeper than it went in. A care label drops out of the top seam at the right end with a wash tub and the tumble-dry symbol, its dot in the status colour (amber running, blue paused, red needs you, green passed), and the value is cross-stitched on the strip under the name. Unshading plays it back: the strip is wetted and worked back out to size.',
+  sayOn:'Shaded: each cushion is fulled in hot soapy water and shrinks to a strip; the dot on its care label shows the status.',sayOff:'Unshaded: the strips are wetted and worked back out to size.',
+  height:(st,small)=>fuH(st,small),
+  show:st=>1-seg(st,0,.08),grip:st=>1-seg(st,0,.08),draw:fuDraw}
 };
 /* ---------- Draught dog: an empty felt sausage dog stood in the gap and stuffed until it wedges both cushions (Swell) ---------- */
 // A new join kind, Swell: nothing is fastened, wound or pinned; something fills the gap until it presses on both sides and the
