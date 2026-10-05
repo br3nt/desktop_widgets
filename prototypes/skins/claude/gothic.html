@@ -8191,6 +8191,125 @@ MORPHS.pilgrims={label:'Pilgrims\' round',kind:'Orbit',sizes:[['facade','Facade'
  say:(d,S)=>d>0?(S[2]===1?'Checks becomes a shrine: it is raised onto a marble base, a pavement spreads round it, and fourteen pilgrims walk once round it and kneel.':'A procession: ten acolytes with banners, one per run, come round the outer pavement the other way.'):(S[2]===0?'The pilgrims get up and walk back round behind the shrine, and the base sinks into the floor.':'The acolytes go back round behind the shrine, and the outer pavement draws in.'),
  about:'A morph of the <b>Orbit</b> kind, which wire\'s orrery opened: the larger form is whatever goes round Checks, and what it is once it comes to rest. In gothic that is pilgrims round a saint\'s shrine. Shrines were raised on high bases so pilgrims could walk right round them (the ambulatory was built for it), and at Canterbury they wore the floor round Becket\'s shrine into a groove. Checks is the shrine and keeps its nameplate and display. <b>Shrine</b>: Checks is raised onto a base of dark Purbeck marble (shelly flecks, a moulded cap, a quatrefoil at each end), and a pavement spreads round its foot, seen from a little above: limestone laid in rings, a dark kerb, a band of red and green tesserae and the worn groove of the track, its far half behind the shrine. Fourteen pilgrims in hooded cloaks, with scallop badges, staffs and tapers, come out from behind the shrine in single file and walk sunwise once right round it, passing behind it and out again, then slow together into their places along the front, kneel and turn their backs to us to face it. Lamps are lit in the base\'s quatrefoils, and a spark carries the flame from taper to taper, right to left, over the two at the front centre: they are the two waiting checks, and they stand with unlit tapers in red rings on the floor while the other twelve kneel lit. The base is gilded RUN 418 · MAIN · 86% PASSED and 12 passed · 2 waiting for approval. Hover or tap a pilgrim to read its check, or the base for the run. <b>Procession</b>: an outer pavement spreads round the first, and ten acolytes in white albs come out from behind the shrine on the left with furled banners and go round the front the other way (the leader carries run 418, the last 409). Five stop at each end, turn to face the shrine, and their swallowtailed banners unfurl one after another, one per run on main: green all passed, amber 13, red 12. The base\'s second line becomes the two waiting by name. Hover or tap a banner to read its run. The pavement spreads below Checks\'s old foot, so the shrine rises only by the height of its base. <b>Shrinking</b> plays it back: the banners furl and the acolytes go back round, the tapers go out, the pilgrims get up and walk back behind the shrine, and the base sinks into the floor. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest.'};
 
+/* ---------- Morph: cope (Checks) ---------- */
+// g runs 0 facade, 1 cope, 2 full cope. A Let out: the bigger form was folded up behind the facade all along. A cope is the great semicircular cloak of the
+// Gothic church, and English copes were worked in opus anglicanum: gold thread on crimson velvet, barbed quatrefoils, a hood hung from an orphrey band.
+// Folded in three with its sides turned behind, it is let down from under the base course; its folds drop open, its fourteen quatrefoils kindle, and for
+// the full cope its sides swing out. Cope space: x from the middle of its straight edge, y down from it. Drawn from g alone, so nothing moves at rest.
+const CPR=200,CPA=104,CPY=CH-3,CPF=[68,136],CPHT=CPY+CPR+10,CPW=2*CPR+16;
+const cpSink=g=>g<1e-6?0:(CPHT-CH)*ease(seg(g,0,.12));
+const cpBox=g=>g<1e-6?[CW,CH]:[g<=1?CW:lerp(CW,CPW,ease(seg(g-1,0,.12))),CH+cpSink(g)],cpDims=k=>cpBox(k);
+const CPSEMI=`M${-CPR} 0H${CPR}A${CPR} ${CPR} 0 0 1 ${-CPR} 0Z`,CPRUNS=[14,14,13,14,12,14,14,13,14,12];
+const cpT=(x,y,t,sz,col,ex='')=>`<text x="${x}" y="${y}" text-anchor="middle" font-family="Georgia,serif" font-size="${sz}" fill="${col}" ${ex}>${t}</text>`;
+// A barbed quatrefoil: four lobes with a barb between each, outlined once round the outside.
+function cpBQ(x,y,r,fill,line,lw){
+ const l=f(r*.47),c=r*.45,q=r*.62;
+ const sh=`<circle cx="${f(x)}" cy="${f(y-c)}" r="${l}"/><circle cx="${f(x+c)}" cy="${f(y)}" r="${l}"/><circle cx="${f(x)}" cy="${f(y+c)}" r="${l}"/><circle cx="${f(x-c)}" cy="${f(y)}" r="${l}"/><rect x="${f(x-q)}" y="${f(y-q)}" width="${f(2*q)}" height="${f(2*q)}"/>`;
+ return `<g fill="${line}" stroke="${line}" stroke-width="${lw*2}" stroke-linejoin="round">${sh}</g><g fill="${fill}">${sh}</g>`;
+}
+// The fourteen checks in an arc under the hood, left to right; the last ten runs in the left side's medallion.
+const CPJ=[...Array(14).keys()].map(m=>{const a=(126-72*m/13)*D2R;return[158*Math.cos(a),158*Math.sin(a)]});
+const CPRP=CPRUNS.map((n,j)=>[-142+(j%5-2)*11,56+12*(j/5|0),n===14?'#5fd06a':n===13?'#f0b440':'#f05a5a']);
+const CPDEFS=`<radialGradient id="cpVel" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="${CPR}"><stop stop-color="#a3283a"/><stop offset=".55" stop-color="#7c1626"/><stop offset="1" stop-color="#4e0b16"/></radialGradient>`+
+ `<radialGradient id="cpLin" gradientUnits="userSpaceOnUse" cx="0" cy="0" r="${CPR}"><stop stop-color="#557f56"/><stop offset="1" stop-color="#22422c"/></radialGradient>`+
+ `<linearGradient id="cpOr" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fbe7a6"/><stop offset=".45" stop-color="#e2b752"/><stop offset="1" stop-color="#9c6c1e"/></linearGradient>`+
+ `<linearGradient id="cpHood" gradientUnits="userSpaceOnUse" x1="0" y1="20" x2="0" y2="118"><stop stop-color="#f6e2a4"/><stop offset=".6" stop-color="#e3c071"/><stop offset="1" stop-color="#b98c3a"/></linearGradient>`+
+ `<pattern id="cpLat" width="34" height="34" patternUnits="userSpaceOnUse" x="-17" y="4">${cpBQ(17,17,9,'#641224','#d9b45a',.45)}<circle cx="17" cy="17" r="1.6" fill="#e9c66a"/>`+
+ [[0,0],[34,0],[0,34],[34,34]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.3" fill="#e9c66a" opacity=".7"/>`).join('')+`</pattern>`+
+ `<pattern id="cpSilk" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 .5H5" stroke="#bfe0b0" stroke-opacity=".16"/></pattern>`;
+// The gold hem band round the curve and its fringe, on both faces.
+const CPHEM=(()=>{let fr='';for(let a=1;a<180;a+=2.4){const c=Math.cos(a*D2R),s=Math.sin(a*D2R);fr+=`M${f(CPR*c)} ${f(CPR*s)}L${f((CPR+7)*c)} ${f((CPR+7)*s)}`}
+ const arc=r=>`M${r} 0A${r} ${r} 0 0 1 ${-r} 0`;
+ return `<path d="${fr}" stroke="#c9963a" stroke-width="1.2"/><path d="${arc(CPR-2.5)}" fill="none" stroke="#e2b752" stroke-width="5"/><path d="${arc(CPR-5.3)}" fill="none" stroke="#6e4a12" stroke-width=".7"/><path d="${arc(CPR-.2)}" fill="none" stroke="#3a1606" stroke-width=".8"/>`})();
+// The face: velvet hanging in soft folds, the quatrefoil lattice, the orphrey with its arcade of saints, the hood, the checks and the two side medallions.
+const CPFACE=(()=>{
+ let s=`<path d="${CPSEMI}" fill="url(#cpVel)"/>`;
+ for(let a=6;a<180;a+=12){const p=d=>`${f(CPR*Math.cos((a+d)*D2R))} ${f(CPR*Math.sin((a+d)*D2R))}`;s+=`<path d="M0 0L${p(-4)}L${p(4)}Z" fill="${(a/12|0)%2?'#fff':'#000'}" opacity=".06"/>`}
+ s+=`<path d="${CPSEMI}" fill="url(#cpLat)" opacity=".6"/>`+CPHEM;
+ // Orphrey: a gold band with a row of little niches, each with a haloed saint, and a cartouche in the middle.
+ let ni='';for(let x=-CPR+10,n=0;x<CPR-6;x+=16,n++){if(Math.abs(x)<60)continue;
+  ni+=`<path d="M${x-4.5} 18V10Q${x-4.5} 6 ${x} 4.4Q${x+4.5} 6 ${x+4.5} 10V18Z" fill="${n%2?'#2b3f86':'#8e1f2b'}" stroke="#7a5414" stroke-width=".6"/><circle cx="${x}" cy="9.6" r="2" fill="#f3d27a"/><path d="M${x-2} 18V13.4Q${x} 11.6 ${x+2} 13.4V18" fill="#e9dcc0" opacity=".85"/>`}
+ s+=`<path d="M${-CPR} 0H${CPR}L${CPR-1.2} 21H${1.2-CPR}Z" fill="url(#cpOr)"/>${ni}<path d="M${-CPR} 1H${CPR}M${-CPR} 20.2H${CPR}" stroke="#8e1f2b" stroke-width="1.4"/>`+
+  `<rect x="-52" y="4" width="104" height="14" rx="2" fill="#f7ebc8" stroke="#8e1f2b" stroke-width="1"/>`+cpT(0,14.6,'RUN 418 · MAIN',9,'#3a1408','font-weight="700" letter-spacing="1.6"');
+ // Hood: a shield of gold thread with its own red border and a tassel at its point; it carries the count.
+ const hd='M-54 21H54V58Q54 94 0 116Q-54 94 -54 58Z';
+ s+=`<path d="${hd}" fill="#2a0508" opacity=".35" transform="translate(1.5 2.5)"/><path d="${hd}" fill="url(#cpHood)" stroke="#8e1f2b" stroke-width="3.2"/><path d="${hd}" fill="none" stroke="#f3d27a" stroke-width=".8" transform="translate(0 1) scale(.94)"/>`+
+  cpT(0,35,'CHECKS',7.5,'#5a1a10','letter-spacing="2"')+cpT(0,59,'12 / 14',22,'#2a1206','font-weight="700"')+cpT(0,78,'passed · 86%',10,'#3a1a08','font-style="italic"')+cpT(0,92,'2 waiting',9.5,'#8a1a14','font-weight="700"')+
+  `<path d="M0 116V123" stroke="#c9963a" stroke-width="1.4"/><circle cx="0" cy="124" r="2.4" fill="url(#gild)"/><path d="M-3 126L-4 134H4L3 126Z" fill="#d9a640" stroke="#7a5414" stroke-width=".5"/>`;
+ // The checks, unlit: dull thread until they kindle.
+ CPJ.forEach(([x,y],m)=>s+=cpBQ(x,y,6.5,m>11?'#4a2226':'#2c4232','#8a6a3a',.5));
+ // Side medallions: velvet ovals ringed with gold cord, shown once the sides swing out.
+ // Kept inside the hem band (r ≤ 190) and clear of the creases (|x| ≥ 106).
+ for(const x of[-142,142])s+=`<circle cx="${x}" cy="60" r="36" fill="#5c0e1a"/><circle cx="${x}" cy="60" r="36" fill="none" stroke="#e2b752" stroke-width="2"/><circle cx="${x}" cy="60" r="33" fill="none" stroke="#e2b752" stroke-width=".6" stroke-dasharray="2 1.6"/>`;
+ s+=cpT(-142,44,'LAST 10 RUNS',6.5,'#f3d98c','letter-spacing=".3"')+CPRP.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" fill="#3a1a1e" stroke="#b08a48" stroke-width=".7"/>`).join('')+
+  cpT(-142,84,'on main',8,'#f3d98c','font-style="italic"');
+ s+=cpT(142,44,'WAITING · 2',6.5,'#ffab98','letter-spacing=".3"')+cpT(142,60,'deploy-preview',8.5,'#fff0c8')+cpT(142,72,'e2e-safari',8.5,'#fff0c8')+cpT(142,84,'on Brent',8,'#f3d98c','font-style="italic"');
+ return s+`<path d="${CPSEMI}" fill="none" stroke="#2a0508" stroke-width="1.2"/>`;
+})();
+// The lining: green silk, seen on a fold turned toward you.
+const CPBACK=`<path d="${CPSEMI}" fill="url(#cpLin)"/><path d="${CPSEMI}" fill="url(#cpSilk)"/>${CPHEM}<path d="${CPSEMI}" fill="none" stroke="#14261a" stroke-width="1.2"/>`;
+// A fold's angle over its run: from shut (a0, folded flat) to open (0); it swings a little past and back as the cloth settles.
+const cpFold=(p,a0=Math.PI)=>a0*(1-ease(seg(p,0,.78)))-.38*Math.sin(Math.PI*seg(p,.62,1));
+function cpRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,[w,h]=cpBox(g),cx=w/2,ox=cx-CW/2,u=Math.min(1,g),v=clamp(g-1);
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=f(h)+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='cp'){ms.dataset.key='cp';ms._d='';ms._bx=null;fx._s=null;
+  ms.innerHTML=`<defs>${CPDEFS}<g id="cpFace">${CPFACE}</g><g id="cpBack">${CPBACK}</g><clipPath id="cpWin"><rect x="-260" y="-1" width="520" height="262"/></clipPath>`+
+   [['cpB0',-2,CPF[0]+2.5],['cpB1',CPF[0]-.5,CPF[1]-CPF[0]+1],['cpB2',CPF[1]-.5,124]].map(([id,y,hh])=>`<clipPath id="${id}"><rect x="${-CPA}" y="${y}" width="${2*CPA}" height="${hh}"/></clipPath>`).join('')+
+   `<clipPath id="cpSR"><rect x="${CPA-.5}" y="-2" width="130" height="240"/></clipPath><clipPath id="cpSL"><rect x="${-CPA-129.5}" y="-2" width="130" height="240"/></clipPath></defs>`+
+   `<g class="cdyn"></g><g class="cfac">${cas(0)}</g>`}
+ const bx=f(w)+'x'+f(h);if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',f(h));n.setAttribute('viewBox',`0 0 ${f(w)} ${f(h)}`)}}
+ ms.querySelector('.cfac').setAttribute('transform',`translate(${f(ox)} 0)`);
+ const shade=(sy,back)=>{const o=.5*(1-Math.abs(sy))+(back?.12:0);return o>.01?`<path d="${CPSEMI}" fill="#140408" opacity="${f(o*100)/100}"/>`:''};
+ let s='';
+ // Full cope: the sides swing out from behind the strip, the right first. While still behind it they are hidden, so they are drawn first and only once they show.
+ if(v>0)for(const[k,sg,a,b]of[['cpSR',1,.1,.44],['cpSL',-1,.3,.64]]){const sx=Math.cos(cpFold(seg(v,a,b),1.7));if(sx<.01)continue;
+  s+=`<g transform="matrix(${lxR3(sx)} 0 0 1 ${f(sg*CPA*(1-sx))} 0)"><g clip-path="url(#${k})"><use href="#cpFace"/>${shade(sx,false)}</g></g>`}
+ // The strip in three panels: the packet comes down from under the base course, then the lower two folds drop open toward you, the hem last.
+ const d=ease(seg(u,.06,.3)),ty=-CPF[0]*(1-d)+3*Math.sin(Math.PI*seg(u,.29,.37));
+ const s1=Math.cos(cpFold(seg(u,.34,.56))),s2=Math.cos(cpFold(seg(u,.52,.74)));
+ const band=(id,sy,t)=>`<g transform="matrix(1 0 0 ${lxR3(sy)} 0 ${f(t)})"><g clip-path="url(#${id})"><use href="#${sy>0?'cpFace':'cpBack'}"/>${shade(sy,sy<0)}</g></g>`;
+ const B1=band('cpB1',s1,CPF[0]*(1-s1)+ty),B2=band('cpB2',s1*s2,CPF[0]+(CPF[1]*(1-s2)-CPF[0])*s1+ty);
+ s+=band('cpB0',1,ty)+(s1<0?B2+B1:B1+B2);
+ // The creases stay, faintly.
+ const cr=seg(u,.7,.8),cv=seg(v,.62,.72),ch=Math.sqrt(CPR*CPR-CPA*CPA);
+ if(cr>0)s+=`<path d="M${-CPA} ${CPF[0]}H${CPA}M${-CPA} ${CPF[1]}H${CPA}" stroke="#1a0408" stroke-opacity="${f(.28*cr*100)/100}"/><path d="M${-CPA} ${CPF[0]+1}H${CPA}M${-CPA} ${CPF[1]+1}H${CPA}" stroke="#ffd9a0" stroke-opacity="${f(.1*cr*100)/100}"/>`;
+ if(cv>0)s+=`<path d="M${-CPA} 21V${f(ch)}M${CPA} 21V${f(ch)}" stroke="#1a0408" stroke-opacity="${f(.3*cv*100)/100}"/>`;
+ // Kindling: the checks one by one, left to right; for the full cope, the last ten runs.
+ const qj=m=>g>=1?1:seg(u,.76+.012*m,.8+.012*m),qr=j=>g>=2?1:seg(v,.7+.018*j,.74+.018*j);
+ if(u>.75)CPJ.forEach(([x,y],m)=>{const q=qj(m);if(q<=0)return;const need=m>11;
+  s+=`<g opacity="${f(q*100)/100}"><circle cx="${f(x)}" cy="${f(y)}" r="9.5" fill="${need?'#ff6b6b':'#9cf09a'}" opacity=".2"/>${cpBQ(x,y,6.5,need?'#c8323a':'#3f9a4c','#f3d27a',.55)}<circle cx="${f(x)}" cy="${f(y)}" r="1.5" fill="#fff6d8"/></g>`});
+ if(v>.69)CPRP.forEach(([x,y,c],j)=>{const q=qr(j);if(q<=0)return;s+=`<g opacity="${f(q*100)/100}"><circle cx="${x}" cy="${y}" r="5.6" fill="${c}" opacity=".25"/><circle cx="${x}" cy="${y}" r="3.6" fill="${c}" stroke="#f3d27a" stroke-width=".8"/></g>`});
+ const dd=`<g transform="translate(${f(cx)} ${CPY})"><g clip-path="url(#cpWin)">${s}</g></g>`;
+ if(ms._d!==dd){ms._d=dd;ms.querySelector('.cdyn').innerHTML=dd}
+ // Effects: light along the base course as the packet comes loose; a glint as each check and run kindles, and one across the names of the two waiting.
+ const spk=(x,y,t,r)=>{const k=Math.sin(Math.PI*t);return k>.05?`<g opacity="${f(k*100)/100}">${sparkle(cx+x,CPY+y,r*k)}</g>`:''};
+ let e='';const sl=g<1?Math.sin(Math.PI*seg(u,0,.2)):0;
+ if(sl>.01)e+=`<path d="M${f(ox+24)} ${CH-1}H${f(ox+CW-24)}" stroke="#ffcf70" stroke-width="7" stroke-linecap="round" opacity="${f(.25*sl*100)/100}"/><path d="M${f(ox+30)} ${CH-1}H${f(ox+CW-30)}" stroke="#fff2c8" stroke-width="1.6" stroke-linecap="round" opacity="${f(sl*100)/100}"/>`;
+ if(g<1&&u>.75)CPJ.forEach(([x,y],m)=>e+=spk(x,y,qj(m),7));
+ if(g>1&&g<2){CPRP.forEach(([x,y],j)=>e+=spk(x,y,qr(j),5));const t=seg(v,.9,.99);if(t>0&&t<1)e+=spk(lerp(114,170,t),56,t,6)+spk(lerp(170,114,t),69,t,5)}
+ if(fx._s!==e){fx._s=e;fx.innerHTML=e}
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=y+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:'6px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'a cope being let out')+': run 418 on main, 12 of 14 checks passed, 86%, 2 waiting for approval'+(g>=2?': deploy-preview and e2e-safari; the last 10 runs on main shown as coloured roundels':''));
+ return true;
+}
+function cpPhase(){
+ const g=model.g,up=model.mDir>0;let t;
+ if(g<=1)t=g<.07?(up?'light shows along the base course':'the light along the base course fades'):g<.33?(up?'a folded cope is let down from under the facade':'the folded cope is drawn up under the facade'):
+  g<.57?(up?'its first fold drops open':'it folds up in half'):g<.76?(up?'the hem drops open: the hood is on show':'the hem folds up over the hood'):(up?'its fourteen quatrefoils kindle, one per check':'the quatrefoils go dark');
+ else{const v=g-1;t=v<.1?(up?'the cope is let out wider':'the cope draws in'):v<.46?(up?'its right side swings out from behind':'its right side folds away behind'):v<.68?(up?'its left side swings out':'its left side folds away behind'):(up?'the last ten runs kindle, and the two waiting are picked out':'the runs go dark')}
+ return 'Checks · '+t;
+}
+MORPHS.cope={label:'Cope',kind:'Let out',sizes:[['facade','Facade',0,'a facade'],['cope','Cope',1,'a cope hung from the facade'],['full','Full cope',2,'a full cope, both sides let out']],ms:[5200,3400],
+ box:cpBox,dims:cpDims,sink:cpSink,render:cpRender,phase:cpPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks lets out a cope: folded in three, it is let down from under the base course, its folds drop open, and its fourteen quatrefoils kindle.':'The cope is let out to its full half-circle: its sides swing out from behind, with the last ten runs on the left and the two waiting on the right.'):(S[2]===0?'The cope folds up in three and is drawn back up under the facade.':'The sides of the cope fold away behind it.'),
+ about:`A <b>Let out</b> morph (felt's expansion zip and elven's moon letter are the others): nothing is added, built or brought in; the bigger form was folded up inside Checks all along. In gothic it is a cope, the great half-circle cloak worn in procession, and England's were famous across Europe: <i>opus anglicanum</i>, gold thread couched on crimson velvet in barbed quatrefoils, with an orphrey band of saints in niches along the straight edge and a shield-shaped hood hung from it at the back. Copes were kept in chests in the vestry and let out for feasts. <b>Cope</b> (276 × 285, hanging downward from the facade, which keeps its nameplate and display and stays where it is unless the floor is in the way, when it rises to make room): light shows along the base course, and the cope, folded in three with its sides turned behind, is let down from under it, its green silk lining outward. The first fold drops open toward you, swinging a little past and back, then the hem drops open with the hood and its tassel: RUN 418 · MAIN on the orphrey, 12 / 14 passed · 86% and 2 waiting on the hood. The fourteen quatrefoils under the hood kindle left to right, twelve green and two red. <b>Full cope</b> (416 wide): the cope's right side swings out from behind about its crease, then its left, each shading as it turns; the left medallion holds the last ten runs on main as roundels in their colours, the right one names deploy-preview and e2e-safari, waiting on Brent. The creases stay, faintly. Every frame is drawn from the size, so nothing moves at rest, and shrinking folds it back up and draws it in under the facade.`
+};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30,roll:30,cwt:30,scr:30,lace:30,esc:30,fortune:30,tcam:15},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
