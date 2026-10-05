@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg,.czsvg,.rusvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg,.czsvg,.rusvg,.sasvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span,.w.czOn .strip span,.w.ruOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span,.w.czOn .strip span,.w.ruOn .strip span,.w.saOn .strip span{visibility:hidden}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -303,6 +303,8 @@ const f=n=>Math.round(n*10)/10;
 
 // Triptych wings sit above the display, so each widget gets a top overlay.
 $$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg><svg class="ulsvg" aria-hidden="true"></svg><svg class="nssvg" aria-hidden="true"></svg><svg class="gysvg" aria-hidden="true"></svg><svg class="prsvg" aria-hidden="true"></svg><svg class="czsvg" aria-hidden="true"></svg><svg class="rusvg" aria-hidden="true"></svg>'));
+// The stone saw draws the wall itself, so its layer sits just above the casing, under the display, nameplate and strip.
+$$('.w').forEach(el=>el.querySelector('.casing').insertAdjacentHTML('afterend','<svg class="sasvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -3756,7 +3758,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress, Cosmati band, ruin) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress, Cosmati band, ruin, stone saw) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -3808,7 +3810,11 @@ const SHADES={
  ruin:{label:'Ruin',kind:'Weather',ms:4800,h:small=>small?48:62,lowAt:[.42,.8],foot:true,
   on:'Shaded: years pass over the wall. Rain stains it, lichen and ivy take hold, the glass breaks out, and the top crumbles away to a low ruin; a low sun picks out the value on a worn tablet, and one surviving pane lights.',
   off:'Unshaded: time runs backwards. The fallen stones fly back up into place, the glass mends, and the ivy and stains withdraw as the wall rises.',
-  about:'A new shade kind, <b>Weather</b>: nothing is folded, stowed or set; time passes over the casing and the shade is what is left. Gothic ruins (Tintern, Rievaulx, Whitby) are the most painted buildings in Britain: roofless walls with empty windows, snapped pinnacles, ivy and a sapling growing out of the top. Here the facade becomes one, years at a time. The display fades into its old glass, a mosaic of ruby, blue, gold and green pieces in lead. Rain stains run down from under the frieze, lichen spreads in orange and yellow rings, moss takes the base course, and ivy climbs the outer pier, leafing as it goes. Two stones strike the glass: cracks run out from each, the pieces fall out of the lead one by one into the bay, and the night shows through the empty window. Then <b>the wall comes down from the top</b> while its foot stays where it stood: the outer pinnacle snaps and falls, turning, and lies on the ground; gaps open in the cresting, the gable\'s apex goes, and the corner of the outer pier breaks away, each piece cracking first, then falling with a puff of grit, and the big ones staying where they land. A birch sapling grows out of the broken pier. <b>A low sun rakes across the ruin</b> and, as raking light does with worn inscriptions, brings out the value cut into a weathered tablet in the face, and catches the one pane left in the stump of a lancet beside it. <b>The pane is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the ruin:</b> the name in the surviving frieze, the value on the tablet, the lit pane, ivy and rubble. Nothing moves at rest. Unshading runs time backwards: the fallen stones fly up into place, the glass mends, and the ivy, lichen and stains withdraw as the wall rises. Joins still work on the shaded pair.'}
+  about:'A new shade kind, <b>Weather</b>: nothing is folded, stowed or set; time passes over the casing and the shade is what is left. Gothic ruins (Tintern, Rievaulx, Whitby) are the most painted buildings in Britain: roofless walls with empty windows, snapped pinnacles, ivy and a sapling growing out of the top. Here the facade becomes one, years at a time. The display fades into its old glass, a mosaic of ruby, blue, gold and green pieces in lead. Rain stains run down from under the frieze, lichen spreads in orange and yellow rings, moss takes the base course, and ivy climbs the outer pier, leafing as it goes. Two stones strike the glass: cracks run out from each, the pieces fall out of the lead one by one into the bay, and the night shows through the empty window. Then <b>the wall comes down from the top</b> while its foot stays where it stood: the outer pinnacle snaps and falls, turning, and lies on the ground; gaps open in the cresting, the gable\'s apex goes, and the corner of the outer pier breaks away, each piece cracking first, then falling with a puff of grit, and the big ones staying where they land. A birch sapling grows out of the broken pier. <b>A low sun rakes across the ruin</b> and, as raking light does with worn inscriptions, brings out the value cut into a weathered tablet in the face, and catches the one pane left in the stump of a lancet beside it. <b>The pane is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the ruin:</b> the name in the surviving frieze, the value on the tablet, the lit pane, ivy and rubble. Nothing moves at rest. Unshading runs time backwards: the fallen stones fly up into place, the glass mends, and the ivy, lichen and stains withdraw as the wall rises. Joins still work on the shaded pair.'},
+ saw:{label:'Stone saw',kind:'Cut',ms:4800,h:small=>small?52:76,lowAt:[.6,.74],foot:true,
+  on:'Shaded: a mason\'s frame saw cuts two courses across the wall, the band between them tips out and falls, the wall is let down onto its foot, and the joint is pointed and cramped; the cut-down window lights with the value.',
+  off:'Unshaded: the cramps and pointing come out, the wall rises, and the fallen band comes back up into the gap and the cuts close.',
+  about:'A new shade kind for gothic, <b>Cut</b>: the casing is cut down to the strip. Nothing is folded, stowed or worn away; what isn\'t needed is cut out and falls, and what is left is closed up and joined. Medieval masons cut stone with a <i>frame saw</i>: a toothless iron blade strained in an oak frame by a twisted cord and a toggle, worked back and forth with sand and water, so the cut is ground rather than torn. Here the display fades into dim leaded glass, and the saw comes in along the wall. It cuts straight across under the frieze, through the window, stroke by stroke, a dark kerf opening behind the blade, grey slurry running down the face and stone dust at the blade\'s end. Then it is carried round and cuts back across just above the base course. The band between the cuts rocks loose, tips toward you and falls out with a puff of dust from both kerfs, and the desktop shows through the gap. <b>The shade keeps its foot where it stood, so the wall is let down onto the foot</b> until the cuts meet, with a flash along the joint and dust squeezed out of it. A pointing iron runs along the joint, laying lime across the stone and a lead came under the cut glass, and two iron cramps are dropped into sockets across the joint at the ends and run in with molten lead, which glows and cools to grey. Last, the strip of window left under the frieze kindles and the value is written across it in dark ink, left to right. <b>The glass is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the cut-down wall:</b> the name in the frieze, a short lit window with the value, the pointed joint and the base course. Nothing moves at rest. Unshading plays it back, the band rising out of the ground into the gap as the wall goes up. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -5204,6 +5210,102 @@ function cryptFront(id,w,h,k){
  if(p>0&&p<1)for(let i=0;i<5;i++){const c=p*2.6+hash(i,7);o+=JOINS.buttress.dust(w*(.1+.2*i),yF,c%1,4,G.sm?7:9,i*11+400+Math.floor(c))}
  if(thud>0&&thud<1)for(let i=0;i<6;i++)o+=JOINS.buttress.dust(w*(.08+.168*i),yF,thud,6,G.sm?12:16,i*13+500);
  return o;
+}
+/* Stone saw: a Cut shade. A mason's frame saw cuts across the wall under the frieze (through the window) and again above the
+   base course; the band between tips out and falls, and the foot-anchored wall is let down until the cuts meet. The cuts are
+   placed so cB-cA is exactly the height lost (H-hS), so the top piece (at offset 0) and the foot piece (at offset h-H) meet
+   just as the strip is reached. From SA_K0 on, the real casing is hidden and the wall is drawn here as clipped copies of the
+   full-height casing, in a layer just above the casing, so the nameplate and strip name stay on top of it. */
+const SA_K0=.1,SA_L={},SA_K={};
+function saCasing(id,w,H0){const ck=id+'|'+model.join;return SA_K[ck]||(SA_K[ck]=casing(id,w,H0).replace(new RegExp('\\b(st|cl)-'+id+'\\b','g'),'sa$1-'+id))}
+function saGeo(id,w){
+ const[,num,val]=tpText(id),ck=id+'|'+val;if(SA_L[ck])return SA_L[ck];
+ const sm=id==='c',H0=sm?CH:H,hS=SHADES.saw.h(sm),cA=sm?46:51,cB=cA+H0-hS,[x,y,sw,sh,b]=SCR[id],r0=x-b-3,r1=x+sw+b+3,sc=sm?.72:1;
+ const fs=sm?9:10.5,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`);
+ // Slurry runs down from each kerf as the blade passes: cut A left to right over .12-.3, cut B right to left over .34-.52.
+ const drips=(y0,n,t0,t1,dir,len,sd)=>{const D=[];for(let i=0;i<n;i++){const xx=8+(w-16)*(i+.2+.6*hash(i,sd))/n,u=(xx+4)/(w+8);
+  D.push({x:xx,y:y0,len:len*(.55+.45*hash(i,sd+2)),t:lerp(t0,t1,dir>0?u:1-u)})}return D};
+ return SA_L[ck]={sm,H0,cA,cB,x,y,sw,sh,r0,r1,sc,fs,tw,xm:x+sw/2,num,val,
+  dA:drips(cA,sm?6:10,.12,.3,1,sm?7:12,31),dB:drips(cB,sm?5:8,.34,.52,-1,sm?3.5:9,37),cr:[r0/2,(r1+w)/2]};
+}
+// The frame saw at (cx,cy), blade on the cut: oak cheeks, a stretcher, a twisted cord with its toggle, and the iron blade.
+const saFrame=(cx,cy,sc,o)=>`<g transform="translate(${f(cx)} ${f(cy)}) scale(${sc})" opacity="${f(o)}" stroke-linecap="round">`+
+ `<path d="M-62 -21V5M62 -21V5" stroke="#3a2412" stroke-width="5"/><path d="M-62 -21V5M62 -21V5" stroke="#a8763e" stroke-width="3.4"/><path d="M-62.8 -20V3M61.2 -20V3" stroke="#e0b47a" stroke-width=".7" opacity=".7"/>`+
+ `<path d="M-60 -10H60" stroke="#3a2412" stroke-width="3.4"/><path d="M-60 -10H60" stroke="#9a6a38" stroke-width="2.2"/>`+
+ `<path d="M-61 -18.5H61" stroke="#5e4a26" stroke-width="2"/><path d="M-61 -18.5H61" stroke="#dcc898" stroke-width="1.4" stroke-dasharray="1.3 1.3"/>`+
+ `<path d="M-4 -21L3 -10" stroke="#3a2412" stroke-width="2.6"/><path d="M-4 -21L3 -10" stroke="#b4824a" stroke-width="1.4"/>`+
+ `<path d="M-62 0H62" stroke="#24201c" stroke-width="2.4"/><path d="M-62 0H62" stroke="#8d8984" stroke-width="1.3"/><path d="M-59 -.5H59" stroke="#f2f0ea" stroke-width=".4" opacity=".7"/>`+
+ `<circle cx="-62" cy="0" r="1.5" fill="url(#gild)"/><circle cx="62" cy="0" r="1.5" fill="url(#gild)"/></g>`;
+function stoneSaw(id,w,h,k){
+ const G=saGeo(id,w),{sm,H0,cA,cB,x,y,sw,sh,r0,r1,sc,fs,tw,xm,num,val}=G,dust=JOINS.buttress.dust,[gl,gb,gd]=msGlass(id);
+ let defs=`<linearGradient id="saD-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#33416f"/><stop offset="1" stop-color="#141b3a"/></linearGradient>`+
+  `<pattern id="saQ-${id}" width="12" height="16" patternUnits="userSpaceOnUse" x="${x}" y="${y}"><path d="M0 0L12 16M12 0L0 16" fill="none" stroke="#0d0a07" stroke-width=".8" opacity=".7"/></pattern>`;
+ const glass=`<rect x="${x}" y="${y}" width="${sw}" height="${sh}" fill="url(#saD-${id})"/><rect x="${x}" y="${y}" width="${sw}" height="${sh}" fill="url(#saQ-${id})"/><rect x="${x}" y="${y}" width="${sw}" height="${sh}" fill="url(#glassHi)"/>`;
+ // Before the copies take over, only the dim glass shows, fading in under the fading display.
+ if(k<SA_K0)return k>0?`<defs>${defs}</defs><g opacity="${f(seg(k,0,SA_K0))}">${glass}</g>`:'';
+ const W2=w+80,dyF=h-H0,split=k>=.52,fallU=seg(k,.56,.66),rock=seg(k,.52,.56),cut=k<.56,pf=Math.round(w);
+ defs+=`<g id="saK-${id}">${saCasing(id,w,H0)}${glass}</g>`+
+  `<clipPath id="saT-${id}"><rect x="-40" y="-140" width="${W2}" height="${140+cA}"/></clipPath>`+
+  `<clipPath id="saB-${id}"><rect x="-40" y="${cA}" width="${W2}" height="${cB-cA}"/></clipPath>`+
+  `<clipPath id="saF-${id}"><rect x="-40" y="${cB}" width="${W2}" height="${H0-cB+40}"/></clipPath>`;
+ const drip=(D,fade)=>{let o='';for(const d of D){const a=seg(k,d.t,d.t+.08);if(a<=0||fade<=0)continue;const l=d.len*ease(a);
+   o+=`<path d="M${f(d.x)} ${f(d.y+1)}V${f(d.y+1+l)}" stroke="#7d776c" stroke-width="${sm?1:1.3}" stroke-linecap="round" opacity="${f(.5*fade)}"/><circle cx="${f(d.x)}" cy="${f(d.y+1.4+l)}" r="${sm?.8:1.05}" fill="#8b857a" opacity="${f(.55*fade)}"/>`}return o};
+ const dryB=1-seg(k,.68,.78),fresh=seg(k,.56,.6)*(1-seg(k,.76,.84));
+ let s='';
+ if(!split)s+=`<use href="#saK-${id}"/>${drip(G.dA,1)}${drip(G.dB,1)}`;
+ else{
+  s+=`<g transform="translate(0 ${f(dyF)})"><g clip-path="url(#saF-${id})"><use href="#saK-${id}"/></g>${drip(G.dB,dryB)}`+
+   (fresh>0?`<path d="M0 ${cB+.6}H${pf}" stroke="#fff6e2" stroke-width=".9" opacity="${f(.7*fresh)}"/>`:'')+'</g>';
+  s+=`<g clip-path="url(#saT-${id})"><use href="#saK-${id}"/></g>`+(fresh>0?`<path d="M0 ${cA-.6}H${pf}" stroke="#fff6e2" stroke-width=".9" opacity="${f(.6*fresh)}"/>`:'');
+  // The band rocks loose, then tips toward you about its foot, foreshortening and darkening, and drops out of sight.
+  if(fallU<1){const r=1.3*Math.sin(rock*Math.PI*3)*(1-rock)*(fallU>0?0:1),sy=Math.cos(fallU*Math.PI/2*.9),dr=(sm?24:36)*fallU*fallU,o=1-seg(fallU,.55,1);
+   s+=`<g opacity="${f(o)}" transform="translate(0 ${f(dyF+dr)}) translate(0 ${cB}) scale(1 ${f(sy*1000)/1000}) translate(0 ${-cB}) rotate(${f(r*100)/100} ${f(w/2)} ${f((cA+cB)/2)})">`+
+    `<g clip-path="url(#saB-${id})"><use href="#saK-${id}"/>${fallU>0?`<rect x="-40" y="${cA}" width="${W2}" height="${cB-cA}" fill="#140d07" opacity="${f(.5*fallU)}"/>`:''}</g>${drip(G.dA,1)}</g>`}
+  for(let i=0;i<5;i++){const xx=w*(.1+.2*i);s+=dust(xx,cA,seg(k,.555,.63),4,sm?7:10,i*7+600)+dust(xx,cB+dyF,seg(k,.56,.64),4,sm?7:10,i*7+640)}
+  for(let i=0;i<4;i++)s+=dust(w*(.15+.23*i),h-1,seg(k,.63,.72),6,sm?11:16,i*5+680)}
+ // The kerfs, open behind the blade until the band comes away.
+ const ko=1-seg(k,.56,.58),kerf=(yy,a,b)=>b>a?`<g opacity="${f(ko)}"><path d="M${f(a)} ${f(yy)}H${f(b)}" stroke="#140d07" stroke-width="${sm?1.4:1.8}"/><path d="M${f(a)} ${f(yy+1.3)}H${f(b)}" stroke="#fff6e2" stroke-opacity=".5" stroke-width=".6"/></g>`:'';
+ const pA=seg(k,.12,.3),pB=seg(k,.34,.52),xeA=lerp(-4,w+4,pA),xeB=lerp(w+4,-4,pB);
+ if(k<.58){s+=kerf(cA,0,Math.min(w,xeA));if(pB>0)s+=kerf(cB,Math.max(0,xeB),w)}
+ // The joint closes with a flash and dust squeezed out of it.
+ const cl=seg(k,.74,.79);
+ if(cl>0&&cl<1){const g=Math.sin(Math.PI*cl);s+=`<path d="M0 ${cA}H${pf}" stroke="#fffbe8" stroke-width="${f(1+2.2*g)}" opacity="${f(.85*g)}"/>`;for(let i=0;i<6;i++)s+=dust(w*(.06+.176*i),cA,cl,5,sm?9:13,i*9+700)}
+ // Pointing: lime across the stone, a lead came under the cut glass; the iron runs left to right.
+ const pp=seg(k,.78,.88),xp=lerp(-2,w+2,pp);
+ if(pp>0){const lime=(a,b)=>b>a?`<path d="M${f(a)} ${cA}H${f(b)}" stroke="#efe6cf" stroke-width="${sm?1.8:2.3}"/><path d="M${f(a)} ${f(cA+1.4)}H${f(b)}" stroke="#3a2c1c" stroke-opacity=".4" stroke-width=".6"/>`:'';
+  s+=lime(0,Math.min(xp,r0))+lime(r1,Math.min(xp,w));
+  if(xp>r0)s+=`<path d="M${f(r0+1)} ${cA}H${f(Math.min(xp,r1-1))}" stroke="#2e2a25" stroke-width="${sm?2.2:2.8}"/><path d="M${f(r0+1)} ${f(cA-.6)}H${f(Math.min(xp,r1-1))}" stroke="#a39d92" stroke-width=".5"/>`;
+  if(pp<1)s+=`<g opacity="${f(1-seg(pp,.9,1))}" transform="translate(${f(xp)} ${cA}) scale(${sc}) rotate(-32)"><path d="M0 0L-10 -2.4L-10 2.4Z" fill="#a19d96" stroke="#34302b" stroke-width=".5"/><path d="M0 0H12" stroke="#3a2412" stroke-width="2.6" stroke-linecap="round"/><path d="M1 0H12" stroke="#a8763e" stroke-width="1.5" stroke-linecap="round"/></g>`}
+ // Two iron cramps drop into sockets across the joint; lead is run in round them, glowing, then cooling to grey.
+ G.cr.forEach((cx,i)=>{const t0=.86+.03*i,sk=seg(k,t0-.025,t0),dp=seg(k,t0,t0+.025),ld=seg(k,t0+.025,t0+.055),cool=seg(k,t0+.05,t0+.1);if(sk<=0)return;
+  const hw=2.6*sc,hh=8*sc,yy=cA-(1-backOut(dp))*10*sc;
+  s+=`<rect x="${f(cx-hw)}" y="${f(cA-hh)}" width="${f(2*hw)}" height="${f(2*hh)}" fill="#1a120a" opacity="${f(.55*sk)}"/>`;
+  if(ld>0){const lc=cool<1?`rgb(${Math.round(lerp(255,141,cool))},${Math.round(lerp(176,137,cool))},${Math.round(lerp(72,132,cool))})`:'#8d8984',fh=2*hh*ld;
+   s+=`<rect x="${f(cx-hw)}" y="${f(cA+hh-fh)}" width="${f(2*hw)}" height="${f(fh)}" fill="${lc}"/>`;
+   if(cool<1)s+=`<g style="mix-blend-mode:screen" opacity="${f(.7*(1-cool))}"><rect x="${f(cx-hw-1)}" y="${f(cA+hh-fh-1)}" width="${f(2*hw+2)}" height="${f(fh+2)}" fill="#ff9a30" filter="url(#lglow)"/></g>`}
+  if(dp>0)s+=`<g opacity="${f(seg(dp,0,.3))}"><path d="M${f(cx-1.3*sc)} ${f(yy-hh+1.5*sc)}V${f(yy+hh-1.5*sc)}" stroke="#141210" stroke-width="${f(3.4*sc)}"/><path d="M${f(cx-1.3*sc)} ${f(yy-hh+1.5*sc)}V${f(yy+hh-1.5*sc)}" stroke="#4a4540" stroke-width="${f(2*sc)}"/>`+
+   `<path d="M${f(cx-1.3*sc)} ${f(yy-hh+1.6*sc)}H${f(cx+1.6*sc)}M${f(cx-1.3*sc)} ${f(yy+hh-1.6*sc)}H${f(cx+1.6*sc)}" stroke="#141210" stroke-width="${f(2.6*sc)}" stroke-linecap="square"/></g>`;
+  if(dp>.7&&dp<1)s+=dust(cx,cA,seg(dp,.7,1),4,6*sc,i*3+760)});
+ // The window left under the frieze kindles, and the value is written across it.
+ const ys=y,yh=cA-(sm?1.1:1.4)-y,kd=seg(k,.9,.95),flare=Math.sin(Math.PI*kd),wr=seg(k,.92,.99);
+ if(kd>0){defs+=`<radialGradient id="saL-${id}" cx=".5" cy=".55" r=".7"><stop stop-color="${gl}"/><stop offset=".6" stop-color="${gb}"/><stop offset="1" stop-color="${gd}"/></radialGradient>`;
+  s+=`<rect x="${x}" y="${ys}" width="${sw}" height="${f(yh)}" fill="url(#saL-${id})" opacity="${f(.93*kd)}"/><rect x="${x}" y="${ys}" width="${sw}" height="${f(yh)}" fill="url(#saQ-${id})" opacity="${f(.4*kd)}"/>`+
+   `<g style="mix-blend-mode:screen" opacity="${f(.4*kd)}"><rect x="${f(x+6)}" y="${f(ys+2)}" width="${f(sw-12)}" height="${f(yh-4)}" fill="${gb}" filter="url(#lglow)"/></g>`;
+  if(flare>.05&&kd<1)s+=`<rect x="${x}" y="${ys}" width="${sw}" height="${f(yh)}" fill="#fffbe8" opacity="${f(.5*flare)}"/>`}
+ if(wr>0){const ty=f(ys+yh/2+fs*.36),x0=xm-tw/2-4,cx=lerp(x0,xm+tw/2+4,wr);defs+=`<clipPath id="saW-${id}"><rect x="${f(x0)}" y="${ys}" width="${f(cx-x0)}" height="${f(yh)}"/></clipPath>`;
+  s+=`<g clip-path="url(#saW-${id})" font-family="Georgia,serif" text-anchor="middle"><text x="${f(xm)}" y="${f(+ty+.7)}" fill="#fff6e2" opacity=".45"><tspan font-weight="bold" font-size="${fs+1}">${num}</tspan><tspan font-style="italic" font-size="${fs}"> ${val}</tspan></text>`+
+   `<text x="${f(xm)}" y="${ty}" fill="#1d1612"><tspan font-weight="bold" font-size="${fs+1}">${num}</tspan><tspan font-style="italic" font-size="${fs}"> ${val}</tspan></text></g>`}
+ const gg=Math.sin(Math.PI*seg(k,.96,1));if(gg>.05)s+=`<g opacity="${f(gg)}">${sparkle(xm+tw/2+7,ys+yh/2,4*gg)}</g>`;
+ // The saw: in from the left, across under the frieze, carried round, back across above the base course, and away.
+ const sw2=58*sc,st=(a)=>a>0&&a<1?7*sc*Math.sin(a*Math.PI*2*6):0;let sx=null,sy2=0,so=1,fr=null;
+ if(k<.12){sx=-4-sw2;sy2=cA;so=seg(k,SA_K0,.12)}
+ else if(k<.3){sx=xeA-sw2+st(pA);sy2=cA;fr=[xeA,cA]}
+ else if(k<.34){const e=ease(seg(k,.3,.34));sx=lerp(w+4-sw2,w+4+sw2,e);sy2=lerp(cA,cB,e)-14*Math.sin(Math.PI*e)}
+ else if(k<.52){sx=xeB+sw2+st(pB);sy2=cB;fr=[xeB,cB]}
+ else if(k<.56){const e=seg(k,.52,.56);sx=-4+sw2-40*e;sy2=cB-10*e;so=1-e}
+ if(sx!==null&&so>0){s+=saFrame(sx,sy2,sc,so);
+  if(fr&&(pA>0&&pA<.97||pB>0&&pB<.97)){const c=(k*48)%1,fl=Math.floor(k*48);s+=dust(Math.min(w,Math.max(0,fr[0])),fr[1],c,3,7*sc,900+fl)}}
+ return `<defs>${defs}</defs>${s}`;
 }
 // A crypt shade keeps the widgets' feet where they stood, so the walls visibly go down into the floor (and come back up out of it).
 function footFix(h0,c0){shiftFeet(h0-shadeH(false),c0-shadeH(true))}
@@ -7079,7 +7181,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0,cz=model.shade==='cosmati'&&model.st>0,ru=model.shade==='ruin'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0,cz=model.shade==='cosmati'&&model.st>0,ru=model.shade==='ruin'&&model.st>0,sa=model.shade==='saw'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -7112,7 +7214,7 @@ function render(){
   // Misericord: the display fades as the seat swings down over it. Lenten veil: it fades as the rod comes in, before the veil drops.
   // Corona: it fades as the wall starts to lower, long before the corona comes down.
   // Aumbry: the tabs and buttons fade; the display itself is drawn back into the recess and hidden once the doors are shut.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru||sa?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   const auG=au?auGeo(id,w,h,k):null;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(!au&&n.style.filter)n.style.filter='';
@@ -7121,13 +7223,17 @@ function render(){
    else if(au&&n.matches('.screen,.mini')){auPose(n,auG);o=1-seg(k,.64,.68)}
    else if(n.style.transform){n.style.transform='';n.style.clipPath='';n.style.transformOrigin=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
-  el.querySelector('.grip').style.opacity=f(1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):rg||rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);el.classList.toggle('czOn',cz);el.classList.toggle('ruOn',ru);
+  el.querySelector('.grip').style.opacity=f(sa?1-seg(k,.07,.14):1-clamp(k*1.6));
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):sa?seg(k,0,.07):rg||rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);el.classList.toggle('czOn',cz);el.classList.toggle('ruOn',ru);el.classList.toggle('saOn',sa);
   // Ruin: the casing loses what has broken off its top, as a clip; the overlay draws everything else that weathers.
   const rclip=ru?ruClip(id,w,h,k):'';if(svg.dataset.rclip!==rclip){svg.dataset.rclip=rclip;svg.style.clipPath=rclip}
   const us2=el.querySelector('.rusvg'),rukey=ru?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.join}`:'';
   if(us2.dataset.key!==rukey){us2.dataset.key=rukey;us2.setAttribute('width',w);us2.setAttribute('height',h);us2.setAttribute('viewBox',`0 0 ${w} ${h}`);us2.innerHTML=rukey?ruin(id,w,h,k):''}
+  // Stone saw: from SA_K0 the casing is hidden and the saw layer draws the wall as clipped full-height copies.
+  const sop=sa&&k>=SA_K0?'0':'';if(svg.style.opacity!==sop)svg.style.opacity=sop;
+  const ss=el.querySelector('.sasvg'),skey=sa?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.join}`:'';
+  if(ss.dataset.key!==skey){ss.dataset.key=skey;ss.setAttribute('width',w);ss.setAttribute('height',h);ss.setAttribute('viewBox',`0 0 ${w} ${h}`);ss.innerHTML=skey?stoneSaw(id,w,h,k):''}
   const zs=el.querySelector('.czsvg'),zkey=cz?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(zs.dataset.key!==zkey){zs.dataset.key=zkey;zs.setAttribute('width',w);zs.setAttribute('height',h);zs.setAttribute('viewBox',`0 0 ${w} ${h}`);zs.innerHTML=zkey?cosmati(id,w,h,k):''}
   const ps=el.querySelector('.prsvg'),pkey=wp?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
