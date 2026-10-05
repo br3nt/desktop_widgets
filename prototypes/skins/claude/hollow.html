@@ -5955,7 +5955,11 @@ const MORPHS={
  fly:{label:'Glow-fly sketch',kind:'Draw',
   about:'Checks grows by being drawn first: the larger Checks is set out full size in lines of light before it is anything, and the lines are then made solid in ink and shell. The light comes from a glow-fly, a small bug with a glowing bulb that lives in the lantern on Checks\' scroll, the way fireflies are kept in a jar for light in the dark. <b>Shield:</b> the box darts down and the lantern flares as the glow-fly comes out. It draws on the fog in pale gold light, lifting off between strokes so the hops leave no line: the outline of a great plate hung under the shell with its foot drawn to a keel, a window, a seam across it, and fourteen small rings in an arc. Then the drawing is made solid: brush ink runs along every line, the shell\'s dark chitin floods down the plate from the belly, the sockets darken, the window fills with parchment and the light fades off the ink. The glow-fly flies home in a long arc and the lantern flares as it goes in. Twelve lamps kindle teal one by one, the checks that passed; the two at the far end take red rings, the checks still waiting. The window reads run 418 on main, 12 / 14, 86% passed and 2 waiting. <b>Shield and wing:</b> the box widens and the glow-fly comes out again, crosses over the shell and draws a hindwing unfolding from its far end: the wing\'s edge, its veins, a second window and two small rings. Ink runs along the lines, the pale membrane spreads out from the root, and the window names deploy-preview and e2e-safari, waiting for Brent, beside two red rings. <b>Shrinking</b> plays it backwards: the ink and shell draw back into lines of light, and the glow-fly takes them up stroke by stroke and goes back into its lantern. Pick a size, press M or scrub the slider. Checks grows from its left corner. When it would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a sketched Checks takes the drawing back first, and unshading draws it again.',
   sizes:['Shell','Shield','Shield and wing'],slider:'Checks size, shell to shield and wing',ms:[6400,3200],ax:0,dims:g=>lfDims(g),travel:t=>ease(seg(t,0,.2)),
-  say:(to,from,n)=>to>from?(to-from>1?'A glow-fly leaves the lantern and draws a shield and then a wing in light; ink and shell set the lines solid: Checks is a shield and wing.':to===2?'The glow-fly comes out again and draws a wing from the shell\'s far end; ink and membrane set it, and it names the two waiting checks.':'A glow-fly leaves the lantern and draws a great shield on the fog in light; ink runs along the lines, chitin floods in, and twelve lamps kindle.'):'The ink and shell go back to light and the glow-fly takes the lines up'+(to?' off the wing':'')+': Checks shrinks to '+article(n)+'.'}
+  say:(to,from,n)=>to>from?(to-from>1?'A glow-fly leaves the lantern and draws a shield and then a wing in light; ink and shell set the lines solid: Checks is a shield and wing.':to===2?'The glow-fly comes out again and draws a wing from the shell\'s far end; ink and membrane set it, and it names the two waiting checks.':'A glow-fly leaves the lantern and draws a great shield on the fog in light; ink runs along the lines, chitin floods in, and twelve lamps kindle.'):'The ink and shell go back to light and the glow-fly takes the lines up'+(to?' off the wing':'')+': Checks shrinks to '+article(n)+'.'},
+ mring:{label:'Moth ring',kind:'Orbit',
+  about:'Checks grows by being circled: the larger Checks is whatever goes round the shell once it comes to rest. It comes from moths at a lamp, which fly round and round a light they cannot reach, and from the iron hoops that lamps hang in here. <b>Moth ring:</b> the box opens out evenly both sides, so the shell stays where it is. An iron hoop rises out of a bank of fog under the shell, seen from a little above, overshoots a touch, and two iron stays swing down from the shell\'s foot and catch it with a glint. Its far half runs behind the shell, its near half in front of its foot. The lantern on Checks\' scroll swells, and fourteen pale moths come out of the fog at the left end one after another and circle the shell as one train, wings beating, the far ones smaller and passing behind it. They go round once and on, slow together, and each settles on the hoop in its place, seven a side where you can see them, and closes its beating wings down to spread flat, as a moth rests. Twelve eyespots kindle teal one by one: the checks that passed. The two moths either side of the front take red rings: the two still waiting. A parchment tag drops on red thread from the front of the hoop: run 418 on main, 86% passed and 2 waiting. <b>Two rings:</b> the box widens again and a wider hoop rises out of the fog and is hung from the first by two more stays. The two waiting moths lift off, fly out to it and once round it the other way, and settle at its front, where two tags drop under them naming deploy-preview and e2e-safari, waiting for Brent. <b>Shrinking</b> plays it backwards: the moths take off, circle back into the fog and the hoops sink away. Pick a size, press M or scrub the slider. When Checks would grow over the pair, it moves to the nearest side with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a moth ring sends the moths away first, and unshading calls them back.',
+  sizes:['Shell','Moth ring','Two rings'],slider:'Checks size, shell to two rings',ms:[5800,3200],ax:.5,dims:g=>mrDims(g),travel:t=>ease(seg(t,0,.2)),
+  say:(to,from,n)=>to>from?(to-from>1?'Moths come out of the fog to Checks\' lamp, circle the shell and settle on an iron hoop; a second hoop is hung and the two waiting moths fly out to it: Checks is two rings.':to===2?'A wider hoop is hung from the first, and the two waiting moths fly out and once round it to settle over their names.':'An iron hoop is hung round Checks and fourteen moths circle the shell and settle on it: twelve eyespots kindle teal, two moths wait in red rings.'):(to?'The two waiting moths fly back to the inner hoop and the outer hoop sinks':'The moths take off and circle back into the fog, and the hoop sinks away')+': Checks shrinks to '+article(n)+'.'}
 };
 // Each morph lists its sizes as [id, label, g]. The base size is always 'sheet' at g 0; scale and detail also has one smaller than the base.
 for(const m of Object.values(MORPHS))m.sz=m.sz||SIZES.map(([id],i)=>[id,m.sizes[i],i]);
@@ -7074,6 +7078,109 @@ function glowFly(el,w,h){
  o+=v>0?fy(LFQ2,v,.64,.84):fy(LFQ1,u,.64,.8);
  svg.innerHTML=o;
 }
+/* ---------- Morph: moth ring (Checks) ---------- */
+// g runs 0 shell, 1 moth ring, 2 two rings. An Orbit morph: the larger Checks is whatever goes round the shell once it comes to rest.
+// Moths come out of the fog to the lit lantern and circle the shell, the way moths circle a lamp, then settle on an iron hoop hung round it.
+// The box grows evenly both sides (ax .5) and the shell is drawn at its middle, so the shell stays put while the hoops spread round it.
+// The hoops are seen from a little above: their far halves pass behind the shell, their near halves in front of its foot. Every frame is drawn from g alone.
+const mrOn=()=>model.morph==='mring'&&model.g>0;
+function mrDims(g){g=clamp(g,0,2);const a=backSoft(seg(clamp(g),0,.12)),b=backSoft(seg(clamp(g-1),0,.12));return[Math.round(CW+124*a+128*b),Math.round(lerp(CH,158,a)+28*b)]}
+// The two hoops, in the shell's own coordinates (its middle is x 138).
+const MR1={cx:138,cy:76,rx:186,ry:30},MR2={cx:138,cy:104,rx:250,ry:44};
+const mrPt=(R,th,lift=0)=>{const a=th*Math.PI/180;return{x:R.cx+R.rx*Math.cos(a),y:R.cy+R.ry*Math.sin(a)-lift,z:Math.sin(a)}};
+// Half a hoop, from angle a to b, as a polyline (positive angles are the near side).
+const mrArc=(R,a,b,dy=0)=>{let d='';for(let i=0;i<=36;i++){const p=mrPt(R,lerp(a,b,i/36));d+=(i?'L':'M')+f(p.x)+' '+f(p.y+dy)}return d};
+// Fourteen slots on the inner hoop, in train order: seven each side, on the near half and the far half beyond the shell's ends, so none rests hidden
+// behind it, leaving the front middle clear for the tag. The two waiting moths (9 and 10) sit either side of the tag.
+// The train comes out of the fog at the left end (180°) heading for the front, so it runs to smaller angles; d is the distance flown from there.
+// Each moth flies its own final distance less one shared remainder, so the gaps in the train never change and none overtakes.
+const MR_E=180,MR_S=[190,206,221,319,334,350,5,21,38,56,124,142,159,175],MR_D=MR_S.map(t=>((MR_E-t)%360+360)%360+360),MR_HEAD=MR_D[0];
+// One moth seen face on, scaled for depth: brush-ink outline, chalk-pale wings with a dark eyespot, a dark body and a pale mask with two eye dots.
+// flap opens and closes the wings (1 spread flat, as a moth rests); lamp kindles the eyespots teal; ring puts the red ring of a check still waiting round it.
+function mrMoth(x,y,sc,flap,lamp,ring,op=1){if(op<=.01)return '';const a=f(lerp(-62,0,flap));
+ const wing=s=>`<g transform="scale(${s} 1) rotate(${a})"><path d="M1 -1.5C5 -9 13 -11.5 16.5 -8.2C17.6 -5.2 14 -1.4 8 .8C5 1.8 2.5 1.2 1 0Z" fill="#d8dfe9" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>`+
+  `<path d="M1 .6C4.5 2 10 3 11.6 6.2C11.4 9.4 6.8 10.6 3.6 8.2C1.8 6.6 1 3.6 1 .6Z" fill="#aab8cb" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>`+
+  `<path d="M3 -3.2C7 -7 11 -8.6 14.2 -8" fill="none" stroke="#fff" stroke-width=".8" opacity=".55" stroke-linecap="round"/>`+
+  `<circle cx="10.4" cy="-4.6" r="2.3" fill="#141a24" stroke="${INK}" stroke-width=".5"/>`+(lamp>.01?`<circle cx="10.4" cy="-4.6" r="2.3" fill="url(#tealG)" opacity="${f3(lamp)}"/>`:'')+'</g>';
+ return `<g opacity="${f3(op)}" transform="translate(${f(x)} ${f(y)}) scale(${f3(sc)})">`+
+  (lamp>.01?`<circle cy="-2" r="17" fill="url(#leakT)" opacity="${f3(.5*lamp)}"/>`:'')+wing(-1)+wing(1)+
+  `<path d="M-1.2 -7.6Q-4 -12 -6.6 -12.4M1.2 -7.6Q4 -12 6.6 -12.4" fill="none" stroke="${INK}" stroke-width=".9" stroke-linecap="round"/>`+
+  `<ellipse cy="1.5" rx="2.3" ry="6.2" fill="#1c2535" stroke="${INK}" stroke-width="1"/><path d="M-1.6 2.4H1.6M-1.4 4.6H1.4" stroke="#7d8ca3" stroke-width=".6"/>`+
+  `<circle cy="-5.6" r="2.8" fill="#e8edf3" stroke="${INK}" stroke-width=".9"/><circle cx="-1" cy="-5.4" r=".7" fill="${INK}"/><circle cx="1" cy="-5.4" r=".7" fill="${INK}"/>`+
+  (ring>.01?`<circle cy="-1" r="${f(lerp(19,15,ease(ring)))}" fill="none" stroke="#3a070b" stroke-width="2.6" opacity="${f3(ring)}"/><circle cy="-1" r="${f(lerp(19,15,ease(ring)))}" fill="none" stroke="${REDHI}" stroke-width="1.3" opacity="${f3(ring)}"/>`:'')+'</g>'}
+// A hoop: forged iron with a chalk edge on top and rivets. Half is the far (behind) or near (in front) side.
+function mrHoop(R,near,dy,op){if(op<=.01)return '';const a=near?0:180,b=near?180:360,d=mrArc(R,a,b,dy);let rv='';
+ for(let t=a+15;t<b;t+=30){const p=mrPt(R,t);rv+=`<circle cx="${f(p.x)}" cy="${f(p.y+dy)}" r="1.5" fill="#7d8ca3" stroke="${INK}" stroke-width=".6"/>`}
+ return `<g opacity="${f3(op)}" fill="none" stroke-linecap="round"><path d="${d}" stroke="${INK}" stroke-width="5.2" transform="translate(0 1.6)" opacity=".5"/><path d="${d}" stroke="${INK}" stroke-width="4.4"/>`+
+  `<path d="${d}" stroke="#2f3d54" stroke-width="2.4"/><path d="${mrArc(R,a,b,dy-1.2)}" stroke="#c9d6e6" stroke-width=".8" opacity="${near?.5:.3}"/>${rv}</g>`}
+// An iron stay from (x,y0) down to y1; it swings down from its knuckle at the top by k.
+function mrStay(x,y0,y1,k){if(k<=.01)return '';const L=y1-y0,a=f((x<138?-80:80)*(1-dart(k)));
+ return `<g transform="translate(${f(x)} ${f(y0)}) rotate(${a})"><path d="M0 0V${f(L)}" stroke="${INK}" stroke-width="3.6" stroke-linecap="round"/><path d="M0 0V${f(L)}" stroke="#454e5c" stroke-width="1.5" stroke-linecap="round"/>`+
+  `<circle r="2.6" fill="url(#iron)" stroke="${INK}" stroke-width="1"/><path d="M-3 ${f(L-1)}Q0 ${f(L+4)} 3 ${f(L-1)}" fill="none" stroke="${INK}" stroke-width="1.6"/></g>`}
+// A parchment tag hung on a red thread from a point on a hoop; it drops into place with a small bounce.
+function mrTag(px,py,x0,x1,y0,y1,k,txt,kt){if(k<=.01)return '';const dy=-(y1-py)*(1-backSoft(k)),cx=(x0+x1)/2,th=d=>`<path d="${d}" stroke="#3a070b" stroke-width="2"/><path d="${d}" stroke="${RED}" stroke-width="1.1"/>`;
+ const T=`M${x0} ${y0}H${x1}V${y1}H${x0}Z`;
+ return `<g opacity="${f3(seg(k,0,.3))}"><g fill="none" stroke-linecap="round">${th(`M${f(px)} ${f(py)}L${f(cx-10)} ${f(y0+dy)}M${f(px)} ${f(py)}L${f(cx+10)} ${f(y0+dy)}`)}</g>`+
+  `<g transform="translate(0 ${f(dy)})"><path d="${T}" fill="${INK}" opacity=".5" transform="translate(1.5 2.6)"/><path d="${T}" fill="url(#parchG)"/><path d="${T}" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round" filter="url(#wob)"/>`+
+  `<circle cx="${f(cx-10)}" cy="${y0+3.4}" r="1.6" fill="url(#brass)" stroke="${INK}" stroke-width=".6"/><circle cx="${f(cx+10)}" cy="${y0+3.4}" r="1.6" fill="url(#brass)" stroke="${INK}" stroke-width=".6"/><g opacity="${f3(kt)}">${txt}</g></g>`+
+  `<circle cx="${f(px)}" cy="${f(py)}" r="2" fill="url(#brass)" stroke="${INK}" stroke-width=".7"/></g>`}
+const MRT1=`<text class="dser" x="138" y="122" text-anchor="middle" font-size="9.5" font-style="italic" fill="#5c4a36" letter-spacing=".4">run 418 · main</text>`+
+ `<text class="dtx" x="138" y="135.5" text-anchor="middle" style="font-size:10.5px"><tspan class="dn">86%</tspan><tspan dx="4">passed · 2 waiting</tspan></text>`;
+const mrT2=(cx,nm)=>`<text class="dser" x="${cx}" y="163" text-anchor="middle" font-size="12" fill="#231b14">${nm}</text><text class="dser" x="${cx}" y="176" text-anchor="middle" font-size="9.5" font-style="italic" fill="#5c4a36">waiting for Brent</text>`;
+// The two outer tags hang from the outer hoop at 55° and 125°; the waiting moths settle on the hoop above them.
+const MR_T=[55,125].map(t=>{const p=mrPt(MR2,t);return{t,x:p.x,y:p.y}});
+function mothRing(el,w,h){
+ const svg=el.querySelector('.casing'),grip=el.querySelector('.grip'),mini=el.querySelector('.mini'),lamp=el.querySelector('.lampdot');
+ if(!mrOn()){if(svg.dataset.ok){svg.dataset.ok='';grip.style.left=grip.style.right=mini.style.transform=lamp.style.transform=''}return}
+ const g=model.g,still=g===Math.round(g),ox=(w-CW)/2;
+ // The shell's display, nameplate and lamp move with the shell to the middle of the box.
+ grip.style.left=grip.style.right=f(40+ox)+'px';mini.style.transform=lamp.style.transform=`translateX(${f(ox)}px)`;
+ const lab='Checks widget, '+(still?sizeName(g).toLowerCase():'moths circling')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; run 418 on main, 86% passed':'')+(g>=2?'; deploy-preview and e2e-safari waiting for Brent':'');
+ if(el.getAttribute('aria-label')!==lab)el.setAttribute('aria-label',lab);
+ const key=[f(g*1000),w,h].join();if(svg.dataset.ok===key)return;svg.dataset.ok=key;
+ svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+ const u=clamp(g),v=clamp(g-1);
+ // Inner hoop: rises out of the fog under the shell, overshoots, and the stays swing down and catch it. Outer hoop the same, hung from the inner.
+ const h1=seg(u,.1,.26),dy1=40*(1-backSoft(h1)),st1=seg(u,.22,.3),h2=seg(v,.1,.26),dy2=30*(1-backSoft(h2)),st2=seg(v,.22,.3);
+ // The flight: the train's head flies MR_HEAD degrees, fast out of the fog and slowing to rest.
+ const fl=seg(u,.3,.86),rem=MR_HEAD*Math.pow(1-fl,2.2);
+ const back=[],farOut=[],front=[];
+ for(let i=0;i<14;i++){const d=MR_D[i]-rem;if(d<=0)continue;
+  const th=MR_E-d,wait=i===9||i===10;
+  // The waiting pair leave for the outer hoop on the second size: out to its radius, then once round it the other way, landing over their tags.
+  // The wings beat while a moth flies and close down to spread flat as it lands, never snapping open.
+  const lf=1-ease(seg(u,.8+.004*i,.86+.004*i)),emerge=seg(d,0,40);
+  let p,lift=14*lf,flap=1-(.5-.5*Math.cos(u*300+i*1.7))*clamp(lf*4),lt=wait?0:seg(u,.88+.006*i,.91+.006*i),rg=wait?seg(u,.92,.98):0,outer=false;
+  if(wait&&v>0){const T=MR_T[i===9?0:1],k=seg(v,.34,.86),out=ease(seg(k,0,.18)),e=1-Math.pow(1-seg(k,.1,1),2),t=lerp(MR_S[i],T.t+360,e),
+    a=mrPt(MR1,t),b=mrPt(MR2,t),ld=ease(seg(v,.82,.9));
+   lift=(14*seg(k,0,.06)+8*Math.sin(Math.PI*seg(k,0,.18)))*(1-ld);outer=out>.5;
+   p={x:lerp(a.x,b.x,out),y:lerp(a.y,b.y,out),z:lerp(a.z,b.z,out)};flap=1-(.5-.5*Math.cos(v*300+i*1.7))*clamp(k*20)*(1-ld);rg=(1-seg(v,.34,.38))*rg+seg(v,.9,.97)}
+  else p=mrPt(MR1,th);
+  const sc=.62+.38*(p.z+1)/2,m=mrMoth(p.x,p.y-lift-7*sc,sc,flap,lt,rg,emerge);
+  (p.z<0?outer?farOut:back:front).push([p.z,m])}
+ const lay=A=>A.sort((a,b)=>a[0]-b[0]).map(q=>q[1]).join('');
+ let o=`<g transform="translate(${f(ox)} 0)">`;
+ // Fog: a bank under the shell for the hoops to rise from, and one at the left end for the moths to come out of.
+ const fb=Math.sin(Math.PI*seg(u,.04,.34)),fm=Math.sin(Math.PI*seg(u,.24,.7)),fb2=Math.sin(Math.PI*seg(v,.04,.34));
+ if(fb>.01)o+=`<ellipse cx="138" cy="118" rx="200" ry="34" fill="url(#fogCold)" opacity="${f3(.8*fb)}"/>`;
+ if(fb2>.01)o+=`<ellipse cx="138" cy="156" rx="270" ry="34" fill="url(#fogCold)" opacity="${f3(.8*fb2)}"/>`;
+ if(fm>.01)o+=`<ellipse cx="-36" cy="70" rx="30" ry="34" fill="url(#fogCold)" opacity="${f3(.9*fm)}"/>`;
+ // The lamp draws them: its glow swells while they fly and steadies as they settle.
+ const pull=Math.max(Math.sin(Math.PI*seg(u,.06,.9)),Math.sin(Math.PI*seg(v,.3,.92)));
+ if(pull>.01)o+=`<circle cx="${f(HANG[0])}" cy="${f(HANG[1]+21)}" r="${f(40+30*pull)}" fill="url(#lamp)" opacity="${f3(pull)}"/>`;
+ o+=mrHoop(MR2,false,dy2,seg(v,.1,.16))+lay(farOut)+mrHoop(MR1,false,dy1,seg(u,.1,.16))+lay(back);
+ o+=casing('c',CW,CH,true,'body')+(IRON||(IRON=casing('c',CW,CH,true,'iron')));
+ // The stays: from the shell's foot to the inner hoop, and from the inner hoop to the outer.
+ for(const x of[16,260]){const y=MR1.cy+MR1.ry*Math.sqrt(1-((x-138)/MR1.rx)**2);o+=mrStay(x,70,y,st1)}
+ o+=mrHoop(MR1,true,dy1,seg(u,.1,.16));
+ for(const t of[30,150]){const a=mrPt(MR1,t),y=MR2.cy+MR2.ry*Math.sqrt(1-((a.x-138)/MR2.rx)**2);if(v>0)o+=mrStay(a.x,a.y,y,st2)}
+ for(const[k,x,y]of[[st1,16,98],[st1,260,98],[st2,-23,138],[st2,299,138]])if(k>.6&&k<1)o+=spark({x,y},Math.sin(Math.PI*seg(k,.6,1))*.85,6);
+ o+=mrTag(138,106,63,213,111,141,seg(u,.84,.92),MRT1,seg(u,.88,.94));
+ o+=mrHoop(MR2,true,dy2,seg(v,.1,.16));
+ for(const T of MR_T){const x0=Math.round(T.x-58);o+=mrTag(T.x,T.y,x0,x0+116,150,181,seg(v,.78,.88),mrT2(f(T.x),T===MR_T[0]?'e2e-safari':'deploy-preview'),seg(v,.84,.92))}
+ o+=lay(front);
+ svg.innerHTML=o+'</g>';
+}
 // The pair's box with a margin (the iron scrolls and lanterns stand above the shells), measured where it stood before any lift it was given to make room for Checks.
 // On an angled join it takes in GitDiscuss swung on its bracket or plates, read from the same transform the page draws it with.
 function pairBox(){
@@ -7257,8 +7364,8 @@ function render(){
   if(id!=='c'&&j.nudge){const n=j.nudge(model.jt,model.dir)*(id==='a'?1:-1);el.style.transform=n?`translateX(${f(n)}px)`:''}
   else if(id==='a')el.style.transform='';
   // A moulting Checks draws its own shells (see moult()).
-  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':small&&bvOn()?'A':small&&rsOn()?'R':small&&lfOn()?'F':'')+w+'x'+h+(lit?'L':'');
-  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHGARF'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
+  const svg=el.querySelector('.casing'),key=(small&&moltOn()?'M':small&&detOn()?'D':small&&weaveOn()?'V':small&&burOn()?'B':small&&nauOn()?'N':small&&ewOn()?'E':small&&hrOn()?'H':small&&mglOn()?'G':small&&bvOn()?'A':small&&rsOn()?'R':small&&lfOn()?'F':small&&mrOn()?'O':'')+w+'x'+h+(lit?'L':'');
+  if(svg.dataset.key!==key){svg.dataset.key=key;if(!'MDVBNEHGARFO'.includes(key[0])){svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=casing(id,w,h,lit)}}
   const k=ease(s),show=coc?1-seg(s,0,.2):rn?1-seg(s,.04,.26):mr||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs||sl||pn?1-seg(s,0,.12):sg?1-seg(s,.04,.14):1-clamp(k*2.2),strip=coc||mr||sg||cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs||rn||sl||pn?0:seg(k,.55,1);
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.lampdot').forEach(n=>{n.style.opacity=f(show);n.style.visibility=show<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(coc?1-seg(s,0,.3):cu||fg||wc||ln||ck||rt||tp||se||ur||ns||dr||pr||qs||rn||sl||pn?1-seg(s,0,.12):mr?1-seg(s,.34,.46):sg?1-seg(s,0,.12):1-clamp(k*1.6));
@@ -7270,7 +7377,7 @@ function render(){
   const sc=svg.querySelector('.scr');if(sc)sc.style.opacity=fs||((ur||ns||dr||pr||qs||rn||sl||pn)&&s>0)?0:'';
   el.style.filter=fg&&s>0?`drop-shadow(0 10px 9px rgba(0,0,0,${f(.73*(1-seg(s,.04,.36)))}))`:'';
   el._sg=[w,h];
-  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h);bivouac(el,w,h);rimstone(el,w,h);glowFly(el,w,h)}
+  cocoon(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapRoll(el,id,w,h,s);hangSign(el,id,w,h,s);curl(el,id,w,h,s,small?'teal':m.run?'amber':'cold');fogSink(el,id,w,h,s,m.run?'amber':'cold',lit);wingCase(el,id,w,h,s,small?'teal':m.run?'amber':'cold');lantern(el,id,w,h,s,small?'teal':m.run?'amber':'cold');cloak(el,id,w,h,s,small?'teal':m.run?'amber':'cold');caveRoots(el,id,w,h,s,small?'teal':m.run?'amber':'cold');shutter(el,id,w,h,s,small?'teal':m.run?'amber':'cold');if(small){unfurl(el,w,h,show);moult(el,w,h);detail(el,w,h);weave(el,w,h);burrow(el,w,h);nautilus(el,w,h);earwig(el,w,h);herse(el,w,h);magic(el,w,h);bivouac(el,w,h);rimstone(el,w,h);glowFly(el,w,h);mothRing(el,w,h)}
   // After the morphs, which can also move Checks' parchment, so the seal's withdraw wins.
   snailSeal(el,id,w,h,s,small?'teal':m.run?'amber':'cold');reelShell(el,id,w,h,s,small?'teal':m.run?'amber':'cold');abdomen(el,id,w,h,s,small?'teal':m.run?'amber':'cold');inkDrain(el,id,w,h,s,small?'teal':m.run?'amber':'cold');mapPress(el,id,w,h,s,small?'teal':m.run?'amber':'cold');scales(el,id,w,h,s,small?'teal':m.run?'amber':'cold');longRain(el,id,w,h,s,small?'teal':m.run?'amber':'cold',m.run);needleSlash(el,id,w,h,s,small?'teal':m.run?'amber':'cold',m.run);pinned(el,id,w,h,s,small?'teal':m.run?'amber':'cold',m.run);
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
