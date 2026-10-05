@@ -6840,7 +6840,12 @@ const MORPHS={
   sizes:['Pad','Toy train','Two lines'],noun:['a pad','a toy train','two train lines'],up:6800,down:4400,
   pad:()=>model.gq>0?[TT.OX[model.gq>1?2:1],TT.OY[model.gq>1?2:1]]:[0,0],padAt:i=>i?[TT.OX[i],TT.OY[i]]:[0,0],
   fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[TT.W[i],TT.H[i]]:[CW,CH],dims:()=>model.gq>0?[TT.W[model.gq>1?2:1],TT.H[model.gq>1?2:1]]:[CW,CH],
-  sayUp:n=>'A felt engine lays a line round Checks and brings its train round: Checks becomes '+n+'.',sayDown:n=>'The train backs into its tunnel and the track is rolled up: Checks shrinks to '+n+'.'}
+  sayUp:n=>'A felt engine lays a line round Checks and brings its train round: Checks becomes '+n+'.',sayDown:n=>'The train backs into its tunnel and the track is rolled up: Checks shrinks to '+n+'.'},
+ letout:{label:'Expansion zip',kind:'Let out',
+  about:'A new morph kind, Let out, from the felt pencil case with expansion zips. In a Let out nothing is brought in, sewn on, stretched or gathered: the bigger form was folded up inside the casing all along, and is let out. The pad never changes or moves. <b>Let out:</b> a raspberry felt zip pull pops out at the pad\'s foot and runs along it, its tab trailing; behind it the brass teeth part in a V over a dark slit. At the end the tab swings on and settles. Then the plum hem under the zip drops on its own weight, and a mustard felt gusset unfolds behind it in ten pleats, their folds poking out past the sides in a zigzag and catching the light by turns. It rebounds once as the gusset takes the weight, the pleats relax flat, leaving faint creases, and a cream label pops up on the gusset: run 418 on main, with a felt bar at 86%. <b>Fully let out:</b> a second pull runs down the right side, and a bound spine swings out to the right on a second gusset, its pleats upright. Its label shows the last ten runs as felt tags, 409 to 418 (green passed, red failed for 411 and 415, amber waiting for 418), and the two checks waiting for Brent, deploy-preview and e2e-safari. <b>Shrinking</b> plays the same timeline backwards: the label goes, the pleats fold, the hem is drawn back up and the pull zips it shut and tucks away. Everything is placed from the size alone, so nothing moves at rest. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks zips it shut first, and unshading lets it out again. Switching morphs takes Checks back to a pad first.',
+  anchorTL:true,sizes:['Pad','Let out','Fully let out'],noun:['a pad','a let-out pouch','a fully let-out pouch'],up:4800,down:3400,
+  fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[EZ.W[i],EZ.H[i]]:[CW,CH],dims:()=>model.gq>0?[EZ.W[model.gq>1?2:1],EZ.H[model.gq>1?2:1]]:[CW,CH],
+  sayUp:n=>'Checks is unzipped and the pleats folded inside it are let out: Checks becomes '+n+'.',sayDown:n=>'The pleats fold back in and the zip is pulled shut: Checks shrinks to '+n+'.'}
 };
 const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
@@ -6945,6 +6950,7 @@ function morphRender(el){
  if(model.morph==='rug')return rgRender(el,svg,gr,kn,pa);
  if(model.morph==='pounce')return puRender(el,svg,gr,kn,pa);
  if(model.morph==='train')return ttRender(el,svg,gr,kn,pa);
+ if(model.morph==='letout')return ezRender(el,svg,gr,kn,pa);
  el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
@@ -8474,6 +8480,119 @@ function ttRender(el,svg,gr,kn,pa){
  gr.style.opacity=1;gr.style.left=f(ox+24)+'px';gr.style.right=f(w-ox-CW+24)+'px';gr.style.top=f(oy+4)+'px';el.querySelector('.strip').style.opacity=0;
  const si=SIZES.findIndex(x=>x[2]===model.g);
  el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'toy train going round')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 7 passed, 411 and 415 failed, 418 waiting; deploy-preview and e2e-safari waiting for Brent':''));
+ return true;
+}
+
+/* ---------- Morph: expansion zip (Let out) ---------- */
+// The Let out kind: nothing comes from outside and nothing stretches. The bigger form was folded up inside the casing all along
+// and is let out, like a felt pencil case with expansion zips. The pad never changes or moves (top-left anchor). g 0→1: a zip
+// pull pops out at the pad's foot and runs along it, parting the teeth; the bound hem under the zip drops on its own weight and a
+// pleated mustard gusset unfolds behind it, rebounds once, the pleats relax flat and a label shows run 418. g 1→2: the same down
+// the right side, a bound spine swinging out on a second gusset that carries the last ten runs. Everything is drawn from the
+// size alone, so nothing moves at rest, and shrinking plays the same timeline backwards.
+const EZ={W:[CW,CW,456],H:[CH,160,160],ZY:72.5,ZX:CW-6.5,GH:72,SG:170,HB:12,VE:134,
+ GUS:'#d9a441',TOOTH:'#e0bd68',TDK:'#7a5410',TAPE:'#3b291d',TAB:'#b8476e',INK:'#3b291d',CREAM:'#f3e6c8',THREAD:'#f7e8c9',
+ C:{ok:'#5f8f2e',bad:'#c4453a',wait:'#e0a03a'},T:{tab:[0,.08],zip:[.08,.4],drop:[.42,.72],bounce:[.72,.8],press:[.8,.9],label:[.88,1]}};
+// One zip's step at progress u: the pull popping in and running, how far the hem has gone (of the gusset, with one rebound),
+// the pleats pressed flat, the label in, and how the tab swings (trailing while it runs, then a swing forward that dies away).
+function ezAt(u){const T=EZ.T,p=seg(u,...T.drop),st=seg(u,.4,.5);
+ return{tab:seg(u,...T.tab),tape:seg(u,0,.05),run:ease(seg(u,...T.zip)),o:p*p-.08*Math.sin(Math.PI*seg(u,...T.bounce)),press:ease(seg(u,...T.press)),label:seg(u,...T.label),
+  sway:12*Math.sin(Math.PI*seg(u,...T.zip))-9*Math.sin(2*Math.PI*st)*(1-st),wob:-5*Math.sin(2*Math.PI*st)*(1-st)}}
+// A pleated felt gusset let out from s0 to s1 (down the page, or across it when vert), c0..c1 wide. Half open, its pleats fold out
+// past the sides in a zigzag and catch the light by turns; pressed, they lie flat and leave faint creases.
+function ezGusset(s0,s1,c0,c1,o,press,vert){
+ if(s1-s0<.5)return'';
+ // The pleats fan out as the first few pixels open, so the zigzag never pops in at full size.
+ const N=10,fd=(1-.7*clamp(o))*(1-press),A=7*fd*clamp((s1-s0-8)/10),P=(s,c)=>vert?`${f(s)} ${f(c)}`:`${f(c)} ${f(s)}`,S=k=>s0+(s1-s0)*k/N,out=k=>k%2?A:0;
+ let L='',R='',faces='',cr='';
+ for(let k=0;k<=N;k++){L+=(k?'L':'M')+P(S(k),c0-out(k));R=`L${P(S(k),c1+out(k))}`+R}
+ for(let k=0;k<N;k++){const q=`M${P(S(k),c0-out(k))}L${P(S(k+1),c0-out(k+1))}L${P(S(k+1),c1+out(k+1))}L${P(S(k),c1+out(k))}Z`;
+  faces+=k%2?`<path d="${q}" fill="#2a1406" opacity="${f3(.42*fd)}"/>`:`<path d="${q}" fill="#fff6dc" opacity="${f3(.2*fd)}"/>`;
+  if(k)cr+=`M${P(S(k),c0-out(k))}L${P(S(k),c1+out(k))}`}
+ return `<path d="${L}${R}Z" fill="${EZ.GUS}" filter="url(#g-c)"/>${faces}<path d="${cr}" fill="none" stroke="#5a3a0e" stroke-opacity="${f3(.12+.25*fd)}" stroke-width=".8"/>`;
+}
+// The bound hem that carries a zip's far row: blanket-stitched along its outer edge. Folded in behind the pad it shows as a lip.
+function ezHem(x,y,w,h,vert,op){
+ if(op<=0)return'';const r=vert?[2,6,6,2]:[2,2,7,6];let bs='';
+ if(vert){for(let t=y+5;t<y+h-4;t+=5)bs+=`M${f(x+w-1.6)} ${f(t)}H${f(x+w-6)}`;bs+=`M${f(x+w-1.6)} ${f(y+5)}V${f(y+h-5)}`}
+ else{for(let t=x+6;t<x+w-5;t+=5)bs+=`M${f(t)} ${f(y+h-1.6)}V${f(y+h-6)}`;bs+=`M${f(x+6)} ${f(y+h-1.6)}H${f(x+w-6)}`}
+ return `<g opacity="${f3(op)}"><path d="${rr4(x-1.5,y+2,w+3,h+.5,r.map(v=>v+1))}" fill="#3b291d" filter="url(#g-c)"/><path d="${rr4(x,y,w,h,r)}" fill="${SKIN.c.band}" filter="url(#g-c)"/>`+
+  `<path d="${bs}" fill="none" stroke="${EZ.THREAD}" stroke-opacity=".85" stroke-width="1" stroke-linecap="round"/></g>`;
+}
+// One zip on line a from s0 to s1: the near row and its tape on the part that stays, the far row and tape parted from it by
+// off(s), and a dark slit between where they have parted. vert runs it down the page.
+function ezZip(a,s0,s1,off,vert,op){
+ if(op<=0)return'';
+ const P=(s,c)=>vert?`${f(c)} ${f(s)}`:`${f(s)} ${f(c)}`,ss=[];for(let s=s0-2;s<s1+2;s+=3)ss.push(s);ss.push(s1+2);
+ const band=(sA,c0,c1)=>'M'+sA.map(s=>P(s,c0(s))).join('L')+'L'+sA.slice().reverse().map(s=>P(s,c1(s))).join('L')+'Z';
+ let near='',far='';
+ for(let s=s0,k=0;s<=s1;s+=1.6,k++){if(k%2){const o=off(s);far+=`M${P(s,a-.5+o)}L${P(s+1.4,a-.5+o)}L${P(s+1.4,a+2.9+o)}L${P(s,a+2.9+o)}Z`}
+  else near+=`M${P(s,a-2.9)}L${P(s+1.4,a-2.9)}L${P(s+1.4,a+.5)}L${P(s,a+.5)}Z`}
+ // The slit fades as the far row drops clear, so an open zip shows its gusset, not a dark band.
+ const sl=.85*(1-clamp((Math.max(...ss.map(off))-3)/20));
+ return `<g opacity="${f3(op)}"><path d="${band([s0-2,s1+2],()=>a-3.8,()=>a-.6)}" fill="${EZ.TAPE}"/>`+
+  (ss.some(s=>off(s)>.3)&&sl>.01?`<path d="${band(ss,()=>a,s=>a+.6+Math.min(3.2,off(s)))}" fill="#1a0b10" opacity="${f3(sl)}"/>`:'')+
+  `<path d="${band(ss,s=>a+.6+off(s),s=>a+4.4+off(s))}" fill="${EZ.TAPE}"/>`+
+  `<g fill="${EZ.TOOTH}" stroke="${EZ.TDK}" stroke-width=".35"><path d="${near}"/><path d="${far}"/></g></g>`;
+}
+// A zip pull: a metal slider on the line and a raspberry felt tab hanging from it on a ring, swung rot degrees; k pops it in.
+function ezPull(x,y,vert,rot,k){
+ if(k<=0)return'';
+ return `<g transform="translate(${f(x)} ${f(y)}) scale(${f3(backOut(k))})"><g transform="rotate(${f(rot)} 0 3)">`+
+  `<circle cx="0" cy="4.6" r="2.1" fill="none" stroke="#8d8576" stroke-width="1.1"/>`+
+  `<g filter="url(#tagfelt)"><path d="M0 6C4.6 6.4 5.8 11.5 4.9 15.4C4 19.2 1.8 21 0 21C-1.8 21 -4 19.2 -4.9 15.4C-5.8 11.5 -4.6 6.4 0 6Z" fill="${EZ.TAB}"/></g>`+
+  `<path d="M0 8.4C3 8.8 3.8 12.2 3.2 15C2.6 17.6 1.2 18.6 0 18.6C-1.2 18.6 -2.6 17.6 -3.2 15C-3.8 12.2 -3 8.8 0 8.4Z" fill="none" stroke="${EZ.THREAD}" stroke-width=".8" stroke-dasharray="1.6 1.3"/>`+
+  `<circle cx="0" cy="13.4" r="1.5" fill="${EZ.THREAD}"/></g>`+
+  `<rect x="${vert?-3.6:-5}" y="${vert?-5:-3.6}" width="${vert?7.2:10}" height="${vert?10:7.2}" rx="2" fill="#c9c2b4" stroke="#6b6457" stroke-width=".7"/>`+
+  `<path d="${vert?'M-1.4 -3V3':'M-3 -1.2H3'}" stroke="#fff" stroke-opacity=".6" stroke-width="1" stroke-linecap="round"/></g>`;
+}
+// A cream felt label stitched round in raspberry, popped in about its middle.
+function ezCard(k,x,y,w,h,body){
+ if(k<=0)return'';const cx=x+w/2,cy=y+h/2;
+ return `<g opacity="${f3(seg(k,0,.4))}" transform="translate(${f(cx)} ${f(cy)}) scale(${f3(backOut(k))}) translate(${f(-cx)} ${f(-cy)})"><g filter="url(#tagfelt)"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="${EZ.CREAM}"/></g>`+
+  `<rect x="${f(x+2.4)}" y="${f(y+2.4)}" width="${f(w-4.8)}" height="${f(h-4.8)}" rx="4" fill="none" stroke="${EZ.TAB}" stroke-width=".8" stroke-dasharray="2 1.6"/><g font-family="${PYF}" fill="${EZ.INK}">${body}</g></g>`;
+}
+// The first gusset's label: the run, its branch and how much of it passed, with a felt bar.
+function ezLabel1(k){const x=16,y=86,w=224,bw=w-20;
+ return ezCard(k,x,y,w,40,`<text x="${x+10}" y="${y+16}" font-size="9.5" font-weight="800">run 418 · main</text><text x="${x+w-10}" y="${y+17}" font-size="12" font-weight="800" text-anchor="end" fill="${EZ.C.ok}">86%</text>`+
+  `<rect x="${x+10}" y="${y+24}" width="${bw}" height="8" rx="4" fill="#e2d2b0"/><g filter="url(#tagfelt)"><rect x="${x+10}" y="${y+24}" width="${f(bw*.86)}" height="8" rx="4" fill="${EZ.C.ok}"/></g>`+
+  `<path d="M${x+14} ${y+28}H${f(x+6+bw*.86)}" stroke="${EZ.THREAD}" stroke-width=".9" stroke-dasharray="2.4 2"/>`)}
+// The second gusset's label: the last ten runs as felt tags in their status colours, and the two checks waiting for Brent.
+function ezLabel2(k){const x=282,y=18,w=148,cx=x+w/2;
+ let s=`<text x="${cx}" y="${y+15}" font-size="9.5" font-weight="800" text-anchor="middle">runs 409–418</text>`;
+ PY.RUNS.forEach(([n,st],i)=>{const tx=x+6+(i%5)*28,ty=y+22+Math.floor(i/5)*21;
+  s+=`<g filter="url(#tagfelt)"><rect x="${tx}" y="${ty}" width="24" height="17" rx="3" fill="${EZ.C[st]}"/></g><text x="${tx+12}" y="${ty+12}" font-size="8.5" font-weight="800" text-anchor="middle" fill="${st==='wait'?EZ.INK:'#fbf3e2'}">${n}</text>`});
+ s+=`<text x="${cx}" y="${y+79}" font-size="8.5" font-weight="700" text-anchor="middle" fill-opacity=".85">waiting for Brent</text>`;
+ ['deploy-preview','e2e-safari'].forEach((t,i)=>{const py=y+86+i*18;
+  s+=`<rect x="${x+14}" y="${py}" width="${w-28}" height="14" rx="7" fill="#f8dca0" stroke="${EZ.C.wait}" stroke-width="1" stroke-dasharray="2 1.4"/><text x="${cx}" y="${py+10}" font-size="8.5" font-weight="800" text-anchor="middle">${t}</text>`});
+ return ezCard(k,x,y,w,122,s)}
+function ezSvg(g,fr,w,h){
+ const a=ezAt(Math.min(1,g)),b=ezAt(g>1?g-1:0),two=g>1,ZY=EZ.ZY,ZX=EZ.ZX,D=EZ.GH*a.o,dx=EZ.SG*b.o,hy=ZY-1+D,vx=ZX-1+dx;
+ const keep=BO;BO=fr<0?0:(fr%3)*31;const pad=casing('c',CW,CH);BO=keep;
+ const hx=lerp(10,CW-22,a.run),vy=lerp(8,EZ.VE,b.run);
+ // Behind the pull the teeth part in a V, wider the further back; once the zip is open they part by the whole drop.
+ const offH=x=>(x<hx?2.6*clamp((hx-x)/26):0)+D,offV=y=>(y<vy?2.6*clamp((vy-y)/26):0)+dx;
+ let s='';
+ // Each gusset is drawn only once its hem has started to drop, so it never peeps out at the pad's rounded corners before.
+ if(two)s+=(dx>.2?ezGusset(ZX-8,vx+3,12,EZ.VE+8,b.o,b.press,true):'')+ezHem(vx,4,EZ.HB,hy+EZ.HB-4,true,b.tape);
+ s+=(D>.2?ezGusset(ZY-6,hy+3,EDGE+3,CW-EDGE-3,a.o,a.press,false):'')+ezHem(EDGE+1,hy,CW-2*EDGE-2,EZ.HB,false,a.tape)+pad;
+ s+=ezZip(ZY,14,CW-28,offH,false,a.tape);
+ if(two)s+=ezZip(ZX,10,EZ.VE-6,offV,true,b.tape)+`<rect x="${f(ZX-3.4)}" y="${EZ.VE-2.6}" width="6.8" height="2.6" rx="1" fill="#c9c2b4" stroke="#6b6457" stroke-width=".6" opacity="${f3(b.tape)}"/>`;
+ s+=ezLabel1(a.label)+(two?ezLabel2(b.label):'')+ezPull(hx,ZY,false,a.sway,a.tab)+(two?ezPull(ZX,vy,true,b.wob,b.tab):'');
+ return `<defs><clipPath id="ezbox"><rect x="-2" y="-2" width="${w+4}" height="${h+4}"/></clipPath></defs><g clip-path="url(#ezbox)">${s}</g>`;
+}
+function ezRender(el,svg,gr,kn,pa){
+ el.dataset.m='1';pa.style.display='none';el.querySelectorAll('.pp,.cp,.sd,.ck,.cktool,.mb').forEach(n=>n.style.display='none');el.classList.remove('sdb');
+ // Until the first drawn frame moves (gq still 0) the box is the bare pad's, as dims() says, so the pad never jumps.
+ const on=model.gq>0,j=model.gq>1?2:1,w=on?EZ.W[j]:CW,h=on?EZ.H[j]:CH,fr=model.mFr<0?-1:model.mFr%3;
+ el.style.width=w+'px';el.style.height=h+'px';el.style.transform='';
+ const key=`ez|${model.gq}|${fr}`;
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=on?ezSvg(model.gq,model.mFr,w,h):casing('c',CW,CH)}
+ const mini=el.querySelector('.mini');mini.style.left='17px';mini.style.top='25px';mini.style.opacity=1;mini.style.visibility='visible';
+ kn.style.left='243px';kn.style.top='34px';kn.style.opacity=1;kn.style.visibility='visible';
+ gr.style.opacity=1;gr.style.left='24px';gr.style.right=f(w-CW+24)+'px';gr.style.top='4px';el.querySelector('.strip').style.opacity=0;
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'being let out')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 7 passed, 411 and 415 failed, 418 waiting; deploy-preview and e2e-safari waiting for Brent':''));
  return true;
 }
 const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
