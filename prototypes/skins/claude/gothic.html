@@ -105,7 +105,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .av .mw{background:radial-gradient(ellipse 90% 120% at 50% 0%,#fffaf0,#f4e6c6 62%,#e6d1a4);outline-color:#4a2c06;box-shadow:inset 0 0 10px #b8862a40}
 .av .mw.lst{padding:4px 3px 0 5px}.av .mw ul{font:10px/1.5 Georgia,serif;margin-top:1px}.av .mw li:before{margin-right:4px}
 #av2 .rb{position:static;display:block;margin:3px 0 0}
-.wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}#ov1 .tri button,#ov2 .tri button,#hv1 .tri button,#hv2 .tri button,#sv1 .tri button,#sv2 .tri button{border-radius:3px}
+.wv .tri{position:absolute;left:0;top:0}.wv .tri button{pointer-events:auto;border-radius:50%}#ov1 .tri button,#ov2 .tri button,#hv1 .tri button,#hv2 .tri button,#sv1 .tri button,#sv2 .tri button,#ob1 .tri button,#ob2 .tri button{border-radius:3px}
 .hit{pointer-events:all;cursor:grab}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
@@ -288,6 +288,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <div class="wv" id="mz2"><div class="tri" role="group" aria-label="The last ten runs and the two waiting, as studs round the side labyrinths"></div></div>
  <div class="wv" id="tf1"><div class="tri" role="group" aria-label="Checks, one enamel roundel per check in the blind window's two lights"></div></div>
  <div class="wv" id="tf2"><div class="tri" role="group" aria-label="The last ten runs as roundels in the left lancet, and the pass-rate gauge in the right"></div></div>
+ <div class="wv" id="ob1"><div class="tri" role="group" aria-label="Checks, one pilgrim per check round the shrine"></div></div>
+ <div class="wv" id="ob2"><div class="tri" role="group" aria-label="The last ten runs, one banner per run in the procession"></div></div>
  <div class="strip" aria-hidden="true"><b>Checks</b><span><em>12 / 14</em></span></div>
  <svg class="mfx" aria-hidden="true"></svg>
 </section>
@@ -5881,8 +5883,12 @@ function bayRender(el){
  return true;
 }
 const cDims=()=>MO().box(model.g);
-function cBase(){const[w,h]=model.cBox;return{x:model.c.x+w/2,y:model.c.y+h}}
-function placeBase(bx,by){const[w,h]=cDims();model.cBox=[w,h];model.c.x=clamp(bx-w/2,10,1190-w);model.c.y=clamp(by-h,TOP-20,590-h)}
+// Checks is placed by its base: the box's bottom-centre, less any floor the morph spreads below its old foot (sink), so that floor grows downward instead of lifting the building.
+// cFoot is the box's own bottom-centre, for measuring against the pair.
+const cSink=()=>MO().sink?MO().sink(model.g):0;
+function cBase(){const[w,h]=model.cBox;return{x:model.c.x+w/2,y:model.c.y+h-(model.cSink||0)}}
+function cFoot(){const[w,h]=model.cBox;return{x:model.c.x+w/2,y:model.c.y+h}}
+function placeBase(bx,by){const[w,h]=cDims(),s=cSink();model.cBox=[w,h];model.cSink=s;model.c.x=clamp(bx-w/2,10,1190-w);model.c.y=clamp(by+s-h,TOP-20,590-h)}
 // The pair's box with a margin, measured where it stands before any lift it was given to make room for Checks.
 function pairBox(){const L=model.lift;return{x0:Math.min(model.a.x,model.b.x)-8,x1:Math.max(model.a.x,model.b.x)+W+8,y0:Math.min(model.a.y,model.b.y)+L-8,y1:Math.max(model.a.y,model.b.y)+L+ctx().h+8}}
 // How far the pair has to rise (from where it stood) to clear a w×h Checks with its foot at bx,by; 0 if they don't meet. Never past the top of the stage.
@@ -5894,11 +5900,11 @@ function clearLift(w,h,bx,by){
 // Where Checks's foot should end up at size `to`: on the stage, and clear of the pair when there is room.
 // When there is none (a nave beside a pair spread across the stage), Checks takes the floor and the pair is nudged up to make way.
 function morphSpot(to){
- const[w,h]=MO().dims(to),b=cBase();let bx=clamp(b.x,10+w/2,1190-w/2),by=clamp(b.y,TOP-20+h,590);
+ const mo=MO(),[w,h]=mo.dims(to),sk=mo.sink?mo.sink(to):0,b=cBase();let bx=clamp(b.x,10+w/2,1190-w/2),by=clamp(b.y+sk,TOP-20+h,590);
  const{x0,x1,y0,y1}=pairBox();
  if(bx+w/2>x0&&bx-w/2<x1&&by-h<y1&&by>y0){
   if(x1+w<=1190)bx=x1+w/2;else if(x0-w>=10)bx=x0-w/2;else if(y1+h<=590)by=y1+h;else if(y0-h>=TOP-20)by=y0;else by=590}
- return{x:bx,y:by,lift:clearLift(w,h,bx,by)};
+ return{x:bx,y:by-sk,lift:clearLift(w,h,bx,by)};
 }
 // Eases the pair's lift to L over ms after a delay; the pair moves as one, with any running join path.
 let liftAnim=0;
@@ -5947,7 +5953,7 @@ function morphTo(id,fast){
   else{const e=ms?ease(clamp(el/Math.min(700,ms))):1;placeBase(lerp(b0.x,b1.x,e),lerp(b0.y,b1.y,e))}
   render();
   // Checks may have been moved while it was built: settle the pair against the finished building.
-  if(t<1)requestAnimationFrame(step);else{const[w,h]=model.cBox,c=cBase();liftTo(clearLift(w,h,c.x,c.y),450);say('Checks is '+S[3]+'.');res(true)}
+  if(t<1)requestAnimationFrame(step);else{const[w,h]=model.cBox,c=cFoot();liftTo(clearLift(w,h,c.x,c.y),450);say('Checks is '+S[3]+'.');res(true)}
  })(t0)});
 }
 
@@ -7660,6 +7666,172 @@ MORPHS.trace={label:'Tracing floor',kind:'Draw',sizes:[['facade','Facade',0,'a f
  say:(d,S)=>d>0?(S[2]===1?'Checks is set out on the tracing floor: chalk lines, dividers and rule draw a window in the plaster, and the drawing steps out as stone.':'Three windows: two piers rise, and the mason draws a lancet on each before they step out too.'):(S[2]===0?'The tracery sinks back into the plaster, the lines are taken back, and the panel sinks behind the facade.':'The lancets sink back into a drawing, the lines are taken back, and the piers sink into the floor.'),
  about:'A morph of a new kind, <b>Draw</b>: the larger form is set out full size in lines before it is anything, and the lines are then made solid. Gothic windows were made this way. The master mason drew each one full size on a tracing floor, a bed of plaster in the masons\' loft (York Minster\'s, about 1360, and the one at Wells still carry their scribed arcs), with a chalk line, great dividers and a rule, and the templates for every stone were cut from the drawing. Here the floor is a gypsum skim on the stone itself, and the drawing steps out of it. The facade stays at the foot and keeps its nameplate and display. <b>Blind window</b> (320 px tall): a stone panel rises from behind the facade under a white skim. The mason pins a red-chalked line down the middle and lifts and lets it go, and it slaps the plaster in a puff of red chalk; then one across at the springing. The great dividers (iron legs, gilt hinge, turned handle) come in and swing seven arcs from the springing line, gliding from centre to centre and leaving a prick at each: the equilateral arch, two lights of half its span, and the circle that touches all four arcs. An oak rule is laid down the jambs and the mullion and along the sill, with a scriber run along it, and small dividers twirl fourteen roundels in the lights. Then the drawing steps out: the skim falls away to ashlar and quatrefoils, the scribed lines swell into moulded tracery bars, the lights and the circle sink into shadow, a gilt ring is set in the circle, and the roundels become enamel and kindle, one per check: twelve green in the left light, the two waiting red in the right, beside their names. The circle is lettered CHECKS, 12 / 14 and 86% · RUN 418; the lights 12 PASSED and 2 WAITING. Hover or tap a roundel to read its check, or the circle for the run. <b>Three windows</b> (480 px): the floor widens and two gabled piers rise from the floor under the skim. One chalk line is snapped across both (it marks only the plaster), the dividers swing a lancet on each with a roundel in its head, the jambs are ruled, and ten roundels are drawn in the left lancet. Both step out: the left lancet\'s roundels kindle in their runs\' colours (green all passed, amber 13, red 12) under 10 RUNS and over LAST TEN RUNS · 6 of 10 green; in the right lancet a channel is cut and fills with green enamel to 86%, where a gilt mark is set, under 86% PASS and over PASS RATE. Hover or tap a run roundel or the gauge. <b>Shrinking</b> plays it back: the stone sinks back into a drawing, the lines are taken back by the tools that drew them, and the panel sinks behind the facade. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest.'};
 
+/* ---------- Morph: pilgrims' round (Checks) ---------- */
+// g runs 0 facade, 1 shrine, 2 procession. An Orbit morph: the larger form is whatever goes round Checks, and what it is once it comes to rest.
+// In gothic it is pilgrims round a saint's shrine. Shrines were raised on high bases so pilgrims could walk right round them (the ambulatory was built for it,
+// and at Canterbury they wore the floor round Becket's shrine into a groove). Checks is the shrine: it is raised onto a Purbeck marble base, a pavement spreads
+// round its foot, and fourteen pilgrims come out from behind it, walk once round it and kneel. Everything is a function of g.
+// Frame: x from the floor's centre (the foot of the base), y down from it. The pavement is an ellipse seen from a little above, so its far half lies behind the shrine.
+// The floor spreads below Checks's old foot (sink), so the shrine rises only by the height of its base.
+const PGTOP=8,PGB=26,PGR=[[176,42],[228,52]],PGF=[[188,49],[240,59]],PGWD=[380,488],PGWAIT=[6,7];
+const pgK=g=>{if(g<1e-6)return{e1:0,e2:0};const i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i);return i?{e1:1,e2:ease(seg(u,0,.14))}:{e1:ease(seg(u,0,.14)),e2:0}};
+const pgSink=g=>{const{e1,e2}=pgK(g);return(PGF[0][1]+3)*e1+(PGF[1][1]-PGF[0][1])*e2};
+const pgBox=g=>{if(g<1e-6)return[CW,CH];const{e1,e2}=pgK(g);return[lerp(CW,PGWD[0],e1)+(PGWD[1]-PGWD[0])*e2,(PGTOP+PGB)*e1+CH+pgSink(g)]},pgDims=k=>pgBox(k);
+// Arc length round each pavement's track, so figures walk at an even pace and keep their spacing round the ends.
+function pgTab([rx,ry]){const n=720,L=[0];for(let k=1;k<=n;k++){const a=k/n*2*Math.PI,b=(k-1)/n*2*Math.PI;L.push(L[k-1]+Math.hypot(rx*(Math.cos(a)-Math.cos(b)),ry*(Math.sin(a)-Math.sin(b))))}return{rx,ry,n,L,P:L[n]}}
+const PGA=PGR.map(pgTab);
+function pgAng(T,s){const lap=Math.floor(s/T.P),r=s-lap*T.P;let lo=0,hi=T.n;while(hi-lo>1){const m=(lo+hi)>>1;if(T.L[m]<=r)lo=m;else hi=m}
+ return(lo+(r-T.L[lo])/((T.L[hi]-T.L[lo])||1))*360/T.n+360*lap}
+const pgLen=(T,a)=>{const k=a/360*T.n,i=Math.min(T.n-1,Math.floor(k));return T.L[i]+(T.L[i+1]-T.L[i])*(k-i)};
+// Pilgrims walk sunwise (clockwise seen from above: right to left along the near side), angle a putting a figure at (rx cos a, ry sin a).
+// They start hidden behind the shrine 18 px apart, walk once right round and on to fourteen slots spread along the near side from 144° (the leader) to 36°.
+const PGS1=[...Array(14)].map((_,j)=>{const a=pgLen(PGA[0],144),b=pgLen(PGA[0],36);return a-(a-b)*j/13});
+const pgSt1=j=>pgLen(PGA[0],316)-PGA[0].P-18*j,pgEn1=j=>PGA[0].P+PGS1[j];
+// Acolytes walk the outer track the other way, angle -p for path angle p. They come out from behind the shrine on the left and go round the front:
+// the leader with run 418 stops at the right end, the last with run 409 at the left end, five a side, clear of the kneeling pilgrims.
+const PGS2=[...Array(10)].map((_,j)=>j<5?lerp(pgLen(PGA[1],358),pgLen(PGA[1],316),j/4):lerp(pgLen(PGA[1],224),pgLen(PGA[1],182),(j-5)/4));
+const pgSt2=j=>pgLen(PGA[1],123)-15*j,pgEn2=j=>PGS2[j];
+// Walking pace: a quick start, a steady walk, then a long slowing to a stop.
+const pgE=t=>{const a=.08,b=.6,A=a/2+(b-a)+(1-b)/2;t=clamp(t);let s;if(t<a)s=t*t/(2*a);else if(t<b)s=a/2+(t-a);else{const d=t-b;s=a/2+(b-a)+d-d*d/(2*(1-b))}return s/A};
+// Which check each pilgrim is: the slots in order, the two at the front centre being the waiting ones; and the order the tapers are lit (right to left, over the two).
+const pgCk=j=>j<6?j:j===6?12:j===7?13:j-2,PGK=[13,12,11,10,9,8,5,4,3,2,1,0],pgKs=n=>.81+.011*n;
+const PGCL=['#6b4a30','#5c5856','#47546b','#7a3b2e','#535d3c','#6e5a3a','#4e4258'],PGBC={pass:'#2f6e45',run:'#c08a1e',need:'#a3222f'};
+const pgSc=y=>1+.0019*y;
+const pgRest1=j=>{const a=pgAng(PGA[0],PGS1[j])*D2R;return[PGR[0][0]*Math.cos(a),PGR[0][1]*Math.sin(a)]};
+const pgRest2=j=>{const p=pgAng(PGA[1],PGS2[j])*D2R;return[PGR[1][0]*Math.cos(p),-PGR[1][1]*Math.sin(p),j<5?-1:1]};
+const PGDEFS=`<radialGradient id="pgFl"><stop offset="0" stop-color="#e7ddc6"/><stop offset=".68" stop-color="#d5c8aa"/><stop offset=".92" stop-color="#bfb08f"/><stop offset="1" stop-color="#a8987a" stop-opacity="0"/></radialGradient>`+
+ `<linearGradient id="pgPb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#58534a"/><stop offset=".5" stop-color="#36332d"/><stop offset="1" stop-color="#25231f"/></linearGradient>`+
+ `<clipPath id="pgUp"><rect x="-300" y="-300" width="600" height="300"/></clipPath>`;
+// A pavement: limestone laid in rings with a dark kerb, the groove the pilgrims' feet have worn along the track, and on the inner one a band of red and green tesserae.
+function pgFloor(k,e){
+ const[rx,ry]=PGF[k],[tx,ty]=PGR[k];let jd='';
+ for(const q of k?[.86]:[.4,.64,.86])jd+=`M${f(rx*q)} 0A${f(rx*q)} ${f(ry*q)} 0 1 1 ${f(-rx*q)} 0A${f(rx*q)} ${f(ry*q)} 0 1 1 ${f(rx*q)} 0`;
+ const r0=k?.8:.4;for(let a=0;a<360;a+=k?15:22.5){const c=Math.cos(a*D2R),s=Math.sin(a*D2R);jd+=`M${f(rx*r0*c)} ${f(ry*r0*s)}L${f(rx*.97*c)} ${f(ry*.97*s)}`}
+ // The outer pavement spreads from the inner one's kerb, so it shows from the start rather than growing out from under it.
+ const sx=k?lerp(PGF[0][0]/rx,1,e):e,sy=k?lerp(PGF[0][1]/ry,1,e):e;
+ return `<g transform="scale(${f(sx*1000)/1000} ${f(sy*1000)/1000})"><ellipse rx="${rx}" ry="${ry}" fill="url(#pgFl)"/><path d="${jd}" fill="none" stroke="#6d5d46" stroke-opacity=".22" stroke-width=".6"/>`+
+  `<ellipse rx="${rx-2}" ry="${f(ry-1.2)}" fill="none" stroke="#4d453a" stroke-opacity=".45" stroke-width="2"/>`+
+  (k?'':`<ellipse rx="${tx-24}" ry="${ty-6}" fill="none" stroke="#8e2a22" stroke-opacity=".7" stroke-width="2.2" stroke-dasharray="2 3"/><ellipse rx="${tx-24}" ry="${ty-6}" fill="none" stroke="#2f5e3a" stroke-opacity=".7" stroke-width="2.2" stroke-dasharray="2 3" stroke-dashoffset="2.5"/>`)+
+  `<ellipse rx="${tx}" ry="${ty}" fill="none" stroke="#5e4c34" stroke-opacity=".2" stroke-width="8"/><ellipse rx="${tx}" ry="${ty}" fill="none" stroke="#fff6e2" stroke-opacity=".28" stroke-width=".8" transform="translate(0 2.6)"/></g>`;
+}
+// The shrine's base, b px of it risen out of the floor: dark Purbeck marble with shelly flecks, a moulded cap and a plinth, a quatrefoil at each end with a lamp in it,
+// and two lines gilded on its face.
+const PGFLK=[...Array(62)].map((_,n)=>`<ellipse cx="${f(-138+276*hash(n,31))}" cy="${f(4+19*hash(n,32))}" rx="${f(.5+.9*hash(n,33))}" ry="${f(.4+.4*hash(n,34))}"/>`).join('');
+function pgBase(b,tq,lamp,l2){
+ if(b<=0)return '';
+ let s=`<g clip-path="url(#pgUp)"><g transform="translate(0 ${f(-b)})"><rect x="-142" y="0" width="284" height="${PGB}" fill="url(#pgPb)"/><g fill="#9a937f" opacity=".4">${PGFLK}</g>`+
+  `<rect x="-145" y="0" width="290" height="3.4" fill="#5d574d"/><path d="M-145 .5H145" stroke="#b3ab98" stroke-opacity=".6" stroke-width=".8"/><path d="M-142 3.9H142" stroke="#15130f" stroke-opacity=".6" stroke-width=".8"/>`+
+  `<rect x="-145" y="${PGB-3}" width="290" height="3" fill="#2a2723"/><path d="M-145 ${PGB-2.6}H145" stroke="#8c8574" stroke-opacity=".4" stroke-width=".6"/>`;
+ for(const x of[-128,128]){s+=`<g transform="translate(${x} 13.5)"><circle r="7.6" fill="none" stroke="#15130f" stroke-opacity=".5" stroke-width=".8"/><g fill="#15130f">${[[1,0],[-1,0],[0,1],[0,-1]].map(([a,c])=>`<circle cx="${f(a*2.9)}" cy="${f(c*2.9)}" r="3.2"/>`).join('')}</g>`;
+  if(lamp>0)s+=`<circle r="9" fill="#ffc35a" opacity="${f(.55*lamp)}" filter="url(#lglow)" style="mix-blend-mode:screen"/><circle cy="1" r="1.9" fill="#ffd27a" opacity="${f(lamp)}"/><path d="M0 -.6c-.8 -.8 -.6 -1.8 0 -2.8c.6 1 .8 2 0 2.8Z" fill="#fff4d8" opacity="${f(lamp)}"/>`;
+  s+='</g>'}
+ if(tq>0){const L2=l2<1?(1-seg(l2,0,.5)):0,N2=seg(l2,.5,1);
+  s+=`<g opacity="${f(tq)}">${svT(.5,12.1,'RUN 418 · MAIN · 86% PASSED',6.3,'#1a1712','letter-spacing=".8" font-weight="700"')}${svT(0,11.4,'RUN 418 · MAIN · 86% PASSED',6.3,'#e9c96e','letter-spacing=".8" font-weight="700"')}`+
+   (L2>0?`<g opacity="${f(L2)}">${svT(0,20.6,'12 passed · 2 waiting for approval',6.8,'#e9c96e','font-style="italic"')}</g>`:'')+(N2>0?`<g opacity="${f(N2)}">${svT(0,20.6,'waiting: deploy-preview · e2e-safari',6.8,'#f0d27e','font-style="italic"')}</g>`:'')+'</g>'}
+ return s+'</g></g>';
+}
+// A pilgrim, drawn about the foot at 24 px tall facing right: a hooded cloak with a scallop badge, a staff (not every one has one) and a taper held up in front.
+// kn kneels them (the cloak shortens and spreads), bk turns their back to us to face the shrine, lit kindles the taper, ring paints a red ring on the floor round a waiting one.
+function pgPil(x,y,sc,sx,o){
+ const hf=1-.27*o.kn,wf=1+.14*o.kn,B=-o.amp*Math.abs(Math.sin(o.ph))*1.1,sw=o.amp*Math.sin(o.ph)*.9,fo=1-o.bk,Y=v=>f(v*hf),L=o.lit;
+ let s=`<g transform="translate(${f(x)} ${f(y)}) scale(${f(sx*sc*100)/100} ${f(sc*100)/100})" opacity="${f(o.op)}">`;
+ if(o.ring>0)s+=`<ellipse cy=".4" rx="10" ry="3.4" fill="none" stroke="${LCOL.need}" stroke-width="1.2" stroke-dasharray="2.2 1.4" opacity="${f(o.ring)}"/>`;
+ if(L>0)s+=`<ellipse cx="5" cy=".6" rx="11" ry="3.2" fill="#ffcf6a" opacity="${f(.22*L)}" style="mix-blend-mode:screen"/>`;
+ s+=`<ellipse cy=".4" rx="${f(6.6*wf)}" ry="1.7" fill="#1d1408" opacity=".28"/><g transform="translate(0 ${f(B)})">`;
+ if(o.staff){const tx=f(-4.1+o.kn*1.4);s+=`<path d="M-4.6 .3L${tx} ${Y(-28)}" stroke="#4a3220" stroke-width="1.1" stroke-linecap="round"/><circle cx="${tx}" cy="${Y(-28.6)}" r="1.05" fill="#7d5531"/>`}
+ const h0=f(-6*wf+sw),h1=f(6*wf+sw);
+ s+=`<path d="M${h0} 0Q-6.6 ${Y(-9)} -4.2 ${Y(-15)}Q-4.8 ${Y(-22)} -.4 ${Y(-24.4)}Q4.6 ${Y(-23)} 4.4 ${Y(-16)}Q6.2 ${Y(-9)} ${h1} 0Q0 1.1 ${h0} 0Z" fill="${o.col}" stroke="#1d140c" stroke-width=".5"/>`+
+  `<path d="M.8 ${Y(-24)}Q4.6 ${Y(-23)} 4.4 ${Y(-16)}Q6.2 ${Y(-9)} ${h1} 0Q3.2 .9 1.6 .7Q2.2 ${Y(-12)} .8 ${Y(-24)}Z" fill="#000" opacity=".24"/>`+
+  `<path d="M-2.2 -2.6L-1.6 ${Y(-13)}M1.7 -2.4L1.3 ${Y(-12.5)}" stroke="#000" stroke-opacity=".2" stroke-width=".5" fill="none"/><path d="M-5.6 -1Q-5.9 ${Y(-9)} -3.9 ${Y(-15)}" stroke="#fff" stroke-opacity=".14" stroke-width=".7" fill="none"/>`+
+  `<path d="M-2.6 ${Y(-15.4)}l1.1 -1.7 1.1 1.7q-1.1 .5 -2.2 0Z" fill="#efe6cf"/>`;
+ if(fo>0)s+=`<g opacity="${f(fo)}"><path d="M4.3 ${Y(-15.6)}Q1.3 ${Y(-17.2)} 2.1 ${Y(-21.6)}Q3.6 ${Y(-22.8)} 4.7 ${Y(-21)}Z" fill="#1e140c"/><ellipse cx="3.6" cy="${Y(-18.4)}" rx=".85" ry="1.5" fill="#c69a72"/></g>`;
+ if(o.bk>0)s+=`<path d="M-.4 ${Y(-24.2)}Q-1 ${Y(-19)} -.2 ${Y(-15.4)}" stroke="#000" stroke-opacity="${f(.25*o.bk)}" stroke-width=".6" fill="none"/>`;
+ const tb=Y(-10.4),tt=Y(-18.6);
+ s+=`<circle cx="4.8" cy="${tb}" r="1" fill="#c69a72"/><path d="M5.2 ${tb}V${tt}" stroke="#efe2bf" stroke-width="1.3"/><path d="M5.2 ${tt}v-.9" stroke="#2a1d10" stroke-width=".4"/>`;
+ if(L>0){const fy=tt-1;s+=`<circle cx="5.2" cy="${f(fy-1.6)}" r="${f(6*L)}" fill="#ffcf6a" opacity="${f(.5*L)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`+
+  `<path d="M5.2 ${f(fy)}c${f(-1.3*L)} ${f(-1.2*L)} ${f(-1*L)} ${f(-2.8*L)} 0 ${f(-4.4*L)}c${f(L)} ${f(1.6*L)} ${f(1.3*L)} ${f(3.2*L)} 0 ${f(4.4*L)}Z" fill="#ffd27a"/>`+
+  `<path d="M5.2 ${f(fy)}c-.5 -.5 -.4 -1.2 0 -1.9c.4 .7 .5 1.4 0 1.9Z" fill="#fff6dc" opacity="${f(L)}"/>`}
+ return s+'</g></g>';
+}
+// Where a kneeling or standing pilgrim's flame is, for the spark passed from taper to taper.
+const pgFlame=(x,y,sc,sx,kn)=>[x+sx*sc*5.2,y+sc*(-18.6*(1-.27*kn)-3)];
+// An acolyte in a white alb, its apparel in the banner's colour, carrying a processional pole with a gilt cross and a swallowtailed banner (gonfalon), furled or open.
+function pgBear(x,y,sc,sx,o){
+ const B=-o.amp*Math.abs(Math.sin(o.ph))*1.1,sw=o.amp*Math.sin(o.ph)*.8,bw=lerp(1.8,8.8,o.open);
+ let s=`<g transform="translate(${f(x)} ${f(y)}) scale(${f(sx*sc*100)/100} ${f(sc*100)/100})" opacity="${f(o.op)}"><ellipse cy=".4" rx="6" ry="1.6" fill="#1d1408" opacity=".26"/><g transform="translate(0 ${f(B)})">`+
+  `<path d="M${f(-5.3+sw)} 0Q-5.8 -9 -3.8 -15.4Q-3.4 -18.2 .2 -18.4Q3.8 -18.2 4 -15.4Q5.8 -9 ${f(5.3+sw)} 0Q0 1 ${f(-5.3+sw)} 0Z" fill="#ece6d6" stroke="#5e5646" stroke-width=".5"/>`+
+  `<path d="M.9 -18.2Q3.8 -18.2 4 -15.4Q5.8 -9 ${f(5.3+sw)} 0Q3 .8 1.6 .6Q2.2 -9 .9 -18.2Z" fill="#6d6250" opacity=".22"/><path d="M-1.8 -2L-1.3 -12M1.6 -2L1.2 -11.5" stroke="#6d6250" stroke-opacity=".35" stroke-width=".45" fill="none"/>`+
+  `<path d="M${f(-4.9+sw*.9)} -2.6H${f(4.9+sw*.9)}L${f(5.1+sw)} -.9H${f(-5.1+sw)}Z" fill="${o.col}" opacity=".9"/><path d="M-2.6 -17.4Q.2 -15.6 3 -17.4" stroke="url(#gild)" stroke-width="1" fill="none"/>`+
+  `<circle cx=".6" cy="-20.6" r="2.5" fill="#c69a72" stroke="#5a3d22" stroke-width=".3"/><path d="M-1.8 -21Q-1.4 -23.4 .8 -23.3Q2.6 -23.1 2.9 -21.6Q1.4 -22.4 -.4 -21.8Z" fill="#3a2a1c"/>`+
+  `<path d="M4.4 -.5V-44.5" stroke="#8a6a32" stroke-width="1.1"/><circle cx="4.1" cy="-11.2" r=".9" fill="#c69a72"/><path d="M4.4 -44.5V-48.6M3 -47.2H5.8" stroke="url(#gild)" stroke-width=".9" fill="none"/>`+
+  `<path d="M3.8 -44H${f(5+bw)}" stroke="url(#gild)" stroke-width=".8"/><path d="M4.4 -43.6H${f(4.4+bw)}V-33.2L${f(4.4+bw*.78)} -30.6L${f(4.4+bw*.5)} -33.2L${f(4.4+bw*.22)} -30.6L4.4 -33.2Z" fill="${o.col}" stroke="#2a1a0a" stroke-width=".35"/>`;
+ if(o.open>.5){const q=seg(o.open,.5,1),c=f(4.4+bw/2);s+=`<g opacity="${f(q)}" fill="none"><path d="M${c} -41.4V-35.8M${f(c-2)} -39.6H${f(+c+2)}" stroke="url(#gild)" stroke-width=".9"/><path d="M4.4 -33.4H${f(4.4+bw)}" stroke="url(#gild)" stroke-width=".7" stroke-dasharray=".6 .6"/></g>`}
+ return s+'</g></g>';
+}
+// A spark carried in a low arc from one flame to the next.
+const pgSpark=(A,B,t)=>{const x=lerp(A[0],B[0],t),y=lerp(A[1],B[1],t)-10*Math.sin(Math.PI*t);return `<circle cx="${f(x)}" cy="${f(y)}" r="4" fill="#ffcf6a" opacity=".6" filter="url(#lglow)" style="mix-blend-mode:screen"/><circle cx="${f(x)}" cy="${f(y)}" r="1.1" fill="#fff6dc"/>`};
+function pgRender(el){
+ const svg=el.querySelector('.casing'),ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),P1=i>0,[w,h]=pgBox(g),{e1,e2}=pgK(g),cx=w/2,ox=cx-CW/2,yT=PGTOP*e1,FY=yT+CH+PGB*e1,dust=JOINS.buttress.dust;
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=f(h)+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='pg'){ms.dataset.key='pg';ms._b='';ms._d='';ms._bx=null;fx._s=null;
+  ms.innerHTML=`<defs>${PGDEFS}</defs><g class="pgback"></g><g class="ofac">${cas(0)}</g><g class="odyn"></g>`}
+ const bx=f(w)+'x'+f(h);if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',f(h));n.setAttribute('viewBox',`0 0 ${f(w)} ${f(h)}`)}}
+ ms.querySelector('.ofac').setAttribute('transform',`translate(${f(ox)} ${f(yT)})`);
+ const F=[];let sp='',e='';
+ // Pilgrims: they come out from behind the shrine, walk once round it, slow together into their places and kneel (the two waiting stand);
+ // lamps are lit in the base's quatrefoils and the flame is passed from taper to taper, right to left and over the two waiting.
+ if(P1||u>.1){const t1=P1?1:seg(u,.1,.72),E=pgE(t1),amp=clamp(t1*30)*clamp((1-E)*10),[rx,ry]=PGR[0],op=P1?1:seg(u,.1,.14),FL=[];
+  for(let j=0;j<14;j++){const s=lerp(pgSt1(j),pgEn1(j),E),a=pgAng(PGA[0],s)*D2R,x=rx*Math.cos(a),y=ry*Math.sin(a),wt=PGWAIT.includes(j),kk=Math.abs(j-6.5)-.5,
+    bk=P1?1:ease(seg(u,.72+.004*kk,.75+.004*kk)),kn2=wt?0:bk,n=PGK.indexOf(j),lit=wt?0:P1?1:seg(u,pgKs(n),pgKs(n)+.02),sc=pgSc(y),sx=lerp(clamp(-Math.sin(a)*4,-1,1),x<0?1:-1,bk);
+   FL[j]=pgFlame(x,y,sc,sx,kn2);
+   F.push([y,pgPil(x,y,sc,sx,{col:PGCL[j%7],staff:j%3!==1,kn:kn2,bk,lit,amp,ph:s/13,op,ring:wt?(P1?1:seg(u,.93,.97)):0})])}
+  if(!P1){for(let n=0;n<12;n++){const a=pgKs(n)-.011,b=pgKs(n);if(u>a&&u<b)sp+=pgSpark(n?FL[PGK[n-1]]:[128,-12.5],FL[PGK[n]],seg(u,a,b))}}}
+ // Acolytes: they come out from behind the shrine on the left with furled banners and go round the front the other way, five stopping each side;
+ // they turn to face the shrine and the banners unfurl, one per run on main, 409 at the left to 418 at the right.
+ if(P1&&u>.1){const t2=seg(u,.1,.68),E=pgE(t2),amp=clamp(t2*30)*clamp((1-E)*10),[rx,ry]=PGR[1],op=seg(u,.1,.14),tn=ease(seg(u,.68,.73));
+  for(let j=0;j<10;j++){const s=lerp(pgSt2(j),pgEn2(j),E),p=pgAng(PGA[1],s)*D2R,x=rx*Math.cos(p),y=-ry*Math.sin(p),sc=pgSc(y),sw=clamp(-Math.sin(p)*4,-1,1),
+    sx=lerp(sw,j<5?-1:1,tn),r=9-j,open=ease(seg(u,.72+.012*j,.78+.012*j));
+   F.push([y,pgBear(x,y,sc,sx,{col:PGBC[orSt(ORUN[r])],open,amp,ph:s/13,op})])}}
+ F.sort((A,B)=>A[0]-B[0]);
+ const fr=`translate(${f(cx)} ${f(FY)})`;
+ const back=`<g transform="${fr}">${e2>0?pgFloor(1,e2):''}${e1>0?pgFloor(0,e1):''}${F.filter(q=>q[0]<=0).map(q=>q[1]).join('')}</g>`;
+ const lamp=P1?1:seg(u,.77,.8),tq=P1?1:seg(u,.95,1),l2=P1?seg(u,.88,.98):0;
+ const d=`<g transform="${fr}">${pgBase(PGB*e1,tq,lamp,l2)}${F.filter(q=>q[0]>0).map(q=>q[1]).join('')}${sp}</g>`;
+ if(ms._b!==back){ms._b=back;ms.querySelector('.pgback').innerHTML=back}
+ if(ms._d!==d){ms._d=d;ms.querySelector('.odyn').innerHTML=d}
+ // Dust: where the base rises out of the floor, and round the rim of each pavement as it spreads.
+ if(!P1){const t=seg(u,.02,.16);if(t>0&&t<1)for(const x of[-130,0,130])e+=dust(cx+x,FY,t,4,10,900+x);
+  const t3=seg(u,.06,.16);if(t3>0&&t3<1)for(const a of[20,90,160])e+=dust(cx+PGF[0][0]*e1*Math.cos(a*D2R),FY+PGF[0][1]*e1*Math.sin(a*D2R),t3,3,8,910+a)}
+ else{const t3=seg(u,.04,.16);if(t3>0&&t3<1)for(const a of[15,60,120,165])e+=dust(cx+PGF[1][0]*e2*Math.cos(a*D2R),FY+PGF[1][1]*e2*Math.sin(a*D2R),t3,3,8,930+a)}
+ if(fx._s!==e){fx._s=e;fx.innerHTML=e}
+ // Displays: the facade keeps its own; the pilgrims and the banners take taps once they are still.
+ const v1=P1||u>.99,v2=P1&&u>.99;
+ for(const[id,v]of[['#ob1',v1],['#ob2',v2]]){const n=$(id);if(!v)n.style.display='none';else Object.assign(n.style,{display:'block',left:f(cx)+'px',top:f(FY)+'px'})}
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+yT)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+yT)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'pilgrims walking round it')+': 12 of 14 checks passed, 86% on run 418, 2 waiting for approval: deploy-preview and e2e-safari');
+ return true;
+}
+function pgPhase(){
+ const g=model.g,i=Math.min(1,Math.floor(g+1e-9)),u=clamp(g-i),up=model.mDir>0;let t;
+ if(i===0){const n=PGK.filter((_,k)=>u>=pgKs(k)+.02).length;
+  t=u<.14?(up?'Checks is raised onto a Purbeck marble base, and a pavement spreads round its foot':'the base sinks into the floor and the pavement draws in'):
+   u<.72?(up?'fourteen pilgrims come out from behind the shrine and walk once round it':'the pilgrims walk back round and go behind the shrine'):
+   u<.78?(up?'they kneel facing the shrine; the two waiting stand':'they get up off their knees'):
+   u<.95?(up?'lamps are lit in the base and the flame is passed from taper to taper, '+n+' of 12 lit':'the tapers are put out, '+n+' still lit'):(up?'the inscription is gilded on the base':'the inscription fades')}
+ else t=u<.14?(up?'an outer pavement spreads round the first':'the outer pavement draws in'):
+  u<.68?(up?'ten acolytes come out from behind the shrine with banners and go round the front the other way':'the acolytes go back round behind the shrine'):
+  u<.73?(up?'they turn to face the shrine':'they turn away'):u<.88?(up?'their banners unfurl, one per run on main':'their banners furl'):(up?'the base is lettered with the two waiting checks':'the names fade from the base');
+ return 'Checks · '+t;
+}
+MORPHS.pilgrims={label:'Pilgrims\' round',kind:'Orbit',sizes:[['facade','Facade',0,'a facade'],['shrine','Shrine',1,'a shrine with fourteen pilgrims round it'],['procession','Procession',2,'a shrine with a procession of banners round it']],ms:[8400,4600],
+ box:pgBox,dims:pgDims,sink:pgSink,render:pgRender,phase:pgPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks becomes a shrine: it is raised onto a marble base, a pavement spreads round it, and fourteen pilgrims walk once round it and kneel.':'A procession: ten acolytes with banners, one per run, come round the outer pavement the other way.'):(S[2]===0?'The pilgrims get up and walk back round behind the shrine, and the base sinks into the floor.':'The acolytes go back round behind the shrine, and the outer pavement draws in.'),
+ about:'A morph of the <b>Orbit</b> kind, which wire\'s orrery opened: the larger form is whatever goes round Checks, and what it is once it comes to rest. In gothic that is pilgrims round a saint\'s shrine. Shrines were raised on high bases so pilgrims could walk right round them (the ambulatory was built for it), and at Canterbury they wore the floor round Becket\'s shrine into a groove. Checks is the shrine and keeps its nameplate and display. <b>Shrine</b>: Checks is raised onto a base of dark Purbeck marble (shelly flecks, a moulded cap, a quatrefoil at each end), and a pavement spreads round its foot, seen from a little above: limestone laid in rings, a dark kerb, a band of red and green tesserae and the worn groove of the track, its far half behind the shrine. Fourteen pilgrims in hooded cloaks, with scallop badges, staffs and tapers, come out from behind the shrine in single file and walk sunwise once right round it, passing behind it and out again, then slow together into their places along the front, kneel and turn their backs to us to face it. Lamps are lit in the base\'s quatrefoils, and a spark carries the flame from taper to taper, right to left, over the two at the front centre: they are the two waiting checks, and they stand with unlit tapers in red rings on the floor while the other twelve kneel lit. The base is gilded RUN 418 · MAIN · 86% PASSED and 12 passed · 2 waiting for approval. Hover or tap a pilgrim to read its check, or the base for the run. <b>Procession</b>: an outer pavement spreads round the first, and ten acolytes in white albs come out from behind the shrine on the left with furled banners and go round the front the other way (the leader carries run 418, the last 409). Five stop at each end, turn to face the shrine, and their swallowtailed banners unfurl one after another, one per run on main: green all passed, amber 13, red 12. The base\'s second line becomes the two waiting by name. Hover or tap a banner to read its run. The pavement spreads below Checks\'s old foot, so the shrine rises only by the height of its base. <b>Shrinking</b> plays it back: the banners furl and the acolytes go back round, the tapers go out, the pilgrims get up and walk back behind the shrine, and the base sinks into the floor. Pick a size, press M, or scrub the slider. Checks moves clear of the pair when there is room; when there isn\'t, the pair rises out of its way and settles back when Checks is smaller again. Shading takes it back to the facade first. Nothing moves at rest.'};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30,roll:30,cwt:30,scr:30,lace:30,esc:30,fortune:30},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
@@ -7898,7 +8070,7 @@ $('#grow').oninput=e=>{if(drag)cancelDrag();
  const b=cBase(),v=e.target.value/100;if(!slideDir)slideDir=v>=model.g?1:-1;model.mDir=slideDir;model.g=v;
  const S=SZ().find(x=>x[2]===v);model.size=S?S[0]:null;placeBase(b.x,b.y);
  // Scrubbed bigger over the pair, the pair rises out of the way; scrubbed back, it comes down.
- const[w,h]=model.cBox,c=cBase();liftTo(clearLift(w,h,c.x,c.y),450);render()};
+ const[w,h]=model.cBox,c=cFoot();liftTo(clearLift(w,h,c.x,c.y),450);render()};
 /* Triforium lights: hover, focus or tap one to read its check. */
 CHK.forEach((n,j)=>{const b=document.createElement('button'),need=j>11,t=`Check ${j+1} of 14 · ${n} · ${need?'waiting for your approval':'passed'}`;
  b.style.cssText=`left:${triX(j)-7}px;top:157px;width:14px;height:35px`;b.setAttribute('aria-label',t);b.dataset.tip=t;b.dataset.c=need?'need':'pass';
@@ -7934,6 +8106,11 @@ CHK.forEach((n,j)=>{const[x,y]=TFJ[j];orTipBtn('#tf1 .tri',`Roundel ${j+1} of 14
 orTipBtn('#tf1 .tri','The circle · run 418 on main · 12 of 14 passed · 86%','run',`left:${TFM-40}px;top:${f(TFO[1]-40)}px;width:80px;height:80px`);
 ORUN.forEach((v,r)=>{const[x,y]=TFJ2[r];orTipBtn('#tf2 .tri',`Run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${x-8}px;top:${y-8}px;width:16px;height:16px`)});
 orTipBtn('#tf2 .tri','Pass rate · 86% on run 418 · 12 of 14 passed','pass','left:413px;top:124px;width:22px;height:134px;border-radius:11px');
+/* Pilgrims' round: hover, focus or tap a pilgrim to read its check, the base for the run, or in the procession a banner for its run. The layers sit on the floor's centre. */
+for(let j=0;j<14;j++){const[x,y]=pgRest1(j),k=pgCk(j),wt=PGWAIT.includes(j),sc=pgSc(y);
+ orTipBtn('#ob1 .tri',`Pilgrim ${k+1} of 14 · ${CHK[k]} · ${wt?'standing with an unlit taper, waiting for your approval':'kneeling with a lit taper, passed'}`,wt?'need':'pass',`left:${f(x-8)}px;top:${f(y-(wt?25:20)*sc)}px;width:16px;height:${f((wt?25:20)*sc+2)}px`)}
+orTipBtn('#ob1 .tri','The shrine\'s base · run 418 on main · 12 of 14 passed · 86% · waiting: deploy-preview and e2e-safari','run','left:-118px;top:-26px;width:236px;height:26px');
+ORUN.forEach((v,r)=>{const[x,y,sx]=pgRest2(9-r),sc=pgSc(y);orTipBtn('#ob2 .tri',`Banner · run ${409+r} · ${v} of 14 checks passed`+(r===9?' · the current run':''),orSt(v),`left:${f(sx>0?x+3*sc:x-14*sc)}px;top:${f(y-45*sc)}px;width:${f(11*sc)}px;height:${f(16*sc)}px`)});
 /* Clerestory bars: the last ten runs as lancets, height by checks passed */
 $('#bv2 .rb').innerHTML=`<svg width="86" height="24" viewBox="0 0 86 24">${[14,14,13,14,12,14,14,13,14,12].map((v,i)=>{const x=i*8.6+.5,hh=4+18*(v-10)/4;return `<path d="M${f(x)} 24V${f(24-hh+4)}Q${f(x)} ${f(24-hh)} ${f(x+3)} ${f(24-hh-1.5)}Q${f(x+6)} ${f(24-hh)} ${f(x+6)} ${f(24-hh+4)}V24Z" fill="${v===14?'#25603f':v===13?'#b8861c':'#a3222f'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
 $('#scrub').oninput=e=>{++anim;model.busy=false;model.glow=0;stopAngle();
@@ -8013,7 +8190,7 @@ function endDrag(){
  if(d.hit){if(J().letGo(d))doSeparate();else tween(model.jt,1,320,setJt).then(ok=>{if(ok){model.path=null;model.dir=1;say(J().say.back||(model.join==='rose'?'The rose settles back; still joined.':'The keystone drops back into place; still joined.'))}});return}
  // A pair put somewhere by hand stays there; a Checks moved off the pair lets it back down (never further).
  if(d.id!=='c'){if(['a','b'].some(k=>d.saved[k].x!==model[k].x||d.saved[k].y!==model[k].y))model.lift=model.liftGoal=0;else liftTo(model.liftGoal,450)}
- else if(model.lift>0){const[w,h]=model.cBox,c=cBase();liftTo(Math.min(model.lift,clearLift(w,h,c.x,c.y)),450)}
+ else if(model.lift>0){const[w,h]=model.cBox,c=cFoot();liftTo(Math.min(model.lift,clearLift(w,h,c.x,c.y)),450)}
  const ready=d.state==='ready';
  if(ready){startJoinFrom({a:0,b:0},.55);model.ready=true;model.path=null;doJoin(d.id==='b'?'a':'b',1500)}else{model.glow=0;render()}
 }
@@ -8037,7 +8214,7 @@ $$('[data-drag]').forEach(b=>b.addEventListener('keydown',e=>{
  else{const m=model[id],w=W;m.x=clamp(m.x+k[0],14,1200-w-14);m.y=clamp(m.y+k[1],TOP,bottom)}
  // As with the pointer: a pair moved by hand stays put; a Checks moved off the pair lets it back down.
  if(id!=='c'){if([model.a.x,model.a.y,model.b.x,model.b.y]+''!==was){stopLift();model.lift=model.liftGoal=0}}
- else if(model.lift>0){const[w,h]=model.cBox,c=cBase();liftTo(Math.min(model.lift,clearLift(w,h,c.x,c.y)),450)}
+ else if(model.lift>0){const[w,h]=model.cBox,c=cFoot();liftTo(Math.min(model.lift,clearLift(w,h,c.x,c.y)),450)}
  render();
 }));
 
