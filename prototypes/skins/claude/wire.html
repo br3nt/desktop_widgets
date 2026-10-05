@@ -3750,7 +3750,7 @@ function dialSvg(c){
 }
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
-  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil, ingot mould, rolling mill, honeycomb, verdigris, saw cut, muscle wire) are built and added here.'},
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil, ingot mould, rolling mill, honeycomb, verdigris, saw cut, muscle wire, afterglow) are built and added here.'},
  strand:{label:'Bead strand',kind:'Distil',ms:1150,ownStrip:true,
   about:'The pendant comes apart into a necklace. The plate and stone fade, the copper frame squeezes flat into a single strung wire, and the beads slide in along it from both clasps, centre beads first, each clicking into place. A flat slab bead carries the name and a cabochon carries the one key value. The round stones between them are the statuses: <b>amber</b> running, <b>labradorite</b> idle or paused, <b>carnelian</b> needs you, <b>malachite</b> passed. Jarvis strings one amber per running agent, GitDiscuss one carnelian per decision, Checks a seed bead per check. Pause a widget and its stones turn to labradorite. The eye loops stay on the ends, so shaded pendants still link by jump ring into one longer strand.',
   sayOn:'Shaded: the frame flattens into a wire and the beads slide on, one stone per status.',
@@ -3868,7 +3868,12 @@ const SHADES={
   about:'The Shrink shade kind (felt\'s fulled, hollow\'s pinned specimen, elven\'s dew silk, gothic\'s fired clay): nothing is folded, cut or stowed; the material itself gets smaller. Done in wire with nitinol, the shape-memory alloy of memory-wire bracelets and of <i>muscle wire</i>, which shortens when a current warms it: set into a shape and then pulled straight, it goes back to that shape when it is warmed. (The steel coil of the Memory wire morph only springs back; this wire has to be warmed.) The pendant\'s frame turns out to be nitinol, set long and straight, remembering tight coils. The display goes dark into its glass and the nameplate fades. Two crocodile clips, red and black on their leads, drop onto the top wire and bite on with a blue spark. A current runs round the frame, bright motes chasing from clip to clip, and the wire warms. Then it pulls back in three fits, each smaller than the last: the frame flares hot, jerks shorter with a shiver, and its sides take up the length they lose as coils, a wave first, then loops, then a tight coil round each end like a telephone cord, while the glass squeezes down with it and the corners glint. Each fit leaves the next heat colour in the wire, as a warmed wire\'s oxide thickens: straw, then purple, then blue. The current goes off, the clips let go and lift away, and the name and the one key value come up in the glass, with a status stone set in its right end that kindles: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. A glint runs along the top wire. The frame keeps its heat colours. Nothing moves at rest, unshading plays it back, and the join ends stay on the pendant\'s ends, so shrunk pendants still join.',
   sayOn:'Shaded: crocodile clips put a current through the nitinol frame, and it pulls itself up into coils in three fits, heat colours blooming along it; the name and value come up in the glass.',
   hk:st=>clamp(memQ(st)),show:st=>1-ease(seg(st,0,.12)),grip:st=>1-ease(seg(st,0,.12)),
-  draw(id,w,h,small,st){return memoryWire(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return memoryWire(id,w,h,small,st)}},
+ glow:{label:'Afterglow',kind:'Wane',ms:4600,ownStrip:true,hs:48,chs:42,
+  about:'The Wane shade kind (elven\'s wane opened the round: nothing is folded, cut, stowed or laid over the casing; the light goes, and the strip is what stays lit; then gothic\'s last light and hollow\'s dark lantern) done in wire. The light that goes is a wire\'s own: a bare filament bulb, whose coiled tungsten filament is the finest wire on the bench, and what stays lit is luminous paint, the way a watchmaker paints the hands and numerals of a dial so they glow after the lamp is off. The display goes dark into its glass and the nameplate fades, and the glass and its coiled bezel fade from the plate. A bulb is let down over the pendant on a twisted cloth flex and swings still; its filament lights white-hot and throws a warm pool over the copper, and in it the name and the one key value show on the plate in pale paint, charging. Then the bulb dims. Its filament cools through yellow and orange to a dull red, its pool draws in toward it so the dark rises from the foot and stops just under the paint, and the pendant closes up under the dark. As the filament goes out the paint glows green, brightest just after the light has gone, then settles, lighting the plate faintly round it, and the dark bulb is drawn back up. Last, a luminous pip at the right end kindles in the status colour: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. Nothing moves at rest, unshading switches the bulb back on, and the join ends stay on the pendant\'s ends, so shaded pendants still join.',
+  sayOn:'Shaded: a filament bulb is let down over the pendant, dims through orange to red and goes out, and the name and value painted on the plate in luminous paint glow on in the dark.',
+  hk:st=>ease(seg(st,.56,.78)),show:st=>1-ease(seg(st,0,.12)),grip:st=>1-ease(seg(st,0,.12)),
+  draw(id,w,h,small,st){return afterglow(id,w,h,small,st)}}
 };
 // The strip height while shaded: most shades close to HS / CHS, Hang shades want a little room below the chain.
 const stripH=small=>{const o=SHADES[model.shade];return small?(o.chs||CHS):(o.hs||HS)};
@@ -4735,6 +4740,73 @@ function memoryWire(id,w,h,small,st){
  s+=glassLabel(id,small,rmWin(small,clamp(q)),seg(st,.82,.87),seg(st,.85,.9),seg(st,.88,.92),seg(st,.92,.97));
  const gt=seg(st,.93,1);if(gt>0&&gt<1)s+=sparkle(lerp(5+r,w-5-r,ease(gt)),5,Math.sin(Math.PI*gt)*.4);
  return jx?`<g transform="translate(${f(jx)} 0)">${s}</g>`:s;
+}
+
+/* ---------- Afterglow pieces ---------- */
+// A bare filament bulb is let down over the pendant. Its coiled filament lights white-hot while the dial painted on the plate charges in
+// its light; then it cools through orange to red and goes out, its pool drawing in toward it so the dark rises from the foot, and the
+// luminous paint is what stays lit. agT is the filament's heat (1 white-hot, 0 out); its light falls off faster, as agT squared.
+const agT=st=>ease(seg(st,.12,.17))*(1-ease(seg(st,.3,.86)));
+const AG_RAMP=[[0,'#2a0e06'],[.2,'#b3301a'],[.45,'#ff8a34'],[.72,'#ffd27e'],[1,'#fff7e6']];
+function agCol(T){for(let i=1;i<AG_RAMP.length;i++){const [a,ca]=AG_RAMP[i-1],[b,cb]=AG_RAMP[i];if(T<=b)return hexMix(ca,cb,clamp((T-a)/(b-a)))}return AG_RAMP[AG_RAMP.length-1][1]}
+// The filament: a fine coil sagging between two supports, as in a squirrel-cage lamp.
+const AG_FIL=(()=>{let d='';for(let i=0;i<=63;i++){const t=i/63,a=t*2*Math.PI*7;d+=(i?'L':'M')+f(lerp(-5.6,5.6,t)+.8*Math.cos(a))+' '+f(16.5+3.2*Math.sin(Math.PI*t)+1.1*Math.sin(a))}return d})();
+// The bulb hung from its lampholder at (0,0), the flex running up out of sight; T is the filament's heat, I its light.
+function agBulb(T,I){
+ const c=agCol(T),cold=hexMix('#4a3a30',c,clamp(T*10)),glass='M-3.6 6C-3.6 10 -10 12 -10 19C-10 25.5 -5.5 30 0 30C5.5 30 10 25.5 10 19C10 12 3.6 10 3.6 6Z';
+ let s=`<path d="M0 -170V-8" stroke="#1a0f08" stroke-width="3.6"/><path d="M0 -170V-8" stroke="#5e4029" stroke-width="2.2" stroke-dasharray="1.5 1.7"/>`;
+ if(I>.005)s+=`<circle cx="0" cy="19" r="${f(16+12*I)}" fill="${c}" opacity="${f(.6*I)}" filter="url(#soft)"/>`;
+ s+=`<path d="${glass}" fill="${hexMix('#1c1612',c,clamp(T*10))}" fill-opacity="${f(.2+.55*I)}" stroke="#ece6da" stroke-opacity=".4" stroke-width=".6"/>`+
+  `<path d="M0 6V12M-1.2 12L-5.6 16.5M1.2 12L5.6 16.5" stroke="#8a8a84" stroke-width=".5" fill="none"/>`;
+ if(T>.01)s+=`<path d="${AG_FIL}" fill="none" stroke="${c}" stroke-width="2.6" opacity="${f(.75*Math.sqrt(I))}" filter="url(#soft)"/>`;
+ s+=`<path d="${AG_FIL}" fill="none" stroke="${cold}" stroke-width=".75"/>`+
+  `<path d="M-6.6 15Q-6.9 22 -3.6 26" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width=".9" stroke-linecap="round"/>`+
+  `<rect x="-5.5" y="-9" width="11" height="10" rx="1.6" fill="url(#cb-brass)" stroke="#3a2408" stroke-width=".7"/><path d="M-5.5 -4.5H5.5" stroke="#3a2408" stroke-width=".5" opacity=".6"/>`+
+  `<rect x="-4.2" y="1" width="8.4" height="5.4" fill="#b9b2a2" stroke="#4a443a" stroke-width=".5"/><path d="M-4.2 2.6L4.2 2M-4.2 4.4L4.2 3.8" stroke="#4a443a" stroke-width=".5"/>`;
+ return s;
+}
+function afterglow(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const T=agT(st),I=T*T,c=agCol(T),R0=small?20:26,r=Math.min(R0,(h-10)/2),bx=w/2,cy0=-2;
+ // The paint: shown in the lamplight (p), glowing as the dark comes (L), brightest just after the filament goes out, then settling.
+ const p=ease(seg(st,.22,.3)),L=ease(seg(st,.34,.84))*(1+.3*Math.sin(Math.PI*seg(st,.8,1))),Lc=clamp(L),Lh=Math.min(1,.75*L);
+ // The dark covers the whole frame wire, its outline and highlight included, not just its centreline.
+ const shell=rrect(2.5,2.5,w-5,h-5,r+2.5);
+ let s=casing(w,h,small,false,true)+`<clipPath id="agc-${id}"><path d="${shell}"/></clipPath>`;
+ // The display goes dark into its glass, then the glass and its coiled bezel fade from the plate, leaving the painted dial.
+ const go=1-seg(st,.12,.24);
+ if(go>0)s+=`<g opacity="${f(go)}">${rmGlass(small,0,seg(st,.02,.1))}</g>`;
+ // The warm pool under the bulb, coloured by the filament.
+ if(I>.005)s+=`<radialGradient id="agw-${id}" gradientUnits="userSpaceOnUse" cx="${f(bx)}" cy="-6" r="${small?120:150}" gradientTransform="translate(${f(bx)} -6) scale(1.8 1) translate(${f(-bx)} 6)"><stop stop-color="${c}" stop-opacity=".6"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient>`+
+  `<rect width="${w}" height="${f(h)}" fill="url(#agw-${id})" opacity="${f(.55*I)}" clip-path="url(#agc-${id})"/>`;
+ // As the bulb dims its pool draws in toward it: the dark rises from the foot and stops just under the paint. Then all of it dims.
+ const fr=ease(seg(st,.3,.6)),ry=lerp(small?112:190,small?44:50,fr);
+ if(fr>0)s+=`<radialGradient id="agd-${id}" gradientUnits="userSpaceOnUse" cx="${f(bx)}" cy="${cy0}" r="${f(ry)}" gradientTransform="translate(${f(bx)} ${cy0}) scale(8 1) translate(${f(-bx)} ${-cy0})"><stop offset=".72" stop-color="#04070b" stop-opacity="0"/><stop offset="1" stop-color="#04070b" stop-opacity=".9"/></radialGradient>`+
+  `<rect width="${w}" height="${f(h)}" fill="url(#agd-${id})" clip-path="url(#agc-${id})"/>`;
+ const dim=st<.3?0:.82*(1-I);
+ if(dim>0)s+=`<path d="${shell}" fill="#04070b" opacity="${f(dim)}"/>`;
+ // The painted dial: name, a dot, the value, laid out as the other strips are, on the plate where the strip will be.
+ if(p>0){
+  const G=rmWin(small,1),ty=G.y+G.ht/2,tx=G.x+10,Lb=wsLabel(id,small),nw=measure(Lb.name,`italic bold ${Lb.fs}px Georgia,serif`),mix=(a,b)=>hexMix(a,b,Lc);
+  const txt=(nf,vf,wf,ex='')=>`<text y="${f(ty)}" dominant-baseline="central"${ex}><tspan x="${f(tx)}" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="${Lb.fs}" fill="${nf}">${Lb.name}</tspan>`+
+   `<tspan x="${f(tx+nw+16)}" font-family="Georgia,serif" font-weight="bold" font-size="${Lb.vs}" fill="${vf}">${Lb.num}</tspan>`+(Lb.word?`<tspan dx="4" font-family="Georgia,serif" font-style="italic" font-size="${Lb.ws}" fill="${wf}">${Lb.word}</tspan>`:'')+'</text>';
+  // The glow lights the plate faintly round the paint.
+  if(L>.01)s+=`<ellipse cx="${f((tx+G.x+G.wd)/2)}" cy="${f(ty)}" rx="${f(G.wd*.55)}" ry="${f(G.ht*.9)}" fill="#3dffa0" opacity="${f(.16*L)}" filter="url(#soft)" clip-path="url(#agc-${id})"/>`+
+   `<g opacity="${f(Lh)}" filter="url(#soft)">${txt('#39ff9a','#39ff9a','#39ff9a')}</g>`;
+  s+=`<g opacity="${f(p*clamp(Math.max(.6,I,L)))}">${txt(mix('#e6e2bc','#d2ffe2'),mix('#efe9c4','#f0fff4'),mix('#c9c19a','#93dcb0'),` stroke="#1a0d06" stroke-opacity="${f(.5*(1-Lc))}" stroke-width=".5" paint-order="stroke"`)}`+
+   `<circle cx="${f(tx+nw+8)}" cy="${f(ty)}" r="1.4" fill="${mix('#e6e2bc','#bfffd6')}"/></g>`;
+  // The luminous pip at the right end, pale paint until it kindles in the status colour.
+  const R=Math.min(small?7:6,(G.ht-5)/2-1),sx=G.x+G.wd-R-7,k=ease(seg(st,.88,.96)),sc=RIM_GLOW[Lb.stone];
+  s+=`<g opacity="${f(p)}"><circle cx="${f(sx)}" cy="${f(ty)}" r="${f(R+1.3)}" fill="#120906"/>`+wire(circ(sx,ty,R+.7),'dim',.8)+
+   `<circle cx="${f(sx)}" cy="${f(ty)}" r="${f(R-.4)}" fill="${hexMix('#d8d4b0',sc,k)}" opacity="${f(clamp(Math.max(.55,I,L)))}"/></g>`;
+  if(k>0){const bump=Math.sin(Math.PI*k);
+   s+=`<circle cx="${f(sx)}" cy="${f(ty)}" r="${f(R*2.2)}" fill="${sc}" opacity="${f((Lb.stone==='lab'?.15:.4)*k+.3*bump)}" filter="url(#soft)"/><circle cx="${f(sx-R*.3)}" cy="${f(ty-R*.3)}" r="${f(R*.35)}" fill="#fff" opacity="${f(.45*k)}"/>`}
+ }
+ // The bulb: let down on its flex, a few swings dying away as it lights, then drawn back up dark.
+ const dn=ease(seg(st,.03,.12)),up=ease(seg(st,.88,.96)),bo=seg(st,.03,.07)*(1-seg(st,.92,.96));
+ if(bo>0){const u=seg(st,.08,.32),sw=u>0?4*Math.sin(u*Math.PI*5)*(1-u):0,by=-36-110*(1-dn)-120*up;
+  s+=`<g opacity="${f(bo)}" transform="translate(${f(bx)} ${f(by)}) rotate(${f(sw)} 0 -170)">${agBulb(T,I)}</g>`}
+ return s;
 }
 
 /* ---------- Honeycomb pieces ---------- */
