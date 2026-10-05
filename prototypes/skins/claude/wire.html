@@ -3244,7 +3244,7 @@ function dialSvg(c){
 }
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
-  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil, ingot mould, rolling mill, honeycomb, verdigris) are built and added here.'},
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil, ingot mould, rolling mill, honeycomb, verdigris, saw cut) are built and added here.'},
  strand:{label:'Bead strand',kind:'Distil',ms:1150,ownStrip:true,
   about:'The pendant comes apart into a necklace. The plate and stone fade, the copper frame squeezes flat into a single strung wire, and the beads slide in along it from both clasps, centre beads first, each clicking into place. A flat slab bead carries the name and a cabochon carries the one key value. The round stones between them are the statuses: <b>amber</b> running, <b>labradorite</b> idle or paused, <b>carnelian</b> needs you, <b>malachite</b> passed. Jarvis strings one amber per running agent, GitDiscuss one carnelian per decision, Checks a seed bead per check. Pause a widget and its stones turn to labradorite. The eye loops stay on the ends, so shaded pendants still link by jump ring into one longer strand.',
   sayOn:'Shaded: the frame flattens into a wire and the beads slide on, one stone per status.',
@@ -3352,7 +3352,12 @@ const SHADES={
   about:'The Weather shade kind (gothic\'s ruin opened the round: nothing is folded, stowed or set; time passes over the casing and the strip is what is left) done in wire, from old copper jewellery left out of doors: tarnish, verdigris, crizzled glass and a cobweb. The display goes dark into its glass and the nameplate fades. The copper flushes rose, then browns and darkens. Green verdigris blooms where water sits: along the foot first, then in the coil bands, the scroll curls and the bezel coils, and rain running down the face draws green stains down from each band and from under the bezel. The glass crizzles, going milky and crazed. Then the foot, where the rain gathered, rots away and drops as green powder, and the frame closes up behind it into a strip. The bezel has corroded loose: the milky glass tips forward out of its setting in one piece and falls away, showing the brass backplate, where the name and the one key value are engraved; the patina settles into the letters and darkens them, the way antiqued jewellery reads. A spider spins a small web in the corner between the curl and the glass, and dew beads on it. Last a low sun runs along the strip, the dew glints, and the cabochon set in the plate, the one thing time does not touch, kindles as the status: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. Nothing moves at rest, unshading runs time backwards, and the join ends stay on the pendant\'s ends, so weathered pendants still join.',
   sayOn:'Shaded: the copper tarnishes and grows verdigris in the rain, the foot rots away, the crizzled glass falls out of its setting, and the patina darkens the name and value engraved behind it.',
   hk:st=>ease(seg(st,.44,.66)),show:st=>1-ease(seg(st,0,.12)),grip:st=>1-ease(seg(st,0,.12)),
-  draw(id,w,h,small,st){return verdigris(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return verdigris(id,w,h,small,st)}},
+ saw:{label:'Saw cut',kind:'Cut',ms:4600,ownStrip:true,hs:64,chs:54,
+  about:'A new shade kind, Cut: the casing is cut down to the strip. Nothing is folded, flattened, stowed or worn away; what isn\'t needed is cut out and falls away, and what is left is closed up and joined. Built from the jeweller\'s piercing saw, a steel frame holding a blade so fine it cuts sheet, wire and glass alike, and from the way a piece is shortened at the bench: cut a band out, close the gap, bind the joint. The display goes dark into its glass and the nameplate fades. The saw drops onto the pendant and cuts straight across it, the blade stroking up and down, a dark kerf opening behind it and bright filings falling below. On the large pendants it makes four cuts, one after another, turned round at the end of each: above the glass, through the glass twice, and above the foot; on Checks, whose glass runs nearer its foot, two. Then the saw lifts away, and the bands between the cuts tip toward you and drop out, so for a moment the stage shows through the gaps. The pieces left close up: the top cap with its scroll curls, a slice of the glass, and the foot with its corners. A spark jumps at each joint of the frame as they meet, and the bright seams dull. A hot point lays a new bezel wire along each cut edge of the glass, coiled like the rest, and each joint of the frame is bound with three turns of fine wire, hot as they go on. The name and the one key value come up in the slice of glass, and a status stone is pressed into its right end and kindles: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. Every cut misses the scroll curls and the foot band, so the strip is the same pendant, only shorter. Nothing moves at rest, unshading puts the bands back, and the join ends stay on the pendant\'s ends, so cut pendants still join.',
+  sayOn:'Shaded: a piercing saw cuts bands out of the pendant, they drop away, and the pieces left close up and are bound, with the name and value in the slice of glass.',
+  hk:st=>ease(seg(st,.62,.78)),show:st=>1-ease(seg(st,0,.12)),grip:st=>1-ease(seg(st,0,.12)),
+  draw(id,w,h,small,st){return sawCut(id,w,h,small,st)}}
 };
 // The strip height while shaded: most shades close to HS / CHS, Hang shades want a little room below the chain.
 const stripH=small=>{const o=SHADES[model.shade];return small?(o.chs||CHS):(o.hs||HS)};
@@ -4029,6 +4034,123 @@ function verdigris(id,w,h,small,st){
  if(gx>-999)s+=`<linearGradient id="vgs-${id}" gradientUnits="userSpaceOnUse" x1="${f(gx-40)}" y1="0" x2="${f(gx+40)}" y2="0"><stop stop-color="#fff0cc" stop-opacity="0"/><stop offset=".5" stop-color="#fff0cc" stop-opacity=".3"/><stop offset="1" stop-color="#fff0cc" stop-opacity="0"/></linearGradient><path d="${outer}" fill="url(#vgs-${id})"/>`;
  // A glint where the glass breaks loose.
  if(gf>0&&gf<.2)s+=sparkle(G.x+G.wd*.3,G.y+1,Math.sin(Math.PI*gf/.2)*.5);
+ return s;
+}
+
+/* ---------- Saw cut pieces ---------- */
+// The pendant at full height is sawn across at SC_CUT. The bands between alternate cuts come out and the pieces left close up:
+// on the large pendants the top cap (0-22), a slice of the glass (53-73) and the foot (108-130), a 64 px strip; on Checks, whose glass
+// runs nearer its foot, the top cap (0-18) and everything from 42 down, a 54 px strip. Every cut misses the scroll curls and the foot band,
+// and crosses the frame where its corners have barely begun to turn, so the steps at the joints are small enough for a binding to cover.
+// (On Checks the cut at 42 also goes through the side coil bands; the half-turns left sit under the new binding at that joint.)
+const SC_CUT={false:[22,53,73,108],true:[18,42]},scCo={};
+function scGeo(small){
+ const c=SC_CUT[small],full=small?CH:H,ys=[-40,...c,full+40],keep=[],gone=[];
+ for(let i=0;i<ys.length-1;i++)(i%2?gone:keep).push([ys[i],ys[i+1]]);
+ // How far each kept piece rises when the gaps close: the height of every band taken out above it.
+ let up=0;keep.forEach((k,i)=>{if(i)up+=gone[i-1][1]-gone[i-1][0];k.up=up});
+ const b=small?[14,22,220,44,9]:[43,29,304,68,10],seams=keep.slice(1).map(k=>k[0]-k.up);
+ // The glass left in the strip (from the piece holding most of it), and the cut edges that cross it, where a new bezel wire is laid.
+ let kg=keep[0],ov=-1;keep.forEach(k=>{const o=Math.min(k[1],b[1]+b[3])-Math.max(k[0],b[1]);if(o>ov){ov=o;kg=k}});
+ const G={x:b[0],y:Math.max(kg[0],b[1])-kg.up,wd:b[2]};G.ht=Math.min(kg[1],b[1]+b[3])-kg.up-G.y;
+ const edges=[];keep.forEach(k=>{for(const y of [k[0],k[1]])if(y>b[1]+1&&y<b[1]+b[3]-1)edges.push(y-k.up)});
+ return{c,full,keep,gone,b,seams,G,edges};
+}
+// A jeweller's piercing saw at the blade's middle, its frame trailing behind the cut (dx 1 trails left, -1 right; between, it is being
+// turned round) and its walnut handle under the back of the frame.
+function scSaw(dx,sk){
+ const bt=-30,bb=30,xb=-52,hd=`M${xb} ${bb+3}L${xb-7} ${bb+40}`;
+ const frame=`M0 ${bt}H${xb+7}Q${xb} ${bt} ${xb} ${bt+7}V${bb-7}Q${xb} ${bb} ${xb+7} ${bb}H0`;
+ let s=`<g transform="scale(${f(dx*sk*100)/100} ${sk})"><g transform="translate(${f(3*dx)} 4)" opacity=".24" fill="none" stroke="#000" stroke-linecap="round"><path d="${frame}" stroke-width="4.5"/><path d="${hd}" stroke-width="9.5"/></g>`;
+ s+=wire(`M0 ${bt+2}V${bb-2}`,'steel',.8)+`<path d="M0 ${bt+3}V${bb-3}" stroke="#20282c" stroke-width=".6" stroke-dasharray=".5 1.1" opacity=".8"/>`+wire(frame,'steel',2.6);
+ s+=`<path d="${hd}" stroke="#140a04" stroke-width="9.5" stroke-linecap="round"/><path d="${hd}" stroke="#7b4a26" stroke-width="7" stroke-linecap="round"/><path d="M${xb-1.6} ${bb+7}L${xb-7.6} ${bb+37}" stroke="#d29a6a" stroke-opacity=".5" stroke-width="1.5" stroke-linecap="round"/>`+
+  `<rect x="${xb-4.6}" y="${bb+1}" width="9.2" height="5" rx="1.6" fill="url(#cb-brass)" stroke="#2a1d08" stroke-width=".7" transform="rotate(10.7 ${xb} ${bb+3.5})"/>`;
+ // Brass clamps hold the blade at both ends, each with a knurled thumbscrew on the frame side.
+ for(const y of [bt,bb])s+=`<rect x="-3.2" y="${y-3}" width="6.4" height="6" rx="1.4" fill="url(#cb-brass)" stroke="#2a1d08" stroke-width=".7"/><circle cx="-6.5" cy="${y}" r="2.6" fill="url(#cb-brass)" stroke="#2a1d08" stroke-width=".7"/><path d="M-7.8 ${y-1.6}V${y+1.6}M-6.5 ${y-2}V${y+2}M-5.2 ${y-1.6}V${y+1.6}" stroke="#4a3010" stroke-width=".5"/>`;
+ return s+'</g>';
+}
+// Where the saw is at st: dropping onto the first cut line, sawing each line in turn (alternate lines the other way, turned round
+// between them), then lifting away. A[i]..B[i] is the window for cut i.
+function scSawAt(st,g,w){
+ const n=g.c.length,P=.38/n,A=i=>.1+i*P,B=i=>.1+i*P+.84*P,X0=i=>i%2?w+6:-6,X1=i=>i%2?-6:w+6,D=i=>i%2?-1:1;
+ if(st<A(0))return{x:X0(0),y:g.c[0]-60*(1-ease(seg(st,.04,A(0)))),dx:1,op:seg(st,.04,.07),cut:false,A,B,X0,X1};
+ for(let i=0;i<n;i++){
+  if(st<=B(i))return{x:lerp(X0(i),X1(i),seg(st,A(i),B(i))),y:g.c[i],dx:D(i),op:1,cut:true,i,A,B,X0,X1};
+  if(i<n-1&&st<A(i+1)){const e=ease(seg(st,B(i),A(i+1)));return{x:X1(i),y:lerp(g.c[i],g.c[i+1],e),dx:lerp(D(i),D(i+1),e),op:1,cut:false,A,B,X0,X1}}
+ }
+ const e=ease(seg(st,B(n-1),B(n-1)+.06));
+ return{x:X1(n-1),y:g.c[n-1]-70*e,dx:D(n-1),op:1-seg(st,B(n-1)+.02,B(n-1)+.06),cut:false,A,B,X0,X1};
+}
+function sawCut(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const g=scGeo(small),{c,full,keep,gone,G}=g,gl=seg(st,.02,.1),q=SHADES.saw.hk(st),S=scSawAt(st,g,w),n=c.length,R0=small?20:26;
+ const base=casing(w,full,small,false,true)+rmGlass(small,0,gl);
+ // The fresh cut edges shine once the bands are out, until the pieces meet; they and the kerfs keep to the pendant's outline.
+ const ge=seg(st,.47,.52)*(1-seg(st,.77,.8)),edge=y=>`<path d="M3 ${f(y)}H${w-3}" stroke="#ffd7ae" stroke-width=".9" stroke-opacity="${f(.75*ge)}" clip-path="url(#scf-${id})"/>`;
+ let s=`<clipPath id="scf-${id}"><path d="${rrect(5,5,w-10,full-10,R0)}"/></clipPath>`;
+ keep.forEach((k,i)=>{
+  s+=`<clipPath id="sck${i}-${id}"><rect x="-30" y="${f(k[0])}" width="${w+60}" height="${f(k[1]-k[0])}"/></clipPath><g transform="translate(0 ${f(-k.up*q)})"><g clip-path="url(#sck${i}-${id})">${base}</g>`+
+   (ge>0?(i?edge(k[0]):'')+(i<keep.length-1?edge(k[1]):''):'')+'</g>';
+ });
+ // The bands that come out: in place until they fall, then each tips toward you about its foot and drops away.
+ gone.forEach((k,i)=>{
+  const fs=.48+.03*i,u=seg(st,fs,fs+.15);if(u>=1)return;
+  const clip=`<clipPath id="scg${i}-${id}"><rect x="-30" y="${f(k[0])}" width="${w+60}" height="${f(k[1]-k[0])}"/></clipPath>`,body=`<g clip-path="url(#scg${i}-${id})">${base}</g>`;
+  if(u<=0){s+=clip+body;return}
+  const tip=ease(seg(u,0,.35)),fl=seg(u,.25,1),by=k[1],rot=(hcHash(i+id.charCodeAt(0),5)-.5)*16*fl;
+  s+=clip+`<g opacity="${f(1-seg(u,.5,1))}" transform="translate(0 ${f(3*tip+90*fl*fl)}) rotate(${f(rot)} ${f(w/2)} ${f(by)}) translate(0 ${f(by)}) scale(1 ${f(1-.55*tip)}) translate(0 ${f(-by)})">${body}`+
+   `<rect x="5" y="${f(k[0])}" width="${w-10}" height="${f(k[1]-k[0])}" fill="#ffe8cc" opacity="${f(.14*tip)}"/></g>`;
+  if(u<.12)s+=sparkle(w*(.3+.4*hcHash(i,6)),k[0],Math.sin(Math.PI*u/.12)*.45);
+ });
+ // The kerfs: a dark slot behind the blade with a bright copper lip.
+ const ko=1-seg(st,.48,.52);
+ if(ko>0)for(let i=0;i<n;i++){const cp=seg(st,S.A(i),S.B(i));if(cp<=0)continue;const xc=lerp(S.X0(i),S.X1(i),cp);
+  s+=`<g opacity="${f(ko)}" clip-path="url(#scf-${id})"><path d="M${f(S.X0(i))} ${c[i]}H${f(xc)}" stroke="#0e0603" stroke-width="1.3"/><path d="M${f(S.X0(i))} ${c[i]+.9}H${f(xc)}" stroke="#ffcf9e" stroke-width=".6" stroke-opacity=".7"/></g>`}
+ // Filings fall from the blade where it is in the metal.
+ for(let i=0;i<n;i++){const a=S.A(i),b=S.B(i);if(st<a||st>b+.05)continue;
+  for(let k=0;k<20;k++){const tk=a+(b-a)*k/20,u=seg(st,tk,tk+.045);if(u<=0||u>=1)continue;
+   const px=lerp(S.X0(i),S.X1(i),seg(tk,a,b))+(hcHash(k+i*31,4)-.5)*5;if(px<4||px>w-4)continue;
+   s+=`<circle cx="${f(px+(hcHash(k,8)-.5)*6*u)}" cy="${f(c[i]+1.5+30*u*u)}" r="${f(.45+.75*hcHash(k+i*7,9))}" fill="${['#ffd9a8','#f3bd92','#e4ecef'][k%3]}" opacity="${f(1-u)}"/>`}}
+ // The saw itself, stroking up and down as it cuts.
+ if(S.op>0){const cu=S.cut?seg(st,S.A(S.i),S.B(S.i)):0,osc=S.cut?2.4*clamp(cu*10)*clamp((1-cu)*10)*Math.sin(st*SHADES.saw.ms/1000*2*Math.PI*9):0;
+  s+=`<g opacity="${f(S.op)}" transform="translate(${f(S.x)} ${f(S.y+osc)})">${scSaw(S.dx,small?.8:1)}</g>`}
+ // The pieces meet: a spark at each joint of the frame, a bright seam that dulls, and the new bezel wire laid along each cut glass edge.
+ const sp=Math.sin(Math.PI*seg(st,.76,.84));
+ const sd=seg(st,.78,.9),sb=seg(st,.77,.8)*(1-sd),hs=stripH(small);
+ if(sb>0||sd>0)s+=`<clipPath id="scs-${id}"><path d="${rrect(5,5,w-10,hs-10,Math.min(R0,(hs-10)/2))}"/></clipPath>`;
+ g.seams.forEach(y=>{
+  if(sb>0||sd>0)s+=`<g clip-path="url(#scs-${id})"><path d="M5 ${f(y)}H${w-5}" stroke="#ffe0b8" stroke-width=".9" stroke-opacity="${f(.8*sb)}"/><path d="M5 ${f(y)}H${w-5}" stroke="#1a0d06" stroke-width=".8" stroke-opacity="${f(.45*sd)}"/></g>`;
+  if(sp>.02)for(const x of [7.8,w-7.8])s+=sparkle(x,y,sp*.45);
+ });
+ const ew=ease(seg(st,.8,.88));
+ if(ew>0)g.edges.forEach(y=>{const x0=G.x,x1=G.x+G.wd,xc=lerp(x0,x1,ew),ln=`M${x0} ${f(y)}H${x1}`,key=ln+(small?'s':'l');
+  const co=ew>=1?(scCo[key]||(scCo[key]=coilsAlong(ln,2.35,2.4))):coilsAlong(ln,2.35,2.4,0,ew);
+  s+=`<path d="M${x0} ${f(y)}H${f(xc)}" stroke="#120906" stroke-width="5" stroke-linecap="round"/>`+wire(co,'copper',1.15);
+  const hp=Math.sin(Math.PI*ew);
+  if(hp>.01)s+=`<circle cx="${f(xc)}" cy="${f(y)}" r="5" fill="#ffb15e" opacity="${f(.6*hp)}" filter="url(#soft)"/><circle cx="${f(xc)}" cy="${f(y)}" r="1.6" fill="#fff0c8" opacity="${f(hp)}"/>`});
+ // On Checks the new wire runs just under the left scroll curl, so the curl goes back on over it.
+ if(ew>0&&small)s+=wire(spiral(17,13,6.5*.75,1.6,1,Math.PI*.9),'copper',1.9);
+ // The joints of the frame are bound: three turns of fine wire over each, the newest hot and still loose.
+ const N=3;
+ g.seams.forEach((y,si)=>[7.8,w-7.8].forEach((x,sx)=>{const t0=.78+(si*2+sx)*.02,u=seg(st,t0,t0+.045);if(u<=0)return;
+  for(let t=0;t<N;t++){const p=clamp(u*N-t);if(p<=0)break;const o=(t-(N-1)/2)*2.5,spn=lerp(15,10,ease(p)),yy=y+o;
+   s+=wire(`M${f(x-spn/2)} ${f(yy-.6)}Q${f(x)} ${f(yy+.9)} ${f(x+spn/2)} ${f(yy-.6)}`,p<1?'hot':'copper',1.25,f(clamp(p*4)))}}));
+ // The name and the value come up in the glass left in the strip, then a status stone is pressed into its right end.
+ const nt=seg(st,.87,.92),vt=seg(st,.9,.95);
+ if(nt>0){const L=wsLabel(id,small),ty=G.y+G.ht/2,tx=G.x+10,nw=measure(L.name,`italic bold ${L.fs}px Georgia,serif`);
+  s+=`<text y="${f(ty)}" dominant-baseline="central"><tspan x="${f(tx)}" dy="${f(3*(1-ease(nt)))}" opacity="${f(nt)}" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="${L.fs}" fill="#f6dcb4">${L.name}</tspan>`+
+   (vt>0?`<tspan x="${f(tx+nw+16)}" dy="${f(3*(1-ease(vt))-3*(1-ease(nt)))}" opacity="${f(vt)}" font-family="Georgia,serif" font-weight="bold" font-size="${L.vs}" fill="${RIM_GLOW[L.stone]}">${L.num}</tspan>`+
+    (L.word?`<tspan dx="4" opacity="${f(vt)}" font-family="Georgia,serif" font-style="italic" font-size="${L.ws}" fill="#c9b494">${L.word}</tspan>`:''):'')+'</text>';
+  if(vt>0)s+=`<circle cx="${f(tx+nw+8)}" cy="${f(ty)}" r="1.3" fill="#c9b494" opacity="${f(vt)}"/>`;
+  const pp=seg(st,.91,.95);
+  if(pp>0){const R=Math.min(small?7:6,(G.ht-5)/2-1),sx=G.x+G.wd-R-7,sc=1+.4*(1-ease(pp)),k=seg(st,.95,1);
+   s+=`<g opacity="${f(clamp(pp*3))}" transform="translate(${f(sx)} ${f(ty)}) scale(${f(sc)}) translate(${f(-sx)} ${f(-ty)})"><circle cx="${f(sx)}" cy="${f(ty)}" r="${f(R+1.3)}" fill="#120906"/>`+wire(circ(sx,ty,R+.7),'copper',.8)+strandItem({k:'bead',r:R,stone:L.stone},sx,ty)+
+    `<circle cx="${f(sx)}" cy="${f(ty)}" r="${f(R)}" fill="#0a0503" opacity="${f(.5*(1-k))}"/></g>`;
+   if(k>0){const bump=Math.sin(Math.PI*k);
+    s+=`<circle cx="${f(sx)}" cy="${f(ty)}" r="${f(R*2)}" fill="${RIM_GLOW[L.stone]}" opacity="${f((L.stone==='lab'?.1:.3)*k+.35*bump)}" filter="url(#soft)"/>`;
+    if(bump>.05)s+=sparkle(sx+1,ty-R*.4,bump*.5)}
+  }
+ }
  return s;
 }
 
