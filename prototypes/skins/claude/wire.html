@@ -3459,7 +3459,7 @@ function dialSvg(c){
 }
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
-  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil, ingot mould, rolling mill, honeycomb, verdigris, saw cut) are built and added here.'},
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil, ingot mould, rolling mill, honeycomb, verdigris, saw cut, muscle wire) are built and added here.'},
  strand:{label:'Bead strand',kind:'Distil',ms:1150,ownStrip:true,
   about:'The pendant comes apart into a necklace. The plate and stone fade, the copper frame squeezes flat into a single strung wire, and the beads slide in along it from both clasps, centre beads first, each clicking into place. A flat slab bead carries the name and a cabochon carries the one key value. The round stones between them are the statuses: <b>amber</b> running, <b>labradorite</b> idle or paused, <b>carnelian</b> needs you, <b>malachite</b> passed. Jarvis strings one amber per running agent, GitDiscuss one carnelian per decision, Checks a seed bead per check. Pause a widget and its stones turn to labradorite. The eye loops stay on the ends, so shaded pendants still link by jump ring into one longer strand.',
   sayOn:'Shaded: the frame flattens into a wire and the beads slide on, one stone per status.',
@@ -3572,7 +3572,12 @@ const SHADES={
   about:'A new shade kind, Cut: the casing is cut down to the strip. Nothing is folded, flattened, stowed or worn away; what isn\'t needed is cut out and falls away, and what is left is closed up and joined. Built from the jeweller\'s piercing saw, a steel frame holding a blade so fine it cuts sheet, wire and glass alike, and from the way a piece is shortened at the bench: cut a band out, close the gap, bind the joint. The display goes dark into its glass and the nameplate fades. The saw drops onto the pendant and cuts straight across it, the blade stroking up and down, a dark kerf opening behind it and bright filings falling below. On the large pendants it makes four cuts, one after another, turned round at the end of each: above the glass, through the glass twice, and above the foot; on Checks, whose glass runs nearer its foot, two. Then the saw lifts away, and the bands between the cuts tip toward you and drop out, so for a moment the stage shows through the gaps. The pieces left close up: the top cap with its scroll curls, a slice of the glass, and the foot with its corners. A spark jumps at each joint of the frame as they meet, and the bright seams dull. A hot point lays a new bezel wire along each cut edge of the glass, coiled like the rest, and each joint of the frame is bound with three turns of fine wire, hot as they go on. The name and the one key value come up in the slice of glass, and a status stone is pressed into its right end and kindles: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. Every cut misses the scroll curls and the foot band, so the strip is the same pendant, only shorter. Nothing moves at rest, unshading puts the bands back, and the join ends stay on the pendant\'s ends, so cut pendants still join.',
   sayOn:'Shaded: a piercing saw cuts bands out of the pendant, they drop away, and the pieces left close up and are bound, with the name and value in the slice of glass.',
   hk:st=>ease(seg(st,.62,.78)),show:st=>1-ease(seg(st,0,.12)),grip:st=>1-ease(seg(st,0,.12)),
-  draw(id,w,h,small,st){return sawCut(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return sawCut(id,w,h,small,st)}},
+ mem:{label:'Muscle wire',kind:'Shrink',ms:5200,ownStrip:true,hs:48,chs:42,
+  about:'The Shrink shade kind (felt\'s fulled, hollow\'s pinned specimen, elven\'s dew silk, gothic\'s fired clay): nothing is folded, cut or stowed; the material itself gets smaller. Done in wire with nitinol, the shape-memory alloy of memory-wire bracelets and of <i>muscle wire</i>, which shortens when a current warms it: set into a shape and then pulled straight, it goes back to that shape when it is warmed. (The steel coil of the Memory wire morph only springs back; this wire has to be warmed.) The pendant\'s frame turns out to be nitinol, set long and straight, remembering tight coils. The display goes dark into its glass and the nameplate fades. Two crocodile clips, red and black on their leads, drop onto the top wire and bite on with a blue spark. A current runs round the frame, bright motes chasing from clip to clip, and the wire warms. Then it pulls back in three fits, each smaller than the last: the frame flares hot, jerks shorter with a shiver, and its sides take up the length they lose as coils, a wave first, then loops, then a tight coil round each end like a telephone cord, while the glass squeezes down with it and the corners glint. Each fit leaves the next heat colour in the wire, as a warmed wire\'s oxide thickens: straw, then purple, then blue. The current goes off, the clips let go and lift away, and the name and the one key value come up in the glass, with a status stone set in its right end that kindles: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. A glint runs along the top wire. The frame keeps its heat colours. Nothing moves at rest, unshading plays it back, and the join ends stay on the pendant\'s ends, so shrunk pendants still join.',
+  sayOn:'Shaded: crocodile clips put a current through the nitinol frame, and it pulls itself up into coils in three fits, heat colours blooming along it; the name and value come up in the glass.',
+  hk:st=>clamp(memQ(st)),show:st=>1-ease(seg(st,0,.12)),grip:st=>1-ease(seg(st,0,.12)),
+  draw(id,w,h,small,st){return memoryWire(id,w,h,small,st)}}
 };
 // The strip height while shaded: most shades close to HS / CHS, Hang shades want a little room below the chain.
 const stripH=small=>{const o=SHADES[model.shade];return small?(o.chs||CHS):(o.hs||HS)};
@@ -4351,14 +4356,17 @@ function sawCut(id,w,h,small,st){
   for(let t=0;t<N;t++){const p=clamp(u*N-t);if(p<=0)break;const o=(t-(N-1)/2)*2.5,spn=lerp(15,10,ease(p)),yy=y+o;
    s+=wire(`M${f(x-spn/2)} ${f(yy-.6)}Q${f(x)} ${f(yy+.9)} ${f(x+spn/2)} ${f(yy-.6)}`,p<1?'hot':'copper',1.25,f(clamp(p*4)))}}));
  // The name and the value come up in the glass left in the strip, then a status stone is pressed into its right end.
- const nt=seg(st,.87,.92),vt=seg(st,.9,.95);
+ return s+glassLabel(id,small,G,seg(st,.87,.92),seg(st,.9,.95),seg(st,.91,.95),seg(st,.95,1));
+}
+// The name (nt) and value (vt) rising into a strip of glass G, then a status stone pressed into its right end (pp) and kindling (k).
+function glassLabel(id,small,G,nt,vt,pp,k){
+ let s='';
  if(nt>0){const L=wsLabel(id,small),ty=G.y+G.ht/2,tx=G.x+10,nw=measure(L.name,`italic bold ${L.fs}px Georgia,serif`);
   s+=`<text y="${f(ty)}" dominant-baseline="central"><tspan x="${f(tx)}" dy="${f(3*(1-ease(nt)))}" opacity="${f(nt)}" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="${L.fs}" fill="#f6dcb4">${L.name}</tspan>`+
    (vt>0?`<tspan x="${f(tx+nw+16)}" dy="${f(3*(1-ease(vt))-3*(1-ease(nt)))}" opacity="${f(vt)}" font-family="Georgia,serif" font-weight="bold" font-size="${L.vs}" fill="${RIM_GLOW[L.stone]}">${L.num}</tspan>`+
     (L.word?`<tspan dx="4" opacity="${f(vt)}" font-family="Georgia,serif" font-style="italic" font-size="${L.ws}" fill="#c9b494">${L.word}</tspan>`:''):'')+'</text>';
   if(vt>0)s+=`<circle cx="${f(tx+nw+8)}" cy="${f(ty)}" r="1.3" fill="#c9b494" opacity="${f(vt)}"/>`;
-  const pp=seg(st,.91,.95);
-  if(pp>0){const R=Math.min(small?7:6,(G.ht-5)/2-1),sx=G.x+G.wd-R-7,sc=1+.4*(1-ease(pp)),k=seg(st,.95,1);
+  if(pp>0){const R=Math.min(small?7:6,(G.ht-5)/2-1),sx=G.x+G.wd-R-7,sc=1+.4*(1-ease(pp));
    s+=`<g opacity="${f(clamp(pp*3))}" transform="translate(${f(sx)} ${f(ty)}) scale(${f(sc)}) translate(${f(-sx)} ${f(-ty)})"><circle cx="${f(sx)}" cy="${f(ty)}" r="${f(R+1.3)}" fill="#120906"/>`+wire(circ(sx,ty,R+.7),'copper',.8)+strandItem({k:'bead',r:R,stone:L.stone},sx,ty)+
     `<circle cx="${f(sx)}" cy="${f(ty)}" r="${f(R)}" fill="#0a0503" opacity="${f(.5*(1-k))}"/></g>`;
    if(k>0){const bump=Math.sin(Math.PI*k);
@@ -4367,6 +4375,75 @@ function sawCut(id,w,h,small,st){
   }
  }
  return s;
+}
+
+/* ---------- Memory wire pieces ---------- */
+// The outer frame is memory wire (nitinol), set straight and long; warmed by a current it pulls back toward the tight coils it
+// remembers, in three fits. MEM_FIT is [start, end, share of the drop] for each; the sides take up the wire they lose as coils.
+const MEM_FIT=[[.3,.38,.45],[.46,.54,.32],[.62,.7,.23]];
+const memQ=st=>MEM_FIT.reduce((q,[a,b,p])=>q+p*backOut(seg(st,a,b)),0);
+// The colours a warmed wire goes as its oxide thickens: copper, straw, purple, blue. T runs 0..3, one stage per fit.
+const MEM_TINT=['#9b5b35','#d6a94e','#8a4f9a','#4a76c2'];
+const hexMix=(a,b,t)=>'#'+[1,3,5].map(i=>Math.round(lerp(parseInt(a.substr(i,2),16),parseInt(b.substr(i,2),16),t)).toString(16).padStart(2,'0')).join('');
+const memTint=T=>{const i=Math.min(2,Math.floor(T));return hexMix(MEM_TINT[i],MEM_TINT[i+1],clamp(T-i))};
+// One side of the frame: from the end of the top wire round the corner, down, and round to the foot (mirrored for the right),
+// coiled by m into loops of pitch lam that grow with m and taper into the straight wire at both ends.
+function memSide(w,h,r,m,right){
+ const v=Math.max(0,h-10-2*r),a=Math.PI*r/2,Ls=2*a+v,lam=lerp(10,4.4,m),A=2.8*clamp(m*1.5),B=2*ease(seg(m,.5,.8));
+ const at=s=>{s=clamp(s,0,Ls);let x,y;
+  if(s<a){const p=-Math.PI/2-s/r;x=5+r+r*Math.cos(p);y=5+r+r*Math.sin(p)}
+  else if(s<a+v){x=5;y=5+r+s-a}
+  else{const p=Math.PI-(s-a-v)/r;x=5+r+r*Math.cos(p);y=h-5-r+r*Math.sin(p)}
+  return[right?w-x:x,y]};
+ const N=Math.ceil(Ls/(lam/16)),pts=[];
+ for(let i=0;i<=N;i++){const s=Ls*i/N,p=at(s),q=at(s+.3),o=at(s-.3);let tx=q[0]-o[0],ty=q[1]-o[1];const n=Math.hypot(tx,ty)||1;tx/=n;ty/=n;
+  const c=ease(clamp(s/8))*ease(clamp((Ls-s)/8)),ph=2*Math.PI*s/lam,da=A*c*Math.sin(ph),db=B*c*Math.cos(ph);
+  pts.push([p[0]-ty*da+tx*db,p[1]+tx*da+ty*db])}
+ return poly(pts);
+}
+// Wires drawn like wire(), in any body and highlight colour; each layer is laid over every [path, width] pair before the next,
+// so the joints between the pieces read as one wire.
+const memWire=(ps,body,hi)=>`<g fill="none" stroke-linecap="round" stroke-linejoin="round">${ps.map(([d,w])=>`<path d="${d}" stroke="#1f110a" stroke-width="${f(w+1.7)}"/>`).join('')}${ps.map(([d,w])=>`<path d="${d}" stroke="${body}" stroke-width="${f(w)}"/>`).join('')}${ps.map(([d,w])=>`<path d="${d}" stroke="${hi}" stroke-width="${f(w*.32)}" stroke-opacity=".85" transform="translate(-.5 -.6)"/>`).join('')}</g>`;
+// A crocodile clip biting the top wire at (0,0): toothed steel jaws open by o (0..1) under a rubber boot, its lead running up and away (dir).
+function memClip(col,dark,hi,o,dir){
+ const ld=`M0 -34C0 -56 ${18*dir} -72 ${34*dir} -124`;
+ let s=`<path d="${ld}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="5" transform="translate(3 4)"/><path d="${ld}" fill="none" stroke="${dark}" stroke-width="4.4"/><path d="${ld}" fill="none" stroke="${col}" stroke-width="3"/><path d="${ld}" fill="none" stroke="${hi}" stroke-opacity=".45" stroke-width=".8" transform="translate(-.7 0)"/>`;
+ for(const sd of [-1,1])s+=`<g transform="rotate(${f(-sd*o*16)} ${f(sd*2.4)} -15)"><path d="M${f(sd*.6)} -16L${f(sd*4)} -15L${f(sd*3)} -2L${f(sd*.4)} 2.6L${f(sd*.9)} -1.5Z" fill="url(#cr-steel)" stroke="#1c2226" stroke-width=".5"/><path d="M${f(sd*.9)} -12V-2" stroke="#1c2226" stroke-width=".7" stroke-dasharray=".7 .9"/></g>`;
+ s+=`<path d="M-4.8 -13Q-5.4 -25 -3.3 -35H3.3Q5.4 -25 4.8 -13Z" fill="${col}" stroke="${dark}" stroke-width=".8"/><path d="M-2.6 -15Q-3.1 -25 -1.7 -33" fill="none" stroke="${hi}" stroke-opacity=".6" stroke-width="1"/>`+
+  `<path d="M-4.6 -16.5H4.6M-4.4 -19H4.4" stroke="${dark}" stroke-width=".6" opacity=".7"/>`;
+ return s;
+}
+function memoryWire(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const q=memQ(st),m=clamp(q),R0=small?20:26,r=Math.min(R0,(h-10)/2),gl=seg(st,.02,.12),ms=SHADES.mem.ms;
+ // The clips drop onto the top wire and bite, hold while the current runs, then let go and lift away.
+ const dn=ease(seg(st,.08,.18)),up=ease(seg(st,.76,.84)),open=clamp(1-ease(seg(st,.17,.2))+ease(seg(st,.74,.77))),cop=seg(st,.08,.11)*(1-seg(st,.8,.84));
+ const cur=seg(st,.2,.25)*(1-seg(st,.72,.76));
+ // Each fit: a flare of heat, a shiver as the wire jerks shorter, and the next heat colour.
+ let fl=0,jx=0,T=0;
+ MEM_FIT.forEach(([a,b])=>{const u=seg(st,a,b);fl+=Math.sin(Math.PI*u);if(u>0&&u<1)jx+=Math.sin(u*2*Math.PI*7)*(1-u)*1.1;T+=ease(seg(st,a-.02,b+.04))});
+ let s=casing(w,h,small,true,true)+rmGlass(small,m,gl);
+ const top=`M${f(5+r)} 5H${f(w-5-r)}M${f(5+r)} ${f(h-5)}H${f(w-5-r)}`,sides=memSide(w,h,r,m,false)+memSide(w,h,r,m,true);
+ const hot=clamp(.22*cur+.6*fl*cur),body=hexMix(hexMix('#9b5b35',memTint(T),.62),'#e08a3c',hot),hi=hexMix(hexMix('#f3bd92','#eef4ff',.45*clamp(T/3)),'#fff0c8',hot);
+ if(cur>0)s+=`<path d="${top}${sides}" fill="none" stroke="#ffb15e" stroke-width="7" opacity="${f(cur*(.16+.4*fl))}" filter="url(#soft)"/>`;
+ s+=memWire([[top,3.1],[sides,lerp(3.1,2.2,m)]],body,hi);
+ // The coil bands go back on over the frame, as casing() lays them.
+ const n=Math.max(2,Math.min(7,Math.floor((h-26)/2.6)));
+ s+=wire(band(7.8,h/2,true,n,10)+band(w-7.8,h/2,true,n,10)+band(w/2,h-7.8,false,small?5:7,10),'copper',1.25);
+ // The current: bright motes running round the frame from clip to clip.
+ if(cur>0)s+=`<path d="${top}${sides}" fill="none" stroke="#fff6d8" stroke-width="1.5" stroke-linecap="round" stroke-dasharray=".1 23" stroke-dashoffset="${f(-st*ms*.06)}" opacity="${f(.85*cur)}"/>`;
+ // As each fit lands, the coils at the corners catch the light.
+ MEM_FIT.forEach(([,b])=>{const g=Math.sin(Math.PI*seg(st,b-.03,b+.03)),c=5+r*.29;
+  if(g>.02)for(const [x,y] of [[c,c],[w-c,c],[c,h-c],[w-c,h-c]])s+=sparkle(x,y,g*.35)});
+ if(cop>0){const cx=small?40:50,y=5-60*(1-dn)-70*up;
+  s+=`<g opacity="${f(cop)}"><g transform="translate(${cx} ${f(y)})">${memClip('#c4372a','#4a0f09','#ff9c8c',open,-1)}</g><g transform="translate(${w-cx} ${f(y)})">${memClip('#2b2b31','#060607','#9a9aa6',open,1)}</g></g>`;
+  const bite=Math.sin(Math.PI*seg(st,.19,.23));
+  if(bite>.02)for(const x of [cx,w-cx])s+=`<circle cx="${x}" cy="5" r="6" fill="#9fd8ff" opacity="${f(.5*bite)}" filter="url(#soft)"/>`+sparkle(x,5,bite*.5);
+ }
+ // Cooled and still, the name and value come up in the glass and a status stone is set in its end; a glint runs along the top wire.
+ s+=glassLabel(id,small,rmWin(small,clamp(q)),seg(st,.82,.87),seg(st,.85,.9),seg(st,.88,.92),seg(st,.92,.97));
+ const gt=seg(st,.93,1);if(gt>0&&gt<1)s+=sparkle(lerp(5+r,w-5-r,ease(gt)),5,Math.sin(Math.PI*gt)*.4);
+ return jx?`<g transform="translate(${f(jx)} 0)">${s}</g>`:s;
 }
 
 /* ---------- Honeycomb pieces ---------- */
