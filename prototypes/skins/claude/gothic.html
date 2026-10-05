@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg,.czsvg,.rusvg,.sasvg,.kisvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg,.czsvg,.rusvg,.sasvg,.kisvg,.dksvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span,.w.czOn .strip span,.w.ruOn .strip span,.w.saOn .strip span,.w.kiOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span,.w.czOn .strip span,.w.ruOn .strip span,.w.saOn .strip span,.w.kiOn .strip span,.w.dkOn .strip span{visibility:hidden}
 .w.kiOn .strip b{color:#fbecc8;text-shadow:0 1px 1px #2a0c03,0 0 3px #3a120580}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
@@ -312,6 +312,8 @@ $$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-
 $$('.w').forEach(el=>el.querySelector('.casing').insertAdjacentHTML('afterend','<svg class="sasvg" aria-hidden="true"></svg>'));
 // Fired clay redraws the wall too, as a recoloured copy, in a layer of its own just above the casing.
 $$('.w').forEach(el=>el.querySelector('.casing').insertAdjacentHTML('afterend','<svg class="kisvg" aria-hidden="true"></svg>'));
+// Last light draws over the stone (shadow, lamp, gilded value) but under the display, nameplate and strip.
+$$('.w').forEach(el=>el.querySelector('.casing').insertAdjacentHTML('afterend','<svg class="dksvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -4291,7 +4293,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress, Cosmati band, ruin, stone saw, fired clay) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress, Cosmati band, ruin, stone saw, fired clay, last light) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -4351,7 +4353,11 @@ const SHADES={
  kiln:{label:'Fired clay',kind:'Shrink',ms:6400,h:small=>small?52:62,curve:k=>kiQ(k),
   on:'Shaded: the stone softens to wet clay, which plasters over the window and shrinks as it dries; a row of tiles is stamped into it and inlaid with white slip, the wall is fired and shrinks again, and it cools to glazed terracotta with the value in the tiles.',
   off:'Unshaded: the glaze cools back, the fire unbakes the clay and it swells, the inlay is lifted out, the clay takes up its water and the stone comes back up the wall from the foot.',
-  about:'A new shade kind for gothic, <b>Shrink</b>: nothing is folded, cut, stowed or worn away; the material itself gets smaller. Stone does not shrink, but clay does, twice: as it dries, and again in the kiln. Where there was no good building stone, as round the Baltic, the gothic cathedrals were built of fired clay instead (the <i>Backsteingotik</i> of Lübeck, Toruń and Malbork), and English abbeys paved their floors with <i>encaustic</i> tiles: red clay stamped with a wooden block while leather-hard, the hollows filled with white clay slip and scraped flush, then glazed and fired, so the pattern shows yellow on deep red. Here the facade goes the same way. The display fades and <b>wet clay runs down the wall from the cresting</b>, a glistening front with slip dripping ahead of it, darkening the stone and plastering the window over. Steam lifts off the top as it dries, and it gives in its first shrink: the wall draws up and the outer end draws in. While it is leather-hard, wooden stamps press a row of tiles into the plastered window, from the value outward a pair at a time, and a scraper runs along them spreading white slip into the hollows and scraping the face clean, leaving the pattern and the key value inlaid in white. It dries pale and shrinks again, hairline cracks opening at the foot of the piers. Then <b>it is fired</b>: flames lick along the foot, the clay glows orange, the cracks glow, the glaze bubbles and goes glassy, sparks lift off the cresting, and the wall gives its last shrink. It cools to terracotta, the glaze crazes with a few small glints, and the white slip comes out honey yellow on deep red. Last, the two roundels beside the value are glazed in the status colour and kindle. <b>They are the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. Each shrink is a fit with a small overshoot, as clay gives; the outer end draws in 8 px over the three (4 each end on Checks) while the joining end stays put. <b>The strip is the fired wall:</b> the name in cream in the frieze and the value inlaid in the tiles. Nothing moves at rest. Unshading plays it back, the stone coming back up the wall over the clay. Joins still work on the shaded pair.'}
+  about:'A new shade kind for gothic, <b>Shrink</b>: nothing is folded, cut, stowed or worn away; the material itself gets smaller. Stone does not shrink, but clay does, twice: as it dries, and again in the kiln. Where there was no good building stone, as round the Baltic, the gothic cathedrals were built of fired clay instead (the <i>Backsteingotik</i> of Lübeck, Toruń and Malbork), and English abbeys paved their floors with <i>encaustic</i> tiles: red clay stamped with a wooden block while leather-hard, the hollows filled with white clay slip and scraped flush, then glazed and fired, so the pattern shows yellow on deep red. Here the facade goes the same way. The display fades and <b>wet clay runs down the wall from the cresting</b>, a glistening front with slip dripping ahead of it, darkening the stone and plastering the window over. Steam lifts off the top as it dries, and it gives in its first shrink: the wall draws up and the outer end draws in. While it is leather-hard, wooden stamps press a row of tiles into the plastered window, from the value outward a pair at a time, and a scraper runs along them spreading white slip into the hollows and scraping the face clean, leaving the pattern and the key value inlaid in white. It dries pale and shrinks again, hairline cracks opening at the foot of the piers. Then <b>it is fired</b>: flames lick along the foot, the clay glows orange, the cracks glow, the glaze bubbles and goes glassy, sparks lift off the cresting, and the wall gives its last shrink. It cools to terracotta, the glaze crazes with a few small glints, and the white slip comes out honey yellow on deep red. Last, the two roundels beside the value are glazed in the status colour and kindle. <b>They are the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. Each shrink is a fit with a small overshoot, as clay gives; the outer end draws in 8 px over the three (4 each end on Checks) while the joining end stays put. <b>The strip is the fired wall:</b> the name in cream in the frieze and the value inlaid in the tiles. Nothing moves at rest. Unshading plays it back, the stone coming back up the wall over the clay. Joins still work on the shaded pair.'},
+ dusk:{label:'Last light',kind:'Wane',ms:4600,h:small=>small?46:58,lowAt:[.56,.78],
+  on:'Shaded: the sun goes down behind the town; the shadow of its roofs climbs the wall, the wall draws in under the dusk, a lamp is lit on the outer pier, and the last light picks out the gilded value under the frieze.',
+  off:'Unshaded: morning. The lamp goes out, the wall rises out of the dusk and the shadow of the town falls away down it.',
+  about:'A gothic <b>Wane</b> shade: nothing is folded, cut, put away or laid over the wall; the light goes, and the strip is what stays lit. At sunset a cathedral stands above its town, and the town\'s shadow climbs its walls while the upper storeys still catch the sun: the last light is on the cresting and the pinnacles long after the street is in dusk. Here the sun goes down behind a town to the west. The display fades into dark leaded glass with the sunset in it, and the stone warms to gold, then rose, strongest under the cresting. <b>The shadow of the town climbs the wall</b> from the foot: a soft roofline of gables, stepped gables, chimneys and a turret, stretching as the sun drops, with a thin warm fringe at its edge. Two swifts cross the lit top on their evening flight. The roofline is laid out along the desktop, not per widget, so a joined pair shares one shadow, and a shaded wall moved along the town shows its shadow slide. The shadow stops just under the frieze, and <b>the wall draws in under the dusk</b>, leaving the band under the frieze in the last light. As the dusk reaches it, <b>a lamp on the outer pier is lit</b> with a flicker, the daylight\'s place taken by lamplight. <b>The lamp is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. Then the last of the sun runs along the band and picks out the gilded value, left to right, and glints on the outer pinnacle\'s finial. <b>The strip is the lit top of the wall:</b> the name in the frieze, the value in the band, the lamp in the dusk below. Nothing moves at rest. Unshading is morning: the lamp goes out, the wall rises out of the dusk and the shadow falls away down it. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -5683,6 +5689,75 @@ function cosmati(id,w,h,k){
   if(pc<1)s+=`<rect x="${f(lx+cw-1)}" y="${yt+1.5}" width="2" height="${f(yb-yt-3)}" fill="#fff4cf" opacity=".9"/>`}
  const g2=Math.sin(Math.PI*seg(k,.95,1));if(g2>.05)s+=`<g opacity="${f(g2)}">${sparkle(xm+lw/2-2,yt+1,g2*4.5)}</g>`;
  return s+'</g>';
+}
+
+/* Last light (Wane): the sun sets behind a town to the west, and the shadow of its roofs climbs the facade. The wall draws in
+   under the dusk, the top stays in the last light, and a lamp on the outer pier is lit as the dusk reaches it.
+   The roofline is laid out in stage x, so a joined pair shares one shadow, and a shaded wall moved along the town shows its shadow slide. */
+const DK_P=sm=>sm?35:43,DK_B=sm=>sm?32.5:40;
+// Built on first use: hash() is declared further down the script.
+let DK_TC=null;const DK_T=()=>DK_TC||(DK_TC=(()=>{const P=[];let X=-300,i=0;
+ while(X<1800){const bw=26+34*hash(i,3),t=hash(i,5),e=6+4*hash(i,7);
+  if(t<.42)P.push([X,e],[X+bw/2,2*hash(i,11)],[X+bw,e]);
+  else if(t<.64){const n=3,sw=bw/(2*n+1),dy=(e-1)/n,up=[[X,e]];for(let s=1;s<=n;s++)up.push([X+(s-1)*sw,e-s*dy],[X+s*sw,e-s*dy]);
+   P.push(...up,...up.slice().reverse().map(([x,y])=>[2*X+bw-x,y]))}
+  else if(t<.86){const e2=5+3*hash(i,13),cx=X+bw*(.2+.5*hash(i,17));P.push([X,e2],[cx,e2],[cx,e2-5],[cx+5,e2-5],[cx+5,e2],[X+bw,e2])}
+  else P.push([X,e],[X+bw*.28,e],[X+bw*.28,4],[X+bw*.5,0],[X+bw*.72,4],[X+bw*.72,e],[X+bw,e]);
+  const gw=2+6*hash(i,19),gd=Math.min(13,e+3+4*hash(i,23));P.push([X+bw+.8,gd],[X+bw+gw-.8,gd]);X+=bw+gw;i++}
+ return P})());
+// Two swifts cross the lit top while the sun goes down: a crescent with flicking wings.
+const DK_SW=(x,y,a,fl)=>`<path transform="translate(${f(x)} ${f(y)}) rotate(${f(a)}) scale(1 ${f(fl)})" d="M-5.5 1.6Q-2.4 -1.4 0 -.3Q2.4 -1.4 5.5 1.6Q2.2 .3 .9 1.1L1.6 2.6L0 1.9L-1.6 2.6L-.9 1.1Q-2.2 .3 -5.5 1.6Z" fill="#20171f"/>`;
+// The casing itself takes the evening light: gold first, then rose as the sun sets.
+function dkTint(k){const wm=ease(seg(k,.03,.28)),rd=ease(seg(k,.36,.8));
+ return k>0?`sepia(${f(.3*wm+.18*rd)}) saturate(${f(1+.45*wm+.5*rd)}) hue-rotate(${f(-13*rd)}deg) brightness(${f(1+.05*wm-.04*rd)})`:''}
+function lastLight(id,w,h,k){
+ const sm=id==='c',s=SK[id],top=sm?5:8,L=s.join==='l'?JP:sm?16:20,Rw=s.join==='r'?JP:sm?16:20,fx=L+5,fw=w-L-Rw-10,xm=fx+fw/2;
+ const[x,y,sw,sh,b]=SCR[id],[gl,gb]=msGlass(id),hk=sm?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(hk*2.2);
+ const rs=ease(seg(k,.14,.56)),yP=DK_P(sm),yTop=lerp((sm?CH:H)+6,yP,rs),st=lerp(.45,1,rs),mx=model[id].x;
+ let o=`<defs><filter id="dkb-${id}" x="-5%" y="-40%" width="110%" height="180%"><feGaussianBlur stdDeviation="${sm?.9:1.1}"/></filter>`+
+  `<linearGradient id="dkg-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffb46e" stop-opacity=".55"/><stop offset="1" stop-color="#ff9a6a" stop-opacity="0"/></linearGradient>`+
+  `<linearGradient id="dkr-${id}" x1="0" y1="0" x2="1" y2="1"><stop offset=".3" stop-color="#ffc27a" stop-opacity="0"/><stop offset=".5" stop-color="#ffc27a" stop-opacity=".55"/><stop offset=".7" stop-color="#ffc27a" stop-opacity="0"/></linearGradient></defs>`;
+ // The window, once the display has faded: dark quarries in lead, reflecting the sunset sky, until the wall draws in under it.
+ const ga=seg(k,.02,.1)*show;
+ if(ga>0){let ld='';for(let d=-sh;d<sw+sh;d+=12)ld+=`M${f(x+d)} ${y}l${sh} ${sh}M${f(x+d+sh)} ${y}l${-sh} ${sh}`;
+  o+=`<g opacity="${f(ga)}"><clipPath id="dkw-${id}"><rect x="${x}" y="${y}" width="${sw}" height="${sh}"/></clipPath><g clip-path="url(#dkw-${id})"><rect x="${x}" y="${y}" width="${sw}" height="${sh}" fill="#1b2034"/>`+
+   `<rect x="${x}" y="${y}" width="${sw}" height="${sh}" fill="url(#dkr-${id})" opacity="${f(1-rs)}"/><path d="${ld}" stroke="#0e0c10" stroke-width="1.1" fill="none"/></g></g>`}
+ // The low sun warms the top of the wall, clipped to the stone so the desktop above stays dark.
+ const wm=ease(seg(k,.05,.3));
+ if(wm>0)o+=`<g clip-path="url(#cl-${id})"><rect x="0" y="0" width="${w}" height="${f(yP)}" fill="url(#dkg-${id})" opacity="${f(wm*(.55+.45*ease(seg(k,.36,.8))))}" style="mix-blend-mode:screen"/></g>`;
+ // The shadow of the town: its roofline rises from below the foot, stretching as the sun drops, to stop just under the band.
+ if(rs>0){const pts=DK_T().filter(([X])=>X>mx-80&&X<mx+w+80).map(([X,d])=>[X-mx,yTop+d*st]);
+  if(pts.length){const d='M-40 '+f(h+30)+'L'+pts.map(p=>f(p[0])+' '+f(p[1])).join('L')+`L${w+40} ${f(h+30)}Z`;
+  o+=`<g clip-path="url(#cl-${id})"><path d="${d}" fill="#141935" opacity="${f(.56*seg(rs,0,.12))}" filter="url(#dkb-${id})"/>`+
+   `<path d="${d}" fill="none" stroke="#ff8a5a" stroke-opacity="${f(.22*seg(rs,0,.2))}" stroke-width="2.2" filter="url(#dkb-${id})"/></g>`}}
+ // A moulded band under the frieze shows once the window has gone: the course the last light falls on.
+ const bd=seg(k,.64,.74)*(1-show),bB=DK_B(sm),fy=top+2+(sm?14:17);
+ if(bd>0)o+=`<g opacity="${f(bd)}"><rect x="${fx}" y="${f(fy+.6)}" width="${fw}" height="${f(bB-fy-.6)}" fill="#fff3dc" opacity=".5"/><path d="M${fx} ${f(fy+1)}H${fx+fw}" stroke="#3a2c1c" stroke-opacity=".35" stroke-width=".7"/><path d="M${fx} ${f(bB-.4)}H${fx+fw}" stroke="#3a2c1c" stroke-opacity=".4" stroke-width=".7"/><path d="M${fx} ${f(bB+.5)}H${fx+fw}" stroke="#fff6e2" stroke-opacity=".55" stroke-width=".6"/></g>`;
+ // The value, gilded into the band, is caught by the last of the sun, left to right.
+ const tv=seg(k,.78,.9);
+ if(tv>0){const[,num,val]=tpText(id),fs=sm?9:10.5,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`),tx=xm-tw/2,ty=sm?29.6:37.2,cw=(tw+8)*tv;
+  const txt=(fill1,fill2,dy)=>`<text x="${f(tx)}" y="${f(ty+dy)}"><tspan font-weight="700" font-size="${fs+1}" fill="${fill1}">${num}</tspan><tspan font-style="italic" fill="${fill2}"> ${val}</tspan></text>`;
+  o+=`<clipPath id="dkt-${id}"><rect x="${f(tx-4)}" y="${f(fy)}" width="${f(cw)}" height="${f(bB-fy)}"/></clipPath><g clip-path="url(#dkt-${id})" font-family="Georgia,serif" font-size="${fs}">${txt('#f6d98c','#f6d98c',.7)}${txt('#7a1f2b','#2a1a0c',0)}</g>`;
+  if(tv<1)o+=`<rect x="${f(tx-4+cw-1.5)}" y="${f(fy+1.5)}" width="3" height="${f(bB-fy-3)}" fill="#ffe6a8" opacity=".85"/>`}
+ // The lamp on the outer pier: hung from the start, unlit until the dusk reaches it, then it kindles with a flicker.
+ const la=seg(k,.08,.16);
+ if(la>0){const ls=sm?.8:1,xl=s.join==='l'?w-(sm?9:12):sm?9:12,yb=yP-(sm?3.5:4),xw=s.join==='l'?w-1.5:1.5,kl=seg(k,.46,.54),lit=kl<1?kl*(.6+.4*Math.abs(Math.sin(kl*23))):1;
+  o+=`<g opacity="${f(la)}">`+(lit>0?`<ellipse cx="${f(xl)}" cy="${f(yb+9*ls)}" rx="${f(13*ls)}" ry="${f(9*ls)}" fill="${gb}" opacity="${f(.32*lit)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`:'')+
+   `<path d="M${f(xw)} ${f(yb-3*ls)}V${f(yb+3*ls)}M${f(xw)} ${f(yb)}H${f(xl)}M${f(lerp(xw,xl,.45))} ${f(yb)}q${f((xl-xw)*.2)} ${f(4*ls)} ${f((xl-xw)*.45)} ${f(1.5*ls)}" stroke="#1d1612" stroke-width="${f(1.1*ls)}" fill="none" stroke-linecap="round"/>`+
+   `<g transform="translate(${f(xl)} ${f(yb)}) scale(${ls})"><path d="M0 0V2.4" stroke="#1d1612" stroke-width=".9"/><path d="M-3.6 5.2L0 2.2L3.6 5.2Z" fill="#2a2019"/>`+
+   `<rect x="-3" y="5.2" width="6" height="7.6" fill="${lit>0?gl:'#2c2a33'}" fill-opacity="${f(lit>0?.55+.45*lit:1)}"/>`+(lit>0?`<rect x="-3" y="5.2" width="6" height="7.6" fill="${gb}" opacity="${f(.5*lit)}"/><path d="M0 11.4Q-1.1 9.8 0 7.4Q1.1 9.8 0 11.4Z" fill="#fff6d6" opacity="${f(lit)}"/>`:'')+
+   `<path d="M-3 5.2H3V12.8H-3ZM0 5.2V12.8" stroke="#1d1612" stroke-width=".8" fill="none"/><path d="M-3.8 12.8H3.8L2.6 14.4H-2.6Z" fill="#2a2019"/><circle cy="15.4" r=".9" fill="#2a2019"/></g>`+
+   (lit>0?`<circle cx="${f(xl)}" cy="${f(yb+9*ls)}" r="${f(6*ls)}" fill="${gl}" opacity="${f(.5*lit)}" filter="url(#lglow)" style="mix-blend-mode:screen"/>`:'')+'</g>'}
+ // Swifts cross the lit top on their evening flight, one each way. Jarvis and GitDiscuss share one sky (laid out in stage
+ // coordinates over both), so a joined pair sees one pair of swifts; each widget draws them, offset to its own corner.
+ const pr=sm?[model.c]:[model.a,model.b],X0=Math.min(...pr.map(p=>p.x))-24,X1=Math.max(...pr.map(p=>p.x))+w+24,Y0=Math.min(...pr.map(p=>p.y));
+ for(const[i,a0,a1,dir]of[[0,.18,.48,1],[1,.27,.56,-1]]){const t=seg(k,a0,a1);if(t<=0||t>=1)continue;
+  const sx=(dir>0?lerp(X0,X1,t):lerp(X1,X0,t))-mx,sy=Y0-model[id].y+(sm?-6:-10)+(sm?7:10)*hash(i+(sm?7:0),41)+5*Math.sin(t*Math.PI*3+i),fl=Math.cos(t*40+i*2);
+  o+=DK_SW(sx,sy,dir*8*Math.sin(t*Math.PI*3+i+.6),.35+.65*Math.abs(fl))}
+ // The last light glints on the outer pinnacle's finial.
+ const gt=Math.sin(Math.PI*seg(k,.9,1));
+ if(gt>.04){const pk=sm?.78:1,px=s.join==='l'?w-Rw/2:L/2,py=top-34*pk-2.6*pk;o+=`<g opacity="${f(gt)}">${sparkle(px,py,gt*4.5)}</g>`}
+ return o;
 }
 
 /* Crypt: the floor stays where the wall stood and the facade sinks into it. Tracery rises in the window first,
@@ -8206,7 +8281,7 @@ function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small)
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0,cz=model.shade==='cosmati'&&model.st>0,ru=model.shade==='ruin'&&model.st>0,sa=model.shade==='saw'&&model.st>0,ki=model.shade==='kiln'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0,cz=model.shade==='cosmati'&&model.st>0,ru=model.shade==='ruin'&&model.st>0,sa=model.shade==='saw'&&model.st>0,ki=model.shade==='kiln'&&model.st>0,dk=model.shade==='dusk'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -8239,7 +8314,7 @@ function render(){
   // Misericord: the display fades as the seat swings down over it. Lenten veil: it fades as the rod comes in, before the veil drops.
   // Corona: it fades as the wall starts to lower, long before the corona comes down.
   // Aumbry: the tabs and buttons fade; the display itself is drawn back into the recess and hidden once the doors are shut.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru||sa||ki?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru||sa||ki||dk?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   const auG=au?auGeo(id,w,h,k):null;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(!au&&n.style.filter)n.style.filter='';
@@ -8248,9 +8323,9 @@ function render(){
    else if(au&&n.matches('.screen,.mini')){auPose(n,auG);o=1-seg(k,.64,.68)}
    else if(n.style.transform){n.style.transform='';n.style.clipPath='';n.style.transformOrigin=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
-  el.querySelector('.grip').style.opacity=f(sa?1-seg(k,.07,.14):1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):sa?seg(k,0,.07):ki?seg(k,.86,.94):rg||rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);el.classList.toggle('czOn',cz);el.classList.toggle('ruOn',ru);el.classList.toggle('saOn',sa);el.classList.toggle('kiOn',ki);
+  el.querySelector('.grip').style.opacity=f(sa?1-seg(k,.07,.14):dk?1-seg(k,.04,.2):1-clamp(k*1.6));
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):sa?seg(k,0,.07):ki?seg(k,.86,.94):dk?seg(k,.8,.92):rg||rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);el.classList.toggle('czOn',cz);el.classList.toggle('ruOn',ru);el.classList.toggle('saOn',sa);el.classList.toggle('kiOn',ki);el.classList.toggle('dkOn',dk);
   // Ruin: the casing loses what has broken off its top, as a clip; the overlay draws everything else that weathers.
   const rclip=ru?ruClip(id,w,h,k):'';if(svg.dataset.rclip!==rclip){svg.dataset.rclip=rclip;svg.style.clipPath=rclip}
   const us2=el.querySelector('.rusvg'),rukey=ru?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.join}`:'';
@@ -8262,6 +8337,10 @@ function render(){
   // Fired clay: from the first frame the casing is hidden and the kiln layer draws the wall as a recoloured copy.
   const ks=el.querySelector('.kisvg'),kkey=ki?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.join}`:'';
   if(ks.dataset.key!==kkey){ks.dataset.key=kkey;ks.setAttribute('width',w);ks.setAttribute('height',h);ks.setAttribute('viewBox',`0 0 ${w} ${h}`);ks.innerHTML=kkey?kiln(id,w,h,k):''}
+  // Last light: the stone itself takes the evening colour (a CSS filter on the casing); the layer draws the shadow, lamp and value.
+  const dfil=dk?dkTint(k):'';if(svg.style.filter!==dfil)svg.style.filter=dfil;
+  const ds=el.querySelector('.dksvg'),dkey=dk?`${w}x${h}|${f(k*1000)}|${model.a.run}|${f(m.x)}|${f(m.y)}|${model.join}${k<.6?`|${f(model.a.x)},${f(model.a.y)},${f(model.b.x)},${f(model.b.y)}`:''}`:'';
+  if(ds.dataset.key!==dkey){ds.dataset.key=dkey;ds.setAttribute('width',w);ds.setAttribute('height',h);ds.setAttribute('viewBox',`0 0 ${w} ${h}`);ds.innerHTML=dkey?lastLight(id,w,h,k):''}
   const zs=el.querySelector('.czsvg'),zkey=cz?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(zs.dataset.key!==zkey){zs.dataset.key=zkey;zs.setAttribute('width',w);zs.setAttribute('height',h);zs.setAttribute('viewBox',`0 0 ${w} ${h}`);zs.innerHTML=zkey?cosmati(id,w,h,k):''}
   const ps=el.querySelector('.prsvg'),pkey=wp?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
