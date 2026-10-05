@@ -110,7 +110,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .hit:focus{outline:none}.hit:focus-visible .ringfocus{opacity:1}
 .ringfocus{opacity:0}
 #cameHit .kh{opacity:0;transition:opacity .2s}#cameHit:hover .kh,#cameHit:focus-visible .kh{opacity:1}
-.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg,.czsvg,.rusvg,.sasvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.clsvg,.tpsvg,.cnsvg,.crsvg,.rgsvg,.rtsvg,.mssvg,.vlsvg,.cosvg,.ausvg,.ulsvg,.nssvg,.gysvg,.prsvg,.czsvg,.rusvg,.sasvg,.kisvg{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 /* Inscription drum: a carved stone cylinder turning on gilt spindles in a sunk channel under the frieze */
 .drh{position:absolute;top:29px;height:20px;display:none;padding:0 18px 0 9px;border-radius:2px;
  background:linear-gradient(#1b130b,#2e2215 30%,#1b130b);box-shadow:inset 0 2px 3px #000b,0 1px 0 #fff6e299,0 -1px 0 #3a2c1c66}
@@ -134,7 +134,8 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .dix b{width:3.4px;height:3.4px;transform:rotate(45deg);background:#5a4630;box-shadow:0 0 0 .6px #1b130b}
 .dix b.on{background:linear-gradient(135deg,#fbe7a4,#c7922c 60%,#7b5413);box-shadow:0 0 3px #ffd36a}
 .small .dix{gap:1px}.small .dix b{width:3px;height:3px}
-.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span,.w.czOn .strip span,.w.ruOn .strip span,.w.saOn .strip span{visibility:hidden}
+.w.drumOn .strip span,.w.rgOn .strip span,.w.rtOn .strip span,.w.msOn .strip span,.w.vlOn .strip span,.w.coOn .strip span,.w.auOn .strip span,.w.ulOn .strip span,.w.nsOn .strip span,.w.gyOn .strip span,.w.prOn .strip span,.w.czOn .strip span,.w.ruOn .strip span,.w.saOn .strip span,.w.kiOn .strip span{visibility:hidden}
+.w.kiOn .strip b{color:#fbecc8;text-shadow:0 1px 1px #2a0c03,0 0 3px #3a120580}
 .lights{position:absolute;left:0;top:0;width:0;height:0;display:none}.lights.on{display:block}
 .lights button,.tri button{position:absolute;padding:0;border:0;background:none;cursor:help;touch-action:manipulation}
 .lights button:focus-visible,.tri button:focus-visible{outline:1.5px solid #f0cf7a;outline-offset:1px}
@@ -307,6 +308,8 @@ const f=n=>Math.round(n*10)/10;
 $$('.w').forEach(el=>el.insertAdjacentHTML('beforeend','<svg class="tpsvg" aria-hidden="true"></svg><svg class="cnsvg" aria-hidden="true"></svg><svg class="crsvg" aria-hidden="true"></svg><svg class="rgsvg" aria-hidden="true"></svg><svg class="rtsvg" aria-hidden="true"></svg><svg class="mssvg" aria-hidden="true"></svg><svg class="vlsvg" aria-hidden="true"></svg><svg class="cosvg" aria-hidden="true"></svg><svg class="ausvg" aria-hidden="true"></svg><svg class="ulsvg" aria-hidden="true"></svg><svg class="nssvg" aria-hidden="true"></svg><svg class="gysvg" aria-hidden="true"></svg><svg class="prsvg" aria-hidden="true"></svg><svg class="czsvg" aria-hidden="true"></svg><svg class="rusvg" aria-hidden="true"></svg>'));
 // The stone saw draws the wall itself, so its layer sits just above the casing, under the display, nameplate and strip.
 $$('.w').forEach(el=>el.querySelector('.casing').insertAdjacentHTML('afterend','<svg class="sasvg" aria-hidden="true"></svg>'));
+// Fired clay redraws the wall too, as a recoloured copy, in a layer of its own just above the casing.
+$$('.w').forEach(el=>el.querySelector('.casing').insertAdjacentHTML('afterend','<svg class="kisvg" aria-hidden="true"></svg>'));
 
 /* Jarvis bars as little glass lancets */
 $('.bars').innerHTML=`<svg width="42" height="22" viewBox="0 0 42 22">${[9,15,12,19,13].map((hh,i)=>{const x=i*8.6+.5;return `<path d="M${f(x)} 22V${f(22-hh+4)}Q${f(x)} ${f(22-hh)} ${f(x+3)} ${f(22-hh-1.5)}Q${f(x+6)} ${f(22-hh)} ${f(x+6)} ${f(22-hh+4)}V22Z" fill="${i===3?'#a3222f':'#2b56b3'}" stroke="#1d1612" stroke-width=".9"/>`}).join('')}</svg>`;
@@ -355,7 +358,7 @@ function casing(id,w,h){
  // Joins that fix fittings to the end face (cast bronze's sockets, the censers' brackets) want it square as well.
  const dl=SQJ.includes(model.join)&&!small,pr=model.join==='pier'&&!small,sq=bt||dl||pr;
  // Winepress: once the wall starts down, its overlay has long since covered the window, so the casing drops it.
- const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2),wpNo=model.shade==='press'&&k>0;
+ const k=small?clamp((CH-h)/(CH-CHS)):clamp((H-h)/(H-HS)),show=1-clamp(k*2.2),wpNo=(model.shade==='press'||model.shade==='kiln')&&k>0;
  // Compound pier: the joining end is left toothed, every other course standing out, like a wall waiting to be continued.
  const tooth=x=>{const t=[[x,top]];for(const r of JOINS.pier.rows(h))t.push([x,r.y],[x+r.e*JOINS.pier.TO,r.y],[x+r.e*JOINS.pier.TO,r.yb],[x,r.yb]);t.push([x,h]);return t};
  const pts=[];
@@ -393,7 +396,7 @@ function casing(id,w,h){
  // Window: stone reveal, coloured glass border; the HTML display is the clear glass inside it
  if(show>.01){const[x,y,sw,sh,b]=SCR[id];
   o+=`<g opacity="${f(show)}">`+(wpNo?'':`<rect x="${x-b-3}" y="${y-b-3}" width="${sw+2*b+6}" height="${sh+2*b+6}" fill="#2a1f15" opacity=".45"/><path d="M${x-b-3} ${y+sh+b+3}H${x+sw+b+3}V${y-b-3}" fill="none" stroke="#fff6e2" stroke-opacity=".55"/>${glassBorder(x,y,sw,sh,b,s.seed)}`);
-  for(const qx of QF[id])o+=`<g transform="translate(${qx} ${h-15})"><circle r="8.2" fill="none" stroke="#2a1d10" stroke-opacity=".3"/><g fill="#24180d" opacity=".32"><circle cx="-3.3" r="3.4"/><circle cx="3.3" r="3.4"/><circle cy="-3.3" r="3.4"/><circle cy="3.3" r="3.4"/></g><circle r="1.4" fill="url(#gild)"/></g>`;
+  for(const qx of model.shade==='kiln'&&k>0?[]:QF[id])o+=`<g transform="translate(${qx} ${h-15})"><circle r="8.2" fill="none" stroke="#2a1d10" stroke-opacity=".3"/><g fill="#24180d" opacity=".32"><circle cx="-3.3" r="3.4"/><circle cx="3.3" r="3.4"/><circle cy="-3.3" r="3.4"/><circle cy="3.3" r="3.4"/></g><circle r="1.4" fill="url(#gild)"/></g>`;
   o+='</g>'}
  return o;
 }
@@ -4002,7 +4005,7 @@ function stopAngle(){++angAnim;if(model.angTo!==undefined)model.angle=model.angT
 function pawlClick(){model.clickAt=performance.now();if(clickRaf)return;clickRaf=requestAnimationFrame(function tick(){render();clickRaf=performance.now()-model.clickAt<240?requestAnimationFrame(tick):0})}
 const SHADES={
  lower:{label:'Plain lower',kind:'Page baseline',
-  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress, Cosmati band, ruin, stone saw) were built, and stays for comparison.'},
+  about:'Not a brainstorm item. The wall sinks until only the cornice, the carved nameplate and a small lit pane with one value remain; pinnacles, gables and the rose stay, smaller. It kept the shade state working before the gothic shade modes (clerestory, triptych, cornice, crypt, inscription drum, shaft rings, rotulus, misericord, Lenten veil, corona, aumbry, unleading, font cover, gargoyle, winepress, Cosmati band, ruin, stone saw, fired clay) were built, and stays for comparison.'},
  clerestory:{label:'Clerestory',kind:'Distil',ms:1700,h:small=>small?56:72,drop:.5,
   on:'Shaded: the wall lowers to a clerestory, and its lancets light one by one, one window per status.',off:'Unshaded: the lancets go dark and the wall rises again.',
   about:'The wall lowers to a single storey of tall, narrow lancets under the carved frieze, like the high windows of a nave. The lancets rise out of the string course bay by bay, then kindle one at a time from the left. <b>Each lit lancet is one status:</b> amber for running, cold blue for idle or paused, red for needs you, green for passed. Bays with nothing to report stay blind, carved into the stone. The frieze keeps the name and the one key value; the window row reads at a glance as a status bar made of light. Hover a lancet, focus it, or tap it on a phone, to read what it stands for. Checks fills its wall with fourteen lancets, twelve green and two red. Pause Jarvis before shading and its three amber agents turn blue.'},
@@ -4058,7 +4061,11 @@ const SHADES={
  saw:{label:'Stone saw',kind:'Cut',ms:4800,h:small=>small?52:76,lowAt:[.6,.74],foot:true,
   on:'Shaded: a mason\'s frame saw cuts two courses across the wall, the band between them tips out and falls, the wall is let down onto its foot, and the joint is pointed and cramped; the cut-down window lights with the value.',
   off:'Unshaded: the cramps and pointing come out, the wall rises, and the fallen band comes back up into the gap and the cuts close.',
-  about:'A new shade kind for gothic, <b>Cut</b>: the casing is cut down to the strip. Nothing is folded, stowed or worn away; what isn\'t needed is cut out and falls, and what is left is closed up and joined. Medieval masons cut stone with a <i>frame saw</i>: a toothless iron blade strained in an oak frame by a twisted cord and a toggle, worked back and forth with sand and water, so the cut is ground rather than torn. Here the display fades into dim leaded glass, and the saw comes in along the wall. It cuts straight across under the frieze, through the window, stroke by stroke, a dark kerf opening behind the blade, grey slurry running down the face and stone dust at the blade\'s end. Then it is carried round and cuts back across just above the base course. The band between the cuts rocks loose, tips toward you and falls out with a puff of dust from both kerfs, and the desktop shows through the gap. <b>The shade keeps its foot where it stood, so the wall is let down onto the foot</b> until the cuts meet, with a flash along the joint and dust squeezed out of it. A pointing iron runs along the joint, laying lime across the stone and a lead came under the cut glass, and two iron cramps are dropped into sockets across the joint at the ends and run in with molten lead, which glows and cools to grey. Last, the strip of window left under the frieze kindles and the value is written across it in dark ink, left to right. <b>The glass is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the cut-down wall:</b> the name in the frieze, a short lit window with the value, the pointed joint and the base course. Nothing moves at rest. Unshading plays it back, the band rising out of the ground into the gap as the wall goes up. Joins still work on the shaded pair.'}
+  about:'A new shade kind for gothic, <b>Cut</b>: the casing is cut down to the strip. Nothing is folded, stowed or worn away; what isn\'t needed is cut out and falls, and what is left is closed up and joined. Medieval masons cut stone with a <i>frame saw</i>: a toothless iron blade strained in an oak frame by a twisted cord and a toggle, worked back and forth with sand and water, so the cut is ground rather than torn. Here the display fades into dim leaded glass, and the saw comes in along the wall. It cuts straight across under the frieze, through the window, stroke by stroke, a dark kerf opening behind the blade, grey slurry running down the face and stone dust at the blade\'s end. Then it is carried round and cuts back across just above the base course. The band between the cuts rocks loose, tips toward you and falls out with a puff of dust from both kerfs, and the desktop shows through the gap. <b>The shade keeps its foot where it stood, so the wall is let down onto the foot</b> until the cuts meet, with a flash along the joint and dust squeezed out of it. A pointing iron runs along the joint, laying lime across the stone and a lead came under the cut glass, and two iron cramps are dropped into sockets across the joint at the ends and run in with molten lead, which glows and cools to grey. Last, the strip of window left under the frieze kindles and the value is written across it in dark ink, left to right. <b>The glass is the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. <b>The strip is the cut-down wall:</b> the name in the frieze, a short lit window with the value, the pointed joint and the base course. Nothing moves at rest. Unshading plays it back, the band rising out of the ground into the gap as the wall goes up. Joins still work on the shaded pair.'},
+ kiln:{label:'Fired clay',kind:'Shrink',ms:6400,h:small=>small?52:62,curve:k=>kiQ(k),
+  on:'Shaded: the stone softens to wet clay, which plasters over the window and shrinks as it dries; a row of tiles is stamped into it and inlaid with white slip, the wall is fired and shrinks again, and it cools to glazed terracotta with the value in the tiles.',
+  off:'Unshaded: the glaze cools back, the fire unbakes the clay and it swells, the inlay is lifted out, the clay takes up its water and the stone comes back up the wall from the foot.',
+  about:'A new shade kind for gothic, <b>Shrink</b>: nothing is folded, cut, stowed or worn away; the material itself gets smaller. Stone does not shrink, but clay does, twice: as it dries, and again in the kiln. Where there was no good building stone, as round the Baltic, the gothic cathedrals were built of fired clay instead (the <i>Backsteingotik</i> of Lübeck, Toruń and Malbork), and English abbeys paved their floors with <i>encaustic</i> tiles: red clay stamped with a wooden block while leather-hard, the hollows filled with white clay slip and scraped flush, then glazed and fired, so the pattern shows yellow on deep red. Here the facade goes the same way. The display fades and <b>wet clay runs down the wall from the cresting</b>, a glistening front with slip dripping ahead of it, darkening the stone and plastering the window over. Steam lifts off the top as it dries, and it gives in its first shrink: the wall draws up and the outer end draws in. While it is leather-hard, wooden stamps press a row of tiles into the plastered window, from the value outward a pair at a time, and a scraper runs along them spreading white slip into the hollows and scraping the face clean, leaving the pattern and the key value inlaid in white. It dries pale and shrinks again, hairline cracks opening at the foot of the piers. Then <b>it is fired</b>: flames lick along the foot, the clay glows orange, the cracks glow, the glaze bubbles and goes glassy, sparks lift off the cresting, and the wall gives its last shrink. It cools to terracotta, the glaze crazes with a few small glints, and the white slip comes out honey yellow on deep red. Last, the two roundels beside the value are glazed in the status colour and kindle. <b>They are the status:</b> amber while Jarvis runs, blue when paused, red for GitDiscuss\'s decisions, green for Checks. Each shrink is a fit with a small overshoot, as clay gives; the outer end draws in 8 px over the three (4 each end on Checks) while the joining end stays put. <b>The strip is the fired wall:</b> the name in cream in the frieze and the value inlaid in the tiles. Nothing moves at rest. Unshading plays it back, the stone coming back up the wall over the clay. Joins still work on the shaded pair.'}
 };
 /* Inscription drum: six faces, each line twice round the cylinder. rot counts faces turned; anim is the token of a running click-turn. */
 const DRL={a:()=>[['03',model.a.run?'agents running':'agents paused'],['task','verify shell assembly'],['10:43','waiting for you']],
@@ -5551,6 +5558,133 @@ function stoneSaw(id,w,h,k){
   if(fr&&(pA>0&&pA<.97||pB>0&&pB<.97)){const c=(k*48)%1,fl=Math.floor(k*48);s+=dust(Math.min(w,Math.max(0,fr[0])),fr[1],c,3,7*sc,900+fl)}}
  return `<defs>${defs}</defs>${s}`;
 }
+/* Fired clay: a Shrink shade. Wet clay runs down the wall and plasters the window over; it dries and shrinks, a row of encaustic
+   tiles is stamped into the plastered window and inlaid with white slip; it is fired and shrinks again, and cools to glazed
+   terracotta. The wall is drawn here as a recoloured copy of the casing (one feColorMatrix, a tint on the stone's luminance), and
+   the height falls in three fits: kiQ is the shrink so far, read by shadeH through SHADES.kiln.curve. Top-anchored. */
+const KI_FIT=[[.18,.24,.4],[.43,.48,.3],[.6,.66,.3]],KI_C={},KI_G={};
+const kiOut=t=>t<=0?0:t>=1?1:1+1.9*Math.pow(t-1,3)+.9*Math.pow(t-1,2);
+const kiQ=k=>KI_FIT.reduce((q,[a,b,p])=>q+p*kiOut(seg(k,a,b)),0);
+// The clay's colour through the run, as a tint on luminance: wet, leather-hard, bone-dry, red heat, fired.
+const KI_TINT=[[0,[.54,.46,.38]],[.14,[.54,.46,.38]],[.3,[.72,.62,.51]],[.47,[1.03,.92,.8]],[.6,[1.36,.74,.36]],[.72,[1.36,.74,.36]],[.86,[.95,.49,.31]]];
+const kiTint=k=>{let i=1;while(i<KI_TINT.length-1&&k>KI_TINT[i][0])i++;const[a,A]=KI_TINT[i-1],[b,B]=KI_TINT[i],u=ease(seg(k,a,b));return A.map((v,j)=>lerp(v,B[j],u))};
+const kiMatrix=m=>m.map(v=>[.3,.59,.11].map(c=>(v*c).toFixed(3)).join(' ')+' 0 0').join(' ')+' 0 0 0 1 0';
+const kiMix=(a,b,t)=>'#'+[1,3,5].map(i=>Math.round(lerp(parseInt(a.substr(i,2),16),parseInt(b.substr(i,2),16),clamp(t))).toString(16).padStart(2,'0')).join('');
+function kiCasing(id,w,h){const ck=id+'|'+model.join+'|'+h;
+ if(!KI_C[ck]){if(Object.keys(KI_C).length>300)for(const c in KI_C)delete KI_C[c];KI_C[ck]=casing(id,w,h).replace(new RegExp('\\b(st|cl)-'+id+'\\b','g'),'ki$1-'+id)}return KI_C[ck]}
+function kiGeo(id,w){
+ const[,num,val]=tpText(id),ck=id+'|'+val;if(KI_G[ck])return KI_G[ck];
+ const sm=id==='c',s=SK[id],[x,y,sw,sh,b]=SCR[id],top=sm?5:8,px0=x-b-3,px1=x+sw+b+3,py0=Math.max(y-b-3,top+(sm?14:17)+3),pyB=y+sh+b+3;
+ const T=sm?13:19,ty=sm?25:28.5,fs=sm?9:11,tw=textW(num,`bold ${fs+1}px Georgia,serif`)+textW(' '+val,`italic ${fs}px Georgia,serif`),vw=Math.ceil(tw+(sm?16:22)),cx=(px0+px1)/2;
+ // Sized for the row as stamped, 7% larger than it ends up.
+ const n=clamp(Math.floor(((px1-px0)/1.07-6-vw)/2/T),1,5),x0=cx-vw/2-n*T,x1=cx+vw/2+n*T;
+ // Tiles left to right: n squares, the value tile, n squares. The squares beside the value carry the status roundels; the rest alternate two patterns.
+ const tiles=[];for(let i=0;i<n;i++)tiles.push({x:x0+i*T,w:T,p:i===n-1?'st':(n-1-i)%2?'a':'b'});
+ tiles.push({x:cx-vw/2,w:vw,p:'v'});for(let i=0;i<n;i++)tiles.push({x:cx+vw/2+i*T,w:T,p:i===0?'st':i%2?'a':'b'});
+ return KI_G[ck]={sm,num,val,top,px0,px1,py0,pyB,T,ty,fs,cx,x0,x1,tiles,ox:s.join==='r'?w:s.join==='l'?0:w/2,dx:8,cracks:[px0-7,px1+7]};
+}
+// One tile's inlay in colour c: a ring and quatrefoil (a), corner quadrants and a lozenge (b), a ring round the status roundel (st), or the value.
+function kiPat(G,t,c){
+ const{T,ty:y,fs}=G,x=t.x,xc=x+t.w/2,m=y+T/2,sw=f(T*.075);
+ if(t.p==='a')return `<circle cx="${f(xc)}" cy="${f(m)}" r="${f(T*.36)}" fill="none" stroke="${c}" stroke-width="${sw}"/><g fill="${c}">${[[0,-1],[1,0],[0,1],[-1,0]].map(([a,b])=>`<circle cx="${f(xc+a*T*.15)}" cy="${f(m+b*T*.15)}" r="${f(T*.105)}"/>`).join('')}</g>`;
+ if(t.p==='b'){const r=T*.4,arc=(X,Y,sx,sy)=>`M${f(X+sx*r)} ${f(Y)}A${f(r)} ${f(r)} 0 0 ${sx*sy>0?1:0} ${f(X)} ${f(Y+sy*r)}`,d=T*.15;
+  return `<path d="${arc(x,y,1,1)}${arc(x+T,y,-1,1)}${arc(x,y+T,1,-1)}${arc(x+T,y+T,-1,-1)}" fill="none" stroke="${c}" stroke-width="${sw}"/><path d="M${f(xc)} ${f(m-d)}L${f(xc+d)} ${f(m)}L${f(xc)} ${f(m+d)}L${f(xc-d)} ${f(m)}Z" fill="${c}"/>`}
+ if(t.p==='st')return `<circle cx="${f(xc)}" cy="${f(m)}" r="${f(T*.38)}" fill="none" stroke="${c}" stroke-width="${sw}"/><g fill="${c}">${[[1,1],[1,-1],[-1,1],[-1,-1]].map(([a,b])=>`<circle cx="${f(xc+a*T*.4)}" cy="${f(m+b*T*.4)}" r="${f(T*.06)}"/>`).join('')}</g>`;
+ return `<rect x="${f(x+2)}" y="${f(y+2)}" width="${f(t.w-4)}" height="${f(T-4)}" fill="none" stroke="${c}" stroke-width="${sw}"/>`+
+  `<text x="${f(xc)}" y="${f(m+fs*.36)}" fill="${c}" font-family="Georgia,serif" text-anchor="middle"><tspan font-weight="bold" font-size="${fs+1}">${G.num}</tspan><tspan font-style="italic" font-size="${fs}"> ${G.val}</tspan></text>`;
+}
+// A flame tongue standing on y.
+const kiFlame=(x,y,hw,hh,ln)=>`M${f(x-hw)} ${f(y)}Q${f(x-hw*.7)} ${f(y-hh*.55)} ${f(x+ln)} ${f(y-hh)}Q${f(x+hw*.7)} ${f(y-hh*.55)} ${f(x+hw)} ${f(y)}Z`;
+function kiln(id,w,h,k){
+ const G=kiGeo(id,w),{sm,T,ty,cx,x0,x1,tiles,top}=G,dust=JOINS.buttress.dust,[gl,gb,gd]=msGlass(id),Q=kiQ(k),N=tiles.length;
+ const wet=seg(k,.02,.13),sx=(w-G.dx*Q)/w,hot=seg(k,.48,.6)*(1-seg(k,.72,.84));
+ let defs=`<g id="kiK-${id}">${kiCasing(id,w,h)}</g><filter id="kiF-${id}" x="-10%" y="-60%" width="120%" height="220%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="${kiMatrix(kiTint(k))}"/></filter>`+
+  `<linearGradient id="kiS-${id}" x1="0" y1="0" x2=".35" y2="1"><stop stop-color="#fff" stop-opacity=".75"/><stop offset=".3" stop-color="#fff" stop-opacity="0"/><stop offset=".55" stop-color="#fff" stop-opacity=".3"/><stop offset=".75" stop-color="#fff" stop-opacity="0"/></linearGradient>`;
+ // The plastered window: smoothed clay over the reveal, the bed the tiles are stamped into. Hairline cracks open at the piers' feet in the second shrink.
+ // Until the first shrink the casing still draws the window, so the bed covers its whole reveal; after it, the bed starts under the frieze.
+ const pb=Math.min(G.pyB,h-12),py=lerp(SCR[id][1]-SCR[id][4]-3,G.py0,seg(k,.18,.24)),cr=seg(k,.43,.48),cl=sm?.75:1;
+ const crack=xc=>`M${f(xc)} ${h-11}l${f(1.2*cl)} ${f(-3*cl)}l${f(-1.7*cl)} ${f(-2.6*cl)}l${f(1.1*cl)} ${f(-2.8*cl)}l${f(-.9*cl)} ${f(-2.4*cl)}`;
+ const cracks=G.cracks.map(crack).join('');
+ let clay=`<use href="#kiK-${id}"/><rect x="${G.px0}" y="${f(py)}" width="${G.px1-G.px0}" height="${f(Math.max(0,pb-py))}" fill="url(#lime)" filter="url(#kist-${id})"/>`+
+  `<path d="M${G.px0} ${f(pb)}H${G.px1}" stroke="#2a1d10" stroke-opacity=".22" stroke-width=".7"/>`;
+ if(cr>0)clay+=G.cracks.map(xc=>`<path d="${crack(xc)}" fill="none" stroke="#1e1108" stroke-opacity=".7" stroke-width=".75" pathLength="1" stroke-dasharray="${f3(cr)} 1"/>`).join('');
+ clay=`<g filter="url(#kiF-${id})">${clay}</g>`;
+ let s='';
+ // The wet front runs down from the cresting, slip dripping ahead of it; under it the clay glistens until it dries.
+ const wg=1-seg(k,.12,.24),gloss=wg>0?`<rect x="0" y="0" width="${w}" height="${h}" fill="url(#kiS-${id})" clip-path="url(#kicl-${id})" opacity="${f(.32*wg)}"/>`:'';
+ if(wet<1){const fy=lerp(-44,h+14,wet),P=[];
+  for(let xx=w+60;xx>=-60;xx-=10){const d=hash(xx+60,3)>.8?(sm?5:8)*ease(seg(wet,0,.35))*(.6+.4*hash(xx,5)):0;P.push([xx,fy+2*Math.sin(xx*.11+wet*9)+d])}
+  const line='M'+P.map(p=>f(p[0])+' '+f(p[1])).join('L');
+  defs+=`<mask id="kiM-${id}" maskUnits="userSpaceOnUse" x="-60" y="-80" width="${w+120}" height="${h+160}"><path d="M${w+60} -80${line.replace('M','L')}L-60 -80Z" fill="#fff"/></mask>`;
+  s+=`<use href="#kiK-${id}"/><g mask="url(#kiM-${id})">${clay}${gloss}</g>`+
+   (wet>0?`<g clip-path="url(#kicl-${id})" fill="none"><path d="${line}" stroke="#2a1a0e" stroke-opacity=".35" stroke-width="1.6"/><path d="${line}" stroke="#fff" stroke-opacity=".55" stroke-width=".7" transform="translate(0 -.8)"/></g>`:'')}
+ else s+=clay+gloss;
+ // Steam lifts off the top as it dries.
+ const dr=seg(k,.12,.27);if(dr>0&&dr<1)for(let i=0;i<4;i++){const u=seg(dr,i*.12,i*.12+.62);if(u>0&&u<1){const xx=w*(.2+.2*i),yy=top-3-16*u;
+  s+=`<path d="M${f(xx)} ${f(yy)}q3 -3 0 -6q-3 -3 0 -6" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="1.3" stroke-opacity="${f(.4*Math.sin(Math.PI*u))}"/>`}}
+ G.cracks.forEach((xc,i)=>s+=dust(xc,h-11,seg(k,.44,.5),3,6,i*5+920));
+ if(hot>0)s+=`<g style="mix-blend-mode:screen" opacity="${f(hot)}"><path d="${cracks}" fill="none" stroke="#ff8a2a" stroke-width="1.6" filter="url(#lglow)"/><path d="${cracks}" fill="none" stroke="#ffd27a" stroke-width=".7"/></g>`;
+ // The tile row: stamped one tile at a time, slipped and scraped, then fired. It is 7% larger when stamped and shrinks with the wall.
+ if(k>=.245){
+  const sT=lerp(1.07,1,clamp((Q-.4)/.6)),stp=seg(k,.245,.38),sl=seg(k,.385,.43),gz=seg(k,.66,.8),Wsh=sm?16:24,xs=lerp(x0-4,x1+Wsh,sl);
+  const slip=k<.48?'#ede4cf':k<.72?kiMix('#ede4cf','#fff1c4',seg(k,.48,.6)):kiMix('#fff1c4','#f2c95e',seg(k,.72,.86));
+  const imp=t=>`<g opacity=".34">${kiPat(G,t,'#1a0f06')}</g><g opacity=".22" transform="translate(0 .7)">${kiPat(G,t,'#fff8e8')}</g>`;
+  // Stamped from the value tile outward, a pair at a time.
+  const S=(N+1)/2,su=j=>{const q=Math.abs(j-(N-1)/2);return seg(stp,q/S,(q+1)/S)};
+  let rows='',inl='',hol='',stamp='';const done=new Set();
+  tiles.forEach((t,j)=>{const u=su(j);if(u<=.5)return;done.add(t);
+   rows+=`<rect x="${f(t.x)}" y="${f(ty)}" width="${f(t.w)}" height="${T}"/>`;hol+=imp(t);inl+=kiPat(G,t,slip)});
+  // The stamp in hand: a wooden block with a turned knob, coming down onto the clay, pressing and lifting away.
+  tiles.forEach((t,j)=>{const u=su(j);if(u<=0||u>=1)return;
+   const sc=u<.4?lerp(1.4,1,ease(u/.4)):u<.55?1-.035*Math.sin(Math.PI*(u-.4)/.15):lerp(1,1.35,ease((u-.55)/.45)),op=u<.4?seg(u,0,.25):1-seg(u,.7,1);
+   const bc=t.x+t.w/2,bm=ty+T/2,sh=(sc-1)*16;
+   stamp+=`<g opacity="${f(op)}"><rect x="${f(t.x-1.5+sh)}" y="${f(ty-1.5+sh)}" width="${f(t.w+3)}" height="${T+3}" rx="1.5" fill="#1a0f06" opacity="${f(.3*(1-seg(sc,1,1.4))+.08)}" transform="translate(${f(bc)} ${f(bm)}) scale(${f3(sc)}) translate(${f(-bc)} ${f(-bm)})"/>`+
+    `<g transform="translate(${f(bc)} ${f(bm)}) scale(${f3(sc)}) translate(${f(-bc)} ${f(-bm)})"><rect x="${f(t.x-1.5)}" y="${f(ty-1.5)}" width="${f(t.w+3)}" height="${T+3}" rx="1.5" fill="url(#kiW-${id})" stroke="#2a1608" stroke-width=".7"/>`+
+    `<path d="M${f(t.x)} ${f(ty+T*.3)}H${f(t.x+t.w)}M${f(t.x)} ${f(ty+T*.72)}H${f(t.x+t.w)}" stroke="#4a2c12" stroke-opacity=".35" stroke-width=".5"/>`+
+    `<circle cx="${f(bc)}" cy="${f(bm)}" r="${f(T*.27)}" fill="#6a3f1c" stroke="#2a1608" stroke-width=".6"/><circle cx="${f(bc-T*.06)}" cy="${f(bm-T*.07)}" r="${f(T*.12)}" fill="#c99a62" opacity=".7"/></g></g>`});
+  if(stamp)defs+=`<linearGradient id="kiW-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b8834b"/><stop offset="1" stop-color="#704622"/></linearGradient>`;
+  let o=rows?`<g fill="none" stroke="#1a0f06" stroke-opacity="${f(.28+.2*gz)}" stroke-width=".6">${rows}</g>`:'';
+  // The glaze deepens the red; the inlay stays bright on it.
+  if(gz>0)o+=`<rect x="${f(x0)}" y="${f(ty)}" width="${f(x1-x0)}" height="${T}" fill="#3c1004" opacity="${f(.42*gz)}"/>`;
+  if(sl<=0)o+=hol;
+  else if(sl>=1)o+=inl;
+  else{defs+=`<clipPath id="kiA-${id}"><rect x="${f(x0-10)}" y="${f(ty-6)}" width="${f(Math.max(0,xs-x0+10))}" height="${T+12}"/></clipPath><clipPath id="kiB-${id}"><rect x="${f(xs)}" y="${f(ty-6)}" width="${f(x1-xs+10)}" height="${T+12}"/></clipPath>`;
+   o+=`<g clip-path="url(#kiB-${id})">${hol}</g><g clip-path="url(#kiA-${id})">${inl}</g>`;
+   const a=Math.max(x0,xs),b=Math.min(x1,xs+Wsh);
+   if(b>a)o+=`<rect x="${f(a)}" y="${f(ty+.5)}" width="${f(b-a)}" height="${T-1}" fill="#efe7d4" opacity=".88"/><path d="M${f(b)} ${f(ty+.5)}v${T-1}" stroke="#fffaf0" stroke-opacity=".6" stroke-width=".8"/>`;
+   // The scraper: an iron blade on a wooden handle, pushing a curl of slip ahead of it.
+   if(xs>x0-4&&xs<x1+4)o+=`<ellipse cx="${f(xs+1.6)}" cy="${f(ty+T/2)}" rx="1.8" ry="${f(T*.46)}" fill="#f4eddc" stroke="#9c9078" stroke-width=".4"/>`+
+    `<path d="M${f(xs-1)} ${f(ty-5)}L${f(xs-12)} ${f(ty-16)}" stroke="#3a2412" stroke-width="3.2" stroke-linecap="round"/><path d="M${f(xs-1)} ${f(ty-5)}L${f(xs-12)} ${f(ty-16)}" stroke="#a8763e" stroke-width="1.8" stroke-linecap="round"/>`+
+    `<rect x="${f(xs-1)}" y="${f(ty-5)}" width="1.8" height="${T+9}" fill="#9a958d" stroke="#24201c" stroke-width=".5"/>`}
+  // The glaze bubbles as it melts, then goes glassy.
+  const bb=seg(k,.62,.74);if(bb>0&&bb<1)for(let i=0;i<14;i++){const u=seg(bb,hash(i,41)*.6,hash(i,41)*.6+.4);if(u>0&&u<1)o+=`<circle cx="${f(lerp(x0+2,x1-2,hash(i,43)))}" cy="${f(ty+2+(T-4)*hash(i,47))}" r="${f(.5+1.1*Math.sin(Math.PI*u))}" fill="none" stroke="#fff6d8" stroke-opacity="${f(.6*(1-u))}" stroke-width=".5"/>`}
+  if(gz>0)o+=`<rect x="${f(x0)}" y="${f(ty)}" width="${f(x1-x0)}" height="${T}" fill="url(#glassHi)" opacity="${f(gz)}"/><path d="M${f(x0)} ${f(ty+.6)}H${f(x1)}" stroke="#fff4d6" stroke-opacity="${f(.4*gz)}" stroke-width=".6"/>`;
+  // The status roundels: glazed last, kindling with a flare.
+  const kd=seg(k,.86,.92),fl=Math.sin(Math.PI*kd);
+  tiles.filter(t=>t.p==='st'&&done.has(t)).forEach(t=>{const xc=t.x+t.w/2,m=ty+T/2,r=T*.25;
+   o+=`<circle cx="${f(xc)}" cy="${f(m)}" r="${f(r)}" fill="#1a0f06" opacity="${f(.3*(1-kd))}"/>`;
+   if(kd>0)o+=`<circle cx="${f(xc)}" cy="${f(m)}" r="${f(r)}" fill="url(#kiR-${id})" opacity="${f(kd)}" stroke="#2a1006" stroke-width=".5"/><g style="mix-blend-mode:screen" opacity="${f(.5*kd)}"><circle cx="${f(xc)}" cy="${f(m)}" r="${f(r+2)}" fill="${gb}" filter="url(#lglow)"/></g>`+
+    (fl>.05&&kd<1?`<circle cx="${f(xc)}" cy="${f(m)}" r="${f(r*(1+fl*.5))}" fill="#fffbe8" opacity="${f(.6*fl)}"/>`:'')});
+  if(kd>0)defs+=`<radialGradient id="kiR-${id}" cx=".4" cy=".36" r=".7"><stop stop-color="${gl}"/><stop offset=".55" stop-color="${gb}"/><stop offset="1" stop-color="${gd}"/></radialGradient>`;
+  // As it cools the glaze crazes with small glints; a last glint runs off the end of the row.
+  const tk=seg(k,.78,.86);if(tk>0&&tk<1)for(let i=0;i<5;i++){const u=seg(tk,i*.16,i*.16+.2),g=Math.sin(Math.PI*u);if(g>.05)o+=`<g opacity="${f(g)}">${sparkle(lerp(x0+4,x1-4,hash(i,53)),ty+3+(T-6)*hash(i,59),2.6*g)}</g>`}
+  const gg=Math.sin(Math.PI*seg(k,.95,1));if(gg>.05)o+=`<g opacity="${f(gg)}">${sparkle(x1-2,ty+2,3.6*gg)}</g>`;
+  o+=stamp;s+=sT!==1?`<g transform="translate(${f(cx)} ${f(ty)}) scale(${f3(sT)}) translate(${f(-cx)} ${f(-ty)})">${o}</g>`:o;
+ }
+ // Firing: the wall glows from the foot, flames lick along it, and sparks lift off the cresting in the last shrink.
+ if(hot>0){s+=`<g style="mix-blend-mode:screen" opacity="${f(.55*hot)}"><rect x="0" y="${top}" width="${w}" height="${h-top}" fill="url(#kiH-${id})" clip-path="url(#kicl-${id})"/></g>`;
+  defs+=`<linearGradient id="kiH-${id}" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#ff7a1c"/><stop offset=".6" stop-color="#ff5a10" stop-opacity="0"/></linearGradient>`}
+ const fl=seg(k,.49,.56)*(1-seg(k,.7,.78));
+ if(fl>0){const fr=Math.floor(k*90),n=sm?7:10;let o1='',o2='';
+  for(let i=0;i<n;i++){const xx=(i+.5)*w/n+3*(hash(i,fr)-.5),hh=(sm?9:13)*fl*(.55+.45*hash(i+7,fr)),hw=(sm?5:7)*(.8+.3*hash(i,5)),ln=(hash(i+3,fr)-.5)*4;
+   o1+=kiFlame(xx,h+3,hw,hh,ln);o2+=kiFlame(xx,h+3,hw*.5,hh*.58,ln*.6)}
+  s+=`<g style="mix-blend-mode:screen"><path d="${o1}" fill="#ff6a12" opacity=".7" filter="url(#lglow)"/><path d="${o1}" fill="#ff8f2a" opacity=".85"/><path d="${o2}" fill="#ffe08a" opacity=".9"/></g>`}
+ const sp=seg(k,.6,.72);if(sp>0&&sp<1)for(let i=0;i<7;i++){const u=seg(sp,hash(i,61)*.5,hash(i,61)*.5+.5);if(u>0&&u<1)
+  s+=`<circle cx="${f(w*(.1+.8*hash(i,67))+6*Math.sin(u*6+i))}" cy="${f(top-4-22*u)}" r="${f(.9*(1-u)+.4)}" fill="#ffc35a" opacity="${f(1-u)}"/>`}
+ const ox=G.ox;
+ return `<defs>${defs}</defs><g transform="translate(${f(ox)} 0) scale(${f3(sx)} 1) translate(${f(-ox)} 0)">${s}</g>`;
+}
+const f3=n=>Math.round(n*1000)/1000;
 // A crypt shade keeps the widgets' feet where they stood, so the walls visibly go down into the floor (and come back up out of it).
 function footFix(h0,c0){shiftFeet(h0-shadeH(false),c0-shadeH(true))}
 // Moves the widgets (and any running join path or drag origin with them) down by d (Checks by dc), kept on the stage.
@@ -7612,11 +7746,11 @@ function toggleShade(force){
 
 /* ---------- Rendering ---------- */
 // Shaded height per option; some shades lower the wall in the first part of their run and use the rest for detail.
-function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small):small?CHS:HS,t=s.lowAt?ease(seg(ease(st),...s.lowAt)):s.drop?ease(seg(ease(st),0,s.drop)):ease(st);return Math.round(lerp(small?CH:H,lo,t))}
+function shadeH(small,st=model.st){const s=SHADES[model.shade],lo=s.h?s.h(small):small?CHS:HS,t=s.curve?s.curve(ease(st)):s.lowAt?ease(seg(ease(st),...s.lowAt)):s.drop?ease(seg(ease(st),0,s.drop)):ease(st);return Math.round(lerp(small?CH:H,lo,t))}
 const lowH=()=>model.st>.5?shadeH(false,1):H;
 function ctx(){return{a:model.a,b:model.b,h:shadeH(false),jt:model.jt,glow:model.glow}}
 function render(){
- const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0,cz=model.shade==='cosmati'&&model.st>0,ru=model.shade==='ruin'&&model.st>0,sa=model.shade==='saw'&&model.st>0;
+ const c=ctx(),j=J(),ch=shadeH(true),cl=model.shade==='clerestory',tp=model.shade==='triptych',cn=model.shade==='cornice'&&model.st>0,cr=model.shade==='crypt'&&model.st>0,rg=model.shade==='rings'&&model.st>0,rt=model.shade==='rotulus'&&model.st>0,ms=model.shade==='misericord'&&model.st>0,vl=model.shade==='veil'&&model.st>0,co=model.shade==='corona'&&model.st>0,au=model.shade==='aumbry'&&model.st>0,ul=model.shade==='unlead'&&model.st>0,fc=model.shade==='nest'&&model.st>0,gy=model.shade==='gargoyle'&&model.st>0,wp=model.shade==='press'&&model.st>0,cz=model.shade==='cosmati'&&model.st>0,ru=model.shade==='ruin'&&model.st>0,sa=model.shade==='saw'&&model.st>0,ki=model.shade==='kiln'&&model.st>0;
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';el.style.height=h+'px';
@@ -7636,7 +7770,7 @@ function render(){
    // Rose dial and strap hinge: GitDiscuss pivots about the middle of the gap (the rose, or the hinge's knuckle).
    else{el.style.transformOrigin=`${-J().gap/2}px ${f(h/2)}px`;el.style.transform=bd?`rotate(${f(bd*100)/100}deg)`:''}}
   const k=ease(model.st),cnG=cn?cnGeo(id):null,Se=cn?cnSoffit(cnG,k):0;
-  const svg=el.querySelector('.casing'),key=cn?`cn|${w}x${h}|${model.join}|${f(Se)}`:cr?`cr|${w}|${model.join}|${crCold(id)}`:w+'x'+h+model.join+(model.shade==='press'?'|wp':'');
+  const svg=el.querySelector('.casing'),key=cn?`cn|${w}x${h}|${model.join}|${f(Se)}`:cr?`cr|${w}|${model.join}|${crCold(id)}`:w+'x'+h+model.join+(model.shade==='press'?'|wp':model.shade==='kiln'?'|ki':'');
   if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=cn?cornWall(id,w,h,k):cr?cryptWall(id,w):casing(id,w,h)}
   if(cr)cryptSet(svg,id,w,h,k);
   const rs=el.querySelector('.crsvg'),rkey=cr?`${w}x${h}|${f(k*1000)}|${model.a.run}|${f(model.jt*100)}`:'';
@@ -7649,7 +7783,7 @@ function render(){
   // Misericord: the display fades as the seat swings down over it. Lenten veil: it fades as the rod comes in, before the veil drops.
   // Corona: it fades as the wall starts to lower, long before the corona comes down.
   // Aumbry: the tabs and buttons fade; the display itself is drawn back into the recess and hidden once the doors are shut.
-  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru||sa?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
+  const vis=cn?1:cr?1-seg(k,0,.12):rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru||sa||ki?1-seg(k,0,.1):tp?show*(1-seg(k,.44,.5)):show,d=cn?cnG.full-h:0;
   const auG=au?auGeo(id,w,h,k):null;
   el.querySelectorAll('.screen,.tabline,.knob,.mini,.knot').forEach(n=>{let o=vis;
    if(!au&&n.style.filter)n.style.filter='';
@@ -7659,16 +7793,19 @@ function render(){
    else if(n.style.transform){n.style.transform='';n.style.clipPath='';n.style.transformOrigin=''}
    n.style.opacity=f(o);n.style.visibility=o<.02?'hidden':'visible'});
   el.querySelector('.grip').style.opacity=f(sa?1-seg(k,.07,.14):1-clamp(k*1.6));
-  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):sa?seg(k,0,.07):rg||rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?seg(k,.82,1):strip);
-  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);el.classList.toggle('czOn',cz);el.classList.toggle('ruOn',ru);el.classList.toggle('saOn',sa);
+  el.querySelector('.strip').style.opacity=f(tp||cn?0:cr?seg(k,.86,1):sa?seg(k,0,.07):ki?seg(k,.86,.94):rg||rt||ms||vl||co||au||ul||fc||gy||wp||cz||ru?seg(k,.82,1):strip);
+  el.classList.toggle('rgOn',rg);el.classList.toggle('rtOn',rt);el.classList.toggle('msOn',ms);el.classList.toggle('vlOn',vl);el.classList.toggle('coOn',co);el.classList.toggle('auOn',au);el.classList.toggle('ulOn',ul);el.classList.toggle('nsOn',fc);el.classList.toggle('gyOn',gy);el.classList.toggle('prOn',wp);el.classList.toggle('czOn',cz);el.classList.toggle('ruOn',ru);el.classList.toggle('saOn',sa);el.classList.toggle('kiOn',ki);
   // Ruin: the casing loses what has broken off its top, as a clip; the overlay draws everything else that weathers.
   const rclip=ru?ruClip(id,w,h,k):'';if(svg.dataset.rclip!==rclip){svg.dataset.rclip=rclip;svg.style.clipPath=rclip}
   const us2=el.querySelector('.rusvg'),rukey=ru?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.join}`:'';
   if(us2.dataset.key!==rukey){us2.dataset.key=rukey;us2.setAttribute('width',w);us2.setAttribute('height',h);us2.setAttribute('viewBox',`0 0 ${w} ${h}`);us2.innerHTML=rukey?ruin(id,w,h,k):''}
   // Stone saw: from SA_K0 the casing is hidden and the saw layer draws the wall as clipped full-height copies.
-  const sop=sa&&k>=SA_K0?'0':'';if(svg.style.opacity!==sop)svg.style.opacity=sop;
+  const sop=sa&&k>=SA_K0||ki?'0':'';if(svg.style.opacity!==sop)svg.style.opacity=sop;
   const ss=el.querySelector('.sasvg'),skey=sa?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.join}`:'';
   if(ss.dataset.key!==skey){ss.dataset.key=skey;ss.setAttribute('width',w);ss.setAttribute('height',h);ss.setAttribute('viewBox',`0 0 ${w} ${h}`);ss.innerHTML=skey?stoneSaw(id,w,h,k):''}
+  // Fired clay: from the first frame the casing is hidden and the kiln layer draws the wall as a recoloured copy.
+  const ks=el.querySelector('.kisvg'),kkey=ki?`${w}x${h}|${f(k*1000)}|${model.a.run}|${model.join}`:'';
+  if(ks.dataset.key!==kkey){ks.dataset.key=kkey;ks.setAttribute('width',w);ks.setAttribute('height',h);ks.setAttribute('viewBox',`0 0 ${w} ${h}`);ks.innerHTML=kkey?kiln(id,w,h,k):''}
   const zs=el.querySelector('.czsvg'),zkey=cz?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
   if(zs.dataset.key!==zkey){zs.dataset.key=zkey;zs.setAttribute('width',w);zs.setAttribute('height',h);zs.setAttribute('viewBox',`0 0 ${w} ${h}`);zs.innerHTML=zkey?cosmati(id,w,h,k):''}
   const ps=el.querySelector('.prsvg'),pkey=wp?`${w}x${h}|${f(k*1000)}|${model.a.run}`:'';
