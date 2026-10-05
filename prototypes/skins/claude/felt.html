@@ -1954,6 +1954,121 @@ function loDraw(id,w,h,small,st){
   t+=`<clipPath id="lon-${id}"><rect x="-20" y="-40" width="${f(w-EDGE-1+20)}" height="${f(h+40)}"/></clipPath><g clip-path="url(#lon-${id})"><g transform="translate(${f(hx)} ${f(top(hx)+(small?-1.2:.4))}) scale(${sc})">${loSnail(id,C,e,str)}</g></g>`}
  return t;
 }
+/* ---------- Shade: pinked seam (Cut) ---------- */
+// The Cut kind (wire's saw cut) done in felt: nothing is folded, flattened or put away; what isn't needed is cut out.
+// Felt doesn't fray, so it is cut and never hemmed. Pinking shears snip straight across the cushion twice, a bite a
+// frame, and the band between the cuts drops out and falls away. Both cuts were made with the same blades, so the two
+// pinked edges are the same zigzag: the foot is pushed up and its teeth sit in the top's notches. A felting needle then
+// stabs along the seam, its barbs dragging fibres from each side into the other until the two are one piece, and dabs
+// a wisp of status-coloured roving onto the seam's end. The value is cross-stitched on the foot.
+const PK_MS=5000,PKG={};
+const pkQ=st=>Math.floor(st*PK_MS/FRAME+1e-6)*FRAME/PK_MS;
+const pkD=small=>small?22:68;
+const pkRise=q=>{const u=seg(q,.74,.84);return ease(seg(u,0,.75))+.022*Math.sin(Math.PI*seg(u,.75,1))};
+const pkH=(st,small)=>Math.round((small?CH:H)-pkD(small)*Math.min(1,pkRise(pkQ(st))));
+// A pinked line at y0 across the cushion and past both ends; every cut shares the phase, so any two edges mesh.
+function pkZig(y0,w,P,A){const o=[];for(let x=-P,k=0;x<=w+P+.01;x+=P/2,k++)o.push({x,y:y0+(k%2?A/2:-A/2)});return o}
+// The part of a pinked line between x=a and x=b, and its height at x.
+function pkSub(pts,a,b){const o=[];
+ for(let i=0;i<pts.length-1;i++){const p=pts[i],q=pts[i+1];if(q.x<a||p.x>b)continue;const at=x=>({x,y:lerp(p.y,q.y,(x-p.x)/(q.x-p.x))});
+  if(!o.length)o.push(p.x<a?at(a):p);o.push(q.x>b?at(b):q)}
+ return o}
+const pkY=(pts,x)=>{const o=pkSub(pts,x,x+.01);return o.length?o[0].y:pts[0].y};
+const pkD2=pts=>pts.length?'M'+pts.map(p=>f(p.x)+' '+f(p.y)).join('L'):'';
+function pkGeo(id,small){
+ const key=id+(small?'s':'');if(PKG[key])return PKG[key];
+ const w=small?CW:W,H0=small?CH:H,D=pkD(small),y1=small?30:34,y2=y1+D,P=small?6.4:7.2,A=3.6,z1=pkZig(y1,w,P,A),z2=pkZig(y2,w,P,A),rev=a=>a.slice().reverse();
+ const reg={top:`M-20 -60H${w+20}V${y1}L${rev(z1).map(pt).join('L')}Z`,band:`M${z1.map(pt).join('L')}L${rev(z2).map(pt).join('L')}Z`,foot:`M${z2.map(pt).join('L')}V${H0+40}H-20Z`};
+ // The needle's stabs along the seam: each drags a few fibres across it, light and dark.
+ let sd=SKIN[id].seed*3301+11;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647,stabs=[];
+ for(let x=EDGE+7;x<w-EDGE-6;x+=small?7.5:8.5){let d1='',d2='';
+  for(let i=0;i<4;i++){const fx=x+(rnd()-.5)*6,fy=pkY(z1,fx)+(rnd()-.5)*2,a=(rnd()-.5)*1.4+(i%2?1.57:-1.57),L=3.5+rnd()*3,c=(rnd()-.5)*3;
+   const d=`M${f(fx-Math.cos(a)*L/2)} ${f(fy-Math.sin(a)*L/2)}q${f(Math.cos(a)*L/2-Math.sin(a)*c)} ${f(Math.sin(a)*L/2+Math.cos(a)*c)} ${f(Math.cos(a)*L)} ${f(Math.sin(a)*L)}`;
+   if(i%2)d2+=d;else d1+=d}
+  stabs.push({x,y:pkY(z1,x),d1,d2})}
+ return PKG[key]={w,H0,D,y1,y2,P,A,z1,z2,reg,stabs};
+}
+// Pinking shears side on, points to +x, pivot at 0: steel blades with toothed edges, chunky orange handles.
+function pkShears(open){
+ const a=open?12:2.5;let teeth='';for(let x=21;x>2;x-=2.4)teeth+=`L${f(x)} ${f(1.3)}L${f(x-1.2)} ${f(.2)}`;
+ const bl=`M0 -1.1L22 -2Q24.6 -1.1 23 .6${teeth}L0 1.1Z`,hd=(sy)=>`<path d="M0 0L-9 ${4*sy}" stroke="#7a3a10" stroke-width="3.8" stroke-linecap="round"/><path d="M0 0L-9 ${4*sy}" stroke="#e8772e" stroke-width="2.6" stroke-linecap="round"/>`+
+  `<ellipse cx="-14.5" cy="${5.6*sy}" rx="6" ry="3.8" fill="none" stroke="#7a3a10" stroke-width="3.6"/><ellipse cx="-14.5" cy="${5.6*sy}" rx="6" ry="3.8" fill="none" stroke="#e8772e" stroke-width="2.4"/><path d="M-19 ${f(4.4*sy)}q3 ${f(-2*sy)} 7 ${f(-1.6*sy)}" fill="none" stroke="#ffc08a" stroke-width=".8" stroke-linecap="round"/>`;
+ return `<g transform="rotate(${-a})"><path d="${bl}" fill="url(#metal)" stroke="#4a443d" stroke-width=".5" stroke-linejoin="round"/>${hd(1)}</g>`+
+  `<g transform="rotate(${a})"><path d="${bl}" transform="scale(1 -1)" fill="url(#metal)" stroke="#4a443d" stroke-width=".5" stroke-linejoin="round"/>${hd(-1)}</g>`+
+  `<circle r="1.6" fill="#f1e6cc" stroke="#4a443d" stroke-width=".5"/>`;
+}
+// A felting needle in a turned wooden holder, tip at 0, leaning back; barbs notched near the tip.
+const pkNeedle=`<g transform="rotate(14)"><path d="M0 0V-25" stroke="#3d3a36" stroke-width="1.5" stroke-linecap="round"/><path d="M0 0V-25" stroke="#d9d4cb" stroke-width=".8" stroke-linecap="round"/>`+
+ `<path d="M-.7 -3l-1 -1.2M.7 -5.5l1 -1.2M-.7 -8l-1 -1.2M.7 -10.5l1 -1.2" stroke="#6d6860" stroke-width=".5"/>`+
+ `<rect x="-2.6" y="-27.5" width="5.2" height="2.6" rx=".8" fill="#c9952e" stroke="#5a3d0c" stroke-width=".5"/><path d="M-3 -27.5Q-3.6 -34 -2.4 -41Q0 -43 2.4 -41Q3.6 -34 3 -27.5Z" fill="#c99560" stroke="#6e4520" stroke-width=".6"/><path d="M-1.4 -29Q-1.8 -34 -1 -39" fill="none" stroke="#f1d6a8" stroke-width=".8" stroke-linecap="round"/></g>`;
+function pkDraw(id,w,h,small,st){
+ const G=pkGeo(id,small),s=SKIN[id],q=pkQ(st),fr=Math.floor(st*PK_MS/FRAME),H0=G.H0,inset=s.r.map(v=>Math.max(3,v-6)),C=PLEAT_C[labelStatus(id)];
+ const bx=small?22:34,by=small?3:5,bh=small?20:22,cushion=rr4(EDGE,EDGE,w-2*EDGE,H0-2*EDGE,s.r),stD=rr4(10,10,w-20,H0-20,inset),band=rr4(bx,by,w-2*bx,bh,[9,8,10,8]);
+ const rim=`<path d="${rr4(2.5,6,w-5,H0-4.5,s.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/>`;
+ const felt=`<path d="${cushion}" fill="${s.body}" filter="url(#f-${id})"/>`+
+  `<path d="${stD}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${stD}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`+
+  `<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band}" fill="${s.band}" filter="url(#g-${id})"/>`+
+  `<path d="${rr4(bx+3.5,by+3.5,w-2*bx-7,bh-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ const lt=mixHex(s.body,'#fff8e8',.45),dk=mixHex(s.body,'#160c05',.45);
+ const c1=seg(q,.14,.36),c2=seg(q,.42,.62),X1=lerp(-G.P,w+G.P,c1),X2=lerp(w+G.P,-G.P,c2),fall=seg(q,.64,.76),rise=pkRise(q),fy=-G.D*rise,joined=rise>=.999;
+ let t=`<defs>${feltFilters(id,s.seed)}<clipPath id="pkb-${id}"><path d="${rr4(EDGE,EDGE,w-2*EDGE,h-2*EDGE,s.r)}"/></clipPath>`+
+  (fall>0?Object.entries(G.reg).map(([k,d])=>`<clipPath id="pk${k}-${id}"><path d="${d}"/></clipPath>`).join(''):'')+'</defs>';
+ const kerf=d=>d?`<path d="${d}" fill="none" stroke="#24160c" stroke-opacity=".8" stroke-width="1.7" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${lt}" stroke-opacity=".5" stroke-width=".7" transform="translate(0 1.1)"/>`:'';
+ if(fall<=0){
+  // Whole: the kerfs open behind the shears, the first left to right, the second back.
+  t+=rim+felt+`<g clip-path="url(#pkb-${id})">${c1>0?kerf(pkD2(pkSub(G.z1,-G.P,X1))):''}${c2>0?kerf(pkD2(pkSub(G.z2,X2,w+G.P))):''}</g>`;
+ }else{
+  // Cut: each piece is the whole cushion clipped to its region, with its own dark underside showing past the pinked edge.
+  const piece=(k,tf)=>`<g transform="${tf}"><g transform="translate(.8 2.6)" opacity=".85"><g clip-path="url(#pk${k}-${id})"><path d="${cushion}" fill="#2a1a10"/></g></g><g clip-path="url(#pk${k}-${id})">${rim}${felt}</g></g>`;
+  // Fresh pinked edges catch the light while the pieces stand apart.
+  const edge=(z,dy,tf,a)=>a>0?`<g clip-path="url(#pkb-${id})"><g transform="${tf}"><path d="${pkD2(z)}" fill="none" stroke="${lt}" stroke-opacity="${f(.75*a)}" stroke-width="1" stroke-linejoin="round" transform="translate(0 ${dy})"/></g></g>`:'';
+  // The top's dark kerf fades into its fresh edge over the first frames of the drop, so the cut doesn't change look at once.
+  const open=1-seg(rise,.9,1),kf=1-seg(fall,0,.3);
+  t+=piece('top','translate(0 0)')+(kf>0?`<g clip-path="url(#pkb-${id})" opacity="${f(kf)}">${kerf(pkD2(G.z1))}</g>`:'')+edge(G.z1,-.9,'translate(0 0)',open*(1-kf))+piece('foot',`translate(0 ${f(fy)})`)+edge(G.z2,.9,`translate(0 ${f(fy)})`,open);
+  // The cut band drops out: it tips forward toward you, falls and fades below the cushion.
+  if(fall<1){const cy=(G.y1+G.y2)/2,e=fall*fall,tilt=lerp(0,id==='b'?-5:5,fall);
+   t+=`<g opacity="${f(1-seg(fall,.5,1))}">${piece('band',`translate(${f(6*fall)} ${f(150*e)}) rotate(${f(tilt)} ${f(w/2)} ${f(cy)}) translate(${f(w/2)} ${f(cy)}) scale(${f(1+.06*fall)} ${f(1-.45*fall)}) translate(${f(-w/2)} ${f(-cy)})`)}</g>`}
+ }
+ // Joined: a crevice where the teeth meet, needle-felted shut from the left.
+ const nq=seg(q,.84,.93),nx=lerp(EDGE,w-EDGE,nq);
+ if(joined){
+  t+=`<clipPath id="pkn-${id}"><rect x="${f(nx)}" y="-10" width="${w}" height="${h+20}"/></clipPath><g clip-path="url(#pkb-${id})"><g clip-path="url(#pkn-${id})"><path d="${pkD2(G.z1)}" fill="none" stroke="#1d1209" stroke-opacity=".6" stroke-width="1.3" stroke-linejoin="round"/><path d="${pkD2(G.z1)}" fill="none" stroke="${lt}" stroke-opacity=".45" stroke-width=".7" transform="translate(0 1.2)"/></g>`;
+  let d1='',d2='',holes='';for(const S of G.stabs)if(S.x<nx){d1+=S.d1;d2+=S.d2;holes+=`<circle cx="${f(S.x)}" cy="${f(S.y)}" r=".75"/>`}
+  if(d1)t+=`<path d="${G.stabs.filter(S=>S.x<nx).map(S=>`M${f(S.x-4.5)} ${f(S.y)}h9`).join('')}" stroke="${s.body}" stroke-width="5" stroke-linecap="round" opacity=".8"/>`+
+   `<g fill="none" stroke-linecap="round" stroke-width=".9"><path d="${d1}" stroke="${lt}"/><path d="${d2}" stroke="${dk}"/></g><g fill="#1d1209" opacity=".35">${holes}</g>`;
+  t+='</g>';
+  // Fibres knocked loose as the teeth meet.
+  const u=seg(q,.82,.88);if(u>0&&u<1)t+=`<g fill="none" stroke="${lt}" stroke-width="1.1" stroke-linecap="round" opacity="${f(1-u)}">${[.16,.38,.6,.82].map((g,i)=>{const[dx,dy,r]=FLUFF[i];return`<path d="M-3 0q1.2-2.4 2.4 0t2.4 0" transform="translate(${f(w*g+dx*10*u)} ${f(G.y1+dy*(4+9*u))}) rotate(${f(r*60+u*80)})"/>`}).join('')}</g>`;
+ }
+ // The status: a wisp of roving dabbed onto the seam's end and felted down into a firm dot.
+ const dq=seg(q,.93,.97),dX=w-(small?26:34),dY=G.y1;
+ if(dq>0){const r=(small?4.2:4.8)*(.55+.45*ease(seg(dq,.3,1)));
+  t+=dq<.6?`<g fill="none" stroke="${C}" stroke-width="1.1" stroke-linecap="round" opacity="${f(1-seg(dq,.3,.6))}"><path d="M${f(dX-6)} ${f(dY-3)}q3 -4 6 0t6 0M${f(dX-5)} ${f(dY+2)}q2.5 3 5 0t5 0M${f(dX-1)} ${f(dY-6)}q3 2 1 5"/></g>`:'';
+  t+=`<g transform="translate(${f(dX)} ${f(dY)})" opacity="${f(ease(seg(dq,0,.4)))}"><circle r="${f(r+1.6)}" fill="${C}" opacity=".3"/><circle r="${f(r)}" fill="${C}" stroke="#1a0d05" stroke-opacity=".45" stroke-width=".7" filter="url(#g-${id})"/><circle cx="${f(-r*.35)}" cy="${f(-r*.4)}" r="${f(r*.28)}" fill="#fff" opacity=".5"/></g>`}
+ // The name stays in its band on the top piece.
+ const nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],na=seg(st,0,.08),tx=small?32:48,ty=small?13.5:16.5;
+ if(na>0)t+=`<g opacity="${f(na)}" font-family="Georgia,serif" font-style="italic" font-size="15" letter-spacing=".2"><text x="${tx}" y="${ty+1}" dominant-baseline="central" fill="#000" opacity=".45">${nm}</text><text x="${tx}" y="${ty}" dominant-baseline="central" fill="#fff3dc">${nm}</text></g>`;
+ // The value cross-stitched on the foot, under the seam, left to right; dark on Jarvis's amber, cream on the others.
+ const vq=seg(q,.95,1);
+ if(vq>0){const dt=pocketData(id),cs=small?1.4:1.6,xp=xpaths(dt.num,cs),wf=small?10.5:12,dkT=id==='a',th1=dkT?'#3a1d08':'#f7e8c9',th2=dkT?'#5c3414':'#e0cba4';
+  const vc=(G.y1+G.A/2+3+h-10)/2,x0=small?22:34,ww=measure(dt.word,`italic 600 ${wf}px Georgia,serif`),tw=xp.w+5+ww;
+  t+=`<clipPath id="pkv-${id}"><rect x="${x0-3}" y="${f(vc-10)}" width="${f(vq>=1?999:(tw+6)*vq)}" height="20"/></clipPath><g clip-path="url(#pkv-${id})"><g transform="translate(${x0} ${f(vc-3.5*cs)})" fill="none" stroke-linecap="round" stroke-width="${f(cs*.4)}">`+
+   `<path d="${xp.d1+xp.d2}" stroke="${dkT?'#fff3dc':'#000'}" stroke-opacity="${dkT?.3:.35}" transform="translate(.4 .6)"/><path d="${xp.d1}" stroke="${th2}"/><path d="${xp.d2}" stroke="${th1}"/></g>`+
+   `<text x="${f(x0+xp.w+5)}" y="${f(vc+1.3)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-size="${wf}" fill="${dkT?'#fff3dc':'#000'}" opacity=".3">${dt.word}</text>`+
+   `<text x="${f(x0+xp.w+5)}" y="${f(vc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="600" font-size="${wf}" fill="${th1}">${dt.word}</text></g>`}
+ // The shears: dropped in at the first cut, snipping a bite a frame, turned round to the second cut, then lifted away.
+ if(q>=.08&&q<.67){let x,y,dir=1,lift=0,a=1;
+  if(q<.36){const k=clamp(X1,EDGE+4,w-EDGE-4);x=k;y=pkY(G.z1,k);lift=1-ease(seg(q,.08,.14));a=seg(q,.08,.1)}
+  else if(q<.42){const u=ease(seg(q,.36,.42));x=w-EDGE-4;y=lerp(pkY(G.z1,x),pkY(G.z2,x),u);lift=Math.sin(Math.PI*u)*.6;dir=Math.cos(Math.PI*u)}
+  else{const k=clamp(X2,EDGE+4,w-EDGE-4);x=k;y=pkY(G.z2,k);dir=-1;lift=ease(seg(q,.62,.67));a=1-seg(q,.65,.67)}
+  const cutting=(q>=.14&&q<.36)||(q>=.42&&q<.62),sd=Math.abs(dir)<.15?.15*Math.sign(dir||1):dir,ly=-40*lift,op=cutting&&fr%2;
+  t+=`<g opacity="${f(a)}" transform="translate(${f(x-sd*15)} ${f(y+ly)}) scale(${f(sd*1.15)} 1.15)"><g transform="translate(1 1.6)" opacity=".3" filter="url(#sh)">${pkShears(op)}</g>${pkShears(op)}</g>`;
+  if(cutting)t+=`<path d="M${f(x-dir*18)} ${f(y-3)}q1.5 -2.5 3 0t3 0M${f(x-dir*24)} ${f(y+3)}q1.5 2.5 3 0" fill="none" stroke="${lt}" stroke-width="1" stroke-linecap="round" opacity=".8"/>`}
+ // The felting needle stabbing along the seam, up and down a frame at a time.
+ if(q>=.83&&q<.97){const a=seg(q,.83,.845)*(1-seg(q,.955,.97)),x=q<.93?nx:lerp(w-EDGE,dX+5,seg(q,.93,.95)),down=fr%2;
+  t+=`<g opacity="${f(a)}" transform="translate(${f(x)} ${f(pkY(G.z1,x)-(down?0:9))})"><g transform="translate(1.2 1.8)" opacity=".3" filter="url(#sh)">${pkNeedle}</g>${pkNeedle}</g>`}
+ return t;
+}
 // A foot-anchored shade (the sewing box) keeps each widget's foot where it stood: as the strip's height changes, the
 // widgets (and a running join path or drag origin with them) move down by d (Checks by dc), kept on the stage.
 function shiftFeet(d,dc){
@@ -5818,7 +5933,7 @@ JOINS.hen={label:'Wind-up hen',kind:'Angle · ratchet',gap:HN.gap,ms:5000,msDrag
 
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw, left out) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw, left out, pinked seam) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -5898,7 +6013,12 @@ const SHADES={
   about:'The Weather kind (gothic\'s ruin, wire\'s verdigris) done in felt: nothing is folded or put away, the cushion is just left out, and wet wool shrinks, which is how felt is fulled in the first place. The cotton display is put away. A grey felt cloud is lowered on cotton threads like a stop-motion prop and drifts along the cushion, dropping blue felt raindrops that splash and leave dark wet blots, while the wet soaks down from the top and drips gather on the foot and fall. The wet felt shrinks to a strip a frame at a time; the thread does not, so the running stitch puckers and the foot rucks. The cloud is lifted out and a felt sun is lowered in its place: the felt warms, steams dry from the top and its dye fades. The value was stitched tone on tone under the display patch in colourfast thread, so it sinks into the felt while wet and stands out as the felt bleaches round it. Last, a felt snail comes out after the rain over the far top corner and crawls in along the top, leaving a silver trail that glints; its shell is the status colour (amber running, blue paused, red to decide, green passed). Nothing moves at rest, and unshading runs the weather backwards.',
   sayOn:'Shaded: each cushion is left out in the rain and shrinks; the sun fades the felt round its stitched value, and a snail comes out.',sayOff:'Unshaded: the weather runs backwards and the cushions grow back.',
   height:(st,small)=>loH(st,small),
-  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.08),draw:loDraw}
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.08),draw:loDraw},
+ pinked:{label:'Pinked seam',kind:'Cut',ms:PK_MS,ownStrip:true,
+  about:'The Cut kind (wire\'s saw cut) done in felt: nothing is folded, flattened or put away; what isn\'t needed is cut out. Felt doesn\'t fray, so it is cut and never hemmed. The cotton display is put away and a pair of pinking shears with chunky orange handles drops onto the cushion under its name band and snips straight across it, a bite a frame, leaving a zigzag kerf with fibres falling from the blades. The shears are turned round and cut back across just above the foot, then lifted away. The band between the cuts drops out, tipping toward you as it falls, and the stage shows through the gap. Both cuts were made with the same blades, so the two pinked edges are the same zigzag: the foot is pushed up and its teeth sit in the top\'s notches with a little bump that knocks fibres loose. A felting needle in a turned wooden holder then stabs along the seam a frame at a time, its barbs dragging fibres from each side into the other until the crevice is gone and the two are one piece. At the seam\'s end it dabs on a wisp of roving in the status colour and felts it down into a firm dot (amber running, blue paused, red needs you, green passed), and the value is cross-stitched on the foot. Unshading puts the band back.',
+  sayOn:'Shaded: each cushion has a band cut out with pinking shears and its pinked edges are needle-felted together; the dot on the seam shows the status.',sayOff:'Unshaded: the seam is unpicked, the band comes back up and the cuts close.',
+  height:(st,small)=>pkH(st,small),
+  show:st=>1-seg(st,0,.1),grip:st=>1-seg(st,0,.08),draw:pkDraw}
 };
 /* ---------- Draught dog: an empty felt sausage dog stood in the gap and stuffed until it wedges both cushions (Swell) ---------- */
 // A new join kind, Swell: nothing is fastened, wound or pinned; something fills the gap until it presses on both sides and the
