@@ -9262,6 +9262,217 @@ MIXES.ripple={...MIXES.moonTab,label:'One ripple',kind:'Half-coupler · Ripple',
   get joined(){return model.rpE>0?'Joined: the water and the rug meet on the centre line, stud to knot at every pitch, and the touch is lit. Drag either nameplate to move the pair. Tug the tab to release.':MIXES.moonTab.text.joined},
   mid:(jt,dir)=>model.rpE<=0||dir<=0?MIXES.moonTab.text.mid(jt,dir):jt<.4?'Joining · closing in ':jt<.6?'Joining · the tab flops over ':jt<.7?'Joining · buttoning ':jt<.78?'Joining · a drop falls through the seam ':'Joining · one ring crosses both halves '}};
 
+/* ---------- Mix: pairwise seam for the Ratchet kind (model D). A stone Catherine wheel, and a copper click that rides its teeth. ----------
+   Every Ratchet in the round turned one way freely and was held the other way by a pawl. For this known pair the ratchet is made by both
+   skins. A ship's capstan has its toothed ring fixed to the deck and its pawls on the drum, so they ride round the ring as the drum turns.
+   Here the ring is gothic: a Catherine wheel (the wheel window, spiked like the saint's wheel), carved into Jarvis's corner and fixed to it.
+   The click is wire: a copper arm, a coiled spring and a garnet bead, hung from GitDiscuss's frame, so the click rides round the stone as
+   GitDiscuss turns. GitDiscuss turns about the corner it shares with Jarvis, as in pinned voussoirs: the foot when lowered (the wheel at the
+   foot, the click under the frame) and the head when raised (both on top). The teeth slope so that turning away from level rides up each
+   tooth and drops into the next notch (a click), and turning back meets the steep face and jams. Tap the click to lift it off the teeth.
+   Joining: the wheel is set .36-.46, its boss .44-.5, the click bent on .5-.64, dropped into the first notch .64-.68, wound tooth by tooth .68-.92, light .92-1.
+   Releasing (r = 1 - jt): light out to .08, the click lifted .08-.13, GitDiscuss runs back level .13-.36, the click unbent .36-.48, boss and wheel out .48-.58. */
+const KW={step:15,lim:45,hard:true,def:30,Rn:21,dp:4.6,a0:20,aria:'GitDiscuss angle on the Catherine wheel, in degrees'};
+let kwSideW=1,kwLv=0,kwLt=0,kwRaf=0,kwTagUntil=0,kwLatch=false,kwBackUntil=0,kwPrev=null,kwClick=0,kwJam=0;
+const kwN=(a=hgSet)=>clamp(Math.round(Math.abs(a)/KW.step),0,3);
+const kwK=h=>lerp(.62,1,clamp((h-HS)/(H-HS)));
+// The wheel's centre: Jarvis's foot corner (side 1, GitDiscuss lowered) or the corner by its head (side 0, raised).
+const kwP=(side,h)=>({x:model.a.x+W,y:model.a.y+(side?h:PV.head)});
+// The rim's radius at psi degrees round the wheel (measured so that turning away from level always increases psi):
+// low in each notch, rising along the tooth's back to the next notch, then a steep face down into it.
+const kwRim=(psi,k)=>k*(KW.Rn+KW.dp*Math.pow((((psi-KW.a0)%15+15)%15)/15,.75));
+// The click on GitDiscuss (in its own coordinates): the nose on the rim at a0° past the edge, at radius rn; its spring and bead at Q,
+// below the nose (above it on the head side), so the arm trails the way the teeth pass freely and a turn back drives it into the root;
+// and a bail from the frame at M. Q and M don't move as the nose lifts.
+function kwGeo(side,h,k,rn){const sy=side?1:-1,py=side?h:PV.head,a=KW.a0*PI/180,co=Math.cos(a),si=Math.sin(a),R=KW.Rn*k,L=22*k,Q={x:R*co-L*si,y:py+sy*(R*si+L*co)};
+ return{sy,py,Q,M:{x:Q.x+18*k,y:side?h-5:5},N:{x:rn*co,y:py+sy*rn*si},u:{x:co,y:sy*si}}}
+// GitDiscuss's swing. Joining, it is wound tooth by tooth: a quick ease up each tooth's back and a beat in each notch.
+// Releasing, the click is lifted and it runs back level in one smooth swing.
+function kwBend(jt){
+ if(jt>=1)return hgCur;const n=kwN(),sg=hgSet<0?-1:1;if(!n)return 0;
+ if(model.dir>0){const x=seg(jt,.68,.92)*n,i=Math.min(n-1,Math.floor(x)),v=x>=n?15*n:15*(i+ease(clamp((x-i)/.8))),t0=model.th0;
+  return t0&&t0.kwv!=null&&t0.jt>0?lerp(t0.bend,sg*v,ease(seg(jt,t0.jt,Math.min(1,t0.jt+.12)))):sg*v}
+ return sg*15*n*(1-ease(seg(1-jt,.13,.36)))}
+function kwRoom(th,h=ctx().h){const r=pvRoom(th,h),k=kwK(h),up=pvUp(th),side=up?1:0,R=(KW.Rn+KW.dp)*k+3,G=kwGeo(side,h,k,KW.Rn*k),o={x:0,y:0};
+ const ys=[G.Q,G.M].map(p=>asRot(o,p.x,p.y+(side?6:-6),th,h).y);
+ return up?{x:0,top:r.top,bottom:Math.max(r.bottom,R,Math.max(...ys)-h)}:{x:0,top:Math.max(r.top,R-PV.head,-Math.min(...ys)),bottom:r.bottom}}
+// The Catherine wheel: a spiked limestone rim of 24 teeth, twelve glazed lancet lights radiating like spokes, a carved boss at the hub.
+function kwWheel(P,side,k,lit,run,op,dy){
+ const sy=side?1:-1,Rn=KW.Rn*k,dp=KW.dp*k,D=PI/180,C={x:P.x,y:P.y+dy},at=(psi,r)=>{const g=sy*psi*D;return f(C.x+r*Math.cos(g))+' '+f(C.y+r*Math.sin(g))};
+ let d='',faces='',crest='';
+ for(let i=0;i<24;i++){const a=KW.a0+15*i;d+=(i?'L':'M')+at(a,Rn+dp)+'L'+at(a,Rn);for(const t of[.3,.6,.85])d+='L'+at(a+15*t,Rn+dp*Math.pow(t,.75));
+  faces+=`M${at(a,Rn+dp)}L${at(a,Rn)}`;crest+=`M${at(a+2,Rn+.6*k)}L${at(a+13,Rn+dp-.9*k)}`}
+ d+='Z';
+ const tone=j=>(run?['#f2c04a','#c43a48']:['#86a4f2','#4566c6'])[j%2],r0=8.4*k,r1=Rn-4.4*k,w=Math.max(1.2,2.3*k);
+ const light=`M${f(r0)} ${f(-w*.7)}L${f(r1-w*2.2)} ${f(-w)}Q${f(r1-w*.5)} ${f(-w*.6)} ${f(r1)} 0Q${f(r1-w*.5)} ${f(w*.6)} ${f(r1-w*2.2)} ${f(w)}L${f(r0)} ${f(w*.7)}A${f(w*.7)} ${f(w*.7)} 0 0 1 ${f(r0)} ${f(-w*.7)}Z`;
+ let L='',Lit='',dots='';
+ for(let j=0;j<12;j++){const g=j*30+15,tr=`translate(${f(C.x)} ${f(C.y)}) rotate(${g})`;L+=`<path d="${light}" transform="${tr}"/>`;
+  if(lit>0)Lit+=`<path d="${light}" transform="${tr}" fill="${tone(j)}"/>`;
+  dots+=`M${at(sy*j*30,Rn-3.9*k)}h.01`}
+ let s=`<g opacity="${f(op)}">`;
+ if(lit>0)s+=`<circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f(Rn+9*k)}" fill="${tone(0)}" opacity="${f(.32*lit)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`;
+ s+=`<path d="${d}" fill="#1d140b" opacity=".35" transform="translate(1.2 2.2)"/><path d="${d}" fill="url(#lime)" stroke="#3a2c1c" stroke-opacity=".7" stroke-width=".9" stroke-linejoin="round"/>`+
+  `<path d="${crest}" stroke="#fff6e2" stroke-opacity=".5" stroke-width=".7" fill="none"/><path d="${faces}" stroke="#2a1d10" stroke-opacity=".6" stroke-width="1.2" fill="none"/>`+
+  `<circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f(Rn-2.4*k)}" fill="none" stroke="#3a2c1c" stroke-opacity=".45" stroke-width=".8"/><circle cx="${f(C.x)}" cy="${f(C.y)}" r="${f(Rn-3.3*k)}" fill="none" stroke="#fff6e2" stroke-opacity=".45" stroke-width=".7"/>`+
+  `<g fill="#120e16">${L}</g>`+(lit>0?`<g opacity="${f(lit)}">${Lit}</g>`:'')+`<g fill="none" stroke="#2a1d10" stroke-opacity=".55" stroke-width=".6">${L}</g>`+
+  `<path d="${dots}" stroke="#3a2c1c" stroke-opacity=".5" stroke-width="${f(1.8*k)}" stroke-linecap="round"/>`+boss(C.x,C.y,.62*k,lit)+'</g>';
+ return s}
+// The copper click, drawn in GitDiscuss's coordinates. pr is how far it has been bent on: the bail from the frame, the coiled spring,
+// then the arm, its working end hot, and last the garnet bead threaded onto the spring's arbor. jam flashes the bead.
+function kwClickSvg(G,k,pr,jam){
+ const{Q,M,N,u,sy}=G,pb=seg(pr,0,.3),pc=seg(pr,.25,.6),pa=seg(pr,.5,.9),pd=seg(pr,.85,1),q=p=>f(p.x)+' '+f(p.y);let s='';
+ // The bail bows out away from the wheel on its way down from the frame to the spring.
+ if(pb>0){const E={x:lerp(M.x,Q.x,pb),y:lerp(M.y,Q.y,pb)};s+=wire(`M${q(M)}Q${f(M.x+7*k)} ${f(lerp(M.y,E.y,.6))} ${q(E)}`,'copper',1.5*k+.3)+wire(band(M.x,M.y,false,3,6*k,2*k),'copper',.8)}
+ if(pc>0)s+=wire(spiral(Q.x,Q.y,4.6*k,.2+1.6*pc,-sy,PI*.5),'copper',1.05*k+.2);
+ if(pa>0){const R={x:N.x+u.x*3.4*k,y:N.y+u.y*3.4*k},E={x:lerp(Q.x,R.x,pa),y:lerp(Q.y,R.y,pa)},mid={x:(Q.x+E.x)/2+4.5*k*pa,y:(Q.y+E.y)/2};
+  s+=wire(`M${q(Q)}Q${q(mid)} ${q(E)}`+(pa>=1?`L${q(N)}`:''),'copper',1.7*k+.4);
+  if(pa<1)s+=`<circle cx="${f(E.x)}" cy="${f(E.y)}" r="${f(2.6*k)}" fill="#ffb15e" opacity=".55" filter="url(#soft)"/>`+wire(`M${q(E)}l.01 0`,'hot',1.7*k+.4)}
+ if(pd>0){const r=2.9*k*pd;
+  s+=`<circle cx="${f(Q.x+.6)}" cy="${f(Q.y+1.2)}" r="${f(r)}" fill="#000" opacity=".35"/><circle cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(r)}" fill="url(#kw-garnet)" stroke="#2a0508" stroke-width=".6"/>`+
+   `<circle cx="${f(Q.x-r*.35)}" cy="${f(Q.y-r*.4)}" r="${f(r*.28)}" fill="#fff" opacity=".7"/>`;
+  if(jam>0)s+=`<circle cx="${f(Q.x)}" cy="${f(Q.y)}" r="${f(r+2.2)}" fill="none" stroke="#ff7a5e" stroke-width="1.4" opacity="${f(jam)}"/>`}
+ return s}
+MIXES.wheel={label:'Catherine wheel',kind:'Pairwise seam · Ratchet',pair:'stonewire',smooth:true,ang:KW,
+ get slow(){return kwN()?2.6:1.9},get sepMs(){return kwN()?3200:2400},
+ home:{a:{x:30,y:190},b:{x:590,y:190},c:{x:890,y:470}},
+ stack:[['Model','Pairwise seam (D), for the Ratchet kind','the Ratchet round gave every skin a joint that turns freely one way and is held the other by a pawl; for this known pair the ratchet is made by both skins. Gothic and wire had met at an authored seam only once, in the first one, copper ivy on a pier'],
+  ['The ratchet','A fixed ring, a riding click','as on a ship\'s capstan, whose toothed ring is fixed to the deck while the pawls on the drum ride round it: the wheel is fixed to Jarvis and the click to GitDiscuss, so the click rides round the stone as GitDiscuss turns. A tooth every 15°, from 0° to 45° either way'],
+  ['Gothic part','The Catherine wheel','a wheel window carved into Jarvis\'s corner, spiked round its rim like the saint\'s wheel: 24 teeth whose backs slope away from level, twelve lancet lights for spokes and a carved boss at the hub'],
+  ['Wire part','The click','a copper arm with a hooked nose, hung from GitDiscuss\'s frame on a bound bail and pressed onto the teeth by a coiled spring, with a garnet bead on the spring\'s arbor. Stone can\'t spring and wire can\'t take a load on its teeth, so each skin does the half it is good at'],
+  ['Join light','The lights','the wheel\'s twelve lancets kindle gold and ruby (blue if either widget is paused), and the boss gilds'],
+  ['Motion','Each its own','the wheel is set once and never moves; the wire is bent on with a hot working end; GitDiscuss is wound a tooth at a time and runs back level in one swing once the click is lifted']],
+ about:'Jarvis wears the gothic skin and GitDiscuss and Checks the wire skin, each as on its own page. Both pages have their own ratchet: gothic\'s is a clock escapement, wire\'s a flip pawl. In this authored seam neither is used whole. The stone brings the toothed wheel and the wire brings the click that rides it, so the ratchet only exists when both skins are there. A standard face (model A) could not do this: it would let one side bring the whole ratchet.',
+ join:{label:'Stone wheel, copper click',kind:'Angle · ratchet',gap:0,
+  about:'Jarvis\'s stone end meets GitDiscuss\'s copper frame, and GitDiscuss turns about the corner they share: the foot when lowered (the wheel at the foot, the click under the frame) and the head when raised (both on top). <b>Near:</b> Jarvis\'s corner warms with gold and GitDiscuss\'s frame glints where the click will hang. <b>Ready:</b> the wheel, its notches up to the set angle, the click and GitDiscuss\'s swing are chalked in dashes. Joining: the casings butt, the Catherine wheel is set into the corner in a puff of dust and its boss is struck home. A copper bail is bent down from GitDiscuss\'s frame and bound, the spring is coiled, the arm is drawn out to the rim with a hot working end, and a garnet bead is threaded on. The nose drops into the first notch with a click. Then GitDiscuss is wound to its angle a tooth at a time, the nose riding up each tooth\'s back and dropping into the next notch, and the twelve lights kindle from the hub (gold and ruby while both run, blue if either is paused). <b>Angle:</b> −45° to +45° in 15° steps. Drag the click up or down to wind GitDiscuss away from level: free, with a click per tooth. Turning back toward level jams on the steep face (the bead flashes). Tap the click to lift it off the teeth, then drag either way; it drops into the nearest notch when you let go. Let go between notches and GitDiscuss settles back onto the last notch passed. The slider and ↑ ↓ lift the click for you when they turn it back. A tag reads the angle and the notch. <b>Release:</b> tap the wheel\'s boss (or focus it and press Enter). The light goes out, the click is lifted, GitDiscuss runs back level, the click is unbent, the wheel is lifted out and the casings part.'},
+ shade:{label:'Plain lower, stone and wire',kind:'Page baseline',
+  about:'Not a brainstorm item. The stone wall lowers to its carved frieze and the wire pendant fades its stone and inner frame down to the copper rim, each with one value. The wheel and the click shrink with the casings and keep their notch, so a shaded pair stays at its angle.'},
+ casing:(id,w,h)=>id==='a'?stoneCasing(id,w,h,false):wireCasing(w,h,id==='c'),
+ readyPose:{warm:1},
+ get room(){return kwRoom(hgSet)},
+ fitRoom(h){return kwRoom(hgCur,h)},
+ turn(c,id){if(id!=='b')return null;const th=kwBend(c.jt);return[th,0,pvUp(th)?c.h:PV.head]},
+ // The teeth are only cut for a joined pair, so the angle waits until the pair is joined or apart.
+ angle(v){if(model.busy&&model.jt>0&&model.jt<1){$('#ang').value=hgSet;say('Set the angle once the click is on (or the widgets are apart).');return}
+  v=clamp(Math.round(v/KW.step)*KW.step,-KW.lim,KW.lim);
+  const steps=Math.max(1,Math.abs(Math.round(v/KW.step)-Math.round(hgCur/KW.step))),back=Math.abs(v)<Math.abs(hgSet)||v*hgSet<0,ms=(back?240:300)+(back?200:280)*steps,now=performance.now();
+  if(back&&model.jt===1&&!kwLatch)kwBackUntil=now+ms+140;
+  kwTagUntil=now+ms+700;setTimeout(()=>{if(model.mix==='wheel')render()},ms+760);hgTo(v,ms)},
+ angSay(v,old){if(model.jt!==1)return 'Angle set to '+hgSign(v)+'; GitDiscuss is wound to it once joined.';
+  const back=Math.abs(v)<Math.abs(old)||v*old<0;
+  return(back?(kwLatch?'GitDiscuss runs back':'The click lifts; GitDiscuss runs back'):'GitDiscuss is wound a tooth at a time')+' to '+hgSign(v)+(kwLatch?'.':' and the click drops into notch '+(kwN(v)+1)+' of 4.')},
+ angPh:()=>'Winding · GitDiscuss at '+hgSign(hgCur)+' · '+(kwLatch?'click lifted':performance.now()-kwJam<500?'held by the click':'notch '+(Math.floor(Math.abs(hgCur)/15+.001)+1)+' of 4'),
+ // Dragging the click: down lowers GitDiscuss, up raises it; about 45° for 150 px. A drag under 3 px is a tap, which lifts or drops the click.
+ // The held notch is the one GitDiscuss is in (or last passed) now, not where a running turn was heading.
+ angGrab:q=>({y0:q.y,a0:hgCur,held:Math.sign(hgCur)*Math.floor(Math.abs(hgCur)/15+.001)*15,moved:false}),
+ angMove(d,p){if(Math.abs(p.y-d.y0)>3)d.moved=true;return d.a0+Math.atan2(p.y-d.y0,150)*180/PI},
+ // The one-way hold: with the click down, GitDiscuss can't turn back past the notch the click is in (it gives a degree and jams).
+ // Each notch passed going away from level becomes the one held.
+ angLimit(a,d){if(kwLatch)return a;const H0=d.held;
+  if(H0>0&&a<H0||H0<0&&a>H0){a=H0-Math.sign(H0)*Math.min(1.2,Math.abs(a-H0)*.08);kwJam=performance.now();
+   if(!d.jamSaid){d.jamSaid=1;say('The click holds GitDiscuss at '+hgSign(H0)+': tap the click to lift it, then turn it back.')}}
+  // A notch counts as passed 3° early, where the drag snaps into it.
+  const m=Math.sign(a)*Math.floor((Math.abs(a)+3)/15)*15;if(Math.abs(m)>Math.abs(H0)&&(H0===0||Math.sign(m)===Math.sign(H0)))d.held=m;
+  return a},
+ angEnd(d){
+  if(!d.moved){kwLatch=!kwLatch;kwTagUntil=performance.now()+1400;
+   return{v:hgSet,msg:kwLatch?'The click is lifted off the teeth: drag it to turn GitDiscuss either way, and it drops into the nearest notch when you let go.':'The click drops back onto the teeth at '+hgSign(hgSet)+'.'}}
+  kwTagUntil=performance.now()+1300;
+  if(kwLatch){kwLatch=false;const v=Math.round(hgCur/15)*15;return{v,msg:'The click drops into notch '+(kwN(v)+1)+' of 4; GitDiscuss is held at '+hgSign(v)+'.'}}
+  const v=Math.sign(hgCur)*Math.floor(Math.abs(hgCur)/15+.001)*15;
+  return{v,msg:Math.abs(v-hgCur)>2?'Let go between notches: GitDiscuss settles back onto the click at '+hgSign(v)+'.':null}},
+ state(c){const jt=c.jt;if(jt===0)return{jt,kwv:null,warm:c.glow};
+  const n=kwN();let s;
+  if(model.dir>0){
+   s={wheel:seg(jt,.36,.46),boss:seg(jt,.44,.5),click:seg(jt,.5,.64),lift:1-ease(seg(jt,.64,.68)),lit:n?seg(jt,.92,1):seg(jt,.72,.88)};
+   // A rejoin partway through a release eases on from where the release had got to.
+   const t0=model.th0;if(t0&&t0.kwv!=null&&t0.jt>0){const u=ease(seg(jt,t0.jt,Math.min(1,t0.jt+.12)));for(const k in s)s[k]=k==='lift'||k==='lit'?lerp(t0[k],s[k],u):Math.max(t0[k],s[k])}}
+  else{const r=1-jt;s={lit:1-seg(r,0,.08),lift:seg(r,.08,.13),click:1-seg(r,.36,.48),boss:1-seg(r,.48,.52),wheel:1-seg(r,.5,.58)}}
+  return{jt,kwv:1,...s,bend:kwBend(jt)}},
+ over(c){
+  const jt=c.jt,h=c.h,k=kwK(h),now=performance.now(),run=model.a.run&&model.b.run,n=kwN(),fwd=model.dir>0,cx=model.a.x+W,q=p=>f(p.x)+' '+f(p.y);
+  let s=`<defs><radialGradient id="kw-garnet" cx=".35" cy=".3" r=".75"><stop stop-color="#ffb4a8"/><stop offset=".35" stop-color="#c0303c"/><stop offset="1" stop-color="#4a0810"/></radialGradient></defs>`;
+  if(jt<1){kwLv=0;kwLt=0;kwPrev=null;kwLatch=false;kwBackUntil=0;kwSideW=hgSet>=0?1:0}
+  if(jt===0){const g=c.glow,side=hgSet>=0?1:0,P=kwP(side,h),gho=seg(g,.8,1)*.85,G0=kwGeo(side,h,k,KW.Rn*k);
+   if(gho>0){
+    // Ready: the wheel and its notches up to the set angle, the click and GitDiscuss's swing, chalked in dashes.
+    const A=hgSet,b={x:cx,y:model.a.y},R=(KW.Rn+KW.dp)*k,sy=side?1:-1,rot=p=>asRot(b,p.x,p.y,A,h),Qg=rot(G0.Q),Ng=rot(G0.N);
+    let gh=`<circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(R)}"/><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(6*k)}"/><path d="M${q(rot(G0.M))}L${q(Qg)}L${q(Ng)}"/>`;
+    for(let i=0;i<=n;i++){const g2=sy*(KW.a0+15*i)*PI/180;gh+=`<path d="M${f(P.x+(KW.Rn-2)*k*Math.cos(g2))} ${f(P.y+(KW.Rn-2)*k*Math.sin(g2))}L${f(P.x+(R+3)*Math.cos(g2))} ${f(P.y+(R+3)*Math.sin(g2))}" stroke-dasharray="none" stroke-width="${i===n?1.6:1}"/>`}
+    const pv=pvUp(A)?{x:cx,y:model.a.y+h}:{x:cx,y:model.a.y+PV.head},far=asRot(b,W,side?h:0,0,h),farA=asRot(b,W,side?h:0,A,h),Rs=Math.hypot(far.x-pv.x,far.y-pv.y);
+    if(A)gh+=`<path d="M${q(far)}A${f(Rs)} ${f(Rs)} 0 0 ${A>0?1:0} ${q(farA)}" opacity=".6"/>`;
+    s+=`<g fill="none" stroke="#fff3d6" stroke-width="1" stroke-dasharray="3 2.4" stroke-linecap="round" opacity="${f(gho)}">${gh}</g>`}
+   else if(g>0){
+    // Near: Jarvis's corner warms with gold where the wheel will be set, and GitDiscuss's frame glints where the click will hang.
+    const M={x:model.b.x+G0.M.x,y:model.b.y+G0.M.y};
+    s+=`<circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f((10+10*g)*k)}" fill="#f3cf78" opacity="${f(.4*g)}" filter="url(#soft)" style="mix-blend-mode:screen"/>`+
+     `<circle cx="${f(M.x)}" cy="${f(M.y)}" r="${f(6+4*g)}" fill="#ffb15e" opacity="${f(.3*g)}" filter="url(#soft)"/><g opacity="${f(g)}">${sparkle(M.x,M.y,.5+.3*g)}</g>`}
+   return s}
+  const r=this.state(c),th=kwBend(jt);
+  // Joined: the click rides the teeth and clicks into each notch going away from level; it lifts (tapped, or for the slider and keys turning back)
+  // and drops back in when the turn stops. Crossing level, the wheel and click fade from one corner to the other.
+  if(jt===1){let dt=now-kwLt;if(!kwLt||dt>100)dt=16;kwLt=now;
+   const sT=hgCur>.01?1:hgCur<-.01?0:(hgSet>=0?1:0),dw=sT-kwSideW;kwSideW=reduce.matches?sT:kwSideW+Math.sign(dw)*Math.min(Math.abs(dw),dt/220);
+   const lt=kwLatch||now<kwBackUntil?1:0,was=kwLv;kwLv=reduce.matches?lt:lt?Math.min(1,kwLv+dt/120):Math.max(0,kwLv-dt/160);
+   if(was>.3&&kwLv<=.3&&!lt)kwClick=now;
+   const ab=Math.abs(hgCur);if(kwPrev!=null&&kwLv<.3&&Math.floor(ab/15+.001)>Math.floor(kwPrev/15+.001))kwClick=now;kwPrev=ab;
+   if(!kwRaf&&(kwLv>0&&kwLv<1||Math.abs(sT-kwSideW)>.001||now-kwClick<450||now-kwJam<420))kwRaf=requestAnimationFrame(()=>{kwRaf=0;if(model.mix==='wheel')render()})}
+  const lv=jt===1?kwLv:r.lift,lit=r.lit,jam=jt===1?1-seg(now-kwJam,0,420):0,ab=Math.abs(th),py=pvUp(th)?h:PV.head;
+  let noseAt=null,fx='';
+  for(const side of[1,0]){const wS=jt===1?(side?kwSideW:1-kwSideW):(side===(hgSet>=0?1:0)?1:0);if(wS<.01)continue;
+   const sy=side?1:-1,P=kwP(side,h),rn=lerp(kwRim(KW.a0+ab,k),(KW.Rn+KW.dp+2.6)*k,lv),G=kwGeo(side,h,k,rn);
+   let g='';
+   // The wheel is set into the corner from outside, and the boss struck home with a spark.
+   if(r.wheel>0){const e=ease(r.wheel);g+=kwWheel(P,side,k,lit,run,clamp(r.wheel*2.5),sy*22*(1-e));
+    if(fwd&&jt>.44&&jt<.52)fx+=pvDust({x:P.x,y:P.y+sy*(KW.Rn+KW.dp)*k},seg(jt,.44,.52),7,10*k,511+side);
+    if(fwd&&jt<1&&r.boss>0&&r.boss<1)fx+=`<g opacity="${f(Math.sin(PI*r.boss))}">${sparkle(P.x,P.y,.9*k)}</g>`}
+   // The click turns with GitDiscuss; a jam shivers it a hair against the steep face.
+   if(r.click>0){const sh=jam>0?Math.sin(now/22)*.5*jam:0;
+    g+=`<g transform="translate(${f(model.b.x)} ${f(model.b.y)}) rotate(${f(th+sh)} 0 ${f(py)})">${kwClickSvg(G,k,r.click,jam)}</g>`}
+   s+=wS<1?`<g opacity="${f(wS)}">${g}</g>`:g;
+   if(wS>.5)noseAt=asRot(model.b,G.N.x,G.N.y,th,h)}
+  // The click: ticks and a ring at the nose as it drops into a notch, joining (the first notch, then each tooth wound) or joined.
+  let cl=0;
+  if(jt===1)cl=seg(now-kwClick,0,450);
+  else if(fwd){cl=seg(jt,.675,.73);if(n&&jt>.68){const x=seg(jt,.68,.92)*n;for(let i=1;i<=n;i++){const t=(x-(i-1+.8))/.3;if(t>0&&t<1)cl=t}}}
+  if(noseAt&&cl>0&&cl<1)s+=`<circle cx="${f(noseAt.x)}" cy="${f(noseAt.y)}" r="${f((3+10*cl)*k)}" fill="none" stroke="#ffe3a6" stroke-width="1" opacity="${f(.7*(1-cl))}"/>`+pvTicks(noseAt,cl,k*.7);
+  if(noseAt&&jam>.3)fx+=pvDust(noseAt,1-jam,4,5*k,Math.floor(kwJam)%97);
+  s+=fx;
+  if(jt!==1)return s;
+  // While it turns: a stone tag under Jarvis's corner (over it when the wheel is on top).
+  if(now<kwTagUntil||drag&&drag.angle){
+   const held=performance.now()-kwJam<600,txt=' · '+(kwLatch||kwLv>.5?'click lifted':held?'held by the click':'notch '+(Math.floor(Math.abs(hgCur)/15+.001)+1)+' of 4'),deg=hgSign(hgCur),lw=Math.round(('GitDiscuss '+deg+txt).length*6.1+22),lx=cx-150-lw/2;
+   let ly=kwSideW>=.5?model.a.y+h+12:model.a.y-38;if(ly+24>598)ly=model.a.y-38;if(ly<TOP-30)ly=model.a.y+h+12;
+   s+=`<g><rect x="${f(lx)}" y="${f(ly)}" width="${lw}" height="20" rx="3" fill="#e6dcc6" stroke="#5b4b36" stroke-width=".9"/><rect x="${f(lx+2.5)}" y="${f(ly+2.5)}" width="${lw-5}" height="15" rx="1.5" fill="none" stroke="#5b4b36" stroke-opacity=".4" stroke-width=".6"/>`+
+    `<text x="${f(lx+lw/2)}" y="${f(ly+14)}" text-anchor="middle" style="font-family:var(--fsans)" font-size="11.5" fill="#3a2c1c">GitDiscuss <tspan font-weight="700" fill="${held&&!kwLatch?'#9a2a20':'#1d140b'}">${deg}</tspan>${txt}</text></g>`}
+  // Hit areas: the click (drag up or down to turn, tap to lift or drop it) and the wheel's boss (tap to release).
+  const side=kwSideW>=.5?1:0,P=kwP(side,h),G=kwGeo(side,h,k,KW.Rn*k),Qs=asRot(model.b,G.Q.x,G.Q.y,hgCur,h),Ns=asRot(model.b,G.N.x,G.N.y,hgCur,h);
+  s+=`<g class="hit" id="angleHit" tabindex="0" role="slider" aria-valuemin="-45" aria-valuemax="45" aria-valuenow="${hgSet}" aria-valuetext="${hgSign(hgSet)}, ${kwLatch?'click lifted':'notch '+(kwN()+1)+' of 4'}" aria-label="Copper click: drag up or down, or press the arrow keys, to turn GitDiscuss a tooth (15°) at a time; tap it, or press Enter, to lift it off the teeth" style="cursor:ns-resize"><title>Drag the click to wind GitDiscuss; tap it to lift it</title>`+
+   `<path d="M${q(Qs)}L${q(Ns)}" stroke="transparent" stroke-width="20" stroke-linecap="round"/><path class="ringfocus" d="M${q(Qs)}L${q(Ns)}" stroke="#ffd08a" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/></g>`+
+   `<g class="hit" id="joinHit" tabindex="0" role="button" aria-label="Wheel boss: tap it, or press Enter, to lift the click, run GitDiscuss level and separate the widgets; arrow keys turn GitDiscuss" style="cursor:pointer"><title>Tap the boss to release</title><circle cx="${f(P.x)}" cy="${f(P.y)}" r="${f(10*k)}" fill="transparent"/><circle class="ringfocus" cx="${f(P.x)}" cy="${f(P.y)}" r="${f(12*k)}" fill="none" stroke="#ffd08a" stroke-width="1.5"/></g>`;
+  return s;
+ },
+ // Picked again while joined, the click starts down on the teeth.
+ onPick(){kwLatch=false;kwBackUntil=0;kwLv=0;kwPrev=null},
+ // Enter or Space on the click lifts it or drops it, as a tap does.
+ placed(){const n=$('#angleHit');if(n&&model.jt===1)n.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();kwLatch=!kwLatch;kwTagUntil=performance.now()+1400;
+  if(!kwLatch)hgTo(Math.round(hgCur/15)*15,400,true);say(kwLatch?'The click is lifted: the arrow keys now turn GitDiscuss either way. Enter drops it again.':'The click drops back onto the teeth at '+hgSign(hgSet)+'.');render()}}},
+ grab(p){return{x0:p.x,y0:p.y,deg:0}},
+ pull(d,p){const dist=Math.hypot(p.x-d.x0,p.y-d.y0);if(dist>3)d.moved=true;d.deg=clamp(dist/50);return 1-.4*d.deg},
+ get text(){const n=kwN(),A=hgSign(hgSet);return{intro:'Jarvis is stone; GitDiscuss and Checks are copper wire. Drag a nameplate toward the other widget, or use the state buttons. The Angle row sets how far GitDiscuss is wound: one tooth of the wheel for each 15°.',
+  join:'The wheel is set into Jarvis\'s corner and the click is bent onto GitDiscuss\'s frame'+(n?'; GitDiscuss is wound to '+A+' a tooth at a time.':'; the click drops into the first notch.'),
+  joined:'Joined at '+A+', the click in notch '+(n+1)+' of 4. Drag the click '+(hgSet<0?'up':'down')+' to wind GitDiscuss (it won\'t turn back); tap the click to lift it; tap the boss to release.',
+  sep:'The light goes out, the click lifts'+(n?', GitDiscuss runs back level':'')+', the click is unbent, the wheel is lifted out, and the casings part.',
+  get hold(){return 'Held mid-join · '+T().mid(model.jt,1).trim().replace(/^Joining · /,'')+'. Use the scrubber to step through the animation.'},
+  near:'Nearby: Jarvis\'s corner warms and GitDiscuss\'s frame glints. Move closer.',
+  ready:'Ready: the wheel and the click for '+A+' are chalked in. Release to join.',
+  back:'The boss settles back; still joined.',cancel:'Release cancelled.',
+  shadeOn:'Shaded: the wall lowers and the wire draws in; the wheel and the click shrink and keep their notch.',shadeOff:'Unshaded: the wall and the frame open again.',
+  sepPh:'Separate · a stone corner and a copper frame',nearPh:'Nearby · the corner warms',readyPh:'Ready · the wheel is chalked in',
+  mid:(jt,dir)=>{const n=kwN();
+   if(dir>0)return jt<.36?'Joining · closing in ':jt<.46?'Joining · the wheel is set ':jt<.5?'Joining · the boss is struck home ':jt<.64?'Joining · the click is bent on ':jt<.68?'Joining · into the first notch ':n&&jt<.92?'Joining · wound to '+hgSign(hgSet)+', a tooth at a time ':'Joining · the lights kindle ';
+   const r=1-jt;return r<.08?'Releasing · the light goes out ':r<.13?'Releasing · the click lifts ':r<.36&&n?'Releasing · running back level ':r<.48?'Releasing · the click is unbent ':r<.58?'Releasing · the wheel is lifted out ':'Releasing · parting '},
+  turn:d=>'Tapping the boss · '+Math.round(d.deg*100)+'%'}}};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:452}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},mix:'feltCathedral',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,match:true,mk:1,g:0,gT:0,mq:null,mo:null,sy:0,syF:0,syT:0,syq:null,syo:null,hjS:0,hjF:0,hjT:0,hjq:null,hjo:null,ofG:0,ofF:0,ofT:0,ofq:null,ofo:null,hkG:0,hkT:0,hkq:null,hko:null,rpE:0,rpF:0,rpT:0,rpq:null,rpo:null};
@@ -9514,7 +9725,8 @@ stage.addEventListener('pointermove',e=>{
   const K=X().ang||HG;let a;
   if(X().angMove)a=X().angMove(drag,p);
   else{const P=hgPb(ctx()),dx=p.x-P.x,dy=p.y-P.y;if(Math.hypot(dx,dy)<6)return;a=Math.atan2(drag.side*dy,drag.side*dx)*180/PI-drag.off}
-  a=clamp(a,-K.lim,K.lim);const stop=Math.round(a/K.step)*K.step;if(Math.abs(a-stop)<3)a=stop;
+  // A ratchet (Catherine wheel) holds the angle one way: angLimit says how far the turn may go.
+  a=clamp(a,-K.lim,K.lim);if(X().angLimit)a=X().angLimit(a,drag);const stop=Math.round(a/K.step)*K.step;if(Math.abs(a-stop)<3)a=stop;
   hgCur=a;if(stop!==hgSet){hgSet=stop;$('#ang').value=stop;$('#angOut').textContent=hgSign(stop)}hgFit();render();return;
  }
  if(drag.turn){
@@ -9553,7 +9765,8 @@ stage.addEventListener('pointermove',e=>{
 });
 function endDrag(){
  if(!drag)return;const d=drag;drag=null;
- if(d.angle){hgTo(hgCur,560,true);say(T().joined);return}
+ // A mix can say where a let-go settles, and what a tap on its control does (the Catherine wheel's click).
+ if(d.angle){const e=X().angEnd?X().angEnd(d):null;hgTo(e?e.v:hgCur,560,true);say(e&&e.msg||T().joined);return}
  // A mix can set where a hand release lets go (moonstones in keyholes: halfway up the slots).
  if(d.turn){if(!d.moved||model.jt<=(X().letGo??.8))doSeparate();else tween(model.jt,1,330,setJt).then(ok=>{if(ok){model.path=null;say(T().back)}});return}
  const ready=d.state==='ready';
