@@ -56,6 +56,7 @@ struct MenuIds {
     shade: tray_icon::menu::MenuId,
     unshade: tray_icon::menu::MenuId,
     refresh: tray_icon::menu::MenuId,
+    access: tray_icon::menu::MenuId,
     reset: tray_icon::menu::MenuId,
     quit: tray_icon::menu::MenuId,
 }
@@ -435,10 +436,11 @@ impl App {
         let shade = MenuItem::new("Shade all", true, None);
         let unshade = MenuItem::new("Unshade all", true, None);
         let refresh = MenuItem::new("Refresh dock regions", true, None);
+        let access = MenuItem::new("Exact Dock position (grant Accessibility)…", cfg!(target_os = "macos"), None);
         let reset = MenuItem::new("Reset layout", true, None);
         let quit = MenuItem::new("Quit Desktop Widgets", true, None);
-        let _ = menu.append_items(&[&shade, &unshade, &PredefinedMenuItem::separator(), &refresh, &reset, &PredefinedMenuItem::separator(), &quit]);
-        self.menu = Some(MenuIds { shade: shade.id().clone(), unshade: unshade.id().clone(), refresh: refresh.id().clone(), reset: reset.id().clone(), quit: quit.id().clone() });
+        let _ = menu.append_items(&[&shade, &unshade, &PredefinedMenuItem::separator(), &refresh, &access, &reset, &PredefinedMenuItem::separator(), &quit]);
+        self.menu = Some(MenuIds { shade: shade.id().clone(), unshade: unshade.id().clone(), refresh: refresh.id().clone(), access: access.id().clone(), reset: reset.id().clone(), quit: quit.id().clone() });
         let proxy = self.proxy.clone();
         MenuEvent::set_event_handler(Some(move |e: MenuEvent| {
             let _ = proxy.send_event(UserEvent::Menu(e.id));
@@ -497,6 +499,8 @@ impl ApplicationHandler<UserEvent> for App {
                 } else if id == m.unshade {
                     self.world.shade_all(false);
                     self.after_change();
+                } else if id == m.access {
+                    platform::request_dock_access();
                 } else if id == m.refresh {
                     self.world.docks.clear();
                     self.refresh_docks(el);

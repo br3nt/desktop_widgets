@@ -10,9 +10,54 @@ So far it covers: widgets for Spotify (bring back the desktop media player), soc
 
 ## Status
 
-Exploration. The only artefact so far is a web prototype:
+A first native host runs on macOS (see [Running the app](#running-the-app)). Before that came a web prototype:
 
 - [`prototypes/capsule-study.html`](prototypes/capsule-study.html) — capsule assembly study: draggable capsules (Jarvis, GitDiscuss), socket joining with end-cap retraction, a release grip, an independent Checks widget that docks into a drawer bay, and paged digital screens. Open it directly in a browser; no build step.
+
+## Running the app
+
+The first native host lives in [`host/`](host/): one Rust process (winit windows, tiny-skia drawing, ab_glyph text, wry for opt-in HTML panels, a tray menu). It's built and tested on macOS. The Windows and Linux paths are behind `cfg` but not yet compiled or tested.
+
+```sh
+cd host
+cargo run --release            # run from the terminal
+cargo test                     # snapping, joining, shade, docks, config, actors, endpoint
+scripts/bundle-mac.sh          # builds ~/Applications/Desktop Widgets.app (menu-bar only, ad-hoc signed)
+```
+
+After bundling, launch **Desktop Widgets** from Spotlight. It has no Dock icon and doesn't appear in Cmd-Tab. Use the capsule icon in the menu bar to Shade all, Unshade all, Refresh dock regions, request exact Dock position, Reset layout, and Quit. Cmd-Q quits when a widget has focus.
+
+What works (tested on macOS 15):
+
+- **Drag** a widget by its casing (anything outside the display and buttons). Edges snap within 12 pt to other widgets and to the screen's usable edges.
+- **Join:** drop a widget flush against another and they form a group that moves together. **Separate:** drag with Option held, or press the detach button (the third lens, shown only when grouped).
+- **Shade:** double-click the casing or press the top lens button to collapse to a strip showing the name and key value. Group members below slide up or down to stay flush.
+- **Always on top** is per group: the middle lens button (lit lime when on). New widgets start on top.
+- **Docks:** two regions either side of the Dock (or above and below it when the Dock is on a side). They show faintly while you drag. Dropping a widget there shades it and packs it next to the Dock. Docked widgets use the region's on-top setting. Drag a docked widget out to undock it. Dropping a group into a dock docks each member. Exact Dock bounds need Accessibility permission (menu: *Exact Dock position…*). Without it the Dock's length is estimated from its preferences and the running apps. Regions are recomputed at each drag start and from the menu.
+- **Widgets are actors.** Each has its own state, changed only by messages it receives. Clicking the GitDiscuss display hands a discussion to Jarvis. Clicking Checks approves a check and tells Jarvis. The HTML panel's *Nudge Jarvis* button posts a message too. Outside programs can message any widget:
+
+  ```sh
+  curl -X POST http://127.0.0.1:47800/send -d '{"to":"jarvis","msg":"set","agents":4}'
+  ```
+
+- **HTML panels:** set `panel = { kind = "html", url = "…" }` on a widget to get a transparent OS webview over its display slot. The demo panel ([`host/examples/panel-demo.html`](host/examples/panel-demo.html), served by the host at `http://127.0.0.1:47800/examples/panel-demo.html`) uses container queries to switch to a one-line layout in shade mode. The page receives its widget's state through `window.dwState(state)` and sends messages with `window.ipc.postMessage(JSON)`.
+- **Persistence:** positions, groups, shade, dock membership and on-top settings save on every change and restore on launch. Actor state (counters and text) isn't saved yet.
+
+Config files (macOS: `~/Library/Application Support/desktop_widgets/`; elsewhere the platform config dir; override with `DESKTOP_WIDGETS_DIR`):
+
+- `widgets.toml`: widget definitions (written from [`host/widgets.default.toml`](host/widgets.default.toml) on first run), plus the endpoint port.
+- `layout.toml`: the saved arrangement.
+
+Measured on an M-series MacBook (macOS 15.6, release build, idle). RSS includes shared system framework pages; the physical footprint is the process's own memory:
+
+| Widgets | Host RSS | Host physical footprint | Extra processes |
+|---|---|---|---|
+| 3 native (Jarvis, GitDiscuss, Checks) | 69 MB | 23 MB | none |
+| 3 native + 1 HTML panel | 87–100 MB | 34–36 MB | WebKit WebContent ~29 MB, Networking ~21 MB RSS |
+
+Idle CPU is 0: no CPU time accrued over 10 s idle. The host only redraws on events.
+
+Known gaps: the first click on an HTML panel while another app is active only focuses the panel. Joined widgets keep their own casings (no shared housing yet). Narrow docks squeeze strips, so long names get cut off. Dock regions don't yet track Dock changes live (they refresh at each drag start).
 
 ## Prior art
 

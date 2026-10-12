@@ -35,6 +35,8 @@ pub fn dock_length_estimate() -> f64 {
     700.0
 }
 
+pub fn request_dock_access() {}
+
 pub fn dock_rect() -> Option<Rect> {
     None
 }

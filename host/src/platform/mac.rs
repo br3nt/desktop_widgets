@@ -6,12 +6,12 @@ use crate::geom::Rect;
 use objc2::rc::Retained;
 use objc2::runtime::AnyObject;
 use objc2::{AllocAnyThread, MainThreadMarker};
-use objc2_app_kit::{NSEvent, NSRunningApplication, NSScreen, NSView, NSWindowCollectionBehavior};
+use objc2_app_kit::{NSApplicationActivationPolicy, NSEvent, NSRunningApplication, NSScreen, NSView, NSWindowCollectionBehavior, NSWorkspace};
 use objc2_core_foundation::{CGPoint, CGRect, CGSize};
 use objc2_core_graphics::{
     CGBitmapInfo, CGColorRenderingIntent, CGColorSpace, CGDataProvider, CGImage, CGImageAlphaInfo, CGImageByteOrderInfo,
 };
-use objc2_foundation::{ns_string, NSString, NSUserDefaults};
+use objc2_foundation::{ns_string, NSDictionary, NSString, NSUserDefaults};
 use objc2_quartz_core::{CALayer, CATransaction};
 use std::ffi::c_void;
 use std::ptr::NonNull;
@@ -62,15 +62,39 @@ pub fn dock_side_hint() -> DockSide {
 /// Rough Dock length when Accessibility isn't granted: tiles from the Dock's prefs.
 pub fn dock_length_estimate() -> f64 {
     let Some(d) = dock_defaults() else { return 700.0 };
-    let count = |k: &NSString| d.arrayForKey(k).map(|a| a.count()).unwrap_or(0);
-    let apps = count(ns_string!("persistent-apps"));
-    let others = count(ns_string!("persistent-others"));
-    let recents = count(ns_string!("recent-apps"));
     let tile = d.doubleForKey(ns_string!("tilesize"));
     let tile = if tile > 8.0 { tile } else { 48.0 };
-    // Finder + Trash + separators; running apps not kept in the Dock add more, so lean long.
-    let items = apps + others + recents + 2 + 4;
-    (items as f64 * (tile + 6.0) + 24.0).max(200.0)
+    // Bundle ids kept in the Dock.
+    let mut kept: Vec<String> = Vec::new();
+    let mut apps = 0usize;
+    if let Some(arr) = d.arrayForKey(ns_string!("persistent-apps")) {
+        apps = arr.count();
+        for item in arr.iter() {
+            let id = item
+                .downcast_ref::<NSDictionary>()
+                .and_then(|t| t.objectForKey(ns_string!("tile-data").as_ref()))
+                .and_then(|td| td.downcast_ref::<NSDictionary>().and_then(|td| td.objectForKey(ns_string!("bundle-identifier").as_ref())))
+                .and_then(|b| b.downcast_ref::<NSString>().map(|s| s.to_string()));
+            if let Some(id) = id {
+                kept.push(id);
+            }
+        }
+    }
+    // Running apps that aren't kept in the Dock still get a tile.
+    let running = NSWorkspace::sharedWorkspace().runningApplications();
+    let extra = running
+        .iter()
+        .filter(|a| a.activationPolicy() == NSApplicationActivationPolicy::Regular)
+        .filter(|a| {
+            let id = a.bundleIdentifier().map(|s| s.to_string()).unwrap_or_default();
+            id != "com.apple.finder" && !kept.contains(&id)
+        })
+        .count();
+    let others = d.arrayForKey(ns_string!("persistent-others")).map(|a| a.count()).unwrap_or(0);
+    // Finder + apps + running extras + folders/stacks + Trash, two separators, end padding.
+    // Calibrated against the Accessibility frame on macOS 15 (25 tiles at size 33 -> 948pt).
+    let items = 1 + apps + extra + others + 1;
+    (items as f64 * tile * 1.1 + 40.0).max(200.0)
 }
 
 // --- Accessibility: the Dock's exact list frame, only if the user granted access. ---
@@ -94,6 +118,19 @@ unsafe fn ax_attr(el: CFTypeRef, name: &NSString) -> Option<CFTypeRef> {
     let mut v: CFTypeRef = std::ptr::null();
     let key = name as *const NSString as CFTypeRef;
     (AXUIElementCopyAttributeValue(el, key, &mut v) == 0 && !v.is_null()).then_some(v)
+}
+
+/// Ask macOS to show the Accessibility permission prompt (for exact Dock bounds).
+pub fn request_dock_access() {
+    #[link(name = "ApplicationServices", kind = "framework")]
+    extern "C" {
+        fn AXIsProcessTrustedWithOptions(options: CFTypeRef) -> bool;
+    }
+    let yes = objc2_foundation::NSNumber::new_bool(true);
+    let opts = NSDictionary::<NSString, objc2_foundation::NSNumber>::from_slices(&[ns_string!("AXTrustedCheckOptionPrompt")], &[&*yes]);
+    unsafe {
+        AXIsProcessTrustedWithOptions(&*opts as *const _ as CFTypeRef);
+    }
 }
 
 /// The Dock's icon strip, in top-left coordinates. None without Accessibility permission.
