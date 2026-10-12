@@ -171,6 +171,11 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       screen and record in the parity note: mid-drag `drag.moved = true`, `drag.members` = all 3
       group members, every member moved by 300 ±1 pt after release, and both PNGs show the casings
       (not wallpaper). Fix probe.sh or the app if any of these fail.
+      Attempted 13 Oct: blocked, screen locked again (`CGSSessionScreenIsLocked = true`, a
+      `screencapture` of the widget region shows only wallpaper). A raw cliclick drag from
+      gitdiscuss's grab point (796,306) by +300 left every widget in place and `/state` showed
+      `drag: none` mid-drag, so pointer events don't reach the app while locked either. Nothing in
+      this item can be checked until a run happens on an unlocked screen.
 - [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
       returns to its start pose (x=624 ±1). The app is an Accessory app (`main.rs:30`) and Escape
       is a `KeyboardInput` on the widget window (`app.rs:598`), so the key may never arrive if the
