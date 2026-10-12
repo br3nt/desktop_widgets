@@ -11,6 +11,7 @@ mod platform;
 mod render;
 mod server;
 mod snap;
+mod snapshot;
 mod text;
 
 use std::sync::Mutex;
@@ -33,11 +34,21 @@ fn main() {
 
     if file.endpoint_port != 0 {
         let p = Mutex::new(proxy.clone());
-        let r = server::start(file.endpoint_port, move |v| {
-            if let Ok(p) = p.lock() {
-                let _ = p.send_event(app::UserEvent::Endpoint(v));
-            }
-        });
+        let q = Mutex::new(proxy.clone());
+        let r = server::start(
+            file.endpoint_port,
+            move |v| {
+                if let Ok(p) = p.lock() {
+                    let _ = p.send_event(app::UserEvent::Endpoint(v));
+                }
+            },
+            // Ask the event loop for a snapshot; it answers between events.
+            move || {
+                let (tx, rx) = std::sync::mpsc::channel();
+                q.lock().ok()?.send_event(app::UserEvent::State(tx)).ok()?;
+                rx.recv_timeout(std::time::Duration::from_secs(1)).ok()
+            },
+        );
         match r {
             Ok(()) => eprintln!("desktop-widgets: messages on http://127.0.0.1:{}/send", file.endpoint_port),
             Err(e) => eprintln!("desktop-widgets: endpoint on port {} unavailable ({e})", file.endpoint_port),

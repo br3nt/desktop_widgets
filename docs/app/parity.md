@@ -167,8 +167,23 @@ Shade mode (the app's own feature) must show the widget name and its one key val
 
 ## Checklist (one item per run; builder ticks with a one-line note)
 
-- [ ] `GET /state` debug endpoint plus `host/scripts/probe.sh` (cliclick drag helper that prints
+- [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --shot /tmp/d.png` live on an unlocked
+      screen and record in the parity note: mid-drag `drag.moved = true`, `drag.members` = all 3
+      group members, every member moved by 300 ±1 pt after release, and both PNGs show the casings
+      (not wallpaper). Fix probe.sh or the app if any of these fail.
+- [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
+      returns to its start pose (x=624 ±1). The app is an Accessory app (`main.rs:30`) and Escape
+      is a `KeyboardInput` on the widget window (`app.rs:598`), so the key may never arrive if the
+      window is not key; if it doesn't, make the pressed window key on mouse-down (or drop
+      `--escape` from probe.sh and say so).
+
+- [x] `GET /state` debug endpoint plus `host/scripts/probe.sh` (cliclick drag helper that prints
       `/state` and takes region screenshots), so every later item can be verified with numbers.
+      Verified: unit tests (`snapshot.rs`, `server.rs`); live release build served `/state`,
+      reflected a `/send` change, refused a foreign Origin (403). The Mac was locked during this
+      run, so the cliclick drag and screenshot path is not yet exercised live; `probe.sh` now
+      refuses drags and shots while the screen is locked. Also unverified: whether `--escape`'s key
+      press reaches the widget window.
 - [ ] Magnetic field (section 1): bands, pull strengths, critically damped spring, 1:1 outside the
       field, no hysteresis. Replace the hard edge-snap join with release-while-captured.
 - [ ] Socket lights and eased glow (section 2), with the status caption while dragging.

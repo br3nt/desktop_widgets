@@ -1,7 +1,8 @@
 //! A tiny HTTP endpoint on 127.0.0.1 so outside programs can message widgets
 //! (`POST /send` with `Content-Type: application/json` and a body like
 //! `{"to":"jarvis","msg":"set","agents":4}`) and so the demo HTML panel has somewhere to
-//! load from (`GET /examples/panel-demo.html`).
+//! load from (`GET /examples/panel-demo.html`). `GET /state` returns the arrangement as JSON
+//! (see `snapshot.rs`) for scripts and tests.
 //!
 //! Web pages can't use it: requests carrying a foreign `Origin`, a non-JSON body type
 //! (what a no-cors browser post can send), or a `Host` other than 127.0.0.1/localhost
@@ -65,7 +66,7 @@ fn respond(s: &mut TcpStream, status: &str, ctype: &str, body: &[u8]) {
     let _ = s.write_all(body);
 }
 
-fn handle(mut s: TcpStream, port: u16, deliver: &dyn Fn(serde_json::Value)) {
+fn handle(mut s: TcpStream, port: u16, deliver: &dyn Fn(serde_json::Value), state: &dyn Fn() -> Option<String>) {
     let deadline = Instant::now() + Duration::from_secs(2);
     let _ = s.set_write_timeout(Some(Duration::from_secs(2)));
     let mut raw = Vec::new();
@@ -100,20 +101,25 @@ fn handle(mut s: TcpStream, port: u16, deliver: &dyn Fn(serde_json::Value)) {
             }
             _ => respond(&mut s, "400 Bad Request", "text/plain", b"expected JSON {\"to\":..., \"msg\":..., ...}\n"),
         },
+        ("GET", "/state") => match state() {
+            Some(json) => respond(&mut s, "200 OK", "application/json", json.as_bytes()),
+            None => respond(&mut s, "503 Service Unavailable", "text/plain", b"state unavailable\n"),
+        },
         ("GET", "/examples/panel-demo.html") => respond(&mut s, "200 OK", "text/html; charset=utf-8", PANEL_DEMO.as_bytes()),
-        ("GET", "/") => respond(&mut s, "200 OK", "text/plain", b"desktop-widgets endpoint. POST /send (application/json) {\"to\":\"jarvis\",\"msg\":\"set\",\"agents\":4}\n"),
+        ("GET", "/") => respond(&mut s, "200 OK", "text/plain", b"desktop-widgets endpoint. POST /send (application/json) {\"to\":\"jarvis\",\"msg\":\"set\",\"agents\":4}; GET /state\n"),
         _ => respond(&mut s, "404 Not Found", "text/plain", b"not found\n"),
     }
 }
 
 /// Bind now (so panels can load immediately), then serve one request at a time on a thread.
-pub fn start(port: u16, deliver: impl Fn(serde_json::Value) + Send + 'static) -> Result<(), String> {
+/// `state` answers `GET /state` with JSON (None = the app didn't answer in time).
+pub fn start(port: u16, deliver: impl Fn(serde_json::Value) + Send + 'static, state: impl Fn() -> Option<String> + Send + 'static) -> Result<(), String> {
     let listener = TcpListener::bind(("127.0.0.1", port)).map_err(|e| e.to_string())?;
     std::thread::Builder::new()
         .name("endpoint".into())
         .spawn(move || {
             for stream in listener.incoming().flatten() {
-                handle(stream, port, &deliver);
+                handle(stream, port, &deliver, &state);
             }
         })
         .map_err(|e| e.to_string())?;
@@ -164,7 +170,7 @@ mod tests {
         let (tx, rx) = mpsc::channel();
         let tx = std::sync::Mutex::new(tx);
         let port = 47911;
-        start(port, move |v| tx.lock().unwrap().send(v).unwrap()).unwrap();
+        start(port, move |v| tx.lock().unwrap().send(v).unwrap(), || None).unwrap();
         let mut s = TcpStream::connect(("127.0.0.1", port)).unwrap();
         let body = r#"{"to":"jarvis","msg":"set","agents":4}"#;
         write!(s, "POST /send HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nContent-Type: application/json\r\nContent-Length: {}\r\n\r\n{body}", body.len()).unwrap();
@@ -188,5 +194,37 @@ mod tests {
         s.read_to_string(&mut out).unwrap();
         assert!(out.starts_with("HTTP/1.1 403"));
         assert!(rx.recv_timeout(std::time::Duration::from_millis(200)).is_err());
+    }
+
+    #[test]
+    fn state_is_served_as_json_to_local_programs_only() {
+        let port = 47912;
+        start(port, |_| {}, || Some(r#"{"widgets":[]}"#.to_string())).unwrap();
+        let get = |head: &str| {
+            let mut s = TcpStream::connect(("127.0.0.1", port)).unwrap();
+            write!(s, "{head}\r\n\r\n").unwrap();
+            let mut out = String::new();
+            s.read_to_string(&mut out).unwrap();
+            out
+        };
+        let out = get(&format!("GET /state HTTP/1.1\r\nHost: 127.0.0.1:{port}"));
+        assert!(out.starts_with("HTTP/1.1 200"), "{out}");
+        assert!(out.contains("Content-Type: application/json"));
+        assert!(out.ends_with(r#"{"widgets":[]}"#));
+        assert!(!out.contains("Access-Control-Allow-Origin"));
+        // A page on another origin, or a rebinding Host, gets nothing.
+        assert!(get(&format!("GET /state HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nOrigin: https://evil.example")).starts_with("HTTP/1.1 403"));
+        assert!(get("GET /state HTTP/1.1\r\nHost: evil.example").starts_with("HTTP/1.1 403"));
+    }
+
+    #[test]
+    fn state_unavailable_is_503() {
+        let port = 47913;
+        start(port, |_| {}, || None).unwrap();
+        let mut s = TcpStream::connect(("127.0.0.1", port)).unwrap();
+        write!(s, "GET /state HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\n\r\n").unwrap();
+        let mut out = String::new();
+        s.read_to_string(&mut out).unwrap();
+        assert!(out.starts_with("HTTP/1.1 503"), "{out}");
     }
 }

@@ -21,7 +21,7 @@ The first native host lives in [`host/`](host/): one Rust process (winit windows
 ```sh
 cd host
 cargo run --release            # run from the terminal
-cargo test                     # snapping, joining, shade, docks, config, actors, endpoint
+cargo test                     # snapping, joining, shade, docks, config, actors, endpoint, /state
 scripts/bundle-mac.sh          # builds ~/Applications/Desktop Widgets.app (menu-bar only, ad-hoc signed)
 ```
 
@@ -38,6 +38,13 @@ What works (tested on macOS 15):
 
   ```sh
   curl -X POST http://127.0.0.1:47800/send -H 'Content-Type: application/json' -d '{"to":"jarvis","msg":"set","agents":4}'
+  ```
+
+- **Inspecting it:** `GET /state` returns every widget's pose, group, shade, dock, on-top, parts (nameplate, display, buttons) in screen points, its actor state, and the drag in progress. [`host/scripts/probe.sh`](host/scripts/probe.sh) wraps it with real mouse drags (cliclick) and region screenshots:
+
+  ```sh
+  host/scripts/probe.sh summary                                 # one line per widget
+  host/scripts/probe.sh drag gitdiscuss 300 0 --shot /tmp/d.png # drag by its nameplate, report mid-drag and after
   ```
 
 - **HTML panels:** set `panel = { kind = "html", url = "…" }` on a widget to get a transparent OS webview over its display slot. The demo panel ([`host/examples/panel-demo.html`](host/examples/panel-demo.html), served by the host at `http://127.0.0.1:47800/examples/panel-demo.html`) uses container queries to switch to a one-line layout in shade mode. The page receives its widget's state through `window.dwState(state)` and sends messages with `window.ipc.postMessage(JSON)`. A panel can message its own widget, plus any widgets listed in its `talks_to`, and it stays on its configured origin.
