@@ -176,11 +176,17 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       gitdiscuss's grab point (796,306) by +300 left every widget in place and `/state` showed
       `drag: none` mid-drag, so pointer events don't reach the app while locked either. Nothing in
       this item can be checked until a run happens on an unlocked screen.
+      Attempted again 13 Oct (later run): still locked (`CGSSessionScreenIsLocked = true`), and it
+      stayed locked through a 10 min wait; nothing launched or changed.
 - [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
       returns to its start pose (x=624 ±1). The app is an Accessory app (`main.rs:30`) and Escape
       is a `KeyboardInput` on the widget window (`app.rs:598`), so the key may never arrive if the
       window is not key; if it doesn't, make the pressed window key on mouse-down (or drop
       `--escape` from probe.sh and say so).
+      Code reading (13 Oct, not yet a live check): winit 0.30.13's `WinitWindow` returns true from
+      `canBecomeKeyWindow`, and the casing windows are not non-activating panels, so AppKit should
+      activate the app and make the pressed window key on mouse-down. Expect Escape to arrive;
+      confirm live before changing any code.
 
 - [x] `GET /state` debug endpoint plus `host/scripts/probe.sh` (cliclick drag helper that prints
       `/state` and takes region screenshots), so every later item can be verified with numbers.
