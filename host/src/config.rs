@@ -247,7 +247,7 @@ mod tests {
         w.toggle_on_top(0);
         w.toggle_shade(1);
         w.dock(2, "dock-left");
-        w.relayout_docks();
+        w.arrange_docks();
         w.toggle_on_top(2);
 
         let text = layout_to_string(&Layout::from_world(&w));

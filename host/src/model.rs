@@ -173,7 +173,7 @@ impl World {
     }
 
     /// Re-run every dock's layout.
-    pub fn relayout_docks(&mut self) {
+    pub fn arrange_docks(&mut self) {
         for d in 0..self.docks.len() {
             let region = self.docks[d].clone();
             let members = self.dock_members(&region.id);
@@ -227,7 +227,7 @@ impl World {
             }
         }
         self.docks = docks;
-        self.relayout_docks();
+        self.arrange_docks();
     }
 
     // ---- dragging ----
@@ -256,7 +256,7 @@ impl World {
             if self.widgets[p].dock.is_some() {
                 let before = self.widgets[p].rect();
                 self.undock(p);
-                self.relayout_docks();
+                self.arrange_docks();
                 let after = self.widgets[p].rect();
                 let fx = ((d.start.0 - before.x) / before.w).clamp(0.0, 1.0);
                 d.origins[0] = (d.start.0 - fx * after.w, d.start.1 - (d.start.1 - before.y).min(after.h - 4.0));
@@ -294,7 +294,7 @@ impl World {
             for m in ms {
                 self.dock(m, &id);
             }
-            self.relayout_docks();
+            self.arrange_docks();
             return Some(DropOutcome::Docked(id));
         }
         let moving: Vec<Rect> = d.members.iter().map(|&m| self.widgets[m].rect()).collect();
