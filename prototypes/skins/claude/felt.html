@@ -36,7 +36,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 #a{--thread:#6a3f0f;--x1:#b4492a;--x2:#7a2e17;--accent:#a8431f}
 #b{--thread:#163f3b;--x1:#2d6d68;--x2:#1b4542;--accent:#2a6964}
 #c{--thread:#3f1c34;--x1:#7b3a63;--x2:#4b2140;--accent:#7b3a63}
-.casing,.face{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.casing,.face,.chromeB,.chromeF{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 .grip{position:absolute;top:6px;left:40px;right:40px;height:21px;border:0;background:none;color:#fbe9cc;cursor:grab;display:flex;justify-content:space-between;align-items:center;padding:0 8px;font-size:10px;letter-spacing:.6px;text-shadow:0 1px 0 #0007}
 .grip b{font:italic 400 15px/1 Georgia,serif;letter-spacing:.2px;color:#fff3dc;margin-right:7px}
 .grip:active{cursor:grabbing}
@@ -56,16 +56,34 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .page small{font-size:11px;line-height:1.55;color:#5d4838;display:block}
 .xs svg{display:block}
 .bars{position:absolute;right:12px;top:8px}
-.tabline{position:absolute;left:50px;top:104px;display:flex;gap:12px}
-.tab{padding:0;background:none;border:0;color:#fff2dcb3;font-size:10px;letter-spacing:.5px;text-shadow:0 1px 0 #0008}
-.tab[aria-selected=true]{color:#fff8ea}
-.tab[aria-selected=true]:before{content:"";display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;vertical-align:0;background:radial-gradient(circle at 38% 32%,#fffaf0,#efd5a6 55%,#9b7442);box-shadow:0 1px 1px #0008}
-/* Felt buttons: domed circles with a stitched ring */
-.knob{position:absolute;top:101px;width:22px;height:22px;border-radius:50%;padding:0;border:0;color:#4a2c12;font:bold 10px/22px Arial,sans-serif;
- background:radial-gradient(circle at 38% 30%,#fbebcb,#e5c08a 52%,#a77c48);outline:1px dashed #6b471f99;outline-offset:-5px;box-shadow:0 2px 2px #0008,inset 0 -1px 2px #0003}
-.knob.run{left:290px;background:radial-gradient(circle at 38% 30%,#f39a7c,#c4543a 55%,#7d2a19);color:#fff1e2;outline-color:#ffe0c299}
-.knob.next{left:322px}
-.knob:hover{filter:brightness(1.08)}
+/* Rework (Brent, 13 Oct): the controls are notions sewn on the cushion, not domed knobs.
+   Screen tabs are woven name tapes sewn into the bottom seam, hanging below it; the open one hangs longest. */
+.tabline{position:absolute;left:54px;top:115px;display:flex;gap:5px;align-items:flex-start}
+.tab{position:relative;border:0;padding:6px 7px 4px;min-width:36px;color:#5a3a26;font-size:10px;line-height:1.1;letter-spacing:.4px;text-shadow:none;border-radius:0 0 2px 2px;
+ background:repeating-linear-gradient(90deg,#6b4a2a17 0 1px,transparent 1px 2px),repeating-linear-gradient(0deg,#fff5 0 .7px,transparent .7px 1.6px),linear-gradient(#ddcfb1,#f5ecd6 30%,#efe3c7);
+ box-shadow:0 1.6px 1.4px #0008,inset 0 4px 2px -2px #0005;transform:rotate(var(--tilt,0deg));transform-origin:50% 0;transition:padding-bottom .25s steps(3)}
+.tab:before{content:"";position:absolute;left:2px;right:2px;top:2px;border-top:1px dashed var(--thread);opacity:.8}
+.tab:nth-child(1){--tilt:-2.2deg}.tab:nth-child(2){--tilt:1.6deg}.tab:nth-child(3){--tilt:-1deg}
+.tab:hover{filter:brightness(1.06)}
+.tab[aria-selected=true]{color:#2a160d;font-weight:600;padding-bottom:10px}
+.tab[aria-selected=true]:after{content:"";position:absolute;left:3px;right:3px;bottom:3.5px;height:2px;background:var(--x1);box-shadow:0 1px 0 #fff6}
+/* Next screen: a felt arrow sewn into the seam beside the tapes. Run/pause: a double-sided felt charm on a cord,
+   a sun while the widget runs and a moon while it is paused; tapping it spins it over on the cord. */
+.knob{position:absolute;padding:0;border:0;background:none;overflow:visible;color:transparent;font-size:0}
+.knob svg{display:block;overflow:visible}
+.knob:hover svg{filter:brightness(1.08)}
+.knob.next{left:300px;top:114px;width:31px;height:26px}
+.knob.next .sw{transform-origin:6px 3px}
+.knob.next.swing .sw{animation:pennant .42s steps(5) both}
+@keyframes pennant{0%{transform:rotate(0)}30%{transform:rotate(-13deg)}65%{transform:rotate(6deg)}100%{transform:rotate(0)}}
+.knob.run{top:84px;width:30px;height:42px}
+#a .knob.run{left:9px}#b .knob.run{left:351px}
+.knob.run .sw{transform-origin:15px 3px}.knob.run .cm{transform-box:fill-box;transform-origin:50% 50%}
+.knob.run .moon,.knob.run[data-on="0"] .sun{display:none}.knob.run[data-on="0"] .moon{display:inline}
+.knob.run.flip .cm{animation:flipc .44s steps(6) both}.knob.run.flip .sw{animation:swingc .6s steps(7) both}
+@keyframes flipc{0%{transform:scaleX(1)}50%{transform:scaleX(.06)}100%{transform:scaleX(1)}}
+@keyframes swingc{0%{transform:rotate(0)}25%{transform:rotate(9deg)}55%{transform:rotate(-5deg)}80%{transform:rotate(2deg)}100%{transform:rotate(0)}}
+@media(prefers-reduced-motion:reduce){.knob .sw,.knob .cm{animation:none!important}}
 .mini{left:17px;top:25px;width:212px;height:39px;padding:3px 10px;font-size:10px;line-height:1.35;color:#5d4838}
 .mini .xs{display:inline-block;vertical-align:-1px;margin-right:6px}
 .knot{position:absolute;left:243px;top:34px;width:19px;height:19px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#e3f7b9,#8fbf4f 50%,#3f6b1c);box-shadow:0 0 1.5px 1px #8fbf4f88,0 2px 2px #0008}
@@ -176,7 +194,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
   <feComposite in2="d" operator="arithmetic" k1="1"/>
  </filter>
 </defs></svg>
-<header><div><h1>Felt <span>/ Claude skin study</span></h1><p>Stuffed wool felt casings, cotton display patches, cross-stitch numbers, felt buttons. <a href="index.html">All pages</a></p></div>
+<header><div><h1>Felt <span>/ Claude skin study</span></h1><p>Stuffed felt cushions sewn onto pinked flanges, ribbon nameplates, woven-tape tabs, a sun/moon charm for run/pause, cotton display patches, cross-stitch numbers. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
  <div class="row" id="stateRow"><span>State</span></div>
  <div class="row" id="joinRow"><span>Join</span></div>
@@ -242,7 +260,7 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 <svg id="over" class="layer" viewBox="0 0 1200 600"></svg>
 </main></div>
 <section class="about"><div id="joinAbout"></div><div id="shadeAbout"></div><div id="morphAbout"></div>
-<p class="hint">Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the buckled strap, drag GitDiscuss's nameplate to slide the strap to another eyelet (each eyelet is 15°), and tap the strap or the buckle to unbuckle it. On the log rocker, drag GitDiscuss's nameplate to roll it up or down the log (each tick on its plank is 15°), and tap the log to lift it off. On the felt balloon, tap the balloon to fire the burner (GitDiscuss rises 15°) or the red tassel to vent it (it sinks 15°), or focus either and press Enter, ↑ or ↓; drag GitDiscuss's nameplate to tip it by hand, and tap the knuckles to release. On the bottlescrew, swipe across the cotton reel to turn it (down lets the stay out and GitDiscuss tips down, up screws it in and it tips up; it holds at any angle), or focus the reel and press ↑ ↓ to wind to the next 10° mark; drag GitDiscuss's nameplate to tip it by hand and the reel turns to match, and tap the button to release. On the lacing card, tug the bow out to draw the lace in (the wedge closes toward level) or push it back to give slack (it opens), or focus the bow and press ↑ ↓ for the next 15° mark; drag GitDiscuss's nameplate to open it by hand, and tap the gusset to unlace it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. On the fishing game, tap the line or the fish to let it go. On the pound-a-peg, tap the flaps to knock the pegs out. On the peg rail, tap the rail to lift GitDiscuss off the pegs. On the wet felt, tap the band and a carder combs it back into roving. On the woolly static, tap the balloon to discharge it, or tug it away to break the pull. Mitten friends adds stitched faces: pause a cushion with Ⅱ and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. On the frogged shade, the ball band's dye swatch is the status colour. On the sewing box shade, the middle spool's thread is the status colour, and the box keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the plughole shade, the plug hanging over the bath's end is the status colour, and the bath keeps each widget's foot where it stood. On the hair bobble, tap the bobble to unhook it and slide it back off the plaits. On the wind-up hen, turn the key (or drag GitDiscuss's nameplate) clockwise to wind GitDiscuss down a click at a time; it won't turn back while the hen's beak is in the teeth, so tap the hen (or press ↑ on the key) to let the spring turn it back up a tooth, and tap the button hub to release. On the draught dog, tap the dog to pull its stitches out and let the stuffing puff out. On the bean bag, tap the bag to heave it out of the gap and send it hopping home. On the snap chain, tap the chain to unsnap it link by link. On the buttonhole crank, drag the navy shank button round to turn the crank (keep turning and GitDiscuss rocks back), tap it (or press Enter) for one steady turn that shows the quick return, or focus it and press ↑ ↓ for the next 15° mark; drag GitDiscuss's nameplate to tip it by hand and the crank keeps up, and tap the pivot button to release. On the daisy cam, drag the daisy round (let go and the bead drops into the nearest seat between two petals), tap it (or press Enter) to turn it one petal on, or focus it and press ↑ ↓ to turn to the nearest seat 15° higher or lower; drag GitDiscuss's nameplate to tip it by hand and the daisy keeps up, and tap the pivot button to release. On the marionette, GitDiscuss hangs parallel to the wooden control on two strings, touching nothing: drag the control round its peg, tap one half to press that end down to the next 15° mark, or focus it and press ↑ ↓ (Enter levels it); it sways on its strings after each tip and settles, and the centre button releases. On the iron shade, the iron's pilot light and the little felt iron on the name tape are the status colour, and the strip keeps each widget's foot where it stood. On the candle shade, the candle's wax is the status colour. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
+<p class="hint">Casing (reworked 13 Oct): each cushion is sewn onto a flange of darker felt cut with pinking shears, with a grosgrain hanging loop at its outer top corner and a grosgrain ribbon for its nameplate. Tap a woven tape hanging from the bottom seam to open that screen, or the felt arrow beside them for the next one. The felt charm on a cord at the outer end is run/pause: a sun while the widget runs, a moon while it is paused; tap it and it spins over. Keys: 1 separate · 2 joining · 3 joined · 4 shade · J / S cycle join and shade options · M steps Checks through its sizes · Esc cancels a drag. On the cloth hinge, drag GitDiscuss's nameplate to bend it, or focus it and press ↑ ↓. On the safety pin, drag GitDiscuss's nameplate round the pin (detents every 15°), and tap the pin to unpin it. On the button joint, drag GitDiscuss's nameplate round the button (it holds any angle), and tap the button to snip the shank. On the godet fan, drag GitDiscuss's nameplate to open or close the fan (detents every 15°), and tap the fan to unstrap it. On the sock heel, drag GitDiscuss's nameplate to knit or unravel the heel (each raspberry wedge is 15°), and tap the sock to frog it. On the cheese wedge, drag GitDiscuss's nameplate to pop slices in or squeeze them out (each slice is 15°), and tap the cheese to pull it apart. On the buckled strap, drag GitDiscuss's nameplate to slide the strap to another eyelet (each eyelet is 15°), and tap the strap or the buckle to unbuckle it. On the log rocker, drag GitDiscuss's nameplate to roll it up or down the log (each tick on its plank is 15°), and tap the log to lift it off. On the felt balloon, tap the balloon to fire the burner (GitDiscuss rises 15°) or the red tassel to vent it (it sinks 15°), or focus either and press Enter, ↑ or ↓; drag GitDiscuss's nameplate to tip it by hand, and tap the knuckles to release. On the bottlescrew, swipe across the cotton reel to turn it (down lets the stay out and GitDiscuss tips down, up screws it in and it tips up; it holds at any angle), or focus the reel and press ↑ ↓ to wind to the next 10° mark; drag GitDiscuss's nameplate to tip it by hand and the reel turns to match, and tap the button to release. On the lacing card, tug the bow out to draw the lace in (the wedge closes toward level) or push it back to give slack (it opens), or focus the bow and press ↑ ↓ for the next 15° mark; drag GitDiscuss's nameplate to open it by hand, and tap the gusset to unlace it. On the button tab, tug the tab to unbutton it. On the ribbon bow, pull a tail of the bow to untie it. On the appliqué patch, tap the patch and a seam ripper unpicks it. On the mitten hands, tug the handshake to make them let go. On the bunting, tug the garland to unhook it. On the bees, tap the festoons to send the bees off. On the padlock, tap the padlock to unlock it. On the fishing game, tap the line or the fish to let it go. On the pound-a-peg, tap the flaps to knock the pegs out. On the peg rail, tap the rail to lift GitDiscuss off the pegs. On the wet felt, tap the band and a carder combs it back into roving. On the woolly static, tap the balloon to discharge it, or tug it away to break the pull. Mitten friends adds stitched faces: pause a cushion with its sun charm and it falls asleep. On the drawstring shade, pull a toggle down to open it. On the pleats shade, the piping on each fold is a status colour: amber running, blue idle or waiting, red needs you, green passed. On the woven label shade, the label's two border stripes are the status colour in the same scheme. On the toy piano shade, the note stickers on the keys are the status colours in the same scheme. On the turning blocks shade, tap the blocks (or focus them and press Enter, ↓ or ↑) to turn them to the next screen. On the washing line shade, the name and value are on the laundry name tape. On the frogged shade, the ball band's dye swatch is the status colour. On the sewing box shade, the middle spool's thread is the status colour, and the box keeps each widget's foot where it stood, so the strip ends up lower on the stage. On the plughole shade, the plug hanging over the bath's end is the status colour, and the bath keeps each widget's foot where it stood. On the hair bobble, tap the bobble to unhook it and slide it back off the plaits. On the wind-up hen, turn the key (or drag GitDiscuss's nameplate) clockwise to wind GitDiscuss down a click at a time; it won't turn back while the hen's beak is in the teeth, so tap the hen (or press ↑ on the key) to let the spring turn it back up a tooth, and tap the button hub to release. On the draught dog, tap the dog to pull its stitches out and let the stuffing puff out. On the bean bag, tap the bag to heave it out of the gap and send it hopping home. On the snap chain, tap the chain to unsnap it link by link. On the buttonhole crank, drag the navy shank button round to turn the crank (keep turning and GitDiscuss rocks back), tap it (or press Enter) for one steady turn that shows the quick return, or focus it and press ↑ ↓ for the next 15° mark; drag GitDiscuss's nameplate to tip it by hand and the crank keeps up, and tap the pivot button to release. On the daisy cam, drag the daisy round (let go and the bead drops into the nearest seat between two petals), tap it (or press Enter) to turn it one petal on, or focus it and press ↑ ↓ to turn to the nearest seat 15° higher or lower; drag GitDiscuss's nameplate to tip it by hand and the daisy keeps up, and tap the pivot button to release. On the marionette, GitDiscuss hangs parallel to the wooden control on two strings, touching nothing: drag the control round its peg, tap one half to press that end down to the next 15° mark, or focus it and press ↑ ↓ (Enter levels it); it sways on its strings after each tip and settles, and the centre button releases. On the iron shade, the iron's pilot light and the little felt iron on the name tape are the status colour, and the strip keeps each widget's foot where it stood. On the candle shade, the candle's wax is the status colour. Checks has no joining edges, as in the capsule study. Chrome moves at 12 frames a second and the felt fibres shift each frame, like stop-motion; displays and dragging stay smooth. Nothing moves at rest.</p></section>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],stage=$('#stage');
 const W=390,H=130,HS=40,CW=276,CH=78,CHS=36,SEP=170,NEAR=120,READY=40,EDGE=4,FRAME=1000/12,TILT=6;
@@ -316,6 +334,125 @@ function casing(id,w,h){
  o+=`<path d="${rr4(bx+3.5,by+3.5,w-2*bx-7,bh-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
  return o;
 }
+/* ---------- Felt chrome (rework, Brent 13 Oct): a sewn cushion, not a recoloured capsule ----------
+   The stuffed panel above is unchanged, so every shade, join and morph that redraws it keeps its handover.
+   Round it, in two layers that fade out with the display as any shade or morph starts:
+   behind, a flange of darker felt cut with pinking shears round the top, bottom and outer end (the joining end stays clean),
+   with a grosgrain hanging loop sewn into the outer top corner; in front, blanket stitch along the panel's edge and a
+   grosgrain ribbon nameplate folded over the outer end and cut in a swallowtail at the joining end. */
+const CHR={fl:{a:'#663914',b:'#173a44',c:'#3f2037'},rb:{a:['#6e2510','#9a3a1b','#c96b42'],b:['#0f3532','#1d5550','#3f8278'],c:['#3e1534','#682c55','#965982']}};
+// The flange's visible edge in Jarvis's frame (outer end on the left), clockwise, as a dense polyline.
+function chrEdge(id,w,h){
+ // GitDiscuss is drawn mirrored, so its joining-end corners are its left ones.
+ const E=EDGE,r0=SKIN[id].r,r=id==='b'?[r0[1],r0[0],r0[3],r0[2]]:r0,both=id==='c',xo=-5,yt=E-6,yb=h-E+6,R=Math.min(14,(yb-yt)/2-1),P=[];
+ const line=(a,b)=>{const n=Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])));for(let i=1;i<=n;i++)P.push([lerp(a[0],b[0],i/n),lerp(a[1],b[1],i/n)])};
+ const arc=(cx,cy,a0,a1)=>{for(let i=1;i<=12;i++){const a=lerp(a0,a1,i/12);P.push([cx+R*Math.cos(a),cy+R*Math.sin(a)])}};
+ const quad=(a,c,b)=>{for(let i=1;i<=14;i++){const t=i/14,u=1-t;P.push([u*u*a[0]+2*u*t*c[0]+t*t*b[0],u*u*a[1]+2*u*t*c[1]+t*t*b[1]])}};
+ const PI=Math.PI,xr=w-xo;
+ if(both){P.push([xr-R,yb]);line([xr-R,yb],[xo+R,yb])}
+ else{// From under the panel at the joining end's foot, the flange tapers out to its full depth.
+  const S=[w-E-r[2]*.4,h-E-5],B=[w-E-r[2]-9,yb];P.push(S);quad(S,[S[0]-3,yb],B);line(B,[xo+R,yb])}
+ arc(xo+R,yb-R,PI/2,PI);line([xo,yb-R],[xo,yt+R]);arc(xo+R,yt+R,PI,1.5*PI);
+ if(both){line([xo+R,yt],[xr-R,yt]);arc(xr-R,yt+R,1.5*PI,2*PI);line([xr,yt+R],[xr,yb-R]);arc(xr-R,yb-R,0,PI/2)}
+ else{const T=[w-E-r[1]-9,yt],U=[w-E-r[1]*.4,E+5];line([xo+R,yt],T);quad(T,[U[0]-3,yt],U)}
+ return P;
+}
+// Pinking shears: resample the edge evenly and push every other point outward, so the felt ends in small triangles.
+// A closed edge (Checks) gets an even count with no repeated end point, so the teeth meet evenly where the path closes.
+function chrPinked(P,closed){
+ const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));
+ const tot=L[L.length-1],Q=[];let n=Math.max(4,Math.round(tot/2.7)),k=1;if(closed)n+=n%2;
+ for(let j=0;j<=(closed?n-1:n);j++){const s=tot*j/n;while(k<P.length-1&&L[k]<s)k++;const a=P[k-1],b=P[k],u=(s-L[k-1])/((L[k]-L[k-1])||1);
+  const tx=b[0]-a[0],ty=b[1]-a[1],tl=Math.hypot(tx,ty)||1,amp=j%2?2.3:0;Q.push([lerp(a[0],b[0],u)+ty/tl*amp,lerp(a[1],b[1],u)-tx/tl*amp])}
+ return Q;
+}
+function chromeBack(id,w,h){
+ const s=SKIN[id],mir=id==='b',c=CHR.rb[id],X=x=>mir?w-x:x;
+ const pts=chrPinked(chrEdge(id,w,h),id==='c'),d='M'+pts.map(p=>f(X(p[0]))+' '+f(p[1])).join('L')+'Z';
+ let o=`<defs><filter id="cfl-${id}" x="-6%" y="-20%" width="112%" height="140%" color-interpolation-filters="sRGB">
+ <feTurbulence class="boil" data-seed="${s.seed+5}" type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="${s.seed+5+BO}" result="n"/>
+ <feDisplacementMap in="SourceGraphic" in2="n" scale="1.6" xChannelSelector="R" yChannelSelector="G" result="d"/>
+ <feGaussianBlur in="d" stdDeviation="1.6" result="b"/>
+ <feDiffuseLighting in="b" surfaceScale="1.6" diffuseConstant="1.15" lighting-color="#fff3e2"><feDistantLight azimuth="235" elevation="58"/></feDiffuseLighting>
+ <feComposite in2="d" operator="arithmetic" k1="1"/></filter></defs>`;
+ // The hanging loop: a fold of the nameplate's grosgrain sewn in under the flange at the outer top corner.
+ const lx=X(15),rx=X(27),loop=`M${lx} 3C${X(13)} -9 ${X(17)} -16.5 ${f((lx+rx)/2)} -16.5C${X(25)} -16.5 ${X(29)} -9 ${rx} 3`;
+ o+=`<g fill="none" stroke-linecap="round"><path d="${loop}" stroke="#000" stroke-opacity=".35" stroke-width="6.4" transform="translate(.6 1.4)"/><path d="${loop}" stroke="${c[0]}" stroke-width="6.2"/><path d="${loop}" stroke="${c[1]}" stroke-width="4.6"/>`+
+  `<path d="${loop}" stroke="${c[0]}" stroke-opacity=".55" stroke-width="4.6" stroke-dasharray=".7 1.5"/><path d="${loop}" stroke="${c[2]}" stroke-opacity=".6" stroke-width=".8" transform="translate(${mir?.8:-.8} -.6)"/></g>`;
+ o+=`<path d="${d}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.4)"/><path d="${d}" fill="${CHR.fl[id]}" filter="url(#cfl-${id})"/>`;
+ // Two bar tacks where the loop is sewn through the flange.
+ o+=`<path d="M${X(12)} -.4h6M${X(24)} -.4h6" transform="${mir?'translate(-6 0)':''}" stroke="#f3e2c2" stroke-opacity=".85" stroke-width="1.1" stroke-dasharray="1.4 .9"/>`;
+ return o;
+}
+// Points round the panel's own outline (the casing's rr4 body), clockwise, every few pixels, with the inward normal.
+function chrRim(x,y,w,h,rs,step){
+ const[a,b,c,d]=rs.map(r=>Math.max(1,Math.min(r,h/2,w/2))),P=[];
+ const line=(p,q)=>{const n=Math.max(1,Math.ceil(Math.hypot(q[0]-p[0],q[1]-p[1])));for(let i=1;i<=n;i++)P.push([lerp(p[0],q[0],i/n),lerp(p[1],q[1],i/n)])};
+ const quad=(p,k,q)=>{for(let i=1;i<=12;i++){const t=i/12,u=1-t;P.push([u*u*p[0]+2*u*t*k[0]+t*t*q[0],u*u*p[1]+2*u*t*k[1]+t*t*q[1]])}};
+ P.push([x+a,y]);line([x+a,y],[x+w-b,y]);quad([x+w-b,y],[x+w,y],[x+w,y+b]);line([x+w,y+b],[x+w,y+h-c]);quad([x+w,y+h-c],[x+w,y+h],[x+w-c,y+h]);
+ line([x+w-c,y+h],[x+d,y+h]);quad([x+d,y+h],[x,y+h],[x,y+h-d]);line([x,y+h-d],[x,y+a]);quad([x,y+a],[x,y],[x+a,y]);
+ const L=[0];for(let i=1;i<P.length;i++)L.push(L[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));
+ const tot=L[L.length-1],n=Math.round(tot/step),out=[];let k=1;
+ for(let j=0;j<n;j++){const s=tot*j/n;while(k<P.length-1&&L[k]<s)k++;const p=P[k-1],q=P[k],u=(s-L[k-1])/((L[k]-L[k-1])||1),tx=q[0]-p[0],ty=q[1]-p[1],tl=Math.hypot(tx,ty)||1;
+  out.push({x:lerp(p[0],q[0],u),y:lerp(p[1],q[1],u),nx:-ty/tl,ny:tx/tl})}
+ return out;
+}
+function chromeFront(id,w,h){
+ const small=id==='c',mir=id==='b',c=CHR.rb[id],E=EDGE;
+ // Blanket stitch: the thread runs along the panel's edge and its legs reach in, sewing the panel to the flange.
+ const R=chrRim(E,E,w-2*E,h-2*E,SKIN[id].r,5.6);let edge='',legs='';
+ R.forEach((p,i)=>{const ex=p.x+p.nx*1.3,ey=p.y+p.ny*1.3;edge+=(i?'L':'M')+f(ex)+' '+f(ey);legs+=`M${f(ex)} ${f(ey)}L${f(p.x+p.nx*4.4)} ${f(p.y+p.ny*4.4)}`});
+ edge+='Z';
+ let o=`<defs><pattern id="crib-${id}" width="2.3" height="4" patternUnits="userSpaceOnUse"><rect width="2.3" height="4" fill="${c[1]}"/><rect width=".85" height="4" fill="${c[0]}" opacity=".6"/><rect x="1.4" width=".45" height="4" fill="#fff" opacity=".12"/></pattern>`+
+  `<linearGradient id="crsh-${id}" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".16"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".32"/></linearGradient></defs>`;
+ o+=`<g fill="none" stroke-linecap="round"><path d="${edge+legs}" stroke="#000" stroke-opacity=".3" stroke-width="1.3" transform="translate(.4 .7)"/><path d="${edge+legs}" stroke="#f6e6c6" stroke-opacity=".88" stroke-width="1.05"/></g>`;
+ // The ribbon nameplate over the felt name band, in Jarvis's frame, mirrored for GitDiscuss.
+ const y0=small?2.5:4.5,y1=small?20:27,ym=(y0+y1)/2,xa=E+4,xb=small?w-E-4:w-E-19;
+ const main=`M${xa} ${y0}H${xb}`+(small?`V${y1}`:`L${xb+10} ${y0}L${xb+4.5} ${f(ym)}L${xb+10} ${y1}`)+`H${xa}Z`;
+ const fold=x=>{const s=x<w/2?-1:1,xe=x+s*7;return `M${x} ${y0}L${xe} ${f(y0+2.6)}L${xe} ${f(y1-2.6)}L${x} ${y1}Z`};
+ const folds=fold(xa)+(small?fold(w-E-4):'');
+ let g=`<path d="${main}" fill="#000" opacity=".45" filter="url(#sh)" transform="translate(0 1.7)"/><path d="${folds}" fill="${c[0]}"/><path d="${folds}" fill="#000" opacity=".25"/>`+
+  `<path d="${main}" fill="url(#crib-${id})"/><path d="${main}" fill="url(#crsh-${id})"/>`;
+ // Selvedges, and the running stitch that holds the ribbon down.
+ const xe2=small?w-E-5:xb+3;
+ g+=`<path d="M${xa} ${f(y0+1.1)}H${small?w-E-4:xb+9.3}M${xa} ${f(y1-1.1)}H${small?w-E-4:xb+9.3}" stroke="${c[2]}" stroke-opacity=".55" stroke-width=".7"/>`+
+  `<path d="M${xa+3} ${f(y0+2.4)}H${xe2}M${xa+3} ${f(y1-2.4)}H${xe2}" stroke="#f6e6c6" stroke-opacity=".8" stroke-width=".95" stroke-dasharray="2.8 2.2" stroke-linecap="round"/>`;
+ o+=mir?`<g transform="translate(${w} 0) scale(-1 1)">${g}</g>`:g;
+ return o;
+}
+// Kept up to date by render(): opacity follows the display, and the drawing is rebuilt only when the size changes.
+function chrome(el,id,w,h,op){
+ const B=el.querySelector('.chromeB'),F=el.querySelector('.chromeF');
+ for(const s of[B,F]){s.style.opacity=f(op);s.style.visibility=op<.02?'hidden':'visible'}
+ if(op<.02)return;const key=w+'x'+h;
+ if(B.dataset.key===key)return;B.dataset.key=key;
+ for(const s of[B,F]){s.setAttribute('width',w);s.setAttribute('height',h);s.setAttribute('viewBox',`0 0 ${w} ${h}`)}
+ B.innerHTML=chromeBack(id,w,h);F.innerHTML=chromeFront(id,w,h);
+}
+// The run charm (sun one side, moon the other) and the next-screen arrow, drawn once.
+const CHARM_SUN=(()=>{let d='';for(let i=0;i<24;i++){const a=i/24*Math.PI*2-Math.PI/2,r=i%2?8.6:11;d+=(i?'L':'M')+f(15+r*Math.cos(a))+' '+f(29+r*Math.sin(a))}return d+'Z'})();
+function charmSvg(){
+ return `<svg width="30" height="42" viewBox="0 0 30 42" aria-hidden="true"><g class="sw">`+
+  `<path d="M15 3.5V20" stroke="#4a3220" stroke-width="2.2"/><path d="M15 3.5V20" stroke="#efe0c2" stroke-width="1.3" stroke-dasharray="1.6 1"/>`+
+  `<rect x="10.5" y=".5" width="9" height="6" rx="1.4" style="fill:var(--x2)" filter="url(#tagfelt)"/><path d="M12 2l6 3M18 2l-6 3" stroke="#f6e6c6" stroke-width=".8" stroke-linecap="round"/>`+
+  `<circle cx="15" cy="17.6" r="2.7" fill="#8a5a2c"/><circle cx="14.2" cy="16.8" r="1" fill="#e6c08a" opacity=".7"/>`+
+  `<g class="cm"><circle cx="15.6" cy="30.4" r="10.6" fill="#000" opacity=".38" filter="url(#sh)"/>`+
+   `<g class="sun"><path d="${CHARM_SUN}" fill="#e9a62a" filter="url(#tagfelt)"/><circle cx="15" cy="29" r="6.2" fill="#f4c24a" filter="url(#tagfelt)"/><circle cx="15" cy="29" r="6.6" fill="none" stroke="#7a3e0c" stroke-opacity=".75" stroke-width=".8" stroke-dasharray="1.6 1.2"/>`+
+    `<circle cx="15" cy="29" r="2" fill="#c9581f"/><circle cx="14.4" cy="28.4" r=".7" fill="#ffe0a6"/><circle cx="19.2" cy="25" r="1.3" fill="#fff4cf"/><circle cx="19" cy="24.8" r=".5" fill="#fff"/></g>`+
+   `<g class="moon"><circle cx="15" cy="29" r="10.4" fill="#33466c" filter="url(#tagfelt)"/><circle cx="15" cy="29" r="8.6" fill="none" stroke="#e8dcc0" stroke-opacity=".7" stroke-width=".8" stroke-dasharray="1.6 1.3"/>`+
+    `<path d="M17.6 21.6A7.6 7.6 0 1 0 17.6 36.4A9 9 0 0 1 17.6 21.6Z" fill="#efe4c6" filter="url(#tagfelt)"/><path d="M19.6 25.2l2 2M21.6 25.2l-2 2M21 31.4l1.4 1.4M22.4 31.4l-1.4 1.4" stroke="#efe4c6" stroke-width=".7" stroke-linecap="round"/></g>`+
+  `</g></g></svg>`;
+}
+function nextSvg(){
+ const d='M2 3H21L29.5 13L21 23H2Z';
+ return `<svg width="31" height="26" viewBox="0 0 31 26" aria-hidden="true"><g class="sw"><path d="${d}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(.6 1.6)"/>`+
+  `<path d="${d}" style="fill:var(--x1)" filter="url(#tagfelt)"/><path d="M4.5 5.5H20L26.3 13L20 20.5H4.5Z" fill="none" stroke="#f6e6c6" stroke-opacity=".75" stroke-width=".8" stroke-dasharray="1.8 1.4"/>`+
+  `<path d="M2.5 5.6H21" stroke="#000" stroke-opacity=".25" stroke-width="2.4"/>`+
+  `<path d="M11 8.6L15.4 13L11 17.4M15.4 8.6L19.8 13L15.4 17.4" fill="none" stroke="#fbf0d6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`;
+}
+['a','b','c'].forEach(id=>{const el=$('#'+id),cs=el.querySelector('.casing'),ns='http://www.w3.org/2000/svg';
+ for(const[k,before]of[['chromeB',true],['chromeF',false]]){const s=document.createElementNS(ns,'svg');s.setAttribute('class',k);s.setAttribute('aria-hidden','true');before?cs.before(s):cs.after(s)}
+ if(id!=='c'){el.querySelector('.run').innerHTML=charmSvg();el.querySelector('.next').innerHTML=nextSvg()}});
 function boil(fr){
  BO=fr<0?0:(fr%3)*31;
  for(const id of ['a','b'])$$('#'+id+' .boil').forEach(t=>t.setAttribute('seed',+t.dataset.seed+BO));
@@ -3248,7 +3385,7 @@ function faceSvg(id,e,show){
 function drawFace(el,id,c,show){
  let svg=el.querySelector('.face');
  const html=J().faces?faceSvg(id,faceExpr(id,c),show):'';
- if(!svg){if(!html)return;svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','face');svg.setAttribute('aria-hidden','true');svg.setAttribute('width',W);svg.setAttribute('height',H);el.querySelector('.casing').after(svg)}
+ if(!svg){if(!html)return;svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('class','face');svg.setAttribute('aria-hidden','true');svg.setAttribute('width',W);svg.setAttribute('height',H);el.querySelector('.chromeF').after(svg)}
  if(svg.dataset.html!==html){svg.dataset.html=html;svg.innerHTML=html}
 }
 JOINS.friends={...JOINS.mittens,label:'Mitten friends',kind:'Grow · character, with faces',faces:true,
@@ -8615,7 +8752,9 @@ function pairBox(){
  if(J().angled&&model.jt>0){const F=angFrame(model.angle,HH);for(const lx of[0,W])for(const ly of[0,HH]){const p=hingePt(F,model.b.x,yb,lx,ly);x1=Math.max(x1,p.x);y0=Math.min(y0,p.y);y1=Math.max(y1,p.y)}}
  // A join with parts standing over the pair (the felt balloon) says where its top is.
  if(J().boxTop&&model.jt>0)y0=Math.min(y0,J().boxTop(HH,yb));
- return{x0:Math.min(model.a.x,model.b.x)-10,x1:x1+10,y0:y0-10,y1:y1+10};
+ // The sewn chrome stands above (the hanging loop) and below (the woven tapes) the casing while it shows.
+ const ch=model.st<.1;
+ return{x0:Math.min(model.a.x,model.b.x)-10,x1:x1+10,y0:y0-(ch?24:10),y1:y1+(ch?18:10)};
 }
 // How far the pair has to rise (from where it stood) to clear a w×h Checks centred at cx,cy that reaches below it; never past the top of the stage.
 function clearLift(w,h,cx,cy){
@@ -9213,6 +9352,9 @@ function render(){
  for(const id of ['a','b','c']){
   const el=$('#'+id),m=model[id],small=id==='c',w=small?CW:W,h=small?ch:c.h;
   el.style.left=f(m.x)+'px';el.style.top=f(m.y)+'px';
+  // The sewn chrome (flange, loop, ribbon, blanket stitch) fades with the display. On Checks it goes as soon as a morph starts,
+  // because several morphs move the pad inside a bigger box and the chrome would be left behind at the box's corner.
+  {const k=ease(model.st),sv=sh.show?sh.show(model.st):1-clamp(k*2.2);chrome(el,id,w,h,small&&model.g>0?0:sv)}
   if(small&&morphRender(el))continue;
   el.style.height=h+'px';
   syncTurn(id);
@@ -9237,7 +9379,7 @@ function render(){
   if(tbOn){const G=blocksGeo(id,w,small),B=G.blocks,F=blockFaces(id)[blkPage(id)];Object.assign(tb.style,{left:f(B[0].x0-3)+'px',top:f(G.cy-G.a-3)+'px',width:f(B[1].x1-B[0].x0+6)+'px',height:f(G.s+6)+'px'});
    tb.setAttribute('aria-label',`${{a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id]} blocks, showing ${F.l}: ${F.num?F.num+' '+F.word:F.text}. Press Enter or arrow down to turn to the next screen, arrow up for the previous one.`)}
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
-   const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
+   const r=el.querySelector('.run');r.dataset.on=m.run?'1':'0';r.title=(m.run?'Running: tap the sun to pause ':'Paused: tap the moon to resume ')+(id==='a'?'Jarvis':'GitDiscuss');r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
  }
  $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
  const focused=document.activeElement&&document.activeElement.id==='pullHit';
@@ -9322,8 +9464,13 @@ document.addEventListener('keydown',e=>{
 ['a','b'].forEach(id=>{
  const el=$('#'+id),m=model[id],name=id==='a'?'Jarvis':'GitDiscuss';
  el.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{m.page=+t.dataset.page;render()});
- el.querySelector('.next').onclick=()=>{m.page=(m.page+1)%3;render()};
- el.querySelector('.run').onclick=()=>{m.run=!m.run;render();say(name+' simulated activity '+(m.run?'resumed.':'paused.'))};
+ // The arrow tab swings when tapped; the charm spins over on its cord and shows its other face halfway round.
+ const nx=el.querySelector('.next'),rn=el.querySelector('.run');let flipT=0;
+ nx.onclick=()=>{m.page=(m.page+1)%3;render();nx.classList.remove('swing');void nx.offsetWidth;nx.classList.add('swing')};
+ rn.onclick=()=>{if(flipT)return;const to=!m.run;say(name+' simulated activity '+(to?'resumed.':'paused.'));
+  if(reduce.matches){m.run=to;render();return}
+  rn.classList.add('flip');
+  flipT=setTimeout(()=>{m.run=to;render();flipT=setTimeout(()=>{rn.classList.remove('flip');flipT=0},420)},220)};
 });
 
 /* ---------- Dragging with near / ready, and the zipper pull ---------- */
