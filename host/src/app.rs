@@ -10,6 +10,7 @@ use crate::geom::Rect;
 use crate::model::{DropOutcome, World};
 use crate::platform::{self, Presenter};
 use crate::render::{self, WidgetView};
+use crate::snapshot;
 use crate::text::Fonts;
 use std::path::PathBuf;
 use std::rc::Rc;
@@ -28,6 +29,8 @@ pub enum UserEvent {
     Endpoint(serde_json::Value),
     /// A message posted by an HTML panel: (widget id, JSON body).
     Ipc(String, String),
+    /// `GET /state`: answer with the snapshot JSON.
+    State(std::sync::mpsc::Sender<String>),
 }
 
 struct WidgetWin {
@@ -524,6 +527,11 @@ impl ApplicationHandler<UserEvent> for App {
                 } else if id == m.quit {
                     self.quit(el);
                 }
+            }
+            UserEvent::State(tx) => {
+                let stage = &self.stage;
+                let json = snapshot::state(&self.world, &|id| stage.state(id).map(|st| serde_json::Value::Object(st.clone())));
+                let _ = tx.send(json.to_string());
             }
             UserEvent::Endpoint(v) => match Message::from_json(&v, "endpoint", None) {
                 Ok(m) => self.deliver(m),

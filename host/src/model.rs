@@ -48,7 +48,10 @@ pub struct Drag {
     pub moved: bool,
     /// Dock region index the pointer is over.
     pub hover_dock: Option<usize>,
-    pressed: usize,
+    /// The widget that was pressed.
+    pub pressed: usize,
+    /// Last pointer position seen by the drag.
+    pub cursor: (f64, f64),
 }
 
 #[derive(Clone, Debug, Default)]
@@ -256,11 +259,12 @@ impl World {
         let g = self.widgets[i].group;
         let members = if self.widgets[i].dock.is_some() { vec![i] } else { self.members(g).into_iter().filter(|&m| self.widgets[m].dock.is_none()).collect() };
         let origins = members.iter().map(|&m| (self.widgets[m].x, self.widgets[m].y)).collect();
-        self.drag = Some(Drag { members, origins, start: cursor, moved: false, hover_dock: None, pressed: i });
+        self.drag = Some(Drag { members, origins, start: cursor, moved: false, hover_dock: None, pressed: i, cursor });
     }
 
     pub fn drag_to(&mut self, cursor: (f64, f64)) {
         let Some(mut d) = self.drag.take() else { return };
+        d.cursor = cursor;
         let (dx, dy) = (cursor.0 - d.start.0, cursor.1 - d.start.1);
         if !d.moved && dx.hypot(dy) < DRAG_SLOP {
             self.drag = Some(d);

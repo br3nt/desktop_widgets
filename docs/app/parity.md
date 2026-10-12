@@ -167,8 +167,13 @@ Shade mode (the app's own feature) must show the widget name and its one key val
 
 ## Checklist (one item per run; builder ticks with a one-line note)
 
-- [ ] `GET /state` debug endpoint plus `host/scripts/probe.sh` (cliclick drag helper that prints
+- [x] `GET /state` debug endpoint plus `host/scripts/probe.sh` (cliclick drag helper that prints
       `/state` and takes region screenshots), so every later item can be verified with numbers.
+      Verified: unit tests (`snapshot.rs`, `server.rs`); live release build served `/state`,
+      reflected a `/send` change, refused a foreign Origin (403). The Mac was locked during this
+      run, so the cliclick drag and screenshot path is not yet exercised live; `probe.sh` now
+      refuses drags and shots while the screen is locked. Also unverified: whether `--escape`'s key
+      press reaches the widget window.
 - [ ] Magnetic field (section 1): bands, pull strengths, critically damped spring, 1:1 outside the
       field, no hysteresis. Replace the hard edge-snap join with release-while-captured.
 - [ ] Socket lights and eased glow (section 2), with the status caption while dragging.
