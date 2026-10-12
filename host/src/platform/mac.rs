@@ -149,7 +149,13 @@ pub fn dock_rect() -> Option<Rect> {
         if let Some(kids) = ax_attr(app, ns_string!("AXChildren")) {
             for i in 0..CFArrayGetCount(kids) {
                 let el = CFArrayGetValueAtIndex(kids, i);
-                let (Some(pos), Some(size)) = (ax_attr(el, ns_string!("AXPosition")), ax_attr(el, ns_string!("AXSize"))) else { continue };
+                let pos = ax_attr(el, ns_string!("AXPosition"));
+                let size = ax_attr(el, ns_string!("AXSize"));
+                let (Some(pos), Some(size)) = (pos, size) else {
+                    // Release whichever one we did get.
+                    pos.into_iter().chain(size).for_each(|v| CFRelease(v));
+                    continue;
+                };
                 let mut p = CGPoint { x: 0.0, y: 0.0 };
                 let mut s = CGSize { width: 0.0, height: 0.0 };
                 let ok = AXValueGetValue(pos, 1, &mut p as *mut _ as *mut c_void) && AXValueGetValue(size, 2, &mut s as *mut _ as *mut c_void);
@@ -218,7 +224,11 @@ impl Presenter {
         let len = data.len();
         let ptr = Box::into_raw(data).cast::<c_void>();
         unsafe {
-            let Some(provider) = CGDataProvider::with_data(std::ptr::null_mut(), ptr, len, Some(release)) else { return };
+            let Some(provider) = CGDataProvider::with_data(std::ptr::null_mut(), ptr, len, Some(release)) else {
+                // CoreGraphics doesn't call `release` when creation fails; free the pixels here.
+                drop(Box::from_raw(std::ptr::slice_from_raw_parts_mut(ptr.cast::<u8>(), len)));
+                return;
+            };
             let info = CGBitmapInfo(CGImageAlphaInfo::PremultipliedLast.0 | CGImageByteOrderInfo::OrderDefault.0);
             let Some(image) = CGImage::new(
                 w as usize,

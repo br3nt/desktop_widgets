@@ -34,6 +34,9 @@ pub struct WidgetDef {
     #[serde(default = "default_h")]
     pub height: f64,
     pub panel: Panel,
+    /// Other widgets this widget's HTML panel may message (it can always message itself).
+    #[serde(default)]
+    pub talks_to: Vec<String>,
     /// Initial actor state (strings, numbers, booleans).
     #[serde(default)]
     pub state: serde_json::Map<String, serde_json::Value>,
@@ -150,6 +153,20 @@ impl Layout {
             groups.entry(p.group).or_insert(true);
             w.widgets.push(p);
         }
+        // Positions must be real numbers; a docked widget is never part of a multi-widget group.
+        for p in &mut w.widgets {
+            if !p.x.is_finite() || !p.y.is_finite() {
+                p.x = origin.0 + 40.0;
+                p.y = origin.1 + 40.0;
+            }
+        }
+        w.groups = groups.clone();
+        for i in 0..w.widgets.len() {
+            if w.widgets[i].dock.is_some() {
+                w.detach(i);
+            }
+        }
+        groups = w.groups.clone();
         groups.retain(|g, _| w.widgets.iter().any(|p| p.group == *g));
         w.groups = groups;
         let mut docks = docks;
@@ -223,6 +240,7 @@ mod tests {
         let ids: Vec<&str> = f.widgets.iter().map(|w| w.id.as_str()).collect();
         assert_eq!(ids, ["jarvis", "gitdiscuss", "checks", "panel-demo"]);
         assert_eq!(f.widgets[3].panel.kind, PanelKind::Html);
+        assert_eq!(f.widgets[3].talks_to, vec!["jarvis".to_string()]);
         assert!(f.widgets[3].panel.url.as_deref().unwrap().contains("panel-demo.html"));
         assert_eq!(f.widgets[0].panel.kind, PanelKind::Native);
         assert!(f.widgets[0].state.contains_key("value"));

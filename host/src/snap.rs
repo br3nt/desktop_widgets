@@ -13,7 +13,7 @@ const MIN_JOIN_OVERLAP: f64 = 8.0;
 fn best(cands: impl Iterator<Item = f64>, threshold: f64) -> Option<f64> {
     cands
         .filter(|d| d.abs() <= threshold)
-        .min_by(|a, b| a.abs().partial_cmp(&b.abs()).unwrap())
+        .min_by(|a, b| a.abs().total_cmp(&b.abs()))
 }
 
 /// Returns the (dx, dy) correction to apply to every moving rect.

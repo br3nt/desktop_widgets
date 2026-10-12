@@ -140,10 +140,26 @@ impl World {
         self.widgets[i].shaded = shaded;
         let new = self.widgets[i].rect();
         let delta = new.h - old.h;
+        // Move what hangs below it: free group members flush under its old bottom edge
+        // (overlapping horizontally), then whatever hangs under those, each once.
         let g = self.widgets[i].group;
-        // Everything in the group whose top is at or below the old bottom edge moves with it.
-        for j in 0..self.widgets.len() {
-            if j != i && self.widgets[j].group == g && self.widgets[j].y >= old.bottom() - 0.5 {
+        let mut moving = vec![false; self.widgets.len()];
+        let mut frontier = vec![old];
+        while let Some(above) = frontier.pop() {
+            for j in 0..self.widgets.len() {
+                let p = &self.widgets[j];
+                if j == i || moving[j] || p.group != g || p.dock.is_some() {
+                    continue;
+                }
+                let r = p.rect();
+                if (r.y - above.bottom()).abs() < 0.75 && r.h_overlap(&above) > 0.0 {
+                    moving[j] = true;
+                    frontier.push(r);
+                }
+            }
+        }
+        for (j, m) in moving.into_iter().enumerate() {
+            if m {
                 self.widgets[j].y += delta;
             }
         }
@@ -157,7 +173,7 @@ impl World {
     pub fn shade_all(&mut self, shaded: bool) {
         // Shade bottom-most first so slides compose.
         let mut order: Vec<usize> = (0..self.widgets.len()).collect();
-        order.sort_by(|a, b| self.widgets[*b].y.partial_cmp(&self.widgets[*a].y).unwrap());
+        order.sort_by(|a, b| self.widgets[*b].y.total_cmp(&self.widgets[*a].y));
         if !shaded {
             order.reverse();
         }
@@ -237,7 +253,8 @@ impl World {
         if solo {
             self.detach(i);
         }
-        let members = if self.widgets[i].dock.is_some() { vec![i] } else { self.members(self.widgets[i].group) };
+        let g = self.widgets[i].group;
+        let members = if self.widgets[i].dock.is_some() { vec![i] } else { self.members(g).into_iter().filter(|&m| self.widgets[m].dock.is_none()).collect() };
         let origins = members.iter().map(|&m| (self.widgets[m].x, self.widgets[m].y)).collect();
         self.drag = Some(Drag { members, origins, start: cursor, moved: false, hover_dock: None, pressed: i });
     }
@@ -290,7 +307,7 @@ impl World {
             let id = self.docks[r].id.clone();
             // Dock in left-to-right order so the group keeps its reading order.
             let mut ms = d.members.clone();
-            ms.sort_by(|a, b| self.widgets[*a].x.partial_cmp(&self.widgets[*b].x).unwrap());
+            ms.sort_by(|a, b| self.widgets[*a].x.total_cmp(&self.widgets[*b].x));
             for m in ms {
                 self.dock(m, &id);
             }
@@ -415,6 +432,63 @@ mod tests {
         assert_eq!(w.widgets[0].y, w.widgets[1].y);
         w.shade_all(false);
         assert_eq!(w.widgets[1].y, 100.0);
+    }
+
+    /// a | b side by side, c hanging under b, all one group.
+    fn l_shape() -> World {
+        let mut w = World::default();
+        w.widgets.push(Placed::new("a", 100.0, 100.0, 300.0, 100.0, 1));
+        w.widgets.push(Placed::new("b", 400.0, 100.0, 300.0, 100.0, 1));
+        w.widgets.push(Placed::new("c", 400.0, 200.0, 300.0, 80.0, 1));
+        w.groups.insert(1, false);
+        w
+    }
+
+    #[test]
+    fn shading_only_moves_widgets_hanging_below() {
+        let mut w = l_shape();
+        w.toggle_shade(0);
+        assert_eq!(w.widgets[2].y, 200.0, "c hangs under b, not a");
+        w.toggle_shade(1);
+        assert_eq!(w.widgets[2].y, 100.0 + SHADE_H);
+    }
+
+    #[test]
+    fn shade_all_round_trip_restores_positions() {
+        let mut w = l_shape();
+        w.shade_all(true);
+        w.shade_all(false);
+        let ys: Vec<f64> = w.widgets.iter().map(|p| p.y).collect();
+        assert_eq!(ys, vec![100.0, 100.0, 200.0]);
+    }
+
+    #[test]
+    fn shade_moves_a_chain_once() {
+        let mut w = world();
+        w.widgets[1] = Placed::new("b", 100.0, 200.0, 300.0, 100.0, 1);
+        w.widgets[2] = Placed::new("c", 100.0, 300.0, 200.0, 80.0, 1);
+        w.toggle_shade(0);
+        assert_eq!(w.widgets[1].y, 100.0 + SHADE_H);
+        assert_eq!(w.widgets[2].y, 200.0 + SHADE_H);
+    }
+
+    #[test]
+    fn docked_widgets_never_ride_with_a_group() {
+        let mut w = with_dock(world());
+        w.widgets[2].dock = Some("dock-left".into());
+        w.widgets[2].group = w.widgets[0].group; // e.g. a hand-edited layout
+        w.begin_drag(0, (150.0, 110.0), false);
+        assert_eq!(w.drag.as_ref().unwrap().members, vec![0]);
+    }
+
+    #[test]
+    fn non_finite_positions_do_not_panic() {
+        let mut w = world();
+        w.widgets[0].y = f64::NAN;
+        w.shade_all(true);
+        w.begin_drag(1, (610.0, 110.0), false);
+        w.drag_to((700.0, 300.0));
+        w.end_drag();
     }
 
     fn with_dock(mut w: World) -> World {

@@ -37,10 +37,11 @@ What works (tested on macOS 15):
 - **Widgets are actors.** Each has its own state, changed only by messages it receives. Clicking the GitDiscuss display hands a discussion to Jarvis. Clicking Checks approves a check and tells Jarvis. The HTML panel's *Nudge Jarvis* button posts a message too. Outside programs can message any widget:
 
   ```sh
-  curl -X POST http://127.0.0.1:47800/send -d '{"to":"jarvis","msg":"set","agents":4}'
+  curl -X POST http://127.0.0.1:47800/send -H 'Content-Type: application/json' -d '{"to":"jarvis","msg":"set","agents":4}'
   ```
 
-- **HTML panels:** set `panel = { kind = "html", url = "…" }` on a widget to get a transparent OS webview over its display slot. The demo panel ([`host/examples/panel-demo.html`](host/examples/panel-demo.html), served by the host at `http://127.0.0.1:47800/examples/panel-demo.html`) uses container queries to switch to a one-line layout in shade mode. The page receives its widget's state through `window.dwState(state)` and sends messages with `window.ipc.postMessage(JSON)`.
+- **HTML panels:** set `panel = { kind = "html", url = "…" }` on a widget to get a transparent OS webview over its display slot. The demo panel ([`host/examples/panel-demo.html`](host/examples/panel-demo.html), served by the host at `http://127.0.0.1:47800/examples/panel-demo.html`) uses container queries to switch to a one-line layout in shade mode. The page receives its widget's state through `window.dwState(state)` and sends messages with `window.ipc.postMessage(JSON)`. A panel can message its own widget, plus any widgets listed in its `talks_to`, and it stays on its configured origin.
+- **Endpoint safety:** the endpoint listens on 127.0.0.1 only. It refuses requests from web pages (foreign `Origin`, a non-JSON content type, or a `Host` other than 127.0.0.1/localhost) and sends no CORS headers. Any local process can still post to it, because there's no token yet.
 - **Persistence:** positions, groups, shade, dock membership and on-top settings save on every change and restore on launch. Actor state (counters and text) isn't saved yet.
 
 Config files (macOS: `~/Library/Application Support/desktop_widgets/`; elsewhere the platform config dir; override with `DESKTOP_WIDGETS_DIR`):

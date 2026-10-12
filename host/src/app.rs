@@ -133,12 +133,12 @@ impl App {
     }
 
     /// Re-read screens and the Dock; move docked widgets if the regions changed.
-    fn refresh_docks(&mut self, el: &ActiveEventLoop) {
+    fn refresh_docks(&mut self, el: &ActiveEventLoop, force: bool) {
         let screens = self.screens(el);
         let regions = self.compute_docks(&screens);
         self.world.screens = screens.iter().map(|s| s.visible).collect();
         let same = regions.len() == self.world.docks.len() && regions.iter().zip(&self.world.docks).all(|(a, b)| a.id == b.id && a.rect == b.rect);
-        if !same {
+        if force || !same {
             self.world.set_docks(regions);
             self.build_overlays(el);
             self.sync();
@@ -192,8 +192,11 @@ impl App {
                 let parts = self.parts(i);
                 let proxy = self.proxy.clone();
                 let id = def.id.clone();
+                // Keep the panel on its configured origin: it has IPC to the host.
+                let home = origin_of(&url);
                 let built = wry::WebViewBuilder::new()
                     .with_url(&url)
+                    .with_navigation_handler(move |to| origin_of(&to) == home)
                     .with_transparent(true)
                     .with_bounds(panel_bounds(&parts))
                     .with_ipc_handler(move |req| {
@@ -370,7 +373,7 @@ impl App {
                     return;
                 }
                 self.wins[i].last_click = Some(now);
-                self.refresh_docks(el);
+                self.refresh_docks(el, false);
                 let c = self.cursor(i);
                 let solo = platform::alt_held().unwrap_or(self.alt);
                 self.world.begin_drag(i, c, solo);
@@ -387,7 +390,7 @@ impl App {
         self.set_overlays(false, None);
         if matches!(out, Some(DropOutcome::Clicked)) {
             // A plain click may still have detached (Option-click).
-            self.sync();
+            self.after_change();
             return;
         }
         self.wins.iter_mut().for_each(|w| w.last_click = None);
@@ -476,6 +479,18 @@ fn draw_overlay(fonts: &mut Fonts, o: &mut Overlay) {
         }
 }
 
+/// scheme://host[:port] of a URL (whole string if it has no path).
+fn origin_of(url: &str) -> String {
+    match url.find("://") {
+        Some(k) => {
+            let rest = &url[k + 3..];
+            let end = rest.find(['/', '?', '#']).unwrap_or(rest.len());
+            url[..k + 3 + end].to_ascii_lowercase()
+        }
+        None => url.to_string(),
+    }
+}
+
 fn panel_bounds(p: &Parts) -> wry::Rect {
     let r = p.panel.inset(if p.shaded { 1.0 } else { 2.0 });
     wry::Rect { position: wry::dpi::LogicalPosition::new(r.x, r.y).into(), size: wry::dpi::LogicalSize::new(r.w, r.h).into() }
@@ -502,8 +517,7 @@ impl ApplicationHandler<UserEvent> for App {
                 } else if id == m.access {
                     platform::request_dock_access();
                 } else if id == m.refresh {
-                    self.world.docks.clear();
-                    self.refresh_docks(el);
+                    self.refresh_docks(el, true);
                     self.after_change();
                 } else if id == m.reset {
                     self.reset_layout(el);
@@ -524,7 +538,15 @@ impl ApplicationHandler<UserEvent> for App {
                     return;
                 }
                 match Message::from_json(&v, &id, Some(&id)) {
-                    Ok(m) => self.deliver(m),
+                    Ok(m) => {
+                        // A panel may message its own widget and the widgets it lists in `talks_to`.
+                        let allowed = self.defs.iter().find(|d| d.id == id).map(|d| m.to == id || d.talks_to.contains(&m.to)).unwrap_or(false);
+                        if allowed {
+                            self.deliver(m);
+                        } else {
+                            eprintln!("desktop-widgets: panel {id} may not message {:?} (add it to talks_to)", m.to);
+                        }
+                    }
                     Err(e) => eprintln!("desktop-widgets: bad panel message from {id}: {e}"),
                 }
             }
