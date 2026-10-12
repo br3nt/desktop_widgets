@@ -5,7 +5,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 ## Joins and shades (interleaved)
 
 
-- [ ] REWORK FIRST (Brent, 13 Oct): wire.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [x] REWORK FIRST (Brent, 13 Oct): wire.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working. — Added selectable Rootbound cabochon construction after studying all six references: open asymmetric hoops, woven stone baskets, twisted roots, copper labels, caged pearl/amber controls and finite wire flex; retained the original casing and all 11 earlier options; 443 simulated state, animation and pointer assertions passed; full browser visual review blocked by URL security policy.
 - [ ] REWORK FIRST (Brent, 13 Oct): gothic.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
 - [ ] REWORK FIRST (Brent, 13 Oct): felt.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
 - [ ] REWORK FIRST (Brent, 13 Oct): elven.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
