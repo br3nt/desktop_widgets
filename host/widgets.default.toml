@@ -1,0 +1,74 @@
+# Desktop Widgets: widget definitions.
+#
+# Each [[widget]] is an actor: `state` is its starting state, `behaviour` names the
+# message handlers it runs (generic, jarvis, gitdiscuss, checks). Panels render from state.
+# Native panels draw these state keys: caption (small line), value (big), unit (after the
+# value), detail (bottom line). Shade mode shows the title's first part plus value.
+#
+# panel.kind = "native" (drawn by the host, ~free) or "html" (an OS webview at `url`,
+# roughly 20-50 MB extra; opt-in per widget).
+
+# Port for the local message endpoint on 127.0.0.1 (0 turns it off). It also serves
+# the demo HTML panel from host/examples/.
+endpoint_port = 47800
+
+# Dock length guess in points, used only when macOS won't tell us the Dock's size
+# (grant Accessibility to Desktop Widgets for exact placement).
+# dock_length = 700
+
+[[widget]]
+id = "jarvis"
+title = "Jarvis / agent control"
+behaviour = "jarvis"
+width = 360
+height = 116
+panel = { kind = "native" }
+[widget.state]
+caption = "Jarvis / active workflow"
+agents = 3
+running = true
+value = "03"
+unit = "agents running"
+detail = "Reviewing the capsule renderer"
+
+[[widget]]
+id = "gitdiscuss"
+title = "GitDiscuss / review queue"
+behaviour = "gitdiscuss"
+width = 360
+height = 116
+panel = { kind = "native" }
+[widget.state]
+caption = "GitDiscuss / incoming · click to hand to Jarvis"
+pending = 2
+value = "02"
+unit = "need a decision"
+detail = "Capsule joining · design feedback"
+
+[[widget]]
+id = "checks"
+title = "Checks / independent widget"
+behaviour = "checks"
+width = 260
+height = 104
+panel = { kind = "native" }
+[widget.state]
+caption = "Checks · click to approve one"
+passed = 12
+total = 14
+value = "12 / 14"
+unit = "passed"
+detail = "2 waiting for approval"
+
+[[widget]]
+id = "panel-demo"
+title = "Web panel / container queries"
+behaviour = "generic"
+width = 360
+height = 150
+panel = { kind = "html", url = "http://127.0.0.1:47800/examples/panel-demo.html" }
+# HTML panels may message their own widget, plus the widgets listed here.
+talks_to = ["jarvis"]
+[widget.state]
+value = "ok"
+caption = "HTML panel"
