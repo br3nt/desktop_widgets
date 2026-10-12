@@ -70,7 +70,7 @@ One item per run. Required state previews are scaffolding; named shade and shape
 ## Morphs and angled connections (interleaved)
 
 - [x] Gothic · Morph · Single arch → three-bay arcade — Added selectable option 13 with rising round-arched bays, fixed-size masonry and glass, a wider reading well, socket-anchored growth and neighbours that move aside and return; retained all earlier options; 927 simulated interaction/geometry assertions and native-font text-fit checks passed, native SVG poses visually reviewed; full browser preview rejected by the file-URL security policy.
-- [ ] Felt · Morph · Pebble widens by moving seams apart
+- [x] Felt · Morph · Pebble widens by moving seams apart — Added option 13: an irregular stitched pebble opens into a 540 px reading cushion with fixed-size wool nap, labels and fabric controls; reserves space before widening, anchors an attached hem and returns displaced neighbours; retained every earlier option; 746 simulated interaction, geometry, state-preservation and touch checks passed, native SVG poses reviewed and font fit verified; full browser preview blocked by URL policy.
 - [ ] Elven · Morph · Long lens → shield-like tall form
 - [ ] Wire · Morph · Compact pendant → broad reading hoop
 - [ ] Hollow · Morph · Low shell extends plates into a tall form
