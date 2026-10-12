@@ -55,18 +55,39 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
 .page strong{font:600 16px/1.2 var(--sans);display:block;color:#262b42;margin:2px 0}
 .page small{font-size:11px;line-height:1.55;color:#454c68;display:block}
 .bars{position:absolute;right:24px;top:9px}.bars svg{display:block}
-.tabline{position:absolute;top:104px;display:flex;gap:15px}#a .tabline{left:52px}#b .tabline{left:54px}
-.tab{padding:0;background:none;border:0;color:#9aa5c8;font:10px/1.4 var(--sans);letter-spacing:1.6px;text-transform:uppercase}
-.tab[aria-selected=true]{color:var(--silver);text-shadow:0 0 6px #a8c0ff88}
-.tab[aria-selected=true]:before{content:"✦";margin-right:5px;font-size:8px;color:#dfe8ff}
-/* Moonstone cabochons in silver bezels */
-.knob{position:absolute;top:102px;width:20px;height:20px;border-radius:50%;padding:0;border:0;color:#2a2f45;font:bold 10px/20px var(--sans);
- background:linear-gradient(130deg,transparent 35%,#a8c4ff55 50%,transparent 65%),radial-gradient(circle at 36% 30%,#fff,#e2e8f5 42%,#a9b8da 78%,#7486b8);box-shadow:0 0 0 1.2px #e8eef8,0 0 0 2.4px #0c1022,0 0 8px #9fc0ff44}
-#a .run{left:300px}#a .next{left:328px}#b .run{left:318px}#b .next{left:346px}
-.knob:hover{box-shadow:0 0 0 1.2px #fff,0 0 0 2.4px #0c1022,0 0 12px #b9d0ff99}
+/* The screen tabs are glass tags strung on a silver tendril under the pane (drawn in .chromeF); the open one is pale moonstone. */
+.tabline{position:absolute;top:104px;display:flex;gap:20px}#a .tabline{left:54px}#b .tabline{left:56px}
+.tab{padding:1px 10px;background:none;border:0;color:#c6cee8;font:10px/1.4 var(--sans);letter-spacing:1.6px;text-transform:uppercase;border-radius:8px;transition:color .5s}
+.tab[aria-selected=true]{color:#1b2142}
+/* The chrome round the casing: a whiplash tendril, a drawn-out drip tip and the hanging nameplate (behind), the tags (in front). */
+.chromeB,.chromeF{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.chromeF .ctag .f{fill:#262d61;transition:fill .6s}.chromeF .ctag.on .f{fill:#e9eef9}
+.chromeF .ctag .tg,.chromeF .ctag .st{opacity:0;transition:opacity .6s}.chromeF .ctag.on .tg{opacity:.75}.chromeF .ctag.on .st{opacity:1}
+/* GitDiscuss is mirrored, so its name hangs toward its outer end too. */
+#b .grip{flex-direction:row-reverse}
+/* Run/pause is a moonflower nodding from the tendril at the outer end: open and lit while running, a closed bud when paused.
+   Next screen is a glass leaf hanging from the drip tip that turns over when tapped. */
+.knob{position:absolute;padding:0;border:0;background:none;border-radius:50%}
+.knob svg{display:block;overflow:visible}
+.knob:hover svg{filter:drop-shadow(0 0 3px #d4e0ff)}
+.knob.run{top:1px;width:24px;height:24px}#a .run{left:-2px}#b .run{left:368px}
+.knob.next{top:93px;width:28px;height:28px;perspective:110px}#a .next{left:-8px}#b .next{left:370px}
+.knob.run .pt{transform-box:fill-box;transform-origin:50% 100%;transform:scale(.16,.42);opacity:0;transition:transform .95s cubic-bezier(.3,.7,.2,1) calc((4 - var(--i))*.07s),opacity .6s calc((4 - var(--i))*.07s)}
+.knob.run.open .pt{transform:none;opacity:1;transition-delay:calc(var(--i)*.13s)}
+.knob.run .bud{transform-box:fill-box;transform-origin:50% 90%;transition:opacity .7s .35s,transform .9s .2s}
+.knob.run.open .bud{opacity:0;transform:scale(.55,.8);transition-delay:0s}
+.knob.run .fh{opacity:.12;transition:opacity 1.3s}.knob.run.open .fh{opacity:.95}
+.knob.run .core{opacity:.35;transition:opacity 1s .4s}.knob.run.open .core{opacity:1}
+.knob.run .ring{opacity:0;transform-box:fill-box;transform-origin:center}
+.knob.run.ringing .ring{animation:flring 1.3s ease-out .55s both}
+@keyframes flring{from{transform:scale(.5);opacity:.9}to{transform:scale(2.4);opacity:0}}
+.knob.next svg{transform-origin:6px 6px}#b .next svg{transform-origin:22px 6px}
+.knob.next.turn svg{animation:leafturn 1s cubic-bezier(.35,.1,.25,1)}
+@keyframes leafturn{0%{transform:none}45%{transform:rotateY(180deg) rotate(-12deg)}75%{transform:rotateY(300deg) rotate(4deg)}100%{transform:rotateY(360deg)}}
+@media(prefers-reduced-motion:reduce){.knob.run .pt,.knob.run .bud,.knob.run .fh,.knob.run .core,.tab,.chromeF .ctag *{transition:none}.knob.next.turn svg,.knob.run.ringing .ring{animation:none}}
 .mini{left:42px;top:28px;width:184px;height:36px;padding:3px 16px;font-size:10px;line-height:1.4;color:#454c68}
 .mini .num{font-size:13px;margin-right:4px}
-.lampdot{position:absolute;left:233px;top:33px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 38% 32%,#fff,#cfe0ff 45%,#6f8fd0);box-shadow:0 0 0 1.2px #e8eef8,0 0 0 2.3px #0c1022,0 0 10px 3px #a8c0ff66}
+.lampdot{position:absolute;left:229px;top:29px;width:20px;height:20px}.lampdot svg{display:block;overflow:visible}
 .strip{position:absolute;top:13px;height:19px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 6px;pointer-events:none;opacity:0}
 .strip b{font:400 17px/1 var(--script);color:var(--silver);text-shadow:0 0 7px #9fb8ff70}
 .strip span{padding:1px 12px;font:11px var(--sans);color:var(--ink);border-radius:9px;background:radial-gradient(ellipse at 35% 25%,#fff,#dfe6f4 60%,#bcc8e4);box-shadow:0 0 0 1px #e8eef8,0 0 0 2px #0c1022}
@@ -268,8 +289,11 @@ header p{margin:5px 0 0;color:var(--muted);font-size:13px}
  <linearGradient id="aspPale" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f7fafb"/><stop offset=".55" stop-color="#e0e8ee"/><stop offset="1" stop-color="#c2cedb"/></linearGradient>
  <linearGradient id="mantleG" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#34488f"/><stop offset=".42" stop-color="#202d68"/><stop offset="1" stop-color="#111a45"/></linearGradient>
  <filter id="wisp"x="-60%" y="-200%" width="220%" height="500%"><feGaussianBlur stdDeviation="3.2"/></filter>
+ <radialGradient id="chPetal" cx=".5" cy="1" r="1.05"><stop stop-color="#cfe0ff"/><stop offset=".45" stop-color="#f4f7ff"/><stop offset="1" stop-color="#fff"/></radialGradient>
+ <linearGradient id="chLeafG" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f6f9ff"/><stop offset=".45" stop-color="#c9d6f2"/><stop offset="1" stop-color="#8ea2d2"/></linearGradient>
+ <linearGradient id="chPlq" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4a5796"/><stop offset=".5" stop-color="#2c3570"/><stop offset="1" stop-color="#1c2252"/></linearGradient>
 </defs></svg>
-<header><div><h1>Elven <span>/ Claude skin study</span></h1><p>Night-glass casings with a pearl sheen and silver hairline rims, leaf-tip ends with tapered filigree, a crescent crest, and moonstone panes for displays. <a href="index.html">All pages</a></p></div>
+<header><div><h1>Elven <span>/ Claude skin study</span></h1><p>Night-glass leaves hung on a whiplash silver tendril that springs from the tip, sweeps up round the outer end and carries the crescent crest; the tip drawn out into a long drip tip with a dewdrop. The name hangs from the tendril on two threads as a frosted glass plaque. Run/pause is a moonflower nodding from the tendril (open while running, a bud when paused); the next screen is a glass leaf hanging from the drip tip that turns over when tapped; the screen tabs are glass tags strung on a tendril under the moonstone pane. <a href="index.html">All pages</a></p></div>
 <div class="controls" role="group" aria-label="Skin controls">
  <div class="row" id="stateRow"><span>State</span></div>
  <div class="row" id="joinRow"><span>Join</span></div>
@@ -456,6 +480,89 @@ $$('.screen,.mini').forEach(el=>{
  s.innerHTML=`<path d="${paneD(w,h,3.4)}" fill="${NIGHT}" opacity=".7"/><path d="${paneD(w,h,3.4)}" fill="none" stroke="url(#silver)" stroke-width="1.3"/><path d="${paneD(w,h,1.1)}" fill="none" stroke="${NIGHT}" stroke-width="1"/>${fin(-10.5)}${fin(w+10.5)}`;
  el.before(s);
 });
+
+/* ---------- Chrome (reworked 13 Oct): the casing is no longer a capsule with two round buttons ---------- */
+// Drawn in Jarvis's frame (outer end at x 0) at the casing's resting size, and mirrored for GitDiscuss; Checks has a tendril from
+// each tip, meeting under its crest. A whiplash silver tendril springs from the leaf's tip, sweeps up round the outer end and runs
+// over the top through the crest (the crescent rides on it) to a curl. The tip is drawn out into a long drip tip with a dewdrop.
+// The nameplate hangs from the tendril on two threads as a frosted glass plaque. Run/pause is a moonflower nodding on a stalk from
+// the tendril; next screen is a glass leaf hanging from the drip tip; the screen tabs are glass tags strung on a tendril under the pane.
+const chBz=(a,b,c,d,n)=>[...Array(n+1)].map((_,i)=>{const t=i/n,u=1-t;return{x:u*u*u*a[0]+3*u*u*t*b[0]+3*u*t*t*c[0]+t*t*t*d[0],y:u*u*u*a[1]+3*u*u*t*b[1]+3*u*t*t*c[1]+t*t*t*d[1]}});
+function chTendril(small,h){const m=h/2;
+ const S=small?[[[1,m-2],[-11,m-9],[-15,8],[-4,-6]],[[-4,-6],[6,-17],[40,-15],[76,-8]],[[76,-8],[104,-3],[124,-1],[138,-1]]]
+  :[[[1,m-3],[-15,m-12],[-22,14],[-7,-8]],[[-7,-8],[6,-24],[44,-23],[84,-14]],[[84,-14],[124,-6],[164,-1],[196,-2]],[[196,-2],[218,-2.5],[236,-4],[250,-8]]];
+ let P=[];S.forEach((s,i)=>{const q=chBz(...s,12);P=P.concat(i?q.slice(1):q)});
+ if(!small){const e=P[P.length-1],p=P[P.length-2];P=P.concat(curlPts(e,Math.atan2(e.y-p.y,e.x-p.x),15,1.7*PI,-1,16).slice(1))}
+ const n=P.length,w0=small?2.6:3.6,w1=small?1:.35;P.forEach((p,i)=>p.w=lerp(w0,w1,Math.pow(i/(n-1),.8)));return P}
+// The tendril's height over a given x, along its run over the top.
+function chY(P,x){for(let i=12;i<P.length-1;i++){const a=P[i],b=P[i+1];if(a.x!==b.x&&(a.x-x)*(b.x-x)<=0)return lerp(a.y,b.y,(x-a.x)/(b.x-a.x))}return P[P.length-1].y}
+const chLeaf=(P,i,s)=>{const a=P[i],b=P[i+1];return leaf(a.x,a.y,Math.atan2(b.y-a.y,b.x-a.x)*180/PI-66,s,.95)};
+// A pointed lens: the plaque and the tags.
+const chLens=(a,b,y0,y1,r)=>{const ym=(y0+y1)/2;return `M${f(a)} ${f(ym)}Q${f(a+r*.4)} ${f(y0)} ${f(a+r)} ${f(y0)}H${f(b-r)}Q${f(b-r*.4)} ${f(y0)} ${f(b)} ${f(ym)}Q${f(b-r*.4)} ${f(y1)} ${f(b-r)} ${f(y1)}H${f(a+r)}Q${f(a+r*.4)} ${f(y1)} ${f(a)} ${f(ym)}Z`};
+const chSilver=(P,a=1.5)=>`<path d="${ribbon(P,a)}" fill="${NIGHT}" opacity=".8"/><path d="${ribbon(P)}" fill="url(#silver)"/>`;
+function chromeBack(id,w,h){
+ const small=id==='c',m=h/2,T=chTendril(small,h);
+ const D=(small?[[2,m,2.4],[-5,m+.5,1.7],[-11,m+1.4,1],[-17,m+2.6,.35]]:[[2,m,3],[-6,m+.6,2.2],[-14,m+1.8,1.4],[-21,m+3.4,.7],[-25,m+4.8,.3]]).map(([x,y,ww])=>({x,y,w:ww})),de=D[D.length-1];
+ let o=`<path d="${ribbon(T,6)}" fill="#8fb0ff" opacity=".14" filter="url(#soft)"/>`+chSilver(T)+chSilver(D,1.2);
+ o+=`<path d="M${f(de.x-.4)} ${f(de.y+.4)}Q${f(de.x+1.9)} ${f(de.y+3.4)} ${f(de.x-.8)} ${f(de.y+5.8)}Q${f(de.x-3.6)} ${f(de.y+3.2)} ${f(de.x-.4)} ${f(de.y+.4)}Z" fill="url(#moonstone)" stroke="#e8eef8" stroke-width=".5"/>`;
+ for(const[i,s]of small?[[4,.6],[16,.62],[23,.5]]:[[4,.8],[15,.85],[21,.7],[30,.72],[42,.6]])o+=chLeaf(T,i,s);
+ if(!small){const ce=T[T.length-1];o+=`<circle cx="${f(ce.x)}" cy="${f(ce.y)}" r="1.3" fill="#fff"/>`;
+  // The moonflower's stalk from the tendril, and the leaf's from the drip tip; both end under their buttons.
+  const q=T[9];o+=chSilver(widths(chBz([q.x,q.y],[q.x+7,q.y-9],[2,-1],[9,8],12),1.8,1.1),1.1)+chSilver(widths(chBz([-12,m+1.6],[-13,m+15],[-10,m+27],[-2.5,h-31],12),1.4,.9),1.1)}
+ const M=`<g transform="translate(${w} 0) scale(-1 1)">${o}</g>`;
+ return id==='b'?M:small?o+M:o;
+}
+// Measured once, and again when the fonts arrive: the name in the nameplate, and each screen tab.
+// Checks is skipped while a morph has moved its nameplate.
+const CHMEAS={};
+function chMeasure(skipC){for(const id of['a','b','c']){if(id==='c'&&skipC)continue;const el=$('#'+id),g=el.querySelector('.grip'),sp=g.querySelector('span');
+ CHMEAS[id]={x0:g.offsetLeft+sp.offsetLeft,x1:g.offsetLeft+sp.offsetLeft+sp.offsetWidth,y:g.offsetTop,h:g.offsetHeight,
+  tabs:[...el.querySelectorAll('.tab')].map(t=>{const l=t.parentNode;return[l.offsetLeft+t.offsetLeft,l.offsetTop+t.offsetTop,t.offsetWidth,t.offsetHeight]})};
+ el.querySelector('.chromeB').dataset.key=''}}
+function chromeFront(id,w,h,page){
+ const small=id==='c',mir=id==='b',M=CHMEAS[id],T=chTendril(small,h);
+ // The plaque in Jarvis's frame: GitDiscuss's name is measured where it stands and mirrored with the rest.
+ const X0=mir?w-M.x1:M.x0,X1=mir?w-M.x0:M.x1,a=X0-10,b=X1+10,y0=M.y-1,y1=M.y+M.h-3.5,ym=(y0+y1)/2;
+ const ty=x=>small&&x>w/2?chY(T,w-x):chY(T,x),L=chLens(a,b,y0,y1,small?10:13);
+ let o='';
+ for(const x of[a+17,b-17]){const t=ty(x);o+=`<path d="M${f(x)} ${f(t+.6)}V${f(y0-1.4)}" stroke="url(#silverV)" stroke-width=".8"/><circle cx="${f(x)}" cy="${f(t+.4)}" r="1.1" fill="#eef2fc"/><circle cx="${f(x)}" cy="${f(y0-.2)}" r="1.5" fill="none" stroke="#e8eef8" stroke-width=".7"/>`}
+ o+=`<path d="${L}" fill="#000" opacity=".35" transform="translate(0 1.6)" filter="url(#soft)"/><path d="${L}" fill="url(#chPlq)" opacity=".94"/><path d="${L}" fill="url(#pearl)" opacity=".08"/><path d="${L}" fill="none" stroke="url(#silver)" stroke-width="1"/><path d="${chLens(a+3,b-3,y0+2,y1-2,small?8:11)}" fill="none" stroke="#c9d4ee" stroke-width=".5" opacity=".4"/>`;
+ o+=leaf(a+1,ym,180,.42,.9)+leaf(b-1,ym,0,.42,.9);
+ if(mir)o=`<g transform="translate(${w} 0) scale(-1 1)">${o}</g>`;
+ // The tags, where the tabs stand (not mirrored), on a tendril curling up at both ends.
+ if(M.tabs.length){const t0=M.tabs[0],tn=M.tabs[M.tabs.length-1],cy=t0[1]+t0[3]/2,xa=t0[0]-16,xb=tn[0]+tn[2]+16,wy=x=>cy+1.4*Math.sin((x-xa)*.09);
+  let d='';for(let x=xa;x<=xb+.1;x+=4)d+=(d?'L':'M')+f(x)+' '+f(wy(x));
+  o+=`<path d="${d}" fill="none" stroke="url(#silver)" stroke-width=".9" opacity=".8"/><path d="${ribbon(widths(curlPts({x:xa,y:wy(xa)},PI,9,1.6*PI,1,12),.9,.3))}" fill="url(#silver)" opacity=".8"/><path d="${ribbon(widths(curlPts({x:xb,y:wy(xb)},0,9,1.6*PI,-1,12),.9,.3))}" fill="url(#silver)" opacity=".8"/>`;
+  M.tabs.forEach(([x,y,tw,th],i)=>{const A=x-6,B=x+tw+6,T0=y+.5,T1=y+th-.5,Lp=chLens(A,B,T0,T1,7),c=(T0+T1)/2;
+   o+=`<g class="ctag${i===page?' on':''}"><ellipse class="tg" cx="${f((A+B)/2)}" cy="${f(c)}" rx="${f((B-A)/2+6)}" ry="${f(th/2+5)}" fill="url(#halo)"/><path d="${Lp}" fill="#000" opacity=".3" transform="translate(0 1.2)"/><path class="f" d="${Lp}"/><path d="${Lp}" fill="none" stroke="url(#silver)" stroke-width=".85"/><g class="st">${star(A-3,c,3.2,1,'#eef2fc')}</g></g>`})}
+ return o;
+}
+// Kept up to date by render(): opacity follows the display (and, on Checks, the casing through a morph); drawn once per width.
+const CH_RESHAPE=new Set(['plants','detail','wax','drawn']);
+function chrome(el,id,w,op,page){
+ const B=el.querySelector('.chromeB'),F=el.querySelector('.chromeF'),h=id==='c'?CH:H;
+ for(const s of[B,F]){s.style.opacity=f(op);s.style.visibility=op<.02?'hidden':'visible'}
+ if(op<.02)return;
+ if(B.dataset.key!==String(w)){B.dataset.key=w;
+  for(const s of[B,F]){s.setAttribute('width',w);s.setAttribute('height',h);s.setAttribute('viewBox',`0 0 ${w} ${h}`)}
+  B.innerHTML=chromeBack(id,w,h);F.innerHTML=chromeFront(id,w,h,page)}
+ F.querySelectorAll('.ctag').forEach((g,i)=>g.classList.toggle('on',i===page));
+}
+// The moonflower (also Checks' status lamp, always open) and the next-screen leaf.
+function flowerSvg(lamp){const z=lamp?20:24,pet='M0 0C-3.5 -3.2 -3.7 -7.6 0 -10.6C3.7 -7.6 3.5 -3.2 0 0Z';
+ let o=`<svg width="${z}" height="${z}" viewBox="-12 -12 24 24" aria-hidden="true"><circle class="fh" r="12" fill="url(#halo)"/>`;
+ if(!lamp)o+=`<circle class="ring" r="7" fill="none" stroke="#e6edff" stroke-width=".8"/><g class="bud"><path d="M0 -8.6C3.3 -4.4 3.5 1.6 0 7C-3.5 1.6 -3.3 -4.4 0 -8.6Z" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".6"/><path d="M0 -7.4Q1.4 -.5 0 5.8M0 -7.4Q-1.6 -1 -.6 5" fill="none" stroke="#7f93c4" stroke-width=".5"/></g>`;
+ for(let i=0;i<5;i++)o+=`<g transform="rotate(${i*72+36})"><g class="pt" style="--i:${i}"><path d="${pet}" fill="url(#chPetal)" stroke="${NIGHT}" stroke-width=".55"/><path d="M0 -1.6V-8.4" stroke="#9fb3e0" stroke-width=".45" opacity=".8"/></g></g>`;
+ return o+`<circle class="core" r="2.7" fill="url(#moonstone)" stroke="${NIGHT}" stroke-width=".5"/><circle class="core" cx="-.7" cy="-.8" r=".9" fill="#fff"/></svg>`}
+function nextLeafSvg(mir){const L='M0 0C5 -6.4 14 -6.6 22 0C14 6.6 5 6.4 0 0Z';
+ const g=`<g transform="translate(6 6) rotate(48)"><path d="${L}" fill="#000" opacity=".3" transform="translate(1 1.6)"/><path d="${L}" fill="url(#chLeafG)" stroke="${NIGHT}" stroke-width=".8"/><path d="${L}" fill="url(#pearl)" opacity=".18"/><path d="${L}" fill="none" stroke="url(#silver)" stroke-width=".6" opacity=".9"/>`+
+  `<path d="M1.5 0Q11 -.7 20.5 0" fill="none" stroke="#5d6f9e" stroke-width=".7"/><path d="M7.5 -3.4L10.6 0L7.5 3.4M12.4 -3L15.5 0L12.4 3" fill="none" stroke="#2f4f86" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></g><circle cx="6" cy="6" r="1.6" fill="url(#silverR)" stroke="${NIGHT}" stroke-width=".5"/>`;
+ return `<svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true">${mir?`<g transform="translate(28 0) scale(-1 1)">${g}</g>`:g}</svg>`}
+['a','b','c'].forEach(id=>{const el=$('#'+id),cs=el.querySelector('.casing'),ns='http://www.w3.org/2000/svg';
+ for(const k of['chromeB','chromeF']){const s=document.createElementNS(ns,'svg');s.setAttribute('class',k);s.setAttribute('aria-hidden','true');k==='chromeB'?el.prepend(s):cs.after(s)}
+ if(id==='c')el.querySelector('.lampdot').innerHTML=flowerSvg(true);
+ else{const r=el.querySelector('.run');r.innerHTML=flowerSvg();r.classList.add('open');el.querySelector('.next').innerHTML=nextLeafSvg(id==='b')}});
+chMeasure();if(document.fonts)document.fonts.ready.then(()=>{chMeasure(model.g>0&&CH_RESHAPE.has(model.morph));render()});
 
 /* ---------- Options ---------- */
 const JOINS={
@@ -6687,7 +6794,8 @@ function pairBox(){
   x0=Math.min(x0,tx-20);x1=Math.max(x1,tx+20);y1=Math.max(y1,ky+Math.sin(td)*L)}
  // A join with ornament standing high over the casings (the counterpoise's bough) gives its top.
  if(j.angled&&model.jt>0&&AH().top)y0=Math.min(y0,model.a.y+AH().top(h/2));
- return{x0:x0-8,x1:x1+8,y0:y0+R-22,y1:y1+R+16};
+ // The margins take in the chrome: the drip tips run 28 px past the outer ends and the tendril rises 24 px over the roofs.
+ return{x0:x0-28,x1:x1+28,y0:y0+R-26,y1:y1+R+16};
 }
 // How far the pair has to rise (from where it stood) to clear a w×h Checks at x,y that reaches below it; never past the top of its range.
 function clearRise(w,h,x,y){
@@ -7540,8 +7648,9 @@ function render(){
   el.style.filter=model.shade==='constellation'&&s>.45?'drop-shadow(0 0 5px #05061299)':'';
   if(small){plants(el,s);detail(el);wax(el);fern(el);hoar(el);brise(el);drawn(el);moonMirror(el);fireflies(el);dewfall(el);silverpoint(el);leafWreath(el);moonLetter(el)}
   constel(el,id,w,h,s);furl(el,id,w,h,s);lantern(el,id,w,h,s);wingFold(el,id,w,h,s);mistShade(el,id,w,h,s);girdle(el,id,w,h,s);aspen(el,id,w,h,s);mantle(el,id,w,h,s);chime(el,id,w,h,s);scry(el,id,w,h,s);niche(el,id,w,h,s);spindle(el,id,w,h,s);farglass(el,id,w,h,s);moonBasin(el,id,w,h,s);leafPress(el,id,w,h,s);tesserae(el,id,w,h,s);skeleton(el,id,w,h,s);graft(el,id,w,h,s);dewSilk(el,id,w,h,s);wane(el,id,w,h,s);
+  {const co=svg.style.opacity===''?1:Math.min(1,+svg.style.opacity);chrome(el,id,w,show*co*(small&&CH_RESHAPE.has(model.morph)?1-seg(model.g,0,.12):1),small?-1:m.page)}
   if(!small){el.querySelector('.pages').style.transform=`translateX(-${m.page*100/3}%)`;el.querySelectorAll('.tab').forEach((t,i)=>t.setAttribute('aria-selected',String(i===m.page)));
-   const r=el.querySelector('.run');r.textContent=m.run?'Ⅱ':'▶';r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'))}
+   const r=el.querySelector('.run');r.classList.toggle('open',m.run);r.setAttribute('aria-label',(m.run?'Pause ':'Resume ')+(id==='a'?'Jarvis':'GitDiscuss'));r.title=r.getAttribute('aria-label')}
  }
  $('#a .runText').textContent=model.a.run?'agents running':'agents paused';
  const focused=document.activeElement&&document.activeElement.id==='seamHit';
@@ -7613,8 +7722,10 @@ document.addEventListener('keydown',e=>{
 ['a','b'].forEach(id=>{
  const el=$('#'+id),m=model[id],name=id==='a'?'Jarvis':'GitDiscuss';
  el.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{m.page=+t.dataset.page;render()});
- el.querySelector('.next').onclick=()=>{m.page=(m.page+1)%3;render()};
- el.querySelector('.run').onclick=()=>{m.run=!m.run;render();say(name+' simulated activity '+(m.run?'resumed; the star on its crest is lit.':'paused; the star on its crest dims.'))};
+ // The leaf turns over on its stalk, and the moonflower opens slowly with a ring of light or closes into a bud.
+ const replay=(n,c)=>{n.classList.remove(c);void n.offsetWidth;n.classList.add(c)};
+ el.querySelector('.next').onclick=()=>{m.page=(m.page+1)%3;replay(el.querySelector('.next'),'turn');render()};
+ el.querySelector('.run').onclick=()=>{m.run=!m.run;const r=el.querySelector('.run');if(m.run)replay(r,'ringing');else r.classList.remove('ringing');render();say(name+' simulated activity '+(m.run?'resumed; its moonflower opens and the star on its crest is lit.':'paused; its moonflower closes into a bud and the star on its crest dims.'))};
 });
 
 /* ---------- Dragging with near / ready, and pulling the vine apart ---------- */
