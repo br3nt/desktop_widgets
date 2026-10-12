@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel demo</title>
+<style>
+/* A display panel served to a desktop widget. The host sizes the webview to the
+   panel slot; container queries pick a layout for the normal and shade sizes. */
+:root { color-scheme: dark; --lime: #bddd55; --cyan: #45eddf; --muted: #829d92; }
+html, body { margin: 0; height: 100%; background: transparent; overflow: hidden;
+  font: 11px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--lime);
+  -webkit-user-select: none; user-select: none; cursor: default; }
+.panel { container-type: size; height: 100vh; width: 100vw; }
+.full { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: auto 1fr auto; gap: 4px 6px; height: 100%; padding: 6px 8px; box-sizing: border-box; }
+.caption { grid-column: 1 / -1; color: var(--cyan); font-size: 9.5px; letter-spacing: .3px; }
+.tile { border: 1px solid #45eddf33; border-radius: 4px; padding: 3px 5px; background: #45eddf0d; }
+.tile b { display: block; font: 600 17px/1.1 Menlo, monospace; }
+.tile span { color: var(--muted); font-size: 9px; }
+.foot { grid-column: 1 / -1; display: flex; gap: 6px; align-items: center; color: var(--muted); }
+button { font: inherit; font-size: 10px; color: #07100e; background: var(--lime); border: 0; border-radius: 3px; padding: 1px 7px; cursor: pointer; }
+.strip { display: none; align-items: center; gap: 6px; height: 100%; padding: 0 4px; white-space: nowrap; }
+.strip b { font: 600 12px Menlo, monospace; }
+.strip span { color: var(--muted); font-size: 9.5px; overflow: hidden; text-overflow: ellipsis; }
+/* Shade mode: the panel is a thin strip, so show one line. */
+@container (max-height: 40px) {
+  .full { display: none; }
+  .strip { display: flex; }
+}
+/* Narrow docks: drop the third tile. */
+@container (max-width: 200px) { .tile:nth-of-type(3) { display: none; } }
+</style>
+</head>
+<body>
+<div class="panel">
+  <div class="full">
+    <div class="caption" id="caption">HTML panel · container queries</div>
+    <div class="tile"><b id="value">ok</b><span>state.value</span></div>
+    <div class="tile"><b id="size">–</b><span>panel px</span></div>
+    <div class="tile"><b id="clock">--:--</b><span>local time</span></div>
+    <div class="foot"><button id="nudge">Nudge Jarvis</button><span id="note">sends a message via the host</span></div>
+  </div>
+  <div class="strip"><b id="svalue">ok</b><span id="snote">web panel</span></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+function send(msg) { if (window.ipc) window.ipc.postMessage(JSON.stringify(msg)); }
+// The host calls this with the widget's actor state whenever it changes.
+window.dwState = state => {
+  $('value').textContent = $('svalue').textContent = state.value ?? '';
+  if (state.caption) $('caption').textContent = state.caption;
+  if (state.note) $('note').textContent = $('snote').textContent = state.note;
+};
+let nudges = 0;
+$('nudge').onclick = () => {
+  nudges++;
+  send({ to: 'jarvis', msg: 'set', caption: 'Jarvis / message from the web panel', detail: `Nudged ${nudges}× from HTML` });
+  send({ msg: 'set', note: `nudged Jarvis ${nudges}×` });
+};
+const size = () => { $('size').textContent = `${innerWidth}×${innerHeight}`; };
+const tick = () => { const d = new Date(); $('clock').textContent = d.toTimeString().slice(0, 5); };
+addEventListener('resize', size); size(); tick(); setInterval(tick, 30000);
+send({ msg: 'ready' });
+</script>
+</body>
+</html>

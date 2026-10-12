@@ -147,7 +147,7 @@ impl Layout {
                 p.group = next;
                 next += 1;
             }
-            groups.entry(p.group).or_insert(false);
+            groups.entry(p.group).or_insert(true);
             w.widgets.push(p);
         }
         groups.retain(|g, _| w.widgets.iter().any(|p| p.group == *g));
@@ -255,7 +255,7 @@ mod tests {
         for (a, b) in w.widgets.iter().zip(&back.widgets) {
             assert_eq!((a.id.as_str(), a.x.round(), a.y.round(), a.shaded, a.group, &a.dock), (b.id.as_str(), b.x, b.y, b.shaded, b.group, &b.dock));
         }
-        assert!(back.on_top(1));
+        assert_eq!(back.on_top(1), w.on_top(1));
         assert!(!back.docks[0].on_top);
         assert_eq!(back.widgets[2].dock_w, w.widgets[2].dock_w);
     }
