@@ -5,6 +5,11 @@ One item per run. Required state previews are scaffolding; named shade and shape
 ## Joins and shades (interleaved)
 
 
+- [ ] REWORK FIRST (Brent, 13 Oct): wire.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): gothic.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): felt.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): elven.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): hollow.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
 - [x] Gothic · Join · Keystone lock — fusion — Added gothic.html with a descending brass key, four state views, retained widget controls and keyboard access; 17 DOM interaction checks passed; visual review blocked by browser access.
 - [x] Felt · Join · Needle-felt merge — fusion — Added felt.html with compressing wool shoulders, gathering fibres, a shared waist and coral release tab; four state views and 22 DOM checks passed; browser visual review blocked by sandbox and computer-use access.
 - [x] Elven · Join · Grafted ribs — fusion — Added elven.html with open silver bows, interleaving ribs and a closing enamel collar; four state views and 24 DOM/state checks passed; browser visual review blocked by computer-use access.

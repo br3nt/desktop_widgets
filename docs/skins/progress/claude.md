@@ -1,3 +1,8 @@
+- [ ] REWORK FIRST (Brent, 13 Oct): wire.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): gothic.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): hollow.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): felt.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): elven.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
 - [x] FIX FIRST (orchestrator): page fails to run, fix this JavaScript error (syntax or on load): prototypes/skins/claude/combined.html: SyntaxError: Invalid left-hand side in assignment
 prototypes/skins/claude/combined.html: ["Uncaught SyntaxError: Invalid left-hand side in assignment @line 8938"]
   - Fixed: the One frost mix's moss loop added to `(i%2?m1:m2)`, and a conditional expression can't be assigned to. It now builds the circle once and uses an if/else to add it to `m1` or `m2`, so the moss draws exactly as intended. A grep of every page finds no other conditional used as an assignment target. Not checked in a browser or parser (node needed approval this run).

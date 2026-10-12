@@ -5,6 +5,11 @@ Checklist of every join, shade, morph, angled connection, and skin-combining ide
 ## Interleaved Roadmap
 
 ### Milestone 0: Casing Silhouette & Material Rework (Brent's Feedback)
+- [ ] REWORK FIRST (Brent, 13 Oct): wire.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): gothic.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): felt.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): elven.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
+- [ ] REWORK FIRST (Brent, 13 Oct): hollow.html casing per feedback.md "the casings are still one shape": change the chrome silhouette, button forms and placement, and mechanism feel; keep all options working.
 - [x] Casing Silhouette & Material Rework: Gothic, Felt, and Elven — Reworked all 3 casings with dramatic architectural, textile, and filigree silhouettes, materials, bespoke hardware, and bezels (Built in gothic.html, felt.html, elven.html)
 
 ### Cycle 1: Primary Joins
