@@ -178,6 +178,8 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       this item can be checked until a run happens on an unlocked screen.
       Attempted again 13 Oct (later run): still locked (`CGSSessionScreenIsLocked = true`), and it
       stayed locked through a 10 min wait; nothing launched or changed.
+      Attempted a third time 13 Oct: locked at start (`ioreg` `CGSSessionScreenIsLocked = true`)
+      and through a 15 min poll every 5 s; release build is current, nothing launched or changed.
 - [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
       returns to its start pose (x=624 ±1). The app is an Accessory app (`main.rs:30`) and Escape
       is a `KeyboardInput` on the widget window (`app.rs:598`), so the key may never arrive if the
