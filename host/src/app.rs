@@ -371,7 +371,8 @@ impl App {
                 self.wins[i].last_click = Some(now);
                 self.refresh_docks(el);
                 let c = self.cursor(i);
-                self.world.begin_drag(i, c, self.alt);
+                let solo = platform::alt_held().unwrap_or(self.alt);
+                self.world.begin_drag(i, c, solo);
                 self.dragging = Some(i);
             }
         }

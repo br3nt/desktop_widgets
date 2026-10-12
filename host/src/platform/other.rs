@@ -23,6 +23,10 @@ pub fn cursor() -> Option<(f64, f64)> {
     None
 }
 
+pub fn alt_held() -> Option<bool> {
+    None
+}
+
 pub fn dock_side_hint() -> DockSide {
     DockSide::Bottom
 }

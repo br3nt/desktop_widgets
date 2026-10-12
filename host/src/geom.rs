@@ -24,6 +24,7 @@ impl Rect {
     pub fn contains(&self, px: f64, py: f64) -> bool {
         px >= self.x && px < self.right() && py >= self.y && py < self.bottom()
     }
+    #[cfg_attr(not(test), allow(dead_code))]
     pub fn offset(&self, dx: f64, dy: f64) -> Rect {
         Rect::new(self.x + dx, self.y + dy, self.w, self.h)
     }

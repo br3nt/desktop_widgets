@@ -191,10 +191,6 @@ impl Stage {
         self.actors.get(id).map(|a| &a.state)
     }
 
-    pub fn ids(&self) -> impl Iterator<Item = &String> {
-        self.actors.keys()
-    }
-
     /// Queue a message. `to = "all"` broadcasts. Unknown targets are dropped (returns false).
     pub fn post(&mut self, msg: Message) -> bool {
         if msg.to == "all" {

@@ -119,33 +119,27 @@ pub fn layout(region: &DockRegion, sizes: &[(f64, f64)]) -> Vec<Rect> {
     let mut out = Vec::with_capacity(sizes.len());
     match region.pack {
         Pack::FromRight | Pack::FromLeft => {
-            // Columns of stacked strips.
-            let mut col_edge = 0.0; // distance from the packing edge
-            let mut y = r.y + PAD;
-            let mut col_w: f64 = 0.0;
-            for &(w, h) in sizes {
-                let w = w.min(r.w);
-                let h = h.min(r.h);
-                if y + h > r.bottom() + 0.01 && y > r.y + PAD {
-                    col_edge += col_w + PAD;
-                    col_w = 0.0;
-                    y = r.y + PAD;
-                }
-                col_w = col_w.max(w);
-                let x = match region.pack {
-                    Pack::FromRight => r.right() - col_edge - w,
-                    _ => r.x + col_edge,
-                };
-                out.push(Rect::new(x, y, w, h));
-                y += h + PAD;
+            // Lanes (columns) of stacked strips, filled from the Dock edge outward. Lanes share
+            // the region's width so nothing spills past it; strips shrink if they must.
+            if sizes.is_empty() {
+                return out;
             }
-            // Vertically centre a lone short lane in the strip.
-            if col_edge == 0.0 && !out.is_empty() {
-                let used = y - PAD - r.y;
-                let shift = ((r.h - used) / 2.0).max(0.0);
-                for rc in &mut out {
-                    rc.y += shift;
-                }
+            let h = sizes.iter().map(|s| s.1).fold(0.0, f64::max).min(r.h);
+            let rows = (((r.h + PAD) / (h + PAD)).floor() as usize).max(1);
+            let cols = sizes.len().div_ceil(rows);
+            let widest = sizes.iter().map(|s| s.0).fold(0.0, f64::max);
+            let lane_w = widest.min(((r.w - PAD * (cols as f64 - 1.0)) / cols as f64).max(20.0));
+            let used = rows.min(sizes.len()) as f64 * (h + PAD) - PAD;
+            let y0 = r.y + ((r.h - used) / 2.0).max(0.0);
+            for (k, &(w, _)) in sizes.iter().enumerate() {
+                let (col, row) = ((k / rows) as f64, (k % rows) as f64);
+                let w = w.min(lane_w);
+                let edge = col * (lane_w + PAD);
+                let x = match region.pack {
+                    Pack::FromRight => r.right() - edge - w,
+                    _ => r.x + edge,
+                };
+                out.push(Rect::new(x, y0 + row * (h + PAD), w, h));
             }
         }
         Pack::FromBottom | Pack::FromTop => {
@@ -233,11 +227,11 @@ mod tests {
     fn layout_packs_toward_dock_in_columns() {
         let region = DockRegion { id: "l".into(), rect: Rect::new(0.0, 1000.0, 400.0, 60.0), pack: Pack::FromRight, on_top: true };
         let rects = layout(&region, &[(150.0, 26.0), (100.0, 26.0), (120.0, 26.0)]);
-        // First lane: two strips stacked against the right edge.
-        assert_eq!(rects[0], Rect::new(250.0, 1002.0, 150.0, 26.0));
-        assert_eq!(rects[1], Rect::new(300.0, 1030.0, 100.0, 26.0));
-        // Third doesn't fit vertically: next lane outward (left of the 150 wide lane).
-        assert_eq!(rects[2], Rect::new(400.0 - 150.0 - 2.0 - 120.0, 1002.0, 120.0, 26.0));
+        // Two rows fit (centred: 54pt used of 60). First lane against the right edge.
+        assert_eq!(rects[0], Rect::new(250.0, 1003.0, 150.0, 26.0));
+        assert_eq!(rects[1], Rect::new(300.0, 1031.0, 100.0, 26.0));
+        // Third goes in the next lane outward (left of the 150 wide lane).
+        assert_eq!(rects[2], Rect::new(400.0 - 150.0 - 2.0 - 120.0, 1003.0, 120.0, 26.0));
     }
 
     #[test]
@@ -246,7 +240,19 @@ mod tests {
         let rects = layout(&region, &[(360.0, 26.0)]);
         assert_eq!(rects[0].x, 1000.0);
         assert_eq!(rects[0].w, 300.0);
-        assert_eq!(rects[0].y, 1000.0 + 2.0 + 11.0);
+        assert_eq!(rects[0].y, 1000.0 + 12.0);
+    }
+
+    #[test]
+    fn layout_shrinks_lanes_to_stay_inside_the_region() {
+        // A 50pt strip holds one row; three 360-wide strips must share 382pt.
+        let region = DockRegion { id: "r".into(), rect: Rect::new(1342.0, 1067.0, 382.0, 50.0), pack: Pack::FromLeft, on_top: true };
+        let rects = layout(&region, &[(360.0, 26.0), (360.0, 26.0), (260.0, 26.0)]);
+        for r in &rects {
+            assert!(r.x >= 1342.0 && r.right() <= 1724.0 + 0.01, "{r:?} escapes the region");
+            assert_eq!(r.y, 1067.0 + 12.0);
+        }
+        assert!(rects[0].right() <= rects[1].x && rects[1].right() <= rects[2].x);
     }
 
     #[test]

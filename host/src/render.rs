@@ -13,7 +13,6 @@ pub struct Palette {
     pub lime: Color,
     pub cyan: Color,
     pub muted: Color,
-    pub ink: Color,
 }
 
 pub fn palette() -> Palette {
@@ -21,7 +20,6 @@ pub fn palette() -> Palette {
         lime: Color::from_rgba8(0xbd, 0xdd, 0x55, 255),
         cyan: Color::from_rgba8(0x45, 0xed, 0xdf, 255),
         muted: Color::from_rgba8(0x82, 0x9d, 0x92, 255),
-        ink: Color::from_rgba8(0x07, 0x10, 0x0e, 255),
     }
 }
 

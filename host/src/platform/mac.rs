@@ -41,6 +41,11 @@ pub fn cursor() -> Option<(f64, f64)> {
     Some((p.x, primary_height() - p.y))
 }
 
+/// Option key held right now (works even when no widget window is focused).
+pub fn alt_held() -> Option<bool> {
+    Some(NSEvent::modifierFlags_class().contains(objc2_app_kit::NSEventModifierFlags::Option))
+}
+
 fn dock_defaults() -> Option<Retained<NSUserDefaults>> {
     NSUserDefaults::initWithSuiteName(NSUserDefaults::alloc(), Some(ns_string!("com.apple.dock")))
 }

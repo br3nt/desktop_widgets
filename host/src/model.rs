@@ -72,10 +72,6 @@ pub enum DropOutcome {
 }
 
 impl World {
-    pub fn index(&self, id: &str) -> Option<usize> {
-        self.widgets.iter().position(|w| w.id == id)
-    }
-
     pub fn members(&self, group: u32) -> Vec<usize> {
         (0..self.widgets.len()).filter(|&i| self.widgets[i].group == group).collect()
     }
@@ -434,7 +430,7 @@ mod tests {
         let c = &w.widgets[2];
         assert!(c.shaded);
         assert_eq!(c.dock.as_deref(), Some("dock-left"));
-        assert_eq!(c.rect(), Rect::new(500.0, 1000.0 + 2.0 + 16.0, 200.0, SHADE_H));
+        assert_eq!(c.rect(), Rect::new(500.0, 1000.0 + 17.0, 200.0, SHADE_H));
         assert!(w.on_top(2), "inherits the dock's on-top");
     }
 
