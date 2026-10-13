@@ -129,7 +129,7 @@ footer{display:block;padding:18px 32px 20px;max-width:1000px}footer>div{display:
 </div></div>
 <div class="tabline" role="tablist" aria-label="Jarvis screens"><button class="digital-tab" role="tab" aria-selected="true" data-page="0">Status</button><button class="digital-tab" role="tab" aria-selected="false" data-page="1">Task</button><button class="digital-tab" role="tab" aria-selected="false" data-page="2">Log</button></div>
 <button class="drawer-button" aria-label="Open activity drawer" aria-expanded="false">▾ activity bay</button><button class="physical run-button" aria-label="Pause Jarvis" title="Pause Jarvis">Ⅱ</button><button class="physical next-button" aria-label="Next Jarvis screen" title="Next screen">›</button>
-<div class="second-region" id="secondRegion" hidden aria-label="Jarvis companion content region"><div class="region-copy" id="regionCopy"></div></div><div class="summary"><b>Jarvis</b><span>03 agents running</span><button class="expand" aria-label="Expand Jarvis">⌄</button></div></section><section class="module" id="b" aria-label="GitDiscuss capsule"><svg class="module-hardware" id="shell-b" viewBox="0 0 420 184" aria-hidden="true"></svg>
+<div class="second-region" id="secondRegion" role="region" hidden aria-label="Jarvis companion content region"><div class="region-copy" id="regionCopy"></div></div><div class="summary"><b>Jarvis</b><span>03 agents running</span><button class="expand" aria-label="Expand Jarvis">⌄</button></div></section><section class="module" id="b" aria-label="GitDiscuss capsule"><svg class="module-hardware" id="shell-b" viewBox="0 0 420 184" aria-hidden="true"></svg>
 <button class="grip" data-drag="b" aria-label="Move GitDiscuss capsule"><span>GitDiscuss / review queue</span><span>⋮⋮</span></button>
 <div class="screen" aria-label="GitDiscuss digital display"><div class="pages">
 <div class="page"><div class="tiny">GitDiscuss / incoming</div><strong>02 <em>need a decision</em></strong><small>Capsule joining · design feedback</small></div>
@@ -700,8 +700,10 @@ function paint(){
  [...meter.children].forEach(child=>child.inert=child.classList.contains('summary')?!model.shadeChecks:model.shadeChecks);
  paintLeaf('a',model.leaf);paintLeaf('b',model.leaf);paintLeaf('meter',model.docked?0:model.meterLeaf);
  const region=$('#secondRegion'),reveal=clamp((form.q-.18)/.82,0,1),regionVisible=twoRegion()&&reveal>0&&model.state!=='shade'&&model.leaf===0;
- region.hidden=!regionVisible;region.inert=!regionVisible||busy;region.setAttribute('aria-hidden',String(!regionVisible||busy));
- $('#a').style.setProperty('--region-top',(144+34*form.q)+'px');$('#a').style.setProperty('--region-height',(104*reveal)+'px');$('#a').style.setProperty('--region-opacity',clamp((form.q-.7)/.3,0,1));
+ const regionReadable=regionVisible&&reveal===1&&!busy;
+ region.hidden=!regionVisible;region.inert=!regionReadable;region.setAttribute('aria-hidden',String(!regionReadable));
+ // Reveal type only after the leaf can hold every line at its authored size.
+ $('#a').style.setProperty('--region-top',(144+34*form.q)+'px');$('#a').style.setProperty('--region-height',(104*reveal)+'px');$('#a').style.setProperty('--region-opacity',clamp((reveal-.94)/.06,0,1));
  // Reuse the widget's own authored content; selected pages remain independent of form.
  const companion=model.a.page===1?2:1,source=$('#a .screen .pages').children[companion];
  if(region.dataset.page!==String(companion)){region.dataset.page=String(companion);$('#regionCopy').innerHTML=source.innerHTML;}
