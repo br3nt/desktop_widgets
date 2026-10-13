@@ -6,6 +6,7 @@ mod casing;
 mod config;
 mod docks;
 mod geom;
+mod magnet;
 mod model;
 mod platform;
 mod render;

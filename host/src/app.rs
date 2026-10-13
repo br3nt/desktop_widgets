@@ -19,9 +19,12 @@ use tiny_skia::Pixmap;
 use winit::application::ApplicationHandler;
 use winit::dpi::{LogicalPosition, LogicalSize};
 use winit::event::{ElementState, MouseButton, WindowEvent};
-use winit::event_loop::{ActiveEventLoop, EventLoopProxy};
+use winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoopProxy};
 use winit::keyboard::{Key, NamedKey};
 use winit::window::{Window, WindowId, WindowLevel};
+
+/// Spring frame interval (about 60 Hz).
+const FRAME: Duration = Duration::from_millis(16);
 
 pub enum UserEvent {
     Menu(tray_icon::menu::MenuId),
@@ -79,6 +82,8 @@ pub struct App {
     alt: bool,
     cmd: bool,
     dragging: Option<usize>,
+    /// Last spring frame, while the drag spring is in flight.
+    frame: Option<Instant>,
     started: bool,
 }
 
@@ -104,6 +109,7 @@ impl App {
             alt: false,
             cmd: false,
             dragging: None,
+            frame: None,
             started: false,
         }
     }
@@ -559,6 +565,23 @@ impl ApplicationHandler<UserEvent> for App {
                 }
             }
         }
+    }
+
+    /// Frames run only while the drag spring is in flight; otherwise the loop sleeps.
+    fn about_to_wait(&mut self, el: &ActiveEventLoop) {
+        if !self.world.in_flight() {
+            self.frame = None;
+            el.set_control_flow(ControlFlow::Wait);
+            return;
+        }
+        let now = Instant::now();
+        let last = *self.frame.get_or_insert(now - FRAME);
+        if now - last >= FRAME {
+            self.world.tick((now - last).as_secs_f64());
+            self.sync();
+            self.frame = Some(now);
+        }
+        el.set_control_flow(ControlFlow::WaitUntil(self.frame.unwrap_or(now) + FRAME));
     }
 
     fn window_event(&mut self, el: &ActiveEventLoop, wid: WindowId, event: WindowEvent) {

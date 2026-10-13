@@ -1,14 +1,10 @@
-//! Snapping maths: pull a moving set of rects onto nearby widget edges and screen edges,
-//! and detect which rects end up flush against each other (the join test).
+//! Snapping maths: pull a moving set of rects onto nearby widget edges and screen edges.
+//! Alignment only; joining is the socket field's job (`magnet.rs`).
 
 use crate::geom::Rect;
 
 /// Distance (points) inside which edges snap.
 pub const SNAP_THRESHOLD: f64 = 12.0;
-/// Two edges closer than this count as touching.
-const TOUCH_EPS: f64 = 0.75;
-/// Perpendicular overlap needed for a flush contact to count as a join.
-const MIN_JOIN_OVERLAP: f64 = 8.0;
 
 fn best(cands: impl Iterator<Item = f64>, threshold: f64) -> Option<f64> {
     cands
@@ -48,28 +44,6 @@ pub fn snap_offset(moving: &[Rect], targets: &[Rect], screens: &[Rect], threshol
     )
 }
 
-/// True when `a` and `b` share an edge (flush, not overlapping) with enough perpendicular overlap.
-pub fn touching(a: &Rect, b: &Rect) -> bool {
-    let side = ((a.right() - b.x).abs() < TOUCH_EPS || (a.x - b.right()).abs() < TOUCH_EPS)
-        && a.v_overlap(b) >= MIN_JOIN_OVERLAP;
-    let stacked = ((a.bottom() - b.y).abs() < TOUCH_EPS || (a.y - b.bottom()).abs() < TOUCH_EPS)
-        && a.h_overlap(b) >= MIN_JOIN_OVERLAP;
-    side || stacked
-}
-
-/// Pairs (moving index, target index) that touch.
-pub fn contacts(moving: &[Rect], targets: &[Rect]) -> Vec<(usize, usize)> {
-    let mut out = Vec::new();
-    for (i, m) in moving.iter().enumerate() {
-        for (j, t) in targets.iter().enumerate() {
-            if touching(m, t) {
-                out.push((i, j));
-            }
-        }
-    }
-    out
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -91,8 +65,6 @@ mod tests {
         let (dx, dy) = snap_offset(&m, &t, &[], T);
         assert_eq!(dx, -8.0);
         assert_eq!(dy, -3.0, "tops align too");
-        let snapped = m[0].offset(dx, dy);
-        assert!(touching(&snapped, &t[0]));
     }
 
     #[test]
@@ -108,7 +80,6 @@ mod tests {
         let t = [Rect::new(0.0, 0.0, 100.0, 40.0)];
         let (dx, dy) = snap_offset(&m, &t, &[], T);
         assert_eq!((dx, dy), (-5.0, -10.0));
-        assert!(touching(&m[0].offset(dx, dy), &t[0]));
     }
 
     #[test]
@@ -125,15 +96,5 @@ mod tests {
         let m = [Rect::new(300.0, 0.0, 100.0, 40.0), Rect::new(400.0, 0.0, 100.0, 40.0)];
         let t = [Rect::new(503.0, 0.0, 100.0, 40.0)];
         assert_eq!(snap_offset(&m, &t, &[], T).0, 3.0);
-    }
-
-    #[test]
-    fn touching_requires_overlap_and_flush() {
-        let a = Rect::new(0.0, 0.0, 100.0, 40.0);
-        assert!(touching(&a, &Rect::new(100.0, 10.0, 50.0, 40.0)));
-        assert!(!touching(&a, &Rect::new(101.5, 10.0, 50.0, 40.0)), "gap");
-        assert!(!touching(&a, &Rect::new(100.0, 38.0, 50.0, 40.0)), "corner only");
-        assert!(!touching(&a, &Rect::new(50.0, 10.0, 100.0, 40.0)), "overlapping");
-        assert_eq!(contacts(&[a], &[Rect::new(0.0, 40.0, 100.0, 26.0)]), vec![(0, 0)]);
     }
 }
