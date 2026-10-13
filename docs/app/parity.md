@@ -335,5 +335,7 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       slot widgets inherit always-on-top, recalculated on display and Dock changes.
 - [ ] Design mode and the sockets toggle (section 7).
 - [ ] Reduced motion, keyboard nudges, latch Right-arrow (section 9).
+      Also make key and mouse-up delivery reliable: the reviewer saw Escape miss once in five tries and one
+      dropped mouse-up; make the pressed window key on mouse-down and verify 10/10 Escape cancels live.
 - [ ] Final side-by-side review: every section verified against the prototype with `/state` numbers
       and screenshots; `docs/app/review.md` says parity reached or lists what's left.
