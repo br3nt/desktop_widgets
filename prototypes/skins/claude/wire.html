@@ -4139,7 +4139,7 @@ function dialSvg(c){
 }
 const SHADES={
  tuck:{label:'Plain tuck',kind:'Page baseline',
-  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil, ingot mould, rolling mill, honeycomb, verdigris, saw cut, muscle wire, afterglow) are built and added here.'},
+  about:'Not a brainstorm item. The frame wires close down around the stone until only the name and one value remain on a small slab. It keeps the shade state working until the wire shade modes (bead strand, coil band, hoop rim, folded branches, caterpillar, rolled sheet, letter beads, mail coverlet, charm bracelet, tilting bail, jeweller\'s case, wire spool, beehive coil, ingot mould, rolling mill, honeycomb, verdigris, saw cut, muscle wire, afterglow, filigree infill) are built and added here.'},
  strand:{label:'Bead strand',kind:'Distil',ms:1150,ownStrip:true,
   about:'The pendant comes apart into a necklace. The plate and stone fade, the copper frame squeezes flat into a single strung wire, and the beads slide in along it from both clasps, centre beads first, each clicking into place. A flat slab bead carries the name and a cabochon carries the one key value. The round stones between them are the statuses: <b>amber</b> running, <b>labradorite</b> idle or paused, <b>carnelian</b> needs you, <b>malachite</b> passed. Jarvis strings one amber per running agent, GitDiscuss one carnelian per decision, Checks a seed bead per check. Pause a widget and its stones turn to labradorite. The eye loops stay on the ends, so shaded pendants still link by jump ring into one longer strand.',
   sayOn:'Shaded: the frame flattens into a wire and the beads slide on, one stone per status.',
@@ -4262,7 +4262,12 @@ const SHADES={
   about:'The Wane shade kind (elven\'s wane opened the round: nothing is folded, cut, stowed or laid over the casing; the light goes, and the strip is what stays lit; then gothic\'s last light and hollow\'s dark lantern) done in wire. The light that goes is a wire\'s own: a bare filament bulb, whose coiled tungsten filament is the finest wire on the bench, and what stays lit is luminous paint, the way a watchmaker paints the hands and numerals of a dial so they glow after the lamp is off. The display goes dark into its glass and the nameplate fades, and the glass and its coiled bezel fade from the plate. A bulb is let down over the pendant on a twisted cloth flex and swings still; its filament lights white-hot and throws a warm pool over the copper, and in it the name and the one key value show on the plate in pale paint, charging. Then the bulb dims. Its filament cools through yellow and orange to a dull red, its pool draws in toward it so the dark rises from the foot and stops just under the paint, and the pendant closes up under the dark. As the filament goes out the paint glows green, brightest just after the light has gone, then settles, lighting the plate faintly round it, and the dark bulb is drawn back up. Last, a luminous pip at the right end kindles in the status colour: <b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused. Nothing moves at rest, unshading switches the bulb back on, and the join ends stay on the pendant\'s ends, so shaded pendants still join.',
   sayOn:'Shaded: a filament bulb is let down over the pendant, dims through orange to red and goes out, and the name and value painted on the plate in luminous paint glow on in the dark.',
   hk:st=>ease(seg(st,.56,.78)),show:st=>1-ease(seg(st,0,.12)),grip:st=>1-ease(seg(st,0,.12)),
-  draw(id,w,h,small,st){return afterglow(id,w,h,small,st)}}
+  draw(id,w,h,small,st){return afterglow(id,w,h,small,st)}},
+ fili:{label:'Filigree infill',kind:'Immure',ms:5400,ownStrip:true,hs:64,chs:54,
+  about:'The Immure shade kind (gothic\'s anchorhold walls its window up in its own stone, hollow\'s shell grows its window shut) done in wire. Nothing is folded, cut, put away or laid over the casing: the opening is filled solid with the pendant\'s own material, and the strip is the gap left. Wire is not laid or grown; it is packed, the way filigree is made: a frame is filled with flat scrolls of fine wire wound tight against each other, a row at a time, between straight dividing wires. The display goes dark into its glass and the nameplate fades. Then the window is filled from the rim inward, a row below and then a row above, three rows each side on Jarvis and GitDiscuss and two on Checks: a hot point lays a straight copper divider along the row, and brass scrolls of a turn and a half are wound into it left to right behind a glowing working end, neighbours turning opposite ways so each row reads as one wave of linked coils, a dark backing coming up behind them. A slit is left across the middle. Twisted brass rails are laid along both its edges, with gold granules set on them as the rail passes. The pendant then closes down, and the bezel\'s edge closes over the outer rows until only the slit and the row either side of it show. A light behind the slit kindles in the status colour (<b>amber</b> running, <b>carnelian</b> to decide, <b>malachite</b> passed, <b>labradorite</b> paused, dimmer), the name and the one key value come up in it left to right, pale with a dark edge, and a glint runs along the top rail. Nothing moves at rest, unshading unwinds the rows from the slit outward, and the join ends stay on the pendant\'s ends, so filled pendants still join.',
+  sayOn:'Shaded: the window is packed shut with rows of filigree scrolls from the rim inward, leaving a slit; the pendant closes on it and the name and value show in the lit slit.',
+  hk:st=>ease(seg(st,.66,.82)),show:st=>1-ease(seg(st,0,.12)),grip:st=>1-ease(seg(st,0,.12)),
+  draw(id,w,h,small,st){return filigree(id,w,h,small,st)}}
 };
 // The strip height while shaded: most shades close to HS / CHS, Hang shades want a little room below the chain.
 const stripH=small=>{const o=SHADES[model.shade];return small?(o.chs||CHS):(o.hs||HS)};
@@ -5195,6 +5200,78 @@ function afterglow(id,w,h,small,st){
  const dn=ease(seg(st,.03,.12)),up=ease(seg(st,.88,.96)),bo=seg(st,.03,.07)*(1-seg(st,.92,.96));
  if(bo>0){const u=seg(st,.08,.32),sw=u>0?4*Math.sin(u*Math.PI*5)*(1-u):0,by=-36-110*(1-dn)-120*up;
   s+=`<g opacity="${f(bo)}" transform="translate(${f(bx)} ${f(by)}) rotate(${f(sw)} 0 -170)">${agBulb(T,I)}</g>`}
+ return s;
+}
+
+/* ---------- Filigree infill pieces ---------- */
+// Immure in wire: the window is packed shut with flat scrolls of fine wire, the way filigree fills a frame, from the rim inward,
+// leaving a slit FG.sh each side of the window's middle. Rows are FG.u tall and laid out on the full-size window; as the pendant
+// closes they are carried with the slit and the bezel's edge closes over the outer rows.
+const FG={false:{u:8,sh:8.5,nr:3,ww:.85,rw:1.5},true:{u:7,sh:7.5,nr:2,ww:.75,rw:1.25}},FGG={},FGR={};
+function fgGeo(small){
+ if(FGG[small])return FGG[small];
+ const P=FG[small],b=small?[14,22,220,44,9]:[43,29,304,68,10],yc=b[1]+b[3]/2,n=Math.floor((b[2]-4)/P.u),x0=b[0]+(b[2]-n*P.u)/2,rows=[];
+ // Outer rows first, below then above; each row's divider wire lies along its edge nearest the slit.
+ for(let i=P.nr-1;i>=0;i--)for(const sd of [1,-1])rows.push({i,sd,y0:yc+sd*(P.sh+i*P.u),cy:yc+sd*(P.sh+(i+.5)*P.u)});
+ rows.forEach((r,k)=>{r.a=.14+.44*k/rows.length;r.b=.14+.44*(k+1)/rows.length});
+ return FGG[small]={...P,b,yc,n,x0,rows};
+}
+// One flat scroll in its cell, a spiral of a turn and a half from the outside in, drawn as far as p.
+// Neighbours turn opposite ways and start from opposite sides, so a row reads as one wave of linked coils.
+function fgScroll(g,row,j,p){
+ const cx=g.x0+(j+.5)*g.u,dir=(j%2?1:-1)*row.sd,a0=j%2?0:Math.PI,r=g.u*.47,m=Math.max(2,Math.ceil(13*p)),pts=[];
+ for(let i=0;i<=m;i++){const t=p*i/m,a=a0+dir*t*3*Math.PI,rr=r*(1-t*.8);pts.push([cx+rr*Math.cos(a),row.cy+rr*Math.sin(a)])}
+ return{d:poly(pts),end:pts[m]};
+}
+// A row as far as rp: its backing, its divider (laid first, with a hot point), then a wave of scrolls wound left to right, three at a time.
+// Returned as layers (backing, scrolls, divider and hot point) so the caller lays every row's divider over the rows inside it.
+function fgRow(g,row,rp,small,k){
+ if(rp>=1&&FGR[small+'|'+k])return FGR[small+'|'+k];
+ const{u,n,x0}=g,dv=seg(rp,0,.22),c=seg(rp,.18,1)*(n+3),top=row.sd>0?row.y0:row.y0-u;
+ let bk='',sc='',dl='',done='',hot='',tip=null;
+ const xb=x0+clamp(c-1.5,0,n)*u;
+ if(xb>x0)bk=`<rect x="${f(x0)}" y="${f(top)}" width="${f(xb-x0)}" height="${u}" fill="#1b0e07"/>`;
+ for(let j=0;j<n;j++){const p=clamp((c-j)/3);if(p<=0)break;const S=fgScroll(g,row,j,p);if(p>=1)done+=S.d;else{hot+=S.d;tip=S.end}}
+ if(done)sc+=wire(done,'brass',g.ww);
+ if(hot)sc+=wire(hot,'hot',g.ww);
+ if(dv>0)dl+=wire(`M${f(x0)} ${f(row.y0)}H${f(x0+n*u*dv)}`,dv<1?'hot':'copper',.9);
+ if(dv>0&&dv<1)tip=[x0+n*u*dv,row.y0];
+ // The hot point fades in at the start of a row and out at its end, so it doesn't jump from row to row.
+ const to=clamp(rp*12)*clamp((1-rp)*12);
+ if(tip&&to>0)dl+=`<g opacity="${f(to)}"><circle cx="${f(tip[0])}" cy="${f(tip[1])}" r="4" fill="#ffb15e" opacity=".55" filter="url(#soft)"/><circle cx="${f(tip[0])}" cy="${f(tip[1])}" r="1.2" fill="#fff6dc"/></g>`;
+ const o={bk,sc,dl};
+ return rp>=1?FGR[small+'|'+k]=o:o;
+}
+function filigree(id,w,h,small,st){
+ if(st<=0)return casing(w,h,small);
+ const g=fgGeo(small),q=SHADES.fili.hk(st),G=rmWin(small,q),gl=seg(st,.02,.12),ys=G.y+G.ht/2,dy=ys-g.yc,sh=g.sh;
+ let s=casing(w,h,small,false,true)+`<clipPath id="fgc-${id}"><path d="${G.d}"/></clipPath><path d="${G.d}" fill="url(#tr-glass)" opacity="${f(gl)}"/>`;
+ // The rows, from the rim inward, carried with the slit as the pendant closes.
+ let fbk='',fsc='',fdl='';
+ g.rows.forEach((row,k)=>{const rp=seg(st,row.a,row.b);if(rp>0){const R=fgRow(g,row,rp,small,k);fbk+=R.bk;fsc+=R.sc;fdl+=R.dl}});
+ let fill=fbk+fsc+fdl;
+ // The slit's edges: twisted brass rails laid left to right, gold granules set on them as the rail passes.
+ const rl=ease(seg(st,.58,.66));
+ if(rl>0){const xe=g.x0+g.n*g.u*rl;fill+=twisted(`M${f(g.x0)} ${f(g.yc-sh)}H${f(xe)}M${f(g.x0)} ${f(g.yc+sh)}H${f(xe)}`,'brass',g.rw);
+  for(let x=g.x0+g.u;x<g.x0+g.n*g.u-14;x+=2*g.u){const p=clamp((xe-x)/14);if(p<=0)break;const r=1.25*backOut(p);
+   for(const y of [g.yc-sh,g.yc+sh])fill+=`<circle cx="${f(x)}" cy="${f(y)}" r="${f(r+.35)}" fill="#3a2408"/><circle cx="${f(x)}" cy="${f(y)}" r="${f(r)}" fill="#e6bf5c"/><circle cx="${f(x-.4)}" cy="${f(y-.45)}" r="${f(r*.38)}" fill="#fff8d8"/>`}}
+ if(fill)s+=`<g clip-path="url(#fgc-${id})"><g transform="translate(0 ${f(dy)})">${fill}</g></g>`;
+ // Once it has closed, a light behind the slit kindles in the status colour.
+ const L=wsLabel(id,small),k=ease(seg(st,.82,.9)),sc=RIM_GLOW[L.stone],lab=L.stone==='lab';
+ if(k>0)s+=`<g clip-path="url(#fgc-${id})"><rect x="${f(G.x)}" y="${f(ys-sh+1.5)}" width="${f(G.wd)}" height="${f(2*sh-3)}" fill="${sc}" opacity="${f((lab?.12:.24)*k)}"/>`+
+  `<rect x="${f(G.x+6)}" y="${f(ys-sh+3)}" width="${f(G.wd-12)}" height="${f(2*sh-6)}" fill="${sc}" opacity="${f((lab?.22:.5)*k*(1+.25*Math.sin(Math.PI*k)))}" filter="url(#soft)"/></g>`;
+ // The bezel's coils go back over the window's edge, covering where the outer rows are cut off.
+ const half=lerp(2.4,1.4,q),ck=G.d+half,co=rmCo[ck]||(rmCo[ck]=wire(coilsAlong(G.d,2.35,half),'copper',lerp(1.15,.9,q)));
+ s+=`<path d="${G.d}" fill="none" stroke="#120906" stroke-width="${f(lerp(5,3.4,q))}"/>`+co;
+ // The name and the one key value come up in the slit left to right, pale against the light, with a dark halo.
+ const tt=seg(st,.86,.96);
+ if(tt>0){const tx=G.x+12,nw=measure(L.name,`italic bold ${L.fs}px Georgia,serif`),halo=` stroke="#120906" stroke-opacity=".85" stroke-width="2.4" paint-order="stroke" stroke-linejoin="round"`;
+  s+=`<clipPath id="fgt-${id}"><rect x="${f(G.x)}" y="${f(ys-sh-6)}" width="${f(12+(G.wd-12)*ease(tt))}" height="${f(2*sh+12)}"/></clipPath><g clip-path="url(#fgt-${id})"><text y="${f(ys)}" dominant-baseline="central"${halo}>`+
+   `<tspan x="${f(tx)}" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="${L.fs}" fill="#f6dcb4">${L.name}</tspan>`+
+   `<tspan x="${f(tx+nw+16)}" font-family="Georgia,serif" font-weight="bold" font-size="${L.vs}" fill="#fff3dc">${L.num}</tspan>`+(L.word?`<tspan dx="4" font-family="Georgia,serif" font-style="italic" font-size="${L.ws}" fill="#e2cca8">${L.word}</tspan>`:'')+
+   `</text><circle cx="${f(tx+nw+8)}" cy="${f(ys)}" r="1.4" fill="#f6dcb4" stroke="#120906" stroke-width=".8"/></g>`}
+ // A glint runs along the top rail.
+ const gt=seg(st,.94,1);if(gt>0&&gt<1)s+=sparkle(lerp(G.x+8,G.x+G.wd-8,ease(gt)),ys-sh,Math.sin(Math.PI*gt)*.4);
  return s;
 }
 
