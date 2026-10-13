@@ -167,95 +167,16 @@ Shade mode (the app's own feature) must show the widget name and its one key val
 
 ## Checklist (one item per run; builder ticks with a one-line note)
 
-- [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --shot /tmp/d.png` live on an unlocked
+- [x] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --shot /tmp/d.png` live on an unlocked
       screen and record in the parity note: mid-drag `drag.moved = true`, `drag.members` = all 3
       group members, every member moved by 300 ±1 pt after release, and both PNGs show the casings
       (not wallpaper). Fix probe.sh or the app if any of these fail.
-      Attempted 13 Oct: blocked, screen locked again (`CGSSessionScreenIsLocked = true`, a
-      `screencapture` of the widget region shows only wallpaper). A raw cliclick drag from
-      gitdiscuss's grab point (796,306) by +300 left every widget in place and `/state` showed
-      `drag: none` mid-drag, so pointer events don't reach the app while locked either. Nothing in
-      this item can be checked until a run happens on an unlocked screen.
-      Attempted again 13 Oct (later run): still locked (`CGSSessionScreenIsLocked = true`), and it
-      stayed locked through a 10 min wait; nothing launched or changed.
-      Attempted a third time 13 Oct: locked at start (`ioreg` `CGSSessionScreenIsLocked = true`)
-      and through a 15 min poll every 5 s; release build is current, nothing launched or changed.
-      Attempted a fourth time 13 Oct (09:47–10:07 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build is current, nothing launched or changed.
-      Attempted a fifth time 13 Oct (10:07–10:28 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build is current, nothing launched or changed.
-      Attempted a sixth time 13 Oct (10:28–10:48 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a seventh time 13 Oct (10:48–11:09 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted an eighth time 13 Oct (11:09–11:29 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a ninth time 13 Oct (11:29–11:50 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a tenth time 13 Oct (11:50–12:10 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted an eleventh time 13 Oct (12:10–12:31 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twelfth time 13 Oct (12:31–12:51 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a thirteenth time 13 Oct (12:51–13:12 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a fourteenth time 13 Oct (13:12–13:32 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a fifteenth time 13 Oct (13:32–13:53 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a sixteenth time 13 Oct (13:53–14:13 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a seventeenth time 13 Oct (14:13–14:34 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted an eighteenth time 13 Oct (14:34–14:54 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a nineteenth time 13 Oct (14:55–15:15 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twentieth time 13 Oct (15:15–15:35 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twenty-first time 13 Oct (15:36–15:56 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twenty-second time 13 Oct (15:56–16:17 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twenty-third time 13 Oct (16:17–16:37 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twenty-fourth time 13 Oct (16:37–16:58 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twenty-fifth time 13 Oct (16:58–17:18 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twenty-sixth time 13 Oct (17:18–17:39 ACDT): locked at start and through a 20 min
-      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
-      or changed.
-      Attempted a twenty-seventh time 13 Oct (17:39–17:59 ACDT): locked at start and through a
-      20 min poll every 5 s; release build current, `cargo test --release` 54 passed; nothing
-      launched or changed.
-      Attempted a twenty-eighth time 13 Oct (17:59–18:10 ACDT): locked at start (a `screencapture`
-      showed the lock screen's clock) and through a 10 min poll every 5 s; release build current,
-      `cargo test --release` 54 passed; nothing launched or changed.
-      Attempted a twenty-ninth time 13 Oct (18:10–18:30 ACDT): locked at start and through a
-      20 min poll every 5 s; release build current, `cargo test --release` 54 passed; nothing
-      launched or changed.
+      Verified live 13 Oct 18:35 ACDT (29 earlier runs were blocked by a locked screen): release
+      build, `probe.sh drag gitdiscuss 300 0 --shot /tmp/d.png` showed mid-drag `moved=true`,
+      `members=jarvis,gitdiscuss,checks`, cursor 1096,306; after release jarvis 624→924,
+      gitdiscuss 624→924, checks 984→1284 (exactly +300, y unchanged), panel-demo untouched,
+      `drag: none`; both PNGs show the three casings over the desktop. No code changes needed;
+      layout.toml restored afterwards.
 - [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
       returns to its start pose (x=624 ±1). The app is an Accessory app (`main.rs:30`) and Escape
       is a `KeyboardInput` on the widget window (`app.rs:598`), so the key may never arrive if the
