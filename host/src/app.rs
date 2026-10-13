@@ -7,6 +7,7 @@ use crate::casing::{self, Button, Hit, Parts};
 use crate::config::{self, Layout, PanelKind, WidgetDef, WidgetsFile};
 use crate::docks::{self, DockRegion, ScreenInfo};
 use crate::geom::Rect;
+use crate::glow::{self, Side};
 use crate::model::{DropOutcome, World};
 use crate::platform::{self, Presenter};
 use crate::render::{self, WidgetView};
@@ -45,6 +46,8 @@ struct WidgetWin {
     top: bool,
     /// What the last draw depended on besides actor state.
     look: (bool, bool, bool, bool),
+    /// Socket light brightness (left, right) at the last redraw request.
+    lights: (f64, f64),
     local: (f64, f64),
     last_click: Option<Instant>,
 }
@@ -57,6 +60,19 @@ struct Overlay {
     shown: bool,
     hot: bool,
 }
+
+/// The status caption under the dragged widget ("Socket nearby · move closer"): a small
+/// click-through window, empty when there is nothing to say.
+struct Caption {
+    window: Rc<Window>,
+    presenter: Option<Presenter>,
+    rect: Rect,
+    text: Option<&'static str>,
+    ready: bool,
+}
+
+const CAPTION_W: f64 = 240.0;
+const CAPTION_H: f64 = 20.0;
 
 struct MenuIds {
     shade: tray_icon::menu::MenuId,
@@ -77,6 +93,7 @@ pub struct App {
     fonts: Fonts,
     wins: Vec<WidgetWin>,
     overlays: Vec<Overlay>,
+    caption: Option<Caption>,
     tray: Option<tray_icon::TrayIcon>,
     menu: Option<MenuIds>,
     alt: bool,
@@ -104,6 +121,7 @@ impl App {
             fonts: Fonts::load(),
             wins: Vec::new(),
             overlays: Vec::new(),
+            caption: None,
             tray: None,
             menu: None,
             alt: false,
@@ -227,6 +245,7 @@ impl App {
                 size: (r.w, r.h),
                 top,
                 look: (false, false, false, false),
+                lights: (0.0, 0.0),
                 local: (0.0, 0.0),
                 last_click: None,
             });
@@ -245,6 +264,41 @@ impl App {
             draw_overlay(&mut self.fonts, &mut o);
             o.window.set_visible(true);
             self.overlays.push(o);
+        }
+    }
+
+    fn build_caption(&mut self, el: &ActiveEventLoop) {
+        let rect = Rect::new(0.0, 0.0, CAPTION_W, CAPTION_H);
+        let Ok(w) = el.create_window(Self::base_attrs("drag caption", rect, true)) else { return };
+        let window = Rc::new(w);
+        let _ = window.set_cursor_hittest(false);
+        platform::configure_widget_window(&window);
+        let presenter = Presenter::new(&window);
+        let mut c = Caption { window, presenter, rect, text: None, ready: false };
+        draw_caption(&mut self.fonts, &mut c);
+        c.window.set_visible(true);
+        self.caption = Some(c);
+    }
+
+    /// Show the drag's caption under the pressed widget, or blank it.
+    fn update_caption(&mut self) {
+        let Some(c) = self.caption.as_mut() else { return };
+        let (text, ready, at) = match &self.world.drag {
+            Some(d) if d.moved && d.hover_dock.is_none() => (glow::caption(d.feel), d.feel == crate::magnet::Feel::Captured, Some(self.world.widgets[d.pressed].rect())),
+            _ => (None, false, None),
+        };
+        if let (Some(_), Some(r)) = (text, at) {
+            let screen = self.world.screens.iter().copied().find(|s| s.contains(r.center_x(), r.y + r.h / 2.0));
+            let to = glow::caption_rect(r, CAPTION_W, CAPTION_H, screen);
+            if (to.x, to.y) != (c.rect.x, c.rect.y) {
+                c.window.set_outer_position(LogicalPosition::new(to.x, to.y));
+                c.rect = to;
+            }
+        }
+        if (text, ready) != (c.text, c.ready) {
+            c.text = text;
+            c.ready = ready;
+            draw_caption(&mut self.fonts, c);
         }
     }
 
@@ -292,11 +346,14 @@ impl App {
                 w.window.set_window_level(if top { WindowLevel::AlwaysOnTop } else { WindowLevel::Normal });
                 w.top = top;
             }
-            if resized || look != w.look {
+            let lights = (self.world.light(i, Side::Left), self.world.light(i, Side::Right));
+            if resized || look != w.look || lights != w.lights {
                 w.look = look;
+                w.lights = lights;
                 w.window.request_redraw();
             }
         }
+        self.update_caption();
     }
 
     fn draw(&mut self, i: usize) {
@@ -313,6 +370,7 @@ impl App {
             on_top: self.world.on_top(i),
             docked: self.world.widgets[i].dock.is_some(),
             html: def.panel.kind == PanelKind::Html,
+            lights: (self.world.light(i, Side::Left), self.world.light(i, Side::Right)),
         };
         render::draw_widget(&mut pm, scale, &mut self.fonts, &view);
         if let Some(p) = self.wins[i].presenter.as_mut() {
@@ -437,6 +495,7 @@ impl App {
         }
         self.build_overlays(el);
         self.create_widget_windows(el);
+        self.build_caption(el);
         self.build_tray();
         self.sync();
         self.save();
@@ -472,6 +531,18 @@ impl App {
     fn quit(&mut self, el: &ActiveEventLoop) {
         self.save();
         el.exit();
+    }
+}
+
+fn draw_caption(fonts: &mut Fonts, c: &mut Caption) {
+    let scale = c.window.scale_factor() as f32;
+    let (pw, ph) = ((c.rect.w * scale as f64).ceil() as u32, (c.rect.h * scale as f64).ceil() as u32);
+    let Some(mut pm) = Pixmap::new(pw.max(1), ph.max(1)) else { return };
+    if let Some(text) = c.text {
+        render::draw_caption(&mut pm, scale, fonts, c.rect.w, c.rect.h, text, c.ready);
+    }
+    if let Some(p) = c.presenter.as_mut() {
+        p.present(pm.take(), pw.max(1), ph.max(1), c.rect.w, c.rect.h);
     }
 }
 
@@ -567,9 +638,10 @@ impl ApplicationHandler<UserEvent> for App {
         }
     }
 
-    /// Frames run only while the drag spring is in flight; otherwise the loop sleeps.
+    /// Frames run only while the drag spring or a socket light is in flight; otherwise the
+    /// loop sleeps.
     fn about_to_wait(&mut self, el: &ActiveEventLoop) {
-        if !self.world.in_flight() {
+        if !self.world.animating() {
             self.frame = None;
             el.set_control_flow(ControlFlow::Wait);
             return;
@@ -586,9 +658,16 @@ impl ApplicationHandler<UserEvent> for App {
 
     fn window_event(&mut self, el: &ActiveEventLoop, wid: WindowId, event: WindowEvent) {
         let Some(i) = self.wins.iter().position(|w| w.window.id() == wid) else {
+            if let WindowEvent::ScaleFactorChanged { .. } = event {
+                if let Some(c) = self.caption.as_ref().filter(|c| c.window.id() == wid) {
+                    c.window.request_redraw();
+                }
+            }
             if let WindowEvent::RedrawRequested = event {
                 if let Some(k) = self.overlays.iter().position(|o| o.window.id() == wid) {
                     self.draw_overlay_at(k);
+                } else if let Some(c) = self.caption.as_mut().filter(|c| c.window.id() == wid) {
+                    draw_caption(&mut self.fonts, c);
                 }
             }
             return;

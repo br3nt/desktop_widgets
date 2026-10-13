@@ -3,6 +3,7 @@
 //! capture history. Pure maths; the model feeds it poses and the shell drives the frames.
 
 use crate::geom::Rect;
+use crate::glow::Side;
 
 /// Outside this distance (points) from the aligned pose the drag is free.
 pub const NEAR: f64 = 120.0;
@@ -120,6 +121,8 @@ pub struct Pairing {
     pub member: usize,
     /// Index into the other bodies.
     pub other: usize,
+    /// The moving body's end that pairs (the other body's opposite end faces it).
+    pub side: Side,
     /// Add to every moving body to reach the aligned pose (`SOCKET_GAP` apart).
     pub aligned: (f64, f64),
     /// Add to every moving body to reach the joined pose (flush, sharing the socket).
@@ -136,17 +139,17 @@ pub fn nearest_pairing(moving: &[Body], others: &[Body]) -> Option<Pairing> {
             let dy = o.rect.y + (o.rect.h - m.rect.h) / 2.0 - m.rect.y;
             // m's right end to o's left end, and m's left end to o's right end.
             let sides = [
-                (m.right && o.left, o.rect.x - m.rect.w - m.rect.x, -SOCKET_GAP),
-                (m.left && o.right, o.rect.right() - m.rect.x, SOCKET_GAP),
+                (m.right && o.left, o.rect.x - m.rect.w - m.rect.x, -SOCKET_GAP, Side::Right),
+                (m.left && o.right, o.rect.right() - m.rect.x, SOCKET_GAP, Side::Left),
             ];
-            for (ok, flush_dx, gap) in sides {
+            for (ok, flush_dx, gap, side) in sides {
                 if !ok {
                     continue;
                 }
                 let aligned = (flush_dx + gap, dy);
                 let distance = aligned.0.hypot(aligned.1);
                 if best.is_none_or(|b| distance < b.distance) {
-                    best = Some(Pairing { member: k, other: j, aligned, joined: (flush_dx, dy), distance });
+                    best = Some(Pairing { member: k, other: j, side, aligned, joined: (flush_dx, dy), distance });
                 }
             }
         }
@@ -248,9 +251,11 @@ mod tests {
         assert_eq!((600.0 + p.aligned.0, 230.0 + p.aligned.1), (142.0 + 390.0 + 12.0, 215.0));
         assert_eq!((600.0 + p.joined.0, 230.0 + p.joined.1), (142.0 + 390.0, 215.0));
         assert!(close(p.distance, 56.0f64.hypot(15.0), 1e-9));
+        assert_eq!(p.side, Side::Left, "B's left end meets A's right end");
         // Dragging A toward B's left end mirrors it.
         let p = nearest_pairing(&[body(100.0, 215.0, 390.0, 130.0)], &[body(700.0, 215.0, 390.0, 130.0)]).unwrap();
         assert_eq!(100.0 + p.aligned.0, 700.0 - 12.0 - 390.0);
+        assert_eq!(p.side, Side::Right);
     }
 
     #[test]

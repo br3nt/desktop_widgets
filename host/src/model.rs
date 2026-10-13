@@ -4,6 +4,7 @@
 
 use crate::docks::{self, DockRegion};
 use crate::geom::Rect;
+use crate::glow::{Glow, Side};
 use crate::magnet::{self, Body, Feel, Pairing, Proximity, Spring};
 use crate::snap;
 use std::collections::BTreeMap;
@@ -76,6 +77,8 @@ pub struct World {
     /// Usable screen areas (snap targets).
     pub screens: Vec<Rect>,
     pub drag: Option<Drag>,
+    /// Socket lights by (widget, end): eased brightness toward what the field asks for.
+    pub lights: BTreeMap<(usize, Side), Glow>,
 }
 
 /// What a finished drag did, so the shell can react (e.g. save, play an effect).
@@ -322,6 +325,11 @@ impl World {
         let (goal, prox) = magnet::goal(d.raw, target);
         d.pairing = pairing.map(|p| (others[p.other], p));
         d.proximity = prox;
+        d.hover_dock = docks::region_at(&self.docks, cursor.0, cursor.1);
+        // Both facing sockets light alike; any other light fades. Over a dock, releasing docks
+        // instead of joining, so the sockets promise nothing.
+        let lit = d.pairing.filter(|_| d.hover_dock.is_none()).map(|(j, p)| [(d.members[p.member], p.side), (j, p.side.opposite())]);
+        self.aim_lights(lit, prox.brightness);
         d.feel = prox.feel;
         d.goal = goal;
         if d.feel == Feel::Free {
@@ -333,12 +341,12 @@ impl World {
             d.spring = Spring { pos: d.goal, vel: (0.0, 0.0) };
         }
         self.place(&d);
-        d.hover_dock = docks::region_at(&self.docks, cursor.0, cursor.1);
         self.drag = Some(d);
     }
 
     pub fn end_drag(&mut self) -> Option<DropOutcome> {
         let d = self.drag.take()?;
+        self.aim_lights(None, 0.0);
         if !d.moved {
             return Some(DropOutcome::Clicked);
         }
@@ -395,18 +403,46 @@ impl World {
         self.drag.as_ref().is_some_and(|d| !d.spring.settled(d.goal))
     }
 
-    /// Advance the drag spring by one frame of `dt` seconds. Returns `in_flight()`.
+    /// Advance the drag spring and the socket lights by one frame of `dt` seconds. Returns
+    /// `animating()`.
     pub fn tick(&mut self, dt: f64) -> bool {
-        let Some(mut d) = self.drag.take() else { return false };
-        if !d.spring.settled(d.goal) {
-            d.spring.step(d.goal, dt);
-            self.place(&d);
+        for g in self.lights.values_mut() {
+            g.step(dt * 1000.0);
         }
-        self.drag = Some(d);
-        self.in_flight()
+        self.lights.retain(|_, g| g.value != 0.0 || g.target != 0.0);
+        if let Some(mut d) = self.drag.take() {
+            if !d.spring.settled(d.goal) {
+                d.spring.step(d.goal, dt);
+                self.place(&d);
+            }
+            self.drag = Some(d);
+        }
+        self.animating()
+    }
+
+    /// Socket light brightness shown now at one end of widget `i`.
+    pub fn light(&self, i: usize, side: Side) -> f64 {
+        self.lights.get(&(i, side)).map_or(0.0, |g| g.value)
+    }
+
+    /// Point the sockets in `lit` at `brightness` and every other light at dark.
+    fn aim_lights(&mut self, lit: Option<[(usize, Side); 2]>, brightness: f64) {
+        for g in self.lights.values_mut() {
+            g.target = 0.0;
+        }
+        for key in lit.into_iter().flatten() {
+            self.lights.entry(key).or_default().target = brightness;
+        }
+        self.lights.retain(|_, g| g.value != 0.0 || g.target != 0.0);
+    }
+
+    /// True while a spring or a light still needs frames.
+    pub fn animating(&self) -> bool {
+        self.in_flight() || self.lights.values().any(|g| !g.settled())
     }
 
     pub fn cancel_drag(&mut self) {
+        self.aim_lights(None, 0.0);
         if let Some(d) = self.drag.take() {
             for (k, &m) in d.members.iter().enumerate() {
                 self.widgets[m].x = d.origins[k].0;
@@ -420,6 +456,7 @@ impl World {
 mod tests {
     use super::*;
     use crate::docks::Pack;
+    use crate::glow::Side;
     use crate::magnet::{self, Feel};
 
     fn world() -> World {
@@ -591,6 +628,113 @@ mod tests {
         w.begin_drag(0, (150.0, 110.0), false);
         w.drag_to((160.0, 110.0));
         assert_eq!(w.drag.as_ref().unwrap().feel, Feel::Free);
+    }
+
+    #[test]
+    fn approach_lights_both_facing_sockets_and_eases() {
+        let mut w = world();
+        w.begin_drag(1, (610.0, 110.0), false);
+        // Raw 60 pt right of b's aligned pose next to a's right end.
+        w.drag_to((482.0, 110.0));
+        let want = magnet::proximity(60.0).brightness;
+        assert_eq!(w.lights[&(1, Side::Left)].target, want);
+        assert_eq!(w.lights[&(0, Side::Right)].target, want);
+        assert_eq!(w.light(1, Side::Left), 0.0, "the light eases in, it doesn't jump");
+        assert_eq!(w.light(0, Side::Left), 0.0);
+        assert_eq!(w.light(1, Side::Right), 0.0);
+        w.tick(0.016);
+        let v = w.light(1, Side::Left);
+        assert!(v > 0.0 && v < want);
+        assert_eq!(v, w.light(0, Side::Right), "both ends of the pair glow alike");
+        settle(&mut w);
+        assert_eq!(w.light(1, Side::Left), want);
+        assert!(!w.animating(), "no frames once the light has settled");
+        // Captured: full.
+        w.drag_to((447.0, 110.0));
+        assert!(w.animating());
+        settle(&mut w);
+        assert_eq!(w.light(0, Side::Right), 1.0);
+    }
+
+    #[test]
+    fn leaving_the_field_fades_the_light_and_returning_relights_it() {
+        let mut w = world();
+        w.begin_drag(1, (610.0, 110.0), false);
+        w.drag_to((447.0, 110.0));
+        settle(&mut w);
+        w.drag_to((800.0, 110.0));
+        assert_eq!(w.light(1, Side::Left), 1.0, "fades, never cuts");
+        w.tick(0.016);
+        let v = w.light(1, Side::Left);
+        assert!(v > 0.0 && v < 1.0);
+        settle(&mut w);
+        assert_eq!(w.light(1, Side::Left), 0.0);
+        assert!(w.lights.is_empty(), "dark lights are dropped");
+        // No lockout: the second approach lights exactly like the first.
+        w.drag_to((447.0, 110.0));
+        settle(&mut w);
+        assert_eq!(w.light(1, Side::Left), 1.0);
+    }
+
+    #[test]
+    fn release_and_escape_fade_the_lights() {
+        let mut w = world();
+        w.begin_drag(1, (610.0, 110.0), false);
+        w.drag_to((482.0, 110.0));
+        settle(&mut w);
+        assert_eq!(w.end_drag(), Some(DropOutcome::Moved));
+        assert!(w.light(1, Side::Left) > 0.0);
+        assert!(w.animating());
+        settle(&mut w);
+        assert_eq!(w.light(1, Side::Left), 0.0);
+        w.begin_drag(1, (w.widgets[1].x + 10.0, 110.0), false);
+        w.drag_to((447.0, 110.0));
+        settle(&mut w);
+        w.cancel_drag();
+        assert_eq!(w.light(0, Side::Right), 1.0);
+        settle(&mut w);
+        assert_eq!(w.light(0, Side::Right), 0.0);
+    }
+
+    #[test]
+    fn switching_partner_fades_the_old_pair() {
+        let mut w = world();
+        // c parked level with a, far right; b swings from a's right end to c's left end.
+        w.widgets[2] = Placed::new("c", 1400.0, 100.0, 200.0, 100.0, 3);
+        w.begin_drag(1, (610.0, 110.0), false);
+        w.drag_to((447.0, 110.0));
+        settle(&mut w);
+        // b raw at 1100 - 12 + 0: aligned to c's left end (b.right + 12 = 1400 -> x = 1088).
+        w.drag_to((1098.0 + 20.0, 110.0));
+        let d = w.drag.as_ref().unwrap();
+        assert_eq!(d.pairing.map(|(j, _)| j), Some(2));
+        assert_eq!(w.lights[&(0, Side::Right)].target, 0.0);
+        assert_eq!(w.lights[&(1, Side::Left)].target, 0.0);
+        assert_eq!(w.lights[&(1, Side::Right)].target, 1.0);
+        assert_eq!(w.lights[&(2, Side::Left)].target, 1.0);
+    }
+
+    #[test]
+    fn no_socket_light_while_over_a_dock() {
+        let mut w = with_dock(world());
+        // a sits just above the dock; b captured at a's right end with the pointer in the dock.
+        w.widgets[0].y = 950.0;
+        w.begin_drag(1, (610.0, 110.0), false);
+        w.drag_to((447.0, 1010.0));
+        let d = w.drag.as_ref().unwrap();
+        assert!(d.hover_dock.is_some());
+        assert!(w.lights.is_empty(), "releasing here docks, so nothing may promise a join");
+        assert_eq!(w.end_drag(), Some(DropOutcome::Docked("dock-left".into())));
+    }
+
+    #[test]
+    fn an_unmoved_press_lights_nothing() {
+        let mut w = world();
+        w.widgets[1].x = 420.0; // already within the field of a's right end
+        w.begin_drag(1, (430.0, 110.0), false);
+        w.drag_to((431.0, 110.0));
+        assert!(w.lights.is_empty());
+        assert!(!w.animating());
     }
 
     #[test]

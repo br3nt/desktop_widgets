@@ -309,7 +309,16 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       0.0 % CPU while held still; pulled out to 178 pt it was 1:1 at once; back at 60 pt it was
       −197.3 again; release at 25 pt joined flush at x=660 in one group. Pair drag, Escape and
       Option-drag unchanged. No glow yet (next item).
-- [ ] Socket lights and eased glow (section 2), with the status caption while dragging.
+- [x] Socket lights and eased glow (section 2), with the status caption while dragging.
+      Verified 13 Oct: unit tests (`glow.rs` easing/curve/caption, `model.rs` lights per facing
+      socket, `render.rs` pixel check near > idle + 5 and ready > near + 10 on both ends,
+      `snapshot.rs`); live release build, GitDiscuss at 60 pt from Jarvis's right socket lit both
+      facing ends at 0.53 with "Socket nearby · move closer" under it, at 25 pt 1.0 with "Ready ·
+      release to join"; pulled free it faded 1 → 0.18 → 0.03 → 0 over ~150 ms; re-approach relit
+      0.53 / 1.0 (no lockout); release captured joined at 560 and the lights faded out; Escape
+      and an approach-band release both faded out and cleared the caption; idle CPU 0.0 %.
+      The caption is a small click-through window under the pressed widget (above it near the
+      screen bottom). Screenshots match `proto-03`/`proto-04`.
 - [ ] Join animation, overlap to 316 and the shared continuous casing with inner caps retracted
       (section 3); grouped pair draws as one stack.
 - [ ] Release latch between joined displays: tension, reseat, breakaway with caps re-extending,

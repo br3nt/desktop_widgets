@@ -2,11 +2,12 @@
 //! points, plus the drag in progress, so behaviour can be checked with numbers rather than
 //! screenshots alone. No windowing code here; the shell calls `state` on request.
 //!
-//! `light` (socket glow brightness 0..1) and `tween` (join/latch phase) are reported now so
-//! the shape stays stable; they stay 0 and null until the glow and the tweens exist.
+//! `light` is the socket glow brightness 0..1 as drawn now (eased); `tween` (join/latch
+//! phase) stays null until the tweens exist.
 
 use crate::casing::{self, Button};
 use crate::geom::Rect;
+use crate::glow::{self, Side};
 use crate::model::World;
 use serde_json::{json, Value};
 
@@ -32,6 +33,7 @@ pub fn state(world: &World, actor: &dyn Fn(&str) -> Option<Value>) -> Value {
             let parts = casing::parts(r.w, r.h, p.shaded, group_size > 1);
             let at = |q: Rect| q.offset(r.x, r.y);
             let grip = at(parts.grip);
+            let target = [Side::Left, Side::Right].iter().map(|&s| world.lights.get(&(i, s)).map_or(0.0, |g| g.target)).fold(0.0, f64::max);
             let buttons: serde_json::Map<String, Value> = parts.buttons.iter().map(|(b, q)| (button_name(*b).to_string(), rect(at(*q)))).collect();
             json!({
                 "id": p.id,
@@ -49,7 +51,11 @@ pub fn state(world: &World, actor: &dyn Fn(&str) -> Option<Value>) -> Value {
                 "grip": rect(grip),
                 "panel": rect(at(parts.panel)),
                 "buttons": buttons,
-                "light": 0.0,
+                // Socket light brightness shown now (eased), the brighter end; per end; and
+                // what the field asks for (the eased value heads there).
+                "light": world.light(i, Side::Left).max(world.light(i, Side::Right)),
+                "lights": { "left": world.light(i, Side::Left), "right": world.light(i, Side::Right) },
+                "light_target": target,
                 "tween": Value::Null,
                 "actor": actor(&p.id).unwrap_or(Value::Null),
             })
@@ -81,7 +87,9 @@ pub fn state(world: &World, actor: &dyn Fn(&str) -> Option<Value>) -> Value {
             "raw": { "x": d.raw.0, "y": d.raw.1 },
             "offset": { "x": d.spring.pos.0, "y": d.spring.pos.1 },
             "goal": { "x": d.goal.0, "y": d.goal.1 },
-            "settled": !world.in_flight(),
+            "caption": glow::caption(d.feel),
+            // Spring and lights both at rest: no frames running.
+            "settled": !world.animating(),
         })
     });
     json!({
@@ -165,6 +173,22 @@ mod tests {
         assert_eq!(d["partner"], "a");
         assert!((d["distance"].as_f64().unwrap() - 60.0).abs() < 1e-9);
         assert_eq!(d["settled"], false);
+        assert_eq!(d["caption"], "Socket nearby · move closer");
+        // The light eases: target now, value after frames.
+        assert_eq!(s["widgets"][2]["light"].as_f64(), Some(0.0));
+        assert_eq!(s["widgets"][2]["light_target"].as_f64(), Some(crate::magnet::proximity(60.0).brightness));
+        for _ in 0..60 {
+            w.tick(0.016);
+        }
+        let s = state(&w, &|_| None);
+        let want = crate::magnet::proximity(60.0).brightness;
+        assert_eq!(s["widgets"][2]["lights"]["right"].as_f64(), Some(want));
+        assert_eq!(s["widgets"][2]["lights"]["left"].as_f64(), Some(0.0));
+        assert_eq!(s["widgets"][0]["lights"]["left"].as_f64(), Some(want));
+        assert_eq!(s["widgets"][0]["light"].as_f64(), Some(want));
+        w.drag_to((150.0 + 400.0, 120.0));
+        let s = state(&w, &|_| None);
+        assert_eq!(s["drag"]["caption"], Value::Null);
     }
 
     #[test]
