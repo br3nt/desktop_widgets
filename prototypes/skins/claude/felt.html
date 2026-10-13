@@ -6232,9 +6232,104 @@ function cdDraw(id,w,h,small,st){
  return t+g+'</g>'+sm;
 }
 
+/* ---------- Shade: darned shut (Immure) ---------- */
+// The Immure kind (gothic's anchorhold, hollow's grown shut, wire's filigree infill) done in felt: nothing is folded, cut or
+// put away; the window is filled in, and the strip is the gap left. Wool is mended by darning, so the cotton display is darned
+// over in a contrasting mending wool, the way visible mending is done: the value is cross-stitched across the middle of the
+// cotton first, then a needle lays the warp down from each edge and weaves the weft over and under it a row at a time, from
+// the rim inward, a row below then a row above, until a slit is left round the value. Its lips are buttonhole-stitched like a
+// buttonhole. The cushion lets its stuffing out to a strip that keeps the slit and a row and a half of darning either side,
+// and a French knot tied off at the slit's end is the status colour. All of it at 12 fps; unshading unpicks it.
+const DN_MS=6500;
+const dnQ=st=>Math.floor(st*DN_MS/FRAME+1e-6)*FRAME/DN_MS;
+// Mending wool per cushion (warp, weft, buttonhole thread): blue on Jarvis's amber, mustard on GitDiscuss's teal, sage on Checks.
+const DN_C={a:{w:'#2f5f78',x:'#6b9fbb',bh:'#f7e8c9',th:'#6a3f0f'},b:{w:'#9a7222',x:'#e2b955',bh:'#fff3dc',th:'#163f3b'},c:{w:'#56704a',x:'#9fb68a',bh:'#4b2140',th:'#3f1c34'}};
+// The cotton window, the slit's centre and height, the row pitch and rows per side; then the strip: its height, the window's
+// top and height in it, and where the slit's centre ends up.
+const dnGeo=small=>small?{x:17,y:25,w:212,h:39,sc:44.5,sh:11,row:3.5,n:4,sp:3.5,H1:58,wy1:26,wh1:18,sc1:35,cs:1.1,wf:10}
+ :{x:45,y:33,w:300,h:62,sc:64,sh:14,row:4,n:6,sp:4,H1:68,wy1:30,wh1:24,sc1:42,cs:1.4,wf:11.5};
+const dnClose=st=>ease(seg(dnQ(st),.72,.86));
+const dnH=(st,small)=>Math.round(lerp(small?CH:H,dnGeo(small).H1,dnClose(st)));
+const DN_W0=.29,DN_W1=.66;
+function dnDraw(id,w,h,small,st){
+ const s=SKIN[id],q=dnQ(st),fr=Math.floor(st*DN_MS/FRAME),G=dnGeo(small),K=DN_C[id],c=dnClose(st);
+ const bx=small?22:34,by=small?3:5,bh=small?20:22,inset=s.r.map(v=>Math.max(3,v-6));
+ const cushion=rr4(EDGE,EDGE,w-2*EDGE,h-2*EDGE,s.r),stD=rr4(10,10,w-20,h-20,inset),band=rr4(bx,by,w-2*bx,bh,[9,8,10,8]);
+ // The window shrinks to the strip's and its contents ride up with the slit's middle (clipped, so the outer rows go under the felt).
+ const wy=lerp(G.y,G.wy1,c),wh=lerp(G.h,G.wh1,c),dy=lerp(0,G.sc1-G.sc,c),x0=G.x,x1=G.x+G.w;
+ const sT=G.sc-G.sh/2,sB=G.sc+G.sh/2,yT=G.y,yB=G.y+G.h,sp=G.sp,nw=Math.floor((G.w-3)/sp)+1;
+ const val=seg(q,.08,.15);
+ let t=`<defs>${feltFilters(id,s.seed)}<clipPath id="dnw-${id}"><rect x="${x0}" y="${f(wy)}" width="${G.w}" height="${f(wh)}" rx="4"/></clipPath>`+
+  `<clipPath id="dnv-${id}"><rect x="${x0}" y="${f(sT-2)}" width="${f(G.w*val)}" height="${G.sh+4}"/></clipPath>`+
+  `<pattern id="dnp-${id}" width="2.5" height="2.5" patternUnits="userSpaceOnUse"><rect width="2.5" height="1" fill="#5a4028" opacity=".045"/><rect width="1" height="2.5" fill="#5a4028" opacity=".045"/></pattern>`+
+  `<linearGradient id="dng-${id}" x1="0" y1="0" x2=".18" y2="1"><stop stop-color="#f8efdb"/><stop offset="1" stop-color="#efe2c6"/></linearGradient></defs>`;
+ // The cushion as it always was, letting its stuffing out at the end.
+ t+=`<path d="${rr4(2.5,6,w-5,h-4.5,s.r.map(v=>v+2))}" fill="#3b291d" filter="url(#g-${id})"/><path d="${cushion}" fill="${s.body}" filter="url(#f-${id})"/>`+
+  `<path d="${stD}" fill="none" stroke="#000" stroke-opacity=".28" stroke-width="1.5" stroke-dasharray="4.4 3.2" transform="translate(.5 .8)"/><path d="${stD}" fill="none" stroke="#f7e8c9" stroke-opacity=".9" stroke-width="1.3" stroke-dasharray="4.4 3.2" stroke-linecap="round"/>`+
+  `<path d="${band}" fill="#000" opacity=".4" filter="url(#sh)" transform="translate(0 1.6)"/><path d="${band}" fill="${s.band}" filter="url(#g-${id})"/>`+
+  `<path d="${rr4(bx+3.5,by+3.5,w-2*bx-7,bh-7,[6,5,7,5])}" fill="none" stroke="#f7e8c9" stroke-opacity=".55" stroke-width="1" stroke-dasharray="2.6 2.4"/>`;
+ // The name comes down into the band as the ribbon nameplate fades.
+ const nm={a:'Jarvis',b:'GitDiscuss',c:'Checks'}[id],na=seg(st,0,.08),tx=small?32:48,ty=small?13.5:16.5;
+ if(na>0)t+=`<g opacity="${f(na)}" font-family="Georgia,serif" font-style="italic" font-size="15" letter-spacing=".2"><text x="${tx}" y="${ty+1}" dominant-baseline="central" fill="#000" opacity=".45">${nm}</text><text x="${tx}" y="${ty}" dominant-baseline="central" fill="#fff3dc">${nm}</text></g>`;
+ // The cotton window, the same patch the display sat on, with its thread outline.
+ t+=`<rect x="${x0}" y="${f(wy+1)}" width="${G.w}" height="${f(wh)}" rx="4" fill="#000" opacity=".4" filter="url(#sh)"/>`+
+  `<rect x="${x0}" y="${f(wy)}" width="${G.w}" height="${f(wh)}" rx="4" fill="url(#dng-${id})"/><rect x="${x0}" y="${f(wy)}" width="${G.w}" height="${f(wh)}" rx="4" fill="url(#dnp-${id})"/>`;
+ let d=`<g clip-path="url(#dnw-${id})"><g transform="translate(0 ${f(dy)})" fill="none">`;
+ // The value, cross-stitched across the middle of the cotton before the darning starts.
+ if(val>0){const dt=pocketData(id),cs=G.cs,xp=xpaths(dt.num,cs),vx=x0+(small?10:14),X1={a:'#b4492a',b:'#2d6d68',c:'#7b3a63'}[id],X2={a:'#7a2e17',b:'#1b4542',c:'#4b2140'}[id];
+  d+=`<g clip-path="url(#dnv-${id})"><g transform="translate(${vx} ${f(G.sc-3.5*cs)})" fill="none" stroke-linecap="round" stroke-width="${f(cs*.4)}"><path d="${xp.d1}" stroke="${X2}"/><path d="${xp.d2}" stroke="${X1}"/></g>`+
+   `<text x="${f(vx+xp.w+6)}" y="${f(G.sc+.5)}" dominant-baseline="central" font-family="Georgia,serif" font-style="italic" font-weight="600" font-size="${G.wf}" fill="#3a2a1e">${dt.word}</text></g>`}
+ // Warp: laid down the top region left to right, then up the bottom region right to left, one thread per pitch.
+ const pT=seg(q,.11,.2),pB=seg(q,.2,DN_W0),xs=[...Array(nw)].map((_,i)=>x0+1.5+i*sp);
+ let wp='';xs.forEach((x,i)=>{const jx=(i%2?.3:-.3);if((x-x0)/G.w<=pT)wp+=`M${f(x+jx)} ${yT-2}V${f(sT)}`;if((x1-x)/G.w<=pB)wp+=`M${f(x+jx)} ${f(sB)}V${yB+2}`});
+ if(wp)d+=`<path d="${wp}" stroke="#000" stroke-opacity=".3" stroke-width="1.7" transform="translate(.4 .5)"/><path d="${wp}" stroke="${K.w}" stroke-width="1.3"/>`;
+ // Weft: rows from the rim inward, a row below then a row above, each woven over and under the warp behind the needle.
+ const N=2*G.n,dW=(DN_W1-DN_W0)/N,dark=mixHex(K.x,'#1a120c',.35);
+ let base='',over='',flo='';
+ for(let k=0;k<N;k++){const p=seg(q,DN_W0+k*dW,DN_W0+(k+1)*dW);if(p<=0)break;
+  const j=k>>1,bot=k%2===0,yc=bot?yB-(j+.5)*G.row:yT+(j+.5)*G.row,ltr=k%2===0,lim=ltr?x0+p*G.w:x1-p*G.w;
+  const vis=x=>ltr?x<=lim:x>=lim,a=ltr?x0:lim,b=ltr?lim:x1;
+  base+=`M${f(a)} ${f(yc)}H${f(b)}`;
+  xs.forEach((x,i)=>{if(!vis(x))return;if((i+j)%2===0)flo+=`M${f(Math.max(x0,x-sp*.62))} ${f(yc)}H${f(Math.min(x1,x+sp*.62))}`;else over+=`M${f(x)} ${f(yc-G.row/2+.3)}V${f(yc+G.row/2-.3)}`})}
+ // The floats have butt ends, so the warp shows between them, and the warp going over is drawn last.
+ if(base)d+=`<path d="${base}" stroke="${dark}" stroke-width="${f(G.row-1)}"/>`+
+  `<path d="${flo}" stroke="${K.x}" stroke-width="${f(G.row-.9)}"/><path d="${flo}" stroke="#fff" stroke-opacity=".32" stroke-width=".6" transform="translate(0 ${f(-G.row*.22)})"/>`+
+  `<path d="${over}" stroke="${K.w}" stroke-width="1.5" stroke-linecap="round"/>`;
+ // The slit's lips buttonhole-stitched, the top left to right and the bottom back, with bar tacks across its ends.
+ const bT=seg(q,.66,.69),bB=seg(q,.69,.72);
+ const lip=(y,dir,p,ltr)=>{if(p<=0)return'';const lim=ltr?x0+p*G.w:x1-p*G.w;let e=`M${f(ltr?x0:lim)} ${f(y)}H${f(ltr?lim:x1)}`;
+  for(let x=x0+2;x<x1-1;x+=2.6)if(ltr?x<=lim:x>=lim)e+=`M${f(x)} ${f(y)}V${f(y+dir*3)}`;return e};
+ const bp=lip(sT-.6,-1,bT,true)+lip(sB+.6,1,bB,false);
+ if(bp){const tk=bB>=1?[x0+2.5,x1-2.5].map(x=>`M${f(x-1)} ${f(sT)}V${f(sB)}M${f(x+1)} ${f(sT)}V${f(sB)}`).join(''):'';
+  d+=`<path d="${bp+tk}" stroke="#000" stroke-opacity=".35" stroke-width="1.2" transform="translate(.3 .4)"/><path d="${bp+tk}" stroke="${K.bh}" stroke-width=".9" stroke-linecap="round"/>`}
+ // The French knot tied off at the slit's end: the status.
+ const kn=backOut(seg(q,.9,.97));
+ if(kn>0){const C=PLEAT_C[labelStatus(id)],r=(small?3:3.6)*kn,kx=x1-(small?9:11);
+  d+=`<circle cx="${f(kx+.6)}" cy="${f(G.sc+.9)}" r="${f(r)}" fill="#000" opacity=".35"/><circle cx="${f(kx)}" cy="${G.sc}" r="${f(r)}" fill="${C}" filter="url(#tagfelt)"/>`+
+   `<path d="M${f(kx-r*.5)} ${f(G.sc-r*.15)}q${f(r*.5)} ${f(-r*.6)} ${f(r)} 0" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".7"/>`}
+ d+='</g></g>';
+ const oo=lerp(3,1,c);
+ t+=d+`<rect x="${f(x0-oo)}" y="${f(wy-oo)}" width="${f(G.w+2*oo)}" height="${f(wh+2*oo)}" rx="${f(4+oo)}" fill="none" stroke="${K.th}" stroke-width="1.4" stroke-dasharray="4 3"/>`;
+ // The darning needle with its wool, from the first warp to the last buttonhole stitch; it jumps a frame at a time.
+ const nv=seg(q,.09,.11)*(1-seg(q,.705,.72));
+ if(nv>0){let nx,ny,a,col=K.w;const z=fr%2;
+  if(q<.2){nx=x0+pT*G.w;ny=z?sT-2:yT+2;a=z?80:-80}
+  else if(q<DN_W0){nx=x1-pB*G.w;ny=z?yB-2:sB+2;a=z?80:-80}
+  else if(q<DN_W1){const k=Math.min(N-1,Math.floor((q-DN_W0)/dW)),p=seg(q,DN_W0+k*dW,DN_W0+(k+1)*dW),j=k>>1,bot=k%2===0,ltr=bot;
+   nx=ltr?x0+p*G.w:x1-p*G.w;ny=(bot?yB-(j+.5)*G.row:yT+(j+.5)*G.row)+(z?-1:1);a=(ltr?0:180)+(z?8:-8);col=K.x}
+  else{const top=q<.69,p=top?bT:bB;nx=top?x0+p*G.w:x1-p*G.w;ny=top?sT+(z?-3:.5):sB+(z?3:-.5);a=top?(z?-70:70):(z?70:-70);col=K.bh}
+  // On Checks the needle and its wool would reach past the cushion's left edge at the start of a row, so it starts a little in.
+  nx=clamp(nx,x0+(small?20:0),x1);
+  const r=a*Math.PI/180,ex=nx-19*Math.cos(r),ey=ny-19*Math.sin(r),tx2=ex-14*Math.cos(r),ty2=ey-14*Math.sin(r)+9;
+  t+=`<g opacity="${f(nv)}"><path d="M${f(ex)} ${f(ey)}Q${f(tx2)} ${f(ty2-8)} ${f(tx2-4)} ${f(ty2+6)}" fill="none" stroke="${col}" stroke-width="1.4" stroke-linecap="round"/>`+
+   `<g transform="translate(${f(nx)} ${f(ny)}) rotate(${f(a)})"><path d="M0 0L-21 -1.2Q-23 0 -21 1.2Z" fill="#000" opacity=".3" transform="translate(.8 1.4)"/>`+
+   `<path d="M0 0L-21 -1.2Q-23 0 -21 1.2Z" fill="#cfd6dc" stroke="#5d666e" stroke-width=".5"/><ellipse cx="-19" cy="0" rx="1.6" ry=".45" fill="#2a2a2a"/><path d="M-15 -.5L-3 -.2" stroke="#fff" stroke-opacity=".7" stroke-width=".4"/></g></g>`}
+ return t;
+}
+
 const SHADES={
  deflate:{label:'Plain deflate',kind:'Page baseline',
-  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw, left out, pinked seam, fulled, candle) were built, and stays as the plainest point of comparison.'},
+  about:'Not a brainstorm item. The cushion lets its stuffing out until only the felt name band and a small cotton label with one value remain. It kept the shade state working while the felt shade modes (pocket, bolster, drawstring, pleats, woven label, turning blocks, bedtime, washing line, toy piano, toy oven, frogged, sewing box, plughole, iron, jigsaw, left out, pinked seam, fulled, candle, darned shut) were built, and stays as the plainest point of comparison.'},
  pocket:{label:'Pocket',kind:'Sink',ms:1500,ownStrip:true,
   about:'The cushion goes in its pocket, like a hanky in a breast pocket. A patch pocket in contrasting felt (denim for Jarvis, raspberry for GitDiscuss, moss for Checks) pops up over the cushion\'s foot. The cotton display and buttons are put away, and the cushion drops in with a squash. The pocket then rises to the nameplate line with only the cushion\'s top edge showing, and a woven name tag pops up out of the mouth. The one key value is cross-stitched in cream thread just under the blanket-stitched mouth. Unshading runs it backwards: the tag ducks, the pocket drops, the cushion climbs out and the pocket shrinks away. Zipped pairs stay zipped, pocket to pocket.',
   sayOn:'Shaded: each cushion drops into its pocket and a woven name tag pops out.',sayOff:'Unshaded: the cushions climb back out of their pockets.',
@@ -6329,7 +6424,12 @@ const SHADES={
   about:'The Wane kind (elven\'s wane, gothic\'s last light, hollow\'s dark lantern, wire\'s afterglow) done in felt: nothing is folded, cut, put away or laid over the cushion; the light goes, and the strip is what stays lit. A felt nursery\'s light at bedtime is a candle, so a cream enamel chamberstick (blue stitched rim, ring handle) is set down on the cushion\'s outer top corner with a bounce, holding a tall rolled-felt candle. The cotton display is put away, leaving the name in its band and the value cross-stitched under it. The room light goes down and the candle is lit: a felt flame, orange round a yellow heart, with a warm glow that spills over the felt. Then it burns down a frame at a time, the flame leaning and stretching as stop-motion flames do, wax running down its sides, and as it gets shorter its light draws in: the dark comes up the cushion from the foot and stops just under the value, and the dark part of the cushion is let go. <b>The candle\'s wax is the status colour</b> (amber running, blue paused, red to decide, green passed). Nothing moves at rest. Unshading puts the room light back on, and only then is the candle blown out, with a curl of wool smoke, and lifted away. Joined pairs stay joined, a candle at each outer end.',
   sayOn:'Shaded: a candle is lit on each cushion and burns down until only the strip is in its light; the wax shows the status.',sayOff:'Unshaded: the room light comes back on and the candles are blown out.',
   height:(st,small)=>cdH(st,small),
-  show:st=>1-seg(st,0,.08),grip:st=>1-seg(st,0,.08),draw:cdDraw}
+  show:st=>1-seg(st,0,.08),grip:st=>1-seg(st,0,.08),draw:cdDraw},
+ darned:{label:'Darned shut',kind:'Immure',ms:DN_MS,ownStrip:true,
+  about:'The Immure kind (gothic\'s anchorhold, hollow\'s grown shut, wire\'s filigree infill) done in felt: nothing is folded, cut or put away; the window is filled in, and the strip is the gap left. Stone is laid, chitin grows and wire is packed; wool is mended, so the cotton display is darned over the way visible mending is done, in a contrasting wool (blue on Jarvis\'s amber, mustard on GitDiscuss\'s teal, sage on Checks\' plum). The display\'s writing goes and the value is cross-stitched across the middle of the bare cotton. A darning needle then lays the warp, down the top half of the window left to right and up the bottom half back, and weaves the weft over and under it a row at a time, from the rim inward, a row below then a row above, until a slit is left round the value. The slit\'s lips are buttonhole-stitched and bar-tacked at the ends, like a buttonhole. Then the cushion lets its stuffing out to a strip that keeps the slit and a row and a half of darning either side, the name in its band above, and a French knot tied off at the slit\'s end is the status (amber running, blue paused, red to decide, green passed). All of it at 12 fps; nothing moves at rest, and unshading unpicks the darning.',
+  sayOn:'Shaded: each cushion\'s window is darned shut round its value, leaving a buttonholed slit; the knot at its end shows the status.',sayOff:'Unshaded: the darning is unpicked and the cushions fill out again.',
+  height:(st,small)=>dnH(st,small),
+  show:st=>1-seg(st,0,.08),grip:st=>1-seg(st,0,.08),draw:dnDraw}
 };
 /* ---------- Draught dog: an empty felt sausage dog stood in the gap and stuffed until it wedges both cushions (Swell) ---------- */
 // A new join kind, Swell: nothing is fastened, wound or pinned; something fills the gap until it presses on both sides and the
