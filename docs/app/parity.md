@@ -115,7 +115,8 @@ The prototype's rule, `proximity()` and `magneticGoal()`:
   - `> 120`: free. The widget is 1:1 with the pointer. No feedback.
   - `120 → 40` (approach): pull strength `s = (1 - d/120)^0.8 * 0.85`; the goal is
     `raw + (target - raw) * s`. Measured: at 110 px the widget sits 11 px closer than the pointer;
-    at 60 px, 29 px closer.
+    at 60 px, 29 px closer. (The code wins: the formula gives 12.8 px at 110 and 29.3 at 60; the
+    11 was read before the spring had settled.)
   - `≤ 40` (captured): `s = 0.88`; the widget sits almost on the pose. Releasing here joins.
 - Motion toward the goal is a **critically damped spring**, not a lerp and not a hard snap:
   `v += ((goal - x) * 400 - v * 40) * dt` in three sub-steps per frame, `dt` capped at 32 ms. Settles
@@ -125,6 +126,14 @@ The prototype's rule, `proximity()` and `magneticGoal()`:
   record: "No hidden penalty for changing direction.")
 - Every connector uses the same rule: capsule sockets and the drawer bay (section 5).
 - Snapping to screen edges may stay as it is (the prototype has none); it must not fight the field.
+- App generalisation (built in `host/src/magnet.rs`): every widget with `sockets` (default true;
+  Checks sets `sockets = false`) has a socket at each end. An end is free unless a group member
+  sits flush against it; shaded and docked widgets offer none. The aligned pose puts the two ends
+  12 pt apart with their **centres** level (the prototype's `y = a.y` with equal heights). For a
+  moving group, the nearest free facing pair over all members wins. Edge snapping (to widget and
+  screen edges) applies only while the drag is free. Until the join animation (section 3) exists,
+  release while captured seats the pair flush (no gap, no overlap) and merges the groups; flush
+  contact on its own no longer joins.
 
 ## 2. Proximity feedback (the glow is a promise)
 
@@ -132,7 +141,8 @@ The prototype's rule, `proximity()` and `magneticGoal()`:
   (`socketLight()`: a 12×70 rounded rect with a blur filter, plus a 4×63 bright core, at the socket
   edge).
 - Brightness from the same rule: `0` outside 120 px; `0.18 + 0.44 * ((120 - d) / 80)^0.8` in the
-  approach band (0.25 at 110 px, 0.53 at 60 px); `1.0` when captured.
+  approach band (0.25 at 110 px, 0.53 at 60 px; the formula gives 0.263 and 0.529); `1.0` when
+  captured.
 - Brightness eases toward its target each frame: `v += (target - v) * (1 - exp(-dt / 40 ms))`. It
   eases out when leaving, never cuts.
 - Meaning: dim-to-medium = nearby but releasing will **not** connect; full = releasing **will**
@@ -291,8 +301,14 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       run, so the cliclick drag and screenshot path is not yet exercised live; `probe.sh` now
       refuses drags and shots while the screen is locked. Also unverified: whether `--escape`'s key
       press reaches the widget window.
-- [ ] Magnetic field (section 1): bands, pull strengths, critically damped spring, 1:1 outside the
+- [x] Magnetic field (section 1): bands, pull strengths, critically damped spring, 1:1 outside the
       field, no hysteresis. Replace the hard edge-snap join with release-while-captured.
+      Verified 13 Oct: unit tests (`magnet.rs`, `model.rs`); live release build, GitDiscuss held
+      at 110 / 60 / 25 pt from its aligned pose (672,300) settled at offsets −130.8 / −197.3 / −225
+      (formula: raw − 12.8 / 29.3 / 22), feel approach / approach / captured, `settled=true` and
+      0.0 % CPU while held still; pulled out to 178 pt it was 1:1 at once; back at 60 pt it was
+      −197.3 again; release at 25 pt joined flush at x=660 in one group. Pair drag, Escape and
+      Option-drag unchanged. No glow yet (next item).
 - [ ] Socket lights and eased glow (section 2), with the status caption while dragging.
 - [ ] Join animation, overlap to 316 and the shared continuous casing with inner caps retracted
       (section 3); grouped pair draws as one stack.

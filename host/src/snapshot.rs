@@ -72,6 +72,16 @@ pub fn state(world: &World, actor: &dyn Fn(&str) -> Option<Value>) -> Value {
             "moved": d.moved,
             "cursor": { "x": d.cursor.0, "y": d.cursor.1 },
             "hover_dock": d.hover_dock.and_then(|k| world.docks.get(k)).map(|r| r.id.clone()),
+            // The socket field: free / approach / captured, the distance from the pointer-driven
+            // pose to the aligned pose, the partner, and the spring's offset vs the pointer's.
+            "feel": d.feel.name(),
+            "distance": d.pairing.map(|_| d.proximity.distance),
+            "brightness": d.proximity.brightness,
+            "partner": d.pairing.map(|(j, _)| world.widgets[j].id.clone()),
+            "raw": { "x": d.raw.0, "y": d.raw.1 },
+            "offset": { "x": d.spring.pos.0, "y": d.spring.pos.1 },
+            "goal": { "x": d.goal.0, "y": d.goal.1 },
+            "settled": !world.in_flight(),
         })
     });
     json!({
@@ -145,6 +155,16 @@ mod tests {
         assert_eq!(d["moved"], true);
         assert_eq!((d["cursor"]["x"].as_f64(), d["cursor"]["y"].as_f64()), (Some(250.0), Some(410.0)));
         assert_eq!(s["widgets"][2]["x"].as_f64(), Some(200.0));
+        assert_eq!(d["feel"], "free");
+        assert_eq!(d["settled"], true);
+        // c next to a's free left end: 60 pt from its aligned pose (-112, 110), centres level.
+        w.drag_to((150.0 - 152.0, 120.0));
+        let s = state(&w, &|_| None);
+        let d = &s["drag"];
+        assert_eq!(d["feel"], "approach");
+        assert_eq!(d["partner"], "a");
+        assert!((d["distance"].as_f64().unwrap() - 60.0).abs() < 1e-9);
+        assert_eq!(d["settled"], false);
     }
 
     #[test]

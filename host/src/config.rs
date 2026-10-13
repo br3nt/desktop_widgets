@@ -34,6 +34,9 @@ pub struct WidgetDef {
     #[serde(default = "default_h")]
     pub height: f64,
     pub panel: Panel,
+    /// Capsule end sockets: the widget can join others side by side. A cartridge sets false.
+    #[serde(default = "yes")]
+    pub sockets: bool,
     /// Other widgets this widget's HTML panel may message (it can always message itself).
     #[serde(default)]
     pub talks_to: Vec<String>,
@@ -42,6 +45,9 @@ pub struct WidgetDef {
     pub state: serde_json::Map<String, serde_json::Value>,
 }
 
+fn yes() -> bool {
+    true
+}
 fn generic() -> String {
     "generic".into()
 }
@@ -139,6 +145,7 @@ impl Layout {
         let origin = w.screens.first().map(|s| (s.x, s.y)).unwrap_or((0.0, 0.0));
         for (k, d) in defs.iter().enumerate() {
             let mut p = Placed::new(&d.id, origin.0 + 40.0, origin.1 + 40.0 + k as f64 * (d.height + 24.0), d.width, d.height, 0);
+            p.sockets = d.sockets;
             if let Some(s) = self.widgets.iter().find(|s| s.id == d.id) {
                 p.x = s.x;
                 p.y = s.y;
@@ -244,6 +251,11 @@ mod tests {
         assert!(f.widgets[3].panel.url.as_deref().unwrap().contains("panel-demo.html"));
         assert_eq!(f.widgets[0].panel.kind, PanelKind::Native);
         assert!(f.widgets[0].state.contains_key("value"));
+        // Checks is a cartridge: no capsule sockets. The rest default to having them.
+        let sockets: Vec<bool> = f.widgets.iter().map(|w| w.sockets).collect();
+        assert_eq!(sockets, [true, true, false, true]);
+        let w = Layout::default().to_world(&f.widgets, vec![], vec![]);
+        assert!(w.widgets[0].sockets && !w.widgets[2].sockets);
     }
 
     fn defs() -> Vec<WidgetDef> {

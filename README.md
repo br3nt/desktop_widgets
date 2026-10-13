@@ -21,7 +21,7 @@ The first native host lives in [`host/`](host/): one Rust process (winit windows
 ```sh
 cd host
 cargo run --release            # run from the terminal
-cargo test                     # snapping, joining, shade, docks, config, actors, endpoint, /state
+cargo test                     # snapping, socket field, joining, shade, docks, config, actors, endpoint, /state
 scripts/bundle-mac.sh          # builds ~/Applications/Desktop Widgets.app (menu-bar only, ad-hoc signed)
 ```
 
@@ -29,8 +29,8 @@ After bundling, launch **Desktop Widgets** from Spotlight. It has no Dock icon a
 
 What works (tested on macOS 15):
 
-- **Drag** a widget by its casing (anything outside the display and buttons). Edges snap within 12 pt to other widgets and to the screen's usable edges.
-- **Join:** drop a widget flush against another and they form a group that moves together. **Separate:** drag with Option held, or press the detach button (the third lens, shown only when grouped).
+- **Drag** a widget by its casing (anything outside the display and buttons). Away from any socket, edges snap within 12 pt to other widgets and to the screen's usable edges.
+- **Join:** capsules have a socket at each end. Within 120 pt of lining up end to end, a dragged widget is pulled toward the socket (a critically damped spring); within 40 pt it's captured, and releasing joins the two into a group that moves together. Move away and the pull fades the same way it grew. Widgets with `sockets = false` in `widgets.toml` (Checks) never join. **Separate:** drag with Option held, or press the detach button (the third lens, shown only when grouped).
 - **Shade:** double-click the casing or press the top lens button to collapse to a strip showing the name and key value. Group members below slide up or down to stay flush.
 - **Always on top** is per group: the middle lens button (lit lime when on). New widgets start on top.
 - **Docks:** two regions either side of the Dock (or above and below it when the Dock is on a side). They show faintly while you drag. Dropping a widget there shades it and packs it next to the Dock. Docked widgets use the region's on-top setting. Drag a docked widget out to undock it. Dropping a group into a dock docks each member. Exact Dock bounds need Accessibility permission (menu: *Exact Dock position…*). Without it the Dock's length is estimated from its preferences and the running apps. Regions are recomputed at each drag start and from the menu.
