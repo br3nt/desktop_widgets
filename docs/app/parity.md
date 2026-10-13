@@ -167,15 +167,25 @@ Shade mode (the app's own feature) must show the widget name and its one key val
 
 ## Checklist (one item per run; builder ticks with a one-line note)
 
-- [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --shot /tmp/d.png` live on an unlocked
+- [x] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --shot /tmp/d.png` live on an unlocked
       screen and record in the parity note: mid-drag `drag.moved = true`, `drag.members` = all 3
       group members, every member moved by 300 ±1 pt after release, and both PNGs show the casings
       (not wallpaper). Fix probe.sh or the app if any of these fail.
+      Verified live 13 Oct 18:35 ACDT (29 earlier runs were blocked by a locked screen): release
+      build, `probe.sh drag gitdiscuss 300 0 --shot /tmp/d.png` showed mid-drag `moved=true`,
+      `members=jarvis,gitdiscuss,checks`, cursor 1096,306; after release jarvis 624→924,
+      gitdiscuss 624→924, checks 984→1284 (exactly +300, y unchanged), panel-demo untouched,
+      `drag: none`; both PNGs show the three casings over the desktop. No code changes needed;
+      layout.toml restored afterwards.
 - [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
       returns to its start pose (x=624 ±1). The app is an Accessory app (`main.rs:30`) and Escape
       is a `KeyboardInput` on the widget window (`app.rs:598`), so the key may never arrive if the
       window is not key; if it doesn't, make the pressed window key on mouse-down (or drop
       `--escape` from probe.sh and say so).
+      Code reading (13 Oct, not yet a live check): winit 0.30.13's `WinitWindow` returns true from
+      `canBecomeKeyWindow`, and the casing windows are not non-activating panels, so AppKit should
+      activate the app and make the pressed window key on mouse-down. Expect Escape to arrive;
+      confirm live before changing any code.
 
 - [x] `GET /state` debug endpoint plus `host/scripts/probe.sh` (cliclick drag helper that prints
       `/state` and takes region screenshots), so every later item can be verified with numbers.
