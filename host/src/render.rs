@@ -4,6 +4,7 @@
 use crate::actor::State;
 use crate::casing::{Button, Parts};
 use crate::geom::Rect;
+use crate::glow::Side;
 use crate::text::Fonts;
 use tiny_skia::{
     Color, FillRule, GradientStop, LinearGradient, Paint, PathBuilder, Pixmap, Point, Shader, SpreadMode, Stroke, Transform,
@@ -32,6 +33,86 @@ pub struct WidgetView<'a> {
     pub docked: bool,
     /// HTML panels: draw the empty screen only; the webview paints the content.
     pub html: bool,
+    /// Socket light brightness at the (left, right) ends, 0..1.
+    pub lights: (f64, f64),
+}
+
+/// Where a socket light sits: over the end lens, about 54% of the casing's height.
+pub fn socket_light_rect(p: &Parts, side: Side) -> Rect {
+    let (o, (inset, lens_w)) = (p.outline, end_lens(p));
+    let cx = match side {
+        Side::Left => o.x + inset + lens_w / 2.0,
+        Side::Right => o.right() - inset - lens_w / 2.0,
+    };
+    // The prototype's 12×70 light on a 130-high casing.
+    let h = o.h * 70.0 / 130.0;
+    Rect::new(cx - 6.0, o.y + (o.h - h) / 2.0, 12.0, h)
+}
+
+/// The end lens's inset from the outline and its width.
+fn end_lens(p: &Parts) -> (f64, f64) {
+    if p.shaded { (5.0, 4.0) } else { (9.0, 7.0) }
+}
+
+/// Blur sigma of the light's halo (points), the prototype's `feGaussianBlur stdDeviation="5"`.
+const LIGHT_BLUR: f64 = 5.0;
+
+/// Three box-blur passes each way approximate a gaussian of sigma about `r` (premultiplied
+/// RGBA, so plain averaging is correct).
+fn box_blur(data: &mut [u8], w: usize, h: usize, r: usize) {
+    if r == 0 || w == 0 || h == 0 {
+        return;
+    }
+    let mut line = Vec::new();
+    for _ in 0..3 {
+        for (len, count, stride, step) in [(w, h, w * 4, 4), (h, w, 4, w * 4)] {
+            for k in 0..count {
+                let base = k * stride;
+                for c in 0..4 {
+                    line.clear();
+                    line.extend((0..len).map(|i| data[base + i * step + c] as u32));
+                    let mut sum: u32 = line.iter().take(r + 1).sum();
+                    let n = (2 * r + 1) as u32;
+                    for i in 0..len {
+                        data[base + i * step + c] = ((sum + n / 2) / n) as u8;
+                        if i + r + 1 < len {
+                            sum += line[i + r + 1];
+                        }
+                        if i >= r {
+                            sum -= line[i - r];
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// A lime socket light at `side`, `amount` 0..1: a blurred 12-wide strip with a bright core.
+pub fn draw_socket_light(pm: &mut Pixmap, scale: f32, p: &Parts, side: Side, amount: f64) {
+    if amount <= 0.0 || p.shaded {
+        return;
+    }
+    let r = socket_light_rect(p, side);
+    let s = scale as f64;
+    let pad = 3.0 * LIGHT_BLUR;
+    let area = Rect::new(r.x - pad, r.y - pad, r.w + 2.0 * pad, r.h + 2.0 * pad);
+    let (bw, bh) = ((area.w * s).ceil() as u32, (area.h * s).ceil() as u32);
+    if let Some(mut halo) = Pixmap::new(bw, bh) {
+        if let Some(path) = rounded(Rect::new(pad, pad, r.w, r.h), 6.0, 6.0) {
+            halo.fill_path(&path, &paint_solid(rgba(0xb7, 0xf6, 0x65, 255)), FillRule::Winding, Transform::from_scale(scale, scale), None);
+        }
+        box_blur(halo.data_mut(), bw as usize, bh as usize, (LIGHT_BLUR * s).round() as usize);
+        let paint = tiny_skia::PixmapPaint { opacity: amount.clamp(0.0, 1.0) as f32, ..Default::default() };
+        pm.draw_pixmap((area.x * s).round() as i32, (area.y * s).round() as i32, halo.as_ref(), &paint, Transform::identity(), None);
+    }
+    // The bright core: 4 wide, 63/70 of the light's height.
+    let core_h = r.h * 63.0 / 70.0;
+    let core = Rect::new(r.x + 4.0, r.y + (r.h - core_h) / 2.0, 4.0, core_h);
+    if let Some(path) = rounded(core, 2.0, 2.0) {
+        let a = (amount.clamp(0.0, 1.0) * 255.0).round() as u8;
+        pm.fill_path(&path, &paint_solid(rgba(0xd9, 0xff, 0x92, a)), FillRule::Winding, Transform::from_scale(scale, scale), None);
+    }
 }
 
 fn rgba(r: u8, g: u8, b: u8, a: u8) -> Color {
@@ -117,7 +198,7 @@ pub fn draw_outline(pm: &mut Pixmap, t: Transform, p: &Parts) {
 /// The lens-like end caps (cyan left, green right) from the capsule study.
 pub fn draw_end_caps(pm: &mut Pixmap, t: Transform, p: &Parts) {
     let o = p.outline;
-    let (inset, cap_w) = if p.shaded { (5.0, 4.0) } else { (9.0, 7.0) };
+    let (inset, cap_w) = end_lens(p);
     let h = if p.shaded { o.h - 10.0 } else { o.h * 0.55 };
     let cy = o.y + o.h / 2.0;
     for (x, c0, c1) in [
@@ -252,6 +333,8 @@ pub fn draw_widget(pm: &mut Pixmap, scale: f32, fonts: &mut Fonts, v: &WidgetVie
     let t = Transform::from_scale(scale, scale);
     draw_outline(pm, t, v.parts);
     draw_end_caps(pm, t, v.parts);
+    draw_socket_light(pm, scale, v.parts, Side::Left, v.lights.0);
+    draw_socket_light(pm, scale, v.parts, Side::Right, v.lights.1);
     draw_grip(pm, t, fonts, scale, v.parts, v.title);
     draw_bezel(pm, t, v.parts);
     if !v.html {
@@ -280,6 +363,21 @@ pub fn draw_dock_overlay(pm: &mut Pixmap, scale: f32, fonts: &mut Fonts, w: f64,
     fonts.draw(pm, scale, t, label, 10.0, 15.0, 10.0, w - 20.0, rgba(0xe5, 0xf5, 0xbd, if hot { 255 } else { 180 }), false);
 }
 
+/// The drag caption: lime monospace on a faint dark pill (brighter when ready to join).
+pub fn draw_caption(pm: &mut Pixmap, scale: f32, fonts: &mut Fonts, w: f64, h: f64, text: &str, ready: bool) {
+    pm.fill(Color::TRANSPARENT);
+    let t = Transform::from_scale(scale, scale);
+    let size = 11.0;
+    let tw = fonts.measure(text, size, scale, true).min(w - 16.0);
+    let pill = Rect::new((w - tw) / 2.0 - 8.0, 1.0, tw + 16.0, h - 2.0);
+    if let Some(path) = rounded(pill, pill.h / 2.0, pill.h / 2.0) {
+        pm.fill_path(&path, &paint_solid(rgba(0x08, 0x12, 0x0a, 190)), FillRule::Winding, t, None);
+    }
+    // The prototype's #phase colours: #b8d478, and #e4fca7 once captured.
+    let ink = if ready { rgba(0xe4, 0xfc, 0xa7, 255) } else { rgba(0xb8, 0xd4, 0x78, 255) };
+    fonts.draw(pm, scale, t, text, (w - tw) / 2.0, h / 2.0 + 4.0, size, tw + 1.0, ink, true);
+}
+
 /// A tiny capsule glyph for the menu bar (template image: black + alpha).
 pub fn tray_icon_rgba(size: u32) -> Vec<u8> {
     let Some(mut pm) = Pixmap::new(size, size) else { return vec![0; (size * size * 4) as usize] };
@@ -292,4 +390,56 @@ pub fn tray_icon_rgba(size: u32) -> Vec<u8> {
         pm.fill_path(&path, &paint_solid(Color::BLACK), FillRule::Winding, Transform::identity(), None);
     }
     pm.data().to_vec()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::casing;
+    use crate::magnet::proximity;
+
+    /// Mean luminance of a strip (points) of a widget drawn at 2x, as the prototype's pixel
+    /// check measures it.
+    fn luminance(lights: (f64, f64), strip: Rect) -> f64 {
+        let (w, h, scale) = (360.0, 116.0, 2.0f32);
+        let parts = casing::parts(w, h, false, false);
+        let mut pm = Pixmap::new((w * 2.0) as u32, (h * 2.0) as u32).unwrap();
+        let mut fonts = Fonts::load();
+        let view = WidgetView { title: "Jarvis / agent control", state: None, parts: &parts, on_top: false, docked: false, html: false, lights };
+        draw_widget(&mut pm, scale, &mut fonts, &view);
+        let (mut sum, mut n) = (0.0, 0.0);
+        for y in (strip.y * 2.0) as u32..(strip.bottom() * 2.0) as u32 {
+            for x in (strip.x * 2.0) as u32..(strip.right() * 2.0) as u32 {
+                let p = pm.pixel(x, y).unwrap().demultiply();
+                sum += 0.2126 * p.red() as f64 + 0.7152 * p.green() as f64 + 0.0722 * p.blue() as f64;
+                n += 1.0;
+            }
+        }
+        sum / n
+    }
+
+    #[test]
+    fn both_sockets_glow_dim_when_near_and_bright_when_ready() {
+        let parts = casing::parts(360.0, 116.0, false, false);
+        let near = proximity(110.0).brightness;
+        for (side, lights) in [(socket_light_rect(&parts, Side::Left), [(0.0, 0.0), (near, 0.0), (1.0, 0.0)]), (socket_light_rect(&parts, Side::Right), [(0.0, 0.0), (0.0, near), (0.0, 1.0)])] {
+            // The prototype samples a 3×22 strip on the socket.
+            let c = (side.x + side.w / 2.0, side.y + side.h / 2.0);
+            let strip = Rect::new(c.0 - 1.5, c.1 - 11.0, 3.0, 22.0);
+            let [idle, dim, ready] = lights.map(|l| luminance(l, strip));
+            assert!(dim > idle + 5.0, "nearby must visibly glow: idle {idle:.1}, near {dim:.1}");
+            assert!(ready > dim + 10.0, "ready must be brighter: near {dim:.1}, ready {ready:.1}");
+        }
+    }
+
+    #[test]
+    fn a_light_only_touches_its_own_end() {
+        let parts = casing::parts(360.0, 116.0, false, false);
+        let l = socket_light_rect(&parts, Side::Left);
+        let strip = Rect::new(l.x + l.w / 2.0 - 1.5, l.y + l.h / 2.0 - 11.0, 3.0, 22.0);
+        assert_eq!(luminance((0.0, 0.0), strip), luminance((0.0, 1.0), strip));
+        // The light sits over the end lens, about the prototype's 70/130 of the height.
+        assert!((l.h / 116.0 - 70.0 / 130.0).abs() < 0.02);
+        assert!(l.x < 30.0 && socket_light_rect(&parts, Side::Right).right() > 330.0);
+    }
 }

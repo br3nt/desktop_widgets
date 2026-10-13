@@ -38,9 +38,9 @@ query() { s=$(state) || exit 1; printf '%s\n' "$s" | jq "$@"; }
 summary() {
   query -r '
     (.widgets[] | [.id, (.x|round), (.y|round), (.w|round), (.h|round), "g\(.group)",
-       (if .shaded then "shaded" else "open" end), (.dock // "-"), "light=\(.light)",
+       (if .shaded then "shaded" else "open" end), (.dock // "-"), "light=\(.light * 100 | round / 100)",
        "tween=\(.tween // "-")"] | @tsv),
-    (if .drag then "drag: pressed=\(.drag.pressed) members=\(.drag.members|join(",")) moved=\(.drag.moved) cursor=\(.drag.cursor.x|round),\(.drag.cursor.y|round) hover_dock=\(.drag.hover_dock // "-")\n  field: feel=\(.drag.feel) partner=\(.drag.partner // "-") distance=\(.drag.distance // "-" | if type == "number" then (. * 10 | round / 10) else . end) brightness=\(.drag.brightness * 100 | round / 100) raw=\(.drag.raw.x|round),\(.drag.raw.y|round) offset=\(.drag.offset.x * 10 | round / 10),\(.drag.offset.y * 10 | round / 10) settled=\(.drag.settled)" else "drag: none" end)'
+    (if .drag then "drag: pressed=\(.drag.pressed) members=\(.drag.members|join(",")) moved=\(.drag.moved) cursor=\(.drag.cursor.x|round),\(.drag.cursor.y|round) hover_dock=\(.drag.hover_dock // "-")\n  field: feel=\(.drag.feel) partner=\(.drag.partner // "-") distance=\(.drag.distance // "-" | if type == "number" then (. * 10 | round / 10) else . end) brightness=\(.drag.brightness * 100 | round / 100) raw=\(.drag.raw.x|round),\(.drag.raw.y|round) offset=\(.drag.offset.x * 10 | round / 10),\(.drag.offset.y * 10 | round / 10) settled=\(.drag.settled)\n  caption: \(.drag.caption // "-")" else "drag: none" end)'
 }
 
 grab() {
