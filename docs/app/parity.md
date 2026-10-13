@@ -13,6 +13,97 @@ Reference frames (outside the repo): `~/Development/desktop_widgets-worktrees/re
 Keep everything the app already has that the prototype lacks (shade mode, docks, always-on-top per
 group, persistence, actors and the endpoint). Add, don't replace.
 
+## 0. The original design chat (29 Sep 2026): the rules in Brent's words
+
+The prototype came out of a Codex Desktop session on 29 Sep. The full transcript is
+`docs/app/design-chat.md`; Brent's screenshots from it are `docs/app/chat/chat-*.png` (06 = the
+first, too-bulky release piece and the overlap artefact; 07 = the wide "⟨⟨⟨⟩" separator he rejected;
+08 = the slim vertical bar he approved; 01 = the Dock whose empty left/right ends are the dynamic
+docking slots). The Playwright checks Codex wrote against the prototype are in `docs/app/verify/`;
+their assertions are the acceptance numbers. Read all of it before building anything. What the
+chat settles, beyond the numbers in sections 1–9:
+
+- **What joining means.** "The controls retain their identity and state. The group owns the outer
+  casing, so the internal end caps disappear and the exterior ones move outward." Joined =
+  `(end cap | Jarvis controls | GitDiscuss controls | end cap)`. Joining two widgets visually must
+  never connect their workflows.
+- **Sequence of a join** (agreed 09:15–09:27): "compatible sockets illuminate, the inner caps
+  retract, the contents slide together, and a shared bevel closes over the seam. Pulling a module
+  away reverses it."
+- **The feel is hardware** (09:37): "like when a ship gets locked in and guided in... or when
+  magnets come close together, there is a tactile feeling that they want to come together, and you
+  need to apply force to stop that happening." Codex's plan Brent approved: approach = sockets wake
+  and the dragged capsule pulls toward alignment; capture = it settles into a groove and resists a
+  little before breaking free; latch = release completes the join with "a short, firm seating
+  motion, more precision mechanism than rubbery bounce"; undock = ordinary dragging moves the
+  assembly, a dedicated release grip pulls one capsule against the latch until it gives way. "We
+  shouldn't move the pointer or make the interface feel like it's fighting you. Attraction should
+  help, and pulling away should always work."
+- **The glow is a promise, on every connector** (09:48–09:50): "if the connection is lit up, that
+  if I drop, it WILL capture the widget... two stages of the light up glow... close... a connection
+  point is near by, but we wont connect, then bright... connection will happen when you let go."
+  "I think all connections should have this." The bright state uses the same condition as the drop
+  action; pulling away clears it immediately. Both stages must visibly glow (09:58: "i expected
+  there still to be glow, but one is brighter than the other"). Measured in the checks: nearby glow
+  > idle + 5 luminance, ready > nearby + 10, on the bay and on both capsule sockets.
+- **The glow curve** (10:21, verbatim): "there needs to be a definitive start... some distance in
+  which we want to indicate that a connection is close. At this distance, there a low dim. And
+  moving into and out of this boundary, the dim turns on and off with a relatively fast but
+  notible easing. Then, as the widget is moved closer to the docking point, the brightness
+  increases and moving away decreases... medium brightness. Then when we are at the distance that
+  docking will definitely take place, full glow. the glow isn't dependent on distance any more, but
+  one solid glow within the definite docking boundary. But transitioning into and out of the
+  definite docking boundary again uses easing... fast but noticable." The checks assert: entering
+  value between 0 and dim; dim < mid < high < 0.8 across the band; the capture crossing is eased
+  (a value between high and full is observable); leaving fades rather than switching off.
+- **Same distances everywhere** (10:21): "the proximity and definite lock distances are different
+  for the draw dock and the bigger widget docking points. I think it should be the same." Codex
+  fixed it to radial 120 px proximity / 40 px capture for both, equal in every direction.
+- **No second-order rules** (10:21): "if get close then move the widget away, then move it close
+  again, the second time the connection doesnt light up." The cause was a `blocked` flag; removed.
+  "Readiness now depends on current proximity." Never reintroduce a lockout or reset boundary.
+- **Don't change behaviour when asked for visuals** (09:58): "you change the magnetic behaviour...
+  i didnt ask for that... i just asked for the visual indicators to change." Capture and escape
+  thresholds are fixed; visual work must leave them alone.
+- **The release control** (09:48, 09:58, 10:21): the first grip was "waaaay to big and bulky",
+  the next "too wide... too much empty chrome space". Approved: a slim vertical pull bar, ink
+  ≤ 6 px wide and 20–28 px tall, hit target ≥ 20×32, geometrically centred between the two
+  displays (gap centre and bar centre within 0.1 px) with highlight and shadow balanced so it also
+  looks centred; display gap 22 px, never the old 52.
+- **Layering** (09:48): shells, caps and displays are drawn per capsule, front to back; a rear
+  capsule's end cap must never paint over the front capsule's casing.
+- **The drawer** (09:37): "its rails guide the widget into position, it seats with a small
+  mechanical click, and the drawer has a definite closed stop." Brent: "I love the draw and
+  docking the ui element into the draw!" A contained widget travels with the drawer when it closes
+  and is still there when it reopens.
+- **Two layers of UI** (09:27): "chrome" is the physical housing, buttons, knobs and drawers, a
+  thing "you could literally 3d print and hold in your hand"; "ui surface" is the digital display
+  inside it, whose content depends on the program. Display content slides between pages while the
+  housing stays fixed.
+- **Design mode** reveals the authored connection points, previews valid joins and can disable
+  joining; a skin author may define no sockets at all. Skins may also define bays that hold other
+  widgets, like the drawer, "much like the dynamic docking points either side of the Mac dock".
+- **Dynamic Dock slots** (08:40–08:43): left slot = screen left edge → Dock left edge, right slot
+  = Dock right edge → screen right edge, height = stable Dock height. Permission-free detection
+  from the window list (`CGWindowListCopyWindowInfo`, Dock-owned windows) with `visibleFrame` as
+  the fallback, Accessibility-based precision as an optional enhancement. Recalculate on display,
+  orientation, auto-hide, icon count and scale changes; ignore transient magnification; apply
+  hysteresis so tiny changes don't resize docked widgets. If a slot gets too narrow, widgets step
+  large → medium → small, stack, or undock. Dropping into a slot uses the same field and two-stage
+  glow as every other connector.
+- **Acceptance numbers from the checks** (prototype coordinates, capsule W = 390): B's rest x is
+  594 (684 in the magnetic checks after reset), A at 90. Dragging B's grip 90 px left and 24 px
+  down must leave B left of 584 and above 233 while held (pull and guidance), not joined. Dragging
+  140 px left then back 30 px: B stays left of 563 (resists the 30 px outward pull); a further
+  60 px out tracks the pointer again within 4 px and release leaves them separate. Captured
+  release joins; a 35,15 drag of the joined pair moves both by exactly 35. With joining disabled
+  in design mode there is no attraction at all (B within 1 px of its raw pose). Release grip: a
+  35 px pull keeps joined with B shifted < 15 px and reseats within 1 px on release; 120 px
+  separates and keeps A's page and run state. Bay: Checks at (260,425) dragged 10,10 toward the
+  bay moves below x 242 and y 408 (attracted toward 201,380); a 10,10 pull after docking does not
+  eject; 100,80 ejects. Escape mid-drag restores exactly (B back to 684, Checks still docked).
+  Reduced motion keeps every state and keyboard Enter on the grip separates.
+
 ## 1. Magnetic guidance while dragging (the feel)
 
 The prototype's rule, `proximity()` and `magneticGoal()`:
@@ -214,6 +305,9 @@ Shade mode (the app's own feature) must show the widget name and its one key val
 - [ ] Cartridge latch: resisted pull-out at 46 px, reseat, Eject (section 5).
 - [ ] Chrome drawing upgraded to match the prototype 1:1 (section 8), including shade-strip text
       fit.
+- [ ] Dynamic Dock slots (section 0, last bullet): slots from Dock geometry with visibleFrame fallback,
+      hysteresis, ignore magnification, same field and two-stage glow when dropping a widget into a slot,
+      slot widgets inherit always-on-top, recalculated on display and Dock changes.
 - [ ] Design mode and the sockets toggle (section 7).
 - [ ] Reduced motion, keyboard nudges, latch Right-arrow (section 9).
 - [ ] Final side-by-side review: every section verified against the prototype with `/state` numbers

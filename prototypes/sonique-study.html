@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Capsules — Sonique-inspired interaction study</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#d5ddd8;background:#191e20;font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,a,input{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #d5fa69;outline-offset:4px}
+header{padding:22px 30px 16px;display:flex;justify-content:space-between;gap:24px;align-items:center;border-bottom:1px solid #ffffff14;background:#171b1d}
+h1{margin:0;font-size:23px;font-weight:550;letter-spacing:-.7px}header p{margin:3px 0 0;color:#93a29d;font-size:13px}.tools{display:flex;gap:7px;flex-wrap:wrap}.tools button{border:1px solid #59605d;background:#2d3433;color:#d8e3dc;border-radius:5px;padding:7px 13px}.tools button:hover,.tools button.active{background:#414e44;border-color:#a1b989}
+#viewport{overflow:auto;background:radial-gradient(ellipse at 35% 25%,#50615d44,transparent 60%),linear-gradient(145deg,#283430,#141d21 65%,#232c29);position:relative}
+#desk{width:1320px;height:760px;margin:0 auto;position:relative;isolation:isolate;overflow:hidden;background:repeating-linear-gradient(115deg,transparent 0 220px,#a8b5aa03 221px 420px)}
+#desk:after{content:"";position:absolute;inset:0;pointer-events:none;z-index:-1;background:radial-gradient(ellipse at 78% 95%,#81928628,transparent 60%)}
+.widget{position:absolute;filter:drop-shadow(0 14px 10px #0008);user-select:none;touch-action:none}
+.widget svg{display:block;width:100%;height:100%;overflow:visible;pointer-events:none}.widget svg [data-drag],.widget svg .ctrl,.widget svg .lens{pointer-events:auto}.widget [data-drag]{cursor:grab}.widget.dragging [data-drag]{cursor:grabbing}.ctrl{cursor:pointer}.ctrl:hover{filter:brightness(1.35)}.ctrl:active{filter:brightness(.8)}.lens{cursor:pointer}
+.widget.selected{filter:drop-shadow(0 14px 10px #0008) drop-shadow(0 0 2px #aada64)}
+svg text{font-family:"Arial",sans-serif}svg .engraved{fill:#d8ded8;font-size:11px;font-weight:bold;letter-spacing:.7px}svg .display{fill:#31f1e5;font-family:"Courier New",monospace;font-weight:bold}svg .minor{fill:#85aaa5;font:11px "Courier New",monospace}svg .label{fill:#c3f635;font-size:12px;font-weight:bold}svg .button-label{fill:#171b19;font-size:12px;font-weight:bold;pointer-events:none}
+#status{position:absolute;left:32px;top:20px;color:#b1c0b8;font-size:12px;pointer-events:none}#instruction{position:absolute;left:32px;bottom:116px;color:#92a198;font-size:12px}
+.dock{position:absolute;bottom:16px;left:455px;width:410px;height:66px;border-radius:19px;background:linear-gradient(#bac7d52b,#a7bace15);border:1px solid #d5e2ea4d;box-shadow:inset 0 1px #fff4,0 6px 15px #0005;display:flex;gap:9px;align-items:center;justify-content:center}
+.dock i{font-style:normal;display:grid;place-items:center;width:42px;height:43px;background:linear-gradient(145deg,#acb8c4,#4f6979);border-radius:10px;font-weight:bold;color:#fff;font-size:21px;box-shadow:inset 0 1px #fff7,0 2px 2px #0005}.dock i:nth-child(2){background:linear-gradient(#e4d9a8,#a78851)}.dock i:nth-child(3){background:linear-gradient(#97c5b4,#366054)}.dock i:nth-child(4){background:linear-gradient(#c5a5d0,#6d508e)}.dock i:nth-child(5){background:linear-gradient(#b7d5df,#427c98)}.dock i:nth-child(6){background:linear-gradient(#dabaaf,#a66151)}.dock i:nth-child(7){background:linear-gradient(#6e817b,#26372e)}
+.anchor{position:absolute;bottom:14px;height:70px;border:1px dashed #a3b99155;border-radius:15px;display:flex;align-items:center;justify-content:center;color:#acb89c;font-size:11px;pointer-events:none}.anchor.left{left:30px;width:397px}.anchor.right{right:30px;width:397px}.anchor.hot{background:#b4e96919;border-color:#c0e58d}
+#dockSettings{position:absolute;right:28px;bottom:100px;display:flex;gap:10px;align-items:center;color:#9caea2;font-size:11px}#dockWidth{width:110px;accent-color:#b9df69}
+footer{padding:15px 30px;background:#171b1d;border-top:1px solid #ffffff10;color:#8e9d97;font-size:12px}footer p{margin:0 0 8px;max-width:950px}a{color:#bcd890;text-underline-offset:3px}
+details{margin-top:13px}summary{cursor:pointer;color:#cfdbd0}.reference-grid{display:flex;align-items:flex-start;flex-wrap:wrap;gap:25px;padding:20px 0}.reference-grid figure{margin:0;max-width:430px}.reference-grid img{display:block;max-height:330px;max-width:100%;object-fit:contain;background:#000}.reference-grid figcaption{margin-top:8px}.note{color:#91a497}
+@media(max-width:800px){header{align-items:flex-start;flex-direction:column;padding:18px}footer{padding:18px}#desk{transform-origin:top left}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style></head>
+<body>
+<header><div><h1>Capsules <span style="color:#89998c;font-weight:400">/ instrument skin</span></h1><p>A hands-on study in Sonique’s sculpted interface language.</p></div>
+<div class="tools"><button id="add">＋ Add module</button><button id="link">Connect modules</button><button id="unlink">Ungroup selected</button><button id="reset">Reset layout</button></div></header>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="metal" x1=".1" y1="0" x2=".8" y2="1"><stop stop-color="#d4d7d0"/><stop offset=".045" stop-color="#6e7771"/><stop offset=".14" stop-color="#3c4540"/><stop offset=".42" stop-color="#222925"/><stop offset=".65" stop-color="#525c55"/><stop offset=".79" stop-color="#272e29"/><stop offset=".96" stop-color="#111913"/><stop offset="1" stop-color="#899188"/></linearGradient>
+<linearGradient id="chrome" x2=".45" y2="1"><stop stop-color="#f1f1e9"/><stop offset=".16" stop-color="#bbc1b8"/><stop offset=".42" stop-color="#66746c"/><stop offset=".48" stop-color="#33433b"/><stop offset=".55" stop-color="#cbd4c8"/><stop offset=".76" stop-color="#7c8980"/><stop offset="1" stop-color="#273b30"/></linearGradient>
+<radialGradient id="knob" cx=".33" cy=".25" r=".8"><stop stop-color="#f6f4e5"/><stop offset=".24" stop-color="#bbc3b7"/><stop offset=".54" stop-color="#667367"/><stop offset=".78" stop-color="#1e2c22"/><stop offset="1" stop-color="#050c07"/></radialGradient>
+<radialGradient id="blue"><stop stop-color="#64e8fc"/><stop offset=".45" stop-color="#1486d1"/><stop offset="1" stop-color="#042c52"/></radialGradient>
+<radialGradient id="amber"><stop stop-color="#fff58e"/><stop offset=".45" stop-color="#efaa19"/><stop offset="1" stop-color="#683308"/></radialGradient>
+<radialGradient id="red"><stop stop-color="#ff8f55"/><stop offset=".45" stop-color="#e82a18"/><stop offset="1" stop-color="#530c08"/></radialGradient>
+<linearGradient id="screen" x2="0" y2="1"><stop stop-color="#053e3e"/><stop offset=".5" stop-color="#001d24"/><stop offset="1" stop-color="#000d15"/></linearGradient>
+<pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 3.5H4" stroke="#84d6b1" stroke-opacity=".09"/></pattern>
+<filter id="grain" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".018 .09" numOctaves="3" seed="8"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="linear" slope=".16"/></feComponentTransfer><feBlend in="SourceGraphic" mode="soft-light"/><feComposite in2="SourceAlpha" operator="in"/></filter>
+<filter id="glow"><feGaussianBlur stdDeviation="1.1"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<g id="screw"><circle r="4.2" fill="#0b100d" stroke="#7a847b"/><circle r="2.8" fill="#5d675e"/><path d="M-2 1L2-1" stroke="#080c09" stroke-width="1.6"/></g>
+</defs></svg>
+<div id="viewport"><main id="desk" aria-label="Interactive simulated desktop">
+<div id="status" role="status" aria-live="polite">Drag a metal shell. Try the S / M / L buttons and the bottom drawer.</div>
+<div id="instruction">Drag near another module to snap together. Option/Alt-drag separates a module.</div>
+<div id="dockSettings"><label for="dockWidth">Simulated Dock width</label><input id="dockWidth" type="range" min="300" max="650" value="410"></div>
+<div class="anchor left">Left docking space</div><div class="dock" aria-label="Simulated macOS Dock"><i>⌘</i><i>◈</i><i>⌁</i><i>◉</i><i>⌑</i><i>✳</i><i>▣</i></div><div class="anchor right">Right docking space</div>
+</main></div>
+<footer>
+<p>This browser study uses simulated agent activity and Dock geometry. Dragging, snapping, grouping, size changes, drawers, and controls work here; native macOS click-through and Dock tracking belong to the app prototype.</p>
+<details><summary>Original Sonique references and what changed</summary>
+<p style="margin-top:12px">The 1999/2000 screenshots from Sonique’s original overview page informed the figure-eight body, scooped shell edges, chrome thumb controls, inset screens, coloured lenses, and pull-out drawer. Capsules’s artwork is newly drawn.</p>
+<div class="reference-grid">
+<figure><img src="https://web.archive.org/web/19991128020835im_/http://images.sonique.com:80/screenshots/100399mid.jpg" alt="Original Sonique medium mode: two circular screens in a sculpted figure-eight body"><figcaption><a href="https://web.archive.org/web/19991128020835im_/http://images.sonique.com:80/screenshots/100399mid.jpg" target="_blank" rel="noreferrer">Original medium mode</a></figcaption></figure>
+<figure><img src="https://web.archive.org/web/20000815053255im_/http://images.sonique.com:80/screenshots/100399vis.jpg" alt="Original Sonique large visual mode with metal frame and lower drawer"><figcaption><a href="https://web.archive.org/web/20000815053255im_/http://images.sonique.com:80/screenshots/100399vis.jpg" target="_blank" rel="noreferrer">Original visual mode</a></figcaption></figure>
+<figure><img src="https://web.archive.org/web/20000125193921im_/http://images.sonique.com:80/screenshots/100399sml.jpg" alt="Original Sonique compact capsule"><figcaption><a href="https://web.archive.org/web/20000229081810/http://www.sonique.com/over.phtml" target="_blank" rel="noreferrer">Archived Sonique overview</a></figcaption></figure>
+</div></details></footer>
+<script>
+const desk=document.querySelector('#desk'), status=document.querySelector('#status');
+const state={widgets:[],selected:null,counter:0,link:false,z:5};
+const names=['Jarvis','GitDiscuss','Prototype','Command'];
+const msg=s=>status.textContent=s;
+const screw=(x,y)=>'<use href="#screw" x="'+x+'" y="'+y+'"/>';
+function button(x,y,r,fill,symbol,action,label){
+ return '<g class="ctrl" role="button" tabindex="0" aria-label="'+label+'" data-action="'+action+'" transform="translate('+x+' '+y+')"><circle r="'+(r+3)+'" fill="#090f0b" stroke="#79877a"/><circle r="'+r+'" fill="url(#'+fill+')" stroke="#061009"/><ellipse cy="'+(-r*.35)+'" rx="'+r*.55+'" ry="'+r*.18+'" fill="#ffffff60"/><text class="button-label" text-anchor="middle" dominant-baseline="central">'+symbol+'</text></g>';
+}
+function modes(x,y){
+ return '<g transform="translate('+x+' '+y+')">'+['S','M','L'].map((v,i)=>'<g class="ctrl" role="button" tabindex="0" aria-label="'+({S:'Small',M:'Medium',L:'Large'}[v])+' size" data-action="'+v+'"><rect x="'+i*24+'" width="20" height="18" rx="4" fill="url(#chrome)" stroke="#060d08"/><text x="'+(i*24+10)+'" y="13" text-anchor="middle" class="button-label">'+v+'</text></g>').join('')+'</g>';
+}
+function waves(x,y,w,h){
+ let s='<g transform="translate('+x+' '+y+')">';
+ for(let j=0;j<4;j++){
+ let d='';for(let i=0;i<=w;i+=4){let q=h/2+Math.sin(i/23+j)*Math.cos(i/61+j)*h*.36;d+=(i?'L':'M')+i+' '+q.toFixed(1)}
+ s+='<path d="'+d+'" fill="none" stroke="'+['#32e1e4','#7395fc','#b0ee32','#ffaa35'][j]+'" stroke-width="1.3" opacity=".8"/>';
+ }
+ return s+'</g>';
+}
+function ring(cx,cy,r,count=44){
+ return '<g>'+Array.from({length:count},(_,i)=>{let a=(i/count)*Math.PI*2;return '<circle cx="'+(cx+Math.sin(a)*r)+'" cy="'+(cy-Math.cos(a)*r)+'" r="1.8" fill="'+(i<30?'#92e42c':i<37?'#dbb72e':'#643daa')+'"/>'}).join('')+'</g>';
+}
+function large(w){
+ const shape='M60 8 Q19 8 15 43 L12 84 Q44 105 14 137 L14 307 Q14 349 55 356 L485 356 Q526 354 527 316 L527 118 Q503 101 528 77 L526 44 Q524 10 489 8 Z';
+ return '<svg viewBox="0 0 540 '+(w.drawer?452:366)+'"><path data-drag="true" d="'+shape+'" fill="url(#metal)" stroke="#131b15" stroke-width="3" filter="url(#grain)"/><path d="M61 11Q25 9 19 45M60 11H489Q519 13 522 43" fill="none" stroke="#d4dbcb" stroke-opacity=".65" stroke-width="2"/>'+
+ screw(42,26)+screw(503,27)+screw(39,329)+screw(505,330)+
+ '<text x="62" y="34" fill="#e1e7d8" font-size="26" font-style="italic" font-weight="900" letter-spacing="-2">capsules</text><text x="151" y="31" class="engraved">agent console</text>'+modes(400,18)+
+ '<path d="M57 51H362Q372 51 372 63V267Q372 287 351 287H64Q47 287 47 271V64Q47 51 57 51Z" fill="#000805" stroke="#738170" stroke-width="2"/>'+
+ '<rect x="55" y="59" width="307" height="137" rx="8" fill="url(#screen)" stroke="#0a6260"/><text x="67" y="76" class="display" font-size="10">Workflow activity / '+w.name+'</text>'+waves(64,88,287,89)+
+ '<path d="M67 175H351" stroke="#0d6361"/><text x="68" y="188" class="minor">review → reason → patch → verify</text>'+
+ '<rect x="55" y="203" width="307" height="75" rx="5" fill="url(#screen)"/><text x="69" y="233" class="display" font-size="25">'+(w.running?'03   00:24.18':'03   PAUSED')+'</text><text x="72" y="249" class="minor">agents       current run</text>'+
+ Array.from({length:38},(_,i)=>'<rect x="'+(70+i*7.2)+'" y="258" width="5" height="5" rx="1" fill="'+(i<27?'#b6e82c':'#34574e')+'"/>').join('')+
+ '<path d="M383 58H480Q492 58 492 71V186Q492 197 480 197H383Z" fill="#001415" stroke="#677b60"/><path d="M389 65Q439 85 485 66V84Q435 105 389 85Z" fill="#144421"/>'+
+ '<text x="393" y="80" class="label">run queue</text><text x="393" y="107" class="display" font-size="11">01 / Jarvis</text><text x="393" y="124" class="minor">Review build</text><text x="393" y="150" class="display" font-size="11">02 / GitDiscuss</text><text x="393" y="167" class="minor">4 new threads</text><text x="393" y="187" class="label">'+(w.running?'● running':'Ⅱ paused')+'</text>'+
+ '<circle cx="431" cy="245" r="42" fill="#0b120c" stroke="#737e70" stroke-width="2"/><circle cx="431" cy="245" r="35" fill="url(#knob)"/>'+
+ '<g class="ctrl" tabindex="0" role="button" aria-label="Next workflow" data-action="next"><path d="M404 234L431 218L457 234Z" fill="#111e16"/><path d="M400 244H463" stroke="#071209" stroke-width="3"/><text x="431" y="267" text-anchor="middle" fill="#111c13" font-size="19">⌄</text></g>'+
+ button(498,222,9,'blue','›','next','Next workflow')+button(498,255,9,'amber',w.running?'Ⅱ':'▶','run','Pause or resume simulated run')+button(498,287,9,'red','■','stop','Stop simulated run')+
+ '<text x="65" y="302" class="minor">'+w.name+' / '+(w.running?'Inspecting changes · 72%':'Activity suspended')+'</text>'+
+ '<g class="ctrl" tabindex="0" role="button" aria-label="Toggle connections drawer" data-action="drawer"><path d="M58 312H478L473 339H64Z" fill="url(#chrome)" stroke="#19251a"/><text x="81" y="331" fill="#eef1e4" font-size="18">'+(w.drawer?'▴':'▾')+'</text><text x="154" y="330" class="engraved">connections &amp; workflow controls</text></g>'+
+ (w.drawer?'<g><path d="M66 347H473V427Q471 443 453 443H84Q66 443 66 427Z" fill="url(#metal)" stroke="#71806d"/><rect x="81" y="362" width="376" height="62" rx="3" fill="#09251e" stroke="#020b05"/><text x="94" y="383" class="label">Command Center  ·  Jarvis  ·  GitDiscuss</text><text x="94" y="408" class="display" font-size="12">local session / simulated connections</text></g>':'')+'</svg>';
+}
+function medium(w){
+ const shape='M111 8C171 -5 202 31 203 78C204 115 186 130 175 147C163 166 182 181 184 203C190 250 158 301 108 316C57 333 9 302 9 257C9 220 27 204 33 182C39 161 23 149 29 126C36 98 49 93 45 68C41 35 72 10 111 8Z';
+ return '<svg viewBox="0 0 220 330"><path data-drag="true" d="'+shape+'" fill="url(#metal)" stroke="#111b13" stroke-width="3" filter="url(#grain)"/><path d="M58 45Q98-6 159 19" stroke="#c2ccbd" stroke-width="2" fill="none"/>'+screw(54,101)+screw(27,273)+
+ '<circle cx="123" cy="78" r="64" fill="#061309" stroke="#879379" stroke-width="2"/><circle cx="123" cy="78" r="57" fill="url(#screen)" stroke="#1d4976" stroke-width="5"/>'+ring(123,78,52)+
+ waves(79,50,87,47)+'<text x="123" y="111" text-anchor="middle" class="display" font-size="11">'+w.name+'</text>'+
+ '<text x="72" y="35" fill="#eaf2df" font-size="17" font-style="italic" font-weight="900" transform="rotate(-29 72 35)">capsules</text>'+
+ '<circle cx="109" cy="231" r="67" fill="#08110d" stroke="#819075" stroke-width="2"/><circle cx="109" cy="231" r="59" fill="url(#screen)" stroke="#334f82" stroke-width="5"/>'+ring(109,231,55)+
+ '<text x="109" y="207" class="display" font-size="21" text-anchor="middle">'+(w.running?'03':'Ⅱ')+'</text><text x="109" y="223" class="display" font-size="12" text-anchor="middle">'+(w.running?'00:24.18':'PAUSED')+'</text><path d="M68 233H150" stroke="#517329"/><text x="109" y="248" class="label" text-anchor="middle">Review build</text><text x="109" y="264" class="minor" text-anchor="middle">2 need input</text>'+
+ '<circle cx="163" cy="150" r="27" fill="#060d08" stroke="#7c8978"/><circle class="ctrl" data-action="next" tabindex="0" role="button" aria-label="Next workflow" cx="163" cy="150" r="23" fill="url(#knob)"/><circle cx="151" cy="140" r="4" fill="#314531"/>'+
+ modes(37,145)+button(30,224,8,'blue','›','next','Next workflow')+button(34,253,10,'red','■','stop','Stop simulated run')+button(53,282,11,'amber',w.running?'Ⅱ':'▶','run','Pause or resume simulated run')+
+ '<path d="M188 180l7 16" stroke="#ddd9bf" stroke-width="2"/><circle cx="191" cy="180" r="7" fill="url(#amber)" stroke="#2f350f"/></svg>';
+}
+function small(w){
+ return '<svg viewBox="0 0 340 56"><path data-drag="true" d="M26 5H310Q332 5 334 27Q333 50 309 51H27Q5 50 5 28Q6 6 26 5Z" fill="url(#metal)" stroke="#162416" stroke-width="2" filter="url(#grain)"/><path d="M28 8H306" stroke="#b4c8b1"/><path d="M99 13H254V42H99Z" fill="url(#screen)" stroke="#6d8c56"/><text x="25" y="35" fill="#e8f0dc" font-size="23" font-style="italic" font-weight="900" letter-spacing="-2">capsules</text><text x="108" y="26" class="display" font-size="11">'+w.name+' / '+(w.running?'03 active':'paused')+'</text><text x="108" y="38" class="minor">2 need input</text>'+button(274,28,9,'amber',w.running?'Ⅱ':'▶','run','Pause or resume simulated run')+button(311,28,8,'blue','＋','M','Expand to medium')+'</svg>';
+}
+function render(w){w.el.innerHTML=({L:large,M:medium,S:small})[w.size](w);const dims={L:[540,w.drawer?452:366],M:[220,330],S:[340,56]};[w.width,w.height]=dims[w.size];w.el.style.width=w.width+'px';w.el.style.height=w.height+'px';position(w)}
+function position(w){w.el.style.left=w.x+'px';w.el.style.top=w.y+'px'}
+function select(w){state.selected=w;state.widgets.forEach(q=>q.el.classList.toggle('selected',q===w));w.el.style.zIndex=++state.z}
+function add(name,size,x,y){
+ let w={id:++state.counter,name,size,x,y,running:true,drawer:false,group:null,anchor:null};
+ w.el=document.createElement('section');w.el.className='widget';w.el.setAttribute('aria-label',name+' module');desk.append(w.el);state.widgets.push(w);render(w);
+ w.el.addEventListener('click',e=>{select(w);let action=e.target.closest('[data-action]');if(action){act(w,action.dataset.action);return}if(state.link){if(!state.first){state.first=w;msg('Select another module to connect to '+w.name+'.')}else if(state.first!==w){connect(state.first,w);state.first=null;state.link=false;document.querySelector('#link').classList.remove('active')}}});
+ w.el.addEventListener('keydown',e=>{const a=e.target.closest('[data-action]');if(a&&(e.key==='Enter'||e.key===' ')){e.preventDefault();select(w);act(w,a.dataset.action)}});
+ w.el.addEventListener('pointerdown',e=>dragStart(e,w));
+ return w;
+}
+function act(w,a){
+ if('SML'.includes(a)){w.size=a;w.anchor=null;render(w);constrain(w);msg(w.name+' switched to '+({S:'small',M:'medium',L:'large'}[a])+' mode.')}
+ if(a==='drawer'){w.drawer=!w.drawer;render(w);constrain(w);msg('Connections drawer '+(w.drawer?'opened.':'closed.'))}
+ if(a==='run'){w.running=!w.running;render(w);msg(w.name+' simulated run '+(w.running?'resumed.':'paused.'))}
+ if(a==='stop'){w.running=false;render(w);msg(w.name+' simulated run stopped.')}
+ if(a==='next'){w.name=names[(names.indexOf(w.name)+1)%names.length];render(w);msg('Switched to '+w.name+'.')}
+}
+function constrain(w){w.x=Math.max(0,Math.min(1320-w.width,w.x));w.y=Math.max(42,Math.min(670-w.height,w.y));position(w)}
+function members(w){return w.group?state.widgets.filter(q=>q.group===w.group):[w]}
+function connect(a,b){let all=[...new Set([...members(a),...members(b)])];all.forEach(q=>{q.group=a.group||'group-'+a.id;q.anchor=null});msg(all.length+' modules connected. Drag any shell to move the group.')}
+function ungroup(w){w.group=null;w.anchor=null;msg(w.name+' detached.');}
+let drag=null;
+function dragStart(e,w){if(e.button!==0||!e.target.closest('[data-drag]'))return;select(w);if(state.link)return;e.preventDefault();if(e.altKey)ungroup(w);const factor=desk.getBoundingClientRect().width/1320;const group=members(w);group.forEach(q=>{q.anchor=null});drag={w,group,startX:e.clientX,startY:e.clientY,factor,original:group.map(q=>[q,q.x,q.y]),moved:false};w.el.classList.add('dragging');w.el.setPointerCapture(e.pointerId)}
+document.addEventListener('pointermove',e=>{if(!drag)return;let dx=(e.clientX-drag.startX)/drag.factor,dy=(e.clientY-drag.startY)/drag.factor;if(Math.abs(dx)+Math.abs(dy)>3)drag.moved=true;const left=Math.min(...drag.original.map(q=>q[1])),right=Math.max(...drag.original.map(q=>q[1]+q[0].width)),top=Math.min(...drag.original.map(q=>q[2])),bottom=Math.max(...drag.original.map(q=>q[2]+q[0].height));dx=Math.max(-left,Math.min(1320-right,dx));dy=Math.max(42-top,Math.min(746-bottom,dy));drag.original.forEach(([q,x,y])=>{q.x=x+dx;q.y=y+dy;position(q)});});
+document.addEventListener('pointerup',()=>{if(!drag)return;let w=drag.w;w.el.classList.remove('dragging');if(drag.moved){
+ if(w.y+w.height>654&&drag.group.length===1){let center=w.x+w.width/2;const dw=Number(document.querySelector('#dockWidth').value),left=(1320-dw)/2; if(center<left-20||center>left+dw+20){w.anchor=center<660?'left':'right';w.size='S';render(w);dockPlace(w);msg(w.name+' docked '+w.anchor+'. Adjust the Dock-width slider.');drag=null;return}}
+ for(const other of state.widgets){if(drag.group.includes(other))continue;const gap=w.x-(other.x+other.width);if(Math.abs(gap)<35&&Math.abs(w.y-other.y)<95){const dx=other.x+other.width+3-w.x,dy=other.y-w.y;drag.group.forEach(q=>{q.x+=dx;q.y+=dy;position(q)});connect(w,other);break}}
+ }drag=null;});
+function dockPlace(w){let dw=Number(document.querySelector('#dockWidth').value),edge=(1320-dw)/2;w.width=Math.min(340,edge-58);w.height=56*w.width/340;w.el.style.width=w.width+'px';w.el.style.height=w.height+'px';w.x=w.anchor==='left'?edge-28-w.width:edge+dw+28;w.y=688+(56-w.height)/2;position(w)}
+function dockUpdate(){let width=+document.querySelector('#dockWidth').value;const dock=document.querySelector('.dock');dock.style.width=width+'px';dock.style.left=(1320-width)/2+'px';document.querySelectorAll('.anchor').forEach(el=>el.style.width=((1320-width)/2-58)+'px');state.widgets.filter(w=>w.anchor).forEach(dockPlace)}
+function reset(){state.widgets.forEach(w=>w.el.remove());state.widgets=[];state.selected=null;state.first=null;state.link=false;document.querySelector('#link').classList.remove('active');add('Jarvis','L',115,118);add('GitDiscuss','M',756,100);add('Command','S',930,493);let w=add('Prototype','S',65,688);w.anchor='left';dockPlace(w);msg('Drag a metal shell. Try the S / M / L buttons and the bottom drawer.')}
+document.querySelector('#add').onclick=()=>{let w=add(names[state.counter%4],'M',1020,110);select(w);msg('New module created. Drag its shell to position it.')};
+document.querySelector('#link').onclick=()=>{state.link=!state.link;state.first=null;document.querySelector('#link').classList.toggle('active',state.link);msg(state.link?'Click the metal shells of two modules to connect them.':'Connection mode cancelled.')};
+document.querySelector('#unlink').onclick=()=>state.selected?ungroup(state.selected):msg('Select a module first, then ungroup it.');
+document.querySelector('#reset').onclick=reset;document.querySelector('#dockWidth').oninput=dockUpdate;
+function fit(){let scale=Math.min(1,document.querySelector('#viewport').clientWidth/1320);desk.style.transform='scale('+scale+')';desk.style.transformOrigin='top left';document.querySelector('#viewport').style.height=(760*scale)+'px';document.querySelector('#viewport').style.overflow='hidden'}
+window.addEventListener('resize',fit);reset();dockUpdate();fit();
+</script></body></html>
