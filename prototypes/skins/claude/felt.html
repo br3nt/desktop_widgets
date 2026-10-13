@@ -7082,7 +7082,12 @@ const MORPHS={
   about:'A new morph kind, Let out, from the felt pencil case with expansion zips. In a Let out nothing is brought in, sewn on, stretched or gathered: the bigger form was folded up inside the casing all along, and is let out. The pad never changes or moves. <b>Let out:</b> a raspberry felt zip pull pops out at the pad\'s foot and runs along it, its tab trailing; behind it the brass teeth part in a V over a dark slit. At the end the tab swings on and settles. Then the plum hem under the zip drops on its own weight, and a mustard felt gusset unfolds behind it in ten pleats, their folds poking out past the sides in a zigzag and catching the light by turns. It rebounds once as the gusset takes the weight, the pleats relax flat, leaving faint creases, and a cream label pops up on the gusset: run 418 on main, with a felt bar at 86%. <b>Fully let out:</b> a second pull runs down the right side, and a bound spine swings out to the right on a second gusset, its pleats upright. Its label shows the last ten runs as felt tags, 409 to 418 (green passed, red failed for 411 and 415, amber waiting for 418), and the two checks waiting for Brent, deploy-preview and e2e-safari. <b>Shrinking</b> plays the same timeline backwards: the label goes, the pleats fold, the hem is drawn back up and the pull zips it shut and tucks away. Everything is placed from the size alone, so nothing moves at rest. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks zips it shut first, and unshading lets it out again. Switching morphs takes Checks back to a pad first.',
   anchorTL:true,sizes:['Pad','Let out','Fully let out'],noun:['a pad','a let-out pouch','a fully let-out pouch'],up:4800,down:3400,
   fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[EZ.W[i],EZ.H[i]]:[CW,CH],dims:()=>model.gq>0?[EZ.W[model.gq>1?2:1],EZ.H[model.gq>1?2:1]]:[CW,CH],
-  sayUp:n=>'Checks is unzipped and the pleats folded inside it are let out: Checks becomes '+n+'.',sayDown:n=>'The pleats fold back in and the zip is pulled shut: Checks shrinks to '+n+'.'}
+  sayUp:n=>'Checks is unzipped and the pleats folded inside it are let out: Checks becomes '+n+'.',sayDown:n=>'The pleats fold back in and the zip is pulled shut: Checks shrinks to '+n+'.'},
+ pizza:{label:'Pizza toss',kind:'Spin',
+  about:'The Spin kind (elven\'s crown glass, gothic\'s bell wheel, hollow\'s ink whirl, wire\'s gem tree) done in felt play food. In a Spin the larger form is flung out by turning, and a pizza cook does exactly that: a ball of dough spun and tossed comes down as a flat disc. The pad never changes or moves. <b>Growing:</b> a round walnut felt board rises out of the table under the pad, and a ball of cream felt dough drops onto it with a squash and a puff of flour. Two raspberry mittened fists come up from below, press it into a thick disc, lift it and spin it on their knuckles. The disc widens as it turns, its rim stitch running round and three knuckle prints going round with it. Then they toss it: it flies up spinning, its edge a blur of dashed arcs, wobbling as it widens, and the fists drop away. It lands flat on the board with a flop and a cloud of flour, its rim toasting to a crust, and slows to a stop. Tomato sauce spreads from the middle in a stitched swirl, cheese pops on, and fourteen felt pepper rings drop one at a time, flipping as they fall, round the pizza: one per check, twelve green passed and two yellow waiting, ringed in dashed stitches either side of the front. A mozzarella patch is laid in the middle: run 418 · main, 12 / 14, 86% · 2 waiting. <b>Two pizzas:</b> a second board rises beside the pad and a smaller pizza is pressed, spun and tossed on it. Its ten rings are the last ten runs, clockwise from the top (green passed, red failed for 411 and 415, yellow waiting for 418), its patch reads last ten runs · 7 / 10 · 409–418, and an order ticket drops in and is pinned: 2 waiting for Brent, deploy-preview · e2e-safari, runs 409 → 418 clockwise from the top. <b>Shrinking</b> plays the same timeline backwards: the toppings fly off, the disc is tossed back up and comes down a ball, and the board sinks. Every part is drawn from the size alone, so nothing moves at rest. Pick a size, press M to step through them, or scrub the slider. Checks moves to the nearest side of the pair with room; when no side has room, it takes the floor and the pair rises just enough to clear it, then settles back once Checks is smaller. Shading a grown Checks clears the pizzas away first, and unshading tosses them again. Switching morphs takes Checks back to a pad first.',
+  anchorTL:true,sizes:['Pad','Pizza','Two pizzas'],noun:['a pad','a pizza','two pizzas'],up:5600,down:3600,
+  fill:g=>g-Math.min(1,Math.floor(g)),box:i=>i?[PZ.W[i],PZ.H]:[CW,CH],dims:()=>model.gq>0?[PZ.W[model.gq>1?2:1],PZ.H]:[CW,CH],
+  sayUp:n=>'A ball of felt dough is spun on two fists and tossed into a disc: Checks becomes '+n+'.',sayDown:n=>'The toppings fly off and the disc is tossed back into a ball: Checks shrinks to '+n+'.'}
 };
 const MM=()=>MORPHS[model.morph],sizeLabel=i=>MM().sizes[i];
 const MD=[[CW,CH],[300,132],[372,206]],MP=[[17,25,212,39],[22,32,228,74],[26,32,290,132]],MK=[[243,34],[262,40],[332,38]],MREST=[0,2.5,4];
@@ -7188,6 +7193,7 @@ function morphRender(el){
  if(model.morph==='pounce')return puRender(el,svg,gr,kn,pa);
  if(model.morph==='train')return ttRender(el,svg,gr,kn,pa);
  if(model.morph==='letout')return ezRender(el,svg,gr,kn,pa);
+ if(model.morph==='pizza')return pzRender(el,svg,gr,kn,pa);
  el.dataset.m='1';gr.style.right='';el.querySelectorAll('.pp,.cp').forEach(n=>n.style.display='none');
  const o=stuffAt(model.gq,model.mDir),q=stuffGeo(o),os=stuffAt(model.g,model.mDir),sag=Math.max(0,-q.b)*.85;
  el.style.width=q.w+'px';el.style.height=q.h+'px';
@@ -8830,6 +8836,140 @@ function ezRender(el,svg,gr,kn,pa){
  gr.style.opacity=1;gr.style.left='24px';gr.style.right=f(w-CW+24)+'px';gr.style.top='4px';el.querySelector('.strip').style.opacity=0;
  const si=SIZES.findIndex(x=>x[2]===model.g);
  el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'being let out')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 7 passed, 411 and 415 failed, 418 waiting; deploy-preview and e2e-safari waiting for Brent':''));
+ return true;
+}
+/* ---------- Morph: pizza toss (Spin) ---------- */
+// The pad never moves (top-left anchor). In a Spin the larger form is flung out by turning; felt play food does it the way a pizza
+// cook does: a ball of felt dough is pressed, spun on two mittened fists and tossed, and comes down as a flat disc. g 0→1: a board
+// rises under the pad, the ball drops onto it, the fists press it, spin it on their knuckles and toss it; it lands flat, sauce is
+// spread in a swirl, cheese pops on, fourteen pepper rings drop round it (twelve green passed, two yellow waiting) and a mozzarella
+// patch carries the run. g 1→2: a second, smaller pizza is tossed beside it, its ten rings the last ten runs, and an order ticket
+// drops in. Seen from a little above (K). Every part is drawn from g alone, so nothing moves at rest.
+const PZ={W:[CW,276,500],H:256,K:.6,TOSS:30,
+ P:[{x:138,y:172,bx:116,R:98,orb:70,rr:10,n:14,patch:[46,28],cheese:16},{x:392,y:172,bx:98,R:82,orb:61,rr:9,n:10,patch:[41,28],cheese:11}],
+ DOUGH:'#ecd3a0',CRUST:'#cf914a',SAUCE:'#b8352c',CHEESE:'#f6e7bf',BOARD:'#8a5a33',BEDGE:'#5a3a20',MITT:'#b5333f',
+ PEP:{ok:['#5e9a2e','#4f8a26','#6aa83a','#477d22'],wait:'#e8b83a',bad:'#c8402f'}};
+// One pizza's step at u: the board, the ball's fall and squash, the fists, the dough's size, lift, toss and turn, and the toppings.
+function pzAt(u,P){
+ const pr=ease(seg(u,.18,.26)),sp=seg(u,.26,.42),ts=seg(u,.42,.58),ld=seg(u,.58,.64),st=seg(u,.26,.64);
+ let rx=lerp(16,38,pr);rx=lerp(rx,66,ease(sp));rx=lerp(rx,P.R,ease(ts));
+ const fl=seg(u,.08,.13),sq=.32*Math.sin(Math.PI*seg(u,.13,.17));
+ return{board:seg(u,0,.08),fall:fl,sq,pr,rx,
+  lift:10*ease(seg(u,.24,.28))*(1-ease(ts)),hop:PZ.TOSS*4*ts*(1-ts),
+  wob:1+.12*Math.sin(4*Math.PI*ts)*Math.sin(Math.PI*ts),flop:Math.sin(Math.PI*ld),
+  th:2*Math.PI*5*ease(st),speed:4*st*(1-st)*(st>0&&st<1?1:0),
+  mitt:seg(u,.18,.26)*(1-seg(u,.44,.54)),punch:seg(u,.42,.46),
+  flour:seg(u,.13,.24),flour2:seg(u,.58,.7),crust:seg(u,.58,.66),stitch:seg(u,.62,.68),
+  sauce:seg(u,.64,.72),cheese:seg(u,.7,.76),u}}
+// A felt pepper ring lying flat (yk = K, or less while it flips), with four soft lobes; evenodd leaves the hole.
+function pzRing(x,y,r,yk,c,op=1){
+ if(op<=0)return'';const k=Math.sign(yk||1)*Math.max(.06,Math.abs(yk));let o='',i='';
+ for(let n=0;n<=24;n++){const a=n/24*2*Math.PI,ro=r*(1+.07*Math.cos(4*a)),ri=r*.52*(1+.1*Math.cos(4*a+.6));
+  o+=(n?'L':'M')+f(x+ro*Math.cos(a))+' '+f(y+ro*k*Math.sin(a));i+=(n?'L':'M')+f(x+ri*Math.cos(a))+' '+f(y+ri*k*Math.sin(a))}
+ const dk=k<0?`<path d="${o}Z${i}Z" fill="#000" opacity=".25" fill-rule="evenodd"/>`:'';
+ return `<g opacity="${f3(op)}"><path d="${o}Z${i}Z" fill="${c}" fill-rule="evenodd" filter="url(#tagfelt)"/>${dk}`+
+  `<path d="${i}Z" fill="none" stroke="#fff6c8" stroke-opacity=".55" stroke-width=".9"/><path d="${o}Z" fill="none" stroke="#000" stroke-opacity=".25" stroke-width=".6"/>`+
+  `<ellipse cx="${f(x+r*.36)}" cy="${f(y-r*.2*k)}" rx="1.1" ry="${f(Math.max(.4,1.1*Math.abs(k)))}" fill="#f7efd2"/></g>`}
+// A mittened fist, knuckles up at (x,y), a cuff and a sleeve-end below it; sd mirrors the thumb toward the middle.
+function pzFist(x,y,sd){
+ return `<g transform="translate(${f(x)} ${f(y)}) scale(${sd} 1)"><ellipse cx="1.5" cy="22" rx="9" ry="3" fill="#000" opacity=".25" filter="url(#sh)"/>`+
+  `<g filter="url(#tagfelt)"><path d="M-10 2C-10 -4 -6 -7.5 0 -7.5C6 -7.5 10 -4 10 2L9 12C8 14.5 -8 14.5 -9 12Z" fill="${PZ.MITT}"/><path d="M7.5 -.5C13 -2 15 4 11 8C9.5 9.4 8 8.6 8 7Z" fill="#9c2834"/>`+
+  `<rect x="-8.5" y="12" width="17" height="11" rx="3" fill="#efe2c4"/></g><path d="M-6.5 -4.6q1.6-2.2 3.2 0M-1.6 -5.6q1.6-2.2 3.2 0M3.2 -4.6q1.6-2.2 3.2 0" fill="none" stroke="#5a1118" stroke-opacity=".6" stroke-width=".8" stroke-linecap="round"/>`+
+  `<path d="M-5 13.5v8M-2 13.5v8M1 13.5v8M4 13.5v8" stroke="#a8936a" stroke-width=".7"/><path d="M-7 1.4C-6 7 6 7 7 1.4" fill="none" stroke="#f7e8c9" stroke-opacity=".6" stroke-width=".8" stroke-dasharray="1.8 1.5"/></g>`}
+// Flour thrown up round a landing: white specks that fly out over the board and settle, fading. w scales the spread.
+function pzFlour(x,y,t,w){
+ if(t<=0||t>=1)return'';let s='';
+ for(let k=0;k<12;k++){const a=2*Math.PI*k/12+.4*(k%3),d=w*(.6+.5*((k*5)%7)/6)*ease(t),hy=10*Math.sin(Math.PI*t)*(.5+(k%2)/2);
+  s+=`<circle cx="${f(x+Math.cos(a)*d)}" cy="${f(y+Math.sin(a)*d*PZ.K-hy)}" r="${f(1.1+.6*(k%3))}" fill="#fffaf0" opacity="${f3(.9*(1-t))}"/>`}
+ return s}
+// The dough at dome height hb (a ball is tall, a disc is its own top face), front edge t deep, on base (cx,cy).
+function pzDough(cx,cy,rx,ry,hb,t){
+ return `M${f(cx-rx)} ${f(cy)}C${f(cx-rx)} ${f(cy-1.33*hb)} ${f(cx+rx)} ${f(cy-1.33*hb)} ${f(cx+rx)} ${f(cy)}L${f(cx+rx)} ${f(cy+t)}A${f(rx)} ${f(ry)} 0 0 1 ${f(cx-rx)} ${f(cy+t)}Z`}
+// One pizza at step u: board, shadow, fists, dough (ball, disc, toss), then sauce, cheese, rings and patch. ring(j) gives a ring's
+// colour and whether it waits; lines are the patch's three lines.
+function pzPizza(P,u,ring,lines,a0){
+ const o=pzAt(u,P),K=PZ.K;let s='';
+ if(o.board<=0)return'';
+ // The board comes up out of the table with a little overshoot.
+ const by=P.y+4+40*(1-backOut(o.board)),bo=seg(o.board,0,.3),bry=P.bx*K;
+ s+=`<g opacity="${f3(bo)}"><ellipse cx="${P.x+2}" cy="${f(by+7)}" rx="${P.bx}" ry="${f(bry)}" fill="#000" opacity=".35" filter="url(#sh)"/>`+
+  `<g filter="url(#tagfelt)"><ellipse cx="${P.x}" cy="${f(by+5)}" rx="${P.bx}" ry="${f(bry)}" fill="${PZ.BEDGE}"/><ellipse cx="${P.x}" cy="${f(by)}" rx="${P.bx}" ry="${f(bry)}" fill="${PZ.BOARD}"/></g>`+
+  `<ellipse cx="${P.x}" cy="${f(by)}" rx="${P.bx-5}" ry="${f(bry-3.2)}" fill="none" stroke="#f3e2c2" stroke-opacity=".7" stroke-width="1" stroke-dasharray="3 2.4"/>`+
+  [.45,.68,.86].map(k=>`<path d="M${f(P.x-P.bx*k)} ${f(by+bry*.12)}Q${P.x} ${f(by-bry*k*.55)} ${f(P.x+P.bx*k)} ${f(by-bry*.08)}" fill="none" stroke="#3a2412" stroke-opacity=".3" stroke-width=".8"/>`).join('')+'</g>';
+ // Flour dusted on the board where the ball lands.
+ if(o.flour>0){let d='';for(let k=0;k<18;k++){const a=k*2.4,r=(14+40*((k*7)%9)/8)*Math.min(1,o.flour*1.6);d+=`<circle cx="${f(P.x+Math.cos(a)*r)}" cy="${f(P.y+Math.sin(a)*r*K)}" r="${f(.8+.4*(k%3))}"/>`}s+=`<g fill="#fffaf0" opacity=".7">${d}</g>`}
+ if(o.fall<=0)return s;
+ const ry=o.rx*K*o.wob*(1+.1*o.flop),rx=o.rx*(1+.03*o.flop),cy=P.y-o.lift-o.hop,t=lerp(0,5,o.pr),air=clamp((o.lift+o.hop)/(PZ.TOSS+10));
+ // The ball: it falls onto the board, stretching, and squashes as it lands.
+ if(o.pr<=0){const y=lerp(P.y-80,P.y,o.fall*o.fall),r=16,sx=1+o.sq,sy=1-o.sq*.8;
+  s+=`<ellipse cx="${P.x+1}" cy="${P.y+2}" rx="${f(13*(.5+.5*o.fall))}" ry="${f(5*(.5+.5*o.fall))}" fill="#000" opacity="${f3(.35*o.fall)}" filter="url(#sh)"/>`+
+   `<g opacity="${f3(seg(o.fall,0,.25))}"><path d="${pzDough(P.x,y,r*sx,r*K*sx,24*sy,0)}" fill="${PZ.DOUGH}" filter="url(#tagfelt)"/>`+
+   `<ellipse cx="${f(P.x-5*sx)}" cy="${f(y-14*sy)}" rx="5" ry="3" fill="#fff" opacity=".45"/><path d="M${f(P.x-8*sx)} ${f(y-4)}q8 3 16 0" fill="none" stroke="#b98f52" stroke-opacity=".5" stroke-width=".8"/></g>`;
+  return s+pzFlour(P.x,P.y,o.flour,26)}
+ // Its shadow on the board, smaller and fainter the higher it flies.
+ s+=`<ellipse cx="${P.x+2}" cy="${f(P.y+t+2)}" rx="${f(rx*(1-.25*air))}" ry="${f(rx*K*(1-.25*air))}" fill="#000" opacity="${f3(.4*(1-.5*air))}" filter="url(#sh)"/>`;
+ // The fists come up from below, carry it and spin it on their knuckles; at the toss they punch up and drop away.
+ // They hang off the dough's front edge, so their knuckles tuck under it and the fists show below.
+ if(o.mitt>0){const d=Math.min(26,.45*rx),fy=cy+t+ry*.8+130*(1-ease(o.mitt))-6*Math.sin(Math.PI*o.punch);s+=pzFist(P.x-d,fy,1)+pzFist(P.x+d,fy,-1)}
+ const col=o.crust>0?mixHex(PZ.DOUGH,PZ.CRUST,o.crust*.8):PZ.DOUGH,hb=lerp(24,ry,o.pr);
+ s+=`<path d="${pzDough(P.x,cy,rx,ry,hb,t,col)}" fill="${col}" filter="url(#tagfelt)"/>`;
+ if(o.pr>.3){const op=seg(o.pr,.3,1);
+  // The top face, a rim stitch whose dashes turn with the dough, and three knuckle prints that go round with it.
+  s+=`<g opacity="${f3(op)}"><ellipse cx="${P.x}" cy="${f(cy)}" rx="${f(rx*.9)}" ry="${f(ry*.9)}" fill="${PZ.DOUGH}" filter="url(#tagfelt)"/>`+
+   `<path d="M${f(P.x-rx)} ${f(cy)}A${f(rx)} ${f(ry)} 0 0 0 ${f(P.x+rx)} ${f(cy)}" fill="none" stroke="#fff6dc" stroke-opacity=".5" stroke-width="1"/>`+
+   `<ellipse cx="${P.x}" cy="${f(cy)}" rx="${f(rx*.95)}" ry="${f(ry*.95)}" fill="none" stroke="#9a6a32" stroke-opacity="${f3(.35+.4*o.stitch)}" stroke-width="1" stroke-dasharray="4 3" stroke-dashoffset="${f(o.th*rx*.95)}"/>`;
+  if(o.sauce<1)for(let k=0;k<3;k++){const a=o.th+2*Math.PI*k/3,r=rx*.5;s+=`<ellipse cx="${f(P.x+Math.cos(a)*r)}" cy="${f(cy+Math.sin(a)*r*ry/rx)}" rx="${f(rx*.09)}" ry="${f(ry*.07)}" fill="#b98f52" opacity="${f3(.45*(1-o.sauce))}"/>`}
+  // Spinning fast, its edge blurs into dashed arcs that run round it.
+  if(o.speed>.08){const er=rx+5,eq=ry+3.5,arc=(a,b)=>`M${f(P.x+er*Math.cos(a))} ${f(cy+eq*Math.sin(a))}A${f(er)} ${f(eq)} 0 0 1 ${f(P.x+er*Math.cos(b))} ${f(cy+eq*Math.sin(b))}`;
+   s+=`<path d="${arc(o.th,o.th+1.1)}${arc(o.th+Math.PI,o.th+Math.PI+1.1)}" fill="none" stroke="#fffaf0" stroke-opacity="${f3(.7*o.speed)}" stroke-width="1.2" stroke-dasharray="5 3" stroke-linecap="round"/>`}
+  s+='</g>'}
+ s+=pzFlour(P.x,P.y,o.flour,26)+pzFlour(P.x,P.y+t,o.flour2,P.R*.8);
+ // Sauce spreads from the middle in a swirl, then the cheese pops on.
+ if(o.sauce>0){const Rs=.84*P.R*ease(o.sauce);let d='';
+  for(let n=0;n<=40;n++){const a=n/40*2*Math.PI,r=Rs*(1+.035*Math.sin(5*a+1)+.02*Math.sin(9*a));d+=(n?'L':'M')+f(P.x+r*Math.cos(a))+' '+f(cy+r*K*Math.sin(a))}
+  let sw='';const turns=2.5;for(let n=0;n<=60;n++){const a=n/60*turns*2*Math.PI,r=Rs*.82*n/60;sw+=(n?'L':'M')+f(P.x+r*Math.cos(a))+' '+f(cy+r*K*Math.sin(a))}
+  s+=`<path d="${d}Z" fill="${PZ.SAUCE}" filter="url(#tagfelt)"/><path d="${sw}" fill="none" stroke="#7d1f1a" stroke-opacity=".7" stroke-width="1" stroke-dasharray="2.6 2" stroke-linecap="round"/>`}
+ if(o.cheese>0){let d='';
+  for(let k=0;k<P.cheese;k++){const c=backOut(seg(o.cheese,k/P.cheese*.6,k/P.cheese*.6+.4));if(c<=0)continue;
+   const a=k*2.4+.5,r=(P.R-16)*(.3+.6*((k*7)%10)/10),z=(4.5+1.3*(k%3))*c,x=P.x+r*Math.cos(a),y=cy+r*K*Math.sin(a);
+   d+=`<path d="M${f(x-z)} ${f(y)}C${f(x-z)} ${f(y-z*K*1.3)} ${f(x+z*.4)} ${f(y-z*K*1.5)} ${f(x+z)} ${f(y-z*K*.4)}C${f(x+z*1.1)} ${f(y+z*K)} ${f(x-z*.5)} ${f(y+z*K*1.2)} ${f(x-z)} ${f(y)}Z"/>`}
+  s+=`<g fill="${PZ.CHEESE}" filter="url(#tagfelt)">${d}</g>`}
+ // The pepper rings drop one at a time, flipping as they fall, and land flat round the ring.
+ const span=.9-.74-.035;
+ for(let j=0;j<P.n;j++){const v=seg(o.u,.74+span*j/(P.n-1),.74+span*j/(P.n-1)+.035);if(v<=0)continue;
+  const a=a0+2*Math.PI*j/P.n,x=P.x+P.orb*Math.cos(a),y=cy+P.orb*K*Math.sin(a),R=ring(j),fy=lerp(y-45,y,v*v),sc=lerp(1.5,1,v),yk=K*Math.cos(lerp(.9*Math.PI,2*Math.PI,v));
+  if(v<1)s+=`<ellipse cx="${f(x+1)}" cy="${f(y+1.5)}" rx="${f(P.rr*sc)}" ry="${f(P.rr*K)}" fill="#000" opacity="${f3(.3*v*(1-seg(v,.7,1)))}" filter="url(#sh)"/>`;
+  s+=pzRing(x,fy,P.rr*sc,yk,R.c,seg(v,0,.25));
+  if(R.w){const wv=seg(o.u,.9,.95);if(wv>0)s+=`<ellipse cx="${f(x)}" cy="${f(y)}" rx="${f(P.rr+3)}" ry="${f((P.rr+3)*K)}" fill="none" stroke="${PZ.PEP.wait}" stroke-width="1.1" stroke-dasharray="2 1.6" opacity="${f3(wv)}"/>`}}
+ s+=rgPatch([P.x,cy],P.patch,backOut(seg(o.u,.88,.93)),seg(o.u,.92,.97),...lines);
+ return s}
+function pzSvg(g,fr){
+ const a=g>=1?1:g,b=g>=1?g-1:0,[P1,P2]=PZ.P;
+ const keep=BO;BO=fr<0?0:(fr%3)*31;const pad=casing('c',CW,CH);BO=keep;
+ // The pad is drawn first; the first pizza sits under it, so a ball or a toss passes in front of it.
+ let x=pzPizza(P1,a,j=>j===0||j===13?{c:PZ.PEP.wait,w:1}:{c:PZ.PEP.ok[j%4]},['run 418 · main','12 / 14','86% · 2 waiting'],Math.PI/2+Math.PI/14);
+ if(b>0){x+=pzPizza(P2,b,j=>{const st=PY.RUNS[j][1];return{c:st==='ok'?PZ.PEP.ok[j%4]:PZ.PEP[st]}},['last ten runs','7 / 10','409–418'],-Math.PI/2);
+  // The order ticket drops in, swings level and is pinned with an amber glass-headed pin.
+  const tg=seg(b,.84,.95),pn=seg(b,.95,1);
+  if(tg>0){const dy=-80*(1-backOut(tg)),rot=-2+9*(1-ease(tg))*Math.cos(Math.PI*2*tg),T=(y,s,w,t,o=1)=>`<text x="94" y="${y}" font-family="${PYF}" font-size="${s}" font-weight="${w}" text-anchor="middle" fill="${PY.INK}" fill-opacity="${o}">${t}</text>`;
+   x+=`<g transform="translate(300 ${f(10+dy)}) rotate(${f(rot)} 8 8)" opacity="${f3(seg(tg,0,.2))}"><rect width="188" height="56" rx="3" fill="#000" opacity=".3" transform="translate(1.5 2.2)" filter="url(#sh)"/><rect width="188" height="56" rx="3" fill="#f2e9d6"/><rect width="188" height="56" rx="3" fill="url(#woven)" opacity=".7"/>`+
+    `<rect x="3.5" y="3.5" width="181" height="49" rx="2" fill="none" stroke="${PY.WAIT}" stroke-width="1.1" stroke-dasharray="3 2.2"/>${T(17,8.5,600,'2 waiting for Brent')}${T(32,10,800,'deploy-preview · e2e-safari')}${T(46,7.5,600,'runs 409 → 418, clockwise from the top',.8)}`;
+   if(pn>0){const py=lerp(-12,0,ease(pn));x+=`<path d="M8 ${f(8+py)}l-6 -9" stroke="#b7b2a8" stroke-width="1.1" stroke-linecap="round"/><circle cx="2" cy="${f(-1+py)}" r="4" fill="${PY.WAIT}"/><circle cx=".8" cy="${f(-2.3+py)}" r="1.2" fill="#fff" opacity=".7"/>`}
+   x+='</g>'}}
+ // The casing doesn't clip, so the scene is kept to its box: the fists come up from below it and the ticket drops in from above.
+ return pad+`<clipPath id="pzclip"><rect width="${PZ.W[g>1?2:1]}" height="${PZ.H}"/></clipPath><g clip-path="url(#pzclip)">${x}</g>`;
+}
+function pzRender(el,svg,gr,kn,pa){
+ el.dataset.m='1';pa.style.display='none';el.querySelectorAll('.pp,.cp,.sd,.ck,.cktool,.mb').forEach(n=>n.style.display='none');el.classList.remove('sdb');
+ const on=model.gq>0,w=on?PZ.W[model.gq>1?2:1]:CW,h=on?PZ.H:CH,fr=model.mFr<0?-1:model.mFr%3;
+ el.style.width=w+'px';el.style.height=h+'px';el.style.transform='';
+ const key=`pz|${model.gq}|${fr}`;
+ if(svg.dataset.key!==key){svg.dataset.key=key;svg.setAttribute('width',w);svg.setAttribute('height',h);svg.setAttribute('viewBox',`0 0 ${w} ${h}`);svg.innerHTML=on?pzSvg(model.gq,model.mFr):casing('c',CW,CH)}
+ const mini=el.querySelector('.mini');mini.style.left='17px';mini.style.top='25px';mini.style.opacity=1;mini.style.visibility='visible';
+ kn.style.left='243px';kn.style.top='34px';kn.style.opacity=1;kn.style.visibility='visible';
+ gr.style.opacity=1;gr.style.left='24px';gr.style.right=f(w-CW+24)+'px';gr.style.top='4px';el.querySelector('.strip').style.opacity=0;
+ const si=SIZES.findIndex(x=>x[2]===model.g);
+ el.setAttribute('aria-label','Checks widget, '+(si>=0?sizeLabel(si).toLowerCase():'pizza being tossed')+': 12 of 14 checks passed, 2 waiting for approval'+(model.g>=1?'; run 418 on main, 86% passed':'')+(model.g>=2?'; last ten runs 409 to 418, 7 passed, 411 and 415 failed, 418 waiting; deploy-preview and e2e-safari waiting for Brent':''));
  return true;
 }
 const cDims=()=>model.g<=0?[CW,CH]:MM().dims();
