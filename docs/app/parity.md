@@ -241,6 +241,9 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       Attempted a twenty-fourth time 13 Oct (16:37–16:58 ACDT): locked at start and through a 20 min
       poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
       or changed.
+      Attempted a twenty-fifth time 13 Oct (16:58–17:18 ACDT): locked at start and through a 20 min
+      poll every 5 s; release build current, `cargo test --release` 54 passed; nothing launched
+      or changed.
 - [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
       returns to its start pose (x=624 ±1). The app is an Accessory app (`main.rs:30`) and Escape
       is a `KeyboardInput` on the widget window (`app.rs:598`), so the key may never arrive if the
