@@ -8815,6 +8815,96 @@ MORPHS.cope={label:'Cope',kind:'Let out',sizes:[['facade','Facade',0,'a facade']
  about:`A <b>Let out</b> morph (felt's expansion zip and elven's moon letter are the others): nothing is added, built or brought in; the bigger form was folded up inside Checks all along. In gothic it is a cope, the great half-circle cloak worn in procession, and England's were famous across Europe: <i>opus anglicanum</i>, gold thread couched on crimson velvet in barbed quatrefoils, with an orphrey band of saints in niches along the straight edge and a shield-shaped hood hung from it at the back. Copes were kept in chests in the vestry and let out for feasts. <b>Cope</b> (276 × 285, hanging downward from the facade, which keeps its nameplate and display and stays where it is unless the floor is in the way, when it rises to make room): light shows along the base course, and the cope, folded in three with its sides turned behind, is let down from under it, its green silk lining outward. The first fold drops open toward you, swinging a little past and back, then the hem drops open with the hood and its tassel: RUN 418 · MAIN on the orphrey, 12 / 14 passed · 86% and 2 waiting on the hood. The fourteen quatrefoils under the hood kindle left to right, twelve green and two red. <b>Full cope</b> (416 wide): the cope's right side swings out from behind about its crease, then its left, each shading as it turns; the left medallion holds the last ten runs on main as roundels in their colours, the right one names deploy-preview and e2e-safari, waiting on Brent. The creases stay, faintly. Every frame is drawn from the size, so nothing moves at rest, and shrinking folds it back up and draws it in under the facade.`
 };
 
+/* ---------- Morph: bell wheel (Checks) ---------- */
+// g runs 0 facade, 1 bell wheel, 2 peal. A Spin: the larger form is flung out by turning. A Sanctus wheel (rueda de campanas, Glockenrad) is a wheel of
+// little bells on a church wall, turned by a rope at the Sanctus. Here it turns on an axle behind the facade, and its iron arms are hinged at the hub and
+// folded back flat against the wall: spun up, they are flung out into the wall's plane and a catch locks each one. The bells hang on pivots at the tips,
+// flung mouth-outward while it spins fast and dropping to hang mouth-down, swinging, as it slows. One bell per check, read clockwise from the top: twelve
+// gilt, and the two waiting are dull bronze, muffled in red leather, so they don't ring. The peal flings out a second ring of ten, one per run on main.
+// Each step turns the wheel exactly three times, so it always stops with its first arm at the top. Drawn from g alone, so nothing moves at rest.
+const BWR=[156,192],BWN=[14,10],BWX=[22,18],BWP=s=>6*s*s-8*s*s*s+3*s*s*s*s,BWW=s=>12*s*(1-s)*(1-s)/(16/9);
+const bwS=t=>seg(t,.04,.86),bwOut=t=>{const s=bwS(t);return s<=0?0:Math.sin(Math.PI/2*ease(seg(s,.05,.36)))};
+function bwBox(g){
+ const r1=BWR[0]*bwOut(Math.min(1,g)),r2=BWR[1]*bwOut(clamp(g-1)),E=Math.max(r1>0?r1+BWX[0]:0,r2>0?r2+BWX[1]:0);
+ return[Math.max(CW,2*E),Math.max(CH,2*E)];
+}
+const bwSink=g=>(bwBox(g)[1]-CH)/2,bwDims=k=>bwBox(k);
+const BWCOL=CPRUNS.map(n=>n===14?'#5fd06a':n===13?'#f0b440':'#f05a5a');
+const BWDEFS=`<linearGradient id="bwGilt" x1="0" x2="1"><stop stop-color="#5a3a10"/><stop offset=".3" stop-color="#f6dc8e"/><stop offset=".55" stop-color="#d1a243"/><stop offset="1" stop-color="#4e320c"/></linearGradient>`+
+ `<linearGradient id="bwDull" x1="0" x2="1"><stop stop-color="#2e2014"/><stop offset=".32" stop-color="#8a6a44"/><stop offset=".6" stop-color="#5c4128"/><stop offset="1" stop-color="#22170d"/></linearGradient>`+
+ `<linearGradient id="bwLeather" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#b4313c"/><stop offset="1" stop-color="#5e0f18"/></linearGradient>`;
+const BWBODY='M-3.2 3.2C-3.7 3.2 -4.2 3.9 -4.3 5.5L-4.9 10.6C-5.1 12.2 -6.3 13.2 -7.4 13.7H7.4C6.3 13.2 5.1 12.2 4.9 10.6L4.3 5.5C4.2 3.9 3.7 3.2 3.2 3.2Z';
+// One bell in its own frame: pivot at 0,0, mouth toward +y. Gilt or dull; a muffle of red leather laced round its waist; an enamel boss for a run.
+function bwBell(kind,mu,boss,q){
+ let s=`<path d="M-2.6 .4H2.6" stroke="#2b2724" stroke-width="1.5" stroke-linecap="round"/><path d="M0 .4V3.4" stroke="#2b2724" stroke-width="1.6"/>`+
+  `<path d="${BWBODY}" fill="url(#${kind?'bwDull':'bwGilt'})" stroke="#2a1806" stroke-width=".6"/><ellipse cy="13.7" rx="7.4" ry="1.3" fill="#20140a"/><circle cy="14.7" r="1.3" fill="#2b2724"/>`+
+  `<path d="M-2.6 4.6L-3.4 10.2" stroke="#fff6d8" stroke-opacity="${kind?.25:.7}" stroke-width=".7" stroke-linecap="round"/><path d="M-6 12.4H6" stroke="#2a1806" stroke-opacity=".45" stroke-width=".6"/>`;
+ if(mu>0)s+=`<g opacity="${f(mu*100)/100}"><path d="M-4.9 7.6H4.9L5.6 11.6H-5.6Z" fill="url(#bwLeather)" stroke="#3a0a10" stroke-width=".5"/><path d="M-4.6 9.6H4.6" stroke="#f3d27a" stroke-width=".5" stroke-dasharray="1 1"/><path d="M0 11.6V15.4" stroke="#5e0f18" stroke-width="1.6"/></g>`;
+ if(boss)s+=`<circle cy="8.2" r="3" fill="#2a1806"/>`+(q>0?`<g opacity="${f(q*100)/100}"><circle cy="8.2" r="5.2" fill="${boss}" opacity=".3"/><circle cy="8.2" r="2.7" fill="${boss}" stroke="#f3d27a" stroke-width=".5"/></g>`:'');
+ return s;
+}
+// The swing a bell keeps once it drops to hang: it starts as the wheel slows and dies away before the wheel stops.
+const bwSwing=s=>{if(s<=.72||s>=1)return 0;const d=s-.72;return .5*Math.exp(-d*12)*Math.sin(d*2*Math.PI*5.5)*clamp((1-s)/.08)};
+function bwRender(el){
+ const ms=el.querySelector('.msvg'),fx=el.querySelector('.mfx'),svg=el.querySelector('.casing'),gr=el.querySelector('.grip'),mini=el.querySelector('.mini'),kn=el.querySelector('.knot');
+ const g=model.g,[w,h]=bwBox(g),cx=w/2,cy=h/2,ox=cx-CW/2,oy=cy-CH/2,u=Math.min(1,g),v=clamp(g-1),su=bwS(u),sv=bwS(v);
+ el.dataset.m='1';el.style.width=f(w)+'px';el.style.height=f(h)+'px';svg.style.display='none';ms.style.display=fx.style.display='block';
+ if(ms.dataset.key!=='bw'){ms.dataset.key='bw';ms._d='';ms._bx=null;fx._s=null;ms.innerHTML=`<defs>${BWDEFS}</defs><g class="bdyn"></g><g class="bfac">${cas(0)}</g>`}
+ const bx=f(w)+'x'+f(h);if(ms._bx!==bx){ms._bx=bx;for(const n of[ms,fx]){n.setAttribute('width',f(w));n.setAttribute('height',f(h));n.setAttribute('viewBox',`0 0 ${f(w)} ${f(h)}`)}}
+ ms.querySelector('.bfac').setAttribute('transform',`translate(${f(ox)} ${f(oy)})`);
+ // The wheel's turn and speed: one step spins at a time, so the two add without overlapping.
+ const th=-Math.PI/2+6*Math.PI*(BWP(su)+BWP(sv)),om=BWW(su)+BWW(sv),sNow=g>1?sv:su,fl=clamp(om*1.5),sw=bwSwing(sNow);
+ const mu=seg(u,.88,.96),out=[bwOut(u),bwOut(v)],q2=j=>g>=2?1:seg(v,.88+.008*j,.92+.008*j);
+ let s='',e='';
+ for(const k of[1,0]){const o=out[k];if(o<=0)continue;const R=BWR[k]*o,N=BWN[k],a0=k?Math.PI/N:0,sc=lerp(.55,1,o)*(k?.8:1),vis=seg(o,0,.25);
+  // Motion blur: a faint bronze ring at the tips and ghost arms trailing the turn.
+  if(om>.12)s+=`<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R+7*sc)}" fill="none" stroke="#c99a3c" stroke-width="${f(13*sc)}" opacity="${f(.24*om*vis*100)/100}"/>`;
+  let arms='',ghost='';
+  for(let i=0;i<N;i++){const a=th+a0+2*Math.PI*i/N,c=Math.cos(a),sn=Math.sin(a);
+   arms+=`M${f(cx+18*c)} ${f(cy+18*sn)}L${f(cx+R*c)} ${f(cy+R*sn)}`;
+   if(om>.2)for(const d of[.07,.14]){const b=a-d*om*model.mDir;ghost+=`M${f(cx+18*Math.cos(b))} ${f(cy+18*Math.sin(b))}L${f(cx+R*Math.cos(b))} ${f(cy+R*Math.sin(b))}`}}
+  if(ghost)s+=`<path d="${ghost}" stroke="#2b2724" stroke-width="2" opacity="${f(.22*vis*100)/100}"/>`;
+  // An iron hoop through the quatrefoils, so it reads as a wheel.
+  s+=`<g opacity="${f(vis*100)/100}"><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R*.66)}" fill="none" stroke="#1d1814" stroke-width="${k?1.6:2}"/><circle cx="${f(cx)}" cy="${f(cy)}" r="${f(R*.66)}" fill="none" stroke="#8a7a66" stroke-width=".6" stroke-opacity=".7" transform="translate(-.5 -.5)"/><path d="${arms}" stroke="#1d1814" stroke-width="${k?2.2:2.8}" stroke-linecap="round"/><path d="${arms}" stroke="#8a7a66" stroke-width=".7" stroke-opacity=".8" transform="translate(-.5 -.5)"/>`;
+  for(let i=0;i<N;i++){const a=th+a0+2*Math.PI*i/N,c=Math.cos(a),sn=Math.sin(a),tx=cx+R*c,ty=cy+R*sn,mx=cx+R*.66*c,my=cy+R*.66*sn,need=!k&&i>11;
+   // A pierced iron quatrefoil on each arm, a gilt pivot at the tip.
+   s+=`<g transform="translate(${f(mx)} ${f(my)}) rotate(${f(a/D2R)})" fill="none" stroke="#1d1814" stroke-width="1.1"><circle cx="-2.4" r="2.1"/><circle cx="2.4" r="2.1"/><circle cy="-2.4" r="2.1"/><circle cy="2.4" r="2.1"/></g>`+
+    `<circle cx="${f(tx)}" cy="${f(ty)}" r="2.3" fill="url(#gild)" stroke="#2a1806" stroke-width=".5"/>`;
+   // The bell's mouth: flung outward along the arm while it spins, dropping to hang (and swing) as it slows.
+   const m=Math.atan2((1-fl)+fl*sn,fl*c)+sw*(1-fl)*(1+.15*Math.sin(i*2.3)),deg=f((m-Math.PI/2)/D2R);
+   s+=`<g transform="translate(${f(tx)} ${f(ty)}) rotate(${deg}) scale(${f(sc*100)/100})">${bwBell(need?1:0,need?mu:0,k?BWCOL[i]:'',k?q2(i):0)}</g>`;
+   // Ringing: sound rings beside a bell's lip, strongest while it is flung or swinging. Muffled bells stay quiet.
+   const I=(need?1-mu:1)*clamp(Math.max(om*1.2,Math.abs(sw)*2.4))*vis*(.55+.45*Math.sin(th*4+i*1.7));
+   if(I>.05&&!(Math.abs(tx-cx)<CW/2+12&&Math.abs(ty-cy)<CH/2+12))e+=`<g transform="translate(${f(tx)} ${f(ty)}) rotate(${deg}) scale(${f(sc*100)/100})" fill="none" stroke="#fff2c8" stroke-linecap="round" opacity="${f(I*.75*100)/100}"><path d="M-9.5 9Q-11.8 12 -9.5 15M9.5 9Q11.8 12 9.5 15" stroke-width="1"/><path d="M-12.6 7Q-16 12 -12.6 17M12.6 7Q16 12 12.6 17" stroke-width=".7" opacity=".6"/></g>`;
+  }
+  s+='</g>';
+ }
+ if(ms._d!==s){ms._d=s;ms.querySelector('.bdyn').innerHTML=s}
+ // Glints: the twelve gilt bells as they settle, clockwise from the top; the runs' bosses as they kindle.
+ const spk=(x,y,t,r)=>{const k=Math.sin(Math.PI*t);return k>.05?`<g opacity="${f(k*100)/100}">${sparkle(x,y,r*k)}</g>`:''};
+ if(g<1&&u>.88)for(let i=0;i<12;i++){const a=th+2*Math.PI*i/14;e+=spk(cx+BWR[0]*Math.cos(a),cy+BWR[0]*Math.sin(a)+9,seg(u,.88+.006*i,.92+.006*i),6)}
+ if(g>1&&g<2&&v>.87)for(let j=0;j<10;j++){const a=th+Math.PI/10+2*Math.PI*j/10;e+=spk(cx+BWR[1]*Math.cos(a),cy+BWR[1]*Math.sin(a)+6.6,seg(v,.88+.008*j,.92+.008*j),5)}
+ if(fx._s!==e){fx._s=e;fx.innerHTML=e}
+ for(const[n,x,y]of[[mini,26,30],[kn,237,37]]){n.style.left=f(x+ox)+'px';n.style.top=f(y+oy)+'px';n.style.opacity='1';n.style.visibility='visible'}
+ Object.assign(gr.style,{left:f(22+ox)+'px',top:f(6+oy)+'px',width:(CW-44)+'px',height:'15px',right:'auto',opacity:'1'});
+ delete el.dataset.wf;el.querySelector('.strip').style.opacity=0;
+ const S=SZ().find(x=>x[2]===g);
+ el.setAttribute('aria-label','Checks widget, '+(S?S[3]:'a bell wheel spinning')+': 12 of 14 checks passed, 2 waiting for approval'+(g>=1?'; one bell per check, the two waiting muffled':'')+(g>=2?'; an outer ring of ten bells for the last 10 runs on main':''));
+ return true;
+}
+function bwPhase(){
+ const g=model.g,up=model.mDir>0,s=bwS(g>1?g-1:g),t=g>1?'the outer ring':'the arms';let p;
+ if(g<=1&&g>.86)p=up?'the two waiting bells are muffled in red leather':'the muffles come off the two waiting bells';
+ else if(g>1&&g-1>.86)p=up?'the ten run bells kindle':'the run bells go dark';
+ else p=s<=0?(up?'the rope is pulled; the wheel starts to turn':'the wheel comes to rest'):s<.36?(up?'the wheel spins up and '+t+' are flung out':'the wheel slows and '+t+' fold back to the wall'):s<.72?(up?'the bells ring, flung outward':'the wheel spins, the bells ringing'):(up?'the wheel slows and the bells drop to hang':'the bells stir and the wheel spins up');
+ return 'Checks · '+p;
+}
+MORPHS.bells={label:'Bell wheel',kind:'Spin',sizes:[['facade','Facade',0,'a facade'],['wheel','Bell wheel',1,'a wheel of fourteen bells'],['peal','Peal',2,'a wheel of fourteen bells in a ring of ten']],ms:[5600,4200],
+ box:bwBox,dims:bwDims,sink:bwSink,render:bwRender,phase:bwPhase,
+ say:(d,S)=>d>0?(S[2]===1?'Checks spins up a bell wheel: its arms are flung out from behind the facade, fourteen bells ring, and as it slows they drop to hang; the two waiting are muffled.':'The wheel spins up again and flings out an outer ring of ten bells, one per run on main.'):(S[2]===0?'The muffles come off, the wheel spins once more and, as it slows, its arms fold back behind the facade.':'The wheel spins, and as it slows the outer ring folds back to the wall.'),
+ about:`A <b>Spin</b> morph (elven's crown glass opened it): nothing is built, grown, unfolded or let out; the larger form is flung out by turning. In gothic it is a Sanctus wheel (<i>rueda de campanas</i>, <i>Glockenrad</i>), a wheel of little bells on a church wall, spun by a rope at the Sanctus. Here it turns on an axle behind the facade, which stays where it is with its nameplate and display, and its iron arms are hinged at the hub and lie folded back against the wall. <b>Bell wheel</b> (356 × 356): the wheel spins up, and the arms are flung out into the wall's plane and catch. Fourteen bells, one per check, read clockwise from the top: flung mouth-outward while the wheel races (a bronze blur at the tips, every bell ringing), they drop to hang mouth-down as it slows and swing to a stop; the wheel always turns exactly three times, so it stops with the first bell on top. The twelve passed bells are gilt and glint as they settle. The two waiting (deploy-preview and e2e-safari, at the top left) are dull bronze, and are muffled in red leather, as bells are for mourning, so they ring no more. <b>Peal</b> (420 × 420): the wheel spins up again and flings out an outer ring of ten smaller bells, one per run on main, and each kindles an enamel boss in its run's colour (green all passed, amber 13, red 12). Shrinking spins it again, and the arms fold back to the wall as it slows, the way a chair-o-plane's seats drop as it stops. Checks moves clear of the pair when there is room; when there isn't, the pair rises out of its way. Nothing moves at rest.`
+};
+
 /* ---------- Model ---------- */
 const HOME={a:{x:110,y:205},b:{x:700,y:205},c:{x:810,y:450}};
 const model={a:{...HOME.a,page:0,run:true},b:{...HOME.b,page:0,run:true},c:{...HOME.c},join:'rose',shade:'lower',jt:0,st:0,dir:1,tsign:1,th0:{...REST},lit0:0,path:null,glow:0,ready:false,busy:false,angle:30,angles:{dial:30,apse:-22.5,fan:30,chevet:45,strap:30,vous:30,stay:30,roll:30,cwt:30,scr:30,lace:30,esc:30,fortune:30,tcam:15,crane:15},apseStep:22.5,lastDet:0,clickAt:-1e4,turnUntil:0,lampOff:[0,0],lampAt:0,morph:'bays',size:'lancet',g:0,mDir:1,restore:null,cMoved:false,cBox:[CW,CH],lift:0,liftGoal:0,liftAt:0,lifting:false};
