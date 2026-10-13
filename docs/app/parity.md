@@ -177,7 +177,7 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       gitdiscuss 624→924, checks 984→1284 (exactly +300, y unchanged), panel-demo untouched,
       `drag: none`; both PNGs show the three casings over the desktop. No code changes needed;
       layout.toml restored afterwards.
-- [ ] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
+- [x] FIX (reviewer): Run `probe.sh drag gitdiscuss 300 0 --escape` live and confirm the group
       returns to its start pose (x=624 ±1). The app is an Accessory app (`main.rs:30`) and Escape
       is a `KeyboardInput` on the widget window (`app.rs:598`), so the key may never arrive if the
       window is not key; if it doesn't, make the pressed window key on mouse-down (or drop
@@ -186,6 +186,12 @@ Shade mode (the app's own feature) must show the widget name and its one key val
       `canBecomeKeyWindow`, and the casing windows are not non-activating panels, so AppKit should
       activate the app and make the pressed window key on mouse-down. Expect Escape to arrive;
       confirm live before changing any code.
+      Verified live 13 Oct 18:36 ACDT: release build, `probe.sh drag gitdiscuss 300 0 --escape
+      --shot /tmp/esc.png` showed mid-drag `moved=true`, `members=jarvis,gitdiscuss,checks`,
+      jarvis/gitdiscuss at x=924, checks 1284 (drag had started); after Escape + release all three
+      back at 624/624/984, y unchanged, `drag: none`; both PNGs show the casings (moved, then
+      restored); `layout.toml` byte-identical to before (cancel not persisted); idle CPU 0.0 %.
+      Escape reaches the pressed window, so no code changes were needed.
 
 - [x] `GET /state` debug endpoint plus `host/scripts/probe.sh` (cliclick drag helper that prints
       `/state` and takes region screenshots), so every later item can be verified with numbers.
